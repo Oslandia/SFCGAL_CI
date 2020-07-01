@@ -1,0 +1,26 @@
+image: alpine
+
+pages:
+  script:
+  - apk update && apk add doxygen cmake make git g++ texlive
+  - cd /builds
+  - git clone https://github.com/Oslandia/$CI_PROJECT_NAME --branch master --depth 1
+  - cd $CI_PROJECT_NAME/doc
+  - cmake .
+  - make
+  - doxygen Doxyfile
+  - rm -rf $CI_PROJECT_DIR/doxygen/*
+  - mkdir  /builds/public
+  - cp -r html/* $CI_PROJECT_DIR/doxygen/
+  - cp -r $CI_PROJECT_DIR/*  /builds/public
+  - rm -rf /builds/$CI_PROJECT_NAME
+  - rm -rf $CI_PROJECT_DIR/*
+  - mkdir $CI_PROJECT_DIR/public
+  - cp -r /builds/public/* $CI_PROJECT_DIR/public
+  artifacts:
+    paths:
+    -  $CI_PROJECT_DIR/public
+  only:
+  - gh-pages
+
+
