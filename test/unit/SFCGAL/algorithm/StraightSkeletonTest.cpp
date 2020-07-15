@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE( testPolygonWithHole )
                                                                       ")"
                                                      )
                                         );
-
+    std::cout << result->asText( ) << std::endl;
     BOOST_CHECK( algorithm::covers( *result, *expected ) );
 }
 
