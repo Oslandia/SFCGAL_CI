@@ -110,8 +110,12 @@ BOOST_AUTO_TEST_CASE( testPolygonWithHole )
                                                                       ")"
                                                      )
                                         );
+    // results for gcc and clang differ due to rounding
+    // To avoid rounding errors in the results (-3730904090310553/9007199254740992 vs -466363011288819/1125899906842624), a text comparison is used. This is not optimal.
+    std::unique_ptr< Geometry > r( io::readWkt( result->asText( 10 ) ) );
+    std::unique_ptr< Geometry > e( io::readWkt( expected->asText( 10 ) ) );
+    BOOST_CHECK( algorithm::covers( *r, *e ) );
 
-    BOOST_CHECK( algorithm::covers( *result, *expected ) );
 }
 
 BOOST_AUTO_TEST_CASE( testPolygonWithHoleTouchingShell )
