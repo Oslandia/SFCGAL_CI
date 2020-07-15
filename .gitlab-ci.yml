@@ -1,16 +1,16 @@
-debian_cgal4_gcc:
-  image: debian:buster
+debian_testing_gcc:
+  image: debian:testing
 
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget build-essential
-    - ./ci/linux/before_install.sh 4.14.3
+    - ./ci/linux/before_install.sh 5.0.2
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     - make
     - ctest -VV
 
-debian_cgal5_gcc:
+debian_buster_gcc:
   image: debian:buster
 
   script:
@@ -22,19 +22,19 @@ debian_cgal5_gcc:
     - make
     - ctest -VV
 
-debian_cgal4_clang:
-  image: debian:buster
+debian_testing_clang:
+  image: debian:testing
 
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget clang
-    - ./ci/linux/before_install.sh 4.14.3
+    - ./ci/linux/before_install.sh 5.0.2
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
     - make
     - ctest -VV
 
-debian_cgal5_clang:
+debian_buster_clang:
   image: debian:buster
 
   script:
