@@ -4,7 +4,7 @@ debian_testing_gcc:
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget build-essential
-    - ./ci/linux/before_install.sh 5.0.2
+    - ./ci/debian/before_install.sh 5.0.2
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     - make
@@ -16,7 +16,7 @@ debian_buster_gcc:
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget build-essential
-    - ./ci/linux/before_install.sh 5.0.2
+    - ./ci/debian/before_install.sh 5.0.2
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     - make
@@ -28,7 +28,7 @@ debian_testing_clang:
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget clang
-    - ./ci/linux/before_install.sh 5.0.2
+    - ./ci/debian/before_install.sh 5.0.2
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
     - make
@@ -40,9 +40,34 @@ debian_buster_clang:
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget clang
-    - ./ci/linux/before_install.sh 5.0.2
+    - ./ci/debian/before_install.sh 5.0.2
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
     - make
     - ctest -VV
 
+centos8_clang:
+  image: centos:centos8
+  
+  script:
+    - yum update -qy
+    - yum install -y sudo wget clang
+    - ./ci/centos/before_install.sh 5.0.2
+    - cd $CI_PROJECT_DIR
+    - ls
+    - find / -name "*CGAL*"
+    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.0.2
+    - make
+    - ctest -VV
+
+centos8_gcc:
+  image: centos:centos8
+  
+  script:
+    - yum update -qy
+    - yum install -y sudo wget gcc-c++
+    - ./ci/centos/before_install.sh 5.0.2
+    - cd $CI_PROJECT_DIR
+    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.0.2
+    - make
+    - ctest -VV
