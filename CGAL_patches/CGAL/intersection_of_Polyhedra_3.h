@@ -94,6 +94,169 @@ namespace CGAL{
 //
 // -- Sebastien Loriot, 2010/04/07
 
+// hardcopy of the class from CGAL 5.0 that is no longer present in 5.1
+namespace SFCGAL{
+
+template <class TM,//TriangleMesh
+          class Kernel,
+          class Box,
+          class OutputIterator,
+          class VertexPointMap>
+struct Intersect_facets
+{
+  // wrapper to check whether anything is inserted to output iterator
+  struct Output_iterator_with_bool
+  {
+    Output_iterator_with_bool(OutputIterator* out, bool* intersected)
+      : m_iterator(out), m_intersected(intersected) { }
+
+    template<class T>
+    void operator()(const T& t) {
+      *m_intersected = true;
+      *(*m_iterator)++ = t;
+    }
+
+    OutputIterator* m_iterator;
+    bool* m_intersected;
+  };
+// typedefs
+  typedef typename Kernel::Segment_3    Segment;
+  typedef typename Kernel::Triangle_3   Triangle;
+  typedef typename boost::graph_traits<TM>::halfedge_descriptor halfedge_descriptor;
+  typedef typename boost::property_map<TM, boost::vertex_point_t>::const_type Ppmap;
+
+// members
+  const TM& m_tmesh;
+  const VertexPointMap m_vpmap;
+  mutable OutputIterator  m_iterator;
+  mutable bool            m_intersected;
+  mutable boost::function_output_iterator<Output_iterator_with_bool> m_iterator_wrapper;
+
+  typename Kernel::Construct_segment_3  segment_functor;
+  typename Kernel::Construct_triangle_3 triangle_functor;
+  typename Kernel::Do_intersect_3       do_intersect_3_functor;
+
+
+  Intersect_facets(const TM& tmesh, OutputIterator it, VertexPointMap vpmap, const Kernel& kernel)
+    :
+    m_tmesh(tmesh),
+    m_vpmap(vpmap),
+    m_iterator(it),
+    m_intersected(false),
+    m_iterator_wrapper(Output_iterator_with_bool(&m_iterator, &m_intersected)),
+    segment_functor(kernel.construct_segment_3_object()),
+    triangle_functor(kernel.construct_triangle_3_object()),
+    do_intersect_3_functor(kernel.do_intersect_3_object())
+  { }
+
+  void operator()(const Box* b, const Box* c) const
+  {
+    halfedge_descriptor h = halfedge(b->info(), m_tmesh);
+    halfedge_descriptor opp_h;
+
+    // check for shared egde
+    for(unsigned int i=0; i<3; ++i){
+      opp_h = opposite(h, m_tmesh);
+      if(face(opp_h, m_tmesh) == c->info()){
+        // there is an intersection if the four points are coplanar and
+        // the triangles overlap
+        if(CGAL::coplanar(get(m_vpmap, target(h, m_tmesh)),
+                          get(m_vpmap, target(next(h, m_tmesh), m_tmesh)),
+                          get(m_vpmap, source(h, m_tmesh)),
+                          get(m_vpmap, target(next(opp_h, m_tmesh), m_tmesh))) &&
+           CGAL::coplanar_orientation(get(m_vpmap, source(h, m_tmesh)),
+                                      get(m_vpmap, target(h, m_tmesh)),
+                                      get(m_vpmap, target(next(h, m_tmesh), m_tmesh)),
+                                      get(m_vpmap, target(next(opp_h, m_tmesh), m_tmesh)))
+             == CGAL::POSITIVE){
+          *m_iterator_wrapper++ = std::make_pair(b->info(), c->info());
+          return;
+        } else { // there is a shared edge but no intersection
+          return;
+        }
+      }
+      h = next(h, m_tmesh);
+    }
+
+    // check for shared vertex --> maybe intersection, maybe not
+    halfedge_descriptor g = halfedge(c->info(),m_tmesh);
+    halfedge_descriptor v;
+
+    if(target(h,m_tmesh) == target(g,m_tmesh))
+      v = g;
+    if(target(h,m_tmesh) == target(next(g,m_tmesh),m_tmesh))
+      v = next(g,m_tmesh);
+    if(target(h,m_tmesh) == target(next(next(g,m_tmesh),m_tmesh),m_tmesh))
+      v = next(next(g,m_tmesh),m_tmesh);
+
+    if(v == halfedge_descriptor()){
+      h = next(h,m_tmesh);
+      if(target(h,m_tmesh) == target(g,m_tmesh))
+        v = g;
+      if(target(h,m_tmesh) == target(next(g,m_tmesh),m_tmesh))
+        v = next(g,m_tmesh);
+      if(target(h,m_tmesh) == target(next(next(g,m_tmesh),m_tmesh),m_tmesh))
+        v = next(next(g,m_tmesh),m_tmesh);
+      if(v == halfedge_descriptor()){
+        h = next(h,m_tmesh);
+        if(target(h,m_tmesh) == target(g,m_tmesh))
+          v = g;
+        if(target(h,m_tmesh) == target(next(g,m_tmesh),m_tmesh))
+          v = next(g,m_tmesh);
+        if(target(h,m_tmesh) == target(next(next(g,m_tmesh),m_tmesh),m_tmesh))
+          v = next(next(g,m_tmesh),m_tmesh);
+      }
+    }
+
+    if(v != halfedge_descriptor()){
+      // found shared vertex:
+      CGAL_assertion(target(h,m_tmesh) == target(v,m_tmesh));
+      // geometric check if the opposite segments intersect the triangles
+      Triangle t1 = triangle_functor( get(m_vpmap,target(h,m_tmesh)),
+                                      get(m_vpmap, target(next(h,m_tmesh),m_tmesh)),
+                                      get(m_vpmap, target(next(next(h,m_tmesh),m_tmesh),m_tmesh)));
+      Triangle t2 = triangle_functor( get(m_vpmap, target(v,m_tmesh)),
+                                      get(m_vpmap, target(next(v,m_tmesh),m_tmesh)),
+                                      get(m_vpmap, target(next(next(v,m_tmesh),m_tmesh),m_tmesh)));
+
+      Segment s1 = segment_functor( get(m_vpmap, target(next(h,m_tmesh),m_tmesh)),
+                                    get(m_vpmap, target(next(next(h,m_tmesh),m_tmesh),m_tmesh)));
+      Segment s2 = segment_functor( get(m_vpmap, target(next(v,m_tmesh),m_tmesh)),
+                                    get(m_vpmap, target(next(next(v,m_tmesh),m_tmesh),m_tmesh)));
+
+      if(do_intersect_3_functor(t1,s2)){
+        *m_iterator_wrapper++ = std::make_pair(b->info(), c->info());
+      } else if(do_intersect_3_functor(t2,s1)){
+        *m_iterator_wrapper++ = std::make_pair(b->info(), c->info());
+      }
+      return;
+    }
+
+    // check for geometric intersection
+    Triangle t1 = triangle_functor( get(m_vpmap, target(h,m_tmesh)),
+                                    get(m_vpmap, target(next(h,m_tmesh),m_tmesh)),
+                                    get(m_vpmap, target(next(next(h,m_tmesh),m_tmesh),m_tmesh)));
+    Triangle t2 = triangle_functor( get(m_vpmap, target(g,m_tmesh)),
+                                    get(m_vpmap, target(next(g,m_tmesh),m_tmesh)),
+                                    get(m_vpmap, target(next(next(g,m_tmesh),m_tmesh),m_tmesh)));
+    if(do_intersect_3_functor(t1, t2)){
+      *m_iterator_wrapper++ = std::make_pair(b->info(), c->info());
+    }
+  } // end operator ()
+}; // end struct Intersect_facets
+
+struct Throw_at_output {
+  class Throw_at_output_exception: public std::exception
+  { };
+
+  template<class T>
+  void operator()(const T& /* t */) const {
+    throw Throw_at_output_exception();
+  }
+};
+
+} // SFCGAL namespace
+
 template <class Polyhedron>
 struct Default_polyhedron_ppmap{
   typedef typename Polyhedron::Point_3 value_type;
@@ -1058,17 +1221,17 @@ class Intersection_of_Polyhedra_3{
           box_ptr.push_back(&*b);
 
         // compute self-intersections filtered out by boxes
-        typedef boost::function_output_iterator<internal::Throw_at_output> OutputIterator;
+        typedef boost::function_output_iterator<SFCGAL::Throw_at_output> OutputIterator;
         OutputIterator out;
-        internal::Intersect_facets<Polyhedron,Kernel,
-                                   Box,OutputIterator,
-                                   PolyhedronPointPMap>
+        SFCGAL::Intersect_facets<Polyhedron,Kernel,
+                                 Box,OutputIterator,
+                                 PolyhedronPointPMap>
           intersect_facets(polyhedron_triangle, out, ppmap, Kernel());
         std::ptrdiff_t cutoff = 2000;
         CGAL::box_self_intersection_d(box_ptr.begin(), box_ptr.end(),intersect_facets,cutoff);
         return false;
       }
-      catch( internal::Throw_at_output::Throw_at_output_exception& )
+      catch( SFCGAL::Throw_at_output::Throw_at_output_exception& )
       {
         return true;
       }
