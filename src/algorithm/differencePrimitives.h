@@ -31,7 +31,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/box_intersection_d.h>
-#include <CGAL/corefinement_operations.h>
+#include <CGAL/Polygon_mesh_processing/corefinement.h>
 #include <SFCGAL/detail/Point_inside_polyhedron.h>
 
 
@@ -524,20 +524,9 @@ OutputIteratorType difference( const Triangle_3& p, const Triangle_3& q, OutputI
 template < typename VolumeOutputIteratorType>
 VolumeOutputIteratorType difference( const MarkedPolyhedron& a, const MarkedPolyhedron& b, VolumeOutputIteratorType out )
 {
-    MarkedPolyhedron& p = const_cast<MarkedPolyhedron&>( a );
-    MarkedPolyhedron& q = const_cast<MarkedPolyhedron&>( b );
-    typedef CGAL::Polyhedron_corefinement<MarkedPolyhedron> Corefinement;
-    Corefinement coref;
-    CGAL::Emptyset_iterator no_polylines;
-    typedef std::vector<std::pair<MarkedPolyhedron*, int> >  ResultType;
-    ResultType result;
-    coref( p, q, no_polylines, std::back_inserter( result ), Corefinement::P_minus_Q_tag );
-
-    for ( ResultType::iterator it = result.begin(); it != result.end(); it++ ) {
-        *out++ = *it->first;
-        delete it->first;
-    }
-
+    MarkedPolyhedron p = a, q = b;
+    if (CGAL::Polygon_mesh_processing::corefine_and_compute_difference(p, q, p))
+      *out++=p;
     return out;
 }
 

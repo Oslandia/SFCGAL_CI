@@ -21,9 +21,9 @@
 
 #include <CGAL/intersections.h>
 
-#include <CGAL/intersection_of_Polyhedra_3.h>
-#include <CGAL/intersection_of_Polyhedra_3_refinement_visitor.h>
-#include <CGAL/corefinement_operations.h>
+#include <CGAL/Polygon_mesh_processing/corefinement.h>
+#include <CGAL/Polygon_mesh_processing/clip.h>
+#include <CGAL/Polygon_mesh_processing/connected_components.h>
 
 #include <SFCGAL/detail/GeometrySet.h>
 #include <SFCGAL/algorithm/intersects.h>
@@ -107,51 +107,6 @@ void _intersection_solid_segment( const PrimitiveHandle<3>& pa, const PrimitiveH
     }
 }
 
-
-#if CGAL_VERSION_NR < 1040301000  // 4.3
-
-// Before 4.3, we pass CGAL::Tag_true to mark boundary halfedges
-typedef CGAL::Node_visitor_refine_polyhedra<MarkedPolyhedron, Kernel, CGAL::Tag_true> Split_visitor;
-
-#elif  CGAL_VERSION_NR < 1041001000 // < 4.10
-
-// Starting with 4.3, we must now pass a property_map
-template<class Polyhedron>
-struct Edge_mark_property_map {
-    typedef bool value_type;
-    typedef value_type reference;
-    typedef std::pair<typename Polyhedron::Halfedge_handle,Polyhedron*> key_type;
-    typedef boost::read_write_property_map_tag category;
-
-    friend reference get( Edge_mark_property_map,const key_type& key ) {
-        return key.first->mark;
-    }
-    friend void put( Edge_mark_property_map,key_type key,value_type v ) {
-        key.first->mark=v;
-    }
-};
-typedef CGAL::Node_visitor_refine_polyhedra<MarkedPolyhedron,Kernel,Edge_mark_property_map<MarkedPolyhedron> > Split_visitor;
-
-#else
-
-template<class Polyhedron>
-struct Edge_mark_property_map {
-    typedef bool value_type;
-    typedef value_type reference;
-    typedef std::pair<typename Polyhedron::Halfedge_handle,Polyhedron*> key_type;
-    typedef boost::read_write_property_map_tag category;
-
-    friend reference get( Edge_mark_property_map,const key_type& key ) {
-        return key.first->mark;
-    }
-    friend void put( Edge_mark_property_map,key_type key,value_type v ) {
-        key.first->mark=v;
-    }
-};
-typedef CGAL::Node_visitor_refine_polyhedra<MarkedPolyhedron, CGAL::Default, CGAL::Default,Edge_mark_property_map<MarkedPolyhedron> > Split_visitor;
-
-#endif
-
 typedef std::vector<Kernel::Point_3> Polyline_3;
 
 struct Is_not_marked {
@@ -164,106 +119,48 @@ struct Is_not_marked {
 void _intersection_solid_triangle( const MarkedPolyhedron& pa, const CGAL::Triangle_3<Kernel>& tri, GeometrySet<3>& output )
 {
     BOOST_ASSERT( pa.is_closed() );
-    Split_visitor visitor;
 
     MarkedPolyhedron polyb;
     polyb.make_triangle( tri.vertex( 0 ), tri.vertex( 1 ), tri.vertex( 2 ) );
 
-    MarkedPolyhedron& polya = const_cast<MarkedPolyhedron&>( pa );
+    MarkedPolyhedron polya =  pa;
+    CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> side_of_tm(polya);
+
     std::list<Polyline_3> polylines;
-    CGAL::Intersection_of_Polyhedra_3<MarkedPolyhedron,Kernel, Split_visitor> intersect_polys( visitor );
-    intersect_polys( polya, polyb, std::back_inserter( polylines ) );
-
-    Point_inside_polyhedron<MarkedPolyhedron, Kernel> point_inside_q( polya );
-
+    CGAL::Polygon_mesh_processing::surface_intersection(polya, polyb, std::back_inserter(polylines));
     if ( polylines.size() == 0 ) {
         // no surface intersection
         // if one of the point of the triangle is inside the polyhedron,
         // the triangle is inside
-        if ( point_inside_q( tri.vertex( 0 ) ) != CGAL::ON_UNBOUNDED_SIDE ) {
+        if ( side_of_tm( tri.vertex( 0 ) ) != CGAL::ON_UNBOUNDED_SIDE )
             output.addPrimitive( tri );
-            return;
-        }
-
         return;
     }
 
-    // triangle decomposition
-    std::list<MarkedPolyhedron> decomposition;
-    Is_not_marked criterion;
-#if CGAL_VERSION_NR < 1040700000 // version 4.7
-    // Before 4.7, extract_connected_components lies in CGAL::internal
-    CGAL::internal::extract_connected_components( polyb, criterion, std::back_inserter( decomposition ) );
-#else
-    // After 4.7, it's now in CGAL::internal::corefinement
-    CGAL::internal::corefinement::extract_connected_components( polyb, criterion, std::back_inserter( decomposition ) );
-#endif
+    CGAL::Polygon_mesh_processing::clip(polyb, polya, CGAL::parameters::use_compact_clipper(true));
 
     bool hasSurface = false;
 
-    for ( std::list<MarkedPolyhedron>::iterator it = decomposition.begin(); it != decomposition.end(); ++it ) {
-        // char fname[256];
-        // sprintf(fname, "decompo%d.off", k++);
-        // std::ofstream decompo(fname);
-        // decompo << *it;
+    std::vector<MarkedPolyhedron> ccs;
+    CGAL::Polygon_mesh_processing::split_connected_components(polyb, ccs);
 
-        // take a point on the component and tests if its inside the other polyhedron
-        //
-        CGAL::Point_3<Kernel> test_point;
-
-        if ( it->size_of_facets() == 1 ) {
-            //
-            // If we only have a facet, take the centroid (cannot take a point on the intersection)
-            CGAL::Point_3<Kernel> q[3];
-            MarkedPolyhedron::Point_iterator pit = it->points_begin();
-
-            for ( size_t i = 0; i < 3; ++i, ++pit ) {
-                q[i] = *pit;
-            }
-
-            test_point = CGAL::centroid( q[0], q[1], q[2] );
-        }
-        else {
-            //
-            // Take a point not an the border
-            for ( MarkedPolyhedron::Halfedge_iterator hit = it->halfedges_begin(); hit != it->halfedges_end(); ++hit ) {
-                if ( !hit->is_border_edge() ) {
-                    // take the center of the edge
-                    test_point = CGAL::midpoint( hit->vertex()->point(), hit->prev()->vertex()->point() );
-                    break;
-                }
-            }
-        }
-
-        // point inside volume or on surface
-        bool point_is_inside = false;
-        // on surface test
+    for (const MarkedPolyhedron& mp : ccs)
+    {
+      // check if all vertices are on polya
+      bool all_on = true;
+      for (auto v : vertices(mp))
+        if ( side_of_tm(v->point()) != CGAL::ON_BOUNDARY )
         {
-            // triangulate the polyhedron
-            GeometrySet<3> triangles;
-            GeometrySet<3> point( test_point );
-
-            triangulate::triangulate( polya, triangles );
-            bool point_on_surface = intersects( triangles, point );
-
-            if ( point_on_surface ) {
-                point_is_inside = true;
-            }
-            else {
-                // strictly inside test
-                bool point_inside_volume = point_inside_q( test_point ) != CGAL::ON_UNBOUNDED_SIDE;
-
-                if ( point_inside_volume ) {
-                    point_is_inside = true;
-                }
-            }
+          all_on=false;
+          break;
         }
-
-        if ( point_is_inside ) {
-            // we know it is a planar intersection
-            hasSurface = true;
-            output.addPrimitive( *it, FLAG_IS_PLANAR );
-        }
+      if (all_on)
+        output.addPrimitive(mp);
+      else
+      {
+        hasSurface=true;
+        output.addPrimitive(mp, FLAG_IS_PLANAR );
+      }
     }
 
     if ( hasSurface ) {
@@ -281,7 +178,7 @@ void _intersection_solid_triangle( const MarkedPolyhedron& pa, const CGAL::Trian
                 output.addPrimitive( seg );
             }
         }
-}
+    }
 }
 
 void _intersection_solid_solid( const MarkedPolyhedron& pa, const MarkedPolyhedron& pb, GeometrySet<3>& output )
@@ -302,26 +199,9 @@ void _intersection_solid_solid( const MarkedPolyhedron& pa, const MarkedPolyhedr
 
     // 2. find intersections in volumes
     {
-        typedef CGAL::Polyhedron_corefinement<MarkedPolyhedron> Corefinement;
-        MarkedPolyhedron& polya = const_cast<MarkedPolyhedron&>( pa );
-        MarkedPolyhedron& polyb = const_cast<MarkedPolyhedron&>( pb );
-
-        Corefinement coref;
-        CGAL::Emptyset_iterator no_polylines;
-        // vector of <Polyhedron, tag>
-        typedef std::vector<std::pair<MarkedPolyhedron*, int> > Decomposition;
-        Decomposition result;
-        coref( polya, polyb, no_polylines, std::back_inserter( result ), Corefinement::Intersection_tag );
-
-        // empty intersection
-        if ( result.size() == 0 ) {
-            return ;
-        }
-
-        // else, we have an intersection
-        MarkedPolyhedron* res_poly = result[0].first;
-        output.addPrimitive( *res_poly );
-        delete res_poly;
+        MarkedPolyhedron polya = pa, polyb = pb;
+        if ( CGAL::Polygon_mesh_processing::corefine_and_compute_intersection(polya, polyb, polya) )
+          output.addPrimitive(polya);
     }
 }
 
