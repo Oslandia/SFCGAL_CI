@@ -32,7 +32,7 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/box_intersection_d.h>
 #include <CGAL/Polygon_mesh_processing/corefinement.h>
-#include <SFCGAL/detail/Point_inside_polyhedron.h>
+#include <CGAL/Side_of_triangle_mesh.h>
 
 
 
@@ -168,7 +168,7 @@ PointOutputIteratorType difference( const Point_3& a, const Triangle_3& b, Point
 template < typename PointOutputIteratorType>
 PointOutputIteratorType difference( const Point_3& a, const MarkedPolyhedron& b, PointOutputIteratorType out )
 {
-    Point_inside_polyhedron<MarkedPolyhedron, Kernel> is_in_poly( b );
+    CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_poly( b );
 
     if ( CGAL::ON_UNBOUNDED_SIDE == is_in_poly( a ) ) {
         *out++ = a;
@@ -617,7 +617,7 @@ SegmentOutputIteratorType difference( const Segment_3& segment, const MarkedPoly
 
     if ( !collisions.size() ) {
         // completely in or out, we just test one point
-        Point_inside_polyhedron<MarkedPolyhedron, Kernel> is_in_poly( polyhedron );
+        CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_poly( polyhedron );
 
         if ( CGAL::ON_UNBOUNDED_SIDE == is_in_poly( segment.source() ) ) {
             *out++ = segment;
@@ -664,7 +664,7 @@ SegmentOutputIteratorType difference( const Segment_3& segment, const MarkedPoly
             const Nearer<Point_3> nearer( seg->source() );
             std::sort( points.begin()+1, points.end()-1, nearer );
 
-            Point_inside_polyhedron<MarkedPolyhedron, Kernel> is_in_poly( polyhedron );
+            CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_poly( polyhedron );
 
             // append segments that has length and wich midpoint is outside polyhedron to result
             for ( std::vector< Point_3 >::const_iterator p = points.begin(); p != points.end()-1; ++p ) {

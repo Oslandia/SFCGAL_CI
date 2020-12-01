@@ -32,7 +32,7 @@
 
 #include <CGAL/IO/Polyhedron_iostream.h>
 
-#include <SFCGAL/detail/Point_inside_polyhedron.h>
+#include <CGAL/Side_of_triangle_mesh.h>
 
 using namespace SFCGAL::detail;
 
@@ -48,7 +48,7 @@ void _intersection_solid_segment( const PrimitiveHandle<3>& pa, const PrimitiveH
     const CGAL::Segment_3<Kernel>* segment = pb.as<CGAL::Segment_3<Kernel> >();
 
     MarkedPolyhedron* ext_poly_nc = const_cast<MarkedPolyhedron*>( ext_poly );
-    Point_inside_polyhedron<MarkedPolyhedron, Kernel> is_in_ext( *ext_poly_nc );
+    CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_ext( *ext_poly_nc );
 
     GeometrySet<3> triangles;
     GeometrySet<3> spoint( segment->source() );
