@@ -51,8 +51,6 @@ if( ${CGAL_USE_AUTOLINK} )
 	add_definitions( "-DCGAL_NO_AUTOLINK" )
 endif()
 
-# 4.3 minimal
-# 4.13 recommended
 find_package( CGAL COMPONENTS Core REQUIRED )
 message( STATUS "CGAL ${CGAL_VERSION} found" )
 
@@ -61,15 +59,6 @@ add_definitions( "-DCGAL_USE_GMPXX=1" )
 endif()
 
 include_directories( ${CMAKE_BINARY_DIR}/include )
-
-# For CGAL versions < 4.3, we add a local directory that contains some tweaked include files from unreleased versions
-# They will overwrite files from the CGAL installation
-if( "${CGAL_VERSION}" VERSION_LESS "4.3" )
-  include_directories( patches/CGAL-4.2 )
-elseif( "${CGAL_VERSION}" VERSION_LESS "4.10")
-  include_directories( patches/CGAL-4.3 )
-  add_definitions( "-DCGAL_INTERSECTION_VERSION=1" )
-endif()
 
 #-- BOOST --------------------------------------------------
 option( Boost_USE_AUTO_LINK "boost use autolink" OFF )
