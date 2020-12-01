@@ -100,7 +100,12 @@ std::unique_ptr< Geometry > building(
     // fix orientation
     algorithm::makeValidOrientation( polygon ) ;
 
-    boost::shared_ptr< Straight_skeleton_2 > skeleton = CGAL::create_interior_straight_skeleton_2( polygon ) ;
+    boost::shared_ptr< Straight_skeleton_2 > skeleton =
+      create_interior_straight_skeleton_2(polygon.outer_boundary().vertices_begin()
+                                          ,polygon.outer_boundary().vertices_end()
+                                          ,polygon.holes_begin()
+                                          ,polygon.holes_end()
+                                          ,Kernel());
 
     std::unique_ptr< PolyhedralSurface > shell( new PolyhedralSurface );
     // bottom part
