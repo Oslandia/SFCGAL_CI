@@ -8,7 +8,7 @@ sudo apt-get install --yes \
     cmake
 #CGAL
 
-wget https://github.com/CGAL/cgal/releases/download/releases/CGAL-"$1"/CGAL-"$1".tar.xz
+wget https://github.com/CGAL/cgal/releases/download/v"$1"/CGAL-"$1".tar.xz
 tar xJf CGAL-"$1".tar.xz
 cd CGAL-"$1" && mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_DIR/CGAL .. && make && make install && cd ../..
 
