@@ -140,7 +140,7 @@ void straightSkeletonToMedialAxis(
     //       of exactly 45 degrees that are otherwise cut out due
     //       to rounding precision
     //
-    const double maxTouchingAngle = CGAL_PI / 8.0 + 1e-15;
+    const double maxTouchingAngle = CGAL_PI / 8.0 + 1e-13;
 
     for ( Halfedge_const_iterator it = ss.halfedges_begin(); it != ss.halfedges_end(); ++it ) {
         // skip contour edge
