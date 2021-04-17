@@ -152,7 +152,7 @@ debian_testing_gcc_cgal52:
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget build-essential
-    - ./ci/debian/before_install.sh 5.2-beta1
+    - ./ci/debian/before_install.sh 5.2.1
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     - make
@@ -164,7 +164,7 @@ debian_buster_gcc_cgal52:
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget build-essential
-    - ./ci/debian/before_install.sh 5.2-beta1
+    - ./ci/debian/before_install.sh 5.2.1
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     - make
@@ -176,7 +176,7 @@ debian_testing_clang_cgal52:
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget clang
-    - ./ci/debian/before_install.sh 5.2-beta1
+    - ./ci/debian/before_install.sh 5.2.1
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
     - make
@@ -188,7 +188,7 @@ debian_buster_clang_cgal52:
   script:
     - apt-get update -qq
     - apt-get install --yes sudo wget clang
-    - ./ci/debian/before_install.sh 5.2-beta1
+    - ./ci/debian/before_install.sh 5.2.1
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
     - make
@@ -200,11 +200,11 @@ centos8_clang_cgal52:
   script:
     - yum update -qy
     - yum install -y sudo wget clang
-    - ./ci/centos/before_install.sh 5.2-beta1
+    - ./ci/centos/before_install.sh 5.2.1
     - cd $CI_PROJECT_DIR
     - ls
     - find / -name "*CGAL*"
-    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.2-beta1
+    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.2.1
     - make
     - ctest -VV
 
@@ -214,8 +214,8 @@ centos8_gcc_cgal52:
   script:
     - yum update -qy
     - yum install -y sudo wget gcc-c++
-    - ./ci/centos/before_install.sh 5.2-beta1
+    - ./ci/centos/before_install.sh 5.2.1
     - cd $CI_PROJECT_DIR
-    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.2-beta1
+    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.2.1
     - make
     - ctest -VV
