@@ -4,7 +4,7 @@ pages:
   script:
   - apk update && apk add doxygen cmake make git g++ texlive
   - cd /builds
-  - git clone https://github.com/Oslandia/$CI_PROJECT_NAME --branch master --depth 1
+  - git clone https://gitlab.com/Oslandia/$CI_PROJECT_NAME --branch master --depth 1
   - cd $CI_PROJECT_NAME/doc
   - cmake .
   - make
