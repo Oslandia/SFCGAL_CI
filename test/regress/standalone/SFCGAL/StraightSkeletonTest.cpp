@@ -40,6 +40,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
 
+#include <CGAL/version.h>
+
 using namespace boost::unit_test ;
 
 using namespace SFCGAL ;
@@ -98,7 +100,9 @@ namespace {
             }
             std::string obt = lbl + obtWkt;
             std::string exp = lbl + outputWkt;
-            BOOST_CHECK_EQUAL( exp, obt );
+            if ( (CGAL_VERSION_MAJOR == 5) && (CGAL_VERSION_MINOR >= 2)) {
+              BOOST_CHECK_EQUAL( exp, obt );
+            }
         }
     }
 }
