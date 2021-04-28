@@ -41,6 +41,7 @@
 #include <boost/filesystem/path.hpp>
 
 #include <CGAL/version.h>
+#include <CGAL/version_macros.h>
 
 using namespace boost::unit_test ;
 
