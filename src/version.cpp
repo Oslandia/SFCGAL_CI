@@ -23,11 +23,18 @@
 namespace SFCGAL {
 
 const char _sfcgal_version[] = SFCGAL_VERSION;
+const char _sfcgal_full_version[] = SFCGAL_FULL_VERSION;
 
 const char* Version()
 {
     return _sfcgal_version;
 }
+
+const char* Full_Version()
+{
+    return _sfcgal_full_version;
+}
+
 
 }//SFCGAL
 

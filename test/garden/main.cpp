@@ -96,6 +96,7 @@ int main( int argc, char* argv[] )
 
     if ( verbose ) {
         std::cout << "testing SFCGAL version " << Version() << "\n";
+        std::cout << "testing SFCGAL full version " << Full_Version() << "\n";
     }
 
 
@@ -573,6 +574,8 @@ sfcgal_triangulated_surface_triangle_n(geom, i)
     *TriangulatedSurface::triangleN(i)
 sfcgal_version()
     *Version()
+sfcgal_full_version()
+    *Full_Version()
 sfcgal_geometry_area_3d(geom)
     *algorithm::area3D(geom)
 sfcgal_geometry_area(geom)
