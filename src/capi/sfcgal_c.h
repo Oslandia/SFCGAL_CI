@@ -919,6 +919,12 @@ SFCGAL_API void sfcgal_init();
  */
 SFCGAL_API const char* sfcgal_version();
 
+/**
+ * Get full version (including CGAL and Boost versions)
+ * @ingroup capi
+ */
+SFCGAL_API const char* sfcgal_full_version();
+
 #ifdef __cplusplus
 }
 #endif
