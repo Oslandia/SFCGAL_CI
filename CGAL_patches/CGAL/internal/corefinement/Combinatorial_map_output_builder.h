@@ -888,16 +888,16 @@ public:
 
       if (!first_hedge->is_border())
         selected_hedge_to_dart
-          .insert(std::make_pair(first_hedge,Dart_handle(NULL)));
+          .insert(std::make_pair(first_hedge,Dart_handle(nullptr)));
       if (!first_hedge->opposite()->is_border())
         selected_hedge_to_dart
-          .insert(std::make_pair(first_hedge->opposite(),Dart_handle(NULL)));
+          .insert(std::make_pair(first_hedge->opposite(),Dart_handle(nullptr)));
       if (!second_hedge->is_border())
         selected_hedge_to_dart
-          .insert(std::make_pair(second_hedge,Dart_handle(NULL)));
+          .insert(std::make_pair(second_hedge,Dart_handle(nullptr)));
       if (!second_hedge->opposite()->is_border())
         selected_hedge_to_dart
-          .insert(std::make_pair(second_hedge->opposite(),Dart_handle(NULL)));
+          .insert(std::make_pair(second_hedge->opposite(),Dart_handle(nullptr)));
     }
 
 #ifdef CGAL_COREFINEMENT_DEBUG
@@ -964,7 +964,7 @@ public:
 #ifndef NDEBUG
     for(typename Halfedge_to_dart_map::iterator it=selected_hedge_to_dart.begin();
         it!=selected_hedge_to_dart.end(); ++it)
-      CGAL_assertion(it->second!=Dart_handle(NULL));
+      CGAL_assertion(it->second!=Dart_handle(nullptr));
 #endif
 
     CGAL_assertion(final_map().is_valid());
