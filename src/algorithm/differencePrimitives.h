@@ -526,7 +526,8 @@ VolumeOutputIteratorType difference( const MarkedPolyhedron& a, const MarkedPoly
 {
     MarkedPolyhedron p = a, q = b;
     if (CGAL::Polygon_mesh_processing::corefine_and_compute_difference(p, q, p))
-      *out++=p;
+      if(std::next(vertices(p).first)!=vertices(p).second)
+        *out++=p;
     return out;
 }
 

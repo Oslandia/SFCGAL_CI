@@ -201,7 +201,8 @@ void _intersection_solid_solid( const MarkedPolyhedron& pa, const MarkedPolyhedr
     {
         MarkedPolyhedron polya = pa, polyb = pb;
         if ( CGAL::Polygon_mesh_processing::corefine_and_compute_intersection(polya, polyb, polya) )
-          output.addPrimitive(polya);
+          if (std::next(vertices(polya).first)!=vertices(polya).second)
+            output.addPrimitive(polya);
     }
 }
 

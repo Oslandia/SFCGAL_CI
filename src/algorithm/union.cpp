@@ -751,14 +751,28 @@ void union_volume_volume( Handle<2> ,Handle<2> )
 
 void union_volume_volume( Handle<3> a,Handle<3> b )
 {
-    MarkedPolyhedron p = a.asVolume(), q = b.asVolume();
+    MarkedPolyhedron& p = const_cast<MarkedPolyhedron&>( a.asVolume() );
+    MarkedPolyhedron& q = const_cast<MarkedPolyhedron&>( b.asVolume() );
 
-    if ( CGAL::Polygon_mesh_processing::corefine_and_compute_union(p, q, p) )
-    {
-      Handle<3> h(p);
-      // @todo check that the volume is valid (connection on one point isn't)
-      h.registerObservers( a );
-      h.registerObservers( b );
+    // volumes must at least share a face, if they share only a point, this will cause
+    // an invalid geometry, if they only share an egde it will cause the CGAL algo to
+    // throw
+    //
+    // for the moment we use hte intersection algo and test the result
+    detail::GeometrySet<3> inter;
+    intersection( detail::GeometrySet<3>( a.asVolume() ), detail::GeometrySet<3>( b.asVolume() ), inter );
+
+    if ( inter.volumes().size() || inter.surfaces().size() ) {
+
+        MarkedPolyhedron output;
+        bool res = CGAL::Polygon_mesh_processing::corefine_and_compute_union(p, q, output);
+
+        if ( res && std::next(vertices(output).first)!=vertices(output).second ) {
+            Handle<3> h( output);
+            // @todo check that the volume is valid (connection on one point isn't)
+            h.registerObservers( a );
+            h.registerObservers( b );
+        }
     }
 }
 
