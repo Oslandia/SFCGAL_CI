@@ -18,7 +18,7 @@
  * @section dependencies_sec Dependencies
  *
  * <ul>
- * 		<li>CGAL 4.1+ (http://www.cgal.org/)</li>
+ * 		<li>CGAL 5.3+ (http://www.cgal.org/)</li>
  * 		<li>Boost library (http://www.boost.org/)</li>
  * </ul>
  *
