@@ -525,7 +525,7 @@ void union_point_volume( Handle<2> ,Handle<2>  )
 void union_point_volume( Handle<3> a,Handle<3> b )
 {
     //@todo put is in poly in a struct derived from MarkedPolyhedron to avoid rebuilding point inside every time
-    Point_inside_polyhedron<MarkedPolyhedron, Kernel> is_in_poly( b.asVolume() );
+    CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_poly( b.asVolume() );
 
     if ( CGAL::ON_UNBOUNDED_SIDE != is_in_poly( a.asPoint() ) ) {
         b.registerObservers( a );
@@ -638,7 +638,7 @@ void union_segment_volume( Handle<3> a,Handle<3> b )
                               bboxes.begin(), bboxes.end(),
                               cb );
 
-    Point_inside_polyhedron<MarkedPolyhedron, Kernel> is_in_poly( polyhedron );
+    CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_poly( polyhedron );
 
     if ( !collisions.size() ) {
         // completely in or out, we just test one point
@@ -753,9 +753,6 @@ void union_volume_volume( Handle<3> a,Handle<3> b )
 {
     MarkedPolyhedron& p = const_cast<MarkedPolyhedron&>( a.asVolume() );
     MarkedPolyhedron& q = const_cast<MarkedPolyhedron&>( b.asVolume() );
-    typedef CGAL::Polyhedron_corefinement<MarkedPolyhedron> Corefinement;
-    Corefinement coref;
-    CGAL::Emptyset_iterator no_polylines;
 
     // volumes must at least share a face, if they share only a point, this will cause
     // an invalid geometry, if they only share an egde it will cause the CGAL algo to
@@ -766,22 +763,17 @@ void union_volume_volume( Handle<3> a,Handle<3> b )
     intersection( detail::GeometrySet<3>( a.asVolume() ), detail::GeometrySet<3>( b.asVolume() ), inter );
 
     if ( inter.volumes().size() || inter.surfaces().size() ) {
-        typedef std::vector<std::pair<MarkedPolyhedron*, int> >  ResultType;
-        ResultType result;
-        coref( p, q, no_polylines, std::back_inserter( result ), Corefinement::Join_tag );
 
-        if ( result.size() == 1 ) {
-            Handle<3> h( *result[0].first );
+        MarkedPolyhedron output;
+        bool res = CGAL::Polygon_mesh_processing::corefine_and_compute_union(p, q, output);
+
+        if ( res && std::next(vertices(output).first)!=vertices(output).second ) {
+            Handle<3> h( output);
             // @todo check that the volume is valid (connection on one point isn't)
             h.registerObservers( a );
             h.registerObservers( b );
         }
-
-        for ( ResultType::iterator it = result.begin(); it != result.end(); it++ ) {
-            delete it->first;
-        }
     }
-
 }
 
 
