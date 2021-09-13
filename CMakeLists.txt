@@ -54,9 +54,8 @@ endif()
 find_package( CGAL COMPONENTS Core REQUIRED )
 message( STATUS "CGAL ${CGAL_VERSION} found" )
 
-if( "${CGAL_VERSION}" VERSION_GREATER_EQUAL "5.0.0")
+# For CGAL >= 5
 add_definitions( "-DCGAL_USE_GMPXX=1" )
-endif()
 
 include_directories( ${CMAKE_BINARY_DIR}/include )
 
