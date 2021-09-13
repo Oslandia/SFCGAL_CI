@@ -51,7 +51,7 @@ if( ${CGAL_USE_AUTOLINK} )
 	add_definitions( "-DCGAL_NO_AUTOLINK" )
 endif()
 
-find_package( CGAL COMPONENTS Core REQUIRED )
+find_package( CGAL 5.3 COMPONENTS Core REQUIRED )
 message( STATUS "CGAL ${CGAL_VERSION} found" )
 
 # For CGAL >= 5
