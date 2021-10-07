@@ -1,12 +1,17 @@
 freebsd_instance:
-  image: freebsd-12-1-release-amd64
-  cpu: 4
-  
+  image: freebsd-12-2-release-amd64
+  cpu: 8
+  memory: 16G
+
 env:
-  MAKE_FLAGS: -j 4
-  
+  MAKE_FLAGS: -j 8
+
 task:
-  install_script: pkg install -y cgal gmp mpfr boost-libs cmake ninja
+  install_script:
+    - sed -i.bak -e 's,pkg+http://pkg.FreeBSD.org/\${ABI}/quarterly,pkg+http://pkg.FreeBSD.org/\${ABI}/latest,' /etc/pkg/FreeBSD.conf
+    - ASSUME_ALWAYS_YES=yes pkg bootstrap -f
+    - pkg install -y cgal gmp mpfr boost-libs cmake ninja
+
   build_script:
     - mkdir build
     - cmake -DSFCGAL_BUILD_TESTS=ON
