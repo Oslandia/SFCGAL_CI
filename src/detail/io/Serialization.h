@@ -34,10 +34,8 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-#ifdef CGAL_USE_GMPXX
 #include <CGAL/mpz_class.h>
 #include <CGAL/mpq_class.h>
-#endif
 
 namespace SFCGAL {
 

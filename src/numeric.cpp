@@ -58,7 +58,6 @@ CGAL::Gmpz round( const CGAL::Gmpq& v )
     }
 }
 
-#ifdef CGAL_USE_GMPXX
 ///
 ///
 ///
@@ -96,10 +95,6 @@ mpz_class round( const mpq_class& v )
         return floor( tmp );
     }
 }
-#endif
-
 
 
 }//SFCGAL
-
-

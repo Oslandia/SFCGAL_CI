@@ -47,13 +47,11 @@ std::ostream& writeFT(std::ostream& s, const CGAL::Gmpq& ft)
   return s;
 }
 
-#ifdef CGAL_USE_GMPXX
 std::ostream& writeFT(std::ostream& s, const mpq_class& ft)
 {
   s << ft.get_num() << "/" << ft.get_den();
   return s;
 }
-#endif
 } //end of impl namespace
 
 ///
@@ -538,6 +536,3 @@ void WktWriter::writeInner( const Solid& g )
 }//io
 }//detail
 }//SFCGAL
-
-
-

@@ -266,17 +266,17 @@ private:
 
 
     Kernel::FT _roundFT( const Kernel::FT& v ) const {
-        #ifdef CGAL_USE_GMPXX
+        /* #ifdef CGAL_USE_GMPXX */
         ::mpq_class q( SFCGAL::round( v.exact() * _scaleFactor ),
                                     _scaleFactor) ;
         q.canonicalize();
         return Kernel::FT(q);
-        #else
-        return Kernel::FT( CGAL::Gmpq(
-                               SFCGAL::round( v.exact() * _scaleFactor ),
-                               _scaleFactor
-                           ) ) ;
-        #endif
+        /* #else */
+        /* return Kernel::FT( CGAL::Gmpq( */
+        /*                        SFCGAL::round( v.exact() * _scaleFactor ), */
+        /*                        _scaleFactor */
+        /*                    ) ) ; */
+        /* #endif */
     }
 
 };
@@ -409,4 +409,3 @@ bool Coordinate::operator != ( const Coordinate& other ) const
 
 
 }//SFCGAL
-

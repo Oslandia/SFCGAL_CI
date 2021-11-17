@@ -169,7 +169,6 @@ void load( boost::archive::binary_iarchive& ar, CGAL::Gmpz& z, const unsigned in
     }
 }
 
-#ifdef CGAL_USE_GMPXX
 void save( boost::archive::text_oarchive& ar, const mpz_class& z, const unsigned int /*version*/ )
 {
     std::ostringstream ostr;
@@ -215,7 +214,6 @@ void load( boost::archive::binary_iarchive& ar, mpz_class& z, const unsigned int
         ar& mpz->_mp_d[i];
     }
 }
-#endif
 
 }
 }
