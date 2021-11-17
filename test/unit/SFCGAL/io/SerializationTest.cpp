@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE( extBinaryTest )
 {
     std::unique_ptr<Geometry> ng1 = io::readWkt( "POLYGON((9.70065196277574 -2.37991360574961,3.74221071600914 5.33515858836472,-4.30443822173402 -2.37991360574961,3.74221071600914 -12.1891073728912,9.70065196277574 -2.37991360574961))" );
     SFCGAL::Geometry* mg1 = ng1.release();
-    SFCGAL::Geometry* ng2;
+    SFCGAL::Geometry* ng2 = nullptr;
 
     std::string str;
     std::ostringstream ostr( str );

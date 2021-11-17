@@ -78,7 +78,7 @@ void SurfaceGraph::addRing( const LineString& ring, FaceIndex faceIndex )
         }
         else {
             // one end at least is missing, create the edge
-            VertexIndex startIndex ;
+            VertexIndex startIndex = 0 ;
 
             if ( startFound == _coordinateMap.end() ) {
                 _coordinateMap.insert( std::make_pair( startCoord, _numVertices ) ) ;
@@ -89,7 +89,7 @@ void SurfaceGraph::addRing( const LineString& ring, FaceIndex faceIndex )
                 startIndex = startFound->second;
             }
 
-            VertexIndex endIndex ;
+            VertexIndex endIndex = 0 ;
 
             if ( endFound == _coordinateMap.end() ) {
                 _coordinateMap.insert( std::make_pair( endCoord, _numVertices ) ) ;

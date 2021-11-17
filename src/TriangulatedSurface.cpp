@@ -217,7 +217,7 @@ public:
     typedef std::map<Point, size_t>             PointMap;
     typedef std::set< std::pair<Point, Point> > HalfedgeSet;
 
-    void operator()( HDS& hds ) {
+    void operator()( HDS& hds ) override {
         // Postcondition: `hds' is a valid polyhedral surface.
         CGAL::Polyhedron_incremental_builder_3<HDS> B( hds, true );
         B.begin_surface( /* vertices */ surf.numGeometries() * 3,

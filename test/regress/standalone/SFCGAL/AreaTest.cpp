@@ -38,8 +38,9 @@
 #include <SFCGAL/MultiSolid.h>
 #include <SFCGAL/io/wkt.h>
 
-#include <SFCGAL/algorithm/area.h>
 #include <SFCGAL/Transform.h>
+#include <SFCGAL/algorithm/area.h>
+#include <math.h>
 
 using namespace boost::unit_test ;
 using namespace SFCGAL ;
@@ -48,7 +49,7 @@ using namespace SFCGAL ;
 class RotateCoordinate : public Transform {
 public:
 
-    virtual void transform( Point& p ) {
+    void transform( Point& p ) override {
         BOOST_ASSERT( ! p.isEmpty() );
         p = Point(
                 p.is3D() ? p.z() : 0.0,
@@ -86,7 +87,7 @@ BOOST_AUTO_TEST_CASE( testComputeArea )
         std::string id ;
         iss >> id ;
 
-        double expectedArea ;
+        double expectedArea = NAN ;
         iss >> expectedArea ;
 
         std::string inputWkt ;

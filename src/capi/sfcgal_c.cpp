@@ -60,9 +60,10 @@
 #include <SFCGAL/algorithm/offset.h>
 #include <SFCGAL/algorithm/straightSkeleton.h>
 
-#include <SFCGAL/detail/transform/ForceZOrderPoints.h>
 #include <SFCGAL/detail/transform/ForceOrderPoints.h>
+#include <SFCGAL/detail/transform/ForceZOrderPoints.h>
 #include <SFCGAL/detail/transform/RoundTransform.h>
+#include <math.h>
 
 //
 // Note about sfcgal_geometry_t pointers: they are basically void* pointers that represent
@@ -807,7 +808,7 @@ SFCGAL_GEOMETRY_FUNCTION_UNARY_CONSTRUCTION( tesselate, SFCGAL::algorithm::tesse
 
 extern "C" double sfcgal_geometry_volume( const sfcgal_geometry_t* ga )
 {
-    double r;
+    double r = NAN;
 
     try {
         r = CGAL::to_double( SFCGAL::algorithm::volume( *( const SFCGAL::Geometry* )( ga ) ) );
@@ -834,7 +835,7 @@ extern "C" int sfcgal_geometry_is_planar( const sfcgal_geometry_t* ga )
         return -1;
     }
 
-    bool r;
+    bool r = 0;
 
     try {
         r = SFCGAL::algorithm::isPlane3D< SFCGAL::Kernel >( g->as<const SFCGAL::Polygon >(), 1e-9 );
@@ -865,7 +866,7 @@ extern "C" int sfcgal_geometry_orientation( const sfcgal_geometry_t* ga )
         return 0;
     }
 
-    bool r;
+    bool r = 0;
 
     try {
         r = g->as<const SFCGAL::Polygon>().isCounterClockWiseOriented();

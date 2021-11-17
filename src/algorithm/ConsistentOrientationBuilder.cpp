@@ -118,7 +118,7 @@ void ConsistentOrientationBuilder::_makeOrientationConsistent()
         const std::set< size_t >& neighbors = _neighbors[ currentTriangle ] ;
 
         for ( std::set< size_t >::const_iterator it = neighbors.begin(); it != neighbors.end(); ++it ) {
-            bool hasOppositeEdge, hasParallelEdge ;
+            bool hasOppositeEdge = 0, hasParallelEdge = 0 ;
             graph::algorithm::studyOrientation(
                 _graph,
                 _triangles[ currentTriangle ],

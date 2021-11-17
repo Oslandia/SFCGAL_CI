@@ -19,20 +19,21 @@
  */
 #include <fstream>
 
-#include <SFCGAL/Point.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/Solid.h>
 #include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/MultiPoint.h>
+#include <SFCGAL/LineString.h>
 #include <SFCGAL/MultiLineString.h>
+#include <SFCGAL/MultiPoint.h>
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/MultiSolid.h>
-#include <SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h>
+#include <SFCGAL/Point.h>
+#include <SFCGAL/Polygon.h>
+#include <SFCGAL/PolyhedralSurface.h>
+#include <SFCGAL/Solid.h>
+#include <SFCGAL/Triangle.h>
+#include <SFCGAL/TriangulatedSurface.h>
 #include <SFCGAL/algorithm/area.h>
+#include <SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h>
+#include <math.h>
 
 
 #include "../../../test_config.h"
@@ -57,7 +58,7 @@ BOOST_AUTO_TEST_CASE( testTriangulateRGC )
     std::ifstream ifs( filename.c_str() );
     BOOST_REQUIRE( ifs.good() ) ;
 
-    double x,y,z ;
+    double x = NAN,y = NAN,z = NAN ;
 
     while ( ifs >> x >> y >> z ) {
         triangulation.addVertex( Coordinate( x,y,z ) );
