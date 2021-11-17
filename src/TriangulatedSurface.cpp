@@ -48,7 +48,7 @@ TriangulatedSurface::TriangulatedSurface( const std::vector< Triangle >& triangl
 ///
 ///
 TriangulatedSurface::TriangulatedSurface( const TriangulatedSurface& other ):
-    Surface(),
+    Surface(other),
     _triangles( other._triangles )
 {
 

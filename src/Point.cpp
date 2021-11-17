@@ -125,7 +125,7 @@ Point::Point( const Kernel::Point_3& other ):
 ///
 ///
 Point::Point( const Point& other ):
-    Geometry(),
+    Geometry(other),
     _coordinate( other._coordinate ),
     _m( other._m )
 {
