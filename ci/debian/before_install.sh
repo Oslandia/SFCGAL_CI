@@ -5,7 +5,7 @@ sudo apt-get install --yes \
     libboost-test-dev libboost-thread-dev \
     libboost-system-dev libboost-serialization-dev \
     libmpfr-dev libgmp-dev \
-    cmake xz-utils libstdc++-11-dev
+    xz-utils libstdc++-11-dev
 #CGAL
 
 wget https://github.com/CGAL/cgal/releases/download/v"$1"/CGAL-"$1".tar.xz
