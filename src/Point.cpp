@@ -213,7 +213,7 @@ bool Point::is3D() const
 ///
 bool  Point::isMeasured() const
 {
-    return ! isNaN( _m ) ;
+    return ! std::isnan( _m ) ;
 }
 
 ///
