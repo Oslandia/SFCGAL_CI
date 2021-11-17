@@ -41,3 +41,5 @@ test/regress/standalone/standalone-regress-test-SFCGAL
 test/unit/unit-test-SFCGAL
 *~
 */.DS_Store
+
+build
