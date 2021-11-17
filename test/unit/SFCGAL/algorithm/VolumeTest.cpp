@@ -18,10 +18,12 @@
  *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <SFCGAL/PolyhedralSurface.h>
+#include <SFCGAL/Solid.h>
 #include <SFCGAL/algorithm/volume.h>
 #include <SFCGAL/algorithm/isValid.h>
 #include <SFCGAL/io/wkt.h>
-#include <SFCGAL/io/vtk.h>
+#include <CGAL/Nef_polyhedron_3.h>
 
 #include <boost/test/unit_test.hpp>
 
@@ -33,7 +35,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_VolumeTest )
 
 BOOST_AUTO_TEST_CASE( cubeVolume )
 {
-    std::unique_ptr<Geometry> s = io::readWkt( "SOLID((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
+    const std::unique_ptr<Geometry> s = io::readWkt( "SOLID((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
                                                      ((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),\
                                                      ((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),\
                                                      ((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),\
@@ -44,7 +46,7 @@ BOOST_AUTO_TEST_CASE( cubeVolume )
 
 BOOST_AUTO_TEST_CASE( cubeWithHoleVolume )
 {
-    std::unique_ptr<Geometry> s = io::readWkt(
+    const std::unique_ptr<Geometry> s = io::readWkt(
                                     "SOLID((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
                 ((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),\
                 ((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),\
@@ -74,6 +76,18 @@ BOOST_AUTO_TEST_CASE( invertedCubeVolume )
 
 }
 
+BOOST_AUTO_TEST_CASE( polyhedronVolume )
+{
+    const std::string block0( "POLYHEDRALSURFACE Z (((0 0 0, 0 1 0, 1 0 0, 0 0 0 )), "
+                                        "((0 0 0, 1 0 0, 0 0 1, 0 0 0 )), "
+                                        "((0 0 0, 0 0 1, 0 1 0, 0 0 0 )), "
+                                        "((1 0 0, 0 1 0, 0 0 1, 1 0 0 )) )" );
+
+    std::unique_ptr< Geometry > geometry0( io::readWkt( block0 ) );
+    Solid solid( geometry0->as< PolyhedralSurface >() );
+    auto vol { algorithm::volume( solid ) };
+    BOOST_CHECK_EQUAL( vol * 6, 1.0 );
+    CGAL::Nef_polyhedron_3<SFCGAL::Kernel> n;
+}
 
 BOOST_AUTO_TEST_SUITE_END()
-
