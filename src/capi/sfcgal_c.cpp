@@ -23,6 +23,7 @@
 #include <SFCGAL/io/ewkt.h>
 #include <SFCGAL/io/wkt.h>
 
+#include <SFCGAL/algorithm/alphaShapes.h>
 #include <SFCGAL/algorithm/area.h>
 #include <SFCGAL/algorithm/convexHull.h>
 #include <SFCGAL/algorithm/covers.h>
@@ -1194,4 +1195,44 @@ sfcgal_geometry_line_sub_string(const sfcgal_geometry_t *geom, double start,
   }
 
   return ls.release();
+}
+
+extern "C" sfcgal_geometry_t *
+sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
+                             bool allow_holes) {
+  const SFCGAL::Geometry *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result = SFCGAL::algorithm::alphaShapes(g1->as<const SFCGAL::Geometry>(),
+                                            alpha, allow_holes);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During alphaShapes(A,%g):", alpha);
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return result.release();
+}
+
+extern "C" sfcgal_geometry_t *
+sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom, bool allow_holes,
+                             size_t nb_components) {
+  const SFCGAL::Geometry *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result = SFCGAL::algorithm::optimal_alpha_shapes(g1->as<const SFCGAL::Geometry>(),
+                                            allow_holes, nb_components);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During optimal_alpha_shapes(A, %g %g):", allow_holes, nb_components);
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return result.release();
 }
