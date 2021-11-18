@@ -130,6 +130,17 @@ link_directories(
 	${Boost_LIBRARY_DIRS}
 )
 
+#-- Coverage ---------------------------------------------------------------------
+option( SFCGAL_COVERAGE "Generate code coverage report" OFF)
+if( SFCGAL_COVERAGE )
+include(CodeCoverage)
+append_coverage_compiler_flags()
+setup_target_for_coverage_gcovr_html(
+     NAME sfcgal_coverage                    # New target name
+     EXECUTABLE ctest -j ${PROCESSOR_COUNT}
+     )
+endif()
+
 #-- Warnings, frounding-math and gprof  ------------------------------------------
 option( SFCGAL_WARNING_AS_ERROR "fail the build on warnings" OFF )
 option( SFCGAL_BUILD_WITH_GPROF "build with gprof" OFF )
