@@ -11,9 +11,9 @@ coverage:
     - make
     - ctest -VV
     - $HOME/.local/bin/gcovr --xml-pretty --exclude-unreachable-branches --print-summary -o coverage.xml --root ${CI_PROJECT_DIR}  --exclude-directories 'build/'  --exclude-directories 'test/'  --exclude-directories 'CGAL*' --filter src/
-  coverage: /^\s*lines:\s*\d+.\d+\%/
-    artifacts:
-      name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
-      expire_in: 2 days
-      reports:
-        cobertura: build/coverage.xml
+  coverage: '/^\s*lines:\s*\d+.\d+\%/'
+  artifacts:
+    name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+    expire_in: 2 days
+    reports:
+      cobertura: build/coverage.xml
