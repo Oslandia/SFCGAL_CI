@@ -8,7 +8,6 @@ coverage:
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_COVERAGE=ON -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     - make
-    - ctest -R unit-test
     - make sfcgal_coverage
     - ls *xml
     - ls
