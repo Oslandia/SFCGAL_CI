@@ -1,17 +1,92 @@
-coverage:
+debian_testing_gcc_cgal53:
   image: debian:testing
 
   script:
     - apt-get update -qq
-    - apt-get install --yes sudo wget build-essential gcovr
+    - apt-get install --yes sudo wget build-essential
     - ./ci/debian/before_install.sh 5.3
     - cd $CI_PROJECT_DIR
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_COVERAGE=ON -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     - make
-    - make sfcgal_coverage
-  coverage: '/^\s*lines:\s*\d+.\d+\%/'
-  artifacts:
-    name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
-    expire_in: 2 days
-    reports:
-      cobertura: sfcgal_coverage.xml
+    - ctest -VV
+
+debian_buster_gcc_cgal53:
+  image: debian:buster
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget build-essential
+    - ./ci/debian/before_install.sh 5.3
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    - make
+    - ctest -VV
+
+debian_testing_clang_cgal53:
+  image: debian:testing
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget clang libstdc++-11-dev
+    - ./ci/debian/before_install.sh 5.3
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+    - make
+    - ctest -VV
+
+debian_buster_clang_cgal53:
+  image: debian:buster
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget clang
+    - ./ci/debian/before_install.sh 5.3
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+    - make
+    - ctest -VV
+
+centos8_clang_cgal53:
+  image: centos:centos8
+
+  script:
+    - yum update -qy
+    - yum install -y sudo wget clang
+    - ./ci/centos/before_install.sh 5.3
+    - cd $CI_PROJECT_DIR
+    - ls
+    - find / -name "*CGAL*"
+    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.3
+    - make
+    - ctest -VV
+
+centos8_gcc_cgal53:
+  image: centos:centos8
+
+  script:
+    - yum update -qy
+    - yum install -y sudo wget gcc-c++
+    - ./ci/centos/before_install.sh 5.3
+    - cd $CI_PROJECT_DIR
+    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.3
+    - make
+    - ctest -VV
+
+# After ccache ci
+# coverage:
+#   image: debian:testing
+
+#   script:
+#     - apt-get update -qq
+#     - apt-get install --yes sudo wget build-essential gcovr
+#     - ./ci/debian/before_install.sh 5.3
+#     - cd $CI_PROJECT_DIR
+#     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_COVERAGE=ON -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+#     - make
+#     - make sfcgal_coverage
+#   coverage: '/^\s*lines:\s*\d+.\d+\%/'
+#   artifacts:
+#     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+#     expire_in: 2 days
+#     reports:
+#       cobertura: sfcgal_coverage.xml
