@@ -40,7 +40,7 @@
 
 #include <SFCGAL/Transform.h>
 #include <SFCGAL/algorithm/area.h>
-#include <math.h>
+#include <cmath>
 
 using namespace boost::unit_test ;
 using namespace SFCGAL ;

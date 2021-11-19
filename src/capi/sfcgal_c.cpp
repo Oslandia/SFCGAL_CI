@@ -63,7 +63,7 @@
 #include <SFCGAL/detail/transform/ForceOrderPoints.h>
 #include <SFCGAL/detail/transform/ForceZOrderPoints.h>
 #include <SFCGAL/detail/transform/RoundTransform.h>
-#include <math.h>
+#include <cmath>
 
 //
 // Note about sfcgal_geometry_t pointers: they are basically void* pointers that represent
@@ -808,7 +808,7 @@ SFCGAL_GEOMETRY_FUNCTION_UNARY_CONSTRUCTION( tesselate, SFCGAL::algorithm::tesse
 
 extern "C" double sfcgal_geometry_volume( const sfcgal_geometry_t* ga )
 {
-    double r = NAN;
+    double r = std::numeric_limits<double>::quiet_NaN();
 
     try {
         r = CGAL::to_double( SFCGAL::algorithm::volume( *( const SFCGAL::Geometry* )( ga ) ) );

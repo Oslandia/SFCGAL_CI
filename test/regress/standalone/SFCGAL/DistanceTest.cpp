@@ -40,7 +40,7 @@
 //#include <SFCGAL/io/vtk.h>
 
 #include <SFCGAL/detail/tools/Log.h>
-#include <math.h>
+#include <cmath>
 
 using namespace boost::unit_test ;
 using namespace SFCGAL ;

@@ -33,7 +33,7 @@
 #include <SFCGAL/TriangulatedSurface.h>
 #include <SFCGAL/algorithm/area.h>
 #include <SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h>
-#include <math.h>
+#include <cmath>
 
 
 #include "../../../test_config.h"
