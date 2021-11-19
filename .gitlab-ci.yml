@@ -71,3 +71,22 @@ centos8_gcc_cgal53:
     - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.3
     - make
     - ctest -VV
+
+# After ccache ci
+# coverage:
+#   image: debian:testing
+
+#   script:
+#     - apt-get update -qq
+#     - apt-get install --yes sudo wget build-essential gcovr
+#     - ./ci/debian/before_install.sh 5.3
+#     - cd $CI_PROJECT_DIR
+#     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_COVERAGE=ON -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+#     - make
+#     - make sfcgal_coverage
+#   coverage: '/^\s*lines:\s*\d+.\d+\%/'
+#   artifacts:
+#     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+#     expire_in: 2 days
+#     reports:
+#       cobertura: sfcgal_coverage.xml
