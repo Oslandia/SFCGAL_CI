@@ -117,7 +117,7 @@ double surfacesArea( const GeometrySet<3>& gs )
     double result = 0.0;
 
     if ( gs.surfaces().empty() && !gs.volumes().empty() ) {
-        result = solidsVolume( gs, /* planarSurfaces = */ true );
+        result = solidsVolume( gs, /* planarSurface = */ true );
     }
 
     for ( GeometrySet<3>::SurfaceCollection::const_iterator it = gs.surfaces().begin();

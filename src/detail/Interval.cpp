@@ -94,7 +94,7 @@ Interval::~Interval()
 ///
 bool Interval::isEmpty() const
 {
-    return isNaN( _lower ) || isNaN( _upper );
+    return std::isnan( _lower ) || std::isnan( _upper );
 }
 
 
@@ -138,7 +138,7 @@ void  Interval::expandToInclude( const Interval& other )
 ///
 void  Interval::expandToInclude( const double& value )
 {
-    if ( isNaN( value ) ) {
+    if ( std::isnan( value ) ) {
         return ;
     }
 

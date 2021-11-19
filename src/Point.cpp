@@ -125,7 +125,7 @@ Point::Point( const Kernel::Point_3& other ):
 ///
 ///
 Point::Point( const Point& other ):
-    Geometry(),
+    Geometry(other),
     _coordinate( other._coordinate ),
     _m( other._m )
 {
@@ -213,7 +213,7 @@ bool Point::is3D() const
 ///
 bool  Point::isMeasured() const
 {
-    return ! isNaN( _m ) ;
+    return ! std::isnan( _m ) ;
 }
 
 ///

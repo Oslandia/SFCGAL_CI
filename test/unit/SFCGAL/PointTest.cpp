@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( defaultConstructor )
     BOOST_CHECK_THROW( g.x(), Exception );
     BOOST_CHECK_THROW( g.y(), Exception );
     BOOST_CHECK_THROW( g.z(), Exception );
-    BOOST_CHECK( isNaN( g.m() ) );
+    BOOST_CHECK( std::isnan( g.m() ) );
 }
 
 //Point( const Coordinate & coordinate ) ;
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE( testGetSetM )
 {
     Point p( 3.0,4.0 );
     BOOST_CHECK( ! p.isMeasured() );
-    BOOST_CHECK( isNaN( p.m() ) );
+    BOOST_CHECK( std::isnan( p.m() ) );
     p.setM( 5.0 );
     BOOST_CHECK_EQUAL( p.m(), 5.0 );
 }

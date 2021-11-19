@@ -60,9 +60,10 @@
 #include <SFCGAL/algorithm/offset.h>
 #include <SFCGAL/algorithm/straightSkeleton.h>
 
-#include <SFCGAL/detail/transform/ForceZOrderPoints.h>
 #include <SFCGAL/detail/transform/ForceOrderPoints.h>
+#include <SFCGAL/detail/transform/ForceZOrderPoints.h>
 #include <SFCGAL/detail/transform/RoundTransform.h>
+#include <cmath>
 
 //
 // Note about sfcgal_geometry_t pointers: they are basically void* pointers that represent
@@ -120,13 +121,13 @@ extern "C" void sfcgal_set_error_handlers( sfcgal_error_handler_t warning_handle
     __sfcgal_error_handler = error_handler;
 }
 
-static sfcgal_alloc_handler_t __sfcgal_alloc_handler = malloc;
-static sfcgal_free_handler_t __sfcgal_free_handler = free;
+static sfcgal_alloc_handler_t sfcgal_alloc_handler = malloc;
+static sfcgal_free_handler_t sfcgal_free_handler = free;
 
 extern "C" void sfcgal_set_alloc_handlers( sfcgal_alloc_handler_t alloc_handler, sfcgal_free_handler_t free_handler )
 {
-    __sfcgal_alloc_handler = alloc_handler;
-    __sfcgal_free_handler = free_handler;
+    sfcgal_alloc_handler = alloc_handler;
+    sfcgal_free_handler = free_handler;
 }
 
 extern "C" void sfcgal_init()
@@ -234,7 +235,7 @@ extern "C" void sfcgal_geometry_as_text( const sfcgal_geometry_t* pgeom, char** 
 {
     SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
         std::string wkt = reinterpret_cast<const SFCGAL::Geometry*>( pgeom )->asText();
-        *buffer = ( char* )__sfcgal_alloc_handler( wkt.size() + 1 );
+        *buffer = ( char* )sfcgal_alloc_handler( wkt.size() + 1 );
         *len = wkt.size();
         strncpy( *buffer, wkt.c_str(), *len );
     )
@@ -244,7 +245,7 @@ extern "C" void sfcgal_geometry_as_text_decim( const sfcgal_geometry_t* pgeom, i
 {
     SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
         std::string wkt = reinterpret_cast<const SFCGAL::Geometry*>( pgeom )->asText( numDecimals );
-        *buffer = ( char* )__sfcgal_alloc_handler( wkt.size() + 1 );
+        *buffer = ( char* )sfcgal_alloc_handler( wkt.size() + 1 );
         *len = wkt.size();
         strncpy( *buffer, wkt.c_str(), *len );
     )
@@ -638,7 +639,7 @@ extern "C" void sfcgal_prepared_geometry_as_ewkt( const sfcgal_prepared_geometry
 {
     SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
         std::string ewkt = reinterpret_cast<const SFCGAL::PreparedGeometry*>( pgeom )->asEWKT( num_decimals );
-        *buffer = ( char* )__sfcgal_alloc_handler( ewkt.size() + 1 );
+        *buffer = ( char* )sfcgal_alloc_handler( ewkt.size() + 1 );
         *len = ewkt.size();
         strncpy( *buffer, ewkt.c_str(), *len );
     )
@@ -656,7 +657,7 @@ extern "C" void sfcgal_io_write_binary_prepared( const sfcgal_prepared_geometry_
     SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
         const SFCGAL::PreparedGeometry* g = reinterpret_cast<const SFCGAL::PreparedGeometry*>( geom );
         std::string str = SFCGAL::io::writeBinaryPrepared( *g );
-        *buffer = ( char* )__sfcgal_alloc_handler( str.size() + 1 );
+        *buffer = ( char* )sfcgal_alloc_handler( str.size() + 1 );
         *len = str.size();
         memcpy( *buffer, str.c_str(), *len );
     )
@@ -807,7 +808,7 @@ SFCGAL_GEOMETRY_FUNCTION_UNARY_CONSTRUCTION( tesselate, SFCGAL::algorithm::tesse
 
 extern "C" double sfcgal_geometry_volume( const sfcgal_geometry_t* ga )
 {
-    double r;
+    double r = std::numeric_limits<double>::quiet_NaN();
 
     try {
         r = CGAL::to_double( SFCGAL::algorithm::volume( *( const SFCGAL::Geometry* )( ga ) ) );
@@ -834,7 +835,7 @@ extern "C" int sfcgal_geometry_is_planar( const sfcgal_geometry_t* ga )
         return -1;
     }
 
-    bool r;
+    bool r = 0;
 
     try {
         r = SFCGAL::algorithm::isPlane3D< SFCGAL::Kernel >( g->as<const SFCGAL::Polygon >(), 1e-9 );
@@ -865,7 +866,7 @@ extern "C" int sfcgal_geometry_orientation( const sfcgal_geometry_t* ga )
         return 0;
     }
 
-    bool r;
+    bool r = 0;
 
     try {
         r = g->as<const SFCGAL::Polygon>().isCounterClockWiseOriented();

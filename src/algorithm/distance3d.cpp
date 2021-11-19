@@ -519,7 +519,7 @@ struct Sphere {
         return _center;
     }
 private:
-    double _radius;
+    double _radius{};
     CGAL::Vector_3<Kernel> _center;
     bool _empty;
 };

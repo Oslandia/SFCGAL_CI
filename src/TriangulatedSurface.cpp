@@ -48,7 +48,7 @@ TriangulatedSurface::TriangulatedSurface( const std::vector< Triangle >& triangl
 ///
 ///
 TriangulatedSurface::TriangulatedSurface( const TriangulatedSurface& other ):
-    Surface(),
+    Surface(other),
     _triangles( other._triangles )
 {
 
@@ -305,5 +305,3 @@ template SFCGAL_API std::unique_ptr< detail::MarkedPolyhedron > TriangulatedSurf
 template SFCGAL_API std::unique_ptr< CGAL::Polyhedron_3<Kernel> > TriangulatedSurface::toPolyhedron_3<Kernel, CGAL::Polyhedron_3<Kernel> >() const;
 
 }//SFCGAL
-
-

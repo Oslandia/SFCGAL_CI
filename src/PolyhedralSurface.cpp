@@ -50,7 +50,7 @@ PolyhedralSurface::PolyhedralSurface( const std::vector< Polygon >& polygons ) :
 ///
 ///
 PolyhedralSurface::PolyhedralSurface( const PolyhedralSurface& other ) :
-    Surface(),
+    Surface(other),
     _polygons( other._polygons )
 {
 

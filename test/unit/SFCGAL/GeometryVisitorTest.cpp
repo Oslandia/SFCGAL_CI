@@ -48,43 +48,43 @@ using namespace boost::unit_test ;
 class DemoVisitorGetType : public ConstGeometryVisitor {
 public:
 
-    virtual void visit( const Point& ) {
+    void visit( const Point& ) override {
         type = "Point";
     }
-    virtual void visit( const LineString& ) {
+    void visit( const LineString& ) override {
         type = "LineString";
     }
-    virtual void visit( const Polygon& ) {
+    void visit( const Polygon& ) override {
         type = "Polygon";
     }
-    virtual void visit( const Triangle& ) {
+    void visit( const Triangle& ) override {
         type = "Triangle";
     }
-    virtual void visit( const Solid& ) {
+    void visit( const Solid& ) override {
         type = "Solid";
     }
-    virtual void visit( const MultiPoint& ) {
+    void visit( const MultiPoint& ) override {
         type = "MultiPoint";
     }
-    virtual void visit( const MultiLineString& ) {
+    void visit( const MultiLineString& ) override {
         type = "MultiLineString";
     }
-    virtual void visit( const MultiPolygon& ) {
+    void visit( const MultiPolygon& ) override {
         type = "MultiPolygon";
     }
-    virtual void visit( const MultiSolid& ) {
+    void visit( const MultiSolid& ) override {
         type = "MultiSolid";
     }
 
-    virtual void visit( const GeometryCollection& ) {
+    void visit( const GeometryCollection& ) override {
         type = "GeometryCollection";
     }
 
-    virtual void visit( const PolyhedralSurface& ) {
+    void visit( const PolyhedralSurface& ) override {
         type = "PolyhedralSurface";
     }
 
-    virtual void visit( const TriangulatedSurface& ) {
+    void visit( const TriangulatedSurface& ) override {
         type = "TriangulatedSurface";
     }
 

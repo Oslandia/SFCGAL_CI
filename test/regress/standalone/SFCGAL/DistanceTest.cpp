@@ -40,6 +40,7 @@
 //#include <SFCGAL/io/vtk.h>
 
 #include <SFCGAL/detail/tools/Log.h>
+#include <cmath>
 
 using namespace boost::unit_test ;
 using namespace SFCGAL ;
@@ -99,7 +100,7 @@ BOOST_AUTO_TEST_CASE( testFileDistanceTest )
 
         std::string distanceDimension ;
         std::string wktGA, wktGB ;
-        double expectedDistance ;
+        double expectedDistance = NAN ;
 
         std::getline( iss, distanceDimension, '|' ) ;
         std::getline( iss, wktGA, '|' ) ;

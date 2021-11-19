@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( testTriangulatePolygon )
         BOOST_TEST_MESSAGE( boost::format( "[line#%s]%s" ) % numLine % line );
 
         std::istringstream iss( line );
-        bool shouldThrowException ;
+        bool shouldThrowException = 0 ;
         iss >> shouldThrowException ;
 
         std::string inputWkt ;
