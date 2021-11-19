@@ -40,7 +40,7 @@ GeometryCollection::GeometryCollection():
 ///
 ///
 GeometryCollection::GeometryCollection( GeometryCollection const& other ):
-    Geometry()
+    Geometry(other)
 {
     for ( size_t i = 0; i < other.numGeometries(); i++ ) {
         addGeometry( other.geometryN( i ).clone() );

@@ -48,7 +48,7 @@ std::unique_ptr< Geometry > readWkt( const std::string& s )
     WktReader wktReader( iss );
     std::unique_ptr< Geometry > geom( wktReader.readGeometry() );
 
-    char extra;
+    char extra = 0;
     if ( iss >> extra ) {
         std::string remaining( s.substr( int(iss.tellg()) - 1 ) );
         throw WktParseException( "Extra characters in WKT: " + remaining );
@@ -65,7 +65,7 @@ std::unique_ptr< Geometry > readWkt( const char* str, size_t len )
     std::istream istr( &buf );
     WktReader wktReader( istr );
     std::unique_ptr< Geometry > geom( wktReader.readGeometry() );
-    char extra;
+    char extra = 0;
     if ( istr >> extra ) {
         std::string remaining( str + int(istr.tellg()) - 1, str + len );
         throw WktParseException( "Extra characters in WKT: " + remaining );

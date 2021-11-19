@@ -28,13 +28,6 @@ using namespace SFCGAL ;
 
 BOOST_AUTO_TEST_SUITE( SFCGAL_NumericTest )
 
-BOOST_AUTO_TEST_CASE( testNaNAndIsNaN )
-{
-    BOOST_CHECK( NaN() != NaN() );
-    BOOST_CHECK( ! isNaN( 0.0 ) );
-    BOOST_CHECK( isNaN( NaN() ) );
-}
-
 BOOST_AUTO_TEST_CASE( testFloorRational )
 {
     BOOST_CHECK_EQUAL( SFCGAL::floor( CGAL::Gmpq( 0 ) ), 0 ) ;
@@ -64,7 +57,3 @@ BOOST_AUTO_TEST_CASE( testRoundRational )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
-
-
-

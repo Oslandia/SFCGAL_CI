@@ -73,7 +73,7 @@ Triangle::Triangle( const Point& p, const Point& q, const Point& r ) :
 ///
 ///
 Triangle::Triangle( const Triangle& other )
-    : Surface()
+    : Surface(other)
 {
     _vertices[0] = other._vertices[0] ;
     _vertices[1] = other._vertices[1] ;

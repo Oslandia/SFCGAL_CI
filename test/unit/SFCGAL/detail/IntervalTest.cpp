@@ -35,8 +35,8 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_detail_IntervalTest )
 BOOST_AUTO_TEST_CASE( testDefaultConstructor )
 {
     Interval bound;
-    BOOST_CHECK( isNaN( bound.lower() ) );
-    BOOST_CHECK( isNaN( bound.upper() ) );
+    BOOST_CHECK( std::isnan( bound.lower() ) );
+    BOOST_CHECK( std::isnan( bound.upper() ) );
 }
 
 //Interval( const double & value ) ;

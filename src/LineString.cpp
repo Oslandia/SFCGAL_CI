@@ -60,7 +60,7 @@ LineString::LineString( const Point& startPoint, const Point& endPoint ):
 ///
 ///
 LineString::LineString( const LineString& other ):
-    Geometry()
+    Geometry(other)
 {
     for ( size_t i = 0; i < other.numPoints(); i++ ) {
         _points.push_back( other.pointN( i ).clone() ) ;
