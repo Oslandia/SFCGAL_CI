@@ -77,7 +77,7 @@ static double computeAlpha(const Geometry &g, Alpha_shape_2 &alphaShape,
 
   // collect points
 
-  if (getPointVisitor.points.size() == 0) {
+  if (getPointVisitor.points.size() < 4) {
     return result;
   }
 
@@ -92,11 +92,14 @@ static double computeAlpha(const Geometry &g, Alpha_shape_2 &alphaShape,
   alphaShape.set_alpha(Kernel::FT(alpha));
   alpha_edges(alphaShape, std::back_inserter(segments));
 
-  if (segments.size() == 0)
-    return result;
+  /* if (segments.size() == 0) { */
+  /*   std::cout << "0 segment"; */
+  /*   return result; */
+  /* } */
 
   result = CGAL::to_double(*alphaShape.find_optimal_alpha(nb_components));
 
+  std::cout << result << "\n";
   return result;
 }
 
