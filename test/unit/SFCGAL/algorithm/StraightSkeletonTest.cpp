@@ -35,6 +35,7 @@
 #include <SFCGAL/io/wkt.h>
 #include <SFCGAL/algorithm/straightSkeleton.h>
 #include <SFCGAL/algorithm/covers.h>
+#include <SFCGAL/algorithm/length.h>
 
 #include <SFCGAL/detail/tools/Registry.h>
 
@@ -188,5 +189,16 @@ BOOST_AUTO_TEST_CASE( testMultiEmptyEmpty )
     BOOST_CHECK_EQUAL( out->asText( 1 ), expectedWKT );
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+// See https://gitlab.com/Oslandia/SFCGAL/-/issues/194
+BOOST_AUTO_TEST_CASE( testDegenerateMultiLineString )
+{
+    std::unique_ptr< Geometry > g( io::readWkt( "Polygon ((1294585.78643762995488942 200985.78643762698629871, 1294000 202400, 1294000 212400, 1294585.78643762995488942 213814.21356237301370129, 1296000 214400, 1297000 214400, 1298414.21356237004511058 213814.21356237301370129, 1299000 212400, 1299000 202400, 1298414.21356237004511058 200985.78643762698629871, 1297000 200400, 1296000 200400, 1294585.78643762995488942 200985.78643762698629871),(1297000 202400, 1297000 212400, 1296000 212400, 1296000 202400, 1297000 202400))"));
+    const double tolerance = 1e-8;
+    std::unique_ptr<Geometry> out( algorithm::straightSkeleton( *g, tolerance ) );
+    for ( size_t i = 0; i < out->numGeometries(); i++ )
+    {
+        BOOST_CHECK( algorithm::length( out->geometryN( i ) ) > tolerance );
+    }
+}
 
+BOOST_AUTO_TEST_SUITE_END()
