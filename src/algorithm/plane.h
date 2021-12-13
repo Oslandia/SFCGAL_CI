@@ -147,7 +147,7 @@ CGAL::Plane_3< Kernel > plane3D( const Polygon& polygon, bool exact )
 {
     if ( exact )
         return plane3D< Kernel >( polygon );
-    else 
+    else
         return plane3D< Kernel >( polygon, Plane3DInexactUnsafe() );
 }
 
@@ -245,7 +245,7 @@ bool isPlane3D( const Geometry& geom,const double& toleranceAbs )
     for ( GetPointsVisitor::const_iterator x = v.points.begin(); x != end; ++x ) {
         const Vector_3 cx = ( *x )->toVector_3() - c ;
 
-        if ( std::abs( CGAL::to_double( cx * n ) ) > toleranceAbs ) {
+        if ( std::abs( CGAL::to_double( cx * nNormed ) ) > toleranceAbs ) {
             // std::cout << "point out of plane\n";
             return false;
         }

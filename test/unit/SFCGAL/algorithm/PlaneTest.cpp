@@ -64,6 +64,7 @@ BOOST_AUTO_TEST_CASE( testPlane )
         {"LINESTRING(0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)", true}, // all point in the plane z=0
         {"LINESTRING(2 1 0,2 0 0,2 1 0,2 1 0,2 0 3)", true}, // all points in the plane x=2
         {"LINESTRING(2 1 0,2 0 0,2 1 1,2 1 0,1 0 3)", false}, // one point out of plane
+        {"LINESTRING(0 0 0, 1e-5 0 0, 1e-5 1e-5 0, 0 1e-5 1e-5)", false}, // fix #247
     };
     const size_t numTest = sizeof( test ) / sizeof( TestCase );
 
@@ -103,4 +104,3 @@ BOOST_AUTO_TEST_CASE( testPlane3DDivideByZeroCrash )
 
 
 BOOST_AUTO_TEST_SUITE_END()
-
