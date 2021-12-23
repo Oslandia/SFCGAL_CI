@@ -1,0 +1,42 @@
+name: MSYS2
+on: [push, pull_request]
+
+jobs:
+  mingw:
+    name: mingw
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        #fail-fast: false
+        include:
+          - { icon: '⬛', sys: mingw32 }
+          - { icon: '🟦', sys: mingw64 }
+          - { icon: '🟨', sys: ucrt64  } # Experimental!
+          - { icon: '🟧', sys: clang64 } # Experimental!
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      # see https://github.com/msys2/setup-msys2
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: '${{ matrix.icon }} Setup MSYS2'
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.sys }}
+        update: true
+        install: >-
+          git
+          make
+        pacboy: >-
+          toolchain:p
+          cmake:p
+          ninja:p
+          cgal:p
+
+    - name: '🚧 Build TOOL'
+      run: |
+        MSYSTEM= cmake -G"Ninja" -B build -DCMAKE_BUILD_TYPE=Release -DSFCGAL_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=D:/a/_temp/msys64/${{ matrix.sys }}
+        MSYSTEM= cmake --build build
+        MSYSTEM= cmake --install build
+        MSYSTEM= ctest -V --output-on-failure --test-dir build
