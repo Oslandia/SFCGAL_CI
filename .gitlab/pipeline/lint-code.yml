@@ -11,7 +11,7 @@ clang-format:
   script:
     # We need to use simple BusyBox `find` syntax here.
     - >
-      clang-format --dry-run --Werror
+      clang-format --dry-run --Werror style=file
       $(find src/ -iname '*.cpp' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.h')
   # script:
   #   - run-clang-format.py -r src --style=file
