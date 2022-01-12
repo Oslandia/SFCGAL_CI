@@ -4,7 +4,7 @@
 # Check if the C++ code is consistent in code formatting (correct amount of tabs/spaces,
 # correct indentation etc.)
 clang-format:
-  stage: Lint code
+  stage: lint
   image: $CI_REGISTRY_IMAGE/clang_format:$TAG
   variables:
       DOCKER_FILE: ".gitlab/dockerfiles/clang_format"

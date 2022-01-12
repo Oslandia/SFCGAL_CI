@@ -1,4 +1,5 @@
 debian_testing_gcc_cgal53:
+  stage: test
   image: debian:testing
 
   script:
@@ -11,6 +12,7 @@ debian_testing_gcc_cgal53:
     - ctest -VV
 
 debian_buster_gcc_cgal53:
+  stage: test
   image: debian:buster
 
   script:
@@ -23,6 +25,7 @@ debian_buster_gcc_cgal53:
     - ctest -VV
 
 debian_testing_clang_cgal53:
+  stage: test
   image: debian:testing
 
   script:
@@ -35,6 +38,7 @@ debian_testing_clang_cgal53:
     - ctest -VV
 
 debian_buster_clang_cgal53:
+  stage: test
   image: debian:buster
 
   script:
@@ -47,6 +51,7 @@ debian_buster_clang_cgal53:
     - ctest -VV
 
 centos8_clang_cgal53:
+  stage: test
   image: centos:centos8
 
   script:
@@ -61,6 +66,7 @@ centos8_clang_cgal53:
     - ctest -VV
 
 centos8_gcc_cgal53:
+  stage: test
   image: centos:centos8
 
   script:

@@ -1,3 +1,9 @@
+
+stages:
+  - lint
+  - test
+  - deploy
+
 # After ccache ci
 # coverage:
 #   image: debian:testing
