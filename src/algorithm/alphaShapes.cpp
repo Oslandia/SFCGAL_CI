@@ -94,7 +94,8 @@ static auto
 alpha_to_geometry(const Alpha_shape_2 &A, bool allow_holes)
     -> std::unique_ptr<Geometry>
 {
-  std::vector<Segment_2> segments;
+  std::unique_ptr<Geometry> result;
+  std::vector<Segment_2>    segments;
   alpha_edges(A, std::back_inserter(segments));
 
   Arrangement arr;
@@ -120,7 +121,9 @@ alpha_to_geometry(const Alpha_shape_2 &A, bool allow_holes)
     }
   }
 
-  return std::unique_ptr<Geometry>(poly);
+  result.reset(poly);
+
+  return result;
 }
 
 auto
