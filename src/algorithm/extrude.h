@@ -1,35 +1,17 @@
-/**
- *   SFCGAL
- *
- *   Copyright (C) 2012-2013 Oslandia <infos@oslandia.com>
- *   Copyright (C) 2012-2013 IGN (http://www.ign.fr)
- *
- *   This library is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU Library General Public
- *   License as published by the Free Software Foundation; either
- *   version 2 of the License, or (at your option) any later version.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *   Library General Public License for more details.
- *
- *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2012-2013, IGN France.
+// Copyright (c) 2012-2022, Oslandia.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #ifndef _SFCGAL_ALGORITHM_EXTRUDE_H_
 #define _SFCGAL_ALGORITHM_EXTRUDE_H_
 
 // SFCGAL
-#include <SFCGAL/config.h>
-#include <SFCGAL/Kernel.h>
 #include <SFCGAL/Geometry.h>
+#include <SFCGAL/Kernel.h>
+#include <SFCGAL/config.h>
 
-namespace SFCGAL
-{
-namespace algorithm
-{
+namespace SFCGAL {
+namespace algorithm {
 
 // Class forward declarations.
 struct NoValidityCheck;
@@ -54,11 +36,8 @@ struct NoValidityCheck;
  *   all measures from the result are removed.
  * @ingroup public_api
  */
-SFCGAL_API std::unique_ptr< Geometry > extrude( const Geometry& g
-                                              , Kernel::FT dx
-                                              , Kernel::FT dy
-                                              , Kernel::FT dz
-                                              ) ;
+SFCGAL_API std::unique_ptr<Geometry>
+extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz);
 
 /**
  * @brief Returns a Geometry equal to the specified Geometry,
@@ -82,12 +61,9 @@ SFCGAL_API std::unique_ptr< Geometry > extrude( const Geometry& g
  * @ingroup detail
  * @warning No actual validity check is conducted.
  */
-SFCGAL_API std::unique_ptr< Geometry > extrude( const Geometry& g
-                                              , Kernel::FT dx
-                                              , Kernel::FT dy
-                                              , Kernel::FT dz
-                                              , NoValidityCheck nvc
-                                              ) ;
+SFCGAL_API std::unique_ptr<Geometry>
+extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz,
+        NoValidityCheck nvc);
 
 /**
  * @brief Returns a Geometry equal to the specified Geometry,
@@ -110,11 +86,9 @@ SFCGAL_API std::unique_ptr< Geometry > extrude( const Geometry& g
  * @ingroup detail
  * @warning No actual validity check is conducted.
  */
-SFCGAL_API std::unique_ptr< Geometry > extrude( const Geometry& g
-                                              , const double& dx
-                                              , const double& dy
-                                              , const double& dz
-                                              );
+SFCGAL_API std::unique_ptr<Geometry>
+           extrude(const Geometry &g, const double &dx, const double &dy,
+                   const double &dz);
 
 /**
  * @brief Returns a Geometry equal to the specified Geometry,
@@ -134,11 +108,10 @@ SFCGAL_API std::unique_ptr< Geometry > extrude( const Geometry& g
  *   topology.
  * @ingroup detail
  */
-SFCGAL_API std::unique_ptr< Geometry > extrude( const Geometry& g
-                                              , const Kernel::Vector_3& v
-                                              ) ;
+SFCGAL_API std::unique_ptr<Geometry>
+           extrude(const Geometry &g, const Kernel::Vector_3 &v);
 
-} // ! namespace algorithm
-} // ! namespace SFCGAL
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif // ! _SFCGAL_ALGORITHM_EXTRUDE_H_

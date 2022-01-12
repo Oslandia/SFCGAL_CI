@@ -1,110 +1,92 @@
-/**
- *   SFCGAL
- *
- *   Copyright (C) 2012-2013 Oslandia <infos@oslandia.com>
- *   Copyright (C) 2012-2013 IGN (http://www.ign.fr)
- *
- *   This library is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU Library General Public
- *   License as published by the Free Software Foundation; either
- *   version 2 of the License, or (at your option) any later version.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *   Library General Public License for more details.
+// Copyright (c) 2012-2013, IGN France.
+// Copyright (c) 2012-2022, Oslandia.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
- *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
- */
-
-#include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/GeometryVisitor.h>
+#include <SFCGAL/MultiPolygon.h>
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-MultiPolygon::MultiPolygon():
-    GeometryCollection()
-{
+MultiPolygon::MultiPolygon() : GeometryCollection() {}
 
+///
+///
+///
+MultiPolygon::MultiPolygon(MultiPolygon const &other)
+    : GeometryCollection(other)
+{
 }
 
 ///
 ///
 ///
-MultiPolygon::MultiPolygon( MultiPolygon const& other ):
-    GeometryCollection( other )
+MultiPolygon &
+MultiPolygon::operator=(MultiPolygon other)
 {
-
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-MultiPolygon& MultiPolygon::operator = ( MultiPolygon other )
+MultiPolygon::~MultiPolygon() {}
+
+///
+///
+///
+MultiPolygon *
+MultiPolygon::clone() const
 {
-    swap( other ) ;
-    return *this ;
+  return new MultiPolygon(*this);
 }
 
 ///
 ///
 ///
-MultiPolygon::~MultiPolygon()
+std::string
+MultiPolygon::geometryType() const
 {
-
+  return "MultiPolygon";
 }
 
 ///
 ///
 ///
-MultiPolygon*    MultiPolygon::clone() const
+GeometryType
+MultiPolygon::geometryTypeId() const
 {
-    return new MultiPolygon( *this );
+  return TYPE_MULTIPOLYGON;
 }
 
 ///
 ///
 ///
-std::string    MultiPolygon::geometryType() const
+bool
+MultiPolygon::isAllowed(Geometry const &g)
 {
-    return "MultiPolygon" ;
+  return g.geometryTypeId() == TYPE_POLYGON;
 }
 
 ///
 ///
 ///
-GeometryType   MultiPolygon::geometryTypeId() const
+void
+MultiPolygon::accept(GeometryVisitor &visitor)
 {
-    return TYPE_MULTIPOLYGON ;
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-bool           MultiPolygon::isAllowed( Geometry const& g )
+void
+MultiPolygon::accept(ConstGeometryVisitor &visitor) const
 {
-    return g.geometryTypeId() == TYPE_POLYGON ;
+  return visitor.visit(*this);
 }
 
-///
-///
-///
-void MultiPolygon::accept( GeometryVisitor& visitor )
-{
-    return visitor.visit( *this );
-}
-
-///
-///
-///
-void MultiPolygon::accept( ConstGeometryVisitor& visitor ) const
-{
-    return visitor.visit( *this );
-}
-
-}//SFCGAL
-
+} // namespace SFCGAL

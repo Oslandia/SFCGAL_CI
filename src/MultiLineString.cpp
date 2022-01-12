@@ -1,110 +1,92 @@
-/**
- *   SFCGAL
- *
- *   Copyright (C) 2012-2013 Oslandia <infos@oslandia.com>
- *   Copyright (C) 2012-2013 IGN (http://www.ign.fr)
- *
- *   This library is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU Library General Public
- *   License as published by the Free Software Foundation; either
- *   version 2 of the License, or (at your option) any later version.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *   Library General Public License for more details.
+// Copyright (c) 2012-2013, IGN France.
+// Copyright (c) 2012-2022, Oslandia.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
- *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
- */
-
-#include <SFCGAL/MultiLineString.h>
 #include <SFCGAL/GeometryVisitor.h>
+#include <SFCGAL/MultiLineString.h>
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-MultiLineString::MultiLineString():
-    GeometryCollection()
-{
+MultiLineString::MultiLineString() : GeometryCollection() {}
 
+///
+///
+///
+MultiLineString::MultiLineString(MultiLineString const &other)
+    : GeometryCollection(other)
+{
 }
 
 ///
 ///
 ///
-MultiLineString::MultiLineString( MultiLineString const& other ):
-    GeometryCollection( other )
+MultiLineString &
+MultiLineString::operator=(MultiLineString other)
 {
-
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-MultiLineString& MultiLineString::operator = ( MultiLineString other )
+MultiLineString::~MultiLineString() {}
+
+///
+///
+///
+MultiLineString *
+MultiLineString::clone() const
 {
-    swap( other ) ;
-    return *this ;
+  return new MultiLineString(*this);
 }
 
 ///
 ///
 ///
-MultiLineString::~MultiLineString()
+std::string
+MultiLineString::geometryType() const
 {
-
+  return "MultiLineString";
 }
 
 ///
 ///
 ///
-MultiLineString*    MultiLineString::clone() const
+GeometryType
+MultiLineString::geometryTypeId() const
 {
-    return new MultiLineString( *this );
+  return TYPE_MULTILINESTRING;
 }
 
 ///
 ///
 ///
-std::string    MultiLineString::geometryType() const
+bool
+MultiLineString::isAllowed(Geometry const &g)
 {
-    return "MultiLineString" ;
+  return g.geometryTypeId() == TYPE_LINESTRING;
 }
 
 ///
 ///
 ///
-GeometryType   MultiLineString::geometryTypeId() const
+void
+MultiLineString::accept(GeometryVisitor &visitor)
 {
-    return TYPE_MULTILINESTRING ;
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-bool           MultiLineString::isAllowed( Geometry const& g )
+void
+MultiLineString::accept(ConstGeometryVisitor &visitor) const
 {
-    return g.geometryTypeId() == TYPE_LINESTRING ;
+  return visitor.visit(*this);
 }
 
-///
-///
-///
-void MultiLineString::accept( GeometryVisitor& visitor )
-{
-    return visitor.visit( *this );
-}
-
-///
-///
-///
-void MultiLineString::accept( ConstGeometryVisitor& visitor ) const
-{
-    return visitor.visit( *this );
-}
-
-}//SFCGAL
-
+} // namespace SFCGAL
