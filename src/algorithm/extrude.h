@@ -54,7 +54,7 @@ struct NoValidityCheck;
  * @ingroup public_api
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz);
+extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz);
 
 /**
  * @brief Returns a Geometry equal to the specified Geometry,
@@ -79,8 +79,8 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @warning No actual validity check is conducted.
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz,
-                   NoValidityCheck nvc);
+extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz,
+        NoValidityCheck nvc);
 
 /**
  * @brief Returns a Geometry equal to the specified Geometry,

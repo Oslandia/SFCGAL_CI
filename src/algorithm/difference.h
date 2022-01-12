@@ -70,7 +70,7 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @warning@ No actual validity check is done
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck);
+difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck);
 
 /**
  * @ingroup detail

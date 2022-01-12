@@ -116,7 +116,7 @@ triangulate(const MarkedPolyhedron &polyhedron, GeometrySet<3> &geometry)
 ///
 void
 triangulate(const CGAL::Polygon_with_holes_2<Kernel> &polygon,
-            GeometrySet<2> &                          output)
+            GeometrySet<2>                           &output)
 {
   // FIXME: lots of copies here, can we avoid this ?
   Polygon             poly(polygon);

@@ -34,14 +34,14 @@ class Geometry;
 /**
  * Ostream operator for Envelope;
  */
-SFCGAL_API std::ostream &
-           operator<<(std::ostream &, const Envelope &);
+SFCGAL_API std::ostream            &
+operator<<(std::ostream &, const Envelope &);
 
 /**
  * Ostream operator for Geometry;
  */
-SFCGAL_API std::ostream &
-           operator<<(std::ostream &, const Geometry &);
+SFCGAL_API std::ostream            &
+operator<<(std::ostream &, const Geometry &);
 } // namespace SFCGAL
 
 #endif

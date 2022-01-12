@@ -54,7 +54,7 @@ void
 straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
                                   MultiLineString &result, bool innerOnly,
                                   Kernel::Vector_2 &translate,
-                                  const double &    toleranceAbs)
+                                  const double     &toleranceAbs)
 {
   typedef CGAL::Straight_skeleton_2<K> Ss;
 
@@ -122,8 +122,8 @@ angle(const Point &a, const Point &b, const Point &c)
 template <class K>
 void
 straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &ss,
-                             MultiLineString &                   result,
-                             Kernel::Vector_2 &                  translate)
+                             MultiLineString                    &result,
+                             Kernel::Vector_2                   &translate)
 {
   typedef CGAL::Straight_skeleton_2<K> Ss;
 

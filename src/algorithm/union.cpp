@@ -219,7 +219,7 @@ struct Surface_d<3> : Triangle_3 {
         for (std::vector<Segment_d<2>>::iterator l = lines.begin();
              l != lines.end(); ++l) {
           CGAL::Object     inter = CGAL::intersection(*l, current);
-          const Point_2 *  p     = CGAL::object_cast<Point_2>(&inter);
+          const Point_2   *p     = CGAL::object_cast<Point_2>(&inter);
           const Segment_2 *s     = CGAL::object_cast<Segment_2>(&inter);
 
           if (p) {
@@ -427,22 +427,26 @@ public:
     return *this;
   }
 
-  const ObservablePrimitive &operator*() const
+  const ObservablePrimitive &
+  operator*() const
   {
     BOOST_ASSERT((*_p)->_observers.count(_p));
     return *(*_p);
   }
-  ObservablePrimitive &operator*()
+  ObservablePrimitive &
+  operator*()
   {
     BOOST_ASSERT((*_p)->_observers.count(_p));
     return *(*_p);
   }
-  const ObservablePrimitive *operator->() const
+  const ObservablePrimitive *
+  operator->() const
   {
     BOOST_ASSERT((*_p)->_observers.count(_p));
     return (*_p);
   }
-  ObservablePrimitive *operator->()
+  ObservablePrimitive *
+  operator->()
   {
     BOOST_ASSERT((*_p)->_observers.count(_p));
     return (*_p);
@@ -500,7 +504,7 @@ public:
       return; // both aready observing the same primitive
     }
 
-    ObservablePrimitive *               observed = *(a._p);
+    ObservablePrimitive                *observed = *(a._p);
     std::vector<ObservablePrimitive **> observers(observed->_observers.begin(),
                                                   observed->_observers.end());
 
@@ -598,29 +602,33 @@ union_point_segment(Handle a, Handle b)
   }
 }
 
-void union_point_surface(Handle<2> a, Handle<2> b)
+void
+union_point_surface(Handle<2> a, Handle<2> b)
 {
   if (do_intersect(a.asPoint(), b.asSurface())) {
     b.registerObservers(a);
   }
 }
 
-void union_point_surface(Handle<3> a, Handle<3> b)
+void
+union_point_surface(Handle<3> a, Handle<3> b)
 {
   if (b.asSurface().has_on(a.asPoint())) {
     b.registerObservers(a);
   }
 }
 
-void union_point_volume(Handle<2>, Handle<2>)
+void
+union_point_volume(Handle<2>, Handle<2>)
 {
   BOOST_ASSERT(false); // there shouldn't be any volume in 2D
 }
 
-void union_point_volume(Handle<3> a, Handle<3> b)
+void
+union_point_volume(Handle<3> a, Handle<3> b)
 {
   //@todo put is in poly in a struct derived from MarkedPolyhedron to avoid
-  //rebuilding point inside every time
+  // rebuilding point inside every time
   CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_poly(
       b.asVolume());
 
@@ -637,7 +645,7 @@ union_segment_segment(Handle<Dim> a, Handle<Dim> b)
   typedef typename detail::TypeForDimension<Dim>::Point   PointType;
 
   CGAL::Object       inter = CGAL::intersection(a.asSegment(), b.asSegment());
-  const PointType *  p     = CGAL::object_cast<PointType>(&inter);
+  const PointType   *p     = CGAL::object_cast<PointType>(&inter);
   const SegmentType *s     = CGAL::object_cast<SegmentType>(&inter);
 
   if (p) {
@@ -650,17 +658,20 @@ union_segment_segment(Handle<Dim> a, Handle<Dim> b)
   }
 }
 
-void union_segment_segment(Handle<2> a, Handle<2> b)
+void
+union_segment_segment(Handle<2> a, Handle<2> b)
 {
   union_segment_segment<2>(a, b);
 }
 
-void union_segment_segment(Handle<3> a, Handle<3> b)
+void
+union_segment_segment(Handle<3> a, Handle<3> b)
 {
   union_segment_segment<3>(a, b);
 }
 
-void union_segment_surface(Handle<2> a, Handle<2> b)
+void
+union_segment_surface(Handle<2> a, Handle<2> b)
 {
   std::vector<Polygon_2> rings(1, b.asSurface().outer_boundary());
   rings.insert(rings.end(), b.asSurface().holes_begin(),
@@ -678,7 +689,7 @@ void union_segment_surface(Handle<2> a, Handle<2> b)
                          *target);
 
       CGAL::Object     inter = CGAL::intersection(a.asSegment(), sc);
-      const Point_2 *  p     = CGAL::object_cast<Point_2>(&inter);
+      const Point_2   *p     = CGAL::object_cast<Point_2>(&inter);
       const Segment_2 *s     = CGAL::object_cast<Segment_2>(&inter);
 
       if (p) {
@@ -706,7 +717,8 @@ void union_segment_surface(Handle<2> a, Handle<2> b)
   }
 }
 
-void union_segment_surface(Handle<3> a, Handle<3> b)
+void
+union_segment_surface(Handle<3> a, Handle<3> b)
 {
   CGAL::Object     inter = CGAL::intersection(a.asSegment(), b.asSurface());
   const Segment_3 *s     = CGAL::object_cast<Segment_3>(&inter);
@@ -717,18 +729,20 @@ void union_segment_surface(Handle<3> a, Handle<3> b)
   }
 }
 
-void union_segment_volume(Handle<2>, Handle<2>)
+void
+union_segment_volume(Handle<2>, Handle<2>)
 {
   BOOST_ASSERT(false); // there shouldn't be any volume in 2D
 }
 
-void union_segment_volume(Handle<3> a, Handle<3> b)
+void
+union_segment_volume(Handle<3> a, Handle<3> b)
 {
-  const Segment_3 &       segment    = a.asSegment();
+  const Segment_3        &segment    = a.asSegment();
   const MarkedPolyhedron &polyhedron = b.asVolume();
 
   std::vector<FaceBbox>     bboxes(polyhedron.facets_begin(),
-                               polyhedron.facets_end());
+                                   polyhedron.facets_end());
   std::vector<FaceBboxBase> bbox(
       1, FaceBboxBase(segment.bbox(),
                       polyhedron.facets_begin()->facet_begin())); // nevermind
@@ -791,7 +805,8 @@ void union_segment_volume(Handle<3> a, Handle<3> b)
   }
 }
 
-void union_surface_surface(Handle<2> a, Handle<2> b)
+void
+union_surface_surface(Handle<2> a, Handle<2> b)
 {
   PolygonWH_2 res;
 
@@ -806,11 +821,12 @@ void union_surface_surface(Handle<2> a, Handle<2> b)
   }
 }
 
-void union_surface_surface(Handle<3> a, Handle<3> b)
+void
+union_surface_surface(Handle<3> a, Handle<3> b)
 {
   CGAL::Object      inter = intersection(a.asSurface(), b.asSurface());
-  const Point_3 *   p     = CGAL::object_cast<Point_3>(&inter);
-  const Segment_3 * s     = CGAL::object_cast<Segment_3>(&inter);
+  const Point_3    *p     = CGAL::object_cast<Point_3>(&inter);
+  const Segment_3  *s     = CGAL::object_cast<Segment_3>(&inter);
   const Triangle_3 *t     = CGAL::object_cast<Triangle_3>(&inter);
   const std::vector<Point_3> *v =
       CGAL::object_cast<std::vector<Point_3>>(&inter);
@@ -830,12 +846,14 @@ void union_surface_surface(Handle<3> a, Handle<3> b)
   }
 }
 
-void union_surface_volume(Handle<2>, Handle<2>)
+void
+union_surface_volume(Handle<2>, Handle<2>)
 {
   BOOST_ASSERT(false); // there shouldn't be any volume in 2D
 }
 
-void union_surface_volume(Handle<3> a, Handle<3> b)
+void
+union_surface_volume(Handle<3> a, Handle<3> b)
 {
   detail::GeometrySet<3> res;
   _intersection_solid_triangle(b.asVolume(), a.asSurface(), res);
@@ -847,12 +865,14 @@ void union_surface_volume(Handle<3> a, Handle<3> b)
   }
 }
 
-void union_volume_volume(Handle<2>, Handle<2>)
+void
+union_volume_volume(Handle<2>, Handle<2>)
 {
   BOOST_ASSERT(false); // there shouldn't be any volume in 2D
 }
 
-void union_volume_volume(Handle<3> a, Handle<3> b)
+void
+union_volume_volume(Handle<3> a, Handle<3> b)
 {
   MarkedPolyhedron &p = const_cast<MarkedPolyhedron &>(a.asVolume());
   MarkedPolyhedron &q = const_cast<MarkedPolyhedron &>(b.asVolume());
@@ -995,7 +1015,7 @@ struct UnionOnBoxCollision {
 template <int Dim>
 void
 collectPrimitives(const typename HandledBox<Dim>::Vector &boxes,
-                  detail::GeometrySet<Dim> &              output)
+                  detail::GeometrySet<Dim>               &output)
 {
   Handle<Dim> empty;
 

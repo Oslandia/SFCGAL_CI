@@ -108,7 +108,7 @@ readBinaryGeometry(const std::string &str)
 {
   std::istringstream istr(str);
   BinaryUnserializer iarc(istr);
-  Geometry *         g = nullptr;
+  Geometry          *g = nullptr;
   iarc >> g;
   return std::unique_ptr<Geometry>(g);
 }
@@ -121,7 +121,7 @@ readBinaryPrepared(const std::string &str)
 {
   std::istringstream istr(str);
   BinaryUnserializer iarc(istr);
-  PreparedGeometry * pg = nullptr;
+  PreparedGeometry  *pg = nullptr;
   iarc >> pg;
   return std::unique_ptr<PreparedGeometry>(pg);
 }
@@ -147,7 +147,7 @@ save(boost::archive::binary_oarchive &ar, const CGAL::Gmpz &z,
 {
   const mpz_t &mpz  = z.mpz();
   int32_t      size = mpz->_mp_size;
-  ar &         size;
+  ar          &size;
   uint32_t     rsize = size >= 0 ? size : -size;
 
   for (uint32_t i = 0; i < rsize; ++i) {
@@ -171,8 +171,8 @@ load(boost::archive::binary_iarchive &ar, CGAL::Gmpz &z,
 {
   int32_t  size  = 0;
   uint32_t rsize = 0;
-  mpz_t &  mpz   = z.mpz();
-  ar &     size;
+  mpz_t   &mpz   = z.mpz();
+  ar      &size;
   rsize         = size >= 0 ? size : -size;
   mpz->_mp_size = size;
   _mpz_realloc(mpz, rsize);
@@ -201,7 +201,7 @@ save(boost::archive::binary_oarchive &ar, const mpz_class &z,
 {
   mpz_srcptr mpz  = z.get_mpz_t();
   int32_t    size = mpz->_mp_size;
-  ar &       size;
+  ar        &size;
   uint32_t   rsize = size >= 0 ? size : -size;
 
   for (uint32_t i = 0; i < rsize; ++i) {
@@ -226,7 +226,7 @@ load(boost::archive::binary_iarchive &ar, mpz_class &z,
   int32_t  size  = 0;
   uint32_t rsize = 0;
   mpz_ptr  mpz   = z.get_mpz_t();
-  ar &     size;
+  ar      &size;
   rsize         = size >= 0 ? size : -size;
   mpz->_mp_size = size;
   _mpz_realloc(mpz, rsize);

@@ -35,13 +35,13 @@ namespace SFCGAL {
  * reason for invalidity before its text representation (that can be very long)
  */
 void SFCGAL_API
-     SFCGAL_ASSERT_GEOMETRY_VALIDITY(const Geometry &g);
+SFCGAL_ASSERT_GEOMETRY_VALIDITY(const Geometry &g);
 void SFCGAL_API
-     SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(const Geometry &g);
+SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(const Geometry &g);
 void SFCGAL_API
-     SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(const Geometry &g);
+SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(const Geometry &g);
 void SFCGAL_API
-     SFCGAL_ASSERT_GEOMETRY_VALIDITY_ON_PLANE(const Geometry &g);
+SFCGAL_ASSERT_GEOMETRY_VALIDITY_ON_PLANE(const Geometry &g);
 
 namespace algorithm {
 
@@ -50,7 +50,7 @@ namespace algorithm {
  * @ingroup public_api
  */
 SFCGAL_API const Validity
-                 isValid(const Geometry &g, const double &toleranceAbs = 1e-9);
+isValid(const Geometry &g, const double &toleranceAbs = 1e-9);
 
 /**
  * Sets the geometry flag on a geometry and propagate to every internal

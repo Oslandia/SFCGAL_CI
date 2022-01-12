@@ -40,7 +40,7 @@ triangulate2DZ(const Geometry &g, ConstraintDelaunayTriangulation &triangulate);
  * points in OXY plane)
  */
 SFCGAL_API ConstraintDelaunayTriangulation
-           triangulate2DZ(const Geometry &g);
+triangulate2DZ(const Geometry &g);
 
 } // namespace triangulate
 } // namespace SFCGAL

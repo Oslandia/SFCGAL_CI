@@ -253,10 +253,10 @@ difference(const Primitive &primitive, PrimitiveHandleConstIterator begin,
 // just performs the type switch for the primitive to substract from
 //
 void
-appendDifference(const PrimitiveHandle<2> &                             pa,
+appendDifference(const PrimitiveHandle<2>                              &pa,
                  CollisionMapper<2>::PrimitiveHandleSet::const_iterator begin,
                  CollisionMapper<2>::PrimitiveHandleSet::const_iterator end,
-                 GeometrySet<2> &                                       output)
+                 GeometrySet<2>                                        &output)
 {
   switch (pa.handle.which()) {
   case PrimitivePoint: {
@@ -281,10 +281,10 @@ appendDifference(const PrimitiveHandle<2> &                             pa,
 }
 
 void
-appendDifference(const PrimitiveHandle<3> &                             pa,
+appendDifference(const PrimitiveHandle<3>                              &pa,
                  CollisionMapper<3>::PrimitiveHandleSet::const_iterator begin,
                  CollisionMapper<3>::PrimitiveHandleSet::const_iterator end,
-                 GeometrySet<3> &                                       output)
+                 GeometrySet<3>                                        &output)
 {
   switch (pa.handle.which()) {
   case PrimitivePoint: {

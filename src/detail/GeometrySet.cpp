@@ -73,7 +73,7 @@ namespace SFCGAL {
 namespace detail {
 
 void
-_decompose_triangle(const Triangle &                   tri,
+_decompose_triangle(const Triangle                    &tri,
                     GeometrySet<2>::SurfaceCollection &surfaces, dim_t<2>)
 {
   CGAL::Polygon_2<Kernel> outer;
@@ -88,7 +88,7 @@ _decompose_triangle(const Triangle &                   tri,
   surfaces.push_back(CGAL::Polygon_with_holes_2<Kernel>(outer));
 }
 void
-_decompose_triangle(const Triangle &                   tri,
+_decompose_triangle(const Triangle                    &tri,
                     GeometrySet<3>::SurfaceCollection &surfaces, dim_t<3>)
 {
   CGAL::Triangle_3<Kernel> outtri(tri.vertex(0).toPoint_3(),
@@ -98,14 +98,14 @@ _decompose_triangle(const Triangle &                   tri,
 }
 
 void
-_decompose_polygon(const Polygon &                    poly,
+_decompose_polygon(const Polygon                     &poly,
                    GeometrySet<2>::SurfaceCollection &surfaces, dim_t<2>)
 {
   BOOST_ASSERT(!poly.isEmpty());
   surfaces.push_back(poly.toPolygon_with_holes_2());
 }
 void
-_decompose_polygon(const Polygon &                    poly,
+_decompose_polygon(const Polygon                     &poly,
                    GeometrySet<3>::SurfaceCollection &surfaces, dim_t<3>)
 {
   BOOST_ASSERT(!poly.isEmpty());
@@ -555,7 +555,7 @@ template <int Dim>
 void
 GeometrySet<Dim>::computeBoundingBoxes(
     typename HandleCollection<Dim>::Type &handles,
-    typename BoxCollection<Dim>::Type &   boxes) const
+    typename BoxCollection<Dim>::Type    &boxes) const
 {
   boxes.clear();
 
@@ -720,7 +720,7 @@ recompose_segments(const typename GeometrySet<Dim>::SegmentCollection &segments,
 
 void
 recompose_surfaces(const GeometrySet<2>::SurfaceCollection &surfaces,
-                   std::vector<Geometry *> &                output, dim_t<2>)
+                   std::vector<Geometry *>                 &output, dim_t<2>)
 {
   for (GeometrySet<2>::SurfaceCollection::const_iterator it = surfaces.begin();
        it != surfaces.end(); ++it) {
@@ -740,7 +740,7 @@ recompose_surfaces(const GeometrySet<2>::SurfaceCollection &surfaces,
 
 void
 recompose_surfaces(const GeometrySet<3>::SurfaceCollection &surfaces,
-                   std::vector<Geometry *> &                output, dim_t<3>)
+                   std::vector<Geometry *>                 &output, dim_t<3>)
 {
   if (surfaces.empty()) {
     return;
@@ -791,7 +791,7 @@ recompose_volumes(const GeometrySet<2>::VolumeCollection &,
 
 void
 recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
-                  std::vector<Geometry *> &               output, dim_t<3>)
+                  std::vector<Geometry *>                &output, dim_t<3>)
 {
   if (volumes.empty()) {
     return;
@@ -919,7 +919,7 @@ GeometrySet<Dim>::recompose() const
 
 void
 _collect_points(const CGAL::Polygon_with_holes_2<Kernel> &poly,
-                GeometrySet<2>::PointCollection &         points)
+                GeometrySet<2>::PointCollection          &points)
 {
   for (CGAL::Polygon_2<Kernel>::Vertex_iterator vit =
            poly.outer_boundary().vertices_begin();
@@ -938,7 +938,7 @@ _collect_points(const CGAL::Polygon_with_holes_2<Kernel> &poly,
 }
 
 void
-_collect_points(const CGAL::Triangle_3<Kernel> & tri,
+_collect_points(const CGAL::Triangle_3<Kernel>  &tri,
                 GeometrySet<3>::PointCollection &points)
 {
   points.insert(tri.vertex(0));
@@ -952,7 +952,7 @@ _collect_points(const NoVolume &, GeometrySet<2>::PointCollection &)
 }
 
 void
-_collect_points(const MarkedPolyhedron &         poly,
+_collect_points(const MarkedPolyhedron          &poly,
                 GeometrySet<3>::PointCollection &points)
 {
   for (MarkedPolyhedron::Vertex_const_iterator vit = poly.vertices_begin();

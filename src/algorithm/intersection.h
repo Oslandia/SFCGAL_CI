@@ -53,7 +53,7 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @warning No actual validity check is done.
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck);
+intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck);
 
 /**
  * Intersection on 3D geometries. Assume z = 0 if needed
@@ -70,7 +70,7 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @warning@ No actual validity check is done
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           intersection3D(const Geometry &ga, const Geometry &gb, NoValidityCheck);
+intersection3D(const Geometry &ga, const Geometry &gb, NoValidityCheck);
 
 /**
  * @ingroup detail

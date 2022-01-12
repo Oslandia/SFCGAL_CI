@@ -316,8 +316,8 @@ TriangulatedSurface::toPolyhedron_3() const
 }
 
 template SFCGAL_API std::unique_ptr<detail::MarkedPolyhedron>
-                    TriangulatedSurface::toPolyhedron_3<Kernel, detail::MarkedPolyhedron>() const;
+TriangulatedSurface::toPolyhedron_3<Kernel, detail::MarkedPolyhedron>() const;
 template SFCGAL_API std::unique_ptr<CGAL::Polyhedron_3<Kernel>>
-                    TriangulatedSurface::toPolyhedron_3<Kernel, CGAL::Polyhedron_3<Kernel>>() const;
+TriangulatedSurface::toPolyhedron_3<Kernel, CGAL::Polyhedron_3<Kernel>>() const;
 
 } // namespace SFCGAL

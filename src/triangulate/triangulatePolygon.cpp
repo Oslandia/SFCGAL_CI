@@ -43,7 +43,7 @@ typedef ConstraintDelaunayTriangulation::Vertex_handle Vertex_handle;
 ///
 ///
 void
-triangulatePolygon3D(const Geometry &     g,
+triangulatePolygon3D(const Geometry      &g,
                      TriangulatedSurface &triangulatedSurface)
 {
   if (g.isEmpty()) {
@@ -91,7 +91,7 @@ triangulatePolygon3D(const Geometry &     g,
 ///
 ///
 void
-triangulatePolygon3D(const Triangle &     triangle,
+triangulatePolygon3D(const Triangle      &triangle,
                      TriangulatedSurface &triangulatedSurface)
 {
   /*
@@ -109,7 +109,7 @@ triangulatePolygon3D(const Triangle &     triangle,
 ///
 void
 triangulatePolygon3D(const TriangulatedSurface &g,
-                     TriangulatedSurface &      triangulatedSurface)
+                     TriangulatedSurface       &triangulatedSurface)
 {
   triangulatedSurface.addTriangles(g);
 }
@@ -119,7 +119,7 @@ triangulatePolygon3D(const TriangulatedSurface &g,
 ///
 void
 triangulatePolygon3D(const GeometryCollection &g,
-                     TriangulatedSurface &     triangulatedSurface)
+                     TriangulatedSurface      &triangulatedSurface)
 {
   for (size_t i = 0; i < g.numGeometries(); i++) {
     triangulatePolygon3D(g.geometryN(i), triangulatedSurface);
@@ -130,7 +130,7 @@ triangulatePolygon3D(const GeometryCollection &g,
 ///
 ///
 void
-triangulatePolygon3D(const Polygon &      polygon,
+triangulatePolygon3D(const Polygon       &polygon,
                      TriangulatedSurface &triangulatedSurface)
 {
   /*
@@ -200,7 +200,7 @@ triangulatePolygon3D(const Polygon &      polygon,
 ///
 void
 triangulatePolygon3D(const PolyhedralSurface &g,
-                     TriangulatedSurface &    triangulatedSurface)
+                     TriangulatedSurface     &triangulatedSurface)
 {
   for (size_t i = 0; i < g.numGeometries(); i++) {
     triangulatePolygon3D(g.polygonN(i), triangulatedSurface);

@@ -223,10 +223,10 @@ lineSubstring(const LineString &ls, double start, double end)
   bool        on_end         = false;
   double      len_to_end_idx = 0.0;
   Point       pend           = find_position(
-      ls, N, len * end, len_to_start_idx, tol, false // Find end.
-      ,
-      end_idx, end_frac, on_end, len_to_end_idx // This result is not used.
-  );
+                      ls, N, len * end, len_to_start_idx, tol, false // Find end.
+                      ,
+                      end_idx, end_frac, on_end, len_to_end_idx // This result is not used.
+                  );
 
   if (reverse && closed) {
     // For closed lines we always want to follow the

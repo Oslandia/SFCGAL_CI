@@ -255,7 +255,7 @@ difference(const Segment_2 &segment, const PolygonWH_2 &polygon,
        ring != rings.end(); ++ring) {
     for (Polygon_2::Vertex_const_iterator target = ring->vertices_begin();
          target != ring->vertices_end(); ++target) {
-      const Segment_2        sc(target == ring->vertices_begin()
+      const Segment_2 sc(target == ring->vertices_begin()
                              ? *(ring->vertices_end() - 1)
                              : *(target - 1),
                          *target);
@@ -278,7 +278,7 @@ difference(const Segment_2 &segment, const PolygonWH_2 &polygon,
          ring != rings.end(); ++ring) {
       for (Polygon_2::Vertex_const_iterator target = ring->vertices_begin();
            target != ring->vertices_end(); ++target) {
-        Segment_2      sc(target == ring->vertices_begin()
+        Segment_2 sc(target == ring->vertices_begin()
                          ? *(ring->vertices_end() - 1)
                          : *(target - 1),
                      *target);
@@ -637,7 +637,7 @@ difference(const Segment_3 &segment, const MarkedPolyhedron &polyhedron,
   // to speed thing up we put facets in AABB-Tree
 
   std::vector<FaceBbox>     bboxes(polyhedron.facets_begin(),
-                               polyhedron.facets_end());
+                                   polyhedron.facets_end());
   std::vector<FaceBboxBase> bbox(
       1, FaceBboxBase(segment.bbox(),
                       polyhedron.facets_begin()->facet_begin())); // nevermind

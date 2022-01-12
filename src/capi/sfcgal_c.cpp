@@ -191,8 +191,8 @@ sfcgal_geometry_is_valid(const sfcgal_geometry_t *geom)
 
 extern "C" int
 sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
-                                char **                  invalidity_reason,
-                                sfcgal_geometry_t **     invalidity_location)
+                                char                   **invalidity_reason,
+                                sfcgal_geometry_t      **invalidity_location)
 {
   // invalidity location is not supported for now
   if (invalidity_location)
@@ -675,7 +675,7 @@ sfcgal_prepared_geometry_geometry(const sfcgal_prepared_geometry_t *pgeom)
 
 extern "C" void
 sfcgal_prepared_geometry_set_geometry(sfcgal_prepared_geometry_t *pgeom,
-                                      sfcgal_geometry_t *         geom)
+                                      sfcgal_geometry_t          *geom)
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       reinterpret_cast<SFCGAL::PreparedGeometry *>(pgeom)->resetGeometry(
@@ -983,7 +983,7 @@ extern "C" sfcgal_geometry_t *
 sfcgal_geometry_force_lhr(const sfcgal_geometry_t *ga)
 {
   const SFCGAL::Geometry *g  = reinterpret_cast<const SFCGAL::Geometry *>(ga);
-  SFCGAL::Geometry *      gb = g->clone();
+  SFCGAL::Geometry       *gb = g->clone();
   SFCGAL::transform::ForceOrderPoints force(/* ccw */ true);
 
   try {
@@ -1003,7 +1003,7 @@ extern "C" sfcgal_geometry_t *
 sfcgal_geometry_force_rhr(const sfcgal_geometry_t *ga)
 {
   const SFCGAL::Geometry *g  = reinterpret_cast<const SFCGAL::Geometry *>(ga);
-  SFCGAL::Geometry *      gb = g->clone();
+  SFCGAL::Geometry       *gb = g->clone();
   SFCGAL::transform::ForceOrderPoints force(/* ccw */ false);
 
   try {
@@ -1067,7 +1067,7 @@ extern "C" sfcgal_geometry_t *
 sfcgal_geometry_round(const sfcgal_geometry_t *ga, int scale)
 {
   const SFCGAL::Geometry *g  = reinterpret_cast<const SFCGAL::Geometry *>(ga);
-  SFCGAL::Geometry *      gb = g->clone();
+  SFCGAL::Geometry       *gb = g->clone();
   //	SFCGAL_WARNING( "geom: %s %s", gb->asText().c_str(), typeid(g).name() );
 
   SFCGAL::transform::RoundTransform roundT(scale);

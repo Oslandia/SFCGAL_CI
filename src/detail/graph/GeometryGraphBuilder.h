@@ -107,7 +107,7 @@ public:
    * @return the list of edges inserted into the graph
    */
   std::vector<edge_descriptor>
-  addLineString(const LineString &     lineString,
+  addLineString(const LineString      &lineString,
                 const edge_properties &edgeProperties = edge_properties())
   {
     BOOST_ASSERT(!lineString.isEmpty());
@@ -127,7 +127,7 @@ public:
    * @return the list of edges inserted into the graph
    */
   std::vector<edge_descriptor>
-  addTriangle(const Triangle &       triangle,
+  addTriangle(const Triangle        &triangle,
               const edge_properties &edgeProperties = edge_properties())
   {
     BOOST_ASSERT(!triangle.isEmpty());
@@ -147,7 +147,7 @@ public:
    * @returns the list of rings inserted into the graph
    */
   std::vector<std::vector<edge_descriptor>>
-  addPolygon(const Polygon &        polygon,
+  addPolygon(const Polygon         &polygon,
              const edge_properties &edgeProperties = edge_properties())
   {
     BOOST_ASSERT(!polygon.isEmpty());
@@ -168,7 +168,7 @@ public:
   std::vector<std::vector<edge_descriptor>>
   addTriangulatedSurface(
       const TriangulatedSurface &triangulatedSurface,
-      const edge_properties &    edgeProperties = edge_properties())
+      const edge_properties     &edgeProperties = edge_properties())
   {
     BOOST_ASSERT(!triangulatedSurface.isEmpty());
 
@@ -189,7 +189,7 @@ public:
   std::vector<std::vector<std::vector<edge_descriptor>>>
   addPolyhedralSurface(
       const PolyhedralSurface &polyhedralSurface,
-      const edge_properties &  edgeProperties = edge_properties())
+      const edge_properties   &edgeProperties = edge_properties())
   {
     BOOST_ASSERT(!polyhedralSurface.isEmpty());
 
@@ -204,7 +204,7 @@ public:
   }
 
 private:
-  graph_t &       _graph;
+  graph_t        &_graph;
   coordinate_list _vertices;
 
   /**

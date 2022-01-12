@@ -322,7 +322,7 @@ public:
    */
   void
   computeBoundingBoxes(typename HandleCollection<Dim>::Type &handles,
-                       typename BoxCollection<Dim>::Type &   boxes) const;
+                       typename BoxCollection<Dim>::Type    &boxes) const;
 
   inline PointCollection &
   points()
@@ -415,12 +415,12 @@ private:
 
 ///
 /// Display operator
-SFCGAL_API std::ostream &
-           operator<<(std::ostream &, const GeometrySet<2> &g);
+SFCGAL_API std::ostream            &
+operator<<(std::ostream &, const GeometrySet<2> &g);
 ///
 /// Display operator
-SFCGAL_API std::ostream &
-           operator<<(std::ostream &, const GeometrySet<3> &g);
+SFCGAL_API std::ostream            &
+operator<<(std::ostream &, const GeometrySet<3> &g);
 
 // bbox of a 'volume' for 2D, will never be called
 inline CGAL::Bbox_2

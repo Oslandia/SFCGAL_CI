@@ -42,7 +42,7 @@ namespace algorithm {
 void
 _intersection_solid_segment(const PrimitiveHandle<3> &pa,
                             const PrimitiveHandle<3> &pb,
-                            GeometrySet<3> &          output)
+                            GeometrySet<3>           &output)
 {
   // typedef CGAL::Polyhedral_mesh_domain_3<MarkedPolyhedron, Kernel>
   // Mesh_domain;
@@ -122,9 +122,9 @@ struct Is_not_marked {
 };
 
 void
-_intersection_solid_triangle(const MarkedPolyhedron &        pa,
+_intersection_solid_triangle(const MarkedPolyhedron         &pa,
                              const CGAL::Triangle_3<Kernel> &tri,
-                             GeometrySet<3> &                output)
+                             GeometrySet<3>                 &output)
 {
   BOOST_ASSERT(pa.is_closed());
 

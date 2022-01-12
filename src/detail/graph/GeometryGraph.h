@@ -431,7 +431,8 @@ public:
   /**
    * returns the VertexProperties attached to a Vertex
    */
-  inline vertex_properties &operator[](const vertex_descriptor &vertex)
+  inline vertex_properties &
+  operator[](const vertex_descriptor &vertex)
   {
     return _graph[vertex];
   }
@@ -439,14 +440,16 @@ public:
   /**
    * returns the VertexProperties attached to a Vertex
    */
-  inline const edge_properties &operator[](const edge_descriptor &edge) const
+  inline const edge_properties &
+  operator[](const edge_descriptor &edge) const
   {
     return _graph[edge];
   }
   /**
    * returns the VertexProperties attached to a Vertex
    */
-  inline edge_properties &operator[](const edge_descriptor &edge)
+  inline edge_properties &
+  operator[](const edge_descriptor &edge)
   {
     return _graph[edge];
   }
@@ -477,7 +480,7 @@ public:
    * implicit cast to the wrapped boost graph in order to keep boost graph
    * interface
    */
-  operator const graph_t &(void)const { return _graph; }
+  operator const graph_t &(void) const { return _graph; }
 
 private:
   /**

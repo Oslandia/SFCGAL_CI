@@ -388,7 +388,7 @@ extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz)
 }
 
 SFCGAL_API std::unique_ptr<Geometry>
-           extrude(const Geometry &g, const double &dx, const double &dy, const double &dz)
+extrude(const Geometry &g, const double &dx, const double &dy, const double &dz)
 {
   if (!std::isfinite(dx) || !std::isfinite(dy) || !std::isfinite(dz)) {
     BOOST_THROW_EXCEPTION(NonFiniteValueException(

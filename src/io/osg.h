@@ -57,8 +57,8 @@ osgWriteFile(const Geometry &g, const std::string &filepath);
 /**
  * @brief [helper] converts a SFCGAL::Geometry to an OSG geometry
  */
-SFCGAL_API osg::Geometry *
-           toOsgGeometry(const Geometry &g);
+SFCGAL_API osg::Geometry            *
+toOsgGeometry(const Geometry &g);
 
 } // namespace io
 } // namespace SFCGAL

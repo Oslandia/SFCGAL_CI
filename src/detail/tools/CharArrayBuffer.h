@@ -61,7 +61,7 @@ private:
 private:
   const char *const begin_;
   const char *const end_;
-  const char *      current_;
+  const char       *current_;
 };
 
 #endif

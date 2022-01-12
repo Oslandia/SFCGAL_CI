@@ -54,8 +54,8 @@ normal3D(const LineString &ls, bool exact = true)
   nx = ny = nz = 0.0;
 
   for (size_t i = 0; i < ls.numPoints(); ++i) {
-    const Point &       pi = ls.pointN(i);
-    const Point &       pj = ls.pointN((i + 1) % ls.numPoints());
+    const Point        &pi = ls.pointN(i);
+    const Point        &pj = ls.pointN((i + 1) % ls.numPoints());
     typename Kernel::FT zi = pi.z();
     typename Kernel::FT zj = pj.z();
     nx += (pi.y() - pj.y()) * (zi + zj);

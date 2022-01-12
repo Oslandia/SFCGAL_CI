@@ -35,7 +35,7 @@ namespace algorithm {
  */
 template <typename Graph>
 void
-studyOrientation(Graph &                                       graph,
+studyOrientation(Graph                                        &graph,
                  std::vector<typename Graph::edge_descriptor> &reference,
                  std::vector<typename Graph::edge_descriptor> &target,
                  bool &hasOppositeEdge, bool &hasParallelEdge)

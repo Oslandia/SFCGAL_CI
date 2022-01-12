@@ -39,7 +39,7 @@ namespace triangulate {
  * @ingroup detail
  */
 SFCGAL_API void
-triangulatePolygon3D(const Geometry &     g,
+triangulatePolygon3D(const Geometry      &g,
                      TriangulatedSurface &triangulatedSurface);
 /**
  * @brief Triangulate a 3D Polygon
@@ -47,7 +47,7 @@ triangulatePolygon3D(const Geometry &     g,
  * @ingroup detail
  */
 SFCGAL_API void
-triangulatePolygon3D(const Polygon &      g,
+triangulatePolygon3D(const Polygon       &g,
                      TriangulatedSurface &triangulatedSurface);
 /**
  * @brief Triangulate a 3D Triangle (copy triangle)
@@ -55,7 +55,7 @@ triangulatePolygon3D(const Polygon &      g,
  * @ingroup detail
  */
 SFCGAL_API void
-triangulatePolygon3D(const Triangle &     g,
+triangulatePolygon3D(const Triangle      &g,
                      TriangulatedSurface &triangulatedSurface);
 /**
  * @brief Triangulate a 3D TriangulatedSurface (copy triangles)
@@ -65,7 +65,7 @@ triangulatePolygon3D(const Triangle &     g,
  */
 SFCGAL_API void
 triangulatePolygon3D(const TriangulatedSurface &g,
-                     TriangulatedSurface &      triangulatedSurface);
+                     TriangulatedSurface       &triangulatedSurface);
 /**
  * @brief Triangulate a 3D MultiPolygon
  * @todo unittest
@@ -73,7 +73,7 @@ triangulatePolygon3D(const TriangulatedSurface &g,
  */
 SFCGAL_API void
 opentriangulatePolygon3D(const GeometryCollection &g,
-                         TriangulatedSurface &     triangulatedSurface);
+                         TriangulatedSurface      &triangulatedSurface);
 /**
  * @brief Triangulate 3D polygons in a PolyhedralSurface.
  *
@@ -82,7 +82,7 @@ opentriangulatePolygon3D(const GeometryCollection &g,
  */
 SFCGAL_API void
 triangulatePolygon3D(const PolyhedralSurface &polyhedralSurface,
-                     TriangulatedSurface &    triangulatedSurface);
+                     TriangulatedSurface     &triangulatedSurface);
 /**
  * @brief Triangulate a Solid
  *

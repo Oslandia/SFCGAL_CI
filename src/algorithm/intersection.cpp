@@ -59,7 +59,7 @@ template <int Dim>
 void
 dispatch_intersection_sym(const PrimitiveHandle<Dim> &pa,
                           const PrimitiveHandle<Dim> &pb,
-                          GeometrySet<Dim> &          output)
+                          GeometrySet<Dim>           &output)
 {
   // assume types are ordered by dimension within the boost::variant
   if (pa.handle.which() >= pb.handle.which()) {

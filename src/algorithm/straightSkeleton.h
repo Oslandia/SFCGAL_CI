@@ -77,9 +77,9 @@ SFCGAL_API std::unique_ptr<MultiLineString>
  * @throws NotImplementedException If g is a Polygon with point touching rings.
  */
 SFCGAL_API std::unique_ptr<MultiLineString>
-           straightSkeleton(const Geometry &g, bool autoOrientation, NoValidityCheck,
-                            bool innerOnly = false, bool outputDistanceInM = false,
-                            const double &toleranceAbs = 1e-8);
+straightSkeleton(const Geometry &g, bool autoOrientation, NoValidityCheck,
+                 bool innerOnly = false, bool outputDistanceInM = false,
+                 const double &toleranceAbs = 1e-8);
 
 /**
  * @brief build a 2D straight skeleton for a Polygon

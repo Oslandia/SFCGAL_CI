@@ -129,8 +129,8 @@ save(Archive &ar, const CGAL::Gmpq &q, const unsigned int /*version*/)
 {
   CGAL::Gmpz n = q.numerator();
   CGAL::Gmpz d = q.denominator();
-  ar &       n;
-  ar &       d;
+  ar        &n;
+  ar        &d;
 }
 
 /**
@@ -142,8 +142,8 @@ load(Archive &ar, CGAL::Gmpq &q, const unsigned int /*version*/)
 {
   CGAL::Gmpz n;
   CGAL::Gmpz d;
-  ar &       n;
-  ar &       d;
+  ar        &n;
+  ar        &d;
   q = CGAL::Gmpq(n, d);
 }
 template <class Archive>
@@ -198,8 +198,8 @@ save(Archive &ar, const mpq_class &q, const unsigned int /*version*/)
 {
   mpz_class n = q.get_num();
   mpz_class d = q.get_den();
-  ar &      n;
-  ar &      d;
+  ar       &n;
+  ar       &d;
 }
 
 /**
@@ -211,8 +211,8 @@ load(Archive &ar, mpq_class &q, const unsigned int /*version*/)
 {
   mpz_class n;
   mpz_class d;
-  ar &      n;
-  ar &      d;
+  ar       &n;
+  ar       &d;
   q = mpq_class(n, d);
 }
 template <class Archive>

@@ -221,7 +221,7 @@ isValid(const Polygon &p, const double &toleranceAbs)
   // of the code, so we check that here
   for (size_t r = 0; r != numRings; ++r) {
     const LineString &ring  = p.ringN(r);
-    const Point &     start = ring.startPoint();
+    const Point      &start = ring.startPoint();
     size_t            i     = 0;
     for (; i < ring.numPoints() && start == ring.pointN(i); i++)
       ; // noop

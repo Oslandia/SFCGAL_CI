@@ -165,7 +165,7 @@ private:
  * get the logger
  */
 SFCGAL_API Logger &
-           logger();
+logger();
 
 } // namespace SFCGAL
 

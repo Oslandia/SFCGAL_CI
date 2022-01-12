@@ -66,7 +66,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb)
   else if (pa.handle.which() == PrimitiveSegment &&
            pb.handle.which() == PrimitivePoint) {
     const CGAL::Segment_2<Kernel> *seg = pa.as<CGAL::Segment_2<Kernel>>();
-    const CGAL::Point_2<Kernel> *  pt  = pb.as<CGAL::Point_2<Kernel>>();
+    const CGAL::Point_2<Kernel>   *pt  = pb.as<CGAL::Point_2<Kernel>>();
     return seg->has_on(*pt);
   }
 
@@ -310,7 +310,7 @@ _intersects(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb)
   } else if (pa.handle.which() == PrimitiveSegment &&
              pb.handle.which() == PrimitivePoint) {
     const CGAL::Segment_3<Kernel> *seg = pa.as<CGAL::Segment_3<Kernel>>();
-    const CGAL::Point_3<Kernel> *  pt  = pb.as<CGAL::Point_3<Kernel>>();
+    const CGAL::Point_3<Kernel>   *pt  = pb.as<CGAL::Point_3<Kernel>>();
     return seg->has_on(*pt);
   } else if (pa.handle.which() == PrimitiveSegment &&
              pb.handle.which() == PrimitiveSegment) {
@@ -327,14 +327,14 @@ _intersects(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb)
   if (pa.handle.which() == PrimitiveSurface &&
       pb.handle.which() == PrimitivePoint) {
     const CGAL::Triangle_3<Kernel> *tri = pa.as<CGAL::Triangle_3<Kernel>>();
-    const CGAL::Point_3<Kernel> *   pt  = pb.as<CGAL::Point_3<Kernel>>();
+    const CGAL::Point_3<Kernel>    *pt  = pb.as<CGAL::Point_3<Kernel>>();
     return tri->has_on(*pt);
   }
 
   if (pa.handle.which() == PrimitiveSurface &&
       pb.handle.which() == PrimitiveSegment) {
     const CGAL::Triangle_3<Kernel> *tri = pa.as<CGAL::Triangle_3<Kernel>>();
-    const CGAL::Segment_3<Kernel> * seg = pb.as<CGAL::Segment_3<Kernel>>();
+    const CGAL::Segment_3<Kernel>  *seg = pb.as<CGAL::Segment_3<Kernel>>();
     return CGAL::do_intersect(*tri, *seg);
   }
 

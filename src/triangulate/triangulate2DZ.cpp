@@ -46,7 +46,7 @@ triangulate2DZ(const Point &g, ConstraintDelaunayTriangulation &triangulation)
 ///
 ///
 void
-triangulate2DZ(const LineString &               g,
+triangulate2DZ(const LineString                &g,
                ConstraintDelaunayTriangulation &triangulation)
 {
   Vertex_handle last;
@@ -75,7 +75,7 @@ triangulate2DZ(const Polygon &g, ConstraintDelaunayTriangulation &triangulation)
 ///
 ///
 void
-triangulate2DZ(const Triangle &                 g,
+triangulate2DZ(const Triangle                  &g,
                ConstraintDelaunayTriangulation &triangulation)
 {
   Vertex_handle last;
@@ -94,7 +94,7 @@ triangulate2DZ(const Triangle &                 g,
 ///
 ///
 void
-triangulateCollection2DZ(const Geometry &                 g,
+triangulateCollection2DZ(const Geometry                  &g,
                          ConstraintDelaunayTriangulation &triangulation)
 {
   for (size_t i = 0; i < g.numGeometries(); i++) {
@@ -106,7 +106,7 @@ triangulateCollection2DZ(const Geometry &                 g,
 ///
 ///
 void
-triangulate2DZ(const Geometry &                 g,
+triangulate2DZ(const Geometry                  &g,
                ConstraintDelaunayTriangulation &triangulation)
 {
 
