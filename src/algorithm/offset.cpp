@@ -24,16 +24,16 @@
 #include <CGAL/minkowski_sum_2.h>
 #include <CGAL/offset_polygon_2.h>
 
-typedef CGAL::Polygon_2<SFCGAL::Kernel>            Polygon_2;
-typedef CGAL::Polygon_with_holes_2<SFCGAL::Kernel> Polygon_with_holes_2;
-typedef CGAL::Polygon_set_2<SFCGAL::Kernel>        Polygon_set_2;
+using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
+using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
+using Polygon_set_2        = CGAL::Polygon_set_2<SFCGAL::Kernel>;
 
-typedef CGAL::Gps_circle_segment_traits_2<SFCGAL::Kernel> Gps_traits_2;
-typedef Gps_traits_2::Curve_2                             Offset_curve_2;
-typedef Gps_traits_2::X_monotone_curve_2          Offset_x_monotone_curve_2;
-typedef Gps_traits_2::Polygon_2                   Offset_polygon_2;
-typedef Gps_traits_2::Polygon_with_holes_2        Offset_polygon_with_holes_2;
-typedef CGAL::General_polygon_set_2<Gps_traits_2> Offset_polygon_set_2;
+using Gps_traits_2   = CGAL::Gps_circle_segment_traits_2<SFCGAL::Kernel>;
+using Offset_curve_2 = Gps_traits_2::Curve_2;
+using Offset_x_monotone_curve_2   = Gps_traits_2::X_monotone_curve_2;
+using Offset_polygon_2            = Gps_traits_2::Polygon_2;
+using Offset_polygon_with_holes_2 = Gps_traits_2::Polygon_with_holes_2;
+using Offset_polygon_set_2        = CGAL::General_polygon_set_2<Gps_traits_2>;
 
 #define SFCGAL_OFFSET_ACCURACY 0.0001
 
@@ -82,16 +82,15 @@ offsetCollection(const Geometry &g, const double &radius,
 /**
  * @brief approximate an Offset_polygon_2 (filter null segments)
  */
-Polygon_2
-approximate(const Offset_polygon_2 &polygon, const int &n = 0)
+auto
+approximate(const Offset_polygon_2 &polygon, const int &n = 0) -> Polygon_2
 {
   std::list<std::pair<double, double>> pair_list;
 
   /*
    * iterate X_monotone_curve_2 components
    */
-  for (Offset_polygon_2::Curve_const_iterator it = polygon.curves_begin();
-       it != polygon.curves_end(); ++it) {
+  for (auto it = polygon.curves_begin(); it != polygon.curves_end(); ++it) {
     it->approximate(std::back_inserter(pair_list), n);
   }
 
@@ -127,14 +126,13 @@ approximate(const Offset_polygon_2 &polygon, const int &n = 0)
 /**
  * @brief approximate an Offset
  */
-Polygon_with_holes_2
+auto
 approximate(const Offset_polygon_with_holes_2 &polygon, const int &n = 0)
+    -> Polygon_with_holes_2
 {
   Polygon_with_holes_2 result(approximate(polygon.outer_boundary(), n));
 
-  for (Offset_polygon_with_holes_2::Hole_const_iterator it =
-           polygon.holes_begin();
-       it != polygon.holes_end(); ++it) {
+  for (auto it = polygon.holes_begin(); it != polygon.holes_end(); ++it) {
     result.add_hole(approximate(*it, n));
   }
 
@@ -144,8 +142,9 @@ approximate(const Offset_polygon_with_holes_2 &polygon, const int &n = 0)
 /**
  * @brief convert Offset_polygon_set_2 to MultiPolygon
  */
-std::unique_ptr<MultiPolygon>
+auto
 polygonSetToMultiPolygon(const Offset_polygon_set_2 &polygonSet, const int &n)
+    -> std::unique_ptr<MultiPolygon>
 {
   std::list<Offset_polygon_with_holes_2> res;
   polygonSet.polygons_with_holes(std::back_inserter(res));
@@ -163,8 +162,8 @@ polygonSetToMultiPolygon(const Offset_polygon_set_2 &polygonSet, const int &n)
 /**
  * @brief helper to create a polygon from a circle
  */
-Offset_polygon_2
-circleToPolygon(const Kernel::Circle_2 &circle)
+auto
+circleToPolygon(const Kernel::Circle_2 &circle) -> Offset_polygon_2
 {
   /*
    * convert the circle into Offset_x_monotone_curve_2 (exactly 2)
@@ -274,13 +273,10 @@ offset(const Polygon &g, const double &radius, Offset_polygon_set_2 &polygonSet)
     std::list<Offset_polygon_with_holes_2> interiorPolygons;
     sumInteriorRings.polygons_with_holes(std::back_inserter(interiorPolygons));
 
-    for (std::list<Offset_polygon_with_holes_2>::iterator it_p =
-             interiorPolygons.begin();
-         it_p != interiorPolygons.end(); ++it_p) {
+    for (auto &interiorPolygon : interiorPolygons) {
 
-      for (Offset_polygon_with_holes_2::Hole_iterator it_hole =
-               it_p->holes_begin();
-           it_hole != it_p->holes_end(); ++it_hole) {
+      for (auto it_hole = interiorPolygon.holes_begin();
+           it_hole != interiorPolygon.holes_end(); ++it_hole) {
 
         it_hole->reverse_orientation();
         polygonSet.difference(*it_hole);
@@ -348,8 +344,9 @@ offset(const Geometry &g, const double &radius,
 ///
 ///
 ///
-std::unique_ptr<MultiPolygon>
+auto
 offset(const Geometry &g, const double &r, NoValidityCheck)
+    -> std::unique_ptr<MultiPolygon>
 {
   SFCGAL_OFFSET_ASSERT_FINITE_RADIUS(r);
   Offset_polygon_set_2 polygonSet;
@@ -357,8 +354,8 @@ offset(const Geometry &g, const double &r, NoValidityCheck)
   return polygonSetToMultiPolygon(polygonSet, 8);
 }
 
-std::unique_ptr<MultiPolygon>
-offset(const Geometry &g, const double &r)
+auto
+offset(const Geometry &g, const double &r) -> std::unique_ptr<MultiPolygon>
 {
   SFCGAL_OFFSET_ASSERT_FINITE_RADIUS(r);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY(g);

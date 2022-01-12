@@ -11,8 +11,8 @@
 namespace SFCGAL {
 namespace algorithm {
 
-const Kernel::FT
-volume(const Solid &solid, NoValidityCheck)
+auto
+volume(const Solid &solid, NoValidityCheck) -> const Kernel::FT
 {
   Kernel::FT                  vol = 0;
   const CGAL::Point_3<Kernel> origin(0, 0, 0);
@@ -34,8 +34,8 @@ volume(const Solid &solid, NoValidityCheck)
   return vol;
 }
 
-const Kernel::FT
-volume(const Geometry &g)
+auto
+volume(const Geometry &g) -> const Kernel::FT
 {
   if (g.isEmpty()) {
     return 0;
@@ -60,8 +60,8 @@ volume(const Geometry &g)
 
   case TYPE_MULTISOLID:
   case TYPE_GEOMETRYCOLLECTION:
-    Kernel::FT                v = 0;
-    const GeometryCollection &c = g.as<GeometryCollection>();
+    Kernel::FT  v = 0;
+    const auto &c = g.as<GeometryCollection>();
 
     for (size_t i = 0; i < c.numGeometries(); i++) {
       if (c.geometryN(i).is<Solid>()) {

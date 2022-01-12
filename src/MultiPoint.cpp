@@ -15,13 +15,13 @@ MultiPoint::MultiPoint() : GeometryCollection() {}
 ///
 ///
 ///
-MultiPoint::MultiPoint(MultiPoint const &other) : GeometryCollection(other) {}
+MultiPoint::MultiPoint(MultiPoint const &other) = default;
 
 ///
 ///
 ///
-MultiPoint &
-MultiPoint::operator=(MultiPoint other)
+auto
+MultiPoint::operator=(MultiPoint other) -> MultiPoint &
 {
   swap(other);
   return *this;
@@ -30,13 +30,13 @@ MultiPoint::operator=(MultiPoint other)
 ///
 ///
 ///
-MultiPoint::~MultiPoint() {}
+MultiPoint::~MultiPoint() = default;
 
 ///
 ///
 ///
-MultiPoint *
-MultiPoint::clone() const
+auto
+MultiPoint::clone() const -> MultiPoint *
 {
   return new MultiPoint(*this);
 }
@@ -44,8 +44,8 @@ MultiPoint::clone() const
 ///
 ///
 ///
-std::string
-MultiPoint::geometryType() const
+auto
+MultiPoint::geometryType() const -> std::string
 {
   return "MultiPoint";
 }
@@ -53,8 +53,8 @@ MultiPoint::geometryType() const
 ///
 ///
 ///
-GeometryType
-MultiPoint::geometryTypeId() const
+auto
+MultiPoint::geometryTypeId() const -> GeometryType
 {
   return TYPE_MULTIPOINT;
 }
@@ -62,8 +62,8 @@ MultiPoint::geometryTypeId() const
 ///
 ///
 ///
-bool
-MultiPoint::isAllowed(Geometry const &g)
+auto
+MultiPoint::isAllowed(Geometry const &g) -> bool
 {
   return g.geometryTypeId() == TYPE_POINT;
 }

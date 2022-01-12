@@ -27,8 +27,8 @@ namespace algorithm {
 
 template <int Dim>
 struct CollisionMapper {
-  typedef std::vector<PrimitiveHandle<Dim> *> PrimitiveHandleSet;
-  typedef std::map<PrimitiveHandle<Dim> *, PrimitiveHandleSet> Map;
+  using PrimitiveHandleSet = std::vector<PrimitiveHandle<Dim> *>;
+  using Map = std::map<PrimitiveHandle<Dim> *, PrimitiveHandleSet>;
   CollisionMapper(Map &map) : _map(map){};
   void
   operator()(const typename PrimitiveBox<Dim>::Type &a,
@@ -42,9 +42,9 @@ private:
 };
 
 template <typename OutputIteratorType>
-OutputIteratorType
+auto
 difference(const Point_2 &primitive, const PrimitiveHandle<2> &pb,
-           OutputIteratorType out)
+           OutputIteratorType out) -> OutputIteratorType
 {
   switch (pb.handle.which()) {
   case PrimitivePoint:
@@ -64,9 +64,9 @@ difference(const Point_2 &primitive, const PrimitiveHandle<2> &pb,
 }
 
 template <typename OutputIteratorType>
-OutputIteratorType
+auto
 difference(const Segment_2 &primitive, const PrimitiveHandle<2> &pb,
-           OutputIteratorType out)
+           OutputIteratorType out) -> OutputIteratorType
 {
   switch (pb.handle.which()) {
   case PrimitivePoint:
@@ -86,9 +86,9 @@ difference(const Segment_2 &primitive, const PrimitiveHandle<2> &pb,
 }
 
 template <typename OutputIteratorType>
-OutputIteratorType
+auto
 difference(const PolygonWH_2 &primitive, const PrimitiveHandle<2> &pb,
-           OutputIteratorType out)
+           OutputIteratorType out) -> OutputIteratorType
 {
   switch (pb.handle.which()) {
   case PrimitivePoint:
@@ -108,9 +108,9 @@ difference(const PolygonWH_2 &primitive, const PrimitiveHandle<2> &pb,
 }
 
 template <typename OutputIteratorType>
-OutputIteratorType
+auto
 difference(const Point_3 &primitive, const PrimitiveHandle<3> &pb,
-           OutputIteratorType out)
+           OutputIteratorType out) -> OutputIteratorType
 {
   switch (pb.handle.which()) {
   case PrimitivePoint:
@@ -134,9 +134,9 @@ difference(const Point_3 &primitive, const PrimitiveHandle<3> &pb,
 }
 
 template <typename OutputIteratorType>
-OutputIteratorType
+auto
 difference(const Segment_3 &primitive, const PrimitiveHandle<3> &pb,
-           OutputIteratorType out)
+           OutputIteratorType out) -> OutputIteratorType
 {
   switch (pb.handle.which()) {
   case PrimitivePoint:
@@ -160,9 +160,9 @@ difference(const Segment_3 &primitive, const PrimitiveHandle<3> &pb,
 }
 
 template <typename OutputIteratorType>
-OutputIteratorType
+auto
 difference(const Triangle_3 &primitive, const PrimitiveHandle<3> &pb,
-           OutputIteratorType out)
+           OutputIteratorType out) -> OutputIteratorType
 {
   switch (pb.handle.which()) {
   case PrimitivePoint:
@@ -186,9 +186,9 @@ difference(const Triangle_3 &primitive, const PrimitiveHandle<3> &pb,
 }
 
 template <typename OutputIteratorType>
-OutputIteratorType
+auto
 difference(const MarkedPolyhedron &primitive, const PrimitiveHandle<3> &pb,
-           OutputIteratorType out)
+           OutputIteratorType out) -> OutputIteratorType
 {
   switch (pb.handle.which()) {
   case PrimitivePoint:
@@ -212,9 +212,9 @@ difference(const MarkedPolyhedron &primitive, const PrimitiveHandle<3> &pb,
 }
 
 template <typename Primitive, typename PrimitiveHandleConstIterator>
-std::vector<Primitive>
+auto
 difference(const Primitive &primitive, PrimitiveHandleConstIterator begin,
-           PrimitiveHandleConstIterator end)
+           PrimitiveHandleConstIterator end) -> std::vector<Primitive>
 {
   std::vector<Primitive> primitives;
   primitives.push_back(primitive);
@@ -305,10 +305,8 @@ post_difference(const GeometrySet<2> &input, GeometrySet<2> &output)
 {
   //
   // reverse orientation of polygons if needed
-  for (GeometrySet<2>::SurfaceCollection::const_iterator it =
-           input.surfaces().begin();
-       it != input.surfaces().end(); ++it) {
-    const PolygonWH_2 &p     = it->primitive();
+  for (const auto &it : input.surfaces()) {
+    const PolygonWH_2 &p     = it.primitive();
     Polygon_2          outer = p.outer_boundary();
 
     if (outer.orientation() == CGAL::CLOCKWISE) {
@@ -317,9 +315,7 @@ post_difference(const GeometrySet<2> &input, GeometrySet<2> &output)
 
     std::list<CGAL::Polygon_2<Kernel>> rings;
 
-    for (CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hit =
-             p.holes_begin();
-         hit != p.holes_end(); ++hit) {
+    for (auto hit = p.holes_begin(); hit != p.holes_end(); ++hit) {
       rings.push_back(*hit);
 
       if (hit->orientation() == CGAL::COUNTERCLOCKWISE) {
@@ -347,9 +343,9 @@ void
 difference(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
            GeometrySet<Dim> &output)
 {
-  typedef typename SFCGAL::detail::BoxCollection<Dim>::Type BoxCollection;
-  typename SFCGAL::detail::HandleCollection<Dim>::Type      ahandles, bhandles;
-  BoxCollection                                             aboxes, bboxes;
+  using BoxCollection = typename SFCGAL::detail::BoxCollection<Dim>::Type;
+  typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles, bhandles;
+  BoxCollection                                        aboxes, bboxes;
   a.computeBoundingBoxes(ahandles, aboxes);
   b.computeBoundingBoxes(bhandles, bboxes);
 
@@ -397,8 +393,9 @@ template void
 difference<3>(const GeometrySet<3> &a, const GeometrySet<3> &b,
               GeometrySet<3> &);
 
-std::unique_ptr<Geometry>
+auto
 difference(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+    -> std::unique_ptr<Geometry>
 {
   GeometrySet<2> gsa(ga), gsb(gb), output;
   algorithm::difference(gsa, gsb, output);
@@ -408,8 +405,8 @@ difference(const Geometry &ga, const Geometry &gb, NoValidityCheck)
   return filtered.recompose();
 }
 
-std::unique_ptr<Geometry>
-difference(const Geometry &ga, const Geometry &gb)
+auto
+difference(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ga);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gb);
@@ -417,8 +414,9 @@ difference(const Geometry &ga, const Geometry &gb)
   return difference(ga, gb, NoValidityCheck());
 }
 
-std::unique_ptr<Geometry>
+auto
 difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+    -> std::unique_ptr<Geometry>
 {
   GeometrySet<3> gsa(ga), gsb(gb), output;
   algorithm::difference(gsa, gsb, output);
@@ -429,8 +427,9 @@ difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck)
   return filtered.recompose();
 }
 
-std::unique_ptr<Geometry>
+auto
 difference3D(const Geometry &ga, const Geometry &gb)
+    -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(ga);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gb);

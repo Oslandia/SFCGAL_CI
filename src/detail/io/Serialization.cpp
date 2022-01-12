@@ -59,8 +59,8 @@ BinaryUnserializer::BinaryUnserializer(std::istream &ostr)
 ///
 ///
 ///
-std::string
-writeBinaryGeometry(const Geometry &g)
+auto
+writeBinaryGeometry(const Geometry &g) -> std::string
 {
   std::ostringstream ostr;
   BinarySerializer   arc(ostr);
@@ -73,8 +73,8 @@ writeBinaryGeometry(const Geometry &g)
 ///
 ///
 ///
-std::string
-writeBinaryPrepared(const PreparedGeometry &g)
+auto
+writeBinaryPrepared(const PreparedGeometry &g) -> std::string
 {
   std::ostringstream      ostr;
   BinarySerializer        arc(ostr);
@@ -86,8 +86,8 @@ writeBinaryPrepared(const PreparedGeometry &g)
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-readBinaryGeometry(const std::string &str)
+auto
+readBinaryGeometry(const std::string &str) -> std::unique_ptr<Geometry>
 {
   std::istringstream istr(str);
   BinaryUnserializer iarc(istr);
@@ -99,8 +99,8 @@ readBinaryGeometry(const std::string &str)
 ///
 ///
 ///
-std::unique_ptr<PreparedGeometry>
-readBinaryPrepared(const std::string &str)
+auto
+readBinaryPrepared(const std::string &str) -> std::unique_ptr<PreparedGeometry>
 {
   std::istringstream istr(str);
   BinaryUnserializer iarc(istr);

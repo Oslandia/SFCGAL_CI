@@ -16,8 +16,8 @@ namespace algorithm {
 // If nothing has to be built, g will be moved to the result without
 // copying and a new allocation. Otherwise, a new geometry is built and
 // the old one is deleted.
-std::unique_ptr<Geometry>
-collectionHomogenize(std::unique_ptr<Geometry> g)
+auto
+collectionHomogenize(std::unique_ptr<Geometry> g) -> std::unique_ptr<Geometry>
 {
   // unknown type
   int common_type = 0;
@@ -53,7 +53,7 @@ collectionHomogenize(std::unique_ptr<Geometry> g)
     return g;
   }
 
-  GeometryCollection *ret_geo = 0;
+  GeometryCollection *ret_geo = nullptr;
 
   if (common_type == TYPE_POINT) {
     ret_geo = new MultiPoint;

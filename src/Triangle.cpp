@@ -62,8 +62,8 @@ Triangle::Triangle(const Triangle &other) : Surface(other)
 ///
 ///
 ///
-Triangle &
-Triangle::operator=(const Triangle &other)
+auto
+Triangle::operator=(const Triangle &other) -> Triangle &
 {
   _vertices[0] = other._vertices[0];
   _vertices[1] = other._vertices[1];
@@ -74,13 +74,13 @@ Triangle::operator=(const Triangle &other)
 ///
 ///
 ///
-Triangle::~Triangle() {}
+Triangle::~Triangle() = default;
 
 ///
 ///
 ///
-Triangle *
-Triangle::clone() const
+auto
+Triangle::clone() const -> Triangle *
 {
   return new Triangle(*this);
 }
@@ -88,8 +88,8 @@ Triangle::clone() const
 ///
 ///
 ///
-std::string
-Triangle::geometryType() const
+auto
+Triangle::geometryType() const -> std::string
 {
   return "Triangle";
 }
@@ -97,8 +97,8 @@ Triangle::geometryType() const
 ///
 ///
 ///
-GeometryType
-Triangle::geometryTypeId() const
+auto
+Triangle::geometryTypeId() const -> GeometryType
 {
   return TYPE_TRIANGLE;
 }
@@ -106,8 +106,8 @@ Triangle::geometryTypeId() const
 ///
 ///
 ///
-int
-Triangle::coordinateDimension() const
+auto
+Triangle::coordinateDimension() const -> int
 {
   return _vertices[0].coordinateDimension();
 }
@@ -115,8 +115,8 @@ Triangle::coordinateDimension() const
 ///
 ///
 ///
-bool
-Triangle::isEmpty() const
+auto
+Triangle::isEmpty() const -> bool
 {
   return _vertices[0].isEmpty();
 }
@@ -124,8 +124,8 @@ Triangle::isEmpty() const
 ///
 ///
 ///
-bool
-Triangle::is3D() const
+auto
+Triangle::is3D() const -> bool
 {
   return _vertices[0].is3D();
 }
@@ -133,8 +133,8 @@ Triangle::is3D() const
 ///
 ///
 ///
-bool
-Triangle::isMeasured() const
+auto
+Triangle::isMeasured() const -> bool
 {
   return _vertices[0].isMeasured();
 }
@@ -152,11 +152,11 @@ Triangle::reverse()
 ///
 ///
 ///
-Polygon
-Triangle::toPolygon() const
+auto
+Triangle::toPolygon() const -> Polygon
 {
   if (isEmpty()) {
-    return Polygon();
+    return {};
   }
 
   std::vector<Point> points;

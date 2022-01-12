@@ -17,8 +17,8 @@ namespace io {
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-readWkt(std::istream &s)
+auto
+readWkt(std::istream &s) -> std::unique_ptr<Geometry>
 {
   WktReader wktReader(s);
   return std::unique_ptr<Geometry>(wktReader.readGeometry());
@@ -27,8 +27,8 @@ readWkt(std::istream &s)
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-readWkt(const std::string &s)
+auto
+readWkt(const std::string &s) -> std::unique_ptr<Geometry>
 {
   std::istringstream        iss(s);
   WktReader                 wktReader(iss);
@@ -45,8 +45,8 @@ readWkt(const std::string &s)
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-readWkt(const char *str, size_t len)
+auto
+readWkt(const char *str, size_t len) -> std::unique_ptr<Geometry>
 {
   CharArrayBuffer           buf(str, str + len);
   std::istream              istr(&buf);

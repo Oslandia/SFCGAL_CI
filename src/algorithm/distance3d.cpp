@@ -24,14 +24,14 @@
 #include <SFCGAL/detail/transform/AffineTransform3.h>
 #include <SFCGAL/triangulate/triangulatePolygon.h>
 
-typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
-typedef Kernel::FT                                        squared_distance_t;
+using Kernel             = CGAL::Exact_predicates_exact_constructions_kernel;
+using squared_distance_t = Kernel::FT;
 
-typedef Kernel::Point_3    Point_3;
-typedef Kernel::Vector_3   Vector_3;
-typedef Kernel::Segment_3  Segment_3;
-typedef Kernel::Triangle_3 Triangle_3;
-typedef Kernel::Plane_3    Plane_3;
+using Point_3    = Kernel::Point_3;
+using Vector_3   = Kernel::Vector_3;
+using Segment_3  = Kernel::Segment_3;
+using Triangle_3 = Kernel::Triangle_3;
+using Plane_3    = Kernel::Plane_3;
 
 namespace SFCGAL {
 namespace algorithm {
@@ -39,8 +39,8 @@ namespace algorithm {
 ///
 ///
 ///
-double
-distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck)
+auto
+distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck) -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distance3D(%s,%s)") % gA.asText() %
   // gB.asText() );
@@ -82,8 +82,8 @@ distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck)
                     .str()));
 }
 
-double
-distance3D(const Geometry &gA, const Geometry &gB)
+auto
+distance3D(const Geometry &gA, const Geometry &gB) -> double
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gA);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gB);
@@ -93,8 +93,8 @@ distance3D(const Geometry &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distancePointGeometry3D(const Point &gA, const Geometry &gB)
+auto
+distancePointGeometry3D(const Point &gA, const Geometry &gB) -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distancePointGeometry3D(%s,%s)") %
   // gA.asText() % gB.asText() );
@@ -134,8 +134,8 @@ distancePointGeometry3D(const Point &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distancePointPoint3D(const Point &gA, const Point &gB)
+auto
+distancePointPoint3D(const Point &gA, const Point &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -148,8 +148,8 @@ distancePointPoint3D(const Point &gA, const Point &gB)
 ///
 ///
 ///
-double
-distancePointLineString3D(const Point &gA, const LineString &gB)
+auto
+distancePointLineString3D(const Point &gA, const LineString &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -168,8 +168,8 @@ distancePointLineString3D(const Point &gA, const LineString &gB)
 ///
 ///
 ///
-double
-distancePointTriangle3D(const Point &gA, const Triangle &gB)
+auto
+distancePointTriangle3D(const Point &gA, const Triangle &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -181,8 +181,8 @@ distancePointTriangle3D(const Point &gA, const Triangle &gB)
 ///
 ///
 ///
-double
-distancePointPolygon3D(const Point &gA, const Polygon &gB)
+auto
+distancePointPolygon3D(const Point &gA, const Polygon &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -196,8 +196,8 @@ distancePointPolygon3D(const Point &gA, const Polygon &gB)
 ///
 ///
 ///
-double
-distancePointSolid3D(const Point &gA, const Solid &gB)
+auto
+distancePointSolid3D(const Point &gA, const Solid &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -220,8 +220,8 @@ distancePointSolid3D(const Point &gA, const Solid &gB)
 ///
 ///
 ///
-double
-distanceLineStringGeometry3D(const LineString &gA, const Geometry &gB)
+auto
+distanceLineStringGeometry3D(const LineString &gA, const Geometry &gB) -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distanceLineStringGeometry3D(%s,%s)")
   // % gA.asText() % gB.asText() );
@@ -261,8 +261,9 @@ distanceLineStringGeometry3D(const LineString &gA, const Geometry &gB)
 ///
 ///
 ///
-double
+auto
 distanceLineStringLineString3D(const LineString &gA, const LineString &gB)
+    -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -287,8 +288,8 @@ distanceLineStringLineString3D(const LineString &gA, const LineString &gB)
 ///
 ///
 ///
-double
-distanceLineStringTriangle3D(const LineString &gA, const Triangle &gB)
+auto
+distanceLineStringTriangle3D(const LineString &gA, const Triangle &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -311,8 +312,8 @@ distanceLineStringTriangle3D(const LineString &gA, const Triangle &gB)
 ///
 ///
 ///
-double
-distanceLineStringPolygon3D(const LineString &gA, const Polygon &gB)
+auto
+distanceLineStringPolygon3D(const LineString &gA, const Polygon &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -326,8 +327,8 @@ distanceLineStringPolygon3D(const LineString &gA, const Polygon &gB)
 ///
 ///
 ///
-double
-distanceLineStringSolid3D(const LineString &gA, const Solid &gB)
+auto
+distanceLineStringSolid3D(const LineString &gA, const Solid &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -349,8 +350,8 @@ distanceLineStringSolid3D(const LineString &gA, const Solid &gB)
 ///
 ///
 ///
-double
-distanceTriangleGeometry3D(const Triangle &gA, const Geometry &gB)
+auto
+distanceTriangleGeometry3D(const Triangle &gA, const Geometry &gB) -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distanceTriangleGeometry3D(%s,%s)") %
   // gA.asText() % gB.asText() );
@@ -390,8 +391,8 @@ distanceTriangleGeometry3D(const Triangle &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distanceTriangleSolid3D(const Triangle &gA, const Solid &gB)
+auto
+distanceTriangleSolid3D(const Triangle &gA, const Solid &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -413,8 +414,8 @@ distanceTriangleSolid3D(const Triangle &gA, const Solid &gB)
 ///
 ///
 ///
-double
-distancePolygonGeometry3D(const Polygon &gA, const Geometry &gB)
+auto
+distancePolygonGeometry3D(const Polygon &gA, const Geometry &gB) -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distancePolygonGeometry3D(%s,%s)") %
   // gA.asText() % gB.asText() );
@@ -431,8 +432,8 @@ distancePolygonGeometry3D(const Polygon &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distanceSolidGeometry3D(const Solid &gA, const Geometry &gB)
+auto
+distanceSolidGeometry3D(const Solid &gA, const Geometry &gB) -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distanceSolidGeometry3D(%s,%s)") %
   // gA.asText() % gB.asText() );
@@ -472,8 +473,8 @@ distanceSolidGeometry3D(const Solid &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distanceSolidSolid3D(const Solid &gA, const Solid &gB)
+auto
+distanceSolidSolid3D(const Solid &gA, const Solid &gB) -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distancePolygonGeometry3D(%s,%s)") %
   // gA.asText() % gB.asText() );
@@ -502,20 +503,20 @@ struct Sphere {
       : _radius(r), _center(c), _empty(false)
   {
   }
-  Sphere() : _empty(true) {}
-  bool
-  isEmpty() const
+  Sphere() = default;
+  auto
+  isEmpty() const -> bool
   {
     return _empty;
   }
-  double
-  radius() const
+  auto
+  radius() const -> double
   {
     BOOST_ASSERT(!_empty);
     return _radius;
   }
-  const CGAL::Vector_3<Kernel> &
-  center() const
+  auto
+  center() const -> const CGAL::Vector_3<Kernel> &
   {
     BOOST_ASSERT(!_empty);
     return _center;
@@ -524,11 +525,11 @@ struct Sphere {
 private:
   double                 _radius{};
   CGAL::Vector_3<Kernel> _center;
-  bool                   _empty;
+  bool                   _empty{true};
 };
 
-const Sphere
-boundingSphere(const Geometry &geom)
+auto
+boundingSphere(const Geometry &geom) -> const Sphere
 {
   if (geom.isEmpty()) {
     return Sphere();
@@ -542,7 +543,7 @@ boundingSphere(const Geometry &geom)
     return Sphere();
   }
 
-  typedef CGAL::Vector_3<Kernel> Vector_3;
+  using Vector_3 = CGAL::Vector_3<Kernel>;
 
   const GetPointsVisitor::const_iterator end = v.points.end();
 
@@ -578,8 +579,9 @@ boundingSphere(const Geometry &geom)
 ///
 ///
 ///
-double
+auto
 distanceGeometryCollectionToGeometry3D(const Geometry &gA, const Geometry &gB)
+    -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch
   // distanceGeometryCollectionToGeometry3D(%s,%s)") % gA.asText() % gB.asText()
@@ -598,7 +600,7 @@ distanceGeometryCollectionToGeometry3D(const Geometry &gA, const Geometry &gB)
   // sphere than encloses all points
   std::set<size_t> noTest;
 
-  if (1) {
+  if (true) {
     std::vector<Sphere> bsA;
 
     for (size_t i = 0; i < gA.numGeometries(); i++) {
@@ -664,8 +666,8 @@ distanceGeometryCollectionToGeometry3D(const Geometry &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distancePointSegment3D(const Point &p, const Point &a, const Point &b)
+auto
+distancePointSegment3D(const Point &p, const Point &a, const Point &b) -> double
 {
   // empty already checked
   BOOST_ASSERT(!p.isEmpty());
@@ -679,8 +681,9 @@ distancePointSegment3D(const Point &p, const Point &a, const Point &b)
 /*
  * missing in CGAL?
  */
-squared_distance_t
+auto
 squaredDistancePointTriangle3D(const Point_3 &p, const Triangle_3 &abc)
+    -> squared_distance_t
 {
 #if CGAL_VERSION_NR >= 1041001000 // >= 4.10
   return CGAL::squared_distance(p, abc);
@@ -714,9 +717,9 @@ squaredDistancePointTriangle3D(const Point_3 &p, const Triangle_3 &abc)
 ///
 ///
 ///
-double
+auto
 distancePointTriangle3D(const Point &p_, const Point &a_, const Point &b_,
-                        const Point &c_)
+                        const Point &c_) -> double
 {
   // empty already checked
   BOOST_ASSERT(!p_.isEmpty());
@@ -734,9 +737,9 @@ distancePointTriangle3D(const Point &p_, const Point &a_, const Point &b_,
 ///
 ///
 ///
-double
+auto
 distanceSegmentSegment3D(const Point &a, const Point &b, const Point &c,
-                         const Point &d)
+                         const Point &d) -> double
 {
   // empty already checked
   BOOST_ASSERT(!a.isEmpty());
@@ -749,10 +752,11 @@ distanceSegmentSegment3D(const Point &a, const Point &b, const Point &c,
       CGAL::Segment_3<Kernel>(c.toPoint_3(), d.toPoint_3()))));
 }
 
-squared_distance_t
+auto
 squaredDistanceSegmentTriangle3D(const Segment_3 &sAB, const Triangle_3 &tABC)
+    -> squared_distance_t
 {
-  typedef Kernel::FT squared_distance_t;
+  using squared_distance_t = Kernel::FT;
 
   /*
    * If [sAsB] intersects the triangle (tA,tB,tC), distance is 0.0
@@ -781,9 +785,9 @@ squaredDistanceSegmentTriangle3D(const Segment_3 &sAB, const Triangle_3 &tABC)
 ///
 ///
 ///
-double
+auto
 distanceSegmentTriangle3D(const Point &sA_, const Point &sB_, const Point &tA_,
-                          const Point &tB_, const Point &tC_)
+                          const Point &tB_, const Point &tC_) -> double
 {
   // empty already checked
   BOOST_ASSERT(!sA_.isEmpty());
@@ -808,12 +812,13 @@ distanceSegmentTriangle3D(const Point &sA_, const Point &sB_, const Point &tA_,
 /*
  * missing in CGAL?
  */
-squared_distance_t
+auto
 squaredDistanceTriangleTriangle3D(const Triangle_3 &triangleA,
                                   const Triangle_3 &triangleB)
+    -> squared_distance_t
 {
   if (CGAL::do_intersect(triangleA, triangleB))
-    return squared_distance_t(0);
+    return {0};
 
   /*
    * min of distance from A segments to B triangle and B segments to A triangle
@@ -844,8 +849,8 @@ squaredDistanceTriangleTriangle3D(const Triangle_3 &triangleA,
 ///
 ///
 ///
-double
-distanceTriangleTriangle3D(const Triangle &gA, const Triangle &gB)
+auto
+distanceTriangleTriangle3D(const Triangle &gA, const Triangle &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();

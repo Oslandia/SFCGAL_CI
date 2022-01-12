@@ -22,7 +22,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-GeometryVisitor::~GeometryVisitor() {}
+GeometryVisitor::~GeometryVisitor() = default;
 
 ///
 ///
@@ -99,7 +99,7 @@ GeometryVisitor::visit(Geometry &g)
 ///
 ///
 ///
-ConstGeometryVisitor::~ConstGeometryVisitor() {}
+ConstGeometryVisitor::~ConstGeometryVisitor() = default;
 
 ///
 ///

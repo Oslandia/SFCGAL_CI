@@ -24,16 +24,15 @@
 namespace SFCGAL {
 namespace tools {
 
-Registry *Registry::_instance = 0;
+Registry *Registry::_instance = nullptr;
 
 ///
 ///
 ///
 Registry::~Registry()
 {
-  for (prototype_iterator it = _prototypes.begin(); it != _prototypes.end();
-       ++it) {
-    delete *it;
+  for (auto &_prototype : _prototypes) {
+    delete _prototype;
   }
 }
 
@@ -62,14 +61,13 @@ Registry::addPrototype(const Geometry &g)
 ///
 ///
 ///
-std::vector<std::string>
-Registry::getGeometryTypes() const
+auto
+Registry::getGeometryTypes() const -> std::vector<std::string>
 {
   std::vector<std::string> names;
 
-  for (const_prototype_iterator it = _prototypes.begin();
-       it != _prototypes.end(); ++it) {
-    names.push_back((*it)->geometryType());
+  for (auto _prototype : _prototypes) {
+    names.push_back(_prototype->geometryType());
   }
 
   return names;
@@ -78,13 +76,13 @@ Registry::getGeometryTypes() const
 ///
 ///
 ///
-Geometry *
+auto
 Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
+    -> Geometry *
 {
-  for (const_prototype_iterator it = _prototypes.begin();
-       it != _prototypes.end(); ++it) {
-    if (geometryTypeName == (*it)->geometryType()) {
-      return (*it)->clone();
+  for (auto _prototype : _prototypes) {
+    if (geometryTypeName == _prototype->geometryType()) {
+      return _prototype->clone();
     }
   }
 
@@ -97,13 +95,12 @@ Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
 ///
 ///
 ///
-Geometry *
-Registry::newGeometryByTypeId(int typeId) const
+auto
+Registry::newGeometryByTypeId(int typeId) const -> Geometry *
 {
-  for (const_prototype_iterator it = _prototypes.begin();
-       it != _prototypes.end(); ++it) {
-    if (typeId == (*it)->geometryTypeId()) {
-      return (*it)->clone();
+  for (auto _prototype : _prototypes) {
+    if (typeId == _prototype->geometryTypeId()) {
+      return _prototype->clone();
     }
   }
 
@@ -116,8 +113,8 @@ Registry::newGeometryByTypeId(int typeId) const
 ///
 ///
 ///
-Registry &
-Registry::instance()
+auto
+Registry::instance() -> Registry &
 {
   if (!Registry::_instance) {
     Registry::_instance = new Registry();

@@ -49,7 +49,8 @@ translate(Geometry &g, const Kernel::Vector_2 &v)
 ///
 ///
 void
-translate(Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz)
+translate(Geometry &g, const Kernel::FT dx, const Kernel::FT dy,
+          const Kernel::FT dz)
 {
   translate(g, Kernel::Vector_3(dx, dy, dz));
 }

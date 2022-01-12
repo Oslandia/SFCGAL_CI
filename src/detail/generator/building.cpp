@@ -19,24 +19,24 @@
 namespace SFCGAL {
 namespace generator {
 
-typedef Kernel::Point_2                    Point_2;
-typedef Kernel::Point_3                    Point_3;
-typedef CGAL::Polygon_2<Kernel>            Polygon_2;
-typedef CGAL::Polygon_with_holes_2<Kernel> Polygon_with_holes_2;
-typedef CGAL::Straight_skeleton_2<Kernel>  Straight_skeleton_2;
+using Point_2              = Kernel::Point_2;
+using Point_3              = Kernel::Point_3;
+using Polygon_2            = CGAL::Polygon_2<Kernel>;
+using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
+using Straight_skeleton_2  = CGAL::Straight_skeleton_2<Kernel>;
 
 /**
  * @brief Basic building generator relying on a straight skeleton
  */
-std::unique_ptr<Geometry>
+auto
 building(const Polygon &g, const Kernel::FT &wallHeight,
-         const Kernel::FT &roofSlope);
+         const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>;
 /**
  * @brief Basic building generator relying on a straight skeleton
  */
-std::unique_ptr<Geometry>
+auto
 building(const MultiPolygon &g, const Kernel::FT &wallHeight,
-         const Kernel::FT &roofSlope);
+         const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>;
 
 void
 _buildingWall(const Polygon_2 &ring, const Kernel::FT &wallHeight,
@@ -61,15 +61,15 @@ _buildingWall(const Polygon_2 &ring, const Kernel::FT &wallHeight,
 ///
 ///
 ///
-std::unique_ptr<Geometry>
+auto
 building(const Polygon &g, const Kernel::FT &wallHeight,
-         const Kernel::FT &roofSlope)
+         const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>
 {
   // typedef Straight_skeleton_2::Vertex_const_handle     Vertex_const_handle ;
-  typedef Straight_skeleton_2::Halfedge_const_handle Halfedge_const_handle;
+  using Halfedge_const_handle = Straight_skeleton_2::Halfedge_const_handle;
   // typedef Straight_skeleton_2::Halfedge_const_iterator
   // Halfedge_const_iterator ;
-  typedef Straight_skeleton_2::Face_const_iterator Face_const_iterator;
+  using Face_const_iterator = Straight_skeleton_2::Face_const_iterator;
 
   // convert to CGAL polygon and generate straight skeleton
   Polygon_with_holes_2 polygon = g.toPolygon_with_holes_2();
@@ -137,9 +137,9 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
 ///
 ///
 ///
-std::unique_ptr<Geometry>
+auto
 building(const MultiPolygon &g, const Kernel::FT &wallHeight,
-         const Kernel::FT &roofSlope)
+         const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>
 {
   std::unique_ptr<MultiSolid> multiSolid(new MultiSolid);
 
@@ -154,9 +154,9 @@ building(const MultiPolygon &g, const Kernel::FT &wallHeight,
 ///
 ///
 ///
-std::unique_ptr<Geometry>
+auto
 building(const Geometry &g, const Kernel::FT &wallHeight,
-         const Kernel::FT &roofSlope)
+         const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>
 {
   switch (g.geometryTypeId()) {
   case TYPE_POLYGON:

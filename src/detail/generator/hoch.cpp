@@ -10,8 +10,9 @@
 namespace SFCGAL {
 namespace generator {
 
-std::vector<Kernel::Vector_2>
+auto
 _hoch(const std::vector<Kernel::Vector_2> &points)
+    -> std::vector<Kernel::Vector_2>
 {
   std::vector<Kernel::Vector_2> result;
   result.reserve(points.size() * 2);
@@ -36,13 +37,13 @@ _hoch(const std::vector<Kernel::Vector_2> &points)
 ///
 ///
 ///
-std::unique_ptr<Polygon>
-hoch(const unsigned int &order)
+auto
+hoch(const unsigned int &order) -> std::unique_ptr<Polygon>
 {
   std::vector<Kernel::Vector_2> points;
-  points.push_back(Kernel::Vector_2(1.0, sqrt(3.0)));
-  points.push_back(Kernel::Vector_2(2.0, 0.0));
-  points.push_back(Kernel::Vector_2(0.0, 0.0));
+  points.emplace_back(1.0, sqrt(3.0));
+  points.emplace_back(2.0, 0.0);
+  points.emplace_back(0.0, 0.0);
 
   for (unsigned int k = 0; k < order; k++) {
     points = _hoch(points);

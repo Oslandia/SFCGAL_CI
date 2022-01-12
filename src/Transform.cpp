@@ -22,7 +22,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-Transform::~Transform() {}
+Transform::~Transform() = default;
 
 ///
 ///

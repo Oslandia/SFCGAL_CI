@@ -20,18 +20,18 @@ namespace triangulate {
  * vertex information with original coordinates
  */
 struct VertexInfo2 {
-  VertexInfo2() : original(NULL) {}
+  VertexInfo2() = default;
 
-  const CGAL::Point_3<Kernel> *original;
+  const CGAL::Point_3<Kernel> *original{NULL};
 };
 
-typedef CGAL::Triangulation_vertex_base_with_info_2<VertexInfo2, Kernel>
-    triangulation_vertex_base;
-typedef CGAL::Triangulation_data_structure_2<triangulation_vertex_base>
-    triangulation_data_structure;
+using triangulation_vertex_base =
+    CGAL::Triangulation_vertex_base_with_info_2<VertexInfo2, Kernel>;
+using triangulation_data_structure =
+    CGAL::Triangulation_data_structure_2<triangulation_vertex_base>;
 
-typedef CGAL::Delaunay_triangulation_2<Kernel, triangulation_data_structure>
-    Triangulation;
+using Triangulation =
+    CGAL::Delaunay_triangulation_2<Kernel, triangulation_data_structure>;
 
 ///
 /// input polyhedron must have its planes computed

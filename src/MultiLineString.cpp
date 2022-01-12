@@ -16,15 +16,14 @@ MultiLineString::MultiLineString() : GeometryCollection() {}
 ///
 ///
 MultiLineString::MultiLineString(MultiLineString const &other)
-    : GeometryCollection(other)
-{
-}
+
+    = default;
 
 ///
 ///
 ///
-MultiLineString &
-MultiLineString::operator=(MultiLineString other)
+auto
+MultiLineString::operator=(MultiLineString other) -> MultiLineString &
 {
   swap(other);
   return *this;
@@ -33,13 +32,13 @@ MultiLineString::operator=(MultiLineString other)
 ///
 ///
 ///
-MultiLineString::~MultiLineString() {}
+MultiLineString::~MultiLineString() = default;
 
 ///
 ///
 ///
-MultiLineString *
-MultiLineString::clone() const
+auto
+MultiLineString::clone() const -> MultiLineString *
 {
   return new MultiLineString(*this);
 }
@@ -47,8 +46,8 @@ MultiLineString::clone() const
 ///
 ///
 ///
-std::string
-MultiLineString::geometryType() const
+auto
+MultiLineString::geometryType() const -> std::string
 {
   return "MultiLineString";
 }
@@ -56,8 +55,8 @@ MultiLineString::geometryType() const
 ///
 ///
 ///
-GeometryType
-MultiLineString::geometryTypeId() const
+auto
+MultiLineString::geometryTypeId() const -> GeometryType
 {
   return TYPE_MULTILINESTRING;
 }
@@ -65,8 +64,8 @@ MultiLineString::geometryTypeId() const
 ///
 ///
 ///
-bool
-MultiLineString::isAllowed(Geometry const &g)
+auto
+MultiLineString::isAllowed(Geometry const &g) -> bool
 {
   return g.geometryTypeId() == TYPE_LINESTRING;
 }

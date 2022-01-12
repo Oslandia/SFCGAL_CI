@@ -71,37 +71,33 @@ Coordinate::Coordinate(const Kernel::Point_3 &other) : _storage(other) {}
 ///
 ///
 ///
-Coordinate::Coordinate(const Coordinate &other) : _storage(other._storage) {}
+Coordinate::Coordinate(const Coordinate &other) = default;
 
 ///
 ///
 ///
-Coordinate &
-Coordinate::operator=(const Coordinate &other)
-{
-  _storage = other._storage;
-  return *this;
-}
+auto
+Coordinate::operator=(const Coordinate &other) -> Coordinate & = default;
 
 ///
 ///
 ///
-Coordinate::~Coordinate() {}
+Coordinate::~Coordinate() = default;
 
 class CoordinateDimensionVisitor : public boost::static_visitor<int> {
 public:
-  int
-  operator()(const Coordinate::Empty &) const
+  auto
+  operator()(const Coordinate::Empty &) const -> int
   {
     return 0;
   }
-  int
-  operator()(const Kernel::Point_2 &) const
+  auto
+  operator()(const Kernel::Point_2 &) const -> int
   {
     return 2;
   }
-  int
-  operator()(const Kernel::Point_3 &) const
+  auto
+  operator()(const Kernel::Point_3 &) const -> int
   {
     return 3;
   }
@@ -110,8 +106,8 @@ public:
 ///
 ///
 ///
-int
-Coordinate::coordinateDimension() const
+auto
+Coordinate::coordinateDimension() const -> int
 {
   CoordinateDimensionVisitor visitor;
   return boost::apply_visitor(visitor, _storage);
@@ -120,8 +116,8 @@ Coordinate::coordinateDimension() const
 ///
 ///
 ///
-bool
-Coordinate::isEmpty() const
+auto
+Coordinate::isEmpty() const -> bool
 {
   return _storage.which() == 0;
 }
@@ -129,28 +125,28 @@ Coordinate::isEmpty() const
 ///
 ///
 ///
-bool
-Coordinate::is3D() const
+auto
+Coordinate::is3D() const -> bool
 {
   return _storage.which() == 2;
 }
 
 class GetXVisitor : public boost::static_visitor<Kernel::FT> {
 public:
-  Kernel::FT
-  operator()(const Coordinate::Empty &) const
+  auto
+  operator()(const Coordinate::Empty &) const -> Kernel::FT
   {
     BOOST_THROW_EXCEPTION(
         Exception("trying to get an empty coordinate x value"));
     return 0;
   }
-  Kernel::FT
-  operator()(const Kernel::Point_2 &storage) const
+  auto
+  operator()(const Kernel::Point_2 &storage) const -> Kernel::FT
   {
     return storage.x();
   }
-  Kernel::FT
-  operator()(const Kernel::Point_3 &storage) const
+  auto
+  operator()(const Kernel::Point_3 &storage) const -> Kernel::FT
   {
     return storage.x();
   }
@@ -159,8 +155,8 @@ public:
 ///
 ///
 ///
-Kernel::FT
-Coordinate::x() const
+auto
+Coordinate::x() const -> Kernel::FT
 {
   GetXVisitor visitor;
   return boost::apply_visitor(visitor, _storage);
@@ -168,20 +164,20 @@ Coordinate::x() const
 
 class GetYVisitor : public boost::static_visitor<Kernel::FT> {
 public:
-  Kernel::FT
-  operator()(const Coordinate::Empty &) const
+  auto
+  operator()(const Coordinate::Empty &) const -> Kernel::FT
   {
     BOOST_THROW_EXCEPTION(
         Exception("trying to get an empty coordinate y value"));
     return 0;
   }
-  Kernel::FT
-  operator()(const Kernel::Point_2 &storage) const
+  auto
+  operator()(const Kernel::Point_2 &storage) const -> Kernel::FT
   {
     return storage.y();
   }
-  Kernel::FT
-  operator()(const Kernel::Point_3 &storage) const
+  auto
+  operator()(const Kernel::Point_3 &storage) const -> Kernel::FT
   {
     return storage.y();
   }
@@ -190,8 +186,8 @@ public:
 ///
 ///
 ///
-Kernel::FT
-Coordinate::y() const
+auto
+Coordinate::y() const -> Kernel::FT
 {
   GetYVisitor visitor;
   return boost::apply_visitor(visitor, _storage);
@@ -199,20 +195,20 @@ Coordinate::y() const
 
 class GetZVisitor : public boost::static_visitor<Kernel::FT> {
 public:
-  Kernel::FT
-  operator()(const Coordinate::Empty &) const
+  auto
+  operator()(const Coordinate::Empty &) const -> Kernel::FT
   {
     BOOST_THROW_EXCEPTION(
         Exception("trying to get an empty coordinate z value"));
     return 0;
   }
-  Kernel::FT
-  operator()(const Kernel::Point_2 &) const
+  auto
+  operator()(const Kernel::Point_2 &) const -> Kernel::FT
   {
     return 0;
   }
-  Kernel::FT
-  operator()(const Kernel::Point_3 &storage) const
+  auto
+  operator()(const Kernel::Point_3 &storage) const -> Kernel::FT
   {
     return storage.z();
   }
@@ -221,8 +217,8 @@ public:
 ///
 ///
 ///
-Kernel::FT
-Coordinate::z() const
+auto
+Coordinate::z() const -> Kernel::FT
 {
   GetZVisitor visitor;
   return boost::apply_visitor(visitor, _storage);
@@ -253,8 +249,8 @@ public:
 private:
   long _scaleFactor;
 
-  Kernel::FT
-  _roundFT(const Kernel::FT &v) const
+  auto
+  _roundFT(const Kernel::FT &v) const -> Kernel::FT
   {
 #ifdef CGAL_USE_GMPXX
     ::mpq_class q(SFCGAL::round(v.exact() * _scaleFactor), _scaleFactor);
@@ -267,8 +263,8 @@ private:
   }
 };
 
-Coordinate &
-Coordinate::round(const long &scaleFactor)
+auto
+Coordinate::round(const long &scaleFactor) -> Coordinate &
 {
   RoundVisitor roundVisitor(scaleFactor);
   boost::apply_visitor(roundVisitor, _storage);
@@ -279,18 +275,18 @@ Coordinate::round(const long &scaleFactor)
 
 class ToPoint2Visitor : public boost::static_visitor<Kernel::Point_2> {
 public:
-  Kernel::Point_2
-  operator()(const Coordinate::Empty &) const
+  auto
+  operator()(const Coordinate::Empty &) const -> Kernel::Point_2
   {
     return Kernel::Point_2(CGAL::ORIGIN);
   }
-  Kernel::Point_2
-  operator()(const Kernel::Point_2 &storage) const
+  auto
+  operator()(const Kernel::Point_2 &storage) const -> Kernel::Point_2
   {
     return storage;
   }
-  Kernel::Point_2
-  operator()(const Kernel::Point_3 &storage) const
+  auto
+  operator()(const Kernel::Point_3 &storage) const -> Kernel::Point_2
   {
     return Kernel::Point_2(storage.x(), storage.y());
   }
@@ -299,8 +295,8 @@ public:
 ///
 ///
 ///
-Kernel::Point_2
-Coordinate::toPoint_2() const
+auto
+Coordinate::toPoint_2() const -> Kernel::Point_2
 {
   ToPoint2Visitor visitor;
   return boost::apply_visitor(visitor, _storage);
@@ -308,18 +304,18 @@ Coordinate::toPoint_2() const
 
 class ToPoint3Visitor : public boost::static_visitor<Kernel::Point_3> {
 public:
-  Kernel::Point_3
-  operator()(const Coordinate::Empty & /*storage*/) const
+  auto
+  operator()(const Coordinate::Empty & /*storage*/) const -> Kernel::Point_3
   {
     return Kernel::Point_3(CGAL::ORIGIN);
   }
-  Kernel::Point_3
-  operator()(const Kernel::Point_2 &storage) const
+  auto
+  operator()(const Kernel::Point_2 &storage) const -> Kernel::Point_3
   {
     return Kernel::Point_3(storage.x(), storage.y(), 0.0);
   }
-  Kernel::Point_3
-  operator()(const Kernel::Point_3 &storage) const
+  auto
+  operator()(const Kernel::Point_3 &storage) const -> Kernel::Point_3
   {
     return storage;
   }
@@ -328,8 +324,8 @@ public:
 ///
 ///
 ///
-Kernel::Point_3
-Coordinate::toPoint_3() const
+auto
+Coordinate::toPoint_3() const -> Kernel::Point_3
 {
   ToPoint3Visitor visitor;
   return boost::apply_visitor(visitor, _storage);
@@ -338,8 +334,8 @@ Coordinate::toPoint_3() const
 ///
 ///
 ///
-bool
-Coordinate::operator<(const Coordinate &other) const
+auto
+Coordinate::operator<(const Coordinate &other) const -> bool
 {
   // no empty comparison
   if (isEmpty() || other.isEmpty()) {
@@ -384,8 +380,8 @@ Coordinate::operator<(const Coordinate &other) const
 ///
 ///
 ///
-bool
-Coordinate::operator==(const Coordinate &other) const
+auto
+Coordinate::operator==(const Coordinate &other) const -> bool
 {
   if (isEmpty()) {
     return other.isEmpty();
@@ -401,8 +397,8 @@ Coordinate::operator==(const Coordinate &other) const
 ///
 ///
 ///
-bool
-Coordinate::operator!=(const Coordinate &other) const
+auto
+Coordinate::operator!=(const Coordinate &other) const -> bool
 {
   return !(*this == other);
 }

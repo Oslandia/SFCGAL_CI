@@ -15,8 +15,8 @@ namespace algorithm {
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-tesselate(const Geometry &g, NoValidityCheck)
+auto
+tesselate(const Geometry &g, NoValidityCheck) -> std::unique_ptr<Geometry>
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
@@ -28,7 +28,7 @@ tesselate(const Geometry &g, NoValidityCheck)
 
   case TYPE_POLYGON:
   case TYPE_POLYHEDRALSURFACE: {
-    TriangulatedSurface *triSurf = new TriangulatedSurface();
+    auto *triSurf = new TriangulatedSurface();
     triangulate::triangulatePolygon3D(g, *triSurf);
     return std::unique_ptr<Geometry>(triSurf);
   }
@@ -67,8 +67,8 @@ tesselate(const Geometry &g, NoValidityCheck)
   return std::unique_ptr<Geometry>(g.clone());
 }
 
-std::unique_ptr<Geometry>
-tesselate(const Geometry &g)
+auto
+tesselate(const Geometry &g) -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY(g);
 

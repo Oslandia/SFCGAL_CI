@@ -17,37 +17,33 @@ using namespace SFCGAL::detail;
 namespace SFCGAL {
 namespace algorithm {
 
-bool
-covers(const PrimitiveHandle<3> &, const PrimitiveHandle<3> &)
+auto
+covers(const PrimitiveHandle<3> &, const PrimitiveHandle<3> &) -> bool
 {
   return false;
 }
 
 template <int Dim>
-double
-segmentsLength(const GeometrySet<Dim> &gs)
+auto
+segmentsLength(const GeometrySet<Dim> &gs) -> double
 {
   double result = 0.0;
 
-  for (typename GeometrySet<Dim>::SegmentCollection::const_iterator it =
-           gs.segments().begin();
-       it != gs.segments().end(); ++it) {
+  for (auto it = gs.segments().begin(); it != gs.segments().end(); ++it) {
     result = result + sqrt(CGAL::to_double(it->primitive().squared_length()));
   }
 
   return result;
 }
 
-double
-solidsVolume(const GeometrySet<3> &gs, bool planarSurface = false)
+auto
+solidsVolume(const GeometrySet<3> &gs, bool planarSurface = false) -> double
 {
   double result = 0.0;
 
-  for (GeometrySet<3>::VolumeCollection::const_iterator it =
-           gs.volumes().begin();
-       it != gs.volumes().end(); ++it) {
+  for (const auto &it : gs.volumes()) {
     // TODO : we use areas of surfaces here instead of volumes
-    const MarkedPolyhedron &poly = it->primitive();
+    const MarkedPolyhedron &poly = it.primitive();
 
     if (poly.is_closed() && planarSurface) {
       continue;
@@ -78,20 +74,16 @@ solidsVolume(const GeometrySet<3> &gs, bool planarSurface = false)
   return result;
 }
 
-double
-surfacesArea(const GeometrySet<2> &gs)
+auto
+surfacesArea(const GeometrySet<2> &gs) -> double
 {
   Kernel::FT result = 0.0;
 
-  for (GeometrySet<2>::SurfaceCollection::const_iterator it =
-           gs.surfaces().begin();
-       it != gs.surfaces().end(); ++it) {
-    const CGAL::Polygon_with_holes_2<Kernel> &polygon = it->primitive();
+  for (const auto &it : gs.surfaces()) {
+    const CGAL::Polygon_with_holes_2<Kernel> &polygon = it.primitive();
     result = result + CGAL::abs(polygon.outer_boundary().area());
 
-    for (CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hit =
-             polygon.holes_begin();
-         hit != polygon.holes_end(); ++hit) {
+    for (auto hit = polygon.holes_begin(); hit != polygon.holes_end(); ++hit) {
       result = result - CGAL::abs(hit->area());
     }
   }
@@ -99,8 +91,8 @@ surfacesArea(const GeometrySet<2> &gs)
   return CGAL::to_double(result);
 }
 
-double
-surfacesArea(const GeometrySet<3> &gs)
+auto
+surfacesArea(const GeometrySet<3> &gs) -> double
 {
   double result = 0.0;
 
@@ -108,24 +100,23 @@ surfacesArea(const GeometrySet<3> &gs)
     result = solidsVolume(gs, /* planarSurface = */ true);
   }
 
-  for (GeometrySet<3>::SurfaceCollection::const_iterator it =
-           gs.surfaces().begin();
-       it != gs.surfaces().end(); ++it) {
-    result = result + sqrt(CGAL::to_double(it->primitive().squared_area()));
+  for (const auto &it : gs.surfaces()) {
+    result = result + sqrt(CGAL::to_double(it.primitive().squared_area()));
   }
 
   return result;
 }
 
-double
-solidsVolume(const GeometrySet<2> &)
+auto
+solidsVolume(const GeometrySet<2> &) -> double
 {
   return 0.0;
 }
 
 template <int Dim>
-bool
+auto
 equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
+    -> bool
 {
   // compare 'length' of primitives in A with 'length' of primitives in B
   // 'length' is :
@@ -184,8 +175,8 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
 }
 
 template <int Dim>
-bool
-covers(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b)
+auto
+covers(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
 {
   int dimA = a.dimension();
   int dimB = b.dimension();
@@ -231,8 +222,8 @@ covers<2>(const GeometrySet<2> &a, const GeometrySet<2> &b);
 template bool
 covers<3>(const GeometrySet<3> &a, const GeometrySet<3> &b);
 
-bool
-covers(const Geometry &ga, const Geometry &gb)
+auto
+covers(const Geometry &ga, const Geometry &gb) -> bool
 {
   if (ga.isEmpty() || gb.isEmpty()) {
     return false;
@@ -244,8 +235,8 @@ covers(const Geometry &ga, const Geometry &gb)
   return covers(gsa, gsb);
 }
 
-bool
-covers3D(const Geometry &ga, const Geometry &gb)
+auto
+covers3D(const Geometry &ga, const Geometry &gb) -> bool
 {
   if (ga.isEmpty() || gb.isEmpty()) {
     return false;

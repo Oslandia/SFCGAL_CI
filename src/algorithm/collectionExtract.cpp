@@ -18,8 +18,9 @@ namespace algorithm {
 // If nothing has to be built, g will be moved to the result without
 // copying and a new allocation. Otherwise, a new geometry is built and
 // the old one is deleted.
-std::unique_ptr<Geometry>
+auto
 collectionExtractPolygons(std::unique_ptr<Geometry> g)
+    -> std::unique_ptr<Geometry>
 {
   if (!g->is<GeometryCollection>()) {
     // not a collection, nothing to do
@@ -33,7 +34,7 @@ collectionExtractPolygons(std::unique_ptr<Geometry> g)
     return g;
   }
 
-  MultiPolygon *ret_geo = new MultiPolygon;
+  auto *ret_geo = new MultiPolygon;
 
   // copy each geometry
   for (size_t i = 0; i < coll.numGeometries(); ++i) {

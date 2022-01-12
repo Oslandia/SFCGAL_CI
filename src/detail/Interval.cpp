@@ -32,31 +32,25 @@ Interval::Interval(const double &v1, const double &v2)
 ///
 ///
 Interval::Interval(const Interval &other)
-    : _lower(other._lower), _upper(other._upper)
-{
-}
+
+    = default;
 
 ///
 ///
 ///
-Interval &
-Interval::operator=(const Interval &other)
-{
-  _lower = other._lower;
-  _upper = other._upper;
-  return *this;
-}
+auto
+Interval::operator=(const Interval &other) -> Interval & = default;
 
 ///
 ///
 ///
-Interval::~Interval() {}
+Interval::~Interval() = default;
 
 ///
 ///
 ///
-bool
-Interval::isEmpty() const
+auto
+Interval::isEmpty() const -> bool
 {
   return std::isnan(_lower) || std::isnan(_upper);
 }
@@ -116,8 +110,8 @@ Interval::expandToInclude(const double &value)
 ///
 ///
 ///
-bool
-Interval::intersects(const Interval &other) const
+auto
+Interval::intersects(const Interval &other) const -> bool
 {
   // empty intervals never intersects
   if (isEmpty() || other.isEmpty()) {
@@ -130,8 +124,8 @@ Interval::intersects(const Interval &other) const
 ///
 ///
 ///
-bool
-Interval::operator==(const Interval &other) const
+auto
+Interval::operator==(const Interval &other) const -> bool
 {
   if (isEmpty() && other.isEmpty()) {
     return true;
@@ -143,8 +137,8 @@ Interval::operator==(const Interval &other) const
 ///
 ///
 ///
-bool
-Interval::operator!=(const Interval &other) const
+auto
+Interval::operator!=(const Interval &other) const -> bool
 {
   return !((*this) == other);
 }

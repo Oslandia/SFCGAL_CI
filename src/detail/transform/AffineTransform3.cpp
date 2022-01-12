@@ -20,6 +20,8 @@
 #include <SFCGAL/Triangle.h>
 #include <SFCGAL/TriangulatedSurface.h>
 
+#include <utility>
+
 namespace SFCGAL {
 namespace transform {
 
@@ -27,7 +29,7 @@ namespace transform {
 ///
 ///
 AffineTransform3::AffineTransform3(CGAL::Aff_transformation_3<Kernel> transform)
-    : _transform(transform)
+    : _transform(std::move(transform))
 {
 }
 

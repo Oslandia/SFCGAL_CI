@@ -140,8 +140,8 @@ SurfaceGraph::SurfaceGraph(const TriangulatedSurface &tin)
   }
 }
 
-bool
-isConnected(const SurfaceGraph &graph)
+auto
+isConnected(const SurfaceGraph &graph) -> bool
 {
   std::vector<SurfaceGraph::FaceIndex> component(
       boost::num_vertices(graph.faceGraph()));
@@ -150,13 +150,12 @@ isConnected(const SurfaceGraph &graph)
   return 1 == numComponents;
 }
 
-bool
-isClosed(const SurfaceGraph &graph)
+auto
+isClosed(const SurfaceGraph &graph) -> bool
 {
   const SurfaceGraph::EdgeMap::const_iterator end = graph.edgeMap().end();
 
-  for (SurfaceGraph::EdgeMap::const_iterator e = graph.edgeMap().begin();
-       e != end; ++e) {
+  for (auto e = graph.edgeMap().begin(); e != end; ++e) {
     if (e->second.second == SurfaceGraph::INVALID_INDEX) {
       return false;
     }

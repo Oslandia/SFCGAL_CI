@@ -15,13 +15,13 @@ MultiSolid::MultiSolid() : GeometryCollection() {}
 ///
 ///
 ///
-MultiSolid::MultiSolid(MultiSolid const &other) : GeometryCollection(other) {}
+MultiSolid::MultiSolid(MultiSolid const &other) = default;
 
 ///
 ///
 ///
-MultiSolid &
-MultiSolid::operator=(MultiSolid other)
+auto
+MultiSolid::operator=(MultiSolid other) -> MultiSolid &
 {
   swap(other);
   return *this;
@@ -30,13 +30,13 @@ MultiSolid::operator=(MultiSolid other)
 ///
 ///
 ///
-MultiSolid::~MultiSolid() {}
+MultiSolid::~MultiSolid() = default;
 
 ///
 ///
 ///
-MultiSolid *
-MultiSolid::clone() const
+auto
+MultiSolid::clone() const -> MultiSolid *
 {
   return new MultiSolid(*this);
 }
@@ -44,8 +44,8 @@ MultiSolid::clone() const
 ///
 ///
 ///
-std::string
-MultiSolid::geometryType() const
+auto
+MultiSolid::geometryType() const -> std::string
 {
   return "MultiSolid";
 }
@@ -53,8 +53,8 @@ MultiSolid::geometryType() const
 ///
 ///
 ///
-GeometryType
-MultiSolid::geometryTypeId() const
+auto
+MultiSolid::geometryTypeId() const -> GeometryType
 {
   return TYPE_MULTISOLID;
 }
@@ -62,8 +62,8 @@ MultiSolid::geometryTypeId() const
 ///
 ///
 ///
-bool
-MultiSolid::isAllowed(Geometry const &g)
+auto
+MultiSolid::isAllowed(Geometry const &g) -> bool
 {
   return g.geometryTypeId() == TYPE_SOLID;
 }

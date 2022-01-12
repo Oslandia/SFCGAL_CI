@@ -30,19 +30,19 @@
 namespace SFCGAL {
 namespace algorithm {
 
-typedef CGAL::Point_2<SFCGAL::Kernel>    Point_2;
-typedef CGAL::Triangle_2<SFCGAL::Kernel> Triangle_2;
-typedef CGAL::Polygon_2<SFCGAL::Kernel>  Polygon_2;
+using Point_2    = CGAL::Point_2<SFCGAL::Kernel>;
+using Triangle_2 = CGAL::Triangle_2<SFCGAL::Kernel>;
+using Polygon_2  = CGAL::Polygon_2<SFCGAL::Kernel>;
 
-typedef CGAL::Point_3<SFCGAL::Kernel>    Point_3;
-typedef CGAL::Triangle_3<SFCGAL::Kernel> Triangle_3;
-typedef CGAL::Plane_3<SFCGAL::Kernel>    Plane_3;
+using Point_3    = CGAL::Point_3<SFCGAL::Kernel>;
+using Triangle_3 = CGAL::Triangle_3<SFCGAL::Kernel>;
+using Plane_3    = CGAL::Plane_3<SFCGAL::Kernel>;
 
 ///
 ///
 ///
-double
-area(const Geometry &g, NoValidityCheck)
+auto
+area(const Geometry &g, NoValidityCheck) -> double
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
@@ -79,8 +79,8 @@ area(const Geometry &g, NoValidityCheck)
           .str()));
 }
 
-double
-area(const Geometry &g)
+auto
+area(const Geometry &g) -> double
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
   return area(g, NoValidityCheck());
@@ -89,8 +89,8 @@ area(const Geometry &g)
 ///
 ///
 ///
-Kernel::FT
-signedArea(const Triangle &g)
+auto
+signedArea(const Triangle &g) -> Kernel::FT
 {
   Triangle_2 triangle = g.toTriangle_2();
   return triangle.area();
@@ -99,8 +99,8 @@ signedArea(const Triangle &g)
 ///
 ///
 ///
-Kernel::FT
-signedArea(const LineString &g)
+auto
+signedArea(const LineString &g) -> Kernel::FT
 {
   return g.toPolygon_2(false).area();
 }
@@ -108,8 +108,8 @@ signedArea(const LineString &g)
 ///
 ///
 ///
-double
-area(const Triangle &g)
+auto
+area(const Triangle &g) -> double
 {
   return CGAL::to_double(CGAL::abs(signedArea(g)));
 }
@@ -117,8 +117,8 @@ area(const Triangle &g)
 ///
 ///
 ///
-double
-area(const Polygon &g)
+auto
+area(const Polygon &g) -> double
 {
   Kernel::RT result = 0.0;
 
@@ -140,8 +140,8 @@ area(const Polygon &g)
 ///
 ///
 ///
-double
-area(const GeometryCollection &g)
+auto
+area(const GeometryCollection &g) -> double
 {
   double result = 0.0;
 
@@ -155,8 +155,8 @@ area(const GeometryCollection &g)
 ///
 ///
 ///
-double
-area(const TriangulatedSurface &g)
+auto
+area(const TriangulatedSurface &g) -> double
 {
   double result = 0.0;
 
@@ -170,8 +170,8 @@ area(const TriangulatedSurface &g)
 ///
 ///
 ///
-double
-area(const PolyhedralSurface &g)
+auto
+area(const PolyhedralSurface &g) -> double
 {
   double result = 0.0;
 
@@ -189,8 +189,8 @@ area(const PolyhedralSurface &g)
 ///
 ///
 ///
-double
-area3D(const Geometry &g, NoValidityCheck)
+auto
+area3D(const Geometry &g, NoValidityCheck) -> double
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
@@ -223,8 +223,8 @@ area3D(const Geometry &g, NoValidityCheck)
   BOOST_THROW_EXCEPTION(Exception("missing case in SFCGAL::algorithm::area3D"));
 }
 
-double
-area3D(const Geometry &g)
+auto
+area3D(const Geometry &g) -> double
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(g);
   return area3D(g, NoValidityCheck());
@@ -232,8 +232,8 @@ area3D(const Geometry &g)
 ///
 ///
 ///
-double
-area3D(const Polygon &g)
+auto
+area3D(const Polygon &g) -> double
 {
   double result = 0.0;
 
@@ -286,8 +286,8 @@ area3D(const Polygon &g)
 ///
 ///
 ///
-double
-area3D(const Triangle &g)
+auto
+area3D(const Triangle &g) -> double
 {
   CGAL::Triangle_3<Kernel> triangle(g.vertex(0).toPoint_3(),
                                     g.vertex(1).toPoint_3(),
@@ -298,8 +298,8 @@ area3D(const Triangle &g)
 ///
 ///
 ///
-double
-area3D(const GeometryCollection &g)
+auto
+area3D(const GeometryCollection &g) -> double
 {
   double result = 0.0;
 
@@ -313,8 +313,8 @@ area3D(const GeometryCollection &g)
 ///
 ///
 ///
-double
-area3D(const PolyhedralSurface &g)
+auto
+area3D(const PolyhedralSurface &g) -> double
 {
   double area = 0.0;
 
@@ -328,8 +328,8 @@ area3D(const PolyhedralSurface &g)
 ///
 ///
 ///
-double
-area3D(const TriangulatedSurface &g)
+auto
+area3D(const TriangulatedSurface &g) -> double
 {
   double result = 0.0;
 

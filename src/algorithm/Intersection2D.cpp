@@ -21,12 +21,11 @@ namespace algorithm {
 
 // local function : get the number of intersection points between rings of a
 // polygon
-int
-numIntersectionPoints(const CGAL::Polygon_with_holes_2<Kernel> &poly)
+auto
+numIntersectionPoints(const CGAL::Polygon_with_holes_2<Kernel> &poly) -> int
 {
-  int numIntersectionPoints = 0;
-  CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hit =
-      poly.holes_begin();
+  int  numIntersectionPoints = 0;
+  auto hit                   = poly.holes_begin();
 
   for (int i = 0; i == 0 || hit != poly.holes_end(); ++i) {
     GeometrySet<2> ringI;
@@ -39,8 +38,7 @@ numIntersectionPoints(const CGAL::Polygon_with_holes_2<Kernel> &poly)
       hit++;
     }
 
-    for (CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hjt = hit;
-         hjt != poly.holes_end(); ++hjt) {
+    for (auto hjt = hit; hjt != poly.holes_end(); ++hjt) {
       GeometrySet<2> ringJ, inter;
       ringJ.addSegments(hjt->edges_begin(), hjt->edges_end());
 
@@ -65,28 +63,24 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
     }
   } else if (pa.handle.which() == PrimitiveSurface &&
              pb.handle.which() == PrimitiveSurface) {
-    const CGAL::Polygon_with_holes_2<Kernel> *poly1 =
-        pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
-    const CGAL::Polygon_with_holes_2<Kernel> *poly2 =
-        pb.as<CGAL::Polygon_with_holes_2<Kernel>>();
+    const auto *poly1 = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
+    const auto *poly2 = pb.as<CGAL::Polygon_with_holes_2<Kernel>>();
 
     // shortcut for triangles
     if (poly1->holes_begin() == poly1->holes_end() &&
         poly1->outer_boundary().size() == 3 &&
         poly2->holes_begin() == poly2->holes_end() &&
         poly2->outer_boundary().size() == 3) {
-      CGAL::Polygon_2<Kernel>::Vertex_iterator vit1 =
-          poly1->outer_boundary().vertices_begin();
-      CGAL::Point_2<Kernel>    pa1 = *vit1++;
-      CGAL::Point_2<Kernel>    pa2 = *vit1++;
-      CGAL::Point_2<Kernel>    pa3 = *vit1;
+      auto                     vit1 = poly1->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel>    pa1  = *vit1++;
+      CGAL::Point_2<Kernel>    pa2  = *vit1++;
+      CGAL::Point_2<Kernel>    pa3  = *vit1;
       CGAL::Triangle_2<Kernel> tri1(pa1, pa2, pa3);
 
-      CGAL::Polygon_2<Kernel>::Vertex_iterator vit2 =
-          poly2->outer_boundary().vertices_begin();
-      CGAL::Point_2<Kernel>    pb1 = *vit2++;
-      CGAL::Point_2<Kernel>    pb2 = *vit2++;
-      CGAL::Point_2<Kernel>    pb3 = *vit2;
+      auto                     vit2 = poly2->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel>    pb1  = *vit2++;
+      CGAL::Point_2<Kernel>    pb2  = *vit2++;
+      CGAL::Point_2<Kernel>    pb3  = *vit2;
       CGAL::Triangle_2<Kernel> tri2(pb1, pb2, pb3);
 
       CGAL::Object interObj = CGAL::intersection(tri1, tri2);
@@ -120,22 +114,20 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
     CGAL::intersection(*poly1, *poly2, std::back_inserter(output.surfaces()));
   } else if (pa.handle.which() == PrimitiveSegment &&
              pb.handle.which() == PrimitiveSegment) {
-    const CGAL::Segment_2<Kernel> *seg1     = pa.as<CGAL::Segment_2<Kernel>>();
-    const CGAL::Segment_2<Kernel> *seg2     = pb.as<CGAL::Segment_2<Kernel>>();
-    CGAL::Object                   interObj = CGAL::intersection(*seg1, *seg2);
+    const auto  *seg1     = pa.as<CGAL::Segment_2<Kernel>>();
+    const auto  *seg2     = pb.as<CGAL::Segment_2<Kernel>>();
+    CGAL::Object interObj = CGAL::intersection(*seg1, *seg2);
     output.addPrimitive(interObj);
   } else if (pa.handle.which() == PrimitiveSurface &&
              pb.handle.which() == PrimitiveSegment) {
-    const CGAL::Polygon_with_holes_2<Kernel> *poly =
-        pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
-    const CGAL::Segment_2<Kernel> *seg = pb.as<CGAL::Segment_2<Kernel>>();
+    const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
+    const auto *seg  = pb.as<CGAL::Segment_2<Kernel>>();
 
     // shortcut for triangle
     if (poly->holes_begin() == poly->holes_end() &&
         poly->outer_boundary().size() == 3) {
       // no holes and 3 vertices => it is a triangle
-      CGAL::Polygon_2<Kernel>::Vertex_iterator vit =
-          poly->outer_boundary().vertices_begin();
+      auto                     vit = poly->outer_boundary().vertices_begin();
       CGAL::Point_2<Kernel>    p1(*vit++);
       CGAL::Point_2<Kernel>    p2(*vit++);
       CGAL::Point_2<Kernel>    p3(*vit++);

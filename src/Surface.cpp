@@ -10,13 +10,13 @@ namespace SFCGAL {
 ///
 ///
 ///
-Surface::~Surface() {}
+Surface::~Surface() = default;
 
 ///
 ///
 ///
-int
-Surface::dimension() const
+auto
+Surface::dimension() const -> int
 {
   return 2;
 }
@@ -29,7 +29,7 @@ Surface::Surface() : Geometry() {}
 ///
 ///
 ///
-Surface::Surface(Surface const &other) : Geometry(other) {}
+Surface::Surface(Surface const &other) = default;
 
 /**
  * [OGC/SFS]"The area of this Surface, as measured in the spatial reference

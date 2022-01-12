@@ -23,9 +23,9 @@
 
 #include <CGAL/Aff_transformation_2.h>
 
-typedef CGAL::Polygon_2<SFCGAL::Kernel>            Polygon_2;
-typedef CGAL::Polygon_with_holes_2<SFCGAL::Kernel> Polygon_with_holes_2;
-typedef CGAL::Polygon_set_2<SFCGAL::Kernel>        Polygon_set_2;
+using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
+using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
+using Polygon_set_2        = CGAL::Polygon_set_2<SFCGAL::Kernel>;
 
 namespace SFCGAL {
 namespace algorithm {
@@ -124,8 +124,7 @@ minkowskiSum(const Point &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
 
   Polygon_2 sum;
 
-  for (Polygon_2::Vertex_const_iterator it = gB.vertices_begin();
-       it != gB.vertices_end(); ++it) {
+  for (auto it = gB.vertices_begin(); it != gB.vertices_end(); ++it) {
     sum.push_back(translate.transform(*it));
   }
 
@@ -221,12 +220,10 @@ minkowskiSum(const Polygon &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
     std::list<Polygon_with_holes_2> interiorPolygons;
     sumInteriorRings.polygons_with_holes(std::back_inserter(interiorPolygons));
 
-    for (std::list<Polygon_with_holes_2>::iterator it_p =
-             interiorPolygons.begin();
-         it_p != interiorPolygons.end(); ++it_p) {
+    for (auto &interiorPolygon : interiorPolygons) {
 
-      for (Polygon_with_holes_2::Hole_iterator it_hole = it_p->holes_begin();
-           it_hole != it_p->holes_end(); ++it_hole) {
+      for (auto it_hole = interiorPolygon.holes_begin();
+           it_hole != interiorPolygon.holes_end(); ++it_hole) {
 
         it_hole->reverse_orientation();
         polygonSet.difference(*it_hole);
@@ -257,8 +254,9 @@ minkowskiSumCollection(const Geometry &gA, const Polygon_2 &gB,
   }
 }
 
-std::unique_ptr<Geometry>
+auto
 minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck)
+    -> std::unique_ptr<Geometry>
 {
   if (gB.isEmpty()) {
     return std::unique_ptr<Geometry>(gA.clone());
@@ -275,8 +273,8 @@ minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck)
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-minkowskiSum(const Geometry &gA, const Polygon &gB)
+auto
+minkowskiSum(const Geometry &gA, const Polygon &gB) -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gA);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gB);

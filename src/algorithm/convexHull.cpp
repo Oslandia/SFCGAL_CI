@@ -26,18 +26,18 @@
 namespace SFCGAL {
 namespace algorithm {
 
-typedef CGAL::Point_3<Kernel>      Point_3;
-typedef CGAL::Segment_3<Kernel>    Segment_3;
-typedef CGAL::Triangle_3<Kernel>   Triangle_3;
-typedef CGAL::Polyhedron_3<Kernel> Polyhedron_3;
+using Point_3      = CGAL::Point_3<Kernel>;
+using Segment_3    = CGAL::Segment_3<Kernel>;
+using Triangle_3   = CGAL::Triangle_3<Kernel>;
+using Polyhedron_3 = CGAL::Polyhedron_3<Kernel>;
 
-typedef CGAL::Point_2<Kernel> Point_2;
+using Point_2 = CGAL::Point_2<Kernel>;
 
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-convexHull(const Geometry &g)
+auto
+convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
 {
   using CGAL::object_cast;
 
@@ -56,8 +56,8 @@ convexHull(const Geometry &g)
 
   std::vector<Point_2> points;
 
-  for (size_t i = 0; i < getPointVisitor.points.size(); i++) {
-    points.push_back(getPointVisitor.points[i]->toPoint_2());
+  for (auto &point : getPointVisitor.points) {
+    points.push_back(point->toPoint_2());
   }
 
   // resulting extreme points
@@ -80,7 +80,7 @@ convexHull(const Geometry &g)
     Point_2                            r(*it++);
     return std::unique_ptr<Geometry>(new Triangle(p, q, r));
   } else if (epoints.size() > 3) {
-    Polygon *poly = new Polygon;
+    auto *poly = new Polygon;
 
     for (std::list<Point_2>::const_iterator it = epoints.begin();
          it != epoints.end(); ++it) {
@@ -99,8 +99,8 @@ convexHull(const Geometry &g)
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-convexHull3D(const Geometry &g)
+auto
+convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
 {
   using CGAL::object_cast;
 
@@ -111,8 +111,8 @@ convexHull3D(const Geometry &g)
 
   std::vector<Point_3> points;
 
-  for (size_t i = 0; i < getPointVisitor.points.size(); i++) {
-    points.push_back(getPointVisitor.points[i]->toPoint_3());
+  for (auto &point : getPointVisitor.points) {
+    points.push_back(point->toPoint_3());
   }
 
   /*
@@ -126,17 +126,16 @@ convexHull3D(const Geometry &g)
 
   if (hull.empty()) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
-  } else if (const Point_3 *point = object_cast<Point_3>(&hull)) {
+  } else if (const auto *point = object_cast<Point_3>(&hull)) {
     return std::unique_ptr<Geometry>(new Point(*point));
-  } else if (const Segment_3 *segment = object_cast<Segment_3>(&hull)) {
+  } else if (const auto *segment = object_cast<Segment_3>(&hull)) {
     return std::unique_ptr<Geometry>(
         new LineString(Point(segment->start()), Point(segment->end())));
-  } else if (const Triangle_3 *triangle = object_cast<Triangle_3>(&hull)) {
+  } else if (const auto *triangle = object_cast<Triangle_3>(&hull)) {
     return std::unique_ptr<Geometry>(new Triangle(Point(triangle->vertex(0)),
                                                   Point(triangle->vertex(1)),
                                                   Point(triangle->vertex(2))));
-  } else if (const Polyhedron_3 *polyhedron =
-                 object_cast<Polyhedron_3>(&hull)) {
+  } else if (const auto *polyhedron = object_cast<Polyhedron_3>(&hull)) {
     std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface());
 
     for (Polyhedron_3::Facet_const_iterator it_facet =
@@ -148,7 +147,7 @@ convexHull3D(const Geometry &g)
       std::vector<Point> ring;
 
       do {
-        ring.push_back(Point(it->vertex()->point()));
+        ring.emplace_back(it->vertex()->point());
       } while (++it != it_facet->facet_begin());
 
       ring.push_back(ring.front());

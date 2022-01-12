@@ -8,9 +8,9 @@
 
 namespace SFCGAL {
 namespace algorithm {
-CGAL::Object
+auto
 intersection(const CGAL::Triangle_3<Kernel> &a,
-             const CGAL::Triangle_3<Kernel> &b)
+             const CGAL::Triangle_3<Kernel> &b) -> CGAL::Object
 {
   return CGAL::intersection(a, b);
 }

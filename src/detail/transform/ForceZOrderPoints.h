@@ -25,7 +25,7 @@ public:
   /**
    * Constructor with a default Z value
    */
-  ForceZOrderPoints(const Kernel::FT &defaultZ = 0);
+  ForceZOrderPoints(const Kernel::FT defaultZ = 0);
 
   /*
    * [SFCGAL::Transform]

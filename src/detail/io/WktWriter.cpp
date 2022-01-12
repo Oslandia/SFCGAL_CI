@@ -25,16 +25,16 @@ namespace detail {
 namespace io {
 
 namespace impl {
-std::ostream &
-writeFT(std::ostream &s, const CGAL::Gmpq &ft)
+auto
+writeFT(std::ostream &s, const CGAL::Gmpq &ft) -> std::ostream &
 {
   s << ft;
   return s;
 }
 
 #ifdef CGAL_USE_GMPXX
-std::ostream &
-writeFT(std::ostream &s, const mpq_class &ft)
+auto
+writeFT(std::ostream &s, const mpq_class &ft) -> std::ostream &
 {
   s << ft.get_num() << "/" << ft.get_den();
   return s;

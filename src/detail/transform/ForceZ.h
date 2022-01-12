@@ -21,7 +21,7 @@ public:
   /**
    * Constructor with a default Z value
    */
-  ForceZ(const Kernel::FT &defaultZ = 0);
+  ForceZ(const Kernel::FT defaultZ = 0);
 
   /*
    * [SFCGAL::Transform]

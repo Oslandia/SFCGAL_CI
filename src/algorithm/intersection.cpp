@@ -23,9 +23,9 @@ using namespace SFCGAL::detail;
 
 namespace SFCGAL {
 
-typedef CGAL::Point_2<Kernel>    Point_2;
-typedef CGAL::Segment_2<Kernel>  Segment_2;
-typedef CGAL::Triangle_2<Kernel> Triangle_2;
+using Point_2    = CGAL::Point_2<Kernel>;
+using Segment_2  = CGAL::Segment_2<Kernel>;
+using Triangle_2 = CGAL::Triangle_2<Kernel>;
 
 namespace algorithm {
 // see Intersection3D.cpp
@@ -89,10 +89,8 @@ post_intersection(const GeometrySet<2> &input, GeometrySet<2> &output)
 {
   //
   // reverse orientation of polygons if needed
-  for (GeometrySet<2>::SurfaceCollection::const_iterator it =
-           input.surfaces().begin();
-       it != input.surfaces().end(); ++it) {
-    const CGAL::Polygon_with_holes_2<Kernel> &p     = it->primitive();
+  for (const auto &it : input.surfaces()) {
+    const CGAL::Polygon_with_holes_2<Kernel> &p     = it.primitive();
     CGAL::Polygon_2<Kernel>                   outer = p.outer_boundary();
 
     if (outer.orientation() == CGAL::CLOCKWISE) {
@@ -101,9 +99,7 @@ post_intersection(const GeometrySet<2> &input, GeometrySet<2> &output)
 
     std::list<CGAL::Polygon_2<Kernel>> rings;
 
-    for (CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hit =
-             p.holes_begin();
-         hit != p.holes_end(); ++hit) {
+    for (auto hit = p.holes_begin(); hit != p.holes_end(); ++hit) {
       rings.push_back(*hit);
 
       if (hit->orientation() == CGAL::COUNTERCLOCKWISE) {
@@ -153,8 +149,9 @@ template void
 intersection<3>(const GeometrySet<3> &a, const GeometrySet<3> &b,
                 GeometrySet<3> &);
 
-std::unique_ptr<Geometry>
+auto
 intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+    -> std::unique_ptr<Geometry>
 {
   GeometrySet<2> gsa(ga), gsb(gb), output;
   algorithm::intersection(gsa, gsb, output);
@@ -164,8 +161,9 @@ intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck)
   return filtered.recompose();
 }
 
-std::unique_ptr<Geometry>
+auto
 intersection(const Geometry &ga, const Geometry &gb)
+    -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ga);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gb);
@@ -173,8 +171,9 @@ intersection(const Geometry &ga, const Geometry &gb)
   return intersection(ga, gb, NoValidityCheck());
 }
 
-std::unique_ptr<Geometry>
+auto
 intersection3D(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+    -> std::unique_ptr<Geometry>
 {
   GeometrySet<3> gsa(ga), gsb(gb), output;
   algorithm::intersection(gsa, gsb, output);
@@ -185,8 +184,9 @@ intersection3D(const Geometry &ga, const Geometry &gb, NoValidityCheck)
   return filtered.recompose();
 }
 
-std::unique_ptr<Geometry>
+auto
 intersection3D(const Geometry &ga, const Geometry &gb)
+    -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(ga);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gb);

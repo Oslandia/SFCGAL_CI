@@ -11,13 +11,13 @@ namespace SFCGAL {
 ///
 ///
 ///
-Logger::~Logger() {}
+Logger::~Logger() = default;
 
 ///
 ///
 ///
-Logger *
-Logger::get()
+auto
+Logger::get() -> Logger *
 {
   static Logger log(std::cout);
   return &log;
@@ -83,8 +83,8 @@ Logger::log(const Level &level, const std::string &message,
 ///
 ///
 ///
-const Logger::Level &
-Logger::logLevel() const
+auto
+Logger::logLevel() const -> const Logger::Level &
 {
   return _logLevel;
 }
@@ -109,8 +109,8 @@ Logger::Logger(std::ostream &str)
 ///
 ///
 ///
-Logger &
-logger()
+auto
+logger() -> Logger &
 {
   return *Logger::get();
 }

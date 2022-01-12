@@ -20,8 +20,9 @@ ConstraintDelaunayTriangulation::ConstraintDelaunayTriangulation() : _cdt() {}
 ///
 ///
 ///
-ConstraintDelaunayTriangulation::Vertex_handle
+auto
 ConstraintDelaunayTriangulation::addVertex(const Coordinate &position)
+    -> ConstraintDelaunayTriangulation::Vertex_handle
 {
   if (position.isEmpty()) {
     BOOST_THROW_EXCEPTION(Exception(
@@ -62,8 +63,8 @@ ConstraintDelaunayTriangulation::clear()
 ///
 ///
 ///
-size_t
-ConstraintDelaunayTriangulation::numVertices() const
+auto
+ConstraintDelaunayTriangulation::numVertices() const -> size_t
 {
   return _cdt.number_of_vertices();
 }
@@ -71,8 +72,8 @@ ConstraintDelaunayTriangulation::numVertices() const
 ///
 ///
 ///
-size_t
-ConstraintDelaunayTriangulation::numTriangles() const
+auto
+ConstraintDelaunayTriangulation::numTriangles() const -> size_t
 {
   return _cdt.number_of_faces();
 }
@@ -91,8 +92,8 @@ ConstraintDelaunayTriangulation::setProjectionPlane(
 ///
 ///
 ///
-Kernel::Plane_3
-ConstraintDelaunayTriangulation::projectionPlane() const
+auto
+ConstraintDelaunayTriangulation::projectionPlane() const -> Kernel::Plane_3
 {
   if (_projectionPlane) {
     return *_projectionPlane;
@@ -143,8 +144,9 @@ ConstraintDelaunayTriangulation::getTriangles(
 ///
 ///
 ///
-std::unique_ptr<TriangulatedSurface>
+auto
 ConstraintDelaunayTriangulation::getTriangulatedSurface() const
+    -> std::unique_ptr<TriangulatedSurface>
 {
   std::unique_ptr<TriangulatedSurface> result(new TriangulatedSurface);
   getTriangles(*result, false);

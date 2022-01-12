@@ -8,6 +8,8 @@
 #include <SFCGAL/PolyhedralSurface.h>
 #include <SFCGAL/Solid.h>
 
+#include <memory>
+
 namespace SFCGAL {
 
 ///
@@ -15,8 +17,8 @@ namespace SFCGAL {
 ///
 Envelope::Envelope()
 {
-  for (size_t i = 0; i < 3; i++) {
-    _bounds[i] = detail::Interval();
+  for (auto &_bound : _bounds) {
+    _bound = detail::Interval();
   }
 }
 
@@ -69,8 +71,8 @@ Envelope::Envelope(const Envelope &other)
 ///
 ///
 ///
-Envelope &
-Envelope::operator=(const Envelope &other)
+auto
+Envelope::operator=(const Envelope &other) -> Envelope &
 {
   for (size_t i = 0; i < 3; i++) {
     _bounds[i] = other._bounds[i];
@@ -82,13 +84,13 @@ Envelope::operator=(const Envelope &other)
 ///
 ///
 ///
-Envelope::~Envelope() {}
+Envelope::~Envelope() = default;
 
 ///
 ///
 ///
-bool
-Envelope::isEmpty() const
+auto
+Envelope::isEmpty() const -> bool
 {
   return _bounds[0].isEmpty() || _bounds[1].isEmpty();
 }
@@ -96,8 +98,8 @@ Envelope::isEmpty() const
 ///
 ///
 ///
-bool
-Envelope::is3D() const
+auto
+Envelope::is3D() const -> bool
 {
   return !isEmpty() && !_bounds[2].isEmpty();
 }
@@ -121,8 +123,8 @@ Envelope::expandToInclude(const Coordinate &coordinate)
 ///
 ///
 ///
-bool
-Envelope::contains(const Envelope &a, const Envelope &b)
+auto
+Envelope::contains(const Envelope &a, const Envelope &b) -> bool
 {
   if (a.is3D()) {
     return b.xMin() >= a.xMin() && b.xMax() <= a.xMax() &&
@@ -137,8 +139,8 @@ Envelope::contains(const Envelope &a, const Envelope &b)
 ///
 ///
 ///
-bool
-Envelope::overlaps(const Envelope &a, const Envelope &b)
+auto
+Envelope::overlaps(const Envelope &a, const Envelope &b) -> bool
 {
   if (a.is3D()) {
     CGAL::Bbox_3 abox = a.toBbox_3();
@@ -154,8 +156,8 @@ Envelope::overlaps(const Envelope &a, const Envelope &b)
 ///
 ///
 ///
-std::unique_ptr<LineString>
-Envelope::toRing() const
+auto
+Envelope::toRing() const -> std::unique_ptr<LineString>
 {
   std::unique_ptr<LineString> ring(new LineString());
 
@@ -175,17 +177,17 @@ Envelope::toRing() const
 ///
 ///
 ///
-std::unique_ptr<Polygon>
-Envelope::toPolygon() const
+auto
+Envelope::toPolygon() const -> std::unique_ptr<Polygon>
 {
-  return std::unique_ptr<Polygon>(new Polygon(toRing().release()));
+  return std::make_unique<Polygon>(toRing().release());
 }
 
 ///
 ///
 ///
-std::unique_ptr<PolyhedralSurface>
-Envelope::toShell() const
+auto
+Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
 {
   std::unique_ptr<PolyhedralSurface> shell(new PolyhedralSurface());
 
@@ -281,17 +283,17 @@ Envelope::toShell() const
 ///
 ///
 ///
-std::unique_ptr<Solid>
-Envelope::toSolid() const
+auto
+Envelope::toSolid() const -> std::unique_ptr<Solid>
 {
-  return std::unique_ptr<Solid>(new Solid(toShell().release()));
+  return std::make_unique<Solid>(toShell().release());
 }
 
 ///
 ///
 ///
-std::ostream &
-Envelope::print(std::ostream &ostr) const
+auto
+Envelope::print(std::ostream &ostr) const -> std::ostream &
 {
   ostr << "[ " << xMin();
   ostr << ", " << xMax();
@@ -306,8 +308,8 @@ Envelope::print(std::ostream &ostr) const
   return ostr;
 }
 
-bool
-operator==(const Envelope &a, const Envelope &b)
+auto
+operator==(const Envelope &a, const Envelope &b) -> bool
 {
   if (a.is3D()) {
     return a.xMin() == b.xMin() && a.yMin() == b.yMin() &&

@@ -41,8 +41,8 @@ ConsistentOrientationBuilder::addTriangulatedSurface(
 ///
 ///
 ///
-TriangulatedSurface
-ConsistentOrientationBuilder::buildTriangulatedSurface()
+auto
+ConsistentOrientationBuilder::buildTriangulatedSurface() -> TriangulatedSurface
 {
   _makeOrientationConsistent();
   TriangulatedSurface triangulatedSurface;
@@ -57,8 +57,8 @@ ConsistentOrientationBuilder::buildTriangulatedSurface()
 ///
 ///
 ///
-Triangle
-ConsistentOrientationBuilder::triangleN(const size_t &n) const
+auto
+ConsistentOrientationBuilder::triangleN(const size_t &n) const -> Triangle
 {
   const edge_descriptor &ab = _triangles[n][0];
   const edge_descriptor &bc = _triangles[n][1];
@@ -102,16 +102,15 @@ ConsistentOrientationBuilder::_makeOrientationConsistent()
     // orient neighbors
     const std::set<size_t> &neighbors = _neighbors[currentTriangle];
 
-    for (std::set<size_t>::const_iterator it = neighbors.begin();
-         it != neighbors.end(); ++it) {
-      bool hasOppositeEdge = 0, hasParallelEdge = 0;
+    for (unsigned long neighbor : neighbors) {
+      bool hasOppositeEdge = false, hasParallelEdge = false;
       graph::algorithm::studyOrientation(_graph, _triangles[currentTriangle],
-                                         _triangles[(*it)], hasOppositeEdge,
+                                         _triangles[neighbor], hasOppositeEdge,
                                          hasParallelEdge);
 
       // orientation is consistent
       if (!hasParallelEdge) {
-        _oriented[*it] = true;
+        _oriented[neighbor] = true;
         continue;
       }
 
@@ -122,15 +121,15 @@ ConsistentOrientationBuilder::_makeOrientationConsistent()
       }
 
       // orientation has already been fixed (moebius)
-      if (hasParallelEdge && _oriented[*it]) {
+      if (hasParallelEdge && _oriented[neighbor]) {
         BOOST_THROW_EXCEPTION(
             Exception("can't build consistent orientation from triangle set, "
                       "inconsistent orientation for triangle"));
       }
 
       // here, neighbor triangle should be reversed
-      _graph.reverse(_triangles[(*it)]);
-      _oriented[*it] = true;
+      _graph.reverse(_triangles[neighbor]);
+      _oriented[neighbor] = true;
     }
   }
 }
@@ -147,17 +146,17 @@ ConsistentOrientationBuilder::_computeNeighbors()
   for (size_t i = 0; i < _triangles.size(); i++) {
     const std::vector<edge_descriptor> &triangle = _triangles[i];
 
-    for (size_t j = 0; j < triangle.size(); j++) {
-      vertex_descriptor source = _graph.source(triangle[j]);
-      vertex_descriptor target = _graph.target(triangle[j]);
+    for (const auto &j : triangle) {
+      vertex_descriptor source = _graph.source(j);
+      vertex_descriptor target = _graph.target(j);
 
       // get neighbor edges
       std::vector<directed_edge_descriptor> neighborEdges =
           _graph.edges(source, target);
 
       // use marker to fill neighborGraph
-      for (size_t k = 0; k < neighborEdges.size(); k++) {
-        size_t idOtherTriangle = (size_t)_graph[neighborEdges[k].first].face;
+      for (auto &neighborEdge : neighborEdges) {
+        auto idOtherTriangle = (size_t)_graph[neighborEdge.first].face;
 
         if (idOtherTriangle == i) {
           continue;
@@ -172,8 +171,8 @@ ConsistentOrientationBuilder::_computeNeighbors()
 ///
 ///
 ///
-int
-ConsistentOrientationBuilder::_findNextTriangle()
+auto
+ConsistentOrientationBuilder::_findNextTriangle() -> int
 {
   int result = -1;
 
