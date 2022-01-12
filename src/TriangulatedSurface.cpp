@@ -18,8 +18,8 @@ TriangulatedSurface::TriangulatedSurface() : Surface(), _triangles() {}
 TriangulatedSurface::TriangulatedSurface(const std::vector<Triangle> &triangles)
     : Surface()
 {
-  for (size_t i = 0; i < triangles.size(); i++) {
-    _triangles.push_back(triangles[i].clone());
+  for (const auto &triangle : triangles) {
+    _triangles.push_back(triangle.clone());
   }
 }
 
@@ -27,15 +27,15 @@ TriangulatedSurface::TriangulatedSurface(const std::vector<Triangle> &triangles)
 ///
 ///
 TriangulatedSurface::TriangulatedSurface(const TriangulatedSurface &other)
-    : Surface(other), _triangles(other._triangles)
-{
-}
+
+    = default;
 
 ///
 ///
 ///
-TriangulatedSurface &
+auto
 TriangulatedSurface::operator=(TriangulatedSurface other)
+    -> TriangulatedSurface &
 {
   swap(other);
   return *this;
@@ -44,13 +44,13 @@ TriangulatedSurface::operator=(TriangulatedSurface other)
 ///
 ///
 ///
-TriangulatedSurface::~TriangulatedSurface() {}
+TriangulatedSurface::~TriangulatedSurface() = default;
 
 ///
 ///
 ///
-TriangulatedSurface *
-TriangulatedSurface::clone() const
+auto
+TriangulatedSurface::clone() const -> TriangulatedSurface *
 {
   return new TriangulatedSurface(*this);
 }
@@ -58,8 +58,8 @@ TriangulatedSurface::clone() const
 ///
 ///
 ///
-std::string
-TriangulatedSurface::geometryType() const
+auto
+TriangulatedSurface::geometryType() const -> std::string
 {
   return "TriangulatedSurface";
 }
@@ -67,8 +67,8 @@ TriangulatedSurface::geometryType() const
 ///
 ///
 ///
-GeometryType
-TriangulatedSurface::geometryTypeId() const
+auto
+TriangulatedSurface::geometryTypeId() const -> GeometryType
 {
   return TYPE_TRIANGULATEDSURFACE;
 }
@@ -76,8 +76,8 @@ TriangulatedSurface::geometryTypeId() const
 ///
 ///
 ///
-int
-TriangulatedSurface::dimension() const
+auto
+TriangulatedSurface::dimension() const -> int
 {
   // surface
   return 2;
@@ -86,8 +86,8 @@ TriangulatedSurface::dimension() const
 ///
 ///
 ///
-int
-TriangulatedSurface::coordinateDimension() const
+auto
+TriangulatedSurface::coordinateDimension() const -> int
 {
   if (_triangles.empty()) {
     return 0;
@@ -99,8 +99,8 @@ TriangulatedSurface::coordinateDimension() const
 ///
 ///
 ///
-bool
-TriangulatedSurface::isEmpty() const
+auto
+TriangulatedSurface::isEmpty() const -> bool
 {
   return _triangles.empty();
 }
@@ -108,8 +108,8 @@ TriangulatedSurface::isEmpty() const
 ///
 ///
 ///
-bool
-TriangulatedSurface::is3D() const
+auto
+TriangulatedSurface::is3D() const -> bool
 {
   return !_triangles.empty() && _triangles.front().is3D();
 }
@@ -117,8 +117,8 @@ TriangulatedSurface::is3D() const
 ///
 ///
 ///
-bool
-TriangulatedSurface::isMeasured() const
+auto
+TriangulatedSurface::isMeasured() const -> bool
 {
   return !_triangles.empty() && _triangles.front().isMeasured();
 }
@@ -129,17 +129,16 @@ TriangulatedSurface::isMeasured() const
 void
 TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
 {
-  for (TriangulatedSurface::const_iterator it = other.begin();
-       it != other.end(); ++it) {
-    addTriangle(*it);
+  for (const auto &it : other) {
+    addTriangle(it);
   }
 }
 
 ///
 ///
 ///
-size_t
-TriangulatedSurface::numGeometries() const
+auto
+TriangulatedSurface::numGeometries() const -> size_t
 {
   return _triangles.size();
 }
@@ -147,8 +146,8 @@ TriangulatedSurface::numGeometries() const
 ///
 ///
 ///
-const Triangle &
-TriangulatedSurface::geometryN(size_t const &n) const
+auto
+TriangulatedSurface::geometryN(size_t const &n) const -> const Triangle &
 {
   BOOST_ASSERT(n < numGeometries());
   return _triangles[n];
@@ -157,8 +156,8 @@ TriangulatedSurface::geometryN(size_t const &n) const
 ///
 ///
 ///
-Triangle &
-TriangulatedSurface::geometryN(size_t const &n)
+auto
+TriangulatedSurface::geometryN(size_t const &n) -> Triangle &
 {
   BOOST_ASSERT(n < numGeometries());
   return _triangles[n];
@@ -199,14 +198,14 @@ class Triangulated2Polyhedron : public CGAL::Modifier_base<HDS> {
 public:
   Triangulated2Polyhedron(const TriangulatedSurface &surf) : surf(surf) {}
 
-  typedef typename HDS::Vertex              Vertex;
-  typedef typename Vertex::Point            Point;
-  typedef typename HDS::Traits              K;
-  typedef std::map<Point, size_t>           PointMap;
-  typedef std::set<std::pair<Point, Point>> HalfedgeSet;
+  using Vertex      = typename HDS::Vertex;
+  using Point       = typename Vertex::Point;
+  using K           = typename HDS::Traits;
+  using PointMap    = std::map<Point, size_t>;
+  using HalfedgeSet = std::set<std::pair<Point, Point>>;
 
   void
-  operator()(HDS &hds)
+  operator()(HDS &hds) override
   {
     // Postcondition: `hds' is a valid polyhedral surface.
     CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
@@ -273,8 +272,8 @@ private:
 
 template <typename Polyhedron>
 struct Plane_from_facet {
-  typename Polyhedron::Plane_3
-  operator()(typename Polyhedron::Facet &f)
+  auto
+  operator()(typename Polyhedron::Facet &f) -> typename Polyhedron::Plane_3
   {
     typename Polyhedron::Halfedge_handle h = f.halfedge();
     return typename Polyhedron::Plane_3(h->vertex()->point(),
@@ -284,10 +283,10 @@ struct Plane_from_facet {
 };
 
 template <typename K, typename Polyhedron>
-std::unique_ptr<Polyhedron>
-TriangulatedSurface::toPolyhedron_3() const
+auto
+TriangulatedSurface::toPolyhedron_3() const -> std::unique_ptr<Polyhedron>
 {
-  Polyhedron *poly = new Polyhedron();
+  auto *poly = new Polyhedron();
   Triangulated2Polyhedron<typename Polyhedron::HalfedgeDS> converter(*this);
   poly->delegate(converter);
 

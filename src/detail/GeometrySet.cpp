@@ -30,9 +30,9 @@
 
 #include <map>
 
-bool
+auto
 operator<(const CGAL::Segment_2<SFCGAL::Kernel> &sega,
-          const CGAL::Segment_2<SFCGAL::Kernel> &segb)
+          const CGAL::Segment_2<SFCGAL::Kernel> &segb) -> bool
 {
   if (sega.source() == segb.source()) {
     return sega.target() < segb.target();
@@ -41,9 +41,9 @@ operator<(const CGAL::Segment_2<SFCGAL::Kernel> &sega,
   return sega.source() < segb.source();
 }
 
-bool
+auto
 operator<(const CGAL::Segment_3<SFCGAL::Kernel> &sega,
-          const CGAL::Segment_3<SFCGAL::Kernel> &segb)
+          const CGAL::Segment_3<SFCGAL::Kernel> &segb) -> bool
 {
   if (sega.source() == segb.source()) {
     return sega.target() < segb.target();
@@ -128,9 +128,7 @@ _decompose_solid(const Solid &solid, GeometrySet<3>::VolumeCollection &volumes,
 }
 
 template <int Dim>
-GeometrySet<Dim>::GeometrySet()
-{
-}
+GeometrySet<Dim>::GeometrySet() = default;
 
 template <int Dim>
 GeometrySet<Dim>::GeometrySet(const Geometry &g)
@@ -244,23 +242,22 @@ template <>
 void
 GeometrySet<3>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
 {
-  typedef TypeForDimension<3>::Point   TPoint;
-  typedef TypeForDimension<3>::Segment TSegment;
-  typedef TypeForDimension<3>::Surface TSurface;
-  typedef TypeForDimension<3>::Volume  TVolume;
+  using TPoint   = TypeForDimension<3>::Point;
+  using TSegment = TypeForDimension<3>::Segment;
+  using TSurface = TypeForDimension<3>::Surface;
+  using TVolume  = TypeForDimension<3>::Volume;
 
-  if (const TPoint *p = CGAL::object_cast<TPoint>(&o)) {
+  if (const auto *p = CGAL::object_cast<TPoint>(&o)) {
     _points.insert(TPoint(*p));
-  } else if (const std::vector<TPoint> *pts =
-                 CGAL::object_cast<std::vector<TPoint>>(&o)) {
+  } else if (const auto *pts = CGAL::object_cast<std::vector<TPoint>>(&o)) {
     if (pointsAsRing) {
       // if pointsAsRing is true, build a polygon out of points
       // FIXME : we use triangulation here, which is not needed
       // We should have created a (planar) Polyhedron directly out of the points
       LineString ls;
 
-      for (size_t i = 0; i < pts->size(); ++i) {
-        ls.addPoint((*pts)[i]);
+      for (const auto &pt : *pts) {
+        ls.addPoint(pt);
       }
 
       // close the ring
@@ -271,11 +268,11 @@ GeometrySet<3>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
       std::copy(pts->begin(), pts->end(),
                 std::inserter(_points, _points.end()));
     }
-  } else if (const TSegment *p = CGAL::object_cast<TSegment>(&o)) {
+  } else if (const auto *p = CGAL::object_cast<TSegment>(&o)) {
     _segments.insert(TSegment(*p));
-  } else if (const TSurface *p = CGAL::object_cast<TSurface>(&o)) {
+  } else if (const auto *p = CGAL::object_cast<TSurface>(&o)) {
     _surfaces.push_back(TSurface(*p));
-  } else if (const TVolume *p = CGAL::object_cast<TVolume>(&o)) {
+  } else if (const auto *p = CGAL::object_cast<TVolume>(&o)) {
     BOOST_ASSERT(!p->empty());
     _volumes.push_back(TVolume(*p));
   }
@@ -285,21 +282,20 @@ template <>
 void
 GeometrySet<2>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
 {
-  typedef TypeForDimension<2>::Point   TPoint;
-  typedef TypeForDimension<2>::Segment TSegment;
-  typedef TypeForDimension<2>::Surface TSurface;
-  typedef TypeForDimension<2>::Volume  TVolume;
+  using TPoint   = TypeForDimension<2>::Point;
+  using TSegment = TypeForDimension<2>::Segment;
+  using TSurface = TypeForDimension<2>::Surface;
+  using TVolume  = TypeForDimension<2>::Volume;
 
-  if (const TPoint *p = CGAL::object_cast<TPoint>(&o)) {
+  if (const auto *p = CGAL::object_cast<TPoint>(&o)) {
     _points.insert(TPoint(*p));
-  } else if (const std::vector<TPoint> *pts =
-                 CGAL::object_cast<std::vector<TPoint>>(&o)) {
+  } else if (const auto *pts = CGAL::object_cast<std::vector<TPoint>>(&o)) {
     if (pointsAsRing) {
       // if pointsAsRing is true, build a polygon out of points
       CGAL::Polygon_2<Kernel> poly;
 
-      for (size_t i = 0; i < pts->size(); ++i) {
-        poly.push_back((*pts)[i]);
+      for (const auto &pt : *pts) {
+        poly.push_back(pt);
       }
 
       CGAL::Polygon_with_holes_2<Kernel> polyh(poly);
@@ -308,7 +304,7 @@ GeometrySet<2>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
       std::copy(pts->begin(), pts->end(),
                 std::inserter(_points, _points.end()));
     }
-  } else if (const CGAL::Triangle_2<Kernel> *tri =
+  } else if (const auto *tri =
                  CGAL::object_cast<CGAL::Triangle_2<Kernel>>(&o)) {
     // convert to a polygon
     CGAL::Polygon_2<Kernel> poly;
@@ -317,12 +313,12 @@ GeometrySet<2>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
     poly.push_back(tri->vertex(2));
     CGAL::Polygon_with_holes_2<Kernel> polyh(poly);
     _surfaces.push_back(polyh);
-  } else if (const TSegment *p = CGAL::object_cast<TSegment>(&o)) {
+  } else if (const auto *p = CGAL::object_cast<TSegment>(&o)) {
     _segments.insert(TSegment(*p));
-  } else if (const TSurface *p = CGAL::object_cast<TSurface>(&o)) {
+  } else if (const auto *p = CGAL::object_cast<TSurface>(&o)) {
     BOOST_ASSERT(!p->is_unbounded());
     _surfaces.push_back(TSurface(*p));
-  } else if (const TVolume *p = CGAL::object_cast<TVolume>(&o)) {
+  } else if (const auto *p = CGAL::object_cast<TVolume>(&o)) {
     _volumes.push_back(TVolume(*p));
   }
 }
@@ -394,37 +390,36 @@ GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Volume &p, int flags)
 }
 
 template <int Dim>
-bool
-GeometrySet<Dim>::hasPoints() const
+auto
+GeometrySet<Dim>::hasPoints() const -> bool
 {
   return !points().empty();
 }
 
 template <int Dim>
-bool
-GeometrySet<Dim>::hasSegments() const
+auto
+GeometrySet<Dim>::hasSegments() const -> bool
 {
   return !segments().empty();
 }
 
 template <>
-bool
-GeometrySet<2>::hasSurfaces() const
+auto
+GeometrySet<2>::hasSurfaces() const -> bool
 {
   return !surfaces().empty();
 }
 template <>
-bool
-GeometrySet<3>::hasSurfaces() const
+auto
+GeometrySet<3>::hasSurfaces() const -> bool
 {
   if (!surfaces().empty()) {
     return true;
   }
 
   if (!volumes().empty()) {
-    for (VolumeCollection::const_iterator it = _volumes.begin();
-         it != _volumes.end(); ++it) {
-      if (!it->primitive().is_closed()) {
+    for (const auto &_volume : _volumes) {
+      if (!_volume.primitive().is_closed()) {
         return true;
       }
     }
@@ -434,23 +429,22 @@ GeometrySet<3>::hasSurfaces() const
 }
 
 template <>
-bool
-GeometrySet<2>::hasVolumes() const
+auto
+GeometrySet<2>::hasVolumes() const -> bool
 {
   return false;
 }
 template <>
-bool
-GeometrySet<3>::hasVolumes() const
+auto
+GeometrySet<3>::hasVolumes() const -> bool
 {
   if (!volumes().empty()) {
     return true;
   }
 
   if (!volumes().empty()) {
-    for (VolumeCollection::const_iterator it = _volumes.begin();
-         it != _volumes.end(); ++it) {
-      if (it->primitive().is_closed()) {
+    for (const auto &_volume : _volumes) {
+      if (_volume.primitive().is_closed()) {
         return true;
       }
     }
@@ -467,7 +461,7 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
   }
 
   if (g.is<GeometryCollection>()) {
-    const GeometryCollection &collect = g.as<GeometryCollection>();
+    const auto &collect = g.as<GeometryCollection>();
 
     for (size_t i = 0; i < g.numGeometries(); ++i) {
       _decompose(collect.geometryN(i));
@@ -482,7 +476,7 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
     break;
 
   case TYPE_LINESTRING: {
-    const LineString &ls = g.as<LineString>();
+    const auto &ls = g.as<LineString>();
 
     for (size_t i = 0; i < ls.numPoints() - 1; ++i) {
       typename TypeForDimension<Dim>::Segment seg(
@@ -504,7 +498,7 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
   }
 
   case TYPE_TRIANGULATEDSURFACE: {
-    const TriangulatedSurface &tri = g.as<TriangulatedSurface>();
+    const auto &tri = g.as<TriangulatedSurface>();
 
     for (size_t i = 0; i < tri.numTriangles(); ++i) {
       _decompose(tri.triangleN(i));
@@ -514,7 +508,7 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
   }
 
   case TYPE_POLYHEDRALSURFACE: {
-    const PolyhedralSurface &tri = g.as<PolyhedralSurface>();
+    const auto &tri = g.as<PolyhedralSurface>();
 
     for (size_t i = 0; i < tri.numPolygons(); ++i) {
       _decompose(tri.polygonN(i));
@@ -524,7 +518,7 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
   }
 
   case TYPE_SOLID: {
-    const Solid &solid = g.as<Solid>();
+    const auto &solid = g.as<Solid>();
     _decompose_solid(solid, _volumes, dim_t<Dim>());
     break;
   }
@@ -542,8 +536,7 @@ GeometrySet<Dim>::computeBoundingBoxes(
 {
   boxes.clear();
 
-  for (typename PointCollection::const_iterator it = _points.begin();
-       it != _points.end(); ++it) {
+  for (auto it = _points.begin(); it != _points.end(); ++it) {
     const typename TypeForDimension<Dim>::Point *pt = &(it->primitive());
     PrimitiveHandle<Dim>                         h(pt);
     handles.push_back(h);
@@ -551,22 +544,19 @@ GeometrySet<Dim>::computeBoundingBoxes(
                                                      &handles.back()));
   }
 
-  for (typename SegmentCollection::const_iterator it = _segments.begin();
-       it != _segments.end(); ++it) {
+  for (auto it = _segments.begin(); it != _segments.end(); ++it) {
     handles.push_back(PrimitiveHandle<Dim>(&(it->primitive())));
     boxes.push_back(typename PrimitiveBox<Dim>::Type(it->primitive().bbox(),
                                                      &handles.back()));
   }
 
-  for (typename SurfaceCollection::const_iterator it = _surfaces.begin();
-       it != _surfaces.end(); ++it) {
+  for (auto it = _surfaces.begin(); it != _surfaces.end(); ++it) {
     handles.push_back(PrimitiveHandle<Dim>(&(it->primitive())));
     boxes.push_back(typename PrimitiveBox<Dim>::Type(it->primitive().bbox(),
                                                      &handles.back()));
   }
 
-  for (typename VolumeCollection::const_iterator it = _volumes.begin();
-       it != _volumes.end(); ++it) {
+  for (auto it = _volumes.begin(); it != _volumes.end(); ++it) {
     handles.push_back(PrimitiveHandle<Dim>(&(it->primitive())));
     boxes.push_back(typename PrimitiveBox<Dim>::Type(
         compute_solid_bbox(it->primitive(), dim_t<Dim>()), &handles.back()));
@@ -582,9 +572,7 @@ recompose_points(const typename GeometrySet<Dim>::PointCollection &points,
     return;
     //			rpoints.push_back( new Point() );
   } else {
-    for (typename GeometrySet<Dim>::PointCollection::const_iterator it =
-             points.begin();
-         it != points.end(); ++it) {
+    for (auto it = points.begin(); it != points.end(); ++it) {
       rpoints.push_back(new Point(it->primitive()));
     }
   }
@@ -592,15 +580,15 @@ recompose_points(const typename GeometrySet<Dim>::PointCollection &points,
 
 // compare less than
 struct ComparePoints {
-  bool
+  auto
   operator()(const CGAL::Point_2<Kernel> &lhs,
-             const CGAL::Point_2<Kernel> &rhs) const
+             const CGAL::Point_2<Kernel> &rhs) const -> bool
   {
     return lhs.x() == rhs.x() ? lhs.y() < rhs.y() : lhs.x() < rhs.x();
   }
-  bool
+  auto
   operator()(const CGAL::Point_3<Kernel> &lhs,
-             const CGAL::Point_3<Kernel> &rhs) const
+             const CGAL::Point_3<Kernel> &rhs) const -> bool
   {
     return lhs.x() == rhs.x()
                ? (lhs.y() == rhs.y() ? lhs.z() < rhs.z() : lhs.y() < rhs.y())
@@ -621,18 +609,15 @@ recompose_segments(const typename GeometrySet<Dim>::SegmentCollection &segments,
   // what we need is a graph, we do a depth first traversal and stop a
   // linestring when more than one segment is connected first we need to label
   // vertices then build the graph and traverse depth first
-  std::vector<Point>          points;
-  typedef std::pair<int, int> Edge;
-  std::vector<Edge>           edges;
+  std::vector<Point> points;
+  using Edge = std::pair<int, int>;
+  std::vector<Edge> edges;
   {
-    typedef typename std::map<typename TypeForDimension<Dim>::Point, int,
-                              ComparePoints>
-             PointMap;
+    using PointMap = typename std::map<typename TypeForDimension<Dim>::Point,
+                                       int, ComparePoints>;
     PointMap pointMap;
 
-    for (typename GeometrySet<Dim>::SegmentCollection::const_iterator it =
-             segments.begin();
-         it != segments.end(); ++it) {
+    for (auto it = segments.begin(); it != segments.end(); ++it) {
       const typename PointMap::const_iterator foundSource =
           pointMap.find(it->primitive().source());
       const typename PointMap::const_iterator foundTarget =
@@ -653,14 +638,13 @@ recompose_segments(const typename GeometrySet<Dim>::SegmentCollection &segments,
         pointMap[it->primitive().target()] = targetId;
       }
 
-      edges.push_back(Edge(sourceId, targetId));
+      edges.emplace_back(sourceId, targetId);
     }
   }
 
-  typedef boost::adjacency_list<
+  using Graph = boost::adjacency_list<
       boost::vecS, boost::vecS, boost::bidirectionalS, boost::no_property,
-      boost::property<boost::edge_color_t, boost::default_color_type>>
-        Graph;
+      boost::property<boost::edge_color_t, boost::default_color_type>>;
   Graph g(edges.begin(), edges.end(), edges.size());
 
   // now we find all branches without bifurcations,
@@ -683,7 +667,7 @@ recompose_segments(const typename GeometrySet<Dim>::SegmentCollection &segments,
       }
 
       // now we go down
-      LineString *line = new LineString;
+      auto *line = new LineString;
       lines.push_back(line);
       line->addPoint(points[boost::source(root, g)]);
       line->addPoint(points[boost::target(root, g)]);
@@ -705,18 +689,16 @@ void
 recompose_surfaces(const GeometrySet<2>::SurfaceCollection &surfaces,
                    std::vector<Geometry *>                 &output, dim_t<2>)
 {
-  for (GeometrySet<2>::SurfaceCollection::const_iterator it = surfaces.begin();
-       it != surfaces.end(); ++it) {
-    if (it->primitive().holes_begin() == it->primitive().holes_end() &&
-        it->primitive().outer_boundary().size() == 3) {
-      CGAL::Polygon_2<Kernel>::Vertex_iterator vit =
-          it->primitive().outer_boundary().vertices_begin();
+  for (const auto &surface : surfaces) {
+    if (surface.primitive().holes_begin() == surface.primitive().holes_end() &&
+        surface.primitive().outer_boundary().size() == 3) {
+      auto vit = surface.primitive().outer_boundary().vertices_begin();
       CGAL::Point_2<Kernel> p1(*vit++);
       CGAL::Point_2<Kernel> p2(*vit++);
       CGAL::Point_2<Kernel> p3(*vit++);
       output.push_back(new Triangle(CGAL::Triangle_2<Kernel>(p1, p2, p3)));
     } else {
-      output.push_back(new Polygon(it->primitive()));
+      output.push_back(new Polygon(surface.primitive()));
     }
   }
 }
@@ -737,9 +719,8 @@ recompose_surfaces(const GeometrySet<3>::SurfaceCollection &surfaces,
 
   std::unique_ptr<TriangulatedSurface> tri(new TriangulatedSurface);
 
-  for (GeometrySet<3>::SurfaceCollection::const_iterator it = surfaces.begin();
-       it != surfaces.end(); ++it) {
-    tri->addTriangle(new Triangle(it->primitive()));
+  for (const auto &surface : surfaces) {
+    tri->addTriangle(new Triangle(surface.primitive()));
   }
 
   algorithm::SurfaceGraph graph(*tri);
@@ -780,15 +761,14 @@ recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
     return;
   }
 
-  for (GeometrySet<3>::VolumeCollection::const_iterator vit = volumes.begin();
-       vit != volumes.end(); ++vit) {
-    if (vit->flags() & FLAG_IS_PLANAR) {
+  for (const auto &volume : volumes) {
+    if (volume.flags() & FLAG_IS_PLANAR) {
       // extract the boundary
       std::list<CGAL::Point_3<Kernel>> boundary;
 
       for (MarkedPolyhedron::Halfedge_const_iterator it =
-               vit->primitive().halfedges_begin();
-           it != vit->primitive().halfedges_end(); ++it) {
+               volume.primitive().halfedges_begin();
+           it != volume.primitive().halfedges_end(); ++it) {
         if (!it->is_border()) {
           continue;
         }
@@ -823,7 +803,7 @@ recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
         output.push_back(new Triangle(p[0], p[1], p[2]));
       } else {
         // Else it is a polygon
-        LineString *ls = new LineString;
+        auto *ls = new LineString;
 
         for (std::list<CGAL::Point_3<Kernel>>::const_iterator it =
                  boundary.begin();
@@ -835,7 +815,7 @@ recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
       }
     } else {
 
-      PolyhedralSurface *shell = new PolyhedralSurface(vit->primitive());
+      auto *shell = new PolyhedralSurface(volume.primitive());
       // TODO: test open / closed
       output.push_back(new Solid(shell));
     }
@@ -843,8 +823,8 @@ recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
 }
 
 template <int Dim>
-std::unique_ptr<Geometry>
-GeometrySet<Dim>::recompose() const
+auto
+GeometrySet<Dim>::recompose() const -> std::unique_ptr<Geometry>
 {
   std::vector<Geometry *> geometries;
 
@@ -865,14 +845,14 @@ GeometrySet<Dim>::recompose() const
   bool hasCommonType = true;
   int  commonType    = geometries[0]->geometryTypeId();
 
-  for (size_t i = 0; i < geometries.size(); ++i) {
-    if (geometries[i]->geometryTypeId() != commonType) {
+  for (auto &geometrie : geometries) {
+    if (geometrie->geometryTypeId() != commonType) {
       hasCommonType = false;
       break;
     }
   }
 
-  GeometryCollection *ret = 0;
+  GeometryCollection *ret = nullptr;
 
   if (hasCommonType) {
     if (commonType == TYPE_POINT) {
@@ -893,8 +873,8 @@ GeometrySet<Dim>::recompose() const
 
   BOOST_ASSERT(ret != 0);
 
-  for (size_t i = 0; i < geometries.size(); ++i) {
-    ret->addGeometry(geometries[i]);
+  for (auto &geometrie : geometries) {
+    ret->addGeometry(geometrie);
   }
 
   return std::unique_ptr<Geometry>(ret);
@@ -904,17 +884,13 @@ void
 _collect_points(const CGAL::Polygon_with_holes_2<Kernel> &poly,
                 GeometrySet<2>::PointCollection          &points)
 {
-  for (CGAL::Polygon_2<Kernel>::Vertex_iterator vit =
-           poly.outer_boundary().vertices_begin();
+  for (auto vit = poly.outer_boundary().vertices_begin();
        vit != poly.outer_boundary().vertices_end(); ++vit) {
     points.insert(*vit);
   }
 
-  for (CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hit =
-           poly.holes_begin();
-       hit != poly.holes_end(); ++hit) {
-    for (CGAL::Polygon_2<Kernel>::Vertex_iterator vit = hit->vertices_begin();
-         vit != hit->vertices_end(); ++vit) {
+  for (auto hit = poly.holes_begin(); hit != poly.holes_end(); ++hit) {
+    for (auto vit = hit->vertices_begin(); vit != hit->vertices_end(); ++vit) {
       points.insert(*vit);
     }
   }
@@ -948,10 +924,10 @@ template <int Dim>
 void
 GeometrySet<Dim>::collectPoints(const PrimitiveHandle<Dim> &pa)
 {
-  typedef typename TypeForDimension<Dim>::Point   TPoint;
-  typedef typename TypeForDimension<Dim>::Segment TSegment;
-  typedef typename TypeForDimension<Dim>::Surface TSurface;
-  typedef typename TypeForDimension<Dim>::Volume  TVolume;
+  using TPoint   = typename TypeForDimension<Dim>::Point;
+  using TSegment = typename TypeForDimension<Dim>::Segment;
+  using TSurface = typename TypeForDimension<Dim>::Surface;
+  using TVolume  = typename TypeForDimension<Dim>::Volume;
 
   switch (pa.handle.which()) {
   case PrimitivePoint: {
@@ -1021,9 +997,7 @@ GeometrySet<2>::addBoundary(const TypeForDimension<2>::Surface &surface)
   addSegments(surface.outer_boundary().edges_begin(),
               surface.outer_boundary().edges_end());
 
-  for (CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hit =
-           surface.holes_begin();
-       hit != surface.holes_end(); ++hit) {
+  for (auto hit = surface.holes_begin(); hit != surface.holes_end(); ++hit) {
     addSegments(hit->edges_begin(), hit->edges_end());
   }
 }
@@ -1036,8 +1010,8 @@ GeometrySet<3>::addBoundary(const TypeForDimension<3>::Surface &)
 }
 
 template <>
-int
-GeometrySet<2>::dimension() const
+auto
+GeometrySet<2>::dimension() const -> int
 {
   if (!surfaces().empty()) {
     return 2;
@@ -1055,14 +1029,12 @@ GeometrySet<2>::dimension() const
 }
 
 template <>
-int
-GeometrySet<3>::dimension() const
+auto
+GeometrySet<3>::dimension() const -> int
 {
   if (!volumes().empty()) {
-    for (GeometrySet<3>::VolumeCollection::const_iterator it =
-             volumes().begin();
-         it != volumes().end(); ++it) {
-      if (it->primitive().is_closed()) {
+    for (const auto &it : volumes()) {
+      if (it.primitive().is_closed()) {
         return 3;
       }
     }
@@ -1095,8 +1067,8 @@ GeometrySet<Dim>::filterCovered(GeometrySet<Dim> &output) const
   _filter_covered(_points.begin(), _points.end(), output);
 }
 
-std::ostream &
-operator<<(std::ostream &ostr, const GeometrySet<2> &g)
+auto
+operator<<(std::ostream &ostr, const GeometrySet<2> &g) -> std::ostream &
 {
   ostr << "points: ";
   std::ostream_iterator<CollectionElement<Point_d<2>::Type>> out_pt(ostr, ", ");
@@ -1113,8 +1085,8 @@ operator<<(std::ostream &ostr, const GeometrySet<2> &g)
   return ostr;
 }
 
-std::ostream &
-operator<<(std::ostream &ostr, const GeometrySet<3> &g)
+auto
+operator<<(std::ostream &ostr, const GeometrySet<3> &g) -> std::ostream &
 {
   ostr << "points: ";
   std::ostream_iterator<CollectionElement<Point_d<3>::Type>> out_pt(ostr, ", ");

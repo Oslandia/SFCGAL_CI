@@ -18,9 +18,9 @@ CharArrayBuffer::CharArrayBuffer(const char *str)
 {
 }
 
-std::streampos
+auto
 CharArrayBuffer::seekoff(std::streamoff off, std::ios_base::seekdir way,
-                         std::ios_base::openmode)
+                         std::ios_base::openmode) -> std::streampos
 {
   if (way == std::ios_base::cur) {
     if (current_ + off < end_) {
@@ -39,8 +39,9 @@ CharArrayBuffer::seekoff(std::streamoff off, std::ios_base::seekdir way,
   return current_ - begin_;
 }
 
-std::streampos
+auto
 CharArrayBuffer::seekpos(std::streampos pos, std::ios_base::openmode)
+    -> std::streampos
 {
   if (begin_ + pos >= end_) {
     return -1;
@@ -50,8 +51,8 @@ CharArrayBuffer::seekpos(std::streampos pos, std::ios_base::openmode)
   return current_ - begin_;
 }
 
-CharArrayBuffer::int_type
-CharArrayBuffer::underflow()
+auto
+CharArrayBuffer::underflow() -> CharArrayBuffer::int_type
 {
   if (current_ == end_) {
     return traits_type::eof();
@@ -60,8 +61,8 @@ CharArrayBuffer::underflow()
   return traits_type::to_int_type(*current_);
 }
 
-CharArrayBuffer::int_type
-CharArrayBuffer::uflow()
+auto
+CharArrayBuffer::uflow() -> CharArrayBuffer::int_type
 {
   if (current_ == end_) {
     return traits_type::eof();
@@ -70,8 +71,8 @@ CharArrayBuffer::uflow()
   return traits_type::to_int_type(*current_++);
 }
 
-CharArrayBuffer::int_type
-CharArrayBuffer::pbackfail(int_type ch)
+auto
+CharArrayBuffer::pbackfail(int_type ch) -> CharArrayBuffer::int_type
 {
   if (current_ == begin_ || (ch != traits_type::eof() && ch != current_[-1])) {
     return traits_type::eof();
@@ -80,8 +81,8 @@ CharArrayBuffer::pbackfail(int_type ch)
   return traits_type::to_int_type(*--current_);
 }
 
-std::streamsize
-CharArrayBuffer::showmanyc()
+auto
+CharArrayBuffer::showmanyc() -> std::streamsize
 {
   return end_ - current_;
 }

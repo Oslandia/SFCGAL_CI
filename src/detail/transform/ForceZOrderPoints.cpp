@@ -8,14 +8,16 @@
 #include <SFCGAL/algorithm/orientation.h>
 #include <SFCGAL/detail/transform/ForceZOrderPoints.h>
 
+#include <utility>
+
 namespace SFCGAL {
 namespace transform {
 
 ///
 ///
 ///
-ForceZOrderPoints::ForceZOrderPoints(const Kernel::FT &defaultZ)
-    : _defaultZ(defaultZ)
+ForceZOrderPoints::ForceZOrderPoints(Kernel::FT defaultZ)
+    : _defaultZ(std::move(defaultZ))
 {
 }
 

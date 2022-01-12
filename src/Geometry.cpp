@@ -24,8 +24,8 @@ namespace SFCGAL {
 ///
 ///
 ///
-std::string
-Geometry::asText(const int &numDecimals) const
+auto
+Geometry::asText(const int &numDecimals) const -> std::string
 {
   std::ostringstream oss;
 
@@ -48,8 +48,8 @@ Geometry::asText(const int &numDecimals) const
 ///
 ///
 ///
-Envelope
-Geometry::envelope() const
+auto
+Geometry::envelope() const -> Envelope
 {
   Envelope                box;
   detail::EnvelopeVisitor envelopeVisitor(box);
@@ -60,8 +60,8 @@ Geometry::envelope() const
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-Geometry::boundary() const
+auto
+Geometry::boundary() const -> std::unique_ptr<Geometry>
 {
   algorithm::BoundaryVisitor visitor;
   accept(visitor);
@@ -71,8 +71,8 @@ Geometry::boundary() const
 ///
 ///
 ///
-double
-Geometry::distance(const Geometry &other) const
+auto
+Geometry::distance(const Geometry &other) const -> double
 {
   return algorithm::distance(*this, other);
 }
@@ -80,8 +80,8 @@ Geometry::distance(const Geometry &other) const
 ///
 ///
 ///
-double
-Geometry::distance3D(const Geometry &other) const
+auto
+Geometry::distance3D(const Geometry &other) const -> double
 {
   return algorithm::distance3D(*this, other);
 }
@@ -99,8 +99,8 @@ Geometry::round(const long &scale)
 ///
 ///
 ///
-size_t
-Geometry::numGeometries() const
+auto
+Geometry::numGeometries() const -> size_t
 {
   return 1;
 }
@@ -108,8 +108,8 @@ Geometry::numGeometries() const
 ///
 ///
 ///
-const Geometry &
-Geometry::geometryN(size_t const &n) const
+auto
+Geometry::geometryN(size_t const &n) const -> const Geometry &
 {
   BOOST_ASSERT(n == 0);
   (void)n;
@@ -119,8 +119,8 @@ Geometry::geometryN(size_t const &n) const
 ///
 ///
 ///
-Geometry &
-Geometry::geometryN(size_t const &n)
+auto
+Geometry::geometryN(size_t const &n) -> Geometry &
 {
   BOOST_ASSERT(n == 0);
   (void)n;
@@ -132,8 +132,8 @@ Geometry::geometryN(size_t const &n)
 ///
 Geometry::Geometry() : validityFlag_(false) {}
 
-bool
-Geometry::hasValidityFlag() const
+auto
+Geometry::hasValidityFlag() const -> bool
 {
   return validityFlag_;
 }
@@ -149,8 +149,8 @@ Geometry::forceValidityFlag(bool valid)
 /// FIXME
 /// Since we do not have (yet) a real "equals" operator, we only compare points
 /// coordinates
-bool
-operator==(const Geometry &ga, const Geometry &gb)
+auto
+operator==(const Geometry &ga, const Geometry &gb) -> bool
 {
   if (ga.geometryTypeId() != gb.geometryTypeId()) {
     return false;
@@ -164,12 +164,12 @@ operator==(const Geometry &ga, const Geometry &gb)
     return false;
   }
 
-  for (size_t i = 0; i < get_points_a.points.size(); ++i) {
+  for (auto &point : get_points_a.points) {
     bool found = false;
 
-    for (size_t j = 0; j < get_points_b.points.size(); ++j) {
-      const Point &pta = *(get_points_a.points[i]);
-      const Point &ptb = *(get_points_b.points[j]);
+    for (auto &j : get_points_b.points) {
+      const Point &pta = *point;
+      const Point &ptb = *j;
 
       if (pta == ptb) {
         found = true;

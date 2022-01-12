@@ -20,17 +20,17 @@ PreparedGeometry::PreparedGeometry(Geometry *geometry, srid_t srid)
 {
 }
 
-PreparedGeometry::~PreparedGeometry() {}
+PreparedGeometry::~PreparedGeometry() = default;
 
-const Geometry &
-PreparedGeometry::geometry() const
+auto
+PreparedGeometry::geometry() const -> const Geometry &
 {
   BOOST_ASSERT(_geometry.get());
   return *_geometry;
 }
 
-Geometry &
-PreparedGeometry::geometry()
+auto
+PreparedGeometry::geometry() -> Geometry &
 {
   BOOST_ASSERT(_geometry.get());
   return *_geometry;
@@ -43,8 +43,8 @@ PreparedGeometry::resetGeometry(Geometry *geom)
   invalidateCache();
 }
 
-const Envelope &
-PreparedGeometry::envelope() const
+auto
+PreparedGeometry::envelope() const -> const Envelope &
 {
   if (!_envelope) {
     _envelope.reset(_geometry->envelope());
@@ -59,8 +59,8 @@ PreparedGeometry::invalidateCache()
   _envelope.reset();
 }
 
-std::string
-PreparedGeometry::asEWKT(const int &numDecimals) const
+auto
+PreparedGeometry::asEWKT(const int &numDecimals) const -> std::string
 {
   std::ostringstream oss;
 

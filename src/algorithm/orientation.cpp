@@ -32,14 +32,13 @@ makeValidOrientation(CGAL::Polygon_2<Kernel> &polygon)
 void
 makeValidOrientation(CGAL::Polygon_with_holes_2<Kernel> &polygon)
 {
-  typedef CGAL::Polygon_with_holes_2<Kernel> Polygon_with_holes_2;
+  using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
 
   if (polygon.outer_boundary().orientation() != CGAL::COUNTERCLOCKWISE) {
     polygon.outer_boundary().reverse_orientation();
   }
 
-  for (Polygon_with_holes_2::Hole_iterator it = polygon.holes_begin();
-       it != polygon.holes_end(); ++it) {
+  for (auto it = polygon.holes_begin(); it != polygon.holes_end(); ++it) {
     if (it->orientation() != CGAL::CLOCKWISE) {
       it->reverse_orientation();
     }
@@ -70,8 +69,8 @@ makeValidOrientation(Polygon &polygon)
 ///
 ///
 ///
-bool
-hasConsistentOrientation3D(const TriangulatedSurface &g)
+auto
+hasConsistentOrientation3D(const TriangulatedSurface &g) -> bool
 {
   using namespace graph;
 
@@ -88,8 +87,8 @@ hasConsistentOrientation3D(const TriangulatedSurface &g)
 ///
 ///
 ///
-bool
-hasConsistentOrientation3D(const PolyhedralSurface &g)
+auto
+hasConsistentOrientation3D(const PolyhedralSurface &g) -> bool
 {
   using namespace graph;
 
@@ -117,8 +116,8 @@ makeConsistentOrientation3D(TriangulatedSurface &g)
 ///
 ///
 ///
-bool
-isCounterClockWiseOriented(const LineString &ls)
+auto
+isCounterClockWiseOriented(const LineString &ls) -> bool
 {
   // Compute the 'z' part of the Newell's formula
   // and test against 0
@@ -136,8 +135,8 @@ isCounterClockWiseOriented(const LineString &ls)
 ///
 ///
 ///
-bool
-isCounterClockWiseOriented(const Triangle &tri)
+auto
+isCounterClockWiseOriented(const Triangle &tri) -> bool
 {
   // Compute the 'z' part of the cross product
 
@@ -151,8 +150,8 @@ isCounterClockWiseOriented(const Triangle &tri)
 ///
 ///
 ///
-bool
-isCounterClockWiseOriented(const Polygon &poly)
+auto
+isCounterClockWiseOriented(const Polygon &poly) -> bool
 {
   return isCounterClockWiseOriented(poly.exteriorRing());
 }

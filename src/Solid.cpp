@@ -36,8 +36,8 @@ Solid::Solid(const std::vector<PolyhedralSurface> &shells)
   if (shells.empty()) {
     _shells.resize(1, new PolyhedralSurface());
   } else {
-    for (size_t i = 0; i < shells.size(); i++) {
-      _shells.push_back(shells[i].clone());
+    for (const auto &shell : shells) {
+      _shells.push_back(shell.clone());
     }
   }
 }
@@ -55,8 +55,8 @@ Solid::Solid(const Solid &other) : Geometry(other)
 ///
 ///
 ///
-Solid &
-Solid::operator=(Solid other)
+auto
+Solid::operator=(Solid other) -> Solid &
 {
   swap(other);
   return *this;
@@ -65,13 +65,13 @@ Solid::operator=(Solid other)
 ///
 ///
 ///
-Solid::~Solid() {}
+Solid::~Solid() = default;
 
 ///
 ///
 ///
-Solid *
-Solid::clone() const
+auto
+Solid::clone() const -> Solid *
 {
   return new Solid(*this);
 }
@@ -79,8 +79,8 @@ Solid::clone() const
 ///
 ///
 ///
-std::string
-Solid::geometryType() const
+auto
+Solid::geometryType() const -> std::string
 {
   return "Solid";
 }
@@ -88,8 +88,8 @@ Solid::geometryType() const
 ///
 ///
 ///
-GeometryType
-Solid::geometryTypeId() const
+auto
+Solid::geometryTypeId() const -> GeometryType
 {
   return TYPE_SOLID;
 }
@@ -97,8 +97,8 @@ Solid::geometryTypeId() const
 ///
 ///
 ///
-int
-Solid::dimension() const
+auto
+Solid::dimension() const -> int
 {
   return 3;
 }
@@ -106,8 +106,8 @@ Solid::dimension() const
 ///
 ///
 ///
-int
-Solid::coordinateDimension() const
+auto
+Solid::coordinateDimension() const -> int
 {
   return exteriorShell().coordinateDimension();
 }
@@ -115,8 +115,8 @@ Solid::coordinateDimension() const
 ///
 ///
 ///
-bool
-Solid::isEmpty() const
+auto
+Solid::isEmpty() const -> bool
 {
   return exteriorShell().isEmpty();
 }
@@ -124,8 +124,8 @@ Solid::isEmpty() const
 ///
 ///
 ///
-bool
-Solid::is3D() const
+auto
+Solid::is3D() const -> bool
 {
   return exteriorShell().is3D();
 }
@@ -133,8 +133,8 @@ Solid::is3D() const
 ///
 ///
 ///
-bool
-Solid::isMeasured() const
+auto
+Solid::isMeasured() const -> bool
 {
   return exteriorShell().isMeasured();
 }

@@ -17,8 +17,8 @@ LineString::LineString() : Geometry(), _points() {}
 ///
 LineString::LineString(const std::vector<Point> &points) : Geometry(), _points()
 {
-  for (size_t i = 0; i < points.size(); i++) {
-    _points.push_back(points[i].clone());
+  for (const auto &point : points) {
+    _points.push_back(point.clone());
   }
 }
 
@@ -45,8 +45,8 @@ LineString::LineString(const LineString &other) : Geometry(other)
 ///
 ///
 ///
-LineString &
-LineString::operator=(LineString other)
+auto
+LineString::operator=(LineString other) -> LineString &
 {
   swap(other);
   return *this;
@@ -55,13 +55,13 @@ LineString::operator=(LineString other)
 ///
 ///
 ///
-LineString::~LineString() {}
+LineString::~LineString() = default;
 
 ///
 ///
 ///
-LineString *
-LineString::clone() const
+auto
+LineString::clone() const -> LineString *
 {
   return new LineString(*this);
 }
@@ -69,8 +69,8 @@ LineString::clone() const
 ///
 ///
 ///
-GeometryType
-LineString::geometryTypeId() const
+auto
+LineString::geometryTypeId() const -> GeometryType
 {
   return TYPE_LINESTRING;
 }
@@ -78,8 +78,8 @@ LineString::geometryTypeId() const
 ///
 ///
 ///
-std::string
-LineString::geometryType() const
+auto
+LineString::geometryType() const -> std::string
 {
   return "LineString";
 }
@@ -87,16 +87,16 @@ LineString::geometryType() const
 ///
 ///
 ///
-int
-LineString::dimension() const
+auto
+LineString::dimension() const -> int
 {
   return 1;
 }
 
 ///
 ///
-int
-LineString::coordinateDimension() const
+auto
+LineString::coordinateDimension() const -> int
 {
   return isEmpty() ? 0 : _points[0].coordinateDimension();
 }
@@ -104,8 +104,8 @@ LineString::coordinateDimension() const
 ///
 ///
 ///
-bool
-LineString::isEmpty() const
+auto
+LineString::isEmpty() const -> bool
 {
   return _points.empty();
 }
@@ -113,8 +113,8 @@ LineString::isEmpty() const
 ///
 ///
 ///
-bool
-LineString::is3D() const
+auto
+LineString::is3D() const -> bool
 {
   return !isEmpty() && startPoint().is3D();
 }
@@ -122,8 +122,8 @@ LineString::is3D() const
 ///
 ///
 ///
-bool
-LineString::isMeasured() const
+auto
+LineString::isMeasured() const -> bool
 {
   return !isEmpty() && startPoint().isMeasured();
 }
@@ -149,8 +149,8 @@ LineString::reverse()
 ///
 ///
 ///
-size_t
-LineString::numSegments() const
+auto
+LineString::numSegments() const -> size_t
 {
   if (_points.empty()) {
     return 0;
@@ -162,8 +162,8 @@ LineString::numSegments() const
 ///
 ///
 ///
-bool
-LineString::isClosed() const
+auto
+LineString::isClosed() const -> bool
 {
   return (!isEmpty()) && (startPoint() == endPoint());
 }
@@ -198,11 +198,11 @@ LineString::accept(ConstGeometryVisitor &visitor) const
 ///
 ///
 ///
-CGAL::Polygon_2<Kernel>
-LineString::toPolygon_2(bool fixOrientation) const
+auto
+LineString::toPolygon_2(bool fixOrientation) const -> CGAL::Polygon_2<Kernel>
 {
   if (isEmpty()) {
-    return CGAL::Polygon_2<Kernel>();
+    return {};
   }
 
   Point_2_const_iterator pend = points_2_end();

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <cmath>
+#include <memory>
 
 // SFCGAL
 #include <SFCGAL/Exception.h>
@@ -18,11 +19,11 @@ namespace algorithm {
 namespace {
 static const double tol = 1.0e-9;
 
-Point
+auto
 find_position(const LineString &ls, const long N, const double target_length,
               const double offset, const double tol, const bool find_start,
               std::size_t &idx, double &frac, bool &on_point,
-              double &len_to_idx)
+              double &len_to_idx) -> Point
 {
   BOOST_ASSERT(!(offset < 0.0));
   BOOST_ASSERT(!(target_length < 0.0));
@@ -115,15 +116,16 @@ find_position(const LineString &ls, const long N, const double target_length,
 
 } // namespace
 
-std::unique_ptr<LineString>
+auto
 lineSubstring(const LineString &ls, double start, double end)
+    -> std::unique_ptr<LineString>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY(ls);
 
   if (ls.isEmpty()) {
     // Empty line, therefore start and end are
     // irrelevant.
-    return std::unique_ptr<LineString>(new LineString());
+    return std::make_unique<LineString>();
   }
 
   // Check for out of range start, end.
@@ -151,7 +153,7 @@ lineSubstring(const LineString &ls, double start, double end)
   // Check for equal start and end.
   if (std::fabs(start - end) < tol) {
     // start and end are equal, hence return an empty line substring.
-    return std::unique_ptr<LineString>(new LineString());
+    return std::make_unique<LineString>();
   }
 
   const long N = static_cast<long>(ls.numPoints());
@@ -164,7 +166,7 @@ lineSubstring(const LineString &ls, double start, double end)
       // We desire a complement line substring of a closed
       // line which has zero length, hence return empty
       // substring.
-      return std::unique_ptr<LineString>(new LineString());
+      return std::make_unique<LineString>();
     }
 
     // Swap the start and end positions so that they
@@ -234,8 +236,7 @@ lineSubstring(const LineString &ls, double start, double end)
 
   // Construct the desired line substring.
 
-  std::unique_ptr<LineString> substring =
-      std::unique_ptr<LineString>(new LineString());
+  std::unique_ptr<LineString> substring = std::make_unique<LineString>();
 
   // Add start point.
 

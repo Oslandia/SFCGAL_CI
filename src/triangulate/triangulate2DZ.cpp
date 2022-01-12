@@ -15,7 +15,7 @@
 namespace SFCGAL {
 namespace triangulate {
 
-typedef ConstraintDelaunayTriangulation::Vertex_handle Vertex_handle;
+using Vertex_handle = ConstraintDelaunayTriangulation::Vertex_handle;
 
 ///
 ///
@@ -143,8 +143,8 @@ triangulate2DZ(const Geometry                  &g,
 ///
 ///
 ///
-ConstraintDelaunayTriangulation
-triangulate2DZ(const Geometry &g)
+auto
+triangulate2DZ(const Geometry &g) -> ConstraintDelaunayTriangulation
 {
   ConstraintDelaunayTriangulation triangulation;
   triangulate2DZ(g, triangulation);

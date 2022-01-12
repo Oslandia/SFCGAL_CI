@@ -16,15 +16,14 @@ MultiPolygon::MultiPolygon() : GeometryCollection() {}
 ///
 ///
 MultiPolygon::MultiPolygon(MultiPolygon const &other)
-    : GeometryCollection(other)
-{
-}
+
+    = default;
 
 ///
 ///
 ///
-MultiPolygon &
-MultiPolygon::operator=(MultiPolygon other)
+auto
+MultiPolygon::operator=(MultiPolygon other) -> MultiPolygon &
 {
   swap(other);
   return *this;
@@ -33,13 +32,13 @@ MultiPolygon::operator=(MultiPolygon other)
 ///
 ///
 ///
-MultiPolygon::~MultiPolygon() {}
+MultiPolygon::~MultiPolygon() = default;
 
 ///
 ///
 ///
-MultiPolygon *
-MultiPolygon::clone() const
+auto
+MultiPolygon::clone() const -> MultiPolygon *
 {
   return new MultiPolygon(*this);
 }
@@ -47,8 +46,8 @@ MultiPolygon::clone() const
 ///
 ///
 ///
-std::string
-MultiPolygon::geometryType() const
+auto
+MultiPolygon::geometryType() const -> std::string
 {
   return "MultiPolygon";
 }
@@ -56,8 +55,8 @@ MultiPolygon::geometryType() const
 ///
 ///
 ///
-GeometryType
-MultiPolygon::geometryTypeId() const
+auto
+MultiPolygon::geometryTypeId() const -> GeometryType
 {
   return TYPE_MULTIPOLYGON;
 }
@@ -65,8 +64,8 @@ MultiPolygon::geometryTypeId() const
 ///
 ///
 ///
-bool
-MultiPolygon::isAllowed(Geometry const &g)
+auto
+MultiPolygon::isAllowed(Geometry const &g) -> bool
 {
   return g.geometryTypeId() == TYPE_POLYGON;
 }

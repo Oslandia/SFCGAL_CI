@@ -62,8 +62,8 @@ extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz);
  * @warning No actual validity check is conducted.
  */
 SFCGAL_API std::unique_ptr<Geometry>
-extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz,
-        NoValidityCheck nvc);
+extrude(const Geometry &g, Kernel::FT &dx, Kernel::FT &dy, Kernel::FT &dz,
+        NoValidityCheck &nvc);
 
 /**
  * @brief Returns a Geometry equal to the specified Geometry,

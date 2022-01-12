@@ -30,11 +30,11 @@ _intersection_solid_segment(const PrimitiveHandle<3> &pa,
   // typedef CGAL::Polyhedral_mesh_domain_3<MarkedPolyhedron, Kernel>
   // Mesh_domain;
 
-  const MarkedPolyhedron *ext_poly = pa.as<MarkedPolyhedron>();
+  const auto *ext_poly = pa.as<MarkedPolyhedron>();
   BOOST_ASSERT(ext_poly->is_closed());
-  const CGAL::Segment_3<Kernel> *segment = pb.as<CGAL::Segment_3<Kernel>>();
+  const auto *segment = pb.as<CGAL::Segment_3<Kernel>>();
 
-  MarkedPolyhedron *ext_poly_nc = const_cast<MarkedPolyhedron *>(ext_poly);
+  auto *ext_poly_nc = const_cast<MarkedPolyhedron *>(ext_poly);
   CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_ext(*ext_poly_nc);
 
   GeometrySet<3> triangles;
@@ -94,11 +94,11 @@ _intersection_solid_segment(const PrimitiveHandle<3> &pa,
   }
 }
 
-typedef std::vector<Kernel::Point_3> Polyline_3;
+using Polyline_3 = std::vector<Kernel::Point_3>;
 
 struct Is_not_marked {
-  bool
-  operator()(MarkedPolyhedron::Halfedge_const_handle h) const
+  auto
+  operator()(MarkedPolyhedron::Halfedge_const_handle h) const -> bool
   {
     return !h->mark;
   }
@@ -214,20 +214,20 @@ intersection(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb,
     }
   } else if (pa.handle.which() == PrimitiveSegment &&
              pb.handle.which() == PrimitiveSegment) {
-    const CGAL::Segment_3<Kernel> *seg1     = pa.as<CGAL::Segment_3<Kernel>>();
-    const CGAL::Segment_3<Kernel> *seg2     = pb.as<CGAL::Segment_3<Kernel>>();
-    CGAL::Object                   interObj = CGAL::intersection(*seg1, *seg2);
+    const auto  *seg1     = pa.as<CGAL::Segment_3<Kernel>>();
+    const auto  *seg2     = pb.as<CGAL::Segment_3<Kernel>>();
+    CGAL::Object interObj = CGAL::intersection(*seg1, *seg2);
     output.addPrimitive(interObj);
   } else if (pa.handle.which() == PrimitiveSurface) {
-    const CGAL::Triangle_3<Kernel> *tri1 = pa.as<CGAL::Triangle_3<Kernel>>();
+    const auto *tri1 = pa.as<CGAL::Triangle_3<Kernel>>();
 
     if (pb.handle.which() == PrimitiveSegment) {
-      const CGAL::Segment_3<Kernel> *seg2 = pb.as<CGAL::Segment_3<Kernel>>();
-      CGAL::Object interObj               = CGAL::intersection(*tri1, *seg2);
+      const auto  *seg2     = pb.as<CGAL::Segment_3<Kernel>>();
+      CGAL::Object interObj = CGAL::intersection(*tri1, *seg2);
       output.addPrimitive(interObj);
     } else if (pb.handle.which() == PrimitiveSurface) {
-      const CGAL::Triangle_3<Kernel> *tri2 = pb.as<CGAL::Triangle_3<Kernel>>();
-      CGAL::Object interObj                = CGAL::intersection(*tri1, *tri2);
+      const auto  *tri2     = pb.as<CGAL::Triangle_3<Kernel>>();
+      CGAL::Object interObj = CGAL::intersection(*tri1, *tri2);
       output.addPrimitive(interObj, /* pointsAsRing */ true);
     }
   } else if (pa.handle.which() == PrimitiveVolume) {

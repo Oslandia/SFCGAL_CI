@@ -133,8 +133,8 @@ private:
 //    Validity::invalid("infinite coordinate"); return Validity::valid();
 //}
 //
-const Validity
-isValid(const Point &p)
+auto
+isValid(const Point &p) -> const Validity
 {
   if (p.isEmpty()) {
     return Validity::valid();
@@ -145,8 +145,8 @@ isValid(const Point &p)
   return Validity::valid();
 }
 
-const Validity
-isValid(const LineString &l, const double &toleranceAbs)
+auto
+isValid(const LineString &l, const double &toleranceAbs) -> const Validity
 {
   if (l.isEmpty()) {
     return Validity::valid();
@@ -163,8 +163,8 @@ isValid(const LineString &l, const double &toleranceAbs)
                                     : Validity::invalid("no length");
 }
 
-const Validity
-isValid(const Polygon &p, const double &toleranceAbs)
+auto
+isValid(const Polygon &p, const double &toleranceAbs) -> const Validity
 {
   if (p.isEmpty()) {
     return Validity::valid();
@@ -257,8 +257,8 @@ isValid(const Polygon &p, const double &toleranceAbs)
 
   // Rings must not share more than one point (no intersection)
   {
-    typedef std::pair<int, int> Edge;
-    std::vector<Edge>           touchingRings;
+    using Edge = std::pair<int, int>;
+    std::vector<Edge> touchingRings;
 
     for (size_t ri = 0; ri < numRings;
          ++ri) { // no need for numRings-1, the next loop won't be entered for
@@ -273,17 +273,16 @@ isValid(const Polygon &p, const double &toleranceAbs)
               (boost::format("intersection between ring %d and %d") % ri % rj)
                   .str());
         } else if (!inter->isEmpty() && inter->is<Point>()) {
-          touchingRings.push_back(Edge(ri, rj));
+          touchingRings.emplace_back(ri, rj);
         }
       }
     }
 
     {
       using namespace boost;
-      typedef adjacency_list<vecS, vecS, undirectedS, no_property,
-                             property<edge_color_t, default_color_type>>
-                                                     Graph;
-      typedef graph_traits<Graph>::vertex_descriptor vertex_t;
+      using Graph    = adjacency_list<vecS, vecS, undirectedS, no_property,
+                                   property<edge_color_t, default_color_type>>;
+      using vertex_t = graph_traits<Graph>::vertex_descriptor;
 
       Graph g(touchingRings.begin(), touchingRings.end(), numRings);
 
@@ -335,14 +334,14 @@ isValid(const Polygon &p, const double &toleranceAbs)
   return Validity::valid();
 }
 
-const Validity
-isValid(const Triangle &t, const double &toleranceAbs)
+auto
+isValid(const Triangle &t, const double &toleranceAbs) -> const Validity
 {
   return isValid(t.toPolygon(), toleranceAbs);
 }
 
-const Validity
-isValid(const MultiLineString &ml, const double &toleranceAbs)
+auto
+isValid(const MultiLineString &ml, const double &toleranceAbs) -> const Validity
 {
   if (ml.isEmpty()) {
     return Validity::valid();
@@ -362,8 +361,8 @@ isValid(const MultiLineString &ml, const double &toleranceAbs)
   return Validity::valid();
 }
 
-const Validity
-isValid(const MultiPolygon &mp, const double &toleranceAbs)
+auto
+isValid(const MultiPolygon &mp, const double &toleranceAbs) -> const Validity
 {
   if (mp.isEmpty()) {
     return Validity::valid();
@@ -397,8 +396,9 @@ isValid(const MultiPolygon &mp, const double &toleranceAbs)
   return Validity::valid();
 }
 
-const Validity
+auto
 isValid(const GeometryCollection &gc, const double &toleranceAbs)
+    -> const Validity
 {
   if (gc.isEmpty()) {
     return Validity::valid();
@@ -418,9 +418,9 @@ isValid(const GeometryCollection &gc, const double &toleranceAbs)
   return Validity::valid();
 }
 
-const Validity
+auto
 isValid(const TriangulatedSurface &tin, const SurfaceGraph &graph,
-        const double &toleranceAbs)
+        const double &toleranceAbs) -> const Validity
 {
   if (tin.isEmpty()) {
     return Validity::valid();
@@ -447,8 +447,9 @@ isValid(const TriangulatedSurface &tin, const SurfaceGraph &graph,
   return Validity::valid();
 }
 
-const Validity
+auto
 isValid(const TriangulatedSurface &tin, const double &toleranceAbs)
+    -> const Validity
 {
   if (tin.isEmpty()) {
     return Validity::valid();
@@ -458,9 +459,9 @@ isValid(const TriangulatedSurface &tin, const double &toleranceAbs)
   return graph.isValid() ? isValid(tin, graph, toleranceAbs) : graph.isValid();
 }
 
-const Validity
+auto
 isValid(const PolyhedralSurface &s, const SurfaceGraph &graph,
-        const double &toleranceAbs)
+        const double &toleranceAbs) -> const Validity
 {
   if (s.isEmpty()) {
     return Validity::valid();
@@ -487,8 +488,9 @@ isValid(const PolyhedralSurface &s, const SurfaceGraph &graph,
   return Validity::valid();
 }
 
-const Validity
+auto
 isValid(const PolyhedralSurface &s, const double &toleranceAbs)
+    -> const Validity
 {
   if (s.isEmpty()) {
     return Validity::valid();
@@ -498,8 +500,8 @@ isValid(const PolyhedralSurface &s, const double &toleranceAbs)
   return graph.isValid() ? isValid(s, graph, toleranceAbs) : graph.isValid();
 }
 
-const Validity
-isValid(const Solid &solid, const double &toleranceAbs)
+auto
+isValid(const Solid &solid, const double &toleranceAbs) -> const Validity
 {
   if (solid.isEmpty()) {
     return Validity::valid();
@@ -532,8 +534,8 @@ isValid(const Solid &solid, const double &toleranceAbs)
   return Validity::valid();
 }
 
-const Validity
-isValid(const MultiSolid &ms, const double &toleranceAbs)
+auto
+isValid(const MultiSolid &ms, const double &toleranceAbs) -> const Validity
 {
   if (ms.isEmpty()) {
     return Validity::valid();
@@ -552,8 +554,8 @@ isValid(const MultiSolid &ms, const double &toleranceAbs)
   return Validity::valid();
 }
 
-const Validity
-isValid(const Geometry &g, const double &toleranceAbs)
+auto
+isValid(const Geometry &g, const double &toleranceAbs) -> const Validity
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:

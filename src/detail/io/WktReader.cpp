@@ -33,8 +33,8 @@ WktReader::WktReader(std::istream &s) : _reader(s) {}
 ///
 ///
 ///
-srid_t
-WktReader::readSRID()
+auto
+WktReader::readSRID() -> srid_t
 {
   srid_t srid = 0;
 
@@ -51,8 +51,8 @@ WktReader::readSRID()
 
 ///
 ///
-Geometry *
-WktReader::readGeometry()
+auto
+WktReader::readGeometry() -> Geometry *
 {
   GeometryType geometryType = readGeometryType();
   _is3D                     = _reader.imatch("Z");
@@ -138,8 +138,8 @@ WktReader::readGeometry()
 ///
 ///
 ///
-GeometryType
-WktReader::readGeometryType()
+auto
+WktReader::readGeometryType() -> GeometryType
 {
   if (_reader.imatch("POINT")) {
     return TYPE_POINT;
@@ -293,7 +293,7 @@ WktReader::readInnerTriangle(Triangle &g)
   std::vector<Point> points;
 
   while (!_reader.eof()) {
-    points.push_back(Point());
+    points.emplace_back();
     readPointCoordinate(points.back());
 
     if (!_reader.match(",")) {
@@ -597,8 +597,8 @@ WktReader::readInnerMultiSolid(MultiSolid &g)
 ///
 ///
 ///
-bool
-WktReader::readPointCoordinate(Point &p)
+auto
+WktReader::readPointCoordinate(Point &p) -> bool
 {
   std::vector<Kernel::Exact_kernel::FT> coordinates;
   Kernel::Exact_kernel::FT              d;
@@ -655,8 +655,8 @@ WktReader::readPointCoordinate(Point &p)
 ///
 ///
 ///
-std::string
-WktReader::parseErrorMessage()
+auto
+WktReader::parseErrorMessage() -> std::string
 {
   std::ostringstream oss;
   oss << "WKT parse error (" << _reader.context() << ")";

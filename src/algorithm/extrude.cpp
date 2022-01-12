@@ -26,51 +26,55 @@
 
 #include <SFCGAL/detail/tools/Log.h>
 
+#include <utility>
+
 namespace SFCGAL {
 namespace algorithm {
 
 //-- private interface
 
-LineString *
-extrude(const Point &g, const Kernel::Vector_3 &v);
-PolyhedralSurface *
-extrude(const LineString &g, const Kernel::Vector_3 &v);
-Solid *
-extrude(const Polygon &g, const Kernel::Vector_3 &v);
-Solid *
-extrude(const Triangle &g, const Kernel::Vector_3 &v);
+auto
+extrude(const Point &g, const Kernel::Vector_3 &v) -> LineString *;
+auto
+extrude(const LineString &g, const Kernel::Vector_3 &v) -> PolyhedralSurface *;
+auto
+extrude(const Polygon &g, const Kernel::Vector_3 &v) -> Solid *;
+auto
+extrude(const Triangle &g, const Kernel::Vector_3 &v) -> Solid *;
 
-MultiLineString *
-extrude(const MultiPoint &g, const Kernel::Vector_3 &v);
-PolyhedralSurface *
-extrude(const MultiLineString &g, const Kernel::Vector_3 &v);
-MultiSolid *
-extrude(const MultiPolygon &g, const Kernel::Vector_3 &v);
+auto
+extrude(const MultiPoint &g, const Kernel::Vector_3 &v) -> MultiLineString *;
+auto
+extrude(const MultiLineString &g, const Kernel::Vector_3 &v)
+    -> PolyhedralSurface *;
+auto
+extrude(const MultiPolygon &g, const Kernel::Vector_3 &v) -> MultiSolid *;
 
 /**
  * @warning suppose that the TriangulatedSurface is connected
  * @todo take orientation in account
  */
-Solid *
-extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v);
+auto
+extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v) -> Solid *;
 /**
  * @warning doesn't take orientation in account
  * @todo take orientation in account
  */
-Solid *
-extrude(const PolyhedralSurface &g, const Kernel::Vector_3 &v);
+auto
+extrude(const PolyhedralSurface &g, const Kernel::Vector_3 &v) -> Solid *;
 
 /**
  * extrude each geometry in a GeometryCollection
  */
-GeometryCollection *
-extrude(const GeometryCollection &g, const Kernel::Vector_3 &v);
+auto
+extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
+    -> GeometryCollection *;
 
 ///
 ///
 ///
-LineString *
-extrude(const Point &g, const Kernel::Vector_3 &v)
+auto
+extrude(const Point &g, const Kernel::Vector_3 &v) -> LineString *
 {
   if (g.isEmpty()) {
     return new LineString();
@@ -85,8 +89,8 @@ extrude(const Point &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-PolyhedralSurface *
-extrude(const LineString &g, const Kernel::Vector_3 &v)
+auto
+extrude(const LineString &g, const Kernel::Vector_3 &v) -> PolyhedralSurface *
 {
 
   std::unique_ptr<PolyhedralSurface> polyhedralSurface(new PolyhedralSurface());
@@ -115,8 +119,8 @@ extrude(const LineString &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-Solid *
-extrude(const Polygon &g, const Kernel::Vector_3 &v)
+auto
+extrude(const Polygon &g, const Kernel::Vector_3 &v) -> Solid *
 {
   if (g.isEmpty()) {
     return new Solid();
@@ -160,8 +164,8 @@ extrude(const Polygon &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-Solid *
-extrude(const Triangle &g, const Kernel::Vector_3 &v)
+auto
+extrude(const Triangle &g, const Kernel::Vector_3 &v) -> Solid *
 {
   return extrude(g.toPolygon(), v);
 }
@@ -169,8 +173,8 @@ extrude(const Triangle &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-MultiLineString *
-extrude(const MultiPoint &g, const Kernel::Vector_3 &v)
+auto
+extrude(const MultiPoint &g, const Kernel::Vector_3 &v) -> MultiLineString *
 {
   std::unique_ptr<MultiLineString> result(new MultiLineString());
 
@@ -188,8 +192,9 @@ extrude(const MultiPoint &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-PolyhedralSurface *
+auto
 extrude(const MultiLineString &g, const Kernel::Vector_3 &v)
+    -> PolyhedralSurface *
 {
   std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface());
 
@@ -211,8 +216,8 @@ extrude(const MultiLineString &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-MultiSolid *
-extrude(const MultiPolygon &g, const Kernel::Vector_3 &v)
+auto
+extrude(const MultiPolygon &g, const Kernel::Vector_3 &v) -> MultiSolid *
 {
   std::unique_ptr<MultiSolid> result(new MultiSolid());
 
@@ -230,8 +235,8 @@ extrude(const MultiPolygon &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-Solid *
-extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v)
+auto
+extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v) -> Solid *
 {
   std::unique_ptr<Solid> result(new Solid());
 
@@ -270,8 +275,8 @@ extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-Solid *
-extrude(const PolyhedralSurface &g, const Kernel::Vector_3 &v)
+auto
+extrude(const PolyhedralSurface &g, const Kernel::Vector_3 &v) -> Solid *
 {
   if (g.isEmpty()) {
     return new Solid();
@@ -285,8 +290,9 @@ extrude(const PolyhedralSurface &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-GeometryCollection *
+auto
 extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
+    -> GeometryCollection *
 {
   std::unique_ptr<GeometryCollection> result(new GeometryCollection());
 
@@ -306,8 +312,9 @@ extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-std::unique_ptr<Geometry>
+auto
 extrude(const Geometry &g, const Kernel::Vector_3 &v)
+    -> std::unique_ptr<Geometry>
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
@@ -354,24 +361,27 @@ extrude(const Geometry &g, const Kernel::Vector_3 &v)
 ///
 ///
 ///
-std::unique_ptr<Geometry>
-extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz,
-        NoValidityCheck)
+auto
+extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
+        const Kernel::FT &dz, NoValidityCheck) -> std::unique_ptr<Geometry>
 {
   return extrude(g, Kernel::Vector_3(dx, dy, dz));
 }
 
-std::unique_ptr<Geometry>
+auto
 extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz)
+    -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY(g);
-  std::unique_ptr<Geometry> result(extrude(g, dx, dy, dz, NoValidityCheck()));
+  std::unique_ptr<Geometry> result(extrude(g, std::move(dx), std::move(dy),
+                                           std::move(dz), NoValidityCheck()));
   propagateValidityFlag(*result, true);
   return result;
 }
 
-SFCGAL_API std::unique_ptr<Geometry>
+SFCGAL_API auto
 extrude(const Geometry &g, const double &dx, const double &dy, const double &dz)
+    -> std::unique_ptr<Geometry>
 {
   if (!std::isfinite(dx) || !std::isfinite(dy) || !std::isfinite(dz)) {
     BOOST_THROW_EXCEPTION(NonFiniteValueException(

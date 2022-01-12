@@ -78,15 +78,14 @@ Point::Point(const Kernel::Point_3 &other) : _coordinate(other), _m(NaN()) {}
 ///
 ///
 Point::Point(const Point &other)
-    : Geometry(other), _coordinate(other._coordinate), _m(other._m)
-{
-}
+
+    = default;
 
 ///
 ///
 ///
-Point &
-Point::operator=(const Point &other)
+auto
+Point::operator=(const Point &other) -> Point &
 {
   _coordinate = other._coordinate;
   _m          = other._m;
@@ -96,13 +95,13 @@ Point::operator=(const Point &other)
 ///
 ///
 ///
-Point::~Point() {}
+Point::~Point() = default;
 
 ///
 ///
 ///
-Point *
-Point::clone() const
+auto
+Point::clone() const -> Point *
 {
   return new Point(*this);
 }
@@ -110,8 +109,8 @@ Point::clone() const
 ///
 ///
 ///
-std::string
-Point::geometryType() const
+auto
+Point::geometryType() const -> std::string
 {
   return "Point";
 }
@@ -119,8 +118,8 @@ Point::geometryType() const
 ///
 ///
 ///
-GeometryType
-Point::geometryTypeId() const
+auto
+Point::geometryTypeId() const -> GeometryType
 {
   return TYPE_POINT;
 }
@@ -128,8 +127,8 @@ Point::geometryTypeId() const
 ///
 ///
 ///
-int
-Point::dimension() const
+auto
+Point::dimension() const -> int
 {
   return 0;
 }
@@ -137,8 +136,8 @@ Point::dimension() const
 ///
 ///
 ///
-int
-Point::coordinateDimension() const
+auto
+Point::coordinateDimension() const -> int
 {
   return _coordinate.coordinateDimension() + (isMeasured() ? 1 : 0);
 }
@@ -146,8 +145,8 @@ Point::coordinateDimension() const
 ///
 ///
 ///
-bool
-Point::isEmpty() const
+auto
+Point::isEmpty() const -> bool
 {
   return _coordinate.isEmpty();
 }
@@ -155,8 +154,8 @@ Point::isEmpty() const
 ///
 ///
 ///
-bool
-Point::is3D() const
+auto
+Point::is3D() const -> bool
 {
   return _coordinate.is3D();
 }
@@ -164,8 +163,8 @@ Point::is3D() const
 ///
 ///
 ///
-bool
-Point::isMeasured() const
+auto
+Point::isMeasured() const -> bool
 {
   return !std::isnan(_m);
 }
@@ -191,8 +190,8 @@ Point::accept(ConstGeometryVisitor &visitor) const
 ///
 ///
 ///
-bool
-Point::operator<(const Point &other) const
+auto
+Point::operator<(const Point &other) const -> bool
 {
   return _coordinate < other._coordinate;
 }
@@ -200,8 +199,8 @@ Point::operator<(const Point &other) const
 ///
 ///
 ///
-bool
-Point::operator==(const Point &other) const
+auto
+Point::operator==(const Point &other) const -> bool
 {
   return _coordinate == other._coordinate;
 }
@@ -209,8 +208,8 @@ Point::operator==(const Point &other) const
 ///
 ///
 ///
-bool
-Point::operator!=(const Point &other) const
+auto
+Point::operator!=(const Point &other) const -> bool
 {
   return _coordinate != other._coordinate;
 }
@@ -219,8 +218,8 @@ Point::operator!=(const Point &other) const
 /// Private structures used to implement partial function specialization
 template <int D>
 struct do_toPoint_d {
-  static CGAL::Point_2<Kernel>
-  toPoint(const Point *p)
+  static auto
+  toPoint(const Point *p) -> CGAL::Point_2<Kernel>
   {
     return p->toPoint_2();
   }
@@ -228,16 +227,16 @@ struct do_toPoint_d {
 
 template <>
 struct do_toPoint_d<3> {
-  static CGAL::Point_3<Kernel>
-  toPoint(const Point *p)
+  static auto
+  toPoint(const Point *p) -> CGAL::Point_3<Kernel>
   {
     return p->toPoint_3();
   }
 };
 
 template <int Dim>
-typename TypeForDimension<Dim>::Point
-Point::toPoint_d() const
+auto
+Point::toPoint_d() const -> typename TypeForDimension<Dim>::Point
 {
   return do_toPoint_d<Dim>::toPoint(this);
 }

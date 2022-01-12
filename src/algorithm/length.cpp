@@ -15,8 +15,8 @@ namespace algorithm {
 ///
 ///
 ///
-double
-length(const LineString &g)
+auto
+length(const LineString &g) -> double
 {
   double result = 0.0;
 
@@ -32,13 +32,13 @@ length(const LineString &g)
 ///
 ///
 ///
-double
-length(const GeometryCollection &g)
+auto
+length(const GeometryCollection &g) -> double
 {
   double result = 0.0;
 
-  for (GeometryCollection::const_iterator it = g.begin(); it != g.end(); ++it) {
-    result += length(*it);
+  for (const auto &it : g) {
+    result += length(it);
   }
 
   return result;
@@ -47,8 +47,8 @@ length(const GeometryCollection &g)
 ///
 ///
 ///
-double
-length(const Geometry &g)
+auto
+length(const Geometry &g) -> double
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
@@ -86,8 +86,8 @@ length(const Geometry &g)
 ///
 ///
 ///
-double
-length3D(const LineString &g)
+auto
+length3D(const LineString &g) -> double
 {
   double result = 0.0;
 
@@ -103,13 +103,13 @@ length3D(const LineString &g)
 ///
 ///
 ///
-double
-length3D(const GeometryCollection &g)
+auto
+length3D(const GeometryCollection &g) -> double
 {
   double result = 0.0;
 
-  for (GeometryCollection::const_iterator it = g.begin(); it != g.end(); ++it) {
-    result += length3D(*it);
+  for (const auto &it : g) {
+    result += length3D(it);
   }
 
   return result;
@@ -118,8 +118,8 @@ length3D(const GeometryCollection &g)
 ///
 ///
 ///
-double
-length3D(const Geometry &g)
+auto
+length3D(const Geometry &g) -> double
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:

@@ -20,6 +20,7 @@
 #include <SFCGAL/detail/ComplexComparator.h>
 #include <complex>
 #include <map>
+#include <memory>
 
 namespace SFCGAL {
 namespace algorithm {
@@ -212,8 +213,8 @@ BoundaryVisitor::visit(const TriangulatedSurface &g)
 ///
 ///
 ///
-Geometry *
-BoundaryVisitor::releaseBoundary()
+auto
+BoundaryVisitor::releaseBoundary() -> Geometry *
 {
   if (_boundary.get()) {
     return _boundary.release();
@@ -228,8 +229,8 @@ BoundaryVisitor::releaseBoundary()
 void
 BoundaryVisitor::getBoundaryFromLineStrings(const graph::GeometryGraph &graph)
 {
-  typedef graph::GeometryGraph::vertex_descriptor vertex_descriptor;
-  typedef graph::GeometryGraph::vertex_iterator   vertex_iterator;
+  using vertex_descriptor = graph::GeometryGraph::vertex_descriptor;
+  using vertex_iterator   = graph::GeometryGraph::vertex_iterator;
 
   std::vector<vertex_descriptor> vertices;
 
@@ -246,12 +247,12 @@ BoundaryVisitor::getBoundaryFromLineStrings(const graph::GeometryGraph &graph)
   if (vertices.empty()) {
     _boundary.reset();
   } else if (vertices.size() == 1) {
-    _boundary.reset(new Point(graph[vertices[0]].coordinate));
+    _boundary = std::make_unique<Point>(graph[vertices[0]].coordinate);
   } else {
     std::unique_ptr<MultiPoint> boundary(new MultiPoint);
 
-    for (size_t i = 0; i < vertices.size(); i++) {
-      boundary->addGeometry(new Point(graph[vertices[i]].coordinate));
+    for (auto &vertice : vertices) {
+      boundary->addGeometry(new Point(graph[vertice].coordinate));
     }
 
     _boundary.reset(boundary.release());
@@ -264,10 +265,10 @@ BoundaryVisitor::getBoundaryFromLineStrings(const graph::GeometryGraph &graph)
 void
 BoundaryVisitor::getBoundaryFromPolygons(const graph::GeometryGraph &g)
 {
-  typedef graph::GeometryGraph::vertex_descriptor vertex_descriptor;
+  using vertex_descriptor = graph::GeometryGraph::vertex_descriptor;
   // typedef graph::GeometryGraph::vertex_iterator   vertex_iterator ;
-  typedef graph::GeometryGraph::edge_descriptor edge_descriptor;
-  typedef graph::GeometryGraph::edge_iterator   edge_iterator;
+  using edge_descriptor = graph::GeometryGraph::edge_descriptor;
+  using edge_iterator   = graph::GeometryGraph::edge_iterator;
 
   std::vector<edge_descriptor> boundaryEdges;
 
@@ -285,9 +286,7 @@ BoundaryVisitor::getBoundaryFromPolygons(const graph::GeometryGraph &g)
     // TODO merge Line Segments into LineString
     std::unique_ptr<MultiLineString> boundary(new MultiLineString);
 
-    for (size_t i = 0; i < boundaryEdges.size(); i++) {
-      const edge_descriptor &edge = boundaryEdges[i];
-
+    for (auto &edge : boundaryEdges) {
       vertex_descriptor source = g.source(edge);
       vertex_descriptor target = g.target(edge);
 

@@ -24,12 +24,12 @@
 #include <SFCGAL/detail/GetPointsVisitor.h>
 #include <SFCGAL/detail/transform/AffineTransform3.h>
 
-typedef SFCGAL::Kernel::Point_2   Point_2;
-typedef SFCGAL::Kernel::Vector_2  Vector_2;
-typedef SFCGAL::Kernel::Segment_2 Segment_2;
+using Point_2   = SFCGAL::Kernel::Point_2;
+using Vector_2  = SFCGAL::Kernel::Vector_2;
+using Segment_2 = SFCGAL::Kernel::Segment_2;
 
-typedef CGAL::Polygon_2<SFCGAL::Kernel>            Polygon_2;
-typedef CGAL::Polygon_with_holes_2<SFCGAL::Kernel> Polygon_with_holes_2;
+using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
+using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
 
 namespace SFCGAL {
 namespace algorithm {
@@ -37,8 +37,8 @@ namespace algorithm {
 ///
 ///
 ///
-double
-distance(const Geometry &gA, const Geometry &gB, NoValidityCheck)
+auto
+distance(const Geometry &gA, const Geometry &gB, NoValidityCheck) -> double
 {
   switch (gA.geometryTypeId()) {
   case TYPE_POINT:
@@ -73,8 +73,8 @@ distance(const Geometry &gA, const Geometry &gB, NoValidityCheck)
   return 0;
 }
 
-double
-distance(const Geometry &gA, const Geometry &gB)
+auto
+distance(const Geometry &gA, const Geometry &gB) -> double
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gA);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gB);
@@ -84,8 +84,8 @@ distance(const Geometry &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distancePointGeometry(const Point &gA, const Geometry &gB)
+auto
+distancePointGeometry(const Point &gA, const Geometry &gB) -> double
 {
   switch (gB.geometryTypeId()) {
   case TYPE_POINT:
@@ -124,8 +124,8 @@ distancePointGeometry(const Point &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distancePointPoint(const Point &gA, const Point &gB)
+auto
+distancePointPoint(const Point &gA, const Point &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -138,8 +138,8 @@ distancePointPoint(const Point &gA, const Point &gB)
 ///
 ///
 ///
-double
-distancePointLineString(const Point &gA, const LineString &gB)
+auto
+distancePointLineString(const Point &gA, const LineString &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -163,8 +163,8 @@ distancePointLineString(const Point &gA, const LineString &gB)
 ///
 ///
 ///
-double
-distancePointPolygon(const Point &gA, const Polygon &gB)
+auto
+distancePointPolygon(const Point &gA, const Polygon &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -191,8 +191,8 @@ distancePointPolygon(const Point &gA, const Polygon &gB)
 ///
 ///
 ///
-double
-distancePointTriangle(const Point &gA, const Triangle &gB)
+auto
+distancePointTriangle(const Point &gA, const Triangle &gB) -> double
 {
   return distancePointPolygon(gA, gB.toPolygon());
 }
@@ -200,8 +200,8 @@ distancePointTriangle(const Point &gA, const Triangle &gB)
 ///
 ///
 ///
-double
-distanceLineStringGeometry(const LineString &gA, const Geometry &gB)
+auto
+distanceLineStringGeometry(const LineString &gA, const Geometry &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -244,8 +244,9 @@ distanceLineStringGeometry(const LineString &gA, const Geometry &gB)
 ///
 ///
 ///
-double
+auto
 distanceLineStringLineString(const LineString &gA, const LineString &gB)
+    -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -270,8 +271,8 @@ distanceLineStringLineString(const LineString &gA, const LineString &gB)
 ///
 ///
 ///
-double
-distanceLineStringPolygon(const LineString &gA, const Polygon &gB)
+auto
+distanceLineStringPolygon(const LineString &gA, const Polygon &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -297,8 +298,8 @@ distanceLineStringPolygon(const LineString &gA, const Polygon &gB)
 ///
 ///
 ///
-double
-distanceLineStringTriangle(const LineString &gA, const Triangle &gB)
+auto
+distanceLineStringTriangle(const LineString &gA, const Triangle &gB) -> double
 {
   return distanceLineStringPolygon(gA, gB.toPolygon());
 }
@@ -306,8 +307,8 @@ distanceLineStringTriangle(const LineString &gA, const Triangle &gB)
 ///
 ///
 ///
-double
-distancePolygonGeometry(const Polygon &gA, const Geometry &gB)
+auto
+distancePolygonGeometry(const Polygon &gA, const Geometry &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -350,8 +351,8 @@ distancePolygonGeometry(const Polygon &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distancePolygonPolygon(const Polygon &gA, const Polygon &gB)
+auto
+distancePolygonPolygon(const Polygon &gA, const Polygon &gB) -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -379,8 +380,8 @@ distancePolygonPolygon(const Polygon &gA, const Polygon &gB)
 ///
 ///
 ///
-double
-distancePolygonTriangle(const Polygon &gA, const Triangle &gB)
+auto
+distancePolygonTriangle(const Polygon &gA, const Triangle &gB) -> double
 {
   return distancePolygonPolygon(gA, gB.toPolygon());
 }
@@ -388,8 +389,8 @@ distancePolygonTriangle(const Polygon &gA, const Triangle &gB)
 ///
 ///
 ///
-double
-distanceTriangleGeometry(const Triangle &gA, const Geometry &gB)
+auto
+distanceTriangleGeometry(const Triangle &gA, const Geometry &gB) -> double
 {
   return distancePolygonGeometry(gA.toPolygon(), gB);
 }
@@ -399,20 +400,20 @@ struct Circle {
       : _radius(r), _center(c), _empty(false)
   {
   }
-  Circle() : _empty(true) {}
-  bool
-  isEmpty() const
+  Circle() = default;
+  auto
+  isEmpty() const -> bool
   {
     return _empty;
   }
-  double
-  radius() const
+  auto
+  radius() const -> double
   {
     BOOST_ASSERT(!_empty);
     return _radius;
   }
-  const CGAL::Vector_2<Kernel> &
-  center() const
+  auto
+  center() const -> const CGAL::Vector_2<Kernel> &
   {
     BOOST_ASSERT(!_empty);
     return _center;
@@ -421,11 +422,11 @@ struct Circle {
 private:
   double                 _radius{};
   CGAL::Vector_2<Kernel> _center;
-  bool                   _empty;
+  bool                   _empty{true};
 };
 
-const Circle
-boundingCircle(const Geometry &geom)
+auto
+boundingCircle(const Geometry &geom) -> const Circle
 {
   if (geom.isEmpty()) {
     return Circle();
@@ -439,7 +440,7 @@ boundingCircle(const Geometry &geom)
     return Circle();
   }
 
-  typedef CGAL::Vector_2<Kernel> Vector_2;
+  using Vector_2 = CGAL::Vector_2<Kernel>;
 
   const GetPointsVisitor::const_iterator end = v.points.end();
 
@@ -475,8 +476,9 @@ boundingCircle(const Geometry &geom)
 ///
 ///
 ///
-double
+auto
 distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
+    -> double
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::numeric_limits<double>::infinity();
@@ -491,7 +493,7 @@ distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
   // sphere than encloses all points
   std::set<size_t> noTest;
 
-  if (1) {
+  if (true) {
     std::vector<Circle> bcA;
 
     for (size_t i = 0; i < gA.numGeometries(); i++) {
@@ -559,8 +561,8 @@ distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
 ///
 ///
 ///
-double
-distancePointSegment(const Point &p, const Point &a, const Point &b)
+auto
+distancePointSegment(const Point &p, const Point &a, const Point &b) -> double
 {
   // empty already checked
   BOOST_ASSERT(!p.isEmpty());
@@ -574,9 +576,9 @@ distancePointSegment(const Point &p, const Point &a, const Point &b)
 ///
 ///
 ///
-double
+auto
 distanceSegmentSegment(const Point &a, const Point &b, const Point &c,
-                       const Point &d)
+                       const Point &d) -> double
 {
   // empty already checked
   BOOST_ASSERT(!a.isEmpty());

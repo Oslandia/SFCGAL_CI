@@ -23,8 +23,8 @@ Polygon::Polygon(const std::vector<LineString> &rings) : Surface()
   if (rings.empty()) {
     _rings.resize(1, new LineString());
   } else {
-    for (size_t i = 0; i < rings.size(); i++) {
-      _rings.push_back(rings[i].clone());
+    for (const auto &ring : rings) {
+      _rings.push_back(ring.clone());
     }
   }
 }
@@ -88,7 +88,7 @@ Polygon::Polygon(const CGAL::Polygon_2<Kernel> &other)
 Polygon::Polygon(const CGAL::Polygon_with_holes_2<Kernel> &poly)
 {
   _rings.push_back(new LineString());
-  CGAL::Polygon_2<Kernel>                      outer = poly.outer_boundary();
+  const CGAL::Polygon_2<Kernel>               &outer = poly.outer_boundary();
   CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
 
   for (ei = outer.edges_begin(); ei != outer.edges_end(); ++ei) {
@@ -97,9 +97,7 @@ Polygon::Polygon(const CGAL::Polygon_with_holes_2<Kernel> &poly)
 
   _rings.back().addPoint(_rings.back().startPoint());
 
-  for (CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hit =
-           poly.holes_begin();
-       hit != poly.holes_end(); ++hit) {
+  for (auto hit = poly.holes_begin(); hit != poly.holes_end(); ++hit) {
     _rings.push_back(new LineString());
     CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
 
@@ -114,8 +112,8 @@ Polygon::Polygon(const CGAL::Polygon_with_holes_2<Kernel> &poly)
 ///
 ///
 ///
-Polygon &
-Polygon::operator=(Polygon other)
+auto
+Polygon::operator=(Polygon other) -> Polygon &
 {
   swap(other);
   return *this;
@@ -124,13 +122,13 @@ Polygon::operator=(Polygon other)
 ///
 ///
 ///
-Polygon::~Polygon() {}
+Polygon::~Polygon() = default;
 
 ///
 ///
 ///
-int
-Polygon::coordinateDimension() const
+auto
+Polygon::coordinateDimension() const -> int
 {
   return _rings[0].coordinateDimension();
 }
@@ -138,8 +136,8 @@ Polygon::coordinateDimension() const
 ///
 ///
 ///
-std::string
-Polygon::geometryType() const
+auto
+Polygon::geometryType() const -> std::string
 {
   return "Polygon";
 }
@@ -147,8 +145,8 @@ Polygon::geometryType() const
 ///
 ///
 ///
-GeometryType
-Polygon::geometryTypeId() const
+auto
+Polygon::geometryTypeId() const -> GeometryType
 {
   return TYPE_POLYGON;
 }
@@ -156,8 +154,8 @@ Polygon::geometryTypeId() const
 ///
 ///
 ///
-Polygon *
-Polygon::clone() const
+auto
+Polygon::clone() const -> Polygon *
 {
   return new Polygon(*this);
 }
@@ -165,8 +163,8 @@ Polygon::clone() const
 ///
 ///
 ///
-bool
-Polygon::isEmpty() const
+auto
+Polygon::isEmpty() const -> bool
 {
   return exteriorRing().isEmpty();
 }
@@ -174,8 +172,8 @@ Polygon::isEmpty() const
 ///
 ///
 ///
-bool
-Polygon::is3D() const
+auto
+Polygon::is3D() const -> bool
 {
   return exteriorRing().is3D();
 }
@@ -183,8 +181,8 @@ Polygon::is3D() const
 ///
 ///
 ///
-bool
-Polygon::isMeasured() const
+auto
+Polygon::isMeasured() const -> bool
 {
   return exteriorRing().isMeasured();
 }
@@ -221,8 +219,8 @@ Polygon::accept(ConstGeometryVisitor &visitor) const
 ///
 ///
 ///
-bool
-Polygon::isCounterClockWiseOriented() const
+auto
+Polygon::isCounterClockWiseOriented() const -> bool
 {
   return algorithm::isCounterClockWiseOriented(*this);
 }
@@ -230,8 +228,8 @@ Polygon::isCounterClockWiseOriented() const
 ///
 ///
 ///
-CGAL::Polygon_2<Kernel>
-Polygon::toPolygon_2(bool fixOrientation) const
+auto
+Polygon::toPolygon_2(bool fixOrientation) const -> CGAL::Polygon_2<Kernel>
 {
   return exteriorRing().toPolygon_2(fixOrientation);
 }
@@ -239,8 +237,9 @@ Polygon::toPolygon_2(bool fixOrientation) const
 ///
 ///
 ///
-CGAL::Polygon_with_holes_2<Kernel>
+auto
 Polygon::toPolygon_with_holes_2(bool fixOrientation) const
+    -> CGAL::Polygon_with_holes_2<Kernel>
 {
   std::list<CGAL::Polygon_2<Kernel>> holes;
 

@@ -28,8 +28,8 @@ GeometryCollection::GeometryCollection(GeometryCollection const &other)
 ///
 ///
 ///
-GeometryCollection &
-GeometryCollection::operator=(GeometryCollection other)
+auto
+GeometryCollection::operator=(GeometryCollection other) -> GeometryCollection &
 {
   swap(other);
   return *this;
@@ -38,13 +38,13 @@ GeometryCollection::operator=(GeometryCollection other)
 ///
 ///
 ///
-GeometryCollection::~GeometryCollection() {}
+GeometryCollection::~GeometryCollection() = default;
 
 ///
 ///
 ///
-GeometryCollection *
-GeometryCollection::clone() const
+auto
+GeometryCollection::clone() const -> GeometryCollection *
 {
   return new GeometryCollection(*this);
 }
@@ -52,8 +52,8 @@ GeometryCollection::clone() const
 ///
 ///
 ///
-std::string
-GeometryCollection::geometryType() const
+auto
+GeometryCollection::geometryType() const -> std::string
 {
   return "GeometryCollection";
 }
@@ -61,8 +61,8 @@ GeometryCollection::geometryType() const
 ///
 ///
 ///
-GeometryType
-GeometryCollection::geometryTypeId() const
+auto
+GeometryCollection::geometryTypeId() const -> GeometryType
 {
   return TYPE_GEOMETRYCOLLECTION;
 }
@@ -70,14 +70,13 @@ GeometryCollection::geometryTypeId() const
 ///
 ///
 ///
-int
-GeometryCollection::dimension() const
+auto
+GeometryCollection::dimension() const -> int
 {
   int maxDimension = 0;
 
-  for (boost::ptr_vector<Geometry>::const_iterator it = _geometries.begin();
-       it != _geometries.end(); ++it) {
-    maxDimension = std::max(maxDimension, it->dimension());
+  for (const auto &_geometrie : _geometries) {
+    maxDimension = std::max(maxDimension, _geometrie.dimension());
   }
 
   return maxDimension;
@@ -86,8 +85,8 @@ GeometryCollection::dimension() const
 ///
 ///
 ///
-int
-GeometryCollection::coordinateDimension() const
+auto
+GeometryCollection::coordinateDimension() const -> int
 {
   if (isEmpty()) {
     return 0;
@@ -99,8 +98,8 @@ GeometryCollection::coordinateDimension() const
 ///
 ///
 ///
-bool
-GeometryCollection::isEmpty() const
+auto
+GeometryCollection::isEmpty() const -> bool
 {
   return _geometries.empty();
 }
@@ -108,8 +107,8 @@ GeometryCollection::isEmpty() const
 ///
 ///
 ///
-bool
-GeometryCollection::is3D() const
+auto
+GeometryCollection::is3D() const -> bool
 {
   return !isEmpty() && _geometries.front().is3D();
 }
@@ -117,8 +116,8 @@ GeometryCollection::is3D() const
 ///
 ///
 ///
-bool
-GeometryCollection::isMeasured() const
+auto
+GeometryCollection::isMeasured() const -> bool
 {
   return !isEmpty() && _geometries.front().isMeasured();
 }
@@ -126,8 +125,8 @@ GeometryCollection::isMeasured() const
 ///
 ///
 ///
-size_t
-GeometryCollection::numGeometries() const
+auto
+GeometryCollection::numGeometries() const -> size_t
 {
   return _geometries.size();
 }
@@ -135,8 +134,8 @@ GeometryCollection::numGeometries() const
 ///
 ///
 ///
-const Geometry &
-GeometryCollection::geometryN(size_t const &n) const
+auto
+GeometryCollection::geometryN(size_t const &n) const -> const Geometry &
 {
   return _geometries[n];
 }
@@ -144,8 +143,8 @@ GeometryCollection::geometryN(size_t const &n) const
 ///
 ///
 ///
-Geometry &
-GeometryCollection::geometryN(size_t const &n)
+auto
+GeometryCollection::geometryN(size_t const &n) -> Geometry &
 {
   return _geometries[n];
 }
@@ -181,8 +180,8 @@ GeometryCollection::addGeometry(Geometry const &geometry)
 ///
 ///
 ///
-bool
-GeometryCollection::isAllowed(Geometry const &)
+auto
+GeometryCollection::isAllowed(Geometry const &) -> bool
 {
   // GeometryCollection accepts all subtypes
   return true;

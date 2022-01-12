@@ -5,13 +5,15 @@
 #include <SFCGAL/Point.h>
 #include <SFCGAL/detail/transform/ForceZ.h>
 
+#include <utility>
+
 namespace SFCGAL {
 namespace transform {
 
 ///
 ///
 ///
-ForceZ::ForceZ(const Kernel::FT &defaultZ) : _defaultZ(defaultZ) {}
+ForceZ::ForceZ(const Kernel::FT defaultZ) : _defaultZ(std::move(defaultZ)) {}
 
 ///
 ///

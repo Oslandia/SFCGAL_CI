@@ -9,8 +9,8 @@ namespace SFCGAL {
 ///
 ///
 ///
-CGAL::Gmpz
-floor(const CGAL::Gmpq &v)
+auto
+floor(const CGAL::Gmpq &v) -> CGAL::Gmpz
 {
   return v.numerator() / v.denominator();
 }
@@ -18,8 +18,8 @@ floor(const CGAL::Gmpq &v)
 ///
 ///
 ///
-CGAL::Gmpz
-ceil(const CGAL::Gmpq &v)
+auto
+ceil(const CGAL::Gmpq &v) -> CGAL::Gmpz
 {
   CGAL::Gmpz result(0);
   mpz_cdiv_q(result.mpz(), v.numerator().mpz(), v.denominator().mpz());
@@ -29,8 +29,8 @@ ceil(const CGAL::Gmpq &v)
 ///
 ///
 ///
-CGAL::Gmpz
-round(const CGAL::Gmpq &v)
+auto
+round(const CGAL::Gmpq &v) -> CGAL::Gmpz
 {
   if (v < 0) {
     // ceil( v - 0.5 ) ;
@@ -47,8 +47,8 @@ round(const CGAL::Gmpq &v)
 ///
 ///
 ///
-mpz_class
-floor(const mpq_class &v)
+auto
+floor(const mpq_class &v) -> mpz_class
 {
   return v.get_num() / v.get_den();
 }
@@ -56,8 +56,8 @@ floor(const mpq_class &v)
 ///
 ///
 ///
-mpz_class
-ceil(const mpq_class &v)
+auto
+ceil(const mpq_class &v) -> mpz_class
 {
   mpz_class result(0);
   mpz_cdiv_q(result.get_mpz_t(), v.get_num().get_mpz_t(),
@@ -68,8 +68,8 @@ ceil(const mpq_class &v)
 ///
 ///
 ///
-mpz_class
-round(const mpq_class &v)
+auto
+round(const mpq_class &v) -> mpz_class
 {
   if (v < 0) {
     // ceil( v - 0.5 ) ;

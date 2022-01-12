@@ -13,6 +13,7 @@
 #include <SFCGAL/Polygon.h>
 
 #include <cmath>
+#include <memory>
 
 namespace SFCGAL {
 namespace generator {
@@ -20,9 +21,9 @@ namespace generator {
 ///
 ///
 ///
-std::unique_ptr<Polygon>
+auto
 disc(const Point &center, const double &radius,
-     const unsigned int &nQuadrantSegments)
+     const unsigned int &nQuadrantSegments) -> std::unique_ptr<Polygon>
 {
   BOOST_ASSERT(nQuadrantSegments > 1);
 
@@ -39,7 +40,7 @@ disc(const Point &center, const double &radius,
 
   exteriorRing->addPoint(exteriorRing->startPoint());
 
-  return std::unique_ptr<Polygon>(new Polygon(exteriorRing.release()));
+  return std::make_unique<Polygon>(exteriorRing.release());
 }
 
 } // namespace generator

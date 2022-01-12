@@ -13,8 +13,8 @@ namespace SFCGAL {
 namespace detail {
 namespace algorithm {
 template <int Dim>
-bool
-_coversPoints(const Geometry &ga, const Geometry &gb)
+auto
+_coversPoints(const Geometry &ga, const Geometry &gb) -> bool
 {
   if (ga.isEmpty() || gb.isEmpty()) {
     return false;
@@ -41,14 +41,14 @@ _coversPoints(const Geometry &ga, const Geometry &gb)
   return true;
 }
 
-bool
-coversPoints(const Geometry &ga, const Geometry &gb)
+auto
+coversPoints(const Geometry &ga, const Geometry &gb) -> bool
 {
   return _coversPoints<2>(ga, gb);
 }
 
-bool
-coversPoints3D(const Geometry &ga, const Geometry &gb)
+auto
+coversPoints3D(const Geometry &ga, const Geometry &gb) -> bool
 {
   return _coversPoints<3>(ga, gb);
 }

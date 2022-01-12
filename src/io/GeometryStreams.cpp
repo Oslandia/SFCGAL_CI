@@ -11,8 +11,8 @@ namespace SFCGAL {
 ///
 ///
 ///
-std::ostream &
-operator<<(std::ostream &ostr, const Envelope &env)
+auto
+operator<<(std::ostream &ostr, const Envelope &env) -> std::ostream &
 {
   return env.print(ostr);
 }
@@ -20,8 +20,8 @@ operator<<(std::ostream &ostr, const Envelope &env)
 ///
 ///
 ///
-std::ostream &
-operator<<(std::ostream &ostr, const Geometry &g)
+auto
+operator<<(std::ostream &ostr, const Geometry &g) -> std::ostream &
 {
   ostr << g.asText();
   return ostr;

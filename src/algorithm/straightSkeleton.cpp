@@ -22,13 +22,15 @@
 #include <CGAL/Straight_skeleton_converter_2.h>
 #include <CGAL/create_straight_skeleton_from_polygon_with_holes_2.h>
 
+#include <memory>
+
 namespace SFCGAL {
 namespace algorithm {
 
-typedef Kernel::Point_2                    Point_2;
-typedef CGAL::Polygon_2<Kernel>            Polygon_2;
-typedef CGAL::Polygon_with_holes_2<Kernel> Polygon_with_holes_2;
-typedef CGAL::Straight_skeleton_2<Kernel>  Straight_skeleton_2;
+using Point_2              = Kernel::Point_2;
+using Polygon_2            = CGAL::Polygon_2<Kernel>;
+using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
+using Straight_skeleton_2  = CGAL::Straight_skeleton_2<Kernel>;
 
 namespace { // anonymous
 
@@ -39,11 +41,11 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
                                   Kernel::Vector_2 &translate,
                                   const double     &toleranceAbs)
 {
-  typedef CGAL::Straight_skeleton_2<K> Ss;
+  using Ss = CGAL::Straight_skeleton_2<K>;
 
-  typedef typename Ss::Vertex_const_handle     Vertex_const_handle;
-  typedef typename Ss::Halfedge_const_handle   Halfedge_const_handle;
-  typedef typename Ss::Halfedge_const_iterator Halfedge_const_iterator;
+  using Vertex_const_handle     = typename Ss::Vertex_const_handle;
+  using Halfedge_const_handle   = typename Ss::Halfedge_const_handle;
+  using Halfedge_const_iterator = typename Ss::Halfedge_const_iterator;
 
   Halfedge_const_handle null_halfedge;
   Vertex_const_handle   null_vertex;
@@ -65,7 +67,7 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
       continue;
     }
 
-    LineString *ls = 0;
+    LineString *ls = nullptr;
     Point       pa(it->opposite()->vertex()->point());
     Point       pb(it->vertex()->point());
     // avoid degenerate cases.https://gitlab.com/Oslandia/SFCGAL/-/issues/143
@@ -87,8 +89,8 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
 /**
  * Return abc angle in radians
  */
-static double
-angle(const Point &a, const Point &b, const Point &c)
+static auto
+angle(const Point &a, const Point &b, const Point &c) -> double
 {
   Point ab(to_double(b.x() - a.x()), to_double(b.y() - a.y()));
   Point cb(to_double(b.x() - c.x()), to_double(b.y() - c.y()));
@@ -108,10 +110,10 @@ straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &ss,
                              MultiLineString                    &result,
                              Kernel::Vector_2                   &translate)
 {
-  typedef CGAL::Straight_skeleton_2<K> Ss;
+  using Ss = CGAL::Straight_skeleton_2<K>;
 
-  typedef typename Ss::Halfedge_const_handle   Halfedge_const_handle;
-  typedef typename Ss::Halfedge_const_iterator Halfedge_const_iterator;
+  using Halfedge_const_handle   = typename Ss::Halfedge_const_handle;
+  using Halfedge_const_iterator = typename Ss::Halfedge_const_iterator;
 
   // Maximum angle for touching bisectors to be
   // retained in the ouptput. The value is in
@@ -167,8 +169,9 @@ straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &ss,
   }
 }
 
-boost::shared_ptr<Straight_skeleton_2>
+auto
 straightSkeleton(const Polygon_with_holes_2 &poly)
+    -> boost::shared_ptr<Straight_skeleton_2>
 {
   boost::shared_ptr<CGAL::Straight_skeleton_2<CGAL::Epick>> sk =
       CGAL::create_interior_straight_skeleton_2(
@@ -208,8 +211,9 @@ checkNoTouchingHoles(const Polygon &g)
   }
 }
 
-Polygon_with_holes_2
+auto
 preparePolygon(const Polygon &poly, Kernel::Vector_2 &trans)
+    -> Polygon_with_holes_2
 {
   checkNoTouchingHoles(poly);
   Envelope env = poly.envelope();
@@ -235,7 +239,7 @@ extractPolygons(const Geometry &g, std::vector<Polygon> &vect)
     vect.push_back(g.as<Polygon>());
     break;
   case TYPE_MULTIPOLYGON: {
-    const MultiPolygon &mp = g.as<MultiPolygon>();
+    const auto &mp = g.as<MultiPolygon>();
     for (size_t i = 0; i < mp.numGeometries(); i++) {
       vect.push_back(mp.polygonN(i));
     }
@@ -251,10 +255,10 @@ extractPolygons(const Geometry &g, std::vector<Polygon> &vect)
 ///
 ///
 ///
-std::unique_ptr<MultiLineString>
+auto
 straightSkeleton(const Geometry &g, bool autoOrientation, NoValidityCheck,
                  bool innerOnly, bool outputDistanceInM,
-                 const double &toleranceAbs)
+                 const double &toleranceAbs) -> std::unique_ptr<MultiLineString>
 {
   switch (g.geometryTypeId()) {
   case TYPE_TRIANGLE:
@@ -270,13 +274,14 @@ straightSkeleton(const Geometry &g, bool autoOrientation, NoValidityCheck,
                             outputDistanceInM);
 
   default:
-    return std::unique_ptr<MultiLineString>(new MultiLineString);
+    return std::make_unique<MultiLineString>();
   }
 }
 
-std::unique_ptr<MultiLineString>
+auto
 straightSkeleton(const Geometry &g, bool autoOrientation, bool innerOnly,
                  bool outputDistanceInM, const double &toleranceAbs)
+    -> std::unique_ptr<MultiLineString>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
 
@@ -288,9 +293,10 @@ straightSkeleton(const Geometry &g, bool autoOrientation, bool innerOnly,
 ///
 ///
 ///
-std::unique_ptr<MultiLineString>
+auto
 straightSkeleton(const Polygon &g, bool /*autoOrientation*/, bool innerOnly,
                  bool outputDistanceInM, const double &toleranceAbs)
+    -> std::unique_ptr<MultiLineString>
 {
   std::unique_ptr<MultiLineString> result(new MultiLineString);
 
@@ -318,10 +324,10 @@ straightSkeleton(const Polygon &g, bool /*autoOrientation*/, bool innerOnly,
 ///
 ///
 ///
-std::unique_ptr<MultiLineString>
+auto
 straightSkeleton(const MultiPolygon &g, bool /*autoOrientation*/,
                  bool innerOnly, bool outputDistanceInM,
-                 const double &toleranceAbs)
+                 const double &toleranceAbs) -> std::unique_ptr<MultiLineString>
 {
   std::unique_ptr<MultiLineString> result(new MultiLineString);
 
@@ -346,8 +352,8 @@ straightSkeleton(const MultiPolygon &g, bool /*autoOrientation*/,
   return result;
 }
 
-std::unique_ptr<MultiLineString>
-approximateMedialAxis(const Geometry &g)
+auto
+approximateMedialAxis(const Geometry &g) -> std::unique_ptr<MultiLineString>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
 
@@ -356,9 +362,9 @@ approximateMedialAxis(const Geometry &g)
   std::vector<Polygon> polys;
   extractPolygons(g, polys);
 
-  for (size_t i = 0; i < polys.size(); ++i) {
+  for (auto &poly : polys) {
     Kernel::Vector_2     trans;
-    Polygon_with_holes_2 polygon = preparePolygon(polys[i], trans);
+    Polygon_with_holes_2 polygon = preparePolygon(poly, trans);
     boost::shared_ptr<Straight_skeleton_2> skeleton = straightSkeleton(polygon);
 
     if (!skeleton.get()) {

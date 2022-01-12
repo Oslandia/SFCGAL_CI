@@ -9,14 +9,14 @@ namespace SFCGAL {
 const char _sfcgal_version[]      = SFCGAL_VERSION;
 const char _sfcgal_full_version[] = SFCGAL_FULL_VERSION;
 
-const char *
-Version()
+auto
+Version() -> const char *
 {
   return _sfcgal_version;
 }
 
-const char *
-Full_Version()
+auto
+Full_Version() -> const char *
 {
   return _sfcgal_full_version;
 }

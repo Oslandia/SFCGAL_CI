@@ -20,8 +20,8 @@ PolyhedralSurface::PolyhedralSurface() : Surface(), _polygons() {}
 PolyhedralSurface::PolyhedralSurface(const std::vector<Polygon> &polygons)
     : Surface()
 {
-  for (size_t i = 0; i < polygons.size(); i++) {
-    _polygons.push_back(polygons[i].clone());
+  for (const auto &polygon : polygons) {
+    _polygons.push_back(polygon.clone());
   }
 }
 
@@ -29,9 +29,8 @@ PolyhedralSurface::PolyhedralSurface(const std::vector<Polygon> &polygons)
 ///
 ///
 PolyhedralSurface::PolyhedralSurface(const PolyhedralSurface &other)
-    : Surface(other), _polygons(other._polygons)
-{
-}
+
+    = default;
 
 ///
 ///
@@ -40,7 +39,7 @@ PolyhedralSurface::PolyhedralSurface(const MarkedPolyhedron &poly) : Surface()
 {
   for (MarkedPolyhedron::Facet_const_iterator fit = poly.facets_begin();
        fit != poly.facets_end(); ++fit) {
-    LineString *face = new LineString();
+    auto *face = new LineString();
     MarkedPolyhedron::Halfedge_around_facet_const_circulator hit =
         fit->facet_begin();
 
@@ -58,8 +57,8 @@ PolyhedralSurface::PolyhedralSurface(const MarkedPolyhedron &poly) : Surface()
 ///
 ///
 ///
-PolyhedralSurface &
-PolyhedralSurface::operator=(PolyhedralSurface other)
+auto
+PolyhedralSurface::operator=(PolyhedralSurface other) -> PolyhedralSurface &
 {
   swap(other);
   return *this;
@@ -68,13 +67,13 @@ PolyhedralSurface::operator=(PolyhedralSurface other)
 ///
 ///
 ///
-PolyhedralSurface::~PolyhedralSurface() {}
+PolyhedralSurface::~PolyhedralSurface() = default;
 
 ///
 ///
 ///
-PolyhedralSurface *
-PolyhedralSurface::clone() const
+auto
+PolyhedralSurface::clone() const -> PolyhedralSurface *
 {
   return new PolyhedralSurface(*this);
 }
@@ -82,8 +81,8 @@ PolyhedralSurface::clone() const
 ///
 ///
 ///
-std::string
-PolyhedralSurface::geometryType() const
+auto
+PolyhedralSurface::geometryType() const -> std::string
 {
   return "PolyhedralSurface";
 }
@@ -91,8 +90,8 @@ PolyhedralSurface::geometryType() const
 ///
 ///
 ///
-GeometryType
-PolyhedralSurface::geometryTypeId() const
+auto
+PolyhedralSurface::geometryTypeId() const -> GeometryType
 {
   return TYPE_POLYHEDRALSURFACE;
 }
@@ -100,8 +99,8 @@ PolyhedralSurface::geometryTypeId() const
 ///
 ///
 ///
-int
-PolyhedralSurface::dimension() const
+auto
+PolyhedralSurface::dimension() const -> int
 {
   return 2;
 }
@@ -109,8 +108,8 @@ PolyhedralSurface::dimension() const
 ///
 ///
 ///
-int
-PolyhedralSurface::coordinateDimension() const
+auto
+PolyhedralSurface::coordinateDimension() const -> int
 {
   if (isEmpty()) {
     return 0;
@@ -122,8 +121,8 @@ PolyhedralSurface::coordinateDimension() const
 ///
 ///
 ///
-bool
-PolyhedralSurface::isEmpty() const
+auto
+PolyhedralSurface::isEmpty() const -> bool
 {
   return _polygons.empty();
 }
@@ -131,8 +130,8 @@ PolyhedralSurface::isEmpty() const
 ///
 ///
 ///
-bool
-PolyhedralSurface::is3D() const
+auto
+PolyhedralSurface::is3D() const -> bool
 {
   if (isEmpty()) {
     return false;
@@ -144,8 +143,8 @@ PolyhedralSurface::is3D() const
 ///
 ///
 ///
-bool
-PolyhedralSurface::isMeasured() const
+auto
+PolyhedralSurface::isMeasured() const -> bool
 {
   if (isEmpty()) {
     return false;
@@ -157,8 +156,8 @@ PolyhedralSurface::isMeasured() const
 ///
 ///
 ///
-TriangulatedSurface
-PolyhedralSurface::toTriangulatedSurface() const
+auto
+PolyhedralSurface::toTriangulatedSurface() const -> TriangulatedSurface
 {
   TriangulatedSurface result;
   triangulate::triangulatePolygon3D(*this, result);
@@ -198,8 +197,8 @@ PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
 ///
 ///
 ///
-size_t
-PolyhedralSurface::numGeometries() const
+auto
+PolyhedralSurface::numGeometries() const -> size_t
 {
   return _polygons.size();
 }
@@ -207,8 +206,8 @@ PolyhedralSurface::numGeometries() const
 ///
 ///
 ///
-const Polygon &
-PolyhedralSurface::geometryN(size_t const &n) const
+auto
+PolyhedralSurface::geometryN(size_t const &n) const -> const Polygon &
 {
   return _polygons[n];
 }
@@ -216,8 +215,8 @@ PolyhedralSurface::geometryN(size_t const &n) const
 ///
 ///
 ///
-Polygon &
-PolyhedralSurface::geometryN(size_t const &n)
+auto
+PolyhedralSurface::geometryN(size_t const &n) -> Polygon &
 {
   return _polygons[n];
 }
