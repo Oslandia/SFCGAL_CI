@@ -5,39 +5,19 @@
 # correct indentation etc.)
 clang-format:
   stage: lint
-  image: mikedld/clang-format:13-alpine
+  image:
+    name: mikedld/clang-format:13-alpine
+    entrypoint: [""]
   script:
-    - run-clang-format.py -r src --style=file
+    # We need to use simple BusyBox `find` syntax here.
+    - >
+      clang-format --dry-run --Werror
+      $(find src/ -iname '*.cpp' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.h')
+  # script:
+  #   - run-clang-format.py -r src --style=file
   rules:
-    # These rules are here to select a different Docker image depending on the
-    # running conditions. The statements are evaluated from top to bottom until a rule
-    # is matched.
-    # They can be interpreted as:
-    #   1. Run if the pipeline is a MR and the Dockerfile has changed with the image
-    #      created from the changed Dockerfile.
-    #   2. Don't run if the pipeline is both a branch and in a merge request
-    #      This is to avoid duplicate pipelines where both a MR pipeline and a branch pipeline
-    #      is scheduled.
-    #   3. Run if the pipline is for a branch without a MR and the Dockerfile has changed
-    #      with the image created from the changed Dockerfile.
-    #   4. In all other cases, if a clang_format, C or C++ related file has changed run with
-    #      the image from the Dockerfile in `main`.
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - $DOCKER_FILE
-      variables:
-        TAG: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    - if: '$CI_COMMIT_BRANCH'
-      changes:
-        - $DOCKER_FILE
-      variables:
-        TAG: $CI_COMMIT_BRANCH
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
       changes:
         - "src/**/*.{c,h,cpp,hpp}"
         - ".clang-format"
         - ".clang-format-ignore"
-      variables:
-        TAG: $CI_DEFAULT_BRANCH
