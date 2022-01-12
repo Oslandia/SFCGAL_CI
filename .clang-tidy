@@ -1,0 +1,5 @@
+Checks: '-p=build,-*,clang-analyzer-*,cert-*,bugprone-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-header-filter=.*'
+CheckOptions:
+    - key: bugprone-argument-comment.StrictMode
+      value: 1
+FormatStyle: 'file'

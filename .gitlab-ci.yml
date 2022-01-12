@@ -1,76 +1,9 @@
-debian_testing_gcc_cgal53:
-  image: debian:testing
 
-  script:
-    - apt-get update -qq
-    - apt-get install --yes sudo wget build-essential
-    - ./ci/debian/before_install.sh 5.3
-    - cd $CI_PROJECT_DIR
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
-    - make
-    - ctest -VV
-
-debian_buster_gcc_cgal53:
-  image: debian:buster
-
-  script:
-    - apt-get update -qq
-    - apt-get install --yes sudo wget build-essential
-    - ./ci/debian/before_install.sh 5.3
-    - cd $CI_PROJECT_DIR
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
-    - make
-    - ctest -VV
-
-debian_testing_clang_cgal53:
-  image: debian:testing
-
-  script:
-    - apt-get update -qq
-    - apt-get install --yes sudo wget clang libstdc++-11-dev
-    - ./ci/debian/before_install.sh 5.3
-    - cd $CI_PROJECT_DIR
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
-    - make
-    - ctest -VV
-
-debian_buster_clang_cgal53:
-  image: debian:buster
-
-  script:
-    - apt-get update -qq
-    - apt-get install --yes sudo wget clang
-    - ./ci/debian/before_install.sh 5.3
-    - cd $CI_PROJECT_DIR
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
-    - make
-    - ctest -VV
-
-centos8_clang_cgal53:
-  image: centos:centos8
-
-  script:
-    - yum update -qy
-    - yum install -y sudo wget clang
-    - ./ci/centos/before_install.sh 5.3
-    - cd $CI_PROJECT_DIR
-    - ls
-    - find / -name "*CGAL*"
-    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.3
-    - make
-    - ctest -VV
-
-centos8_gcc_cgal53:
-  image: centos:centos8
-
-  script:
-    - yum update -qy
-    - yum install -y sudo wget gcc-c++
-    - ./ci/centos/before_install.sh 5.3
-    - cd $CI_PROJECT_DIR
-    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-5.3
-    - make
-    - ctest -VV
+stages:
+  - lint
+  - build
+  - test
+  - deploy
 
 # After ccache ci
 # coverage:
@@ -91,73 +24,7 @@ centos8_gcc_cgal53:
 #     reports:
 #       cobertura: sfcgal_coverage.xml
 
-# SonarCloud
-image: gcc
-
-variables:
-  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
-
-get-sonar-binaries:
-  stage: .pre
-  cache:
-    policy: push
-    key: "${CI_COMMIT_SHORT_SHA}"
-    paths:
-      - build-wrapper/
-      - sonar-scanner/
-  script:
-    # Download sonar-scanner
-    - curl -sSLo ./sonar-scanner.zip 'https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170-linux.zip'
-    - unzip -o sonar-scanner.zip
-    - mv sonar-scanner-4.4.0.2170-linux sonar-scanner
-    # Download build-wrapper
-    - curl -sSLo ./build-wrapper-linux-x86.zip "${SONAR_HOST_URL}/static/cpp/build-wrapper-linux-x86.zip"
-    - unzip -oj build-wrapper-linux-x86.zip -d ./build-wrapper
-  only:
-    - merge_requests
-    - master
-    - develop
-
-build:
-  stage: build
-  cache:
-    policy: pull-push
-    key: "${CI_COMMIT_SHORT_SHA}"
-    paths:
-      - build-wrapper/
-      - sonar-scanner/
-      - bw-output/
-      - build/ # the build has to be made available to the sonar-scanner for the analysis
-  before_script:
-    - ./ci/debian/before_install.sh 5.3
-  script:
-    # prepare the build tree
-    - mkdir build
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON
-    # run the build inside the build wrapper
-    - build-wrapper/build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --config Release
-  artifacts:
-    paths:
-      - build/
-  only:
-    - merge_requests
-    - master
-    - develop
-
-sonarcloud-check:
-  stage: .post
-  cache:
-    policy: pull
-    key: "${CI_COMMIT_SHORT_SHA}"
-    paths:
-      - build-wrapper/
-      - sonar-scanner/
-      - bw-output/
-      - build/
-  script:
-    - sonar-scanner/bin/sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}" -Dsonar.token="${SONAR_TOKEN}" -Dsonar.cfamily.build-wrapper-output=bw-output
-  only:
-    - merge_requests
-    - master
-    - develop
+include:
+  - local: /.gitlab/pipeline/sonar.yml
+  - local: /.gitlab/pipeline/lint-code.yml
+  - local: /.gitlab/pipeline/test-code.yml

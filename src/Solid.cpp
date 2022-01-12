@@ -1,179 +1,160 @@
-/**
- *   SFCGAL
- *
- *   Copyright (C) 2012-2013 Oslandia <infos@oslandia.com>
- *   Copyright (C) 2012-2013 IGN (http://www.ign.fr)
- *
- *   This library is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU Library General Public
- *   License as published by the Free Software Foundation; either
- *   version 2 of the License, or (at your option) any later version.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *   Library General Public License for more details.
+// Copyright (c) 2012-2013, IGN France.
+// Copyright (c) 2012-2022, Oslandia.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
- *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
- */
-
-#include <SFCGAL/Solid.h>
 #include <SFCGAL/GeometryVisitor.h>
+#include <SFCGAL/Solid.h>
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-Solid::Solid()
+Solid::Solid() { _shells.push_back(new PolyhedralSurface()); }
+
+///
+///
+///
+Solid::Solid(const PolyhedralSurface &exteriorShell)
 {
-    _shells.push_back( new PolyhedralSurface()  );
+  _shells.push_back(exteriorShell.clone());
 }
 
 ///
 ///
 ///
-Solid::Solid( const PolyhedralSurface& exteriorShell )
+Solid::Solid(PolyhedralSurface *exteriorShell)
 {
-    _shells.push_back( exteriorShell.clone() );
+  _shells.push_back(exteriorShell);
 }
 
 ///
 ///
 ///
-Solid::Solid( PolyhedralSurface* exteriorShell )
+Solid::Solid(const std::vector<PolyhedralSurface> &shells)
 {
-    _shells.push_back( exteriorShell );
-}
-
-///
-///
-///
-Solid::Solid( const std::vector< PolyhedralSurface >& shells )
-{
-    if ( shells.empty() ) {
-        _shells.resize( 1, new PolyhedralSurface() );
+  if (shells.empty()) {
+    _shells.resize(1, new PolyhedralSurface());
+  } else {
+    for (size_t i = 0; i < shells.size(); i++) {
+      _shells.push_back(shells[i].clone());
     }
-    else {
-        for ( size_t i = 0; i < shells.size(); i++ ) {
-            _shells.push_back( shells[i].clone() ) ;
-        }
-    }
+  }
 }
 
 ///
 ///
 ///
-Solid::Solid( const Solid& other ):
-    Geometry( other )
+Solid::Solid(const Solid &other) : Geometry(other)
 {
-    for ( size_t i = 0; i < other.numShells(); i++ ) {
-        _shells.push_back( other.shellN( i ).clone() );
-    }
+  for (size_t i = 0; i < other.numShells(); i++) {
+    _shells.push_back(other.shellN(i).clone());
+  }
 }
 
 ///
 ///
 ///
-Solid& Solid::operator = ( Solid other )
+Solid &
+Solid::operator=(Solid other)
 {
-    swap( other );
-    return *this ;
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-Solid::~Solid()
+Solid::~Solid() {}
+
+///
+///
+///
+Solid *
+Solid::clone() const
 {
-
+  return new Solid(*this);
 }
 
 ///
 ///
 ///
-Solid*   Solid::clone() const
+std::string
+Solid::geometryType() const
 {
-    return new Solid( *this );
+  return "Solid";
 }
 
-
-
-
 ///
 ///
 ///
-std::string  Solid::geometryType() const
+GeometryType
+Solid::geometryTypeId() const
 {
-    return "Solid" ;
+  return TYPE_SOLID;
 }
 
 ///
 ///
 ///
-GeometryType  Solid::geometryTypeId() const
+int
+Solid::dimension() const
 {
-    return TYPE_SOLID ;
+  return 3;
 }
 
 ///
 ///
 ///
-int  Solid::dimension() const
+int
+Solid::coordinateDimension() const
 {
-    return 3 ;
+  return exteriorShell().coordinateDimension();
 }
 
 ///
 ///
 ///
-int  Solid::coordinateDimension() const
+bool
+Solid::isEmpty() const
 {
-    return exteriorShell().coordinateDimension() ;
+  return exteriorShell().isEmpty();
 }
 
 ///
 ///
 ///
-bool  Solid::isEmpty() const
+bool
+Solid::is3D() const
 {
-    return exteriorShell().isEmpty();
+  return exteriorShell().is3D();
 }
 
 ///
 ///
 ///
-bool  Solid::is3D() const
+bool
+Solid::isMeasured() const
 {
-    return exteriorShell().is3D();
+  return exteriorShell().isMeasured();
 }
 
 ///
 ///
 ///
-bool  Solid::isMeasured() const
+void
+Solid::accept(GeometryVisitor &visitor)
 {
-    return exteriorShell().isMeasured();
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-void Solid::accept( GeometryVisitor& visitor )
+void
+Solid::accept(ConstGeometryVisitor &visitor) const
 {
-    return visitor.visit( *this );
+  return visitor.visit(*this);
 }
 
-///
-///
-///
-void Solid::accept( ConstGeometryVisitor& visitor ) const
-{
-    return visitor.visit( *this );
-}
-
-}//SFCGAL
-
-
-
+} // namespace SFCGAL

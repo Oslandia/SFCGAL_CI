@@ -1,22 +1,6 @@
-/**
- *   SFCGAL
- *
- *   Copyright (C) 2012-2013 Oslandia <infos@oslandia.com>
- *   Copyright (C) 2012-2013 IGN (http://www.ign.fr)
- *
- *   This library is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU Library General Public
- *   License as published by the Free Software Foundation; either
- *   version 2 of the License, or (at your option) any later version.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *   Library General Public License for more details.
-
- *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2012-2013, IGN France.
+// Copyright (c) 2012-2022, Oslandia.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #ifndef SFCGAL_COLLECT_ALGORITHM
 #define SFCGAL_COLLECT_ALGORITHM
@@ -32,26 +16,29 @@ namespace algorithm {
  * Returns an aggregate of ga and gb
  * @ingroup detail
  */
-SFCGAL_API std::unique_ptr<Geometry> collect( const Geometry& ga, const Geometry& gb );
+SFCGAL_API std::unique_ptr<Geometry>
+           collect(const Geometry &ga, const Geometry &gb);
 
 /**
  * Returns an aggregate of a list of geometries
  * @ingroup detail
  */
 template <typename GeometryIterator>
-std::unique_ptr<Geometry> collect( GeometryIterator begin, GeometryIterator end )
+std::unique_ptr<Geometry>
+collect(GeometryIterator begin, GeometryIterator end)
 {
-    GeometryIterator it;
-    // FIXME: optimize type. For instance, if all the given geometries are points, return a MultiPoint instead of a GeometryCollection
-    GeometryCollection* coll = new GeometryCollection();
+  GeometryIterator it;
+  // FIXME: optimize type. For instance, if all the given geometries are points,
+  // return a MultiPoint instead of a GeometryCollection
+  GeometryCollection *coll = new GeometryCollection();
 
-    for ( it = begin; it != end; ++it ) {
-        coll->addGeometry( *it );
-    }
+  for (it = begin; it != end; ++it) {
+    coll->addGeometry(*it);
+  }
 
-    return std::unique_ptr<Geometry>( coll );
+  return std::unique_ptr<Geometry>(coll);
 }
-}
-}
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif
