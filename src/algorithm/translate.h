@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TRANSLATE_H_
@@ -26,7 +27,7 @@
 #include <SFCGAL/Kernel.h>
 
 namespace SFCGAL {
-class Geometry ;
+class Geometry;
 }
 
 namespace SFCGAL {
@@ -36,20 +37,22 @@ namespace algorithm {
  * @brief translate a geometry from a given vector
  * @todo unittest
  */
-SFCGAL_API void       translate( Geometry& g, const Kernel::Vector_3& v ) ;
+SFCGAL_API void
+translate(Geometry &g, const Kernel::Vector_3 &v);
 /**
  * @brief translate a geometry from a given vector
  * @todo unittest
  */
-SFCGAL_API void       translate( Geometry& g, const Kernel::Vector_2& v ) ;
+SFCGAL_API void
+translate(Geometry &g, const Kernel::Vector_2 &v);
 /**
  * @brief translate a geometry from a given vector
  * @todo unittest
  */
-SFCGAL_API void       translate( Geometry& g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz ) ;
+SFCGAL_API void
+translate(Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz);
 
 } // namespace algorithm
 } // namespace SFCGAL
 
 #endif
-

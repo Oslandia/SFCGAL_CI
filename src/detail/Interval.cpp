@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/detail/Interval.h>
@@ -23,170 +24,147 @@
 
 #include <algorithm>
 
-
 namespace SFCGAL {
 namespace detail {
 
 ///
 ///
 ///
-Interval::Interval():
-    _lower( NaN() ),
-    _upper( NaN() )
-{
+Interval::Interval() : _lower(NaN()), _upper(NaN()) {}
 
+///
+///
+///
+Interval::Interval(const double &value) : _lower(value), _upper(value) {}
+
+///
+///
+///
+Interval::Interval(const double &v1, const double &v2)
+    : _lower(std::min(v1, v2)), _upper(std::max(v1, v2))
+{
 }
 
 ///
 ///
 ///
-Interval::Interval( const double& value ):
-    _lower( value ),
-    _upper( value )
+Interval::Interval(const Interval &other)
+    : _lower(other._lower), _upper(other._upper)
 {
-
 }
 
 ///
 ///
 ///
-Interval::Interval( const double& v1, const double& v2 ):
-    _lower( std::min( v1,v2 ) ),
-    _upper( std::max( v1,v2 ) )
+Interval &
+Interval::operator=(const Interval &other)
 {
-
-}
-
-
-///
-///
-///
-Interval::Interval( const Interval& other ):
-    _lower( other._lower ),
-    _upper( other._upper )
-{
-
-}
-
-
-///
-///
-///
-Interval& Interval::operator = ( const Interval& other )
-{
-    _lower = other._lower ;
-    _upper = other._upper ;
-    return *this ;
-}
-
-
-///
-///
-///
-Interval::~Interval()
-{
-
-}
-
-
-///
-///
-///
-bool Interval::isEmpty() const
-{
-    return std::isnan( _lower ) || std::isnan( _upper );
-}
-
-
-
-///
-///
-///
-void  Interval::expandBy( const double& d )
-{
-    if ( isEmpty() ) {
-        return ;
-    }
-
-    _lower = _lower - d ;
-    _upper = _upper + d ;
+  _lower = other._lower;
+  _upper = other._upper;
+  return *this;
 }
 
 ///
 ///
 ///
-void  Interval::expandToInclude( const Interval& other )
+Interval::~Interval() {}
+
+///
+///
+///
+bool
+Interval::isEmpty() const
 {
-    //ignore empty interval
-    if ( other.isEmpty() ) {
-        return ;
-    }
-
-    if ( isEmpty() ) {
-        ( *this ) = other ;
-    }
-    else {
-        _lower = std::min( _lower, other._lower );
-        _upper = std::max( _upper, other._upper );
-    }
-}
-
-
-
-///
-///
-///
-void  Interval::expandToInclude( const double& value )
-{
-    if ( std::isnan( value ) ) {
-        return ;
-    }
-
-    if ( isEmpty() ) {
-        _lower = value ;
-        _upper = value ;
-    }
-    else {
-        _lower = std::min( _lower, value ) ;
-        _upper = std::max( _upper, value ) ;
-    }
+  return std::isnan(_lower) || std::isnan(_upper);
 }
 
 ///
 ///
 ///
-bool  Interval::intersects( const Interval& other ) const
+void
+Interval::expandBy(const double &d)
 {
-    //empty intervals never intersects
-    if ( isEmpty() || other.isEmpty() ) {
-        return false ;
-    }
+  if (isEmpty()) {
+    return;
+  }
 
-    return ! ( _lower > other._upper || _upper < other._lower ) ;
+  _lower = _lower - d;
+  _upper = _upper + d;
 }
 
 ///
 ///
 ///
-bool Interval::operator == ( const Interval& other ) const
+void
+Interval::expandToInclude(const Interval &other)
 {
-    if ( isEmpty() && other.isEmpty() ) {
-        return true ;
-    }
+  // ignore empty interval
+  if (other.isEmpty()) {
+    return;
+  }
 
-    return _lower == other._lower && _upper == other._upper ;
+  if (isEmpty()) {
+    (*this) = other;
+  } else {
+    _lower = std::min(_lower, other._lower);
+    _upper = std::max(_upper, other._upper);
+  }
 }
 
 ///
 ///
 ///
-bool Interval::operator != ( const Interval& other ) const
+void
+Interval::expandToInclude(const double &value)
 {
-    return ! ( ( *this ) == other );
+  if (std::isnan(value)) {
+    return;
+  }
+
+  if (isEmpty()) {
+    _lower = value;
+    _upper = value;
+  } else {
+    _lower = std::min(_lower, value);
+    _upper = std::max(_upper, value);
+  }
 }
 
+///
+///
+///
+bool
+Interval::intersects(const Interval &other) const
+{
+  // empty intervals never intersects
+  if (isEmpty() || other.isEmpty()) {
+    return false;
+  }
 
+  return !(_lower > other._upper || _upper < other._lower);
+}
 
-}//detail
-}//SFCGAL
+///
+///
+///
+bool
+Interval::operator==(const Interval &other) const
+{
+  if (isEmpty() && other.isEmpty()) {
+    return true;
+  }
 
+  return _lower == other._lower && _upper == other._upper;
+}
+
+///
+///
+///
+bool
+Interval::operator!=(const Interval &other) const
+{
+  return !((*this) == other);
+}
+
+} // namespace detail
+} // namespace SFCGAL

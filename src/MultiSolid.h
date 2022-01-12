@@ -15,19 +15,20 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_MULTISOLID_H_
 #define _SFCGAL_MULTISOLID_H_
 
-#include <vector>
 #include <boost/assert.hpp>
+#include <vector>
 
 #include <boost/serialization/base_object.hpp>
 
-#include <SFCGAL/Solid.h>
 #include <SFCGAL/GeometryCollection.h>
+#include <SFCGAL/Solid.h>
 
 namespace SFCGAL {
 
@@ -37,66 +38,77 @@ namespace SFCGAL {
  */
 class SFCGAL_API MultiSolid : public GeometryCollection {
 public:
-    /**
-     * Empty MultiSolid constructor
-     */
-    MultiSolid() ;
-    /**
-     * Copy constructor
-     */
-    MultiSolid( const MultiSolid& other ) ;
-    /**
-     * assign operator
-     */
-    MultiSolid& operator = ( MultiSolid other ) ;
-    /**
-     * destructor
-     */
-    virtual ~MultiSolid() ;
+  /**
+   * Empty MultiSolid constructor
+   */
+  MultiSolid();
+  /**
+   * Copy constructor
+   */
+  MultiSolid(const MultiSolid &other);
+  /**
+   * assign operator
+   */
+  MultiSolid &
+  operator=(MultiSolid other);
+  /**
+   * destructor
+   */
+  virtual ~MultiSolid();
 
-    //-- SFCGAL::Geometry
-    virtual MultiSolid*    clone() const ;
+  //-- SFCGAL::Geometry
+  virtual MultiSolid *
+  clone() const;
 
-    //-- SFCGAL::Geometry
-    virtual std::string    geometryType() const ;
-    //-- SFCGAL::Geometry
-    virtual GeometryType   geometryTypeId() const ;
+  //-- SFCGAL::Geometry
+  virtual std::string
+  geometryType() const;
+  //-- SFCGAL::Geometry
+  virtual GeometryType
+  geometryTypeId() const;
 
-    /**
-     * returns the n-th Geometry as a Solid
-     */
-    inline Solid&          solidN( const size_t& n ) {
-        return geometryN( n ).as< Solid >() ;
-    }
-    /**
-     * returns the n-th Geometry as a Solid
-     */
-    inline const Solid&    solidN( const size_t& n ) const {
-        return geometryN( n ).as< Solid >() ;
-    }
+  /**
+   * returns the n-th Geometry as a Solid
+   */
+  inline Solid &
+  solidN(const size_t &n)
+  {
+    return geometryN(n).as<Solid>();
+  }
+  /**
+   * returns the n-th Geometry as a Solid
+   */
+  inline const Solid &
+  solidN(const size_t &n) const
+  {
+    return geometryN(n).as<Solid>();
+  }
 
+  //-- visitors
 
-    //-- visitors
+  //-- SFCGAL::Geometry
+  virtual void
+  accept(GeometryVisitor &visitor);
+  //-- SFCGAL::Geometry
+  virtual void
+  accept(ConstGeometryVisitor &visitor) const;
 
-    //-- SFCGAL::Geometry
-    virtual void accept( GeometryVisitor& visitor ) ;
-    //-- SFCGAL::Geometry
-    virtual void accept( ConstGeometryVisitor& visitor ) const ;
+  /**
+   * Serializer
+   */
+  template <class Archive>
+  void
+  serialize(Archive &ar, const unsigned int /*version*/)
+  {
+    ar &boost::serialization::base_object<GeometryCollection>(*this);
+  }
 
-    /**
-     * Serializer
-     */
-    template <class Archive>
-    void serialize( Archive& ar, const unsigned int /*version*/ ) {
-        ar& boost::serialization::base_object<GeometryCollection>( *this );
-
-    }
 protected:
-    //-- SFCGAL::GeometryCollection
-    virtual bool           isAllowed( Geometry const& g ) ;
+  //-- SFCGAL::GeometryCollection
+  virtual bool
+  isAllowed(Geometry const &g);
 };
 
-
-}
+} // namespace SFCGAL
 
 #endif

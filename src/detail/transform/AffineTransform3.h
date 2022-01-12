@@ -15,15 +15,16 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TRANSFORM_AFFINETRANSFORM3_H_
 #define _SFCGAL_TRANSFORM_AFFINETRANSFORM3_H_
 
-#include <SFCGAL/config.h>
 #include <SFCGAL/Kernel.h>
 #include <SFCGAL/Transform.h>
+#include <SFCGAL/config.h>
 
 #include <CGAL/Aff_transformation_3.h>
 
@@ -36,36 +37,38 @@ namespace transform {
  */
 class SFCGAL_API AffineTransform3 : public Transform {
 public:
-    /**
-     * Constructor with a transform
-     */
-    AffineTransform3( CGAL::Aff_transformation_3< Kernel > transform ) ;
+  /**
+   * Constructor with a transform
+   */
+  AffineTransform3(CGAL::Aff_transformation_3<Kernel> transform);
 
-    /*
-     * [SFCGAL::Transform]
-     */
-    virtual void transform( Point& p ) ;
+  /*
+   * [SFCGAL::Transform]
+   */
+  virtual void
+  transform(Point &p);
 
-    virtual void transform( LineString& ls ) ;
-    virtual void transform( Triangle& tri ) ;
-    virtual void transform( Polygon& poly ) ;
+  virtual void
+  transform(LineString &ls);
+  virtual void
+  transform(Triangle &tri);
+  virtual void
+  transform(Polygon &poly);
 
-    virtual void transform( PolyhedralSurface& surf ) ;
+  virtual void
+  transform(PolyhedralSurface &surf);
 
-    virtual void transform( TriangulatedSurface& surf ) ;
+  virtual void
+  transform(TriangulatedSurface &surf);
 
-    virtual void transform( Solid& solid ) ;
+  virtual void
+  transform(Solid &solid);
 
 private:
-    CGAL::Aff_transformation_3< Kernel > _transform ;
+  CGAL::Aff_transformation_3<Kernel> _transform;
 };
 
-
-}//transform
-}//SFCGAL
-
-
-
+} // namespace transform
+} // namespace SFCGAL
 
 #endif
-

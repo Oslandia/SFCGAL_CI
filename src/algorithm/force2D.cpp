@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/algorithm/force2D.h>
@@ -27,12 +28,12 @@ namespace algorithm {
 ///
 ///
 ///
-void force2D( Geometry& g )
+void
+force2D(Geometry &g)
 {
-    transform::Force2D t ;
-    g.accept( t ) ;
+  transform::Force2D t;
+  g.accept(t);
 }
 
 } // namespace algorithm
 } // namespace SFCGAL
-

@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_GRAPH_EDGE_H_
@@ -27,16 +28,16 @@ namespace SFCGAL {
 namespace graph {
 
 /**
- * @brief [private]An edge in a GeometryGraph with minimal requirements (some algorithms could need
- * more information)
+ * @brief [private]An edge in a GeometryGraph with minimal requirements (some
+ * algorithms could need more information)
  */
 struct SFCGAL_API Edge {
-    Edge( const int& face_ = -1 );
+  Edge(const int &face_ = -1);
 
-    int face ;
+  int face;
 };
 
-}//graph
-}//SFCGAL
+} // namespace graph
+} // namespace SFCGAL
 
 #endif

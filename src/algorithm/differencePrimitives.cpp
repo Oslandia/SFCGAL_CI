@@ -15,18 +15,21 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/Triangle.h>
-// GOTCHA do not include the header, this is a trick to avoid ambiguous def in CGAL
+// GOTCHA do not include the header, this is a trick to avoid ambiguous def in
+// CGAL
 
 namespace SFCGAL {
 namespace algorithm {
-CGAL::Object intersection( const CGAL::Triangle_3<Kernel>& a, const CGAL::Triangle_3<Kernel>& b )
+CGAL::Object
+intersection(const CGAL::Triangle_3<Kernel> &a,
+             const CGAL::Triangle_3<Kernel> &b)
 {
-    return CGAL::intersection( a, b );
+  return CGAL::intersection(a, b);
 }
-}
-}
-
+} // namespace algorithm
+} // namespace SFCGAL

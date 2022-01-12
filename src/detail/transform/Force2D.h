@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TRANSFORM_FORCE2D_H_
@@ -34,17 +35,14 @@ namespace transform {
  */
 class SFCGAL_API Force2D : public Transform {
 public:
-    /*
-     * [SFCGAL::Transform]
-     */
-    virtual void transform( Point& p ) ;
+  /*
+   * [SFCGAL::Transform]
+   */
+  virtual void
+  transform(Point &p);
 };
 
-}//transform
-}//SFCGAL
-
-
-
+} // namespace transform
+} // namespace SFCGAL
 
 #endif
-

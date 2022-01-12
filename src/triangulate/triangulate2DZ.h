@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TRIANGULATE_TRIANGULATE2DZ_H_
@@ -29,16 +30,19 @@
 namespace SFCGAL {
 namespace triangulate {
 /**
- * @brief Constraint 2DZ Delaunay Triangulation (keep Z if defined, a projectionPlane may be provided)
+ * @brief Constraint 2DZ Delaunay Triangulation (keep Z if defined, a
+ * projectionPlane may be provided)
  */
-SFCGAL_API void triangulate2DZ( const Geometry& g, ConstraintDelaunayTriangulation& triangulate );
+SFCGAL_API void
+triangulate2DZ(const Geometry &g, ConstraintDelaunayTriangulation &triangulate);
 /**
- * @brief Constraint 2DZ Delaunay Triangulation (keep Z if defined, project points in OXY plane)
+ * @brief Constraint 2DZ Delaunay Triangulation (keep Z if defined, project
+ * points in OXY plane)
  */
-SFCGAL_API ConstraintDelaunayTriangulation triangulate2DZ( const Geometry& g );
+SFCGAL_API ConstraintDelaunayTriangulation
+           triangulate2DZ(const Geometry &g);
 
-}//algorithm
-}//SFCGAL
+} // namespace triangulate
+} // namespace SFCGAL
 
 #endif
-

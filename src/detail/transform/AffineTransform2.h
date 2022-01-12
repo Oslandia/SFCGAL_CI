@@ -15,18 +15,18 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TRANSFORM_AFFINETRANSFORM2_H_
 #define _SFCGAL_TRANSFORM_AFFINETRANSFORM2_H_
 
-#include <SFCGAL/config.h>
 #include <SFCGAL/Kernel.h>
 #include <SFCGAL/Transform.h>
+#include <SFCGAL/config.h>
 
 #include <CGAL/Aff_transformation_2.h>
-
 
 namespace SFCGAL {
 namespace transform {
@@ -37,26 +37,22 @@ namespace transform {
  */
 class SFCGAL_API AffineTransform2 : public Transform {
 public:
-    /**
-     * Constructor with a transform
-     */
-    AffineTransform2( CGAL::Aff_transformation_2< Kernel > transform ) ;
+  /**
+   * Constructor with a transform
+   */
+  AffineTransform2(CGAL::Aff_transformation_2<Kernel> transform);
 
-    /*
-     * [SFCGAL::Transform]
-     */
-    virtual void transform( Point& p ) ;
+  /*
+   * [SFCGAL::Transform]
+   */
+  virtual void
+  transform(Point &p);
 
 private:
-    CGAL::Aff_transformation_2< Kernel > _transform ;
+  CGAL::Aff_transformation_2<Kernel> _transform;
 };
 
-
-}//transform
-}//SFCGAL
-
-
-
+} // namespace transform
+} // namespace SFCGAL
 
 #endif
-

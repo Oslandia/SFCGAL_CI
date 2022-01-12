@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TRANSFORM_FORCE_ORDER_POINTS_H_
@@ -37,29 +38,27 @@ namespace transform {
  */
 class SFCGAL_API ForceOrderPoints : public Transform {
 public:
-    /**
-     * Pass the forced orientation as parameter
-     */
-    ForceOrderPoints( bool orientCCW = true ) ;
+  /**
+   * Pass the forced orientation as parameter
+   */
+  ForceOrderPoints(bool orientCCW = true);
 
-    /*
-     * [SFCGAL::Transform]
-     */
-    virtual void transform( Point& p ) ;
+  /*
+   * [SFCGAL::Transform]
+   */
+  virtual void
+  transform(Point &p);
 
-    virtual void visit( Triangle& );
-    virtual void visit( Polygon& );
+  virtual void
+  visit(Triangle &);
+  virtual void
+  visit(Polygon &);
 
 private:
-    bool _orientCCW;
+  bool _orientCCW;
 };
 
-
-}//transform
-}//SFCGAL
-
-
-
+} // namespace transform
+} // namespace SFCGAL
 
 #endif
-

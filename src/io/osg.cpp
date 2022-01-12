@@ -15,18 +15,19 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/config.h>
 #ifdef SFCGAL_WITH_OSG
 
-#include <SFCGAL/io/osg.h>
 #include <SFCGAL/detail/io/OsgFactory.h>
+#include <SFCGAL/io/osg.h>
 
+#include <osg/Geode>
 #include <osg/Geometry>
 #include <osg/Group>
-#include <osg/Geode>
 
 #include <osgDB/WriteFile>
 
@@ -36,29 +37,28 @@ namespace io {
 ///
 ///
 ///
-void osgWriteFile( const Geometry& g, const std::string& filepath )
+void
+osgWriteFile(const Geometry &g, const std::string &filepath)
 {
-    SFCGAL::detail::io::OsgFactory factory ;
-    osg::ref_ptr< osg::Geometry > osgGeometry = factory.createGeometry( g );
-    osg::ref_ptr< osg::Geode > geode = new osg::Geode;
-    geode->setName( g.geometryType() );
-    geode->addDrawable( osgGeometry );
-    osgDB::writeNodeFile( *geode, filepath ) ;
+  SFCGAL::detail::io::OsgFactory factory;
+  osg::ref_ptr<osg::Geometry>    osgGeometry = factory.createGeometry(g);
+  osg::ref_ptr<osg::Geode>       geode       = new osg::Geode;
+  geode->setName(g.geometryType());
+  geode->addDrawable(osgGeometry);
+  osgDB::writeNodeFile(*geode, filepath);
 }
 
-
 ///
 ///
 ///
-osg::Geometry* toOsgGeometry( const Geometry& g )
+osg::Geometry *
+toOsgGeometry(const Geometry &g)
 {
-    SFCGAL::detail::io::OsgFactory factory ;
-    return factory.createGeometry( g ) ;
+  SFCGAL::detail::io::OsgFactory factory;
+  return factory.createGeometry(g);
 }
-
 
 } // namespace io
 } // namespace SFCGAL
 
-
-#endif //SFCGAL_WITH_OSG
+#endif // SFCGAL_WITH_OSG

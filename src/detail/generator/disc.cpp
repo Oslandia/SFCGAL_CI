@@ -15,18 +15,18 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-
 #ifdef _MSC_VER
-#  define _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
 #endif
 
 #include <SFCGAL/detail/generator/disc.h>
 
-#include <SFCGAL/Point.h>
 #include <SFCGAL/LineString.h>
+#include <SFCGAL/Point.h>
 #include <SFCGAL/Polygon.h>
 
 #include <cmath>
@@ -37,28 +37,27 @@ namespace generator {
 ///
 ///
 ///
-std::unique_ptr< Polygon > disc(
-    const Point& center,
-    const double& radius,
-    const unsigned int& nQuadrantSegments
-)
+std::unique_ptr<Polygon>
+disc(const Point &center, const double &radius,
+     const unsigned int &nQuadrantSegments)
 {
-    BOOST_ASSERT( nQuadrantSegments > 1 );
+  BOOST_ASSERT(nQuadrantSegments > 1);
 
-    std::unique_ptr< LineString > exteriorRing( new LineString() ) ;
+  std::unique_ptr<LineString> exteriorRing(new LineString());
 
-    double dTheta = M_PI_4 / nQuadrantSegments ;
+  double dTheta = M_PI_4 / nQuadrantSegments;
 
-    for ( size_t i = 0; i < nQuadrantSegments * 4; i++ ) {
-        Kernel::Vector_2 p = center.toVector_2() + radius * Kernel::Vector_2( cos( i*dTheta ), sin( i*dTheta ) ) ;
-        exteriorRing->addPoint( new Point( p.x(), p.y() ) ) ;
-    }
+  for (size_t i = 0; i < nQuadrantSegments * 4; i++) {
+    Kernel::Vector_2 p =
+        center.toVector_2() +
+        radius * Kernel::Vector_2(cos(i * dTheta), sin(i * dTheta));
+    exteriorRing->addPoint(new Point(p.x(), p.y()));
+  }
 
-    exteriorRing->addPoint( exteriorRing->startPoint() ) ;
+  exteriorRing->addPoint(exteriorRing->startPoint());
 
-    return std::unique_ptr< Polygon >( new Polygon( exteriorRing.release() ) );
+  return std::unique_ptr<Polygon>(new Polygon(exteriorRing.release()));
 }
 
 } // namespace generator
 } // namespace SFCGAL
-

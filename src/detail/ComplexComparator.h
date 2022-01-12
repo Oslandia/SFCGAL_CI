@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_DETAIL_COMPLEXCOMPARATOR_H_
@@ -32,15 +33,16 @@ namespace detail {
  * lexicographic order on complex
  */
 struct SFCGAL_API ComplexComparator {
-    template < typename T >
-    inline bool operator () ( const std::complex< T >& a, const std::complex< T >& b ) const {
-        return ( a.real() < b.real() ) || ( a.real() == b.real() && a.imag() < b.imag() );
-    }
+  template <typename T>
+  inline bool
+  operator()(const std::complex<T> &a, const std::complex<T> &b) const
+  {
+    return (a.real() < b.real()) ||
+           (a.real() == b.real() && a.imag() < b.imag());
+  }
 };
 
-
-}//detail
-}//SFCGAL
-
+} // namespace detail
+} // namespace SFCGAL
 
 #endif

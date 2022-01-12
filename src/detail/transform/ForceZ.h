@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TRANSFORM_FORCEZ_H_
@@ -34,25 +35,22 @@ namespace transform {
  */
 class SFCGAL_API ForceZ : public Transform {
 public:
-    /**
-     * Constructor with a default Z value
-     */
-    ForceZ( const Kernel::FT& defaultZ = 0 ) ;
+  /**
+   * Constructor with a default Z value
+   */
+  ForceZ(const Kernel::FT &defaultZ = 0);
 
-    /*
-     * [SFCGAL::Transform]
-     */
-    virtual void transform( Point& p ) ;
+  /*
+   * [SFCGAL::Transform]
+   */
+  virtual void
+  transform(Point &p);
 
 private:
-    Kernel::FT _defaultZ ;
+  Kernel::FT _defaultZ;
 };
 
-}//transform
-}//SFCGAL
-
-
-
+} // namespace transform
+} // namespace SFCGAL
 
 #endif
-

@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_ISVALID_H_
@@ -30,12 +31,17 @@ namespace SFCGAL {
 
 /**
  * Functions used to assert for geometry validity
- * @note exception message is apparently limited in length, thus print the reason for invalidity before its text representation (that can be very long)
+ * @note exception message is apparently limited in length, thus print the
+ * reason for invalidity before its text representation (that can be very long)
  */
-void SFCGAL_API SFCGAL_ASSERT_GEOMETRY_VALIDITY( const Geometry& g );
-void SFCGAL_API SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D( const Geometry& g );
-void SFCGAL_API SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D( const Geometry& g );
-void SFCGAL_API SFCGAL_ASSERT_GEOMETRY_VALIDITY_ON_PLANE( const Geometry& g );
+void SFCGAL_API
+     SFCGAL_ASSERT_GEOMETRY_VALIDITY(const Geometry &g);
+void SFCGAL_API
+     SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(const Geometry &g);
+void SFCGAL_API
+     SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(const Geometry &g);
+void SFCGAL_API
+     SFCGAL_ASSERT_GEOMETRY_VALIDITY_ON_PLANE(const Geometry &g);
 
 namespace algorithm {
 
@@ -43,22 +49,25 @@ namespace algorithm {
  * @brief Check validity of a geometry
  * @ingroup public_api
  */
-SFCGAL_API const Validity isValid( const Geometry& g, const double& toleranceAbs= 1e-9 );
+SFCGAL_API const Validity
+                 isValid(const Geometry &g, const double &toleranceAbs = 1e-9);
 
 /**
- * Sets the geometry flag on a geometry and propagate to every internal geometries
+ * Sets the geometry flag on a geometry and propagate to every internal
+ * geometries
  * @ingroup public_api
  */
-SFCGAL_API void propagateValidityFlag( Geometry& g, bool valid );
+SFCGAL_API void
+propagateValidityFlag(Geometry &g, bool valid);
 
 /**
  * Tag used for variants of algorithm that do not do validity check
  * @ingroup public_api
  */
-struct NoValidityCheck {};
+struct NoValidityCheck {
+};
 
-}//algorithm
-}//SFCGAL
-
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif

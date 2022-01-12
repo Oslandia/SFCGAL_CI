@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TRIANGULATE_IN_GEOMETRY_SET_H_
@@ -29,16 +30,21 @@ namespace SFCGAL {
 namespace triangulate {
 
 /**
- * Populate the GeometrySet<3> geometry with the triangulation (list of triangles) of a polyhedron
+ * Populate the GeometrySet<3> geometry with the triangulation (list of
+ * triangles) of a polyhedron
  */
-SFCGAL_API void triangulate( const detail::MarkedPolyhedron& polyhedron, detail::GeometrySet<3>& geometry );
+SFCGAL_API void
+triangulate(const detail::MarkedPolyhedron &polyhedron,
+            detail::GeometrySet<3> &        geometry);
 /**
- * Populate the GeometrySet<2> geometry with the triangulation (list of polygons) of a polygon
+ * Populate the GeometrySet<2> geometry with the triangulation (list of
+ * polygons) of a polygon
  */
-SFCGAL_API void triangulate( const CGAL::Polygon_with_holes_2<Kernel>& polygon, detail::GeometrySet<2>& geometry );
+SFCGAL_API void
+triangulate(const CGAL::Polygon_with_holes_2<Kernel> &polygon,
+            detail::GeometrySet<2> &                  geometry);
 
-}//algorithm
-}//SFCGAL
+} // namespace triangulate
+} // namespace SFCGAL
 
 #endif
-

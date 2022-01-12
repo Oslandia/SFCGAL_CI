@@ -15,11 +15,12 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#include <SFCGAL/PolyhedralSurface.h>
 #include <SFCGAL/GeometryVisitor.h>
+#include <SFCGAL/PolyhedralSurface.h>
 
 using namespace SFCGAL::detail;
 
@@ -28,233 +29,231 @@ namespace SFCGAL {
 ///
 ///
 ///
-PolyhedralSurface::PolyhedralSurface():
-    Surface(),
-    _polygons()
-{
+PolyhedralSurface::PolyhedralSurface() : Surface(), _polygons() {}
 
+///
+///
+///
+PolyhedralSurface::PolyhedralSurface(const std::vector<Polygon> &polygons)
+    : Surface()
+{
+  for (size_t i = 0; i < polygons.size(); i++) {
+    _polygons.push_back(polygons[i].clone());
+  }
 }
 
 ///
 ///
 ///
-PolyhedralSurface::PolyhedralSurface( const std::vector< Polygon >& polygons ) :
-    Surface()
+PolyhedralSurface::PolyhedralSurface(const PolyhedralSurface &other)
+    : Surface(other), _polygons(other._polygons)
 {
-    for ( size_t i = 0; i < polygons.size(); i++ ) {
-        _polygons.push_back( polygons[i].clone() ) ;
-    }
 }
 
 ///
 ///
 ///
-PolyhedralSurface::PolyhedralSurface( const PolyhedralSurface& other ) :
-    Surface(other),
-    _polygons( other._polygons )
+PolyhedralSurface::PolyhedralSurface(const MarkedPolyhedron &poly) : Surface()
 {
+  for (MarkedPolyhedron::Facet_const_iterator fit = poly.facets_begin();
+       fit != poly.facets_end(); ++fit) {
+    LineString *face = new LineString();
+    MarkedPolyhedron::Halfedge_around_facet_const_circulator hit =
+        fit->facet_begin();
 
+    do {
+      face->addPoint(hit->vertex()->point());
+      ++hit;
+    } while (hit != fit->facet_begin());
+
+    // close the ring
+    face->addPoint(hit->vertex()->point());
+    _polygons.push_back(new Polygon(face));
+  }
 }
 
 ///
 ///
 ///
-PolyhedralSurface::PolyhedralSurface( const MarkedPolyhedron& poly ) :
-    Surface()
+PolyhedralSurface &
+PolyhedralSurface::operator=(PolyhedralSurface other)
 {
-    for ( MarkedPolyhedron::Facet_const_iterator fit = poly.facets_begin(); fit != poly.facets_end(); ++fit ) {
-        LineString* face = new LineString();
-        MarkedPolyhedron::Halfedge_around_facet_const_circulator hit = fit->facet_begin();
-
-        do {
-            face->addPoint( hit->vertex()->point() );
-            ++hit;
-        }
-        while ( hit != fit->facet_begin() );
-
-        // close the ring
-        face->addPoint( hit->vertex()->point() );
-        _polygons.push_back( new Polygon( face ) );
-    }
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-PolyhedralSurface& PolyhedralSurface::operator = ( PolyhedralSurface other )
+PolyhedralSurface::~PolyhedralSurface() {}
+
+///
+///
+///
+PolyhedralSurface *
+PolyhedralSurface::clone() const
 {
-    swap( other );
-    return *this ;
-}
-
-
-///
-///
-///
-PolyhedralSurface::~PolyhedralSurface()
-{
-
+  return new PolyhedralSurface(*this);
 }
 
 ///
 ///
 ///
-PolyhedralSurface* PolyhedralSurface::clone() const
+std::string
+PolyhedralSurface::geometryType() const
 {
-    return new PolyhedralSurface( *this );
+  return "PolyhedralSurface";
 }
 
 ///
 ///
 ///
-std::string  PolyhedralSurface::geometryType() const
+GeometryType
+PolyhedralSurface::geometryTypeId() const
 {
-    return "PolyhedralSurface" ;
+  return TYPE_POLYHEDRALSURFACE;
 }
 
 ///
 ///
 ///
-GeometryType  PolyhedralSurface::geometryTypeId() const
+int
+PolyhedralSurface::dimension() const
 {
-    return TYPE_POLYHEDRALSURFACE ;
+  return 2;
 }
 
 ///
 ///
 ///
-int  PolyhedralSurface::dimension() const
+int
+PolyhedralSurface::coordinateDimension() const
 {
-    return 2 ;
+  if (isEmpty()) {
+    return 0;
+  } else {
+    return _polygons.front().coordinateDimension();
+  }
 }
 
 ///
 ///
 ///
-int  PolyhedralSurface::coordinateDimension() const
+bool
+PolyhedralSurface::isEmpty() const
 {
-    if ( isEmpty() ) {
-        return 0 ;
-    }
-    else {
-        return _polygons.front().coordinateDimension() ;
-    }
+  return _polygons.empty();
 }
 
 ///
 ///
 ///
-bool  PolyhedralSurface::isEmpty() const
+bool
+PolyhedralSurface::is3D() const
 {
-    return _polygons.empty();
+  if (isEmpty()) {
+    return false;
+  } else {
+    return _polygons.front().is3D();
+  }
 }
 
 ///
 ///
 ///
-bool  PolyhedralSurface::is3D() const
+bool
+PolyhedralSurface::isMeasured() const
 {
-    if ( isEmpty() ) {
-        return false ;
-    }
-    else {
-        return _polygons.front().is3D() ;
-    }
+  if (isEmpty()) {
+    return false;
+  } else {
+    return _polygons.front().isMeasured();
+  }
 }
 
 ///
 ///
 ///
-bool  PolyhedralSurface::isMeasured() const
+TriangulatedSurface
+PolyhedralSurface::toTriangulatedSurface() const
 {
-    if ( isEmpty() ) {
-        return false ;
-    }
-    else {
-        return _polygons.front().isMeasured() ;
-    }
-}
-
-
-
-///
-///
-///
-TriangulatedSurface  PolyhedralSurface::toTriangulatedSurface() const
-{
-    TriangulatedSurface result ;
-    triangulate::triangulatePolygon3D( *this, result );
-    return result ;
+  TriangulatedSurface result;
+  triangulate::triangulatePolygon3D(*this, result);
+  return result;
 }
 
 ///
 ///
 ///
-void  PolyhedralSurface::addPolygon( const Polygon& polygon )
+void
+PolyhedralSurface::addPolygon(const Polygon &polygon)
 {
-    addPolygon( polygon.clone() );
+  addPolygon(polygon.clone());
 }
 
 ///
 ///
 ///
-void  PolyhedralSurface::addPolygon( Polygon* polygon )
+void
+PolyhedralSurface::addPolygon(Polygon *polygon)
 {
-    BOOST_ASSERT( polygon != NULL );
-    _polygons.push_back( polygon );
+  BOOST_ASSERT(polygon != NULL);
+  _polygons.push_back(polygon);
 }
 
 ///
 ///
 ///
-void  PolyhedralSurface::addPolygons( const PolyhedralSurface& polyhedralSurface )
+void
+PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
 {
-    for ( size_t i = 0; i < polyhedralSurface.numPolygons(); i++ ) {
-        addPolygon( polyhedralSurface.polygonN( i ) );
-    }
+  for (size_t i = 0; i < polyhedralSurface.numPolygons(); i++) {
+    addPolygon(polyhedralSurface.polygonN(i));
+  }
 }
 
 ///
 ///
 ///
-size_t   PolyhedralSurface::numGeometries() const
+size_t
+PolyhedralSurface::numGeometries() const
 {
-    return _polygons.size() ;
-}
-
-
-///
-///
-///
-const Polygon&     PolyhedralSurface::geometryN( size_t const& n ) const
-{
-    return _polygons[n] ;
+  return _polygons.size();
 }
 
 ///
 ///
 ///
-Polygon& PolyhedralSurface::geometryN( size_t const& n )
+const Polygon &
+PolyhedralSurface::geometryN(size_t const &n) const
 {
-    return _polygons[n];
+  return _polygons[n];
 }
 
 ///
 ///
 ///
-void PolyhedralSurface::accept( GeometryVisitor& visitor )
+Polygon &
+PolyhedralSurface::geometryN(size_t const &n)
 {
-    return visitor.visit( *this );
+  return _polygons[n];
 }
 
 ///
 ///
 ///
-void PolyhedralSurface::accept( ConstGeometryVisitor& visitor ) const
+void
+PolyhedralSurface::accept(GeometryVisitor &visitor)
 {
-    return visitor.visit( *this );
+  return visitor.visit(*this);
 }
-}//SFCGAL
 
-
-
+///
+///
+///
+void
+PolyhedralSurface::accept(ConstGeometryVisitor &visitor) const
+{
+  return visitor.visit(*this);
+}
+} // namespace SFCGAL

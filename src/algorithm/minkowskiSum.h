@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_MINKOWSKISUM_H_
@@ -23,8 +24,8 @@
 
 #include <SFCGAL/config.h>
 
-#include <memory>
 #include <SFCGAL/Geometry.h>
+#include <memory>
 
 namespace SFCGAL {
 namespace algorithm {
@@ -33,25 +34,31 @@ struct NoValidityCheck;
 /**
  * @brief 2D minkowski sum (p+q)
  *
- * @warning If gA is a polygon, its orientation is taken into account. A "reversed" polygon (with a clockwise-oriented exterior ring) will involve a minkowski difference rather than a sum.
+ * @warning If gA is a polygon, its orientation is taken into account. A
+ * "reversed" polygon (with a clockwise-oriented exterior ring) will involve a
+ * minkowski difference rather than a sum.
  *
  * @todo missing cases (union)
  * @pre gA and gB are valid geometries
  * @ingroup public_api
  */
-SFCGAL_API std::unique_ptr< Geometry > minkowskiSum( const Geometry& gA, const Polygon& gB ) ;
+SFCGAL_API std::unique_ptr<Geometry>
+           minkowskiSum(const Geometry &gA, const Polygon &gB);
 
 /**
  * @brief 2D minkowski sum (p+q)
  *
- * @warning If gA is a polygon, its orientation is taken into account. A "reversed" polygon (with a clockwise-oriented exterior ring) will involve a minkowski difference rather than a sum.
+ * @warning If gA is a polygon, its orientation is taken into account. A
+ * "reversed" polygon (with a clockwise-oriented exterior ring) will involve a
+ * minkowski difference rather than a sum.
  *
  * @todo missing cases (union)
  * @pre gA and gB are valid geometries
  * @ingroup detail
  * @warning@ No actual validity check is done.
  */
-SFCGAL_API std::unique_ptr< Geometry > minkowskiSum( const Geometry& gA, const Polygon& gB, NoValidityCheck ) ;
+SFCGAL_API std::unique_ptr<Geometry>
+           minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck);
 
 } // namespace algorithm
 } // namespace SFCGAL

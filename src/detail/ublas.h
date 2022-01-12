@@ -15,18 +15,19 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_UBLAS_H_
 #define _SFCGAL_UBLAS_H_
 
-#include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 
 namespace SFCGAL {
 namespace detail {
-namespace ublas = boost::numeric::ublas ;
+namespace ublas = boost::numeric::ublas;
 } // namespace detail
 } // namespace SFCGAL
 

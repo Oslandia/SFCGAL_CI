@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TRIANGULATE_TRIANGULATEPOLYGON_H_
@@ -37,70 +38,61 @@ namespace triangulate {
  * @todo unittest
  * @ingroup detail
  */
-SFCGAL_API void triangulatePolygon3D(
-    const Geometry& g,
-    TriangulatedSurface& triangulatedSurface
-);
+SFCGAL_API void
+triangulatePolygon3D(const Geometry &     g,
+                     TriangulatedSurface &triangulatedSurface);
 /**
  * @brief Triangulate a 3D Polygon
  * @todo unittest
  * @ingroup detail
  */
-SFCGAL_API void triangulatePolygon3D(
-    const Polygon& g,
-    TriangulatedSurface& triangulatedSurface
-);
+SFCGAL_API void
+triangulatePolygon3D(const Polygon &      g,
+                     TriangulatedSurface &triangulatedSurface);
 /**
  * @brief Triangulate a 3D Triangle (copy triangle)
  * @todo unittest
  * @ingroup detail
  */
-SFCGAL_API void triangulatePolygon3D(
-    const Triangle& g,
-    TriangulatedSurface& triangulatedSurface
-);
+SFCGAL_API void
+triangulatePolygon3D(const Triangle &     g,
+                     TriangulatedSurface &triangulatedSurface);
 /**
  * @brief Triangulate a 3D TriangulatedSurface (copy triangles)
  *
  * @todo unittest
  * @ingroup detail
  */
-SFCGAL_API void triangulatePolygon3D(
-    const TriangulatedSurface& g,
-    TriangulatedSurface& triangulatedSurface
-);
+SFCGAL_API void
+triangulatePolygon3D(const TriangulatedSurface &g,
+                     TriangulatedSurface &      triangulatedSurface);
 /**
  * @brief Triangulate a 3D MultiPolygon
  * @todo unittest
  * @ingroup detail
  */
-SFCGAL_API void opentriangulatePolygon3D(
-    const GeometryCollection& g,
-    TriangulatedSurface& triangulatedSurface
-);
+SFCGAL_API void
+opentriangulatePolygon3D(const GeometryCollection &g,
+                         TriangulatedSurface &     triangulatedSurface);
 /**
  * @brief Triangulate 3D polygons in a PolyhedralSurface.
  *
  * @todo unittest
  * @ingroup detail
  */
-SFCGAL_API void triangulatePolygon3D(
-    const PolyhedralSurface& polyhedralSurface,
-    TriangulatedSurface& triangulatedSurface
-);
+SFCGAL_API void
+triangulatePolygon3D(const PolyhedralSurface &polyhedralSurface,
+                     TriangulatedSurface &    triangulatedSurface);
 /**
  * @brief Triangulate a Solid
  *
  * @todo unittest
  * @ingroup detail
  */
-SFCGAL_API void triangulatePolygon3D(
-    const Solid& g,
-    TriangulatedSurface& triangulatedSurface
-);
+SFCGAL_API void
+triangulatePolygon3D(const Solid &g, TriangulatedSurface &triangulatedSurface);
 
-}//algorithm
-}//SFCGAL
+} // namespace triangulate
+} // namespace SFCGAL
 
 #endif
-

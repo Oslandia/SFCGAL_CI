@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/detail/transform/AffineTransform2.h>
@@ -28,27 +29,25 @@ namespace transform {
 ///
 ///
 ///
-AffineTransform2::AffineTransform2( CGAL::Aff_transformation_2< Kernel > transform ):
-    _transform( transform )
+AffineTransform2::AffineTransform2(CGAL::Aff_transformation_2<Kernel> transform)
+    : _transform(transform)
 {
-
 }
 
 /*
  * [SFCGAL::Transform]
  */
-void AffineTransform2::transform( Point& p )
+void
+AffineTransform2::transform(Point &p)
 {
-    if ( ! p.isEmpty() ) {
-        // FIXME add a Point::Point( Kernel::Point_2&, double m );
-        Point pt( p.toPoint_2().transform( _transform ) );
-        if ( p.isMeasured() )
-            pt.setM( p.m() );
-        p = pt;
-    }
+  if (!p.isEmpty()) {
+    // FIXME add a Point::Point( Kernel::Point_2&, double m );
+    Point pt(p.toPoint_2().transform(_transform));
+    if (p.isMeasured())
+      pt.setM(p.m());
+    p = pt;
+  }
 }
 
-
-}//transform
-}//SFCGAL
-
+} // namespace transform
+} // namespace SFCGAL

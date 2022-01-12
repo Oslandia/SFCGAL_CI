@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_DETAIL_FORCEVALIDITY_VISITOR_H_
@@ -30,26 +31,37 @@ namespace detail {
 
 class SFCGAL_API ForceValidityVisitor : public GeometryVisitor {
 public:
-    ForceValidityVisitor( bool valid ) : valid_( valid ) {}    
-    virtual void visit( Point& g ) ;
-    virtual void visit( LineString& g ) ;
-    virtual void visit( Polygon& g ) ;
-    virtual void visit( Triangle& g ) ;
-    virtual void visit( Solid& g ) ;
-    virtual void visit( MultiPoint& g ) ;
-    virtual void visit( MultiLineString& g ) ;
-    virtual void visit( MultiPolygon& g ) ;
-    virtual void visit( MultiSolid& g ) ;
-    virtual void visit( GeometryCollection& g ) ;
-    virtual void visit( PolyhedralSurface& g ) ;
-    virtual void visit( TriangulatedSurface& g ) ;
- private:
-    bool valid_;
+  ForceValidityVisitor(bool valid) : valid_(valid) {}
+  virtual void
+  visit(Point &g);
+  virtual void
+  visit(LineString &g);
+  virtual void
+  visit(Polygon &g);
+  virtual void
+  visit(Triangle &g);
+  virtual void
+  visit(Solid &g);
+  virtual void
+  visit(MultiPoint &g);
+  virtual void
+  visit(MultiLineString &g);
+  virtual void
+  visit(MultiPolygon &g);
+  virtual void
+  visit(MultiSolid &g);
+  virtual void
+  visit(GeometryCollection &g);
+  virtual void
+  visit(PolyhedralSurface &g);
+  virtual void
+  visit(TriangulatedSurface &g);
+
+private:
+  bool valid_;
 };
 
-
-}//detail
-}//SFCGAL
-
+} // namespace detail
+} // namespace SFCGAL
 
 #endif

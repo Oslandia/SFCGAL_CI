@@ -15,14 +15,15 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/algorithm/collectionToMulti.h>
 
 #include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/MultiPoint.h>
 #include <SFCGAL/MultiLineString.h>
+#include <SFCGAL/MultiPoint.h>
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/MultiSolid.h>
 
@@ -31,96 +32,94 @@
 namespace SFCGAL {
 namespace algorithm {
 
-
 // If nothing has to be built, g will be moved to the result without
 // copying and a new allocation. Otherwise, a new geometry is built and
 // the old one is deleted.
-std::unique_ptr<Geometry> collectionToMulti( std::unique_ptr<Geometry> g )
+std::unique_ptr<Geometry>
+collectionToMulti(std::unique_ptr<Geometry> g)
 {
-    if ( ! g->is<GeometryCollection>() ) {
-        // not a collection, nothing to do
-        return g;
+  if (!g->is<GeometryCollection>()) {
+    // not a collection, nothing to do
+    return g;
+  }
+
+  const GeometryCollection &coll = g->as<GeometryCollection>();
+
+  // if it is empty, do not do anything
+  if (coll.isEmpty()) {
+    return g;
+  }
+
+  bool has2d = false;
+  bool has3d = false;
+
+  for (size_t i = 0; i < coll.numGeometries(); ++i) {
+    const Geometry &gi = coll.geometryN(i);
+
+    if (!has3d && gi.is3D()) {
+      has3d = true;
     }
 
-    const GeometryCollection& coll = g->as<GeometryCollection>();
-
-    // if it is empty, do not do anything
-    if ( coll.isEmpty() ) {
-        return g;
+    if (!has2d && !gi.is3D()) {
+      has2d = true;
     }
 
-    bool has2d = false;
-    bool has3d = false;
+    if (!gi.isEmpty() && (gi.geometryTypeId() != TYPE_POLYGON) &&
+        (gi.geometryTypeId() != TYPE_TRIANGLE) &&
+        (gi.geometryTypeId() != TYPE_POLYHEDRALSURFACE) &&
+        (gi.geometryTypeId() != TYPE_TRIANGULATEDSURFACE)) {
+      // it contains a bad type, abort
+      return g;
+    }
+  }
 
-    for ( size_t i = 0; i < coll.numGeometries(); ++i ) {
-        const Geometry& gi = coll.geometryN( i );
+  bool force3d = has2d && has3d;
 
-        if ( !has3d && gi.is3D() ) {
-            has3d = true;
-        }
+  MultiPolygon *ret_geo = new MultiPolygon;
 
-        if ( !has2d && !gi.is3D() ) {
-            has2d = true;
-        }
+  // copy each geometry
+  for (size_t i = 0; i < coll.numGeometries(); ++i) {
 
-        if ( !gi.isEmpty() && ( gi.geometryTypeId() != TYPE_POLYGON ) &&
-                ( gi.geometryTypeId() != TYPE_TRIANGLE ) &&
-                ( gi.geometryTypeId() != TYPE_POLYHEDRALSURFACE ) &&
-                ( gi.geometryTypeId() != TYPE_TRIANGULATEDSURFACE ) ) {
-            // it contains a bad type, abort
-            return g;
-        }
+    Geometry *gi = coll.geometryN(i).clone();
+
+    if (force3d && !gi->is3D()) {
+      transform::ForceZ forceZ;
+      gi->accept(forceZ);
     }
 
-    bool force3d = has2d && has3d;
+    switch (gi->geometryTypeId()) {
+    case TYPE_TRIANGLE:
+      ret_geo->addGeometry(Polygon(gi->as<Triangle>()));
+      break;
 
-    MultiPolygon* ret_geo = new MultiPolygon;
+    case TYPE_TRIANGULATEDSURFACE: {
+      for (size_t j = 0; j < gi->numGeometries(); ++j) {
+        ret_geo->addGeometry(Polygon(gi->geometryN(j).as<Triangle>()));
+      }
+    } break;
 
-    // copy each geometry
-    for ( size_t i = 0; i < coll.numGeometries(); ++i ) {
+    case TYPE_POLYHEDRALSURFACE: {
+      for (size_t j = 0; j < gi->numGeometries(); ++j) {
+        ret_geo->addGeometry(gi->geometryN(j));
+      }
+    } break;
 
-        Geometry* gi = coll.geometryN( i ).clone();
+    case TYPE_GEOMETRYCOLLECTION:
 
-        if ( force3d && !gi->is3D() ) {
-            transform::ForceZ forceZ;
-            gi->accept( forceZ );
-        }
+      // do not include empty geometrycollection
+      if (gi->isEmpty()) {
+        continue;
+      }
+      ret_geo->addGeometry(*gi);
+      break;
 
-        switch ( gi->geometryTypeId() ) {
-        case TYPE_TRIANGLE:
-            ret_geo->addGeometry( Polygon( gi->as<Triangle>() ) );
-            break;
-
-        case TYPE_TRIANGULATEDSURFACE: {
-            for ( size_t j = 0; j < gi->numGeometries(); ++j ) {
-                ret_geo->addGeometry( Polygon( gi->geometryN( j ).as<Triangle>() ) );
-            }
-        }
-        break;
-
-        case TYPE_POLYHEDRALSURFACE: {
-            for ( size_t j = 0; j < gi->numGeometries(); ++j ) {
-                ret_geo->addGeometry( gi->geometryN( j ) );
-            }
-        }
-        break;
-
-        case TYPE_GEOMETRYCOLLECTION:
-
-            // do not include empty geometrycollection
-            if ( gi->isEmpty() ) {
-                continue;
-            }
-            ret_geo->addGeometry( *gi );
-            break;
-
-        default:
-            ret_geo->addGeometry( *gi );
-        }
+    default:
+      ret_geo->addGeometry(*gi);
     }
+  }
 
-    return std::unique_ptr<Geometry>( ret_geo );
+  return std::unique_ptr<Geometry>(ret_geo);
 }
 
-}
-}
+} // namespace algorithm
+} // namespace SFCGAL

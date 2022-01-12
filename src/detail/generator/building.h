@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_GENERATOR_BUILDING_H_
@@ -28,9 +29,9 @@
 #include <SFCGAL/Kernel.h>
 
 namespace SFCGAL {
-class Geometry ;
-class Polygon ;
-}
+class Geometry;
+class Polygon;
+} // namespace SFCGAL
 
 namespace SFCGAL {
 namespace generator {
@@ -41,12 +42,9 @@ namespace generator {
  * @warning only supports Polygon and MultiPolygon
  * @todo unittest
  */
-SFCGAL_API std::unique_ptr< Geometry > building(
-    const Geometry& g,
-    const Kernel::FT& wallHeight,
-    const Kernel::FT& roofSlope
-) ;
-
+SFCGAL_API std::unique_ptr<Geometry>
+           building(const Geometry &g, const Kernel::FT &wallHeight,
+                    const Kernel::FT &roofSlope);
 
 } // namespace generator
 } // namespace SFCGAL

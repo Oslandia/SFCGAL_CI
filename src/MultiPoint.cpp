@@ -15,99 +15,92 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#include <SFCGAL/MultiPoint.h>
 #include <SFCGAL/GeometryVisitor.h>
-
+#include <SFCGAL/MultiPoint.h>
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-MultiPoint::MultiPoint():
-    GeometryCollection()
-{
+MultiPoint::MultiPoint() : GeometryCollection() {}
 
+///
+///
+///
+MultiPoint::MultiPoint(MultiPoint const &other) : GeometryCollection(other) {}
+
+///
+///
+///
+MultiPoint &
+MultiPoint::operator=(MultiPoint other)
+{
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-MultiPoint::MultiPoint( MultiPoint const& other ):
-    GeometryCollection( other )
-{
+MultiPoint::~MultiPoint() {}
 
+///
+///
+///
+MultiPoint *
+MultiPoint::clone() const
+{
+  return new MultiPoint(*this);
 }
 
 ///
 ///
 ///
-MultiPoint& MultiPoint::operator = ( MultiPoint other )
+std::string
+MultiPoint::geometryType() const
 {
-    swap( other ) ;
-    return *this ;
+  return "MultiPoint";
 }
 
 ///
 ///
 ///
-MultiPoint::~MultiPoint()
+GeometryType
+MultiPoint::geometryTypeId() const
 {
-
+  return TYPE_MULTIPOINT;
 }
 
 ///
 ///
 ///
-MultiPoint*    MultiPoint::clone() const
+bool
+MultiPoint::isAllowed(Geometry const &g)
 {
-    return new MultiPoint( *this );
+  return g.geometryTypeId() == TYPE_POINT;
 }
 
 ///
 ///
 ///
-std::string    MultiPoint::geometryType() const
+void
+MultiPoint::accept(GeometryVisitor &visitor)
 {
-    return "MultiPoint" ;
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-GeometryType   MultiPoint::geometryTypeId() const
+void
+MultiPoint::accept(ConstGeometryVisitor &visitor) const
 {
-    return TYPE_MULTIPOINT ;
+  return visitor.visit(*this);
 }
 
-///
-///
-///
-bool           MultiPoint::isAllowed( Geometry const& g )
-{
-    return g.geometryTypeId() == TYPE_POINT ;
-}
-
-
-
-///
-///
-///
-void MultiPoint::accept( GeometryVisitor& visitor )
-{
-    return visitor.visit( *this );
-}
-
-///
-///
-///
-void MultiPoint::accept( ConstGeometryVisitor& visitor ) const
-{
-    return visitor.visit( *this );
-}
-
-}//SFCGAL
-
+} // namespace SFCGAL

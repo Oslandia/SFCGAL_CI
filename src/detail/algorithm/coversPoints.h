@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SFCGAL_COVERS_POINTS_ALGORITHM
@@ -30,20 +31,23 @@ class Geometry;
 namespace detail {
 namespace algorithm {
 
-
 /**
- * Pseudo cover test on 2D geometries. Collect points of gb and tests if no points of gb is outside ga
+ * Pseudo cover test on 2D geometries. Collect points of gb and tests if no
+ * points of gb is outside ga
  * @ingroup@ detail
  */
-SFCGAL_API bool coversPoints( const Geometry& ga, const Geometry& gb );
+SFCGAL_API bool
+coversPoints(const Geometry &ga, const Geometry &gb);
 
 /**
- * Pseudo cover test on 3D geometries. Collect points of gb and tests if no points of gb is outside ga
+ * Pseudo cover test on 3D geometries. Collect points of gb and tests if no
+ * points of gb is outside ga
  * @ingroup@ detail
  */
-SFCGAL_API bool coversPoints3D( const Geometry& ga, const Geometry& gb );
-}
-}
-}
+SFCGAL_API bool
+coversPoints3D(const Geometry &ga, const Geometry &gb);
+} // namespace algorithm
+} // namespace detail
+} // namespace SFCGAL
 
 #endif

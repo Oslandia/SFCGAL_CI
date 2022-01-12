@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_OFFSET_H_
@@ -26,9 +27,9 @@
 #include <memory>
 
 namespace SFCGAL {
-class Geometry ;
-class MultiPolygon ;
-}
+class Geometry;
+class MultiPolygon;
+} // namespace SFCGAL
 
 namespace SFCGAL {
 namespace algorithm {
@@ -41,7 +42,8 @@ struct NoValidityCheck;
  * @pre g is a valid Geometry
  * @ingroup public_api
  */
-SFCGAL_API std::unique_ptr< MultiPolygon > offset( const Geometry& g, const double& r ) ;
+SFCGAL_API std::unique_ptr<MultiPolygon>
+           offset(const Geometry &g, const double &r);
 
 /**
  * @brief [experimental]compute polygon offset
@@ -51,9 +53,10 @@ SFCGAL_API std::unique_ptr< MultiPolygon > offset( const Geometry& g, const doub
  * @ingroup detail
  * @warning No actual validity check is done.
  */
-SFCGAL_API std::unique_ptr< MultiPolygon > offset( const Geometry& g, const double& r, NoValidityCheck ) ;
+SFCGAL_API std::unique_ptr<MultiPolygon>
+           offset(const Geometry &g, const double &r, NoValidityCheck);
 
-}//namespace algorithm
-}//namespace SFCGAL
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif

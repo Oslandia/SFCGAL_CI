@@ -15,19 +15,20 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_MULTIPOLYGON_H_
 #define _SFCGAL_MULTIPOLYGON_H_
 
-#include <vector>
 #include <boost/assert.hpp>
+#include <vector>
 
 #include <boost/serialization/base_object.hpp>
 
-#include <SFCGAL/Polygon.h>
 #include <SFCGAL/GeometryCollection.h>
+#include <SFCGAL/Polygon.h>
 
 namespace SFCGAL {
 
@@ -38,66 +39,77 @@ namespace SFCGAL {
  */
 class SFCGAL_API MultiPolygon : public GeometryCollection {
 public:
-    /**
-     * Empty MultiPolygon constructor
-     */
-    MultiPolygon() ;
-    /**
-     * Copy constructor
-     */
-    MultiPolygon( MultiPolygon const& other ) ;
-    /**
-     * assign operator
-     */
-    MultiPolygon& operator = ( MultiPolygon other ) ;
-    /**
-     * destructor
-     */
-    virtual ~MultiPolygon() ;
+  /**
+   * Empty MultiPolygon constructor
+   */
+  MultiPolygon();
+  /**
+   * Copy constructor
+   */
+  MultiPolygon(MultiPolygon const &other);
+  /**
+   * assign operator
+   */
+  MultiPolygon &
+  operator=(MultiPolygon other);
+  /**
+   * destructor
+   */
+  virtual ~MultiPolygon();
 
-    //-- SFCGAL::Geometry
-    virtual MultiPolygon*    clone() const ;
+  //-- SFCGAL::Geometry
+  virtual MultiPolygon *
+  clone() const;
 
-    //-- SFCGAL::Geometry
-    virtual std::string    geometryType() const ;
-    //-- SFCGAL::Geometry
-    virtual GeometryType   geometryTypeId() const ;
+  //-- SFCGAL::Geometry
+  virtual std::string
+  geometryType() const;
+  //-- SFCGAL::Geometry
+  virtual GeometryType
+  geometryTypeId() const;
 
-    /**
-     * returns the n-th Geometry as a Polygon
-     */
-    inline Polygon&        polygonN( const size_t& n ) {
-        return geometryN( n ).as< Polygon >() ;
-    }
-    /**
-     * returns the n-th Geometry as a Polygon
-     */
-    inline const Polygon& polygonN( const size_t& n ) const {
-        return geometryN( n ).as< Polygon >() ;
-    }
+  /**
+   * returns the n-th Geometry as a Polygon
+   */
+  inline Polygon &
+  polygonN(const size_t &n)
+  {
+    return geometryN(n).as<Polygon>();
+  }
+  /**
+   * returns the n-th Geometry as a Polygon
+   */
+  inline const Polygon &
+  polygonN(const size_t &n) const
+  {
+    return geometryN(n).as<Polygon>();
+  }
 
+  //-- visitors
 
-    //-- visitors
+  //-- SFCGAL::Geometry
+  virtual void
+  accept(GeometryVisitor &visitor);
+  //-- SFCGAL::Geometry
+  virtual void
+  accept(ConstGeometryVisitor &visitor) const;
 
-    //-- SFCGAL::Geometry
-    virtual void accept( GeometryVisitor& visitor ) ;
-    //-- SFCGAL::Geometry
-    virtual void accept( ConstGeometryVisitor& visitor ) const ;
+  /**
+   * Serializer
+   */
+  template <class Archive>
+  void
+  serialize(Archive &ar, const unsigned int /*version*/)
+  {
+    ar &boost::serialization::base_object<GeometryCollection>(*this);
+  }
 
-    /**
-     * Serializer
-     */
-    template <class Archive>
-    void serialize( Archive& ar, const unsigned int /*version*/ ) {
-        ar& boost::serialization::base_object<GeometryCollection>( *this );
-
-    }
 protected:
-    //-- SFCGAL::GeometryCollection
-    virtual bool           isAllowed( Geometry const& g ) ;
+  //-- SFCGAL::GeometryCollection
+  virtual bool
+  isAllowed(Geometry const &g);
 };
 
-
-}
+} // namespace SFCGAL
 
 #endif

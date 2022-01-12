@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_FORCE3D_H_
@@ -26,17 +27,19 @@
 #include <SFCGAL/Kernel.h>
 
 namespace SFCGAL {
-class Geometry ;
+class Geometry;
 }
 
 namespace SFCGAL {
 namespace algorithm {
 
 /**
- * @brief force a 2D geometry to be 3D (replace undefined Z by defaultZ, existing Z values remains unchanged)
+ * @brief force a 2D geometry to be 3D (replace undefined Z by defaultZ,
+ * existing Z values remains unchanged)
  * @warning ignore empty geometries
  */
-SFCGAL_API void force3D( Geometry& g, const Kernel::FT& defaultZ = 0 ) ;
+SFCGAL_API void
+force3D(Geometry &g, const Kernel::FT &defaultZ = 0);
 
 } // namespace algorithm
 } // namespace SFCGAL

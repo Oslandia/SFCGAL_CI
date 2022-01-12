@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_IO_EWKT_H_
@@ -23,30 +24,33 @@
 
 #include <SFCGAL/config.h>
 
+#include <memory>
 #include <sstream>
 #include <string>
-#include <memory>
 
 namespace SFCGAL {
-class Geometry ;
-class PreparedGeometry ;
-}
+class Geometry;
+class PreparedGeometry;
+} // namespace SFCGAL
 
 namespace SFCGAL {
 namespace io {
 /**
  * Read a EWKT prepared geometry from an input stream
  */
-SFCGAL_API std::unique_ptr< PreparedGeometry > readEwkt( std::istream& s ) ;
+SFCGAL_API std::unique_ptr<PreparedGeometry>
+           readEwkt(std::istream &s);
 /**
  * Read a EWKT geometry from a string
  */
-SFCGAL_API std::unique_ptr< PreparedGeometry > readEwkt( const std::string& s ) ;
+SFCGAL_API std::unique_ptr<PreparedGeometry>
+           readEwkt(const std::string &s);
 /**
  * Read a EWKT geometry from a char*
  */
-SFCGAL_API std::unique_ptr< PreparedGeometry > readEwkt( const char*, size_t );
-}
-}
+SFCGAL_API std::unique_ptr<PreparedGeometry>
+           readEwkt(const char *, size_t);
+} // namespace io
+} // namespace SFCGAL
 
 #endif

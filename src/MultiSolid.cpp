@@ -15,96 +15,92 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#include <SFCGAL/MultiSolid.h>
 #include <SFCGAL/GeometryVisitor.h>
+#include <SFCGAL/MultiSolid.h>
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-MultiSolid::MultiSolid():
-    GeometryCollection()
-{
+MultiSolid::MultiSolid() : GeometryCollection() {}
 
+///
+///
+///
+MultiSolid::MultiSolid(MultiSolid const &other) : GeometryCollection(other) {}
+
+///
+///
+///
+MultiSolid &
+MultiSolid::operator=(MultiSolid other)
+{
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-MultiSolid::MultiSolid( MultiSolid const& other ):
-    GeometryCollection( other )
-{
+MultiSolid::~MultiSolid() {}
 
+///
+///
+///
+MultiSolid *
+MultiSolid::clone() const
+{
+  return new MultiSolid(*this);
 }
 
 ///
 ///
 ///
-MultiSolid& MultiSolid::operator = ( MultiSolid other )
+std::string
+MultiSolid::geometryType() const
 {
-    swap( other ) ;
-    return *this ;
+  return "MultiSolid";
 }
 
 ///
 ///
 ///
-MultiSolid::~MultiSolid()
+GeometryType
+MultiSolid::geometryTypeId() const
 {
-
+  return TYPE_MULTISOLID;
 }
 
 ///
 ///
 ///
-MultiSolid*    MultiSolid::clone() const
+bool
+MultiSolid::isAllowed(Geometry const &g)
 {
-    return new MultiSolid( *this );
+  return g.geometryTypeId() == TYPE_SOLID;
 }
 
 ///
 ///
 ///
-std::string    MultiSolid::geometryType() const
+void
+MultiSolid::accept(GeometryVisitor &visitor)
 {
-    return "MultiSolid" ;
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-GeometryType   MultiSolid::geometryTypeId() const
+void
+MultiSolid::accept(ConstGeometryVisitor &visitor) const
 {
-    return TYPE_MULTISOLID ;
+  return visitor.visit(*this);
 }
 
-///
-///
-///
-bool           MultiSolid::isAllowed( Geometry const& g )
-{
-    return g.geometryTypeId() == TYPE_SOLID ;
-}
-
-///
-///
-///
-void MultiSolid::accept( GeometryVisitor& visitor )
-{
-    return visitor.visit( *this );
-}
-
-///
-///
-///
-void MultiSolid::accept( ConstGeometryVisitor& visitor ) const
-{
-    return visitor.visit( *this );
-}
-
-}//SFCGAL
-
+} // namespace SFCGAL

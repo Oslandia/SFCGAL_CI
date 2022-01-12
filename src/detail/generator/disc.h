@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_GENERATOR_DISC_H_
@@ -26,9 +27,9 @@
 #include <memory>
 
 namespace SFCGAL {
-class Point ;
-class Polygon ;
-}
+class Point;
+class Polygon;
+} // namespace SFCGAL
 
 namespace SFCGAL {
 namespace generator {
@@ -37,11 +38,9 @@ namespace generator {
  * Generate a discrete circle
  * @todo unittest
  */
-SFCGAL_API std::unique_ptr< Polygon > disc(
-    const Point& center,
-    const double& radius,
-    const unsigned int& nQuadrantSegments = 8U
-) ;
+SFCGAL_API std::unique_ptr<Polygon>
+           disc(const Point &center, const double &radius,
+                const unsigned int &nQuadrantSegments = 8U);
 
 } // namespace generator
 } // namespace SFCGAL

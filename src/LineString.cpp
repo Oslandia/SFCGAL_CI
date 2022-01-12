@@ -15,242 +15,243 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#include <SFCGAL/LineString.h>
 #include <SFCGAL/GeometryVisitor.h>
+#include <SFCGAL/LineString.h>
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-LineString::LineString():
-    Geometry(),
-    _points()
-{
+LineString::LineString() : Geometry(), _points() {}
 
+///
+///
+///
+LineString::LineString(const std::vector<Point> &points) : Geometry(), _points()
+{
+  for (size_t i = 0; i < points.size(); i++) {
+    _points.push_back(points[i].clone());
+  }
 }
 
 ///
 ///
 ///
-LineString::LineString( const std::vector< Point >& points ):
-    Geometry(),
-    _points()
+LineString::LineString(const Point &startPoint, const Point &endPoint)
+    : Geometry(), _points()
 {
-    for ( size_t i = 0; i < points.size(); i++ ) {
-        _points.push_back( points[i].clone() ) ;
-    }
+  _points.push_back(startPoint.clone());
+  _points.push_back(endPoint.clone());
 }
 
 ///
 ///
 ///
-LineString::LineString( const Point& startPoint, const Point& endPoint ):
-    Geometry(),
-    _points()
+LineString::LineString(const LineString &other) : Geometry(other)
 {
-    _points.push_back( startPoint.clone() );
-    _points.push_back( endPoint.clone() );
+  for (size_t i = 0; i < other.numPoints(); i++) {
+    _points.push_back(other.pointN(i).clone());
+  }
 }
 
 ///
 ///
 ///
-LineString::LineString( const LineString& other ):
-    Geometry(other)
+LineString &
+LineString::operator=(LineString other)
 {
-    for ( size_t i = 0; i < other.numPoints(); i++ ) {
-        _points.push_back( other.pointN( i ).clone() ) ;
-    }
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-LineString& LineString::operator = ( LineString other )
+LineString::~LineString() {}
+
+///
+///
+///
+LineString *
+LineString::clone() const
 {
-    swap( other );
-    return *this ;
+  return new LineString(*this);
 }
 
 ///
 ///
 ///
-LineString::~LineString()
+GeometryType
+LineString::geometryTypeId() const
 {
-
+  return TYPE_LINESTRING;
 }
 
 ///
 ///
 ///
-LineString* LineString::clone() const
+std::string
+LineString::geometryType() const
 {
-    return new LineString( *this );
-}
-
-
-///
-///
-///
-GeometryType LineString::geometryTypeId() const
-{
-    return TYPE_LINESTRING ;
+  return "LineString";
 }
 
 ///
 ///
 ///
-std::string LineString::geometryType() const
+int
+LineString::dimension() const
 {
-    return "LineString" ;
+  return 1;
+}
+
+///
+///
+int
+LineString::coordinateDimension() const
+{
+  return isEmpty() ? 0 : _points[0].coordinateDimension();
 }
 
 ///
 ///
 ///
-int LineString::dimension() const
+bool
+LineString::isEmpty() const
 {
-    return 1 ;
-}
-
-///
-///
-int   LineString::coordinateDimension() const
-{
-    return isEmpty() ? 0 : _points[0].coordinateDimension() ;
+  return _points.empty();
 }
 
 ///
 ///
 ///
-bool   LineString::isEmpty() const
+bool
+LineString::is3D() const
 {
-    return _points.empty() ;
+  return !isEmpty() && startPoint().is3D();
 }
 
 ///
 ///
 ///
-bool  LineString::is3D() const
+bool
+LineString::isMeasured() const
 {
-    return ! isEmpty() && startPoint().is3D() ;
+  return !isEmpty() && startPoint().isMeasured();
 }
 
 ///
 ///
 ///
-bool  LineString::isMeasured() const
+void
+LineString::clear()
 {
-    return ! isEmpty() && startPoint().isMeasured() ;
+  _points.clear();
 }
 
 ///
 ///
 ///
-void LineString::clear()
+void
+LineString::reverse()
 {
-    _points.clear();
+  std::reverse(_points.begin(), _points.end());
 }
 
 ///
 ///
 ///
-void LineString::reverse()
+size_t
+LineString::numSegments() const
 {
-    std::reverse( _points.begin(), _points.end() );
+  if (_points.empty()) {
+    return 0;
+  } else {
+    return _points.size() - 1;
+  }
 }
 
 ///
 ///
 ///
-size_t LineString::numSegments() const
+bool
+LineString::isClosed() const
 {
-    if ( _points.empty() ) {
-        return 0 ;
-    }
-    else {
-        return _points.size() - 1 ;
-    }
+  return (!isEmpty()) && (startPoint() == endPoint());
 }
 
 ///
 ///
 ///
-bool LineString::isClosed() const
+void
+LineString::reserve(const size_t &n)
 {
-    return ( ! isEmpty() ) && ( startPoint() == endPoint() ) ;
+  _points.reserve(n);
 }
 
 ///
 ///
 ///
-void LineString::reserve( const size_t& n )
+void
+LineString::accept(GeometryVisitor &visitor)
 {
-    _points.reserve( n ) ;
-}
-
-
-///
-///
-///
-void LineString::accept( GeometryVisitor& visitor )
-{
-    return visitor.visit( *this );
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-void LineString::accept( ConstGeometryVisitor& visitor ) const
+void
+LineString::accept(ConstGeometryVisitor &visitor) const
 {
-    return visitor.visit( *this );
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-CGAL::Polygon_2< Kernel > LineString::toPolygon_2( bool fixOrientation ) const
+CGAL::Polygon_2<Kernel>
+LineString::toPolygon_2(bool fixOrientation) const
 {
-    if ( isEmpty() ) {
-        return CGAL::Polygon_2< Kernel >();
-    }
+  if (isEmpty()) {
+    return CGAL::Polygon_2<Kernel>();
+  }
 
-    Point_2_const_iterator pend = points_2_end();
-    // skip the last point
-    pend--;
+  Point_2_const_iterator pend = points_2_end();
+  // skip the last point
+  pend--;
 
-    // skip double points
-    // TODO: what to do with cycles ?
-    std::list<Kernel::Point_2> points;
-    Kernel::Point_2 lastP;
+  // skip double points
+  // TODO: what to do with cycles ?
+  std::list<Kernel::Point_2> points;
+  Kernel::Point_2            lastP;
 
-    for ( Point_2_const_iterator pit = points_2_begin(); pit != pend; ++pit ) {
-        if ( pit == points_2_begin() ) {
-            lastP = *pit;
-            points.push_back( *pit );
-            continue;
-        }
-
-        if ( lastP != *pit ) {
-            points.push_back( *pit );
-        }
-
-        lastP = *pit;
+  for (Point_2_const_iterator pit = points_2_begin(); pit != pend; ++pit) {
+    if (pit == points_2_begin()) {
+      lastP = *pit;
+      points.push_back(*pit);
+      continue;
     }
 
-    CGAL::Polygon_2< Kernel > result( points.begin(), points.end() );
-
-    if ( fixOrientation && result.orientation() == CGAL::CLOCKWISE ) {
-        result.reverse_orientation() ;
+    if (lastP != *pit) {
+      points.push_back(*pit);
     }
 
-    return result ;
+    lastP = *pit;
+  }
+
+  CGAL::Polygon_2<Kernel> result(points.begin(), points.end());
+
+  if (fixOrientation && result.orientation() == CGAL::CLOCKWISE) {
+    result.reverse_orientation();
+  }
+
+  return result;
 }
 
-
-}//SFCGAL
-
+} // namespace SFCGAL

@@ -15,96 +15,95 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#include <SFCGAL/MultiLineString.h>
 #include <SFCGAL/GeometryVisitor.h>
+#include <SFCGAL/MultiLineString.h>
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-MultiLineString::MultiLineString():
-    GeometryCollection()
-{
+MultiLineString::MultiLineString() : GeometryCollection() {}
 
+///
+///
+///
+MultiLineString::MultiLineString(MultiLineString const &other)
+    : GeometryCollection(other)
+{
 }
 
 ///
 ///
 ///
-MultiLineString::MultiLineString( MultiLineString const& other ):
-    GeometryCollection( other )
+MultiLineString &
+MultiLineString::operator=(MultiLineString other)
 {
-
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-MultiLineString& MultiLineString::operator = ( MultiLineString other )
+MultiLineString::~MultiLineString() {}
+
+///
+///
+///
+MultiLineString *
+MultiLineString::clone() const
 {
-    swap( other ) ;
-    return *this ;
+  return new MultiLineString(*this);
 }
 
 ///
 ///
 ///
-MultiLineString::~MultiLineString()
+std::string
+MultiLineString::geometryType() const
 {
-
+  return "MultiLineString";
 }
 
 ///
 ///
 ///
-MultiLineString*    MultiLineString::clone() const
+GeometryType
+MultiLineString::geometryTypeId() const
 {
-    return new MultiLineString( *this );
+  return TYPE_MULTILINESTRING;
 }
 
 ///
 ///
 ///
-std::string    MultiLineString::geometryType() const
+bool
+MultiLineString::isAllowed(Geometry const &g)
 {
-    return "MultiLineString" ;
+  return g.geometryTypeId() == TYPE_LINESTRING;
 }
 
 ///
 ///
 ///
-GeometryType   MultiLineString::geometryTypeId() const
+void
+MultiLineString::accept(GeometryVisitor &visitor)
 {
-    return TYPE_MULTILINESTRING ;
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-bool           MultiLineString::isAllowed( Geometry const& g )
+void
+MultiLineString::accept(ConstGeometryVisitor &visitor) const
 {
-    return g.geometryTypeId() == TYPE_LINESTRING ;
+  return visitor.visit(*this);
 }
 
-///
-///
-///
-void MultiLineString::accept( GeometryVisitor& visitor )
-{
-    return visitor.visit( *this );
-}
-
-///
-///
-///
-void MultiLineString::accept( ConstGeometryVisitor& visitor ) const
-{
-    return visitor.visit( *this );
-}
-
-}//SFCGAL
-
+} // namespace SFCGAL

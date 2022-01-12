@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SFCGAL_COVERS_ALGORITHM
@@ -30,34 +31,42 @@ class Geometry;
 class Solid;
 class Point;
 namespace detail {
-template <int Dim> class GeometrySet;
-template <int Dim> struct PrimitiveHandle;
-}
+template <int Dim>
+class GeometrySet;
+template <int Dim>
+struct PrimitiveHandle;
+} // namespace detail
 
 namespace algorithm {
 /**
- * Cover test on 2D geometries. Checks if gA covers gB. Force projection to z=0 if needed
+ * Cover test on 2D geometries. Checks if gA covers gB. Force projection to z=0
+ * if needed
  * @ingroup@ detail
  */
-SFCGAL_API bool covers( const Geometry& ga, const Geometry& gb );
+SFCGAL_API bool
+covers(const Geometry &ga, const Geometry &gb);
 
 /**
  * Cover test on 3D geometries. Checks if gA covers gB. Assume z = 0 if needed
  */
-SFCGAL_API bool covers3D( const Geometry& ga, const Geometry& gb );
+SFCGAL_API bool
+covers3D(const Geometry &ga, const Geometry &gb);
 
 /**
  * @ingroup@ detail
  */
 template <int Dim>
-bool covers( const detail::GeometrySet<Dim>& a, const detail::GeometrySet<Dim>& b );
+bool
+covers(const detail::GeometrySet<Dim> &a, const detail::GeometrySet<Dim> &b);
 
 /**
  * @ingroup@ detail
  */
 template <int Dim>
-bool covers( const detail::PrimitiveHandle<Dim>& a, const detail::PrimitiveHandle<Dim>& b );
-}
-}
+bool
+covers(const detail::PrimitiveHandle<Dim> &a,
+       const detail::PrimitiveHandle<Dim> &b);
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif

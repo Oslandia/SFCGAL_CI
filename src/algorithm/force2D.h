@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_FORCE2D_H_
@@ -26,7 +27,7 @@
 #include <SFCGAL/Kernel.h>
 
 namespace SFCGAL {
-class Geometry ;
+class Geometry;
 }
 
 namespace SFCGAL {
@@ -36,7 +37,8 @@ namespace algorithm {
  * @brief force a geometry to be 2D (project on O,x,y)
  * @warning ignore empty geometries
  */
-SFCGAL_API void force2D( Geometry& g );
+SFCGAL_API void
+force2D(Geometry &g);
 
 } // namespace algorithm
 } // namespace SFCGAL

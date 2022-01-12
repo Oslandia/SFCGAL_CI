@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_LENGTH_H_
@@ -24,9 +25,9 @@
 #include <SFCGAL/config.h>
 
 namespace SFCGAL {
-class Geometry ;
-class LineString ;
-class GeometryCollection ;
+class Geometry;
+class LineString;
+class GeometryCollection;
 } // namespace SFCGAL
 
 namespace SFCGAL {
@@ -35,33 +36,37 @@ namespace algorithm {
 /**
  * @brief Compute the 2D length for a Geometry (0 for incompatible types)
  */
-SFCGAL_API double length( const Geometry& g ) ;
+SFCGAL_API double
+length(const Geometry &g);
 /**
  * @brief Compute the 2D length for a LineString
  */
-SFCGAL_API double length( const LineString& g ) ;
+SFCGAL_API double
+length(const LineString &g);
 /**
  * @brief Compute the 2D length for a GeometryCollection
  */
-SFCGAL_API double length( const GeometryCollection& g ) ;
+SFCGAL_API double
+length(const GeometryCollection &g);
 
 /**
  * @brief Compute the 2D length for a geometry
  * @return the length of the Geometry, 0 for incompatible types
  */
-SFCGAL_API double length3D( const Geometry& g ) ;
+SFCGAL_API double
+length3D(const Geometry &g);
 /**
  * @brief Compute the 3D length for a LineString
  */
-SFCGAL_API double length3D( const LineString& g ) ;
+SFCGAL_API double
+length3D(const LineString &g);
 /**
  * @brief Compute the 3D length for a GeometryCollection
  */
-SFCGAL_API double length3D( const GeometryCollection& g ) ;
+SFCGAL_API double
+length3D(const GeometryCollection &g);
 
-
-}//algorithm
-}//SFCGAL
-
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif

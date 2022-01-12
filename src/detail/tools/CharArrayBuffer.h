@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_TOOLS_CHARARRAYBUFFER_H_
@@ -25,7 +26,6 @@
 
 #include <streambuf>
 
-
 ///
 /// Streambuf on a char*
 ///
@@ -33,28 +33,35 @@
 ///
 class SFCGAL_API CharArrayBuffer : public std::streambuf {
 public:
-    CharArrayBuffer( const char* begin, const char* end );
-    explicit CharArrayBuffer( const char* str );
+  CharArrayBuffer(const char *begin, const char *end);
+  explicit CharArrayBuffer(const char *str);
 
 private:
-    int_type underflow();
-    int_type uflow();
-    int_type pbackfail( int_type ch );
-    std::streamsize showmanyc();
+  int_type
+  underflow();
+  int_type
+  uflow();
+  int_type
+  pbackfail(int_type ch);
+  std::streamsize
+  showmanyc();
 
-    // copy ctor and assignment not implemented;
-    // copying not allowed
-    CharArrayBuffer( const CharArrayBuffer& );
-    CharArrayBuffer& operator= ( const CharArrayBuffer& );
+  // copy ctor and assignment not implemented;
+  // copying not allowed
+  CharArrayBuffer(const CharArrayBuffer &);
+  CharArrayBuffer &
+  operator=(const CharArrayBuffer &);
 
-    std::streampos seekpos( std::streampos pos, std::ios_base::openmode );
-    std::streampos seekoff ( std::streamoff off, std::ios_base::seekdir way, std::ios_base::openmode );
+  std::streampos
+  seekpos(std::streampos pos, std::ios_base::openmode);
+  std::streampos
+  seekoff(std::streamoff off, std::ios_base::seekdir way,
+          std::ios_base::openmode);
+
 private:
-    const char* const begin_;
-    const char* const end_;
-    const char* current_;
+  const char *const begin_;
+  const char *const end_;
+  const char *      current_;
 };
 
-
 #endif
-

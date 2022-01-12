@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_IO_WKTWRITER_H_
@@ -23,8 +24,8 @@
 
 #include <sstream>
 
-#include <SFCGAL/config.h>
 #include <SFCGAL/Geometry.h>
+#include <SFCGAL/config.h>
 
 namespace SFCGAL {
 namespace detail {
@@ -37,58 +38,80 @@ namespace io {
  */
 class SFCGAL_API WktWriter {
 public:
-    WktWriter( std::ostream& s ) ;
+  WktWriter(std::ostream &s);
 
-    /**
-     * @todo replace with visitor dispatch
-     */
-    void write( const Geometry& g, bool exact = false ) ;
+  /**
+   * @todo replace with visitor dispatch
+   */
+  void
+  write(const Geometry &g, bool exact = false);
 
 protected:
-    /**
-     * write coordinate type (""|" Z"|" ZM")
-     */
-    void writeCoordinateType( const Geometry& g );
+  /**
+   * write coordinate type (""|" Z"|" ZM")
+   */
+  void
+  writeCoordinateType(const Geometry &g);
 
-    void writeCoordinate( const Point& g );
+  void
+  writeCoordinate(const Point &g);
 
-    void write( const Point& g ) ;
-    void writeInner( const Point& g ) ;
+  void
+  write(const Point &g);
+  void
+  writeInner(const Point &g);
 
-    void write( const LineString& g ) ;
-    void writeInner( const LineString& g ) ;
+  void
+  write(const LineString &g);
+  void
+  writeInner(const LineString &g);
 
-    void write( const Polygon& g ) ;
-    void writeInner( const Polygon& g ) ;
+  void
+  write(const Polygon &g);
+  void
+  writeInner(const Polygon &g);
 
-    void write( const GeometryCollection& g ) ;
+  void
+  write(const GeometryCollection &g);
 
-    void write( const MultiPoint& g ) ;
-    void write( const MultiLineString& g ) ;
-    void write( const MultiPolygon& g ) ;
-    void write( const MultiSolid& g ) ;
+  void
+  write(const MultiPoint &g);
+  void
+  write(const MultiLineString &g);
+  void
+  write(const MultiPolygon &g);
+  void
+  write(const MultiSolid &g);
 
-    void write( const Triangle& g );
-    void writeInner( const Triangle& g ) ;
+  void
+  write(const Triangle &g);
+  void
+  writeInner(const Triangle &g);
 
-    void write( const TriangulatedSurface& g );
+  void
+  write(const TriangulatedSurface &g);
 
-    void write( const PolyhedralSurface& g );
-    void writeInner( const PolyhedralSurface& g );
+  void
+  write(const PolyhedralSurface &g);
+  void
+  writeInner(const PolyhedralSurface &g);
 
-    void write( const Solid& g );
-    void writeInner( const Solid& g );
+  void
+  write(const Solid &g);
+  void
+  writeInner(const Solid &g);
 
-    // for recursive call use
-    void writeRec( const Geometry& g ) ;
+  // for recursive call use
+  void
+  writeRec(const Geometry &g);
+
 private:
-    std::ostream& _s ;
-    bool _exactWrite;
+  std::ostream &_s;
+  bool          _exactWrite;
 };
 
-
-}//io
-}//detail
-}//SFCGAL
+} // namespace io
+} // namespace detail
+} // namespace SFCGAL
 
 #endif

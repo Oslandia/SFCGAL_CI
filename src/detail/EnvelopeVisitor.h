@@ -15,15 +15,16 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_DETAIL_ENVELOPEVISITOR_H_
 #define _SFCGAL_DETAIL_ENVELOPEVISITOR_H_
 
-#include <SFCGAL/config.h>
 #include <SFCGAL/Envelope.h>
 #include <SFCGAL/GeometryVisitor.h>
+#include <SFCGAL/config.h>
 
 #include <vector>
 
@@ -37,27 +38,38 @@ namespace detail {
  */
 class SFCGAL_API EnvelopeVisitor : public ConstGeometryVisitor {
 public:
-    EnvelopeVisitor( Envelope& envelope_ );
+  EnvelopeVisitor(Envelope &envelope_);
 
-    virtual void visit( const Point& g ) ;
-    virtual void visit( const LineString& g ) ;
-    virtual void visit( const Polygon& g ) ;
-    virtual void visit( const Triangle& g ) ;
-    virtual void visit( const Solid& g ) ;
-    virtual void visit( const MultiPoint& g ) ;
-    virtual void visit( const MultiLineString& g ) ;
-    virtual void visit( const MultiPolygon& g ) ;
-    virtual void visit( const MultiSolid& g ) ;
-    virtual void visit( const GeometryCollection& g ) ;
-    virtual void visit( const PolyhedralSurface& g ) ;
-    virtual void visit( const TriangulatedSurface& g ) ;
+  virtual void
+  visit(const Point &g);
+  virtual void
+  visit(const LineString &g);
+  virtual void
+  visit(const Polygon &g);
+  virtual void
+  visit(const Triangle &g);
+  virtual void
+  visit(const Solid &g);
+  virtual void
+  visit(const MultiPoint &g);
+  virtual void
+  visit(const MultiLineString &g);
+  virtual void
+  visit(const MultiPolygon &g);
+  virtual void
+  visit(const MultiSolid &g);
+  virtual void
+  visit(const GeometryCollection &g);
+  virtual void
+  visit(const PolyhedralSurface &g);
+  virtual void
+  visit(const TriangulatedSurface &g);
+
 public:
-    Envelope& envelope ;
+  Envelope &envelope;
 };
 
-
-}//detail
-}//SFCGAL
-
+} // namespace detail
+} // namespace SFCGAL
 
 #endif

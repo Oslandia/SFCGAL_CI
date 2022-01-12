@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SFCGAL_COLLECTION_HOMOGENIZE_ALGORITHM
@@ -31,15 +32,16 @@
 namespace SFCGAL {
 namespace algorithm {
 /**
- * Given a geometry collection, returns the "simplest" representation of the contents.
- * Singletons will be returned as singletons.
- * Collections that are homogeneous will be returned as the appropriate multi-type.
+ * Given a geometry collection, returns the "simplest" representation of the
+ * contents. Singletons will be returned as singletons. Collections that are
+ * homogeneous will be returned as the appropriate multi-type.
  *
  * @warning Ownership is taken from the parameter
  * @ingroup detail
  */
-SFCGAL_API std::unique_ptr<Geometry> collectionHomogenize( std::unique_ptr<Geometry> coll );
-}
-}
+SFCGAL_API std::unique_ptr<Geometry>
+           collectionHomogenize(std::unique_ptr<Geometry> coll);
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif

@@ -15,11 +15,12 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#include <SFCGAL/Polygon.h>
 #include <SFCGAL/GeometryVisitor.h>
+#include <SFCGAL/Polygon.h>
 
 #include <SFCGAL/Triangle.h>
 #include <SFCGAL/algorithm/orientation.h>
@@ -29,253 +30,251 @@ namespace SFCGAL {
 ///
 ///
 ///
-Polygon::Polygon():
-    Surface()
-{
-    _rings.push_back( new LineString()  );
-}
+Polygon::Polygon() : Surface() { _rings.push_back(new LineString()); }
 
 ///
 ///
 ///
-Polygon::Polygon( const std::vector< LineString >& rings ):
-    Surface()
+Polygon::Polygon(const std::vector<LineString> &rings) : Surface()
 {
-    if ( rings.empty() ) {
-        _rings.resize( 1, new LineString() );
+  if (rings.empty()) {
+    _rings.resize(1, new LineString());
+  } else {
+    for (size_t i = 0; i < rings.size(); i++) {
+      _rings.push_back(rings[i].clone());
     }
-    else {
-        for ( size_t i = 0; i < rings.size(); i++ ) {
-            _rings.push_back( rings[i].clone() ) ;
-        }
+  }
+}
+
+///
+///
+///
+Polygon::Polygon(const LineString &exteriorRing) : Surface()
+{
+  _rings.push_back(exteriorRing.clone());
+}
+
+///
+///
+///
+Polygon::Polygon(LineString *exteriorRing) : Surface()
+{
+  _rings.push_back(exteriorRing);
+}
+
+///
+///
+///
+Polygon::Polygon(const Triangle &triangle) : Surface()
+{
+  _rings.push_back(new LineString());
+
+  if (!triangle.isEmpty()) {
+    for (size_t i = 0; i < 4; i++) {
+      exteriorRing().addPoint(triangle.vertex(i));
     }
+  }
 }
 
 ///
 ///
 ///
-Polygon::Polygon( const LineString& exteriorRing ):
-    Surface()
+Polygon::Polygon(const Polygon &other) : Surface(other)
 {
-    _rings.push_back( exteriorRing.clone() );
+  for (size_t i = 0; i < other.numRings(); i++) {
+    _rings.push_back(other.ringN(i).clone());
+  }
 }
 
 ///
 ///
 ///
-Polygon::Polygon( LineString* exteriorRing ):
-    Surface()
+Polygon::Polygon(const CGAL::Polygon_2<Kernel> &other)
 {
-    _rings.push_back( exteriorRing );
+  _rings.push_back(new LineString());
+  CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
+
+  for (ei = other.edges_begin(); ei != other.edges_end(); ++ei) {
+    _rings.back().addPoint(ei->source());
+  }
 }
 
 ///
 ///
 ///
-Polygon::Polygon( const Triangle& triangle ):
-    Surface()
+Polygon::Polygon(const CGAL::Polygon_with_holes_2<Kernel> &poly)
 {
-    _rings.push_back( new LineString() );
+  _rings.push_back(new LineString());
+  CGAL::Polygon_2<Kernel>                      outer = poly.outer_boundary();
+  CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
 
-    if ( ! triangle.isEmpty() ) {
-        for ( size_t i = 0; i < 4; i++ ) {
-            exteriorRing().addPoint( triangle.vertex( i ) );
-        }
-    }
-}
+  for (ei = outer.edges_begin(); ei != outer.edges_end(); ++ei) {
+    _rings.back().addPoint(ei->source());
+  }
 
-///
-///
-///
-Polygon::Polygon( const Polygon& other ):
-    Surface( other )
-{
-    for ( size_t i = 0; i < other.numRings(); i++ ) {
-        _rings.push_back( other.ringN( i ).clone() );
-    }
-}
+  _rings.back().addPoint(_rings.back().startPoint());
 
-///
-///
-///
-Polygon::Polygon( const CGAL::Polygon_2< Kernel >& other )
-{
-    _rings.push_back( new LineString() );
+  for (CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hit =
+           poly.holes_begin();
+       hit != poly.holes_end(); ++hit) {
+    _rings.push_back(new LineString());
     CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
 
-    for ( ei = other.edges_begin(); ei != other.edges_end(); ++ei ) {
-        _rings.back().addPoint( ei->source() );
-    }
-}
-
-
-///
-///
-///
-Polygon::Polygon( const CGAL::Polygon_with_holes_2< Kernel >& poly )
-{
-    _rings.push_back( new LineString() );
-    CGAL::Polygon_2<Kernel> outer = poly.outer_boundary();
-    CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
-
-    for ( ei = outer.edges_begin(); ei != outer.edges_end(); ++ei ) {
-        _rings.back().addPoint( ei->source() );
+    for (ei = hit->edges_begin(); ei != hit->edges_end(); ++ei) {
+      _rings.back().addPoint(ei->source());
     }
 
-    _rings.back().addPoint( _rings.back().startPoint() );
-
-    for ( CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator hit = poly.holes_begin(); hit != poly.holes_end(); ++hit ) {
-        _rings.push_back( new LineString() );
-        CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
-
-        for ( ei = hit->edges_begin(); ei != hit->edges_end(); ++ei ) {
-            _rings.back().addPoint( ei->source() );
-        }
-
-        _rings.back().addPoint( _rings.back().startPoint() );
-    }
+    _rings.back().addPoint(_rings.back().startPoint());
+  }
 }
 
 ///
 ///
 ///
-Polygon& Polygon::operator = ( Polygon other )
+Polygon &
+Polygon::operator=(Polygon other)
 {
-    swap( other );
-    return *this ;
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-Polygon::~Polygon()
-{
+Polygon::~Polygon() {}
 
+///
+///
+///
+int
+Polygon::coordinateDimension() const
+{
+  return _rings[0].coordinateDimension();
 }
 
 ///
 ///
 ///
-int Polygon::coordinateDimension() const
+std::string
+Polygon::geometryType() const
 {
-    return _rings[0].coordinateDimension() ;
-}
-
-
-///
-///
-///
-std::string Polygon::geometryType() const
-{
-    return "Polygon" ;
+  return "Polygon";
 }
 
 ///
 ///
 ///
-GeometryType Polygon::geometryTypeId() const
+GeometryType
+Polygon::geometryTypeId() const
 {
-    return TYPE_POLYGON ;
+  return TYPE_POLYGON;
 }
 
 ///
 ///
 ///
-Polygon* Polygon::clone() const
+Polygon *
+Polygon::clone() const
 {
-    return new Polygon( *this );
+  return new Polygon(*this);
 }
 
 ///
 ///
 ///
-bool   Polygon::isEmpty() const
+bool
+Polygon::isEmpty() const
 {
-    return exteriorRing().isEmpty() ;
+  return exteriorRing().isEmpty();
 }
 
 ///
 ///
 ///
-bool   Polygon::is3D() const
+bool
+Polygon::is3D() const
 {
-    return exteriorRing().is3D() ;
+  return exteriorRing().is3D();
 }
 
 ///
 ///
 ///
-bool   Polygon::isMeasured() const
+bool
+Polygon::isMeasured() const
 {
-    return exteriorRing().isMeasured() ;
+  return exteriorRing().isMeasured();
 }
 
 ///
 ///
 ///
-void Polygon::reverse()
+void
+Polygon::reverse()
 {
-    for ( size_t i = 0; i < numRings(); i++ ) {
-        ringN( i ).reverse();
-    }
-}
-
-
-///
-///
-///
-void Polygon::accept( GeometryVisitor& visitor )
-{
-    return visitor.visit( *this );
+  for (size_t i = 0; i < numRings(); i++) {
+    ringN(i).reverse();
+  }
 }
 
 ///
 ///
 ///
-void Polygon::accept( ConstGeometryVisitor& visitor ) const
+void
+Polygon::accept(GeometryVisitor &visitor)
 {
-    return visitor.visit( *this );
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-bool Polygon::isCounterClockWiseOriented() const
+void
+Polygon::accept(ConstGeometryVisitor &visitor) const
 {
-    return algorithm::isCounterClockWiseOriented( *this );
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-CGAL::Polygon_2<Kernel> Polygon::toPolygon_2( bool fixOrientation ) const
+bool
+Polygon::isCounterClockWiseOriented() const
 {
-    return exteriorRing().toPolygon_2( fixOrientation );
+  return algorithm::isCounterClockWiseOriented(*this);
 }
 
 ///
 ///
 ///
-CGAL::Polygon_with_holes_2<Kernel> Polygon::toPolygon_with_holes_2( bool fixOrientation ) const
+CGAL::Polygon_2<Kernel>
+Polygon::toPolygon_2(bool fixOrientation) const
 {
-    std::list<CGAL::Polygon_2<Kernel> > holes;
+  return exteriorRing().toPolygon_2(fixOrientation);
+}
 
-    for ( size_t i = 0; i < numInteriorRings(); ++i ) {
-        // note that the orientation is fixed here to avoid double reverse for interior rings
-        CGAL::Polygon_2<Kernel> inner = interiorRingN( i ).toPolygon_2( false );
+///
+///
+///
+CGAL::Polygon_with_holes_2<Kernel>
+Polygon::toPolygon_with_holes_2(bool fixOrientation) const
+{
+  std::list<CGAL::Polygon_2<Kernel>> holes;
 
-        if ( fixOrientation && inner.orientation() == CGAL::COUNTERCLOCKWISE ) {
-            inner.reverse_orientation();
-        }
+  for (size_t i = 0; i < numInteriorRings(); ++i) {
+    // note that the orientation is fixed here to avoid double reverse for
+    // interior rings
+    CGAL::Polygon_2<Kernel> inner = interiorRingN(i).toPolygon_2(false);
 
-        holes.push_back( inner );
+    if (fixOrientation && inner.orientation() == CGAL::COUNTERCLOCKWISE) {
+      inner.reverse_orientation();
     }
 
-    CGAL::Polygon_2<Kernel> outer = exteriorRing().toPolygon_2( fixOrientation );
-    return CGAL::Polygon_with_holes_2<Kernel>( outer,
-            holes.begin(),
-            holes.end() );
+    holes.push_back(inner);
+  }
+
+  CGAL::Polygon_2<Kernel> outer = exteriorRing().toPolygon_2(fixOrientation);
+  return CGAL::Polygon_with_holes_2<Kernel>(outer, holes.begin(), holes.end());
 }
 
-}//SFCGAL
-
+} // namespace SFCGAL

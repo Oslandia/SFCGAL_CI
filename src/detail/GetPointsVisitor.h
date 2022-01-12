@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_DETAIL_GETPOINTSVISITOR_H_
@@ -23,8 +24,8 @@
 
 #include <SFCGAL/config.h>
 
-#include <vector>
 #include <SFCGAL/GeometryVisitor.h>
+#include <vector>
 
 namespace SFCGAL {
 namespace detail {
@@ -34,26 +35,37 @@ namespace detail {
  */
 class SFCGAL_API GetPointsVisitor : public ConstGeometryVisitor {
 public:
-    virtual void visit( const Point& g ) ;
-    virtual void visit( const LineString& g ) ;
-    virtual void visit( const Polygon& g ) ;
-    virtual void visit( const Triangle& g ) ;
-    virtual void visit( const Solid& g ) ;
-    virtual void visit( const MultiPoint& g ) ;
-    virtual void visit( const MultiLineString& g ) ;
-    virtual void visit( const MultiPolygon& g ) ;
-    virtual void visit( const MultiSolid& g ) ;
-    virtual void visit( const GeometryCollection& g ) ;
-    virtual void visit( const PolyhedralSurface& g ) ;
-    virtual void visit( const TriangulatedSurface& g ) ;
+  virtual void
+  visit(const Point &g);
+  virtual void
+  visit(const LineString &g);
+  virtual void
+  visit(const Polygon &g);
+  virtual void
+  visit(const Triangle &g);
+  virtual void
+  visit(const Solid &g);
+  virtual void
+  visit(const MultiPoint &g);
+  virtual void
+  visit(const MultiLineString &g);
+  virtual void
+  visit(const MultiPolygon &g);
+  virtual void
+  visit(const MultiSolid &g);
+  virtual void
+  visit(const GeometryCollection &g);
+  virtual void
+  visit(const PolyhedralSurface &g);
+  virtual void
+  visit(const TriangulatedSurface &g);
+
 public:
-    typedef std::vector< const Point* >::const_iterator const_iterator;
-    std::vector< const Point* > points ;
+  typedef std::vector<const Point *>::const_iterator const_iterator;
+  std::vector<const Point *>                         points;
 };
 
-
-}//detail
-}//SFCGAL
-
+} // namespace detail
+} // namespace SFCGAL
 
 #endif

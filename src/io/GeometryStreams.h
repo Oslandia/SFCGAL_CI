@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_GEOMETRY_STREAMS_H_
@@ -33,12 +34,14 @@ class Geometry;
 /**
  * Ostream operator for Envelope;
  */
-SFCGAL_API std::ostream& operator<< ( std::ostream&, const Envelope& );
+SFCGAL_API std::ostream &
+           operator<<(std::ostream &, const Envelope &);
 
 /**
  * Ostream operator for Geometry;
  */
-SFCGAL_API std::ostream& operator<< ( std::ostream&, const Geometry& );
-}
+SFCGAL_API std::ostream &
+           operator<<(std::ostream &, const Geometry &);
+} // namespace SFCGAL
 
 #endif

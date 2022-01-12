@@ -15,9 +15,9 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
-
 
 #ifndef _SFCGAL_VALIDITY_H_
 #define _SFCGAL_VALIDITY_H_
@@ -25,39 +25,44 @@
 namespace SFCGAL {
 
 /**
- * @brief the class, convertible to bool, that stores the reason why a geom is invalid
+ * @brief the class, convertible to bool, that stores the reason why a geom is
+ * invalid
  */
 struct Validity {
-    /**
-     * @note the class has private ctor to force the use of functions valid() and invalid(reason) that are clearer in the code than to remember that "Valid constructed with a reason is invalid"
-     */
-    static const Validity valid() {
-        return Validity();
-    }
-    static const Validity invalid( const std::string& reason ) {
-        return Validity( reason );
-    }
-    operator bool() const {
-        return _valid;
-    }
-    const std::string& reason() const {
-        return _reason;
-    }
+  /**
+   * @note the class has private ctor to force the use of functions valid() and
+   * invalid(reason) that are clearer in the code than to remember that "Valid
+   * constructed with a reason is invalid"
+   */
+  static const Validity
+  valid()
+  {
+    return Validity();
+  }
+  static const Validity
+  invalid(const std::string &reason)
+  {
+    return Validity(reason);
+  }
+  operator bool() const { return _valid; }
+  const std::string &
+  reason() const
+  {
+    return _reason;
+  }
+
 private:
-    bool _valid; // not const to allow default copy
-    std::string _reason;
-    /**
-     * @brief default ctor for valid
-     */
-    Validity():_valid( true ) {}
-    /**
-     * @brief if we construct with a reason, the class is invalid
-     */
-    Validity( const std::string& reason ):
-        _valid( false ),
-        _reason( reason ) {
-    }
+  bool        _valid; // not const to allow default copy
+  std::string _reason;
+  /**
+   * @brief default ctor for valid
+   */
+  Validity() : _valid(true) {}
+  /**
+   * @brief if we construct with a reason, the class is invalid
+   */
+  Validity(const std::string &reason) : _valid(false), _reason(reason) {}
 };
 
-}
+} // namespace SFCGAL
 #endif

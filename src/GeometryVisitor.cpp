@@ -15,46 +15,45 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/GeometryVisitor.h>
 
-#include <SFCGAL/Point.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/Solid.h>
 #include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/MultiPoint.h>
+#include <SFCGAL/LineString.h>
 #include <SFCGAL/MultiLineString.h>
+#include <SFCGAL/MultiPoint.h>
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/MultiSolid.h>
+#include <SFCGAL/Point.h>
+#include <SFCGAL/Polygon.h>
+#include <SFCGAL/PolyhedralSurface.h>
+#include <SFCGAL/Solid.h>
+#include <SFCGAL/Triangle.h>
+#include <SFCGAL/TriangulatedSurface.h>
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-GeometryVisitor::~GeometryVisitor()
-{
-
-}
+GeometryVisitor::~GeometryVisitor() {}
 
 ///
 ///
 ///
-void GeometryVisitor::visit( Geometry& g )
+void
+GeometryVisitor::visit(Geometry &g)
 {
-    g.accept( *this );
+  g.accept(*this);
 }
 //
 /////
 /////
 /////
-//void GeometryVisitor::visit( MultiPoint & g )
+// void GeometryVisitor::visit( MultiPoint & g )
 //{
 //	for ( size_t i = 0; i < g.numGeometries(); i++ ){
 //		visit( g.geometryN(i).as< Point >() );
@@ -64,7 +63,7 @@ void GeometryVisitor::visit( Geometry& g )
 /////
 /////
 /////
-//void GeometryVisitor::visit( MultiLineString & g )
+// void GeometryVisitor::visit( MultiLineString & g )
 //{
 //	for ( size_t i = 0; i < g.numGeometries(); i++ ){
 //		visit( g.geometryN(i).as< LineString >() );
@@ -74,7 +73,7 @@ void GeometryVisitor::visit( Geometry& g )
 /////
 /////
 /////
-//void GeometryVisitor::visit( MultiPolygon & g )
+// void GeometryVisitor::visit( MultiPolygon & g )
 //{
 //	for ( size_t i = 0; i < g.numGeometries(); i++ ){
 //		visit( g.geometryN(i).as< Polygon >() );
@@ -85,7 +84,7 @@ void GeometryVisitor::visit( Geometry& g )
 /////
 /////
 /////
-//void GeometryVisitor::visit( GeometryCollection & g )
+// void GeometryVisitor::visit( GeometryCollection & g )
 //{
 //	for ( size_t i = 0; i < g.numGeometries(); i++ ){
 //		visit( g.geometryN(i) );
@@ -95,7 +94,7 @@ void GeometryVisitor::visit( Geometry& g )
 /////
 /////
 /////
-//void GeometryVisitor::visit( PolyhedralSurface & g )
+// void GeometryVisitor::visit( PolyhedralSurface & g )
 //{
 //	for ( size_t i = 0; i < g.numPolygons(); i++ ){
 //		visit( g.polygonN(i) );
@@ -105,38 +104,33 @@ void GeometryVisitor::visit( Geometry& g )
 /////
 /////
 /////
-//void GeometryVisitor::visit( TriangulatedSurface & g )
+// void GeometryVisitor::visit( TriangulatedSurface & g )
 //{
 //	for ( size_t i = 0; i < g.numTriangles(); i++ ){
 //		visit( g.triangleN(i) );
 //	}
 //}
-
 
 //---------------- ConstGeometryVisitor
 
+///
+///
+///
+ConstGeometryVisitor::~ConstGeometryVisitor() {}
 
-
 ///
 ///
 ///
-ConstGeometryVisitor::~ConstGeometryVisitor()
+void
+ConstGeometryVisitor::visit(const Geometry &g)
 {
-
-}
-
-///
-///
-///
-void ConstGeometryVisitor::visit( const Geometry& g )
-{
-    g.accept( *this );
+  g.accept(*this);
 }
 //
 /////
 /////
 /////
-//void ConstGeometryVisitor::visit( const MultiPoint & g )
+// void ConstGeometryVisitor::visit( const MultiPoint & g )
 //{
 //	for ( size_t i = 0; i < g.numGeometries(); i++ ){
 //		visit( g.geometryN(i).as< Point >() );
@@ -146,7 +140,7 @@ void ConstGeometryVisitor::visit( const Geometry& g )
 /////
 /////
 /////
-//void ConstGeometryVisitor::visit( const MultiLineString & g )
+// void ConstGeometryVisitor::visit( const MultiLineString & g )
 //{
 //	for ( size_t i = 0; i < g.numGeometries(); i++ ){
 //		visit( g.geometryN(i).as< LineString >() );
@@ -156,7 +150,7 @@ void ConstGeometryVisitor::visit( const Geometry& g )
 /////
 /////
 /////
-//void ConstGeometryVisitor::visit( const MultiPolygon & g )
+// void ConstGeometryVisitor::visit( const MultiPolygon & g )
 //{
 //	for ( size_t i = 0; i < g.numGeometries(); i++ ){
 //		visit( g.geometryN(i).as< Polygon >() );
@@ -167,7 +161,7 @@ void ConstGeometryVisitor::visit( const Geometry& g )
 /////
 /////
 /////
-//void ConstGeometryVisitor::visit( const GeometryCollection & g )
+// void ConstGeometryVisitor::visit( const GeometryCollection & g )
 //{
 //	for ( size_t i = 0; i < g.numGeometries(); i++ ){
 //		visit( g.geometryN(i) );
@@ -177,7 +171,7 @@ void ConstGeometryVisitor::visit( const Geometry& g )
 /////
 /////
 /////
-//void ConstGeometryVisitor::visit( const PolyhedralSurface & g )
+// void ConstGeometryVisitor::visit( const PolyhedralSurface & g )
 //{
 //	for ( size_t i = 0; i < g.numPolygons(); i++ ){
 //		visit( g.polygonN(i) );
@@ -187,7 +181,7 @@ void ConstGeometryVisitor::visit( const Geometry& g )
 /////
 /////
 /////
-//void ConstGeometryVisitor::visit( const TriangulatedSurface & g )
+// void ConstGeometryVisitor::visit( const TriangulatedSurface & g )
 //{
 //	for ( size_t i = 0; i < g.numTriangles(); i++ ){
 //		visit( g.triangleN(i) );
@@ -195,9 +189,4 @@ void ConstGeometryVisitor::visit( const Geometry& g )
 //}
 //
 
-
-
-
-
-}//SFCGAL
-
+} // namespace SFCGAL

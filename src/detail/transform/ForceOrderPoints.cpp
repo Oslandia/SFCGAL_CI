@@ -15,14 +15,15 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#include <SFCGAL/detail/transform/ForceOrderPoints.h>
 #include <SFCGAL/Point.h>
-#include <SFCGAL/Triangle.h>
 #include <SFCGAL/Polygon.h>
+#include <SFCGAL/Triangle.h>
 #include <SFCGAL/algorithm/orientation.h>
+#include <SFCGAL/detail/transform/ForceOrderPoints.h>
 
 namespace SFCGAL {
 namespace transform {
@@ -30,83 +31,73 @@ namespace transform {
 ///
 ///
 ///
-ForceOrderPoints::ForceOrderPoints( bool orientCCW ) :
-    _orientCCW( orientCCW )
-{
-
-}
+ForceOrderPoints::ForceOrderPoints(bool orientCCW) : _orientCCW(orientCCW) {}
 
 ///
 ///
 ///
-void ForceOrderPoints::transform( Point& )
+void
+ForceOrderPoints::transform(Point &)
 {
 }
 
-
 ///
 ///
 ///
-void ForceOrderPoints::visit( Triangle& t )
+void
+ForceOrderPoints::visit(Triangle &t)
 {
-    if ( ! t.is3D() ) {
-        if ( ! algorithm::isCounterClockWiseOriented( t ) ) {
-            // not pointing up, reverse
-            if ( _orientCCW ) {
-                t.reverse();
-            }
-        }
-        else {
-            if ( ! _orientCCW ) {
-                t.reverse();
-            }
-        }
-
-        Transform::visit( t );
+  if (!t.is3D()) {
+    if (!algorithm::isCounterClockWiseOriented(t)) {
+      // not pointing up, reverse
+      if (_orientCCW) {
+        t.reverse();
+      }
+    } else {
+      if (!_orientCCW) {
+        t.reverse();
+      }
     }
 
+    Transform::visit(t);
+  }
 }
 
-void ForceOrderPoints::visit( Polygon& p )
+void
+ForceOrderPoints::visit(Polygon &p)
 {
-    if ( ! p.is3D() ) {
-        LineString& ext = p.exteriorRing();
+  if (!p.is3D()) {
+    LineString &ext = p.exteriorRing();
 
-        if ( ! algorithm::isCounterClockWiseOriented( p.exteriorRing() ) ) {
-            // exterior ring not pointing up, reverse
-            if ( _orientCCW ) {
-                ext.reverse();
-            }
-        }
-        else {
-            if ( ! _orientCCW ) {
-                ext.reverse();
-            }
-        }
-
-        for ( size_t i = 0; i < p.numInteriorRings(); ++i ) {
-            LineString inter = p.interiorRingN( i );
-
-            if ( algorithm::isCounterClockWiseOriented( inter ) ) {
-                // interior ring is pointing up, reverse
-                if ( _orientCCW ) {
-                    inter.reverse();
-                }
-            }
-            else {
-                if ( ! _orientCCW ) {
-                    inter.reverse();
-                }
-            }
-        }
-
-        Transform::visit( p );
+    if (!algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
+      // exterior ring not pointing up, reverse
+      if (_orientCCW) {
+        ext.reverse();
+      }
+    } else {
+      if (!_orientCCW) {
+        ext.reverse();
+      }
     }
 
+    for (size_t i = 0; i < p.numInteriorRings(); ++i) {
+      LineString inter = p.interiorRingN(i);
+
+      if (algorithm::isCounterClockWiseOriented(inter)) {
+        // interior ring is pointing up, reverse
+        if (_orientCCW) {
+          inter.reverse();
+        }
+      } else {
+        if (!_orientCCW) {
+          inter.reverse();
+        }
+      }
+    }
+
+    Transform::visit(p);
+  }
 }
 
-}//transform
-}//SFCGAL
-
-
-
+} // namespace transform
+} // namespace SFCGAL

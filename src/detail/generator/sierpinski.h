@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_GENERATOR_SIERPINSKI_H_
@@ -26,7 +27,7 @@
 #include <memory>
 
 namespace SFCGAL {
-class MultiPolygon ;
+class MultiPolygon;
 }
 
 namespace SFCGAL {
@@ -36,7 +37,8 @@ namespace generator {
  * generate hoch snowflake
  * @todo unittest
  */
-SFCGAL_API std::unique_ptr< MultiPolygon > sierpinski( const unsigned int& order ) ;
+SFCGAL_API std::unique_ptr<MultiPolygon>
+           sierpinski(const unsigned int &order);
 
 } // namespace generator
 } // namespace SFCGAL

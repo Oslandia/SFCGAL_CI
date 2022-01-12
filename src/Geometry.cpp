@@ -15,15 +15,16 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/Geometry.h>
 
-#include <SFCGAL/Point.h>
 #include <SFCGAL/GeometryVisitor.h>
-#include <SFCGAL/detail/io/WktWriter.h>
+#include <SFCGAL/Point.h>
 #include <SFCGAL/detail/GetPointsVisitor.h>
+#include <SFCGAL/detail/io/WktWriter.h>
 
 #include <SFCGAL/algorithm/BoundaryVisitor.h>
 #include <SFCGAL/algorithm/distance.h>
@@ -40,157 +41,165 @@ namespace SFCGAL {
 ///
 ///
 ///
-std::string Geometry::asText( const int& numDecimals ) const
+std::string
+Geometry::asText(const int &numDecimals) const
 {
-    std::ostringstream oss;
+  std::ostringstream oss;
 
-    if ( numDecimals >= 0 ) {
-        oss << std::fixed ;
-        oss.precision( numDecimals );
-    }
+  if (numDecimals >= 0) {
+    oss << std::fixed;
+    oss.precision(numDecimals);
+  }
 
-    detail::io::WktWriter writer( oss );
-    bool exact = false;
+  detail::io::WktWriter writer(oss);
+  bool                  exact = false;
 
-    if ( numDecimals == -1 ) {
-        exact = true;
-    }
+  if (numDecimals == -1) {
+    exact = true;
+  }
 
-    writer.write( *this, exact );
-    return oss.str();
+  writer.write(*this, exact);
+  return oss.str();
 }
 
 ///
 ///
 ///
-Envelope   Geometry::envelope() const
+Envelope
+Geometry::envelope() const
 {
-    Envelope box ;
-    detail::EnvelopeVisitor envelopeVisitor( box );
-    accept( envelopeVisitor );
-    return box ;
+  Envelope                box;
+  detail::EnvelopeVisitor envelopeVisitor(box);
+  accept(envelopeVisitor);
+  return box;
 }
 
 ///
 ///
 ///
-std::unique_ptr< Geometry > Geometry::boundary() const
+std::unique_ptr<Geometry>
+Geometry::boundary() const
 {
-    algorithm::BoundaryVisitor visitor ;
-    accept( visitor );
-    return std::unique_ptr< Geometry >( visitor.releaseBoundary() ) ;
-}
-
-
-///
-///
-///
-double Geometry::distance( const Geometry& other ) const
-{
-    return algorithm::distance( *this, other ) ;
+  algorithm::BoundaryVisitor visitor;
+  accept(visitor);
+  return std::unique_ptr<Geometry>(visitor.releaseBoundary());
 }
 
 ///
 ///
 ///
-double Geometry::distance3D( const Geometry& other ) const
+double
+Geometry::distance(const Geometry &other) const
 {
-    return algorithm::distance3D( *this, other ) ;
+  return algorithm::distance(*this, other);
 }
 
 ///
 ///
 ///
-void Geometry::round( const long& scale )
+double
+Geometry::distance3D(const Geometry &other) const
 {
-    transform::RoundTransform roundTransform( scale );
-    accept( roundTransform ) ;
+  return algorithm::distance3D(*this, other);
 }
 
 ///
 ///
 ///
-size_t Geometry::numGeometries() const
+void
+Geometry::round(const long &scale)
 {
-    return 1 ;
+  transform::RoundTransform roundTransform(scale);
+  accept(roundTransform);
 }
 
 ///
 ///
 ///
-const Geometry&    Geometry::geometryN( size_t const& n ) const
+size_t
+Geometry::numGeometries() const
 {
-    BOOST_ASSERT( n == 0 );
-    ( void )n;
-    return *this ;
+  return 1;
 }
 
 ///
 ///
 ///
-Geometry&   Geometry::geometryN( size_t const& n )
+const Geometry &
+Geometry::geometryN(size_t const &n) const
 {
-    BOOST_ASSERT( n == 0 );
-    ( void )n;
-    return *this ;
+  BOOST_ASSERT(n == 0);
+  (void)n;
+  return *this;
 }
 
 ///
 ///
 ///
-Geometry::Geometry() : validityFlag_( false )
+Geometry &
+Geometry::geometryN(size_t const &n)
 {
-
+  BOOST_ASSERT(n == 0);
+  (void)n;
+  return *this;
 }
 
-bool Geometry::hasValidityFlag() const
+///
+///
+///
+Geometry::Geometry() : validityFlag_(false) {}
+
+bool
+Geometry::hasValidityFlag() const
 {
-        return validityFlag_;
+  return validityFlag_;
 }
 
-void Geometry::forceValidityFlag( bool valid )
+void
+Geometry::forceValidityFlag(bool valid)
 {
-        validityFlag_ = valid;
+  validityFlag_ = valid;
 }
 
 ///
 /// Function used to compare geometries
 /// FIXME
-/// Since we do not have (yet) a real "equals" operator, we only compare points coordinates
-bool operator == ( const Geometry& ga, const Geometry& gb )
+/// Since we do not have (yet) a real "equals" operator, we only compare points
+/// coordinates
+bool
+operator==(const Geometry &ga, const Geometry &gb)
 {
-    if ( ga.geometryTypeId() != gb.geometryTypeId() ) {
-        return false;
+  if (ga.geometryTypeId() != gb.geometryTypeId()) {
+    return false;
+  }
+
+  detail::GetPointsVisitor get_points_a, get_points_b;
+  ga.accept(get_points_a);
+  gb.accept(get_points_b);
+
+  if (get_points_a.points.size() != get_points_b.points.size()) {
+    return false;
+  }
+
+  for (size_t i = 0; i < get_points_a.points.size(); ++i) {
+    bool found = false;
+
+    for (size_t j = 0; j < get_points_b.points.size(); ++j) {
+      const Point &pta = *(get_points_a.points[i]);
+      const Point &ptb = *(get_points_b.points[j]);
+
+      if (pta == ptb) {
+        found = true;
+        break;
+      }
     }
 
-    detail::GetPointsVisitor get_points_a, get_points_b;
-    ga.accept( get_points_a );
-    gb.accept( get_points_b );
-
-    if ( get_points_a.points.size() != get_points_b.points.size() ) {
-        return false;
+    if (!found) {
+      return false;
     }
+  }
 
-    for ( size_t i = 0; i < get_points_a.points.size(); ++i ) {
-        bool found = false;
-
-        for ( size_t j = 0; j < get_points_b.points.size(); ++j ) {
-            const Point& pta = *( get_points_a.points[i] );
-            const Point& ptb = *( get_points_b.points[j] );
-
-            if ( pta == ptb ) {
-                found = true;
-                break;
-            }
-        }
-
-        if ( ! found ) {
-            return false;
-        }
-    }
-
-    return true;
+  return true;
 }
 
-}//SFCGAL
-
+} // namespace SFCGAL

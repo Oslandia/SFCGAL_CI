@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _IGN_EXCEPTION_H_
@@ -37,33 +38,37 @@ namespace SFCGAL {
  * BOOST_THROW_EXCEPTION( Exception("invalid geometry") );
  * \endcode
  */
-class SFCGAL_API Exception : public virtual boost::exception, public virtual  std::exception {
+class SFCGAL_API Exception : public virtual boost::exception,
+                             public virtual std::exception {
 public:
-    Exception() throw();
-    Exception( std::string const& message ) throw();
-    virtual ~Exception() throw();
+  Exception() throw();
+  Exception(std::string const &message) throw();
+  virtual ~Exception() throw();
 
-    /**
-     * returns the exception message
-     */
-    virtual const char* what() const throw();
-    /**
-     * returns diagnostic information (file, line, etc.)
-     */
-    std::string diagnostic() const throw();
+  /**
+   * returns the exception message
+   */
+  virtual const char *
+  what() const throw();
+  /**
+   * returns diagnostic information (file, line, etc.)
+   */
+  std::string
+  diagnostic() const throw();
+
 protected:
-    std::string _message;
+  std::string _message;
 };
 
 /**
- * SFCGAL Exception thrown when invalid geometries are found before entering an algo
+ * SFCGAL Exception thrown when invalid geometries are found before entering an
+ * algo
  */
 class SFCGAL_API GeometryInvalidityException : public Exception {
 public:
-    GeometryInvalidityException( std::string const& message ):
-        Exception( message ) {
-    }
-
+  GeometryInvalidityException(std::string const &message) : Exception(message)
+  {
+  }
 };
 
 /**
@@ -71,10 +76,7 @@ public:
  */
 class SFCGAL_API NotImplementedException : public Exception {
 public:
-    NotImplementedException( std::string const& message ):
-        Exception( message ) {
-    }
-
+  NotImplementedException(std::string const &message) : Exception(message) {}
 };
 
 /**
@@ -82,10 +84,10 @@ public:
  */
 class SFCGAL_API InappropriateGeometryException : public Exception {
 public:
-    InappropriateGeometryException( std::string const& message ):
-        Exception( message ) {
-    }
-
+  InappropriateGeometryException(std::string const &message)
+      : Exception(message)
+  {
+  }
 };
 
 /**
@@ -93,10 +95,7 @@ public:
  */
 class SFCGAL_API NonFiniteValueException : public Exception {
 public:
-    NonFiniteValueException( std::string const& message ):
-        Exception( message ) {
-    }
-
+  NonFiniteValueException(std::string const &message) : Exception(message) {}
 };
 
 /**
@@ -104,14 +103,9 @@ public:
  */
 class SFCGAL_API WktParseException : public Exception {
 public:
-    WktParseException( std::string const& message ):
-        Exception( message ) {
-    }
-
+  WktParseException(std::string const &message) : Exception(message) {}
 };
 
 } // namespace SFCGAL
 
 #endif
-
-

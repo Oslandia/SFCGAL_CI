@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/GeometryCollection.h>
@@ -23,199 +24,203 @@
 
 #include <SFCGAL/Exception.h>
 
-
-
 namespace SFCGAL {
 
 ///
 ///
 ///
-GeometryCollection::GeometryCollection():
-    _geometries()
-{
+GeometryCollection::GeometryCollection() : _geometries() {}
 
+///
+///
+///
+GeometryCollection::GeometryCollection(GeometryCollection const &other)
+    : Geometry(other)
+{
+  for (size_t i = 0; i < other.numGeometries(); i++) {
+    addGeometry(other.geometryN(i).clone());
+  }
 }
 
 ///
 ///
 ///
-GeometryCollection::GeometryCollection( GeometryCollection const& other ):
-    Geometry(other)
+GeometryCollection &
+GeometryCollection::operator=(GeometryCollection other)
 {
-    for ( size_t i = 0; i < other.numGeometries(); i++ ) {
-        addGeometry( other.geometryN( i ).clone() );
-    }
+  swap(other);
+  return *this;
 }
 
 ///
 ///
 ///
-GeometryCollection& GeometryCollection::operator = ( GeometryCollection other )
+GeometryCollection::~GeometryCollection() {}
+
+///
+///
+///
+GeometryCollection *
+GeometryCollection::clone() const
 {
-    swap( other );
-    return *this ;
+  return new GeometryCollection(*this);
 }
 
 ///
 ///
 ///
-GeometryCollection::~GeometryCollection()
+std::string
+GeometryCollection::geometryType() const
 {
-
+  return "GeometryCollection";
 }
 
 ///
 ///
 ///
-GeometryCollection*   GeometryCollection::clone() const
+GeometryType
+GeometryCollection::geometryTypeId() const
 {
-    return new GeometryCollection( *this );
+  return TYPE_GEOMETRYCOLLECTION;
 }
 
 ///
 ///
 ///
-std::string    GeometryCollection::geometryType() const
+int
+GeometryCollection::dimension() const
 {
-    return "GeometryCollection";
+  int maxDimension = 0;
+
+  for (boost::ptr_vector<Geometry>::const_iterator it = _geometries.begin();
+       it != _geometries.end(); ++it) {
+    maxDimension = std::max(maxDimension, it->dimension());
+  }
+
+  return maxDimension;
 }
 
 ///
 ///
 ///
-GeometryType   GeometryCollection::geometryTypeId() const
+int
+GeometryCollection::coordinateDimension() const
 {
-    return TYPE_GEOMETRYCOLLECTION ;
+  if (isEmpty()) {
+    return 0;
+  } else {
+    return _geometries.front().coordinateDimension();
+  }
 }
 
 ///
 ///
 ///
-int  GeometryCollection::dimension() const
+bool
+GeometryCollection::isEmpty() const
 {
-    int maxDimension = 0 ;
-
-    for ( boost::ptr_vector< Geometry >::const_iterator it = _geometries.begin(); it != _geometries.end(); ++it ) {
-        maxDimension = std::max( maxDimension, it->dimension() );
-    }
-
-    return maxDimension ;
+  return _geometries.empty();
 }
 
 ///
 ///
 ///
-int   GeometryCollection::coordinateDimension() const
+bool
+GeometryCollection::is3D() const
 {
-    if ( isEmpty() ) {
-        return 0 ;
-    }
-    else {
-        return _geometries.front().coordinateDimension() ;
-    }
+  return !isEmpty() && _geometries.front().is3D();
 }
 
 ///
 ///
 ///
-bool   GeometryCollection::isEmpty() const
+bool
+GeometryCollection::isMeasured() const
 {
-    return _geometries.empty() ;
+  return !isEmpty() && _geometries.front().isMeasured();
 }
 
 ///
 ///
 ///
-bool   GeometryCollection::is3D() const
+size_t
+GeometryCollection::numGeometries() const
 {
-    return ! isEmpty() && _geometries.front().is3D() ;
+  return _geometries.size();
 }
 
 ///
 ///
 ///
-bool   GeometryCollection::isMeasured() const
+const Geometry &
+GeometryCollection::geometryN(size_t const &n) const
 {
-    return ! isEmpty() && _geometries.front().isMeasured() ;
+  return _geometries[n];
 }
 
 ///
 ///
 ///
-size_t  GeometryCollection::numGeometries() const
+Geometry &
+GeometryCollection::geometryN(size_t const &n)
 {
-    return _geometries.size();
+  return _geometries[n];
 }
 
 ///
 ///
 ///
-const Geometry&    GeometryCollection::geometryN( size_t const& n ) const
+void
+GeometryCollection::addGeometry(Geometry *geometry)
 {
-    return _geometries[n];
+  BOOST_ASSERT(geometry != NULL);
+
+  if (!isAllowed(*geometry)) {
+    std::ostringstream oss;
+    oss << "try a add a '" << geometry->geometryType() << "' in a '"
+        << geometryType() << "'";
+    delete geometry; // we are responsible for the resource here
+    BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
+  }
+
+  _geometries.push_back(geometry);
 }
 
 ///
 ///
 ///
-Geometry&          GeometryCollection::geometryN( size_t const& n )
+void
+GeometryCollection::addGeometry(Geometry const &geometry)
 {
-    return _geometries[n];
-}
-
-
-///
-///
-///
-void    GeometryCollection::addGeometry( Geometry* geometry )
-{
-    BOOST_ASSERT( geometry != NULL );
-
-    if ( ! isAllowed( *geometry ) ) {
-        std::ostringstream oss;
-        oss << "try a add a '" << geometry->geometryType() << "' in a '" << geometryType() << "'";
-        delete geometry; // we are responsible for the resource here
-        BOOST_THROW_EXCEPTION( std::runtime_error( oss.str() ) );
-    }
-
-    _geometries.push_back( geometry );
+  addGeometry(geometry.clone());
 }
 
 ///
 ///
 ///
-void    GeometryCollection::addGeometry( Geometry const& geometry )
+bool
+GeometryCollection::isAllowed(Geometry const &)
 {
-    addGeometry( geometry.clone() );
+  // GeometryCollection accepts all subtypes
+  return true;
 }
 
 ///
 ///
 ///
-bool GeometryCollection::isAllowed( Geometry const& )
+void
+GeometryCollection::accept(GeometryVisitor &visitor)
 {
-    //GeometryCollection accepts all subtypes
-    return true ;
+  return visitor.visit(*this);
 }
 
 ///
 ///
 ///
-void GeometryCollection::accept( GeometryVisitor& visitor )
+void
+GeometryCollection::accept(ConstGeometryVisitor &visitor) const
 {
-    return visitor.visit( *this );
+  return visitor.visit(*this);
 }
 
-///
-///
-///
-void GeometryCollection::accept( ConstGeometryVisitor& visitor ) const
-{
-    return visitor.visit( *this );
-}
-
-
-
-
-}//SFCGAL
-
+} // namespace SFCGAL

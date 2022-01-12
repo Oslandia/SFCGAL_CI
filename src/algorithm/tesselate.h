@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_TESSELATE_H_
@@ -30,24 +31,25 @@ namespace algorithm {
 struct NoValidityCheck;
 
 /**
- * Tesselate a geometry: this will triangulate surfaces (including polyhedral and solid's surfaces) and keep untouched
- * points, lines, etc.
+ * Tesselate a geometry: this will triangulate surfaces (including polyhedral
+ * and solid's surfaces) and keep untouched points, lines, etc.
  * @pre g is a valid geometry
  * @ingroup public_api
  */
-SFCGAL_API std::unique_ptr<SFCGAL::Geometry> tesselate( const Geometry& );
+SFCGAL_API std::unique_ptr<SFCGAL::Geometry>
+           tesselate(const Geometry &);
 
 /**
- * Tesselate a geometry: this will triangulate surfaces (including polyhedral and solid's surfaces) and keep untouched
- * points, lines, etc.
+ * Tesselate a geometry: this will triangulate surfaces (including polyhedral
+ * and solid's surfaces) and keep untouched points, lines, etc.
  * @pre g is a valid geometry
  * @ingroup detail
  * @warning No actual validity check is done.
  */
-SFCGAL_API std::unique_ptr<SFCGAL::Geometry> tesselate( const Geometry&, NoValidityCheck );
+SFCGAL_API std::unique_ptr<SFCGAL::Geometry>
+           tesselate(const Geometry &, NoValidityCheck);
 
-}//algorithm
-}//SFCGAL
-
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif

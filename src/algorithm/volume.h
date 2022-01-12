@@ -15,15 +15,16 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_VOLUME_H_
 #define _SFCGAL_ALGORITHM_VOLUME_H_
 
-#include <SFCGAL/export.h>
-#include <SFCGAL/Kernel.h>
 #include <SFCGAL/Geometry.h>
+#include <SFCGAL/Kernel.h>
+#include <SFCGAL/export.h>
 
 namespace SFCGAL {
 namespace algorithm {
@@ -35,16 +36,18 @@ struct NoValidityCheck;
  * @pre g is a valid Geometry
  * @ingroup public_api
  */
-SFCGAL_API const Kernel::FT volume( const Geometry& g );
+SFCGAL_API const Kernel::FT
+                 volume(const Geometry &g);
 
 /**
  * Computes the volume of a Solid
  * @pre (not checked) volume is closed and consistently oriented
  * @ingroup detail
  */
-SFCGAL_API const Kernel::FT volume( const Solid& g, NoValidityCheck );
+SFCGAL_API const Kernel::FT
+                 volume(const Solid &g, NoValidityCheck);
 
-}
-}
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif

@@ -15,30 +15,33 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#include <SFCGAL/io/GeometryStreams.h>
 #include <SFCGAL/Envelope.h>
 #include <SFCGAL/Geometry.h>
+#include <SFCGAL/io/GeometryStreams.h>
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-std::ostream& operator<<( std::ostream& ostr, const Envelope& env )
+std::ostream &
+operator<<(std::ostream &ostr, const Envelope &env)
 {
-    return env.print( ostr );
+  return env.print(ostr);
 }
 
 ///
 ///
 ///
-std::ostream& operator<<( std::ostream& ostr, const Geometry& g )
+std::ostream &
+operator<<(std::ostream &ostr, const Geometry &g)
 {
-    ostr << g.asText();
-    return ostr;
+  ostr << g.asText();
+  return ostr;
 }
 
-}
+} // namespace SFCGAL

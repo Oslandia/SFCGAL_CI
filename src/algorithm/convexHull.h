@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_CONVEXHULL_H_
@@ -32,18 +33,18 @@ namespace algorithm {
  * Compute the 2D convex hull for a geometry
  * @ingroup public_api
  */
-SFCGAL_API std::unique_ptr<Geometry> convexHull( const Geometry& g ) ;
+SFCGAL_API std::unique_ptr<Geometry>
+           convexHull(const Geometry &g);
 
 /**
  * Compute the 3D convex hull for a geometry
  * @todo improve to handle collinear points and coplanar points
  * @ingroup public_api
  */
-SFCGAL_API std::unique_ptr<Geometry> convexHull3D( const Geometry& g ) ;
+SFCGAL_API std::unique_ptr<Geometry>
+           convexHull3D(const Geometry &g);
 
-
-}//algorithm
-}//SFCGAL
-
+} // namespace algorithm
+} // namespace SFCGAL
 
 #endif

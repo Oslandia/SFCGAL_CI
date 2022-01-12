@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_GRAPH_VERTEX_H_
@@ -29,19 +30,19 @@ namespace SFCGAL {
 namespace graph {
 
 /**
- * @brief [private]A vertex in a GeometryGraph with minimal requirements (some algorithms could need
- * a richer class)
+ * @brief [private]A vertex in a GeometryGraph with minimal requirements (some
+ * algorithms could need a richer class)
  */
 struct SFCGAL_API Vertex {
-    /**
-     * [requirement]Constructor with coordinate
-     */
-    Vertex( const Coordinate& coordinate_ = Coordinate() ) ;
+  /**
+   * [requirement]Constructor with coordinate
+   */
+  Vertex(const Coordinate &coordinate_ = Coordinate());
 
-    Coordinate coordinate ;
+  Coordinate coordinate;
 };
 
-}//graph
-}//SFCGAL
+} // namespace graph
+} // namespace SFCGAL
 
 #endif

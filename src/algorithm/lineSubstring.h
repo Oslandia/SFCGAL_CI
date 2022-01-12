@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_ALGORITHM_LINESUBSTRING_H_
@@ -27,14 +28,12 @@
 // SFCGAL
 #include <SFCGAL/config.h>
 
-namespace SFCGAL
-{
+namespace SFCGAL {
 
 // Class forward delclarations.
-class LineString ;
+class LineString;
 
-namespace algorithm
-{
+namespace algorithm {
 
 /**
  * @brief Retrieve a substring of a specified LineString,
@@ -58,14 +57,11 @@ namespace algorithm
  * @throws If either {@code start} or {@code end} have an absolute value
  *   greater than 1.
  */
-SFCGAL_API std::unique_ptr<LineString> lineSubstring( const LineString& ls
-                                                    , double start
-                                                    , double end
-                                                    );
+SFCGAL_API std::unique_ptr<LineString>
+           lineSubstring(const LineString &ls, double start, double end);
 
-} // ! namespace algorithm
+} // namespace algorithm
 
-} // ! namespace SFCGAL
-
+} // namespace SFCGAL
 
 #endif // ! _SFCGAL_ALGORITHM_LINESUBSTRING_H_

@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #include <SFCGAL/algorithm/force3D.h>
@@ -27,12 +28,12 @@ namespace algorithm {
 ///
 ///
 ///
-void force3D( Geometry& g, const Kernel::FT& defaultZ )
+void
+force3D(Geometry &g, const Kernel::FT &defaultZ)
 {
-    transform::ForceZ t( defaultZ ) ;
-    g.accept( t ) ;
+  transform::ForceZ t(defaultZ);
+  g.accept(t);
 }
 
 } // namespace algorithm
 } // namespace SFCGAL
-

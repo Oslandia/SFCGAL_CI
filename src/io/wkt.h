@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SFCGAL_IO_WKT_H_
@@ -23,12 +24,12 @@
 
 #include <SFCGAL/config.h>
 
+#include <memory>
 #include <sstream>
 #include <string>
-#include <memory>
 
 namespace SFCGAL {
-class Geometry ;
+class Geometry;
 }
 
 namespace SFCGAL {
@@ -36,16 +37,19 @@ namespace io {
 /**
  * Read a WKT geometry from an input stream
  */
-SFCGAL_API std::unique_ptr< Geometry > readWkt( std::istream& s ) ;
+SFCGAL_API std::unique_ptr<Geometry>
+           readWkt(std::istream &s);
 /**
  * Read a WKT geometry from a string
  */
-SFCGAL_API std::unique_ptr< Geometry > readWkt( const std::string& s ) ;
+SFCGAL_API std::unique_ptr<Geometry>
+           readWkt(const std::string &s);
 /**
  * Read a WKT geometry from a char*
  */
-SFCGAL_API std::unique_ptr< Geometry > readWkt( const char*, size_t );
-}
-}
+SFCGAL_API std::unique_ptr<Geometry>
+           readWkt(const char *, size_t);
+} // namespace io
+} // namespace SFCGAL
 
 #endif

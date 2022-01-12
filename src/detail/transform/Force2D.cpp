@@ -15,12 +15,12 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#include <SFCGAL/detail/transform/Force2D.h>
 #include <SFCGAL/Point.h>
-
+#include <SFCGAL/detail/transform/Force2D.h>
 
 namespace SFCGAL {
 namespace transform {
@@ -28,19 +28,16 @@ namespace transform {
 ///
 ///
 ///
-void Force2D::transform( Point& p )
+void
+Force2D::transform(Point &p)
 {
-    if ( ! p.isEmpty() && p.is3D() ) {
-        Point pt( p.x(), p.y() );
-        if ( p.isMeasured() )
-            pt.setM( p.m() );
-        p = pt;
-    }
+  if (!p.isEmpty() && p.is3D()) {
+    Point pt(p.x(), p.y());
+    if (p.isMeasured())
+      pt.setM(p.m());
+    p = pt;
+  }
 }
 
-
-}//transform
-}//SFCGAL
-
-
-
+} // namespace transform
+} // namespace SFCGAL
