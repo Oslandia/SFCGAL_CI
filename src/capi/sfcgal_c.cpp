@@ -1199,7 +1199,8 @@ sfcgal_geometry_line_sub_string(const sfcgal_geometry_t *geom, double start,
 
 extern "C" sfcgal_geometry_t *
 sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
-                             bool allow_holes) {
+                             bool allow_holes)
+{
   const SFCGAL::Geometry *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   std::unique_ptr<SFCGAL::Geometry> result;
 
@@ -1218,16 +1219,18 @@ sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
 }
 
 extern "C" sfcgal_geometry_t *
-sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom, bool allow_holes,
-                             size_t nb_components) {
+sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
+                                     bool allow_holes, size_t nb_components)
+{
   const SFCGAL::Geometry *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   std::unique_ptr<SFCGAL::Geometry> result;
 
   try {
-    result = SFCGAL::algorithm::optimal_alpha_shapes(g1->as<const SFCGAL::Geometry>(),
-                                            allow_holes, nb_components);
+    result = SFCGAL::algorithm::optimal_alpha_shapes(
+        g1->as<const SFCGAL::Geometry>(), allow_holes, nb_components);
   } catch (std::exception &e) {
-    SFCGAL_WARNING("During optimal_alpha_shapes(A, %g %g):", allow_holes, nb_components);
+    SFCGAL_WARNING("During optimal_alpha_shapes(A, %g %g):", allow_holes,
+                   nb_components);
     SFCGAL_WARNING("  with A: %s",
                    ((const SFCGAL::Geometry *)(geom))->asText().c_str());
     SFCGAL_ERROR("%s", e.what());

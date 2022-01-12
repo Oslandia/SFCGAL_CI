@@ -44,8 +44,8 @@ alphaShapes(const Geometry &g, double alpha = 1, bool allow_holes = false);
  * @since 1.4.1
  */
 SFCGAL_API std::unique_ptr<Geometry>
-optimal_alpha_shapes(const Geometry &g, bool allow_holes = false,
-                     size_t nb_components = 1);
+           optimal_alpha_shapes(const Geometry &g, bool allow_holes = false,
+                                size_t nb_components = 1);
 
 } // namespace algorithm
 } // namespace SFCGAL

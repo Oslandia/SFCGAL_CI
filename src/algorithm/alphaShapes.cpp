@@ -39,13 +39,13 @@
 namespace SFCGAL {
 namespace algorithm {
 
-typedef CGAL::Alpha_shape_vertex_base_2<Kernel> Vb;
-typedef CGAL::Alpha_shape_face_base_2<Kernel> Fb;
+typedef CGAL::Alpha_shape_vertex_base_2<Kernel>      Vb;
+typedef CGAL::Alpha_shape_face_base_2<Kernel>        Fb;
 typedef CGAL::Triangulation_data_structure_2<Vb, Fb> Tds;
-typedef CGAL::Delaunay_triangulation_2<Kernel, Tds> Triangulation_2;
-typedef CGAL::Point_2<Kernel> Point_2;
-typedef CGAL::Segment_2<Kernel> Segment_2;
-typedef CGAL::Alpha_shape_2<Triangulation_2> Alpha_shape_2;
+typedef CGAL::Delaunay_triangulation_2<Kernel, Tds>  Triangulation_2;
+typedef CGAL::Point_2<Kernel>                        Point_2;
+typedef CGAL::Segment_2<Kernel>                      Segment_2;
+typedef CGAL::Alpha_shape_2<Triangulation_2>         Alpha_shape_2;
 
 typedef Alpha_shape_2::Alpha_shape_edges_iterator Alpha_shape_edges_iterator;
 
@@ -54,8 +54,10 @@ typedef CGAL::Arr_non_caching_segment_basic_traits_2<Kernel> Traits_2;
 typedef CGAL::Arrangement_2<Traits_2> Arrangement;
 
 template <class OutputIterator>
-void alpha_edges(const Alpha_shape_2 &A, OutputIterator out) {
-  Alpha_shape_edges_iterator it = A.alpha_shape_edges_begin(),
+void
+alpha_edges(const Alpha_shape_2 &A, OutputIterator out)
+{
+  Alpha_shape_edges_iterator it  = A.alpha_shape_edges_begin(),
                              end = A.alpha_shape_edges_end();
   for (; it != end; ++it) {
     if (A.classify(*it) == 2)
@@ -63,8 +65,10 @@ void alpha_edges(const Alpha_shape_2 &A, OutputIterator out) {
   }
 }
 
-static double computeAlpha(const Geometry &g, Alpha_shape_2 &alphaShape,
-                           double alpha = 0, size_t nb_components = 1) {
+static double
+computeAlpha(const Geometry &g, Alpha_shape_2 &alphaShape, double alpha = 0,
+             size_t nb_components = 1)
+{
   using CGAL::object_cast;
   double result = -1.0;
 
@@ -103,8 +107,9 @@ static double computeAlpha(const Geometry &g, Alpha_shape_2 &alphaShape,
   return result;
 }
 
-static std::unique_ptr<Geometry> alpha_to_geometry(const Alpha_shape_2 &A,
-                                                   bool allow_holes) {
+static std::unique_ptr<Geometry>
+alpha_to_geometry(const Alpha_shape_2 &A, bool allow_holes)
+{
   std::vector<Segment_2> segments;
   alpha_edges(A, std::back_inserter(segments));
 
@@ -134,11 +139,11 @@ static std::unique_ptr<Geometry> alpha_to_geometry(const Alpha_shape_2 &A,
   return std::unique_ptr<Geometry>(poly);
 }
 
-std::unique_ptr<Geometry> optimal_alpha_shapes(const Geometry &g,
-                                               bool allow_holes,
-                                               size_t nb_components) {
+std::unique_ptr<Geometry>
+optimal_alpha_shapes(const Geometry &g, bool allow_holes, size_t nb_components)
+{
   Alpha_shape_2 A;
-  const double optimalAlpha = computeAlpha(g, A, 10000, nb_components);
+  const double  optimalAlpha = computeAlpha(g, A, 10000, nb_components);
   if (optimalAlpha < 0) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
   }
@@ -148,11 +153,12 @@ std::unique_ptr<Geometry> optimal_alpha_shapes(const Geometry &g,
   return alpha_to_geometry(A, allow_holes);
 }
 
-std::unique_ptr<Geometry> alphaShapes(const Geometry &g, double alpha,
-                                      bool allow_holes) {
+std::unique_ptr<Geometry>
+alphaShapes(const Geometry &g, double alpha, bool allow_holes)
+{
   using CGAL::object_cast;
   Alpha_shape_2 A;
-  const double optimalAlpha = computeAlpha(g, A, alpha);
+  const double  optimalAlpha = computeAlpha(g, A, alpha);
   if (optimalAlpha < 0) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
   }
