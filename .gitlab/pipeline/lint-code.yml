@@ -5,14 +5,9 @@
 # correct indentation etc.)
 clang-format:
   stage: lint
-  image: $CI_REGISTRY_IMAGE/clang_format:$TAG
-  variables:
-      DOCKER_FILE: ".gitlab/dockerfiles/clang_format"
+  image: mikedld/clang-format:13-alpine
   script:
     - run-clang-format.py -r src --style=file
-  needs:
-    - job: "clang_format container build"
-      optional: true
   rules:
     # These rules are here to select a different Docker image depending on the
     # running conditions. The statements are evaluated from top to bottom until a rule
