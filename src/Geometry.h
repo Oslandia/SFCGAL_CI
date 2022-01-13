@@ -230,6 +230,14 @@ public:
   void
   round(const long &scale = 1);
 
+/**
+ * Equality operator
+ * @todo only compare coordinate points
+ * @pre the two geometries must be valid
+ */
+auto
+almostEqual(const Geometry &, const double tolerance) const -> bool;
+
   /**
    * @brief [OGC/SFA]Gets the number of geometries in a collection of geometries
    * @warning 1 for Point, LineString, Polygon, Triangle
@@ -319,7 +327,6 @@ protected:
  */
 SFCGAL_API bool
 operator==(const Geometry &, const Geometry &);
-
 } // namespace SFCGAL
 
 #endif
