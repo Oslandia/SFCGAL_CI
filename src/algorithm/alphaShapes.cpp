@@ -94,16 +94,15 @@ static auto
 alpha_to_geometry(const Alpha_shape_2 &A, bool allow_holes)
     -> std::unique_ptr<Geometry>
 {
-  std::unique_ptr<Geometry> result;
-  std::vector<Segment_2>    segments;
+  std::vector<Segment_2> segments;
   alpha_edges(A, std::back_inserter(segments));
 
   Arrangement arr;
 
   CGAL::insert_non_intersecting_curves(arr, segments.begin(), segments.end());
-  auto *poly = new Polygon;
+  std::unique_ptr<Polygon> poly(new Polygon);
   for (auto f = arr.faces_begin(); f != arr.faces_end(); f++) {
-    auto *ring = new LineString;
+    std::unique_ptr<LineString> ring(new LineString);
     for (auto h = f->holes_begin(); h != f->holes_end(); h++) {
       auto he = *h;
       do {
@@ -114,14 +113,14 @@ alpha_to_geometry(const Alpha_shape_2 &A, bool allow_holes)
     if (ring->numPoints() > 3) {
       ring->addPoint(ring->startPoint());
       if (f->is_unbounded()) {
-        poly->setExteriorRing(ring);
+        poly->setExteriorRing(ring.release());
       } else if (allow_holes) {
-        poly->addInteriorRing(ring);
+        poly->addInteriorRing(ring.release());
       }
     }
   }
 
-  result.reset(poly);
+  std::unique_ptr<Geometry> result = std::move(poly);
 
   return result;
 }
@@ -131,7 +130,7 @@ optimal_alpha_shapes(const Geometry &g, bool allow_holes, size_t nb_components)
     -> std::unique_ptr<Geometry>
 {
   Alpha_shape_2 A;
-  const double  optimalAlpha = computeAlpha(g, A, 10000, nb_components);
+  const double  optimalAlpha{computeAlpha(g, A, 10000, nb_components)};
   if (optimalAlpha < 0) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
   }
@@ -147,7 +146,7 @@ alphaShapes(const Geometry &g, double alpha, bool allow_holes)
 {
   using CGAL::object_cast;
   Alpha_shape_2 A;
-  const double  optimalAlpha = computeAlpha(g, A, alpha);
+  const double  optimalAlpha{computeAlpha(g, A, alpha)};
   if (optimalAlpha < 0) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
   }

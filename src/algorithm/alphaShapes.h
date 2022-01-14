@@ -18,8 +18,8 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SFCGAL_ALGORITHM_ALPHASHAPES_H_
-#define _SFCGAL_ALGORITHM_ALPHASHAPES_H_
+#ifndef SFCGAL_ALGORITHM_ALPHASHAPES_H_
+#define SFCGAL_ALGORITHM_ALPHASHAPES_H_
 
 #include <SFCGAL/config.h>
 
@@ -34,8 +34,9 @@ namespace algorithm {
  * @ingroup public_api
  * @since 1.4.1
  */
-SFCGAL_API std::unique_ptr<Geometry>
-alphaShapes(const Geometry &g, double alpha = 1, bool allow_holes = false);
+SFCGAL_API auto
+alphaShapes(const Geometry &g, double alpha = 1, bool allow_holes = false)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * Compute the optimal 2D alpha shapes for a geometry
@@ -43,9 +44,9 @@ alphaShapes(const Geometry &g, double alpha = 1, bool allow_holes = false);
  * @ingroup public_api
  * @since 1.4.1
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           optimal_alpha_shapes(const Geometry &g, bool allow_holes = false,
-                                size_t nb_components = 1);
+SFCGAL_API auto
+optimal_alpha_shapes(const Geometry &g, bool allow_holes = false,
+                     size_t nb_components = 1) -> std::unique_ptr<Geometry>;
 
 } // namespace algorithm
 } // namespace SFCGAL
