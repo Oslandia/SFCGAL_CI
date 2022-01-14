@@ -32,24 +32,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-namespace SFCGAL {
-namespace algorithm {
-void handleLeakTest();
-}
-}
-
 #define DEBUG_OUT if (0) std::cerr << __FILE__ << ":" << __LINE__ << " debug: "
 
 using namespace SFCGAL;
 using namespace boost::unit_test ;
 
 BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_UnionTest )
-
-
-BOOST_AUTO_TEST_CASE( Handle )
-{
-    algorithm::handleLeakTest();
-}
 
 BOOST_AUTO_TEST_CASE( Handle1 )
 {
@@ -398,4 +386,3 @@ BOOST_AUTO_TEST_CASE( VolumeVolume )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

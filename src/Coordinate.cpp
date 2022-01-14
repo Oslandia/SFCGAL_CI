@@ -389,9 +389,8 @@ Coordinate::operator==(const Coordinate &other) const -> bool
 
   if (is3D() || other.is3D()) {
     return x() == other.x() && y() == other.y() && z() == other.z();
-  } else {
-    return x() == other.x() && y() == other.y();
   }
+  return x() == other.x() && y() == other.y();
 }
 
 ///
@@ -401,6 +400,26 @@ auto
 Coordinate::operator!=(const Coordinate &other) const -> bool
 {
   return !(*this == other);
+}
+
+auto
+Coordinate::almostEqual(const Coordinate &other, const double tolerance) const
+    -> bool
+{
+  if (isEmpty()) {
+    return other.isEmpty();
+  }
+
+  const bool xEquality =
+      SFCGAL::almostEqual(x(), other.x(), Kernel::FT(tolerance));
+  const bool yEquality =
+      SFCGAL::almostEqual(y(), other.y(), Kernel::FT(tolerance));
+  if (is3D() || other.is3D()) {
+    const bool zEquality =
+        SFCGAL::almostEqual(z(), other.z(), Kernel::FT(tolerance));
+    return xEquality && yEquality && zEquality;
+  }
+  return xEquality && yEquality;
 }
 
 } // namespace SFCGAL
