@@ -144,6 +144,43 @@ Geometry::forceValidityFlag(bool valid)
   validityFlag_ = valid;
 }
 
+auto
+Geometry::almostEqual(const Geometry &other, const double tolerance) const
+    -> bool
+{
+  if (geometryTypeId() != other.geometryTypeId()) {
+    return false;
+  }
+
+  detail::GetPointsVisitor get_points_a;
+  detail::GetPointsVisitor get_points_b;
+  accept(get_points_a);
+  other.accept(get_points_b);
+
+  if (get_points_a.points.size() != get_points_b.points.size()) {
+    return false;
+  }
+
+  for (auto &point : get_points_a.points) {
+    bool found = false;
+
+    for (auto &j : get_points_b.points) {
+      const Point &pta = *point;
+      const Point &ptb = *j;
+
+      if (pta.almostEqual(ptb, tolerance)) {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      return false;
+    }
+  }
+
+  return true;
+}
 ///
 /// Function used to compare geometries
 /// FIXME
@@ -156,7 +193,8 @@ operator==(const Geometry &ga, const Geometry &gb) -> bool
     return false;
   }
 
-  detail::GetPointsVisitor get_points_a, get_points_b;
+  detail::GetPointsVisitor get_points_a;
+  detail::GetPointsVisitor get_points_b;
   ga.accept(get_points_a);
   gb.accept(get_points_b);
 

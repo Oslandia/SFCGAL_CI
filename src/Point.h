@@ -164,6 +164,12 @@ public:
   bool
   operator!=(const Point &other) const;
 
+  /**
+   * absolute comparison with an other point
+   */
+  bool
+  almostEqual(const Point &other, const double tolerance) const;
+
   //-- visitors
 
   //-- SFCGAL::Geometry

@@ -15,39 +15,40 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
+#include <CGAL/Nef_polyhedron_3.h>
 #include <SFCGAL/PolyhedralSurface.h>
 #include <SFCGAL/Solid.h>
-#include <SFCGAL/algorithm/volume.h>
 #include <SFCGAL/algorithm/isValid.h>
+#include <SFCGAL/algorithm/volume.h>
 #include <SFCGAL/io/wkt.h>
-#include <CGAL/Nef_polyhedron_3.h>
 
 #include <boost/test/unit_test.hpp>
 
 using namespace SFCGAL;
-using namespace boost::unit_test ;
+using namespace boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_VolumeTest )
+BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_VolumeTest)
 
-
-BOOST_AUTO_TEST_CASE( cubeVolume )
+BOOST_AUTO_TEST_CASE(cubeVolume)
 {
-    const std::unique_ptr<Geometry> s = io::readWkt( "SOLID((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
+  const std::unique_ptr<Geometry> s =
+      io::readWkt("SOLID((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
                                                      ((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),\
                                                      ((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),\
                                                      ((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),\
                                                      ((0 0 1,1 0 1,1 1 1,0 1 1,0 0 1)),\
-                                                     ((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0))))" );
-    BOOST_CHECK_EQUAL( algorithm::volume( *s ), 1 );
+                                                     ((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0))))");
+  BOOST_CHECK_EQUAL(algorithm::volume(*s), 1);
 }
 
-BOOST_AUTO_TEST_CASE( cubeWithHoleVolume )
+BOOST_AUTO_TEST_CASE(cubeWithHoleVolume)
 {
-    const std::unique_ptr<Geometry> s = io::readWkt(
-                                    "SOLID((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
+  const std::unique_ptr<Geometry> s =
+      io::readWkt("SOLID((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
                 ((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),\
                 ((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),\
                 ((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),\
@@ -58,36 +59,39 @@ BOOST_AUTO_TEST_CASE( cubeWithHoleVolume )
                 ((.2 .2 .2,.2 .2 .8,.8 .2 .8,.8 .2 .2,.2 .2 .2)),\
                 ((.8 .2 .2,.8 .2 .8,.8 .8 .8,.8 .8 .2,.8 .2 .2)),\
                 ((.2 .2 .8,.2 .8 .8,.8 .8 .8,.8 .2 .8,.2 .2 .8)),\
-                ((.2 .8 .2,.8 .8 .2,.8 .8 .8,.2 .8 .8,.2 .8 .2))))" );
-    const Kernel::FT c( .6 );
-    const Kernel::FT ref =  1 - c*c*c;
-    BOOST_CHECK_EQUAL( CGAL::to_double( algorithm::volume( s->as<Solid>(), algorithm::NoValidityCheck() ) ), CGAL::to_double( ref ) );
+                ((.2 .8 .2,.8 .8 .2,.8 .8 .8,.2 .8 .8,.2 .8 .2))))");
+  const Kernel::FT c(.6);
+  const Kernel::FT ref = 1 - c * c * c;
+  BOOST_CHECK(algorithm::volume(
+                        s->as<Solid>(), algorithm::NoValidityCheck())
+                    - ref < 0.001);
 }
 
-BOOST_AUTO_TEST_CASE( invertedCubeVolume )
+BOOST_AUTO_TEST_CASE(invertedCubeVolume)
 {
-    std::unique_ptr<Geometry> s = io::readWkt( "SOLID((((0 0 0,0 1 0,0 1 1,0 0 1,0 0 0)),\
+  std::unique_ptr<Geometry> s =
+      io::readWkt("SOLID((((0 0 0,0 1 0,0 1 1,0 0 1,0 0 0)),\
                                                      ((0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)),\
                                                      ((0 0 0,0 0 1,1 0 1,1 0 0,0 0 0)),\
                                                      ((1 0 0,1 0 1,1 1 1,1 1 0,1 0 0)),\
                                                      ((0 0 1,0 1 1,1 1 1,1 0 1,0 0 1)),\
-                                                     ((0 1 0,1 1 0,1 1 1,0 1 1,0 1 0))))" );
-    BOOST_CHECK_EQUAL( algorithm::volume( *s ), -1 );
-
+                                                     ((0 1 0,1 1 0,1 1 1,0 1 1,0 1 0))))");
+  BOOST_CHECK_EQUAL(algorithm::volume(*s), -1);
 }
 
-BOOST_AUTO_TEST_CASE( polyhedronVolume )
+BOOST_AUTO_TEST_CASE(polyhedronVolume)
 {
-    const std::string block0( "POLYHEDRALSURFACE Z (((0 0 0, 0 1 0, 1 0 0, 0 0 0 )), "
-                                        "((0 0 0, 1 0 0, 0 0 1, 0 0 0 )), "
-                                        "((0 0 0, 0 0 1, 0 1 0, 0 0 0 )), "
-                                        "((1 0 0, 0 1 0, 0 0 1, 1 0 0 )) )" );
+  const std::string block0(
+      "POLYHEDRALSURFACE Z (((0 0 0, 0 1 0, 1 0 0, 0 0 0 )), "
+      "((0 0 0, 1 0 0, 0 0 1, 0 0 0 )), "
+      "((0 0 0, 0 0 1, 0 1 0, 0 0 0 )), "
+      "((1 0 0, 0 1 0, 0 0 1, 1 0 0 )) )");
 
-    std::unique_ptr< Geometry > geometry0( io::readWkt( block0 ) );
-    Solid solid( geometry0->as< PolyhedralSurface >() );
-    auto vol { algorithm::volume( solid ) };
-    BOOST_CHECK_EQUAL( vol * 6, 1.0 );
-    CGAL::Nef_polyhedron_3<SFCGAL::Kernel> n;
+  std::unique_ptr<Geometry> geometry0(io::readWkt(block0));
+  Solid                     solid(geometry0->as<PolyhedralSurface>());
+  auto                      vol{algorithm::volume(solid)};
+  BOOST_CHECK_EQUAL(vol * 6, 1.0);
+  CGAL::Nef_polyhedron_3<SFCGAL::Kernel> n;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -14,7 +14,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-Point::Point() : Geometry(), _coordinate(), _m(NaN()) {}
+Point::Point() : _m(NaN()) {}
 
 ///
 ///
@@ -43,16 +43,13 @@ Point::Point(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z,
 ///
 ///
 ///
-Point::Point(const double &x, const double &y)
-    : Geometry(), _coordinate(x, y), _m(NaN())
-{
-}
+Point::Point(const double &x, const double &y) : _coordinate(x, y), _m(NaN()) {}
 
 ///
 ///
 ///
 Point::Point(const double &x, const double &y, const double &z)
-    : Geometry(), _coordinate(x, y, z), _m(NaN())
+    : _coordinate(x, y, z), _m(NaN())
 {
 }
 
@@ -60,7 +57,7 @@ Point::Point(const double &x, const double &y, const double &z)
 ///
 ///
 Point::Point(const double &x, const double &y, const double &z, const double &m)
-    : Geometry(), _coordinate(x, y, z), _m(m)
+    : _coordinate(x, y, z), _m(m)
 {
 }
 
@@ -212,6 +209,12 @@ auto
 Point::operator!=(const Point &other) const -> bool
 {
   return _coordinate != other._coordinate;
+}
+
+auto
+Point::almostEqual(const Point &other, const double tolerance) const -> bool
+{
+  return _coordinate.almostEqual(other._coordinate, tolerance);
 }
 
 ///

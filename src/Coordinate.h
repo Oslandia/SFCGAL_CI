@@ -144,6 +144,12 @@ public:
   operator!=(const Coordinate &other) const;
 
   /**
+   * absolute comparison with an other coordinate
+   */
+  bool
+  almostEqual(const Coordinate &other, const double tolerance) const;
+
+  /**
    * @brief Converts to Kernel::Vector_2
    */
   inline Kernel::Vector_2
