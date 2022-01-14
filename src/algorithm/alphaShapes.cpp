@@ -100,9 +100,9 @@ alpha_to_geometry(const Alpha_shape_2 &A, bool allow_holes)
   Arrangement arr;
 
   CGAL::insert_non_intersecting_curves(arr, segments.begin(), segments.end());
-  std::unique_ptr<Polygon> poly(new Polygon);
+  auto poly{std::make_unique<Polygon>()};
   for (auto f = arr.faces_begin(); f != arr.faces_end(); f++) {
-    std::unique_ptr<LineString> ring(new LineString);
+    auto ring{std::make_unique<LineString>()};
     for (auto h = f->holes_begin(); h != f->holes_end(); h++) {
       auto he = *h;
       do {
