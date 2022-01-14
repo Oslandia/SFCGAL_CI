@@ -403,16 +403,20 @@ Coordinate::operator!=(const Coordinate &other) const -> bool
 }
 
 auto
-Coordinate::almostEqual(const Coordinate &other, const double tolerance) const -> bool
+Coordinate::almostEqual(const Coordinate &other, const double tolerance) const
+    -> bool
 {
   if (isEmpty()) {
     return other.isEmpty();
   }
 
-  const bool xEquality = SFCGAL::almostEqual(x(), other.x(), Kernel::FT(tolerance));
-  const bool yEquality = SFCGAL::almostEqual(y(), other.y(), Kernel::FT(tolerance));
+  const bool xEquality =
+      SFCGAL::almostEqual(x(), other.x(), Kernel::FT(tolerance));
+  const bool yEquality =
+      SFCGAL::almostEqual(y(), other.y(), Kernel::FT(tolerance));
   if (is3D() || other.is3D()) {
-  const bool zEquality = SFCGAL::almostEqual(z(), other.z(), Kernel::FT(tolerance));
+    const bool zEquality =
+        SFCGAL::almostEqual(z(), other.z(), Kernel::FT(tolerance));
     return xEquality && yEquality && zEquality;
   }
   return xEquality && yEquality;

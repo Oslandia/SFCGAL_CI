@@ -168,7 +168,7 @@ public:
    * absolute comparison with an other point
    */
   bool
-almostEqual(const Point &other, const double tolerance) const;
+  almostEqual(const Point &other, const double tolerance) const;
 
   //-- visitors
 

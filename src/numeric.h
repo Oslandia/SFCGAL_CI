@@ -21,44 +21,47 @@ namespace SFCGAL {
 #pragma gcc diagnostic push
 #pragma gcc diagnostic ignored "-Wfloat-equal"
 #endif
-inline auto almostEqual( const double a, const double b, const double epsilon ) -> bool
+inline auto
+almostEqual(const double a, const double b, const double epsilon) -> bool
 {
   // shortcut and handles inf values
-  if ( a == b ) {
+  if (a == b) {
     return true;
   }
 
-  if ( std::isnan( a ) || std::isnan( b ) ) {
-    return std::isnan( a ) && std::isnan( b ) ;
+  if (std::isnan(a) || std::isnan(b)) {
+    return std::isnan(a) && std::isnan(b);
   }
 
-  const double absA = std::fabs( a );
-  const double absB = std::fabs( b );
-  const double diff = std::fabs( a - b );
- // fixed epsilon
-  if ( diff <= epsilon ) {
+  const double absA = std::fabs(a);
+  const double absB = std::fabs(b);
+  const double diff = std::fabs(a - b);
+  // fixed epsilon
+  if (diff <= epsilon) {
     return true;
   }
 
-  return diff <= epsilon * std::max( absA, absB ); // adaptative epsilon
+  return diff <= epsilon * std::max(absA, absB); // adaptative epsilon
 }
 
-inline auto almostEqual( const Kernel::FT &a, const Kernel::FT &b, const Kernel::FT &epsilon ) -> bool
+inline auto
+almostEqual(const Kernel::FT &a, const Kernel::FT &b, const Kernel::FT &epsilon)
+    -> bool
 {
   // shortcut and handles inf values
-  if ( a == b ) {
+  if (a == b) {
     return true;
   }
 
-  const Kernel::FT absA = abs( a );
-  const Kernel::FT absB = abs( b );
-  const Kernel::FT diff = abs( a - b );
- // fixed epsilon
-  if ( diff <= epsilon ) {
+  const Kernel::FT absA = abs(a);
+  const Kernel::FT absB = abs(b);
+  const Kernel::FT diff = abs(a - b);
+  // fixed epsilon
+  if (diff <= epsilon) {
     return true;
   }
 
-  return diff <= epsilon * std::max( absA, absB ); // adaptative epsilon
+  return diff <= epsilon * std::max(absA, absB); // adaptative epsilon
 }
 #if defined(__clang__)
 #pragma clang diagnostic pop

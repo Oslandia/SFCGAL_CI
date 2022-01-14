@@ -230,13 +230,13 @@ public:
   void
   round(const long &scale = 1);
 
-/**
- * Equality operator
- * @todo only compare coordinate points
- * @pre the two geometries must be valid
- */
-auto
-almostEqual(const Geometry &, const double tolerance) const -> bool;
+  /**
+   * Equality operator
+   * @todo only compare coordinate points
+   * @pre the two geometries must be valid
+   */
+  auto
+  almostEqual(const Geometry &, const double tolerance) const -> bool;
 
   /**
    * @brief [OGC/SFA]Gets the number of geometries in a collection of geometries
