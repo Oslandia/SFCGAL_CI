@@ -129,7 +129,7 @@ auto
 optimal_alpha_shapes(const Geometry &g, bool allow_holes, size_t nb_components)
     -> std::unique_ptr<Geometry>
 {
-  Alpha_shape_2 A;
+  Alpha_shape_2 A{};
   const double  optimalAlpha{computeAlpha(g, A, 10000, nb_components)};
   if (optimalAlpha < 0.0) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
@@ -145,7 +145,7 @@ alphaShapes(const Geometry &g, double alpha, bool allow_holes)
     -> std::unique_ptr<Geometry>
 {
   using CGAL::object_cast;
-  Alpha_shape_2 A;
+  Alpha_shape_2 A{};
   const double  optimalAlpha{computeAlpha(g, A, alpha)};
   if (optimalAlpha < 0.0) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
