@@ -1,3 +1,12 @@
+1.4.1 (2022-01-27):
+    * Add alpha-shapes algorithm (Loïc Bartoletti, Hugo Mercier)
+    * Fix build and tests for MSYS2/MinGW (Loïc Bartoletti)
+    * Modernize code (Loïc Bartoletti)
+    * Remove patches for Boost 1.60.0 (Loïc Bartoletti)
+    * Fix isPlane3d (#247, by fan fan)
+    * Fix ST_StraightSkeleton returns degenerate line segments. Add a new parameter `toleranceAbs` (Loïc Bartoletti)
+    * Add tests for issues #133 and #153 (Loïc Bartoletti)
+    * Add ccache, and improve CI (Loïc Bartoletti)
 1.4.0 (2021-09-13):
     * Use officially documented CGAL functions. SFCGAL requires CGAL >= 5.3.
     * Fix compilation issue with CGAL 5.3 (Sébastien Loriot)
