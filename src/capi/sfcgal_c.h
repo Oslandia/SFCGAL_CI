@@ -6,9 +6,9 @@
 #define _SFCGAL_CAPI_H_
 
 #include <SFCGAL/config.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
