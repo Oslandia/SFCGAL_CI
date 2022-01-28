@@ -1,5 +1,5 @@
 // Copyright (c) 2022-2022, Oslandia.
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include <SFCGAL/algorithm/alphaShapes.h>
 
