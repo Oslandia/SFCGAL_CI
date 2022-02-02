@@ -23,7 +23,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 option( SFCGAL_BUILD_EXAMPLES "build examples" OFF )
-option( SFCGAL_BUILD_TESTS "build unit, garden and regress tests" OFF )
+option( SFCGAL_BUILD_TESTS "build unit and regress tests" OFF )
 option( SFCGAL_BUILD_BENCH "Build benchmarks" OFF )
 
 option( SFCGAL_WITH_OSG "Compile with OpenSceneGraph support" OFF )
