@@ -55,6 +55,8 @@ centos8_clang_cgal53:
   image: centos:centos8
 
   script:
+    - sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
+    - sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
     - yum update -qy
     - yum install -y sudo wget clang
     - ./ci/centos/before_install.sh 5.3
@@ -70,6 +72,8 @@ centos8_gcc_cgal53:
   image: centos:centos8
 
   script:
+    - sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
+    - sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
     - yum update -qy
     - yum install -y sudo wget gcc-c++
     - ./ci/centos/before_install.sh 5.3
