@@ -16,7 +16,6 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 if( SFCGAL_BUILD_TESTS )
 	add_subdirectory( unit )
 	add_subdirectory( regress )
-    add_subdirectory( garden )
 endif()
 
 if( SFCGAL_BUILD_BENCH )
