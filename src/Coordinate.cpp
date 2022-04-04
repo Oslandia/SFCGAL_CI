@@ -410,16 +410,20 @@ Coordinate::almostEqual(const Coordinate &other, const double tolerance) const
     return other.isEmpty();
   }
 
-  const bool xEquality{
-      SFCGAL::almostEqual(x(), other.x(), Kernel::FT(tolerance))};
-  const bool yEquality{
-      SFCGAL::almostEqual(y(), other.y(), Kernel::FT(tolerance))};
-  if (is3D() || other.is3D()) {
-    const bool zEquality{
-        SFCGAL::almostEqual(z(), other.z(), Kernel::FT(tolerance))};
-    return xEquality && yEquality && zEquality;
+  // no mixed dimension comparison
+  if ((is3D() && !other.is3D()) || (!is3D() && other.is3D())) {
+    BOOST_THROW_EXCEPTION(
+        Exception("try to compare points with different coordinate "
+                  "dimension using a.almostEqual(b)"));
   }
-  return xEquality && yEquality;
+
+  bool result{
+      SFCGAL::almostEqual(x(), other.x(), Kernel::FT(tolerance)) &&
+      SFCGAL::almostEqual(y(), other.y(), Kernel::FT(tolerance))};
+  if (is3D()) {
+        result &= SFCGAL::almostEqual(z(), other.z(), Kernel::FT(tolerance));
+  }
+  return result;
 }
 
 } // namespace SFCGAL
