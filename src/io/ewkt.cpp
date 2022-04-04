@@ -26,7 +26,7 @@ readEwkt(std::istream &s) -> std::unique_ptr<PreparedGeometry>
   std::unique_ptr<Geometry>         g(wktReader.readGeometry());
   std::unique_ptr<PreparedGeometry> uptr(
       new PreparedGeometry(std::move(g), srid));
-  return std::move(uptr);
+  return uptr;
 }
 
 ///
