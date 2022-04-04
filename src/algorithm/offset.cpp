@@ -95,7 +95,8 @@ approximate(const Offset_polygon_2 &polygon, const int &n = 0) -> Polygon_2
   }
 
   // remove duplicated last point
-  pair_list.pop_back();
+  if (pair_list.size() > 0)
+    pair_list.pop_back();
 
   /*
    * convertr to polygon
