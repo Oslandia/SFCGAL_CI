@@ -14,7 +14,7 @@ CharArrayBuffer::CharArrayBuffer(const char *begin, const char *end)
 }
 
 CharArrayBuffer::CharArrayBuffer(const char *str)
-    : begin_(str), end_(begin_ + std::strlen(str)), current_(begin_)
+    : begin_(str), end_(begin_ + std::string(str).length()), current_(begin_)
 {
 }
 
