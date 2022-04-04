@@ -406,8 +406,9 @@ auto
 Coordinate::almostEqual(const Coordinate &other, const double tolerance) const
     -> bool
 {
+  bool result{true};
   if (isEmpty()) {
-    return other.isEmpty();
+    return result;
   }
 
   // no mixed dimension comparison
@@ -417,8 +418,8 @@ Coordinate::almostEqual(const Coordinate &other, const double tolerance) const
                   "dimension using a.almostEqual(b)"));
   }
 
-  bool result{SFCGAL::almostEqual(x(), other.x(), Kernel::FT(tolerance)) &&
-              SFCGAL::almostEqual(y(), other.y(), Kernel::FT(tolerance))};
+  result = SFCGAL::almostEqual(x(), other.x(), Kernel::FT(tolerance)) &&
+           SFCGAL::almostEqual(y(), other.y(), Kernel::FT(tolerance));
   if (is3D()) {
     result &= SFCGAL::almostEqual(z(), other.z(), Kernel::FT(tolerance));
   }
