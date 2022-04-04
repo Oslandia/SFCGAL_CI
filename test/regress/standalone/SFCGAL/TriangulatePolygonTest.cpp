@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_TriangulatePolygonTest )
 
 /**
  * Triangulate polygon and make some checks
- * @ŧodo Check inPolygon.area3D() == outPolygon.area3D();
+ * @todo Check inPolygon.area3D() == outPolygon.area3D();
  */
 BOOST_AUTO_TEST_CASE( testTriangulatePolygon )
 {

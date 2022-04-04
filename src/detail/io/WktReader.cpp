@@ -484,8 +484,6 @@ WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
     readInnerTriangle(*triangle);
     g.addTriangle(triangle.release());
 
-    // break if not Oui tout à fait, le Z n'est pas pris en compte dans ce cas
-    // là.followed by another points
     if (!_reader.match(',')) {
       break;
     }
