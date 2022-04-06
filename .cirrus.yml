@@ -1,12 +1,14 @@
-freebsd_instance:
-  image: freebsd-12-2-release-amd64
-  cpu: 8
-  memory: 16G
-
-env:
-  MAKE_FLAGS: -j 8
-
 task:
+  name: FreeBSD
+  alias: test-freebsd
+  freebsd_instance:
+    image: freebsd-12-2-release-amd64
+    cpu: 8
+    memory: 16G
+
+  env:
+    MAKE_FLAGS: -j 8
+
   install_script:
     - sed -i.bak -e 's,pkg+http://pkg.FreeBSD.org/\${ABI}/quarterly,pkg+http://pkg.FreeBSD.org/\${ABI}/latest,' /etc/pkg/FreeBSD.conf
     - ASSUME_ALWAYS_YES=yes pkg bootstrap -f
@@ -17,3 +19,15 @@ task:
     - cmake -DSFCGAL_BUILD_TESTS=ON
     - make $(MAKE_FLAGS)
     - ctest -VV
+
+task:
+  name: macOS
+  alias: test-macos
+  macos_instance:
+    image: big-sur-base
+  test_script:
+    - brew update
+    - brew install cmake boost cgal gmp mpfr
+    - cmake -DSFCGAL_BUILD_TESTS=ON -S . -B build
+    - cmake --build build
+    - ctest --test-dir build
