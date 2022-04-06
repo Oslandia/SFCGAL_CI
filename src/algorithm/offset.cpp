@@ -218,13 +218,13 @@ offset(const LineString &lineString, const double &radius,
     Polygon_2 P;
     P.push_back(lineString.pointN(i).toPoint_2());
     P.push_back(lineString.pointN(i + 1).toPoint_2());
-    Offset_polygon_with_holes_2 offset =
+    Offset_polygon_with_holes_2 offsetp =
         CGAL::approximated_offset_2(P, radius, SFCGAL_OFFSET_ACCURACY);
 
     if (polygonSet.is_empty()) {
-      polygonSet.insert(offset);
+      polygonSet.insert(offsetp);
     } else {
-      polygonSet.join(offset);
+      polygonSet.join(offsetp);
     }
   }
 }
@@ -245,13 +245,13 @@ offset(const Polygon &g, const double &radius, Offset_polygon_set_2 &polygonSet)
    * Invoke minkowski_sum_2 for exterior ring
    */
   {
-    Offset_polygon_with_holes_2 offset = CGAL::approximated_offset_2(
+    Offset_polygon_with_holes_2 offsetp = CGAL::approximated_offset_2(
         g.exteriorRing().toPolygon_2(), radius, SFCGAL_OFFSET_ACCURACY);
 
     if (polygonSet.is_empty()) {
-      polygonSet.insert(offset);
+      polygonSet.insert(offsetp);
     } else {
-      polygonSet.join(offset);
+      polygonSet.join(offsetp);
     }
   }
 
