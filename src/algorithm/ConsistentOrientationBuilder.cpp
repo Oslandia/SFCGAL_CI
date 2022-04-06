@@ -115,13 +115,13 @@ ConsistentOrientationBuilder::_makeOrientationConsistent()
       }
 
       // orientation can't be consistent
-      if (hasOppositeEdge && hasParallelEdge) {
+      if (hasOppositeEdge) {
         BOOST_THROW_EXCEPTION(
             Exception("can't build consistent orientation from triangle set"));
       }
 
       // orientation has already been fixed (moebius)
-      if (hasParallelEdge && _oriented[neighbor]) {
+      if (_oriented[neighbor]) {
         BOOST_THROW_EXCEPTION(
             Exception("can't build consistent orientation from triangle set, "
                       "inconsistent orientation for triangle"));
