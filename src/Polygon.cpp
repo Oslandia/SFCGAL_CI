@@ -99,10 +99,10 @@ Polygon::Polygon(const CGAL::Polygon_with_holes_2<Kernel> &poly)
 
   for (auto hit = poly.holes_begin(); hit != poly.holes_end(); ++hit) {
     _rings.push_back(new LineString());
-    CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
+    CGAL::Polygon_2<Kernel>::Edge_const_iterator eci;
 
-    for (ei = hit->edges_begin(); ei != hit->edges_end(); ++ei) {
-      _rings.back().addPoint(ei->source());
+    for (eci = hit->edges_begin(); eci != hit->edges_end(); ++eci) {
+      _rings.back().addPoint(eci->source());
     }
 
     _rings.back().addPoint(_rings.back().startPoint());
