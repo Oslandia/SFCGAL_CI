@@ -8,7 +8,7 @@ variables:
 get-sonar-binaries:
   stage: .pre
   cache:
-    policy: push
+    policy: pull-push
     key: "${CI_COMMIT_SHORT_SHA}"
     paths:
       - build-wrapper/
@@ -62,9 +62,9 @@ sonarcloud-check:
       - sonar-scanner/
       - bw-output/
       - build/
-      - ./sonar/cache
+      - .sonar/cache
   script:
-    - sonar-scanner/bin/sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}" -Dsonar.token="${SONAR_TOKEN}" -Dsonar.cfamily.build-wrapper-output=bw-output -Dsonar.cfamily.cache.path=./sonar/cache
+    - sonar-scanner/bin/sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}" -Dsonar.token="${SONAR_TOKEN}" -Dsonar.cfamily.build-wrapper-output=bw-output -Dsonar.cfamily.cache.path=.sonar/cache
   only:
     - merge_requests
     - master
