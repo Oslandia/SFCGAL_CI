@@ -34,8 +34,7 @@ jobs:
         id: sonarcloud-cache
         with:
           path: ~/.sonar
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          key: ${{ runner.os }}-${{env.GITHUB_REF_NAME}}-cache
 
       - name: Download and setup sonar-scanner
         shell: bash
