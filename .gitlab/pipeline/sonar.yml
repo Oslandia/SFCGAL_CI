@@ -40,7 +40,7 @@ build:
     - ./ci/debian/before_install.sh 5.3
   script:
     # prepare the build tree
-    - mkdir build
+    - mkdir -p build
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON
     # run the build inside the build wrapper
     - build-wrapper/build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --config Release
