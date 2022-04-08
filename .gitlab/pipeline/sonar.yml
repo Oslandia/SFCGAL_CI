@@ -4,12 +4,13 @@ image: gcc
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
   GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  CACHE_FALLBACK_KEY: "${CI_DEFAULT_BRANCH}"
 
 get-sonar-binaries:
   stage: .pre
   cache:
     policy: pull-push
-    key: "${CI_COMMIT_SHORT_SHA}"
+    key: "${CI_COMMIT_REF_SLUG}"
     paths:
       - build-wrapper/
       - sonar-scanner/
@@ -30,7 +31,7 @@ build:
   stage: build
   cache:
     policy: pull-push
-    key: "${CI_COMMIT_SHORT_SHA}"
+    key: "${CI_COMMIT_REF_SLUG}"
     paths:
       - build-wrapper/
       - sonar-scanner/
@@ -56,7 +57,7 @@ sonarcloud-check:
   stage: .post
   cache:
     policy: pull-push
-    key: "${CI_COMMIT_SHORT_SHA}"
+    key: "${CI_COMMIT_REF_SLUG}"
     paths:
       - build-wrapper/
       - sonar-scanner/
