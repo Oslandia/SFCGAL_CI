@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE( asText3d )
     GeometryCollection g;
     g.addGeometry( Point( 2.0,3.0,5.0 ) );
     g.addGeometry( Triangle( Point( 0.0,0.0,6.0 ), Point( 1.0,0.0,6.0 ), Point( 1.0,1.0,6.0 ) ) );
-    BOOST_CHECK_EQUAL( g.asText( 1 ), "GEOMETRYCOLLECTION(POINT(2.0 3.0 5.0),TRIANGLE((0.0 0.0 6.0,1.0 0.0 6.0,1.0 1.0 6.0,0.0 0.0 6.0)))" );
+    BOOST_CHECK_EQUAL( g.asText( 1 ), "GEOMETRYCOLLECTION Z(POINT Z(2.0 3.0 5.0),TRIANGLE Z((0.0 0.0 6.0,1.0 0.0 6.0,1.0 1.0 6.0,0.0 0.0 6.0)))" );
 }
 
 //virtual std::string  Geometry::geometryType() const = 0 ;

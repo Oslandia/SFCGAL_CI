@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE( testExtrudePoint )
     std::unique_ptr< Geometry > ext( algorithm::extrude( g, 0.0, 0.0, 1.0 ) );
     BOOST_CHECK( ext->is< LineString >() );
     BOOST_CHECK( ext->as< LineString >().is3D() );
-    BOOST_CHECK_EQUAL( ext->asText( 1 ), "LINESTRING(0.0 0.0 0.0,0.0 0.0 1.0)" );
+    BOOST_CHECK_EQUAL( ext->asText( 1 ), "LINESTRING Z(0.0 0.0 0.0,0.0 0.0 1.0)" );
 }
 
 
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE( testExtrudeLineString )
     std::unique_ptr< Geometry > ext( algorithm::extrude( g, 0.0, 0.0, 1.0 ) );
     BOOST_CHECK( ext->is< PolyhedralSurface >() );
     BOOST_CHECK( ext->as< PolyhedralSurface >().is3D() );
-    BOOST_CHECK_EQUAL( ext->asText( 1 ), "POLYHEDRALSURFACE(((0.0 0.0 0.0,1.0 0.0 0.0,1.0 0.0 1.0,0.0 0.0 1.0,0.0 0.0 0.0)))" );
+    BOOST_CHECK_EQUAL( ext->asText( 1 ), "POLYHEDRALSURFACE Z(((0.0 0.0 0.0,1.0 0.0 0.0,1.0 0.0 1.0,0.0 0.0 1.0,0.0 0.0 0.0)))" );
 }
 
 
@@ -162,11 +162,11 @@ BOOST_AUTO_TEST_CASE( testChainingExtrude )
 {
     std::unique_ptr< Geometry > g( new Point( 0.0,0.0 ) );
     g = algorithm::extrude( *g, 1.0, 0.0, 0.0 ) ;
-    BOOST_CHECK_EQUAL( g->asText( 0 ), "LINESTRING(0 0 0,1 0 0)" ) ;
+    BOOST_CHECK_EQUAL( g->asText( 0 ), "LINESTRING Z(0 0 0,1 0 0)" ) ;
     g =  algorithm::extrude( *g, 0.0, 1.0, 0.0 ) ;
-    BOOST_CHECK_EQUAL( g->asText( 0 ), "POLYHEDRALSURFACE(((0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)))" ) ;
+    BOOST_CHECK_EQUAL( g->asText( 0 ), "POLYHEDRALSURFACE Z(((0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)))" ) ;
     g =  algorithm::extrude( *g, 0.0, 0.0, 1.0 ) ;
-    BOOST_CHECK_EQUAL( g->asText( 0 ), "SOLID((((0 1 0,1 1 0,1 0 0,0 1 0)),((0 1 1,1 0 1,1 1 1,0 1 1)),((0 1 0,1 0 0,0 0 0,0 1 0)),((0 1 1,0 0 1,1 0 1,0 1 1)),((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),((1 1 0,0 1 0,0 1 1,1 1 1,1 1 0)),((0 1 0,0 0 0,0 0 1,0 1 1,0 1 0)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0))))" ) ;
+    BOOST_CHECK_EQUAL( g->asText( 0 ), "SOLID Z((((0 1 0,1 1 0,1 0 0,0 1 0)),((0 1 1,1 0 1,1 1 1,0 1 1)),((0 1 0,1 0 0,0 0 0,0 1 0)),((0 1 1,0 0 1,1 0 1,0 1 1)),((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),((1 1 0,0 1 0,0 1 1,1 1 1,1 1 0)),((0 1 0,0 0 0,0 0 1,0 1 1,0 1 0)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0))))" ) ;
 }
 
 

@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE( testRoundPoint )
 {
     std::unique_ptr< Geometry > g( io::readWkt( "POINT(1.5 2.6 3.4)" ) );
     g->round();
-    BOOST_CHECK_EQUAL( g->asText(), "POINT(2/1 3/1 3/1)" );
+    BOOST_CHECK_EQUAL( g->asText(), "POINT Z(2/1 3/1 3/1)" );
 }
 
 BOOST_AUTO_TEST_CASE( testRoundLineString )

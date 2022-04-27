@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE( asText2d )
 BOOST_AUTO_TEST_CASE( asText3d )
 {
     Point g( 2.0,3.0,4.0 );
-    BOOST_CHECK_EQUAL( g.asText( 3 ), "POINT(2.000 3.000 4.000)" );
+    BOOST_CHECK_EQUAL( g.asText( 3 ), "POINT Z(2.000 3.000 4.000)" );
 }
 
 //virtual std::string  Geometry::geometryType() const = 0 ;
