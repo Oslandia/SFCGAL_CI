@@ -1,0 +1,10 @@
+opensuse_gcc: 
+  stage: test
+  image: opensuse:tumbleweed
+
+  script:
+    - ./ci/opensuse/before_install.sh
+    - cmake -DSFCGAL_BUILD_TESTS=ON -GNinja
+    - cmake -S . -B build 
+    - cmake --build build
+    - ctest --test-dir build 
