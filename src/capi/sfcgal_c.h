@@ -184,6 +184,13 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_point_create_from_xyz(double x, double y, double z);
 
 /**
+ * Creates a point from three X, Y and M coordinates
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_point_create_from_xym(double x, double y, double m);
+
+/**
  * Creates a point from four X, Y, Z and M coordinates
  * @ingroup capi
  */
