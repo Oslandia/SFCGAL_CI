@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_CASE( asText3d )
         Point( 2.0,3.0,7.0 ),
         Point( 4.0,5.0,8.0 )
     );
-    BOOST_CHECK_EQUAL( g.asText( 3 ), "LINESTRING(2.000 3.000 7.000,4.000 5.000 8.000)" );
+    BOOST_CHECK_EQUAL( g.asText( 3 ), "LINESTRING Z(2.000 3.000 7.000,4.000 5.000 8.000)" );
 }
 
 //virtual std::string  Geometry::geometryType() const = 0 ;

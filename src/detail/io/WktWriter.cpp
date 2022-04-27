@@ -121,10 +121,12 @@ WktWriter::write(const Geometry &g, bool exact)
 void
 WktWriter::writeCoordinateType(const Geometry &g)
 {
-  if (g.is3D() && g.isMeasured()) {
-    _s << " ZM";
+  if (g.is3D() && !g.isMeasured()) {
+    _s << " Z";
   } else if (!g.is3D() && g.isMeasured()) {
     _s << " M";
+  } else if (g.is3D() && g.isMeasured()) {
+    _s << " ZM";
   }
 }
 
