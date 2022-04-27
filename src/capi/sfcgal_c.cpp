@@ -277,12 +277,30 @@ sfcgal_point_create_from_xy(double x, double y) -> sfcgal_geometry_t *
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Point(x, y));)
 }
+
+extern "C" auto
+sfcgal_point_create_from_xym(double x, double y, double m)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto g = std::make_unique<SFCGAL::Point>(x, y); g->setM(m);
+      return static_cast<SFCGAL::Geometry *>(g.release());)
+}
+
 extern "C" auto
 sfcgal_point_create_from_xyz(double x, double y, double z)
     -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Point(x, y, z));)
+}
+
+extern "C" auto
+sfcgal_point_create_from_xyzm(double x, double y, double z, double m)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return static_cast<SFCGAL::Geometry *>(new SFCGAL::Point(x, y, z, m));)
 }
 
 extern "C" auto
