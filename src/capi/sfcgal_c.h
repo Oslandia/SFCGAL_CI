@@ -190,7 +190,6 @@ sfcgal_point_create_from_xyz(double x, double y, double z);
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_point_create_from_xyzm(double x, double y, double z, double m);
 
-
 /**
  * Returns the X coordinate of the given Point
  * @pre the given geometry must be a Point
