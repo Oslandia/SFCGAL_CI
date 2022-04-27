@@ -1,2 +1,2 @@
 include:
-  - local: /opensuse.yml
+  - local: /.gitlab/pipeline/opensuse.yml
