@@ -4,7 +4,6 @@ opensuse_gcc:
 
   script:
     - ./ci/opensuse/before_install.sh
-    - cmake -DSFCGAL_BUILD_TESTS=ON -GNinja
-    - cmake -S . -B build 
+    - cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -GNinja
     - cmake --build build
     - ctest --test-dir build 
