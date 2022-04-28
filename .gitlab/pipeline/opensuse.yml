@@ -1,6 +1,6 @@
 opensuse_gcc: 
   stage: test
-  image: opensuse:tumbleweed
+  image: opensuse/tumbleweed
 
   script:
     - ./ci/opensuse/before_install.sh
