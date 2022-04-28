@@ -1,2 +1,4 @@
 include:
   - local: /.gitlab/pipeline/opensuse.yml
+  - local: /.gitlab/pipeline/centos.yml
+  - local: /.gitlab/pipeline/debian.yml
