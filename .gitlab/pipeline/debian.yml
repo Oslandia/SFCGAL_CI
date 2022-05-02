@@ -1,0 +1,63 @@
+debian_testing_gcc:
+  stage: test
+  image: debian:testing
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget build-essential
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    - make
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.3", "5.4"]
+
+debian_buster_gcc:
+  stage: test
+  image: debian:buster
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget build-essential
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    - make
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.3", "5.4"]
+
+debian_testing_clang:
+  stage: test
+  image: debian:testing
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget clang libstdc++-11-dev
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+    - make
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.3", "5.4"]
+
+debian_buster_clang:
+  stage: test
+  image: debian:buster
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget clang
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+    - make
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.3", "5.4"]
