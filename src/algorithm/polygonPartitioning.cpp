@@ -8,7 +8,6 @@
 
 #include <SFCGAL/Exception.h>
 #include <SFCGAL/Kernel.h>
-#include <SFCGAL/GeometryCollection.h>
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/Polygon.h>
 
@@ -60,7 +59,7 @@ SFCGAL_API std::unique_ptr<Geometry>
 
 
 
-  auto *partitions = new GeometryCollection;
+  auto *partitions = new MultiPolygon;
   for (auto &partition_poly : partition_polys) {
     auto *poly = new Polygon;
 
