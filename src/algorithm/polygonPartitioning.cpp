@@ -50,6 +50,10 @@ SFCGAL_API std::unique_ptr<Geometry>
     polygon.push_back(point->toPoint_2());
   }
   
+  // TODO: 
+  // - for polygon like remove last point 
+  // - reverse point order,since orientation is not the same
+  //
   CGAL::greene_approx_convex_partition_2(polygon.vertices_begin(),
                                     polygon.vertices_end(),
                                     std::back_inserter(partition_polys));
