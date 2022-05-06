@@ -48,7 +48,11 @@ SFCGAL_API std::unique_ptr<Geometry>
   for (auto &point : getPointVisitor.points) {
     polygon.push_back(point->toPoint_2());
   }
-  
+
+  if (g.is<Polygon>()) {
+    polygon.container().pop_back();
+    polygon.reverse_orientation();
+  }
   // TODO: 
   // - for polygon like remove last point 
   // - reverse point order,since orientation is not the same
