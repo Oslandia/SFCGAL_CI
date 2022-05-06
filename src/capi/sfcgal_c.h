@@ -1044,6 +1044,14 @@ sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
                                      bool allow_holes, size_t nb_components);
+
+/**
+ * Returns the optimal partitions of the geometry into convex polygons
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_greene_approx_convex_partition(const sfcgal_geometry_t *geom);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Error handling

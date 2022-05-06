@@ -17,7 +17,7 @@ namespace algorithm {
  * @ingroup public_api
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           optimal_convex_partition(const Geometry &g);
+           greene_approx_convex_partition(const Geometry &g);
 
 } // namespace algorithm
 } // namespace SFCGAL

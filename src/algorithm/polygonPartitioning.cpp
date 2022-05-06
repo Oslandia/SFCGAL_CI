@@ -2,7 +2,7 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/polygonPartioning.h>
+#include <SFCGAL/algorithm/polygonPartitioning.h>
 
 #include <SFCGAL/detail/GetPointsVisitor.h>
 
@@ -26,7 +26,7 @@ using Polygon_list = std::list<Polygon_2>;
 
 
 SFCGAL_API std::unique_ptr<Geometry>
-           optimal_convex_partition(const Geometry &g) 
+           greene_approx_convex_partition(const Geometry &g) 
 {
   using CGAL::object_cast;
 
@@ -49,7 +49,8 @@ SFCGAL_API std::unique_ptr<Geometry>
   for (auto &point : getPointVisitor.points) {
     polygon.push_back(point->toPoint_2());
   }
-  CGAL::optimal_convex_partition_2(polygon.vertices_begin(),
+  
+  CGAL::greene_approx_convex_partition_2(polygon.vertices_begin(),
                                     polygon.vertices_end(),
                                     std::back_inserter(partition_polys));
 

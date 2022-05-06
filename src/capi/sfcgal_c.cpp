@@ -38,6 +38,7 @@
 #include <SFCGAL/algorithm/minkowskiSum.h>
 #include <SFCGAL/algorithm/offset.h>
 #include <SFCGAL/algorithm/plane.h>
+#include <SFCGAL/algorithm/polygonPartitioning.h>
 #include <SFCGAL/algorithm/straightSkeleton.h>
 #include <SFCGAL/algorithm/tesselate.h>
 #include <SFCGAL/algorithm/union.h>
@@ -1257,3 +1258,24 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
 
   return result.release();
 }
+
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_greene_approx_convex_partition(const sfcgal_geometry_t *geom)
+{
+  const SFCGAL::Geometry *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result = SFCGAL::algorithm::greene_approx_convex_partition(
+        g1->as<const SFCGAL::Geometry>());
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During greene_approx_convex_partition(A):");
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return result.release();
+}
+
