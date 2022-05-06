@@ -1278,4 +1278,3 @@ sfcgal_geometry_greene_approx_convex_partition(const sfcgal_geometry_t *geom)
 
   return result.release();
 }
-

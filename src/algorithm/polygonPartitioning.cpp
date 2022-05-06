@@ -18,14 +18,13 @@
 namespace SFCGAL {
 namespace algorithm {
 
-using Traits = CGAL::Partition_traits_2<Kernel>;
-using Polygon_2 = Traits::Polygon_2;
-using Point_2 = Traits::Point_2;
+using Traits       = CGAL::Partition_traits_2<Kernel>;
+using Polygon_2    = Traits::Polygon_2;
+using Point_2      = Traits::Point_2;
 using Polygon_list = std::list<Polygon_2>;
 
-
 SFCGAL_API std::unique_ptr<Geometry>
-           greene_approx_convex_partition(const Geometry &g) 
+           greene_approx_convex_partition(const Geometry &g)
 {
   using CGAL::object_cast;
 
@@ -42,8 +41,8 @@ SFCGAL_API std::unique_ptr<Geometry>
     return std::unique_ptr<Geometry>(new GeometryCollection());
   }
 
-  Polygon_2 polygon;
-  Polygon_list          partition_polys;
+  Polygon_2    polygon;
+  Polygon_list partition_polys;
 
   for (auto &point : getPointVisitor.points) {
     polygon.push_back(point->toPoint_2());
@@ -53,15 +52,13 @@ SFCGAL_API std::unique_ptr<Geometry>
     polygon.container().pop_back();
     polygon.reverse_orientation();
   }
-  // TODO: 
-  // - for polygon like remove last point 
+  // TODO:
+  // - for polygon like remove last point
   // - reverse point order,since orientation is not the same
   //
   CGAL::greene_approx_convex_partition_2(polygon.vertices_begin(),
-                                    polygon.vertices_end(),
-                                    std::back_inserter(partition_polys));
-
-
+                                         polygon.vertices_end(),
+                                         std::back_inserter(partition_polys));
 
   auto *partitions = new MultiPolygon;
   for (auto &partition_poly : partition_polys) {
@@ -75,7 +72,6 @@ SFCGAL_API std::unique_ptr<Geometry>
     // add back the first point to close the ring
     poly->exteriorRing().addPoint(*partition_poly.begin());
     partitions->addGeometry(poly);
-
   }
 
   return std::unique_ptr<Geometry>(partitions);
