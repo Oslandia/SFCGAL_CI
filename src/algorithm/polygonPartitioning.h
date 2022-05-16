@@ -11,13 +11,26 @@
 
 namespace SFCGAL {
 namespace algorithm {
+struct NoValidityCheck;
 
 /**
- * Compute a partition of the geometry into convex polygons
+ * Compute a partition of a surface geometry (mulitpolygon/polygon)
+ * into convex polygons. Return the original geometry otherwise.
+ * @pre g is a valid geometry
  * @ingroup public_api
  */
 SFCGAL_API std::unique_ptr<Geometry>
            greene_approx_convex_partition(const Geometry &g);
+
+/**
+ * Compute a partition of a surface geometry (mulitpolygon/polygon)
+ * into convex polygons. Return the original geometry otherwise.
+ * @pre g is a valid geometry
+ * @ingroup detail
+ * @warning No actual validity check is done.
+ */
+SFCGAL_API std::unique_ptr<Geometry>
+           greene_approx_convex_partition(const Geometry &g, NoValidityCheck);
 
 } // namespace algorithm
 } // namespace SFCGAL
