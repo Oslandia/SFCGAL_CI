@@ -43,3 +43,4 @@ test/unit/unit-test-SFCGAL
 */.DS_Store
 
 build
+build_release
