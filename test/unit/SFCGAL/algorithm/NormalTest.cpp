@@ -34,6 +34,7 @@
 #include <SFCGAL/MultiSolid.h>
 #include <SFCGAL/io/wkt.h>
 #include <SFCGAL/algorithm/normal.h>
+#include <SFCGAL/algorithm/makebuilding.h>
 
 using namespace SFCGAL ;
 using namespace boost::unit_test ;
@@ -112,6 +113,15 @@ BOOST_AUTO_TEST_CASE( testNormal3 )
 }
 
 
+BOOST_AUTO_TEST_CASE( makebuildingtest )
+{
+    std::unique_ptr<Geometry> gA( io::readWkt( "POLYGON((0 0,0 10,10 10,10 0,0 0))" ) );
+    Kernel::FT build{12.0};
+    Kernel::FT roof{2.5};
+    auto res{SFCGAL::algorithm::makebuilding(gA->as<Polygon>(),build,roof)};
+    std::cout << res->asText(1) << "\n";
+    // exact
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

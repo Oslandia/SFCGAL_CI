@@ -1044,6 +1044,18 @@ sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
                                      bool allow_holes, size_t nb_components);
+
+/**
+ * Extrude a polygon with a fake roof top
+ *
+ * @ingroup public_api
+ * @warning Z component is ignored.
+ * @ingroup public_api
+ * @pre g is a valid polygon
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_make_building(const sfcgal_geometry_t *geom, double height_building, double height_roof);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Error handling

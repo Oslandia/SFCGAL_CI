@@ -35,6 +35,7 @@
 #include <SFCGAL/algorithm/intersects.h>
 #include <SFCGAL/algorithm/isValid.h>
 #include <SFCGAL/algorithm/lineSubstring.h>
+#include <SFCGAL/algorithm/makebuilding.h>
 #include <SFCGAL/algorithm/minkowskiSum.h>
 #include <SFCGAL/algorithm/offset.h>
 #include <SFCGAL/algorithm/plane.h>
@@ -1249,6 +1250,28 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During optimal_alpha_shapes(A, %g %g):", allow_holes,
                    nb_components);
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return result.release();
+}
+
+extern "C" sfcgal_geometry_t *
+sfcgal_geometry_make_building(const sfcgal_geometry_t *geom,
+                              double height_building, double height_roof)
+{
+  const SFCGAL::Geometry *g = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::PolyhedralSurface> result;
+
+  try {
+    result = SFCGAL::algorithm::makebuilding(g->as<const SFCGAL::Polygon>(),
+                                             height_building, height_roof);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During makebuilding(A, %g %g):", height_building,
+                   height_roof);
     SFCGAL_WARNING("  with A: %s",
                    ((const SFCGAL::Geometry *)(geom))->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
