@@ -6,4 +6,4 @@ opensuse_gcc:
     - ./ci/opensuse/before_install.sh
     - cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -GNinja
     - cmake --build build
-    - ctest --test-dir build 
+    - ctest --test-dir build --output-on-failure
