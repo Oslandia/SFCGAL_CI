@@ -8,6 +8,8 @@ SFCGAL is a C++ wrapper library around [CGAL](http://www.cgal.org) with the aim 
 
 Please refer to the <a href="http://oslandia.gitlab.io/SFCGAL">project page</a> for an updated installation procedure.
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/sfcgal.svg)](https://repology.org/project/sfcgal/versions)
+
 ## Licence
 
 SFCGAL is provided under the following licence LGPL version 2 or later.
