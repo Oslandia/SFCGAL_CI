@@ -42,12 +42,28 @@ BOOST_AUTO_TEST_CASE(testPolygon)
   BOOST_CHECK_EQUAL(triangulation.asText(0), expectedWKT);
 }
 
+BOOST_AUTO_TEST_CASE(testPolygon_with_hole)
+{
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON((0 0, 1 0, 1 1, 0 1, 0 0),(0.2 0.2,0.2 0.8,0.8 0.8,0.8 0.2,0.2 0.2))"));
+  TriangulatedSurface triangulation = constrainedPolygonalDomain(
+      g->as<Polygon>(), MultiLineString(), MultiPoint());
+  BOOST_CHECK_EQUAL(triangulation.numTriangles(), 8U);
+  std::string expectedWKT(
+      "TIN(((0.8 0.2,0.2 0.2,1.0 0.0,0.8 0.2)),((0.2 0.2,0.0 0.0,1.0 0.0,0.2 "
+      "0.2)),((1.0 1.0,0.8 0.8,0.8 0.2,1.0 1.0)),((0.0 1.0,0.0 0.0,0.2 0.2,0.0 "
+      "1.0)),((0.0 1.0,0.2 0.8,1.0 1.0,0.0 1.0)),((0.0 1.0,0.2 0.2,0.2 0.8,0.0 "
+      "1.0)),((0.2 0.8,0.8 0.8,1.0 1.0,0.2 0.8)),((1.0 1.0,0.8 0.2,1.0 0.0,1.0 "
+      "1.0)))");
+  BOOST_CHECK_EQUAL(triangulation.asText(1), expectedWKT);
+}
+
 BOOST_AUTO_TEST_CASE(testPolygon_line_constrained)
 {
   std::unique_ptr<Geometry> g(
       io::readWkt("POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))"));
   std::unique_ptr<Geometry> l(
-      io::readWkt("MULTILINESTRING((0.2 0.2,0.2 0.8,0.8 0.8,0.8 0.2,0.20.2))"));
+      io::readWkt("MULTILINESTRING((0.2 0.2,0.2 0.8,0.8 0.8,0.8 0.2,0.2 0.2))"));
   TriangulatedSurface triangulation = constrainedPolygonalDomain(
       g->as<Polygon>(), l->as<MultiLineString>(), MultiPoint());
   BOOST_CHECK_EQUAL(triangulation.numTriangles(), 8U);

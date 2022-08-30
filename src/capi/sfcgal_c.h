@@ -876,11 +876,14 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_triangulate_2dz(const sfcgal_geometry_t *geom);
 
 /**
- * Returns an extrusion of the given Geometry
+ * Returns a triangulation of the given Geometry
  * @pre isValid(geom) == true
  * @post isValid(return) == true
  * @ingroup capi
  */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_polygonal_domain(const sfcgal_geometry_t *polygon, const sfcgal_geometry_t *multiline, const sfcgal_geometry_t *multipoint);
+
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_extrude(const sfcgal_geometry_t *geom, double ex, double ey,
                         double ez);

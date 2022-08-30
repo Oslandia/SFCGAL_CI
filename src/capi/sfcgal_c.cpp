@@ -43,6 +43,7 @@
 #include <SFCGAL/algorithm/union.h>
 #include <SFCGAL/algorithm/volume.h>
 #include <SFCGAL/triangulate/triangulate2DZ.h>
+#include <SFCGAL/triangulate/triangulatePolygonalDomain.h>
 
 #include <SFCGAL/detail/transform/ForceOrderPoints.h>
 #include <SFCGAL/detail/transform/ForceZOrderPoints.h>
@@ -1056,6 +1057,32 @@ sfcgal_geometry_triangulate_2dz(const sfcgal_geometry_t *ga)
   }
 
   return static_cast<SFCGAL::Geometry *>(surf);
+}
+
+extern "C" auto
+sfcgal_geometry_polygonal_domain(const sfcgal_geometry_t *polygon, const sfcgal_geometry_t *multiline, const sfcgal_geometry_t *multipoint)
+    -> sfcgal_geometry_t *
+{
+  const auto *p    = reinterpret_cast<const SFCGAL::Geometry *>(polygon);
+  const auto *ml    = reinterpret_cast<const SFCGAL::Geometry *>(multiline);
+  const auto *mp    = reinterpret_cast<const SFCGAL::Geometry *>(multipoint);
+  SFCGAL::TriangulatedSurface       surf; 
+
+  try {
+    surf = SFCGAL::triangulate::constrainedPolygonalDomain(p->as<SFCGAL::Polygon>(), ml->as<SFCGAL::MultiLineString>(), mp->as<SFCGAL::MultiPoint>());
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During triangulatePolygonalDomain(P, ML, MP) :");
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(p))->asText().c_str());
+    SFCGAL_WARNING("  and ML: %s",
+                   ((const SFCGAL::Geometry *)(ml))->asText().c_str());
+    SFCGAL_WARNING("  and MP: %s",
+                   ((const SFCGAL::Geometry *)(mp))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+  
+  return static_cast<SFCGAL::Geometry *>(surf.clone());
 }
 
 extern "C" auto
