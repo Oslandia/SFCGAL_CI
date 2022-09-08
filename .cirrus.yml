@@ -39,8 +39,6 @@ task:
     - ctest --output-on-failure -VV --test-dir build
   matrix:
     macos_instance:
-      image: ventura-base
-    macos_instance:
-      image: monterey-base
+      image: ghcr.io/cirruslabs/macos-ventura-base:latest
     macos_instance:
       image: ghcr.io/cirruslabs/macos-monterey-base:latest
