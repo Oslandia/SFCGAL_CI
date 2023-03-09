@@ -1044,6 +1044,43 @@ sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
                                      bool allow_holes, size_t nb_components);
+
+/**
+ * Returns the y monotone partition of a geometry (polygon without hole)
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_y_monotone_partition_2(const sfcgal_geometry_t *geom);
+
+/**
+ * Returns the approximal convex partition of a geometry (polygon without hole)
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_approx_convex_partition_2(const sfcgal_geometry_t *geom);
+
+/**
+ * Returns the greene approximal convex partition of a geometry (polygon without hole)
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_greene_approx_convex_partition_2(const sfcgal_geometry_t *geom);
+
+/**
+ * Returns the optimal convex partition of a geometry (polygon without hole)
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Error handling
