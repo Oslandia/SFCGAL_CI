@@ -37,6 +37,7 @@
 #include <SFCGAL/algorithm/lineSubstring.h>
 #include <SFCGAL/algorithm/minkowskiSum.h>
 #include <SFCGAL/algorithm/offset.h>
+#include <SFCGAL/algorithm/partition_2.h>
 #include <SFCGAL/algorithm/plane.h>
 #include <SFCGAL/algorithm/straightSkeleton.h>
 #include <SFCGAL/algorithm/tesselate.h>
@@ -1249,6 +1250,82 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During optimal_alpha_shapes(A, %g %g):", allow_holes,
                    nb_components);
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return result.release();
+}
+
+
+extern "C" sfcgal_geometry_t *
+sfcgal_y_monotone_partition_2(const sfcgal_geometry_t *geom)
+{
+  const SFCGAL::Geometry *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(), SFCGAL::algorithm::y_monotone);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During y_monotone_partition_2(A):");
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return result.release();
+}
+
+extern "C" sfcgal_geometry_t *
+sfcgal_approx_convex_partition_2(const sfcgal_geometry_t *geom)
+{
+  const SFCGAL::Geometry *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(), SFCGAL::algorithm::approx_convex);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During approx_convex_partition_2(A):");
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return result.release();
+}
+
+extern "C" sfcgal_geometry_t *
+sfcgal_greene_approx_convex_partition_2(const sfcgal_geometry_t *geom)
+{
+  const SFCGAL::Geometry *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(), SFCGAL::algorithm::greene_approx_convex);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During greene_approx_convex_partition_2(A):");
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return result.release();
+}
+extern "C" sfcgal_geometry_t *
+sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom)
+{
+  const SFCGAL::Geometry *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(), SFCGAL::algorithm::optimal_convex);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During optimal_convex_partition_2(A):");
     SFCGAL_WARNING("  with A: %s",
                    ((const SFCGAL::Geometry *)(geom))->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
