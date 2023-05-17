@@ -73,9 +73,9 @@ enum GeometryType {
   //     TYPE_SURFACE             = 14, //abstract
   TYPE_POLYHEDRALSURFACE   = 15,
   TYPE_TRIANGULATEDSURFACE = 16,
+  TYPE_TRIANGLE   = 17,
 
   //-- not official codes
-  TYPE_TRIANGLE   = 100, // 17 in Wikipedia???
   TYPE_SOLID      = 101,
   TYPE_MULTISOLID = 102
 };
