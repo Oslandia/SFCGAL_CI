@@ -39,6 +39,6 @@ task:
     - ctest --test-dir build
   matrix:
     macos_instance:
-      image: big-sur-base
+      image: ghcr.io/cirruslabs/macos-ventura-base:latest
     macos_instance:
-      image: monterey-base
+      image: ghcr.io/cirruslabs/macos-ventura-base:latest
