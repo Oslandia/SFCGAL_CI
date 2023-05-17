@@ -57,9 +57,9 @@ typedef enum {
   //     TYPE_SURFACE             = 14, //abstract
   SFCGAL_TYPE_POLYHEDRALSURFACE   = 15,
   SFCGAL_TYPE_TRIANGULATEDSURFACE = 16,
+  SFCGAL_TYPE_TRIANGLE   = 17,
 
   //-- not official codes
-  SFCGAL_TYPE_TRIANGLE   = 100, // 17 in Wikipedia???
   SFCGAL_TYPE_SOLID      = 101,
   SFCGAL_TYPE_MULTISOLID = 102
 } sfcgal_geometry_type_t;
