@@ -73,7 +73,7 @@ enum GeometryType {
   //     TYPE_SURFACE             = 14, //abstract
   TYPE_POLYHEDRALSURFACE   = 15,
   TYPE_TRIANGULATEDSURFACE = 16,
-  TYPE_TRIANGLE   = 17,
+  TYPE_TRIANGLE            = 17,
 
   //-- not official codes
   TYPE_SOLID      = 101,
@@ -194,6 +194,11 @@ public:
   std::string
   asText(const int &numDecimals = -1) const;
 
+  /**
+   * [OGC/SFA]returns the WKB string
+   */
+  std::string
+  asWkb(const bool asHex = false) const;
   /**
    * [OGC/SFA]Returns a polygon representing the BBOX of the geometry
    * @todo In order to adapt to 3D, would be better to define an "Envelope
