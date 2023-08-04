@@ -23,12 +23,11 @@
 #include <boost/exception/all.hpp>
 #include <exception>
 
-namespace SFCGAL {
-namespace detail {
-namespace io {
+namespace SFCGAL::detail::io {
 
-static std::array<std::byte, 8>
+static auto
 toByte(const double x, boost::endian::order byteOrder)
+    -> std::array<std::byte, 8>
 {
   double y = x;
   if (boost::endian::order::native == boost::endian::order::big &&
@@ -41,8 +40,9 @@ toByte(const double x, boost::endian::order byteOrder)
   return *reinterpret_cast<std::array<std::byte, 8> *>(&y);
 }
 
-static std::array<std::byte, 4>
+static auto
 toByte(const uint32_t x, boost::endian::order byteOrder)
+    -> std::array<std::byte, 4>
 {
   uint32_t y = x;
   if (boost::endian::order::native == boost::endian::order::big &&
@@ -221,10 +221,11 @@ WkbWriter::writeInner(const Point &g, boost::endian::order wkbOrder)
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
   // TODO: SRID
 
@@ -264,10 +265,11 @@ WkbWriter::writeInner(const LineString &g, boost::endian::order wkbOrder)
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
   // TODO: SRID
@@ -305,10 +307,11 @@ WkbWriter::writeInner(const Polygon &g, boost::endian::order wkbOrder)
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
   // TODO: SRID
@@ -340,10 +343,11 @@ WkbWriter::writeInner(const GeometryCollection &g,
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
   // Number of Geometries
@@ -373,10 +377,11 @@ WkbWriter::writeInner(const MultiPoint &g, boost::endian::order wkbOrder)
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
   // Number of Geometries
@@ -406,10 +411,11 @@ WkbWriter::writeInner(const MultiLineString &g, boost::endian::order wkbOrder)
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
   // Number of Geometries
@@ -439,10 +445,11 @@ WkbWriter::writeInner(const MultiPolygon &g, boost::endian::order wkbOrder)
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
   // Number of Geometries
@@ -476,10 +483,11 @@ WkbWriter::writeInner(const Triangle &g, boost::endian::order wkbOrder)
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
   // 4 Points
@@ -517,10 +525,11 @@ WkbWriter::writeInner(const TriangulatedSurface &g,
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
   // Number of Geometries
   const std::array<std::byte, 4> numGeometries{
@@ -553,10 +562,11 @@ WkbWriter::writeInner(const PolyhedralSurface &g, boost::endian::order wkbOrder)
   _wkb.push_back(static_cast<std::byte>(wkbOrder));
 
   // WkbType
-  const std::array<std::byte, 4> wkbType{
-      toByte(static_cast<uint32_t>(g.geometryTypeId() + g.is3D() * 1000 +
-                                   g.isMeasured() * 2000),
-             wkbOrder)};
+  const std::array<std::byte, 4> wkbType{toByte(
+      static_cast<uint32_t>(g.geometryTypeId() +
+                            static_cast<int>(g.is3D()) * COORDINATE_XYZ +
+                            static_cast<int>(g.isMeasured()) * COORDINATE_XYM),
+      wkbOrder)};
   _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
   // Number of Geometries
@@ -570,6 +580,4 @@ WkbWriter::writeInner(const PolyhedralSurface &g, boost::endian::order wkbOrder)
   }
 }
 
-} // namespace io
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::io

@@ -33,6 +33,7 @@
 #include <SFCGAL/Solid.h>
 #include <SFCGAL/Triangle.h>
 #include <SFCGAL/TriangulatedSurface.h>
+#include <SFCGAL/io/wkb.h>
 #include <SFCGAL/io/wkt.h>
 
 #include <boost/test/unit_test.hpp>
@@ -45,9 +46,7 @@ using namespace SFCGAL::io;
 
 BOOST_AUTO_TEST_SUITE(SFCGAL_io_WkbWriterTest)
 
-//-- WKB POINT
-
-BOOST_AUTO_TEST_CASE(wktFiles)
+BOOST_AUTO_TEST_CASE(writeWkb)
 {
   std::string inputData(SFCGAL_TEST_DIRECTORY);
   inputData += "/data/WKT.txt";
@@ -68,4 +67,37 @@ BOOST_AUTO_TEST_CASE(wktFiles)
   }
 }
 
+BOOST_AUTO_TEST_CASE(readWkb)
+{
+  std::string inputData(SFCGAL_TEST_DIRECTORY);
+  inputData += "/data/WKT.txt";
+  std::ifstream ifs(inputData.c_str());
+  BOOST_REQUIRE(ifs.good());
+
+  std::string expectedData(SFCGAL_TEST_DIRECTORY);
+  expectedData += "/data/WKT_expected.txt";
+  std::ifstream efs(expectedData.c_str());
+  BOOST_REQUIRE(efs.good());
+
+  std::string inputWkt;
+  std::string expectedWkb;
+  while (std::getline(ifs, inputWkt)) {
+    std::getline(efs, expectedWkb);
+    std::unique_ptr<Geometry> g(io::readWkt(inputWkt));
+    std::unique_ptr<Geometry> gWkb(io::readWkb(expectedWkb));
+    std::vector<std::string>  allowedBeThyFail{
+        "GEOMETRYCOLLECTION (POINT Z (1 2 3), LINESTRING (0 0, 1 1, 2 2), "
+         "POLYGON Z ((0 0 1, 0 3 2, 3 3 3, 3 0 4, 0 0 1)), MULTIPOINT M ((1 1 "
+         "4), (2 2 5)))",
+        "GEOMETRYCOLLECTION (POINT ZM (1 2 3 4), POINT EMPTY, POLYGON ((0 0, 0 "
+         "4, 4 4, 4 0, 0 0)), POLYGON ZM ((0 0 1 4, 0 3 2 5, 3 3 3 6, 3 0 4 7, "
+         "0 0 1 4)), POLYGON EMPTY)",
+        "POLYGON Z ((0 0,0 10,10 10,10 0,0 0),(1 1 1,1 2 1,2 2 1,2 1 1,1 1 "
+         "1))"};
+    if (std::find(allowedBeThyFail.begin(), allowedBeThyFail.end(), inputWkt) ==
+        std::end(allowedBeThyFail)) {
+      BOOST_CHECK_EQUAL(g->asText(0), gWkb->asText(0));
+    }
+  }
+}
 BOOST_AUTO_TEST_SUITE_END()
