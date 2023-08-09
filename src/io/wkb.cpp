@@ -30,11 +30,17 @@ auto
 readWkb(const std::string &s) -> std::unique_ptr<Geometry>
 {
   WkbReader                 wkbReader(s);
-  std::unique_ptr<Geometry> geom(wkbReader.readWkb());
-
-  return geom;
+  wkbReader.readWkb();
+  return wkbReader.geometry();
 }
 
+auto
+readEwkb(const std::string &s) -> std::unique_ptr<PreparedGeometry>
+{
+  WkbReader                 wkbReader(s);
+  wkbReader.readWkb();
+  return wkbReader.preparedGeometry();
+}
 ///
 ///
 ///

@@ -136,7 +136,8 @@ WkbReader::readInnerMultiPoint() -> MultiPoint
   try {
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
-      SFCGAL::Point geom{readWkb()->as<SFCGAL::Point>()};
+      readWkb();
+      SFCGAL::Point geom{_geometry->as<SFCGAL::Point>()};
       result.addGeometry(geom);
     }
   } catch (std::exception &e) {
@@ -156,7 +157,8 @@ WkbReader::readInnerMultiLineString() -> MultiLineString
   try {
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
-      SFCGAL::LineString geom{readWkb()->as<SFCGAL::LineString>()};
+      readWkb();
+      SFCGAL::LineString geom{_geometry->as<SFCGAL::LineString>()};
       result.addGeometry(geom);
     }
   } catch (std::exception &e) {
@@ -176,7 +178,8 @@ WkbReader::readInnerMultiPolygon() -> MultiPolygon
   try {
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
-      SFCGAL::Polygon geom{readWkb()->as<SFCGAL::Polygon>()};
+      readWkb();
+      SFCGAL::Polygon geom{_geometry->as<SFCGAL::Polygon>()};
       result.addGeometry(geom);
     }
   } catch (std::exception &e) {
@@ -196,7 +199,8 @@ WkbReader::readInnerGeometryCollection() -> GeometryCollection
   try {
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
-      result.addGeometry(readWkb().release());
+      readWkb();
+      result.addGeometry(_geometry.release());
     }
   } catch (std::exception &e) {
     std::cerr << e.what();
@@ -215,7 +219,8 @@ WkbReader::readInnerTriangulatedSurface() -> TriangulatedSurface
   try {
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
-      SFCGAL::Triangle geom{readWkb()->as<SFCGAL::Triangle>()};
+      readWkb();
+      SFCGAL::Triangle geom{_geometry->as<SFCGAL::Triangle>()};
       result.addTriangle(geom);
     }
   } catch (std::exception &e) {
@@ -235,7 +240,8 @@ WkbReader::readInnerPolyhedralSurface() -> PolyhedralSurface
   try {
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
-      geoms.push_back(readWkb()->as<SFCGAL::Polygon>());
+      readWkb();
+      geoms.push_back(_geometry->as<SFCGAL::Polygon>());
     }
   } catch (std::exception &e) {
     std::cerr << e.what();

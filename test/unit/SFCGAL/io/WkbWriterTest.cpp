@@ -119,9 +119,12 @@ BOOST_AUTO_TEST_CASE(readEWkb)
   std::string expectedWkb;
   while (std::getline(ifs, inputWkt)) {
     std::getline(efs, expectedWkb);
-    std::unique_ptr<PreparedGeometry> pg(io::readEwkt(inputWkt));
     std::unique_ptr<Geometry> gWkb(io::readWkb(expectedWkb));
+    std::unique_ptr<PreparedGeometry> pg(io::readEwkt(inputWkt));
+    std::unique_ptr<PreparedGeometry> gEwkb(io::readEwkb(expectedWkb));
     BOOST_CHECK_EQUAL(pg->geometry().asText(0), gWkb->asText(0));
+    BOOST_CHECK_EQUAL(gEwkb->geometry().asText(0), gWkb->asText(0));
+    BOOST_CHECK_EQUAL(3946, gEwkb->SRID());
   }
 }
 BOOST_AUTO_TEST_SUITE_END()

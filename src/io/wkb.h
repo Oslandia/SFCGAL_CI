@@ -13,6 +13,7 @@
 
 namespace SFCGAL {
 class Geometry;
+class PreparedGeometry;
 }
 
 namespace SFCGAL {
@@ -27,6 +28,10 @@ namespace io {
  */
 SFCGAL_API std::unique_ptr<Geometry>
            readWkb(const std::string &s);
+
+
+SFCGAL_API auto
+readEwkb(const std::string &s) -> std::unique_ptr<PreparedGeometry>;
 /**
  * Read a WKB geometry from a char*
  */

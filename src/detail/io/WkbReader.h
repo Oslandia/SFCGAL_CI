@@ -48,15 +48,29 @@ public:
   }
 
   auto
-  readWkb() -> std::unique_ptr<SFCGAL::Geometry>
+  readWkb() -> void
   {
     // wkbOrder
     std::byte wkbOrder{read<std::byte>()};
     _swapEndian =
         boost::endian::order::native == boost::endian::order(wkbOrder);
 
-    return readGeometry();
+    _geometry = readGeometry();
   }
+
+  auto 
+    geometry() -> std::unique_ptr<SFCGAL::Geometry>
+    {
+      return std::move(_geometry);
+    }
+
+  auto 
+    preparedGeometry() -> std::unique_ptr<SFCGAL::PreparedGeometry>
+    {
+      return std::make_unique<SFCGAL::PreparedGeometry>(std::move(_geometry), _srid);
+    }
+  [[nodiscard]] auto
+    srid() const -> srid_t { return _srid;}
 
 private:
   template <typename T>
@@ -262,6 +276,8 @@ private:
   size_t _index = 0;
 
   srid_t _srid = 0;
+
+  std::unique_ptr<SFCGAL::Geometry> _geometry;
 };
 
 } // namespace io
