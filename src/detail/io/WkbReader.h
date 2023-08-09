@@ -31,6 +31,9 @@ namespace SFCGAL {
 namespace detail {
 namespace io {
 
+  const uint32_t wkbSRID = 0x20000000;
+  const uint32_t wkbM = 0x40000000;
+  const uint32_t wkbZ = 0x80000000;
 /**
  * read WKB geometry
  *
@@ -53,13 +56,6 @@ public:
         boost::endian::order::native == boost::endian::order(wkbOrder);
 
     return readGeometry();
-  }
-  // Méthode pour lire une géométrie à partir du WKB
-  auto
-  readGeometry() -> std::unique_ptr<SFCGAL::Geometry>
-  {
-    GeometryType geometryType = readGeometryType();
-    return readGeometryData(geometryType);
   }
 
 private:
@@ -87,22 +83,48 @@ private:
     return d;
   }
 
+  // Méthode pour lire une géométrie à partir du WKB
+  auto
+  readGeometry() -> std::unique_ptr<SFCGAL::Geometry>
+  {
+    GeometryType geometryType = readGeometryType();
+    return readGeometryData(geometryType);
+  }
+
   auto
   readGeometryType() -> GeometryType
   {
-    uint32_t geometryType = read<uint32_t>();
-    if (geometryType >= COORDINATE_XYZM) {
-      _is3D       = true;
-      _isMeasured = true;
-      geometryType -= COORDINATE_XYZM;
-    } else if (geometryType >= COORDINATE_XYM) {
-      _is3D       = false;
-      _isMeasured = true;
-      geometryType -= COORDINATE_XYM;
-    } else if (geometryType >= COORDINATE_XYZ) {
-      _is3D       = true;
-      _isMeasured = false;
-      geometryType -= COORDINATE_XYZ;
+    auto geometryType = read<uint32_t>();
+
+    if ( (geometryType & wkbSRID) == wkbSRID)
+    {
+      readSRID();
+
+      if ( (geometryType & wkbZ) == wkbZ)
+      {
+        _is3D = true;
+      }
+      if ( (geometryType & wkbM) == wkbM)
+      {
+        _isMeasured = true;
+      }
+        geometryType &= 0xF;
+    }
+    else
+    {
+      if (geometryType >= COORDINATE_XYZM) {
+        _is3D       = true;
+        _isMeasured = true;
+        geometryType -= COORDINATE_XYZM;
+      } else if (geometryType >= COORDINATE_XYM) {
+        _is3D       = false;
+        _isMeasured = true;
+        geometryType -= COORDINATE_XYM;
+      } else if (geometryType >= COORDINATE_XYZ) {
+        _is3D       = true;
+        _isMeasured = false;
+        geometryType -= COORDINATE_XYZ;
+      }
     }
     return static_cast<GeometryType>(geometryType);
   }
@@ -158,8 +180,8 @@ private:
    * read an SRID, if present
    *
    */
-  srid_t
-  readSRID();
+  auto
+  readSRID() -> void { _srid = read<uint32_t>(); }
 
   /**
    * Read Point content from wkb
@@ -238,6 +260,8 @@ private:
   bool _swapEndian = false;
 
   size_t _index = 0;
+
+  srid_t _srid = 0;
 };
 
 } // namespace io

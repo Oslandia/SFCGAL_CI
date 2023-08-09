@@ -35,6 +35,8 @@
 #include <SFCGAL/TriangulatedSurface.h>
 #include <SFCGAL/io/wkb.h>
 #include <SFCGAL/io/wkt.h>
+#include <SFCGAL/io/ewkt.h>
+#include <SFCGAL/PreparedGeometry.h>
 
 #include <boost/test/unit_test.hpp>
 using namespace boost::unit_test;
@@ -98,6 +100,28 @@ BOOST_AUTO_TEST_CASE(readWkb)
         std::end(allowedBeThyFail)) {
       BOOST_CHECK_EQUAL(g->asText(0), gWkb->asText(0));
     }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(readEWkb)
+{
+  std::string inputData(SFCGAL_TEST_DIRECTORY);
+  inputData += "/data/EWKT.txt";
+  std::ifstream ifs(inputData.c_str());
+  BOOST_REQUIRE(ifs.good());
+
+  std::string expectedData(SFCGAL_TEST_DIRECTORY);
+  expectedData += "/data/EWKT_expected.txt";
+  std::ifstream efs(expectedData.c_str());
+  BOOST_REQUIRE(efs.good());
+
+  std::string inputWkt;
+  std::string expectedWkb;
+  while (std::getline(ifs, inputWkt)) {
+    std::getline(efs, expectedWkb);
+    std::unique_ptr<PreparedGeometry> pg(io::readEwkt(inputWkt));
+    std::unique_ptr<Geometry> gWkb(io::readWkb(expectedWkb));
+    BOOST_CHECK_EQUAL(pg->geometry().asText(0), gWkb->asText(0));
   }
 }
 BOOST_AUTO_TEST_SUITE_END()
