@@ -5,6 +5,7 @@
 #include <SFCGAL/PreparedGeometry.h>
 
 #include <SFCGAL/detail/io/WktWriter.h>
+#include <SFCGAL/detail/io/WkbWriter.h>
 
 namespace SFCGAL {
 PreparedGeometry::PreparedGeometry() : _srid(0) {}
@@ -83,4 +84,13 @@ PreparedGeometry::asEWKT(const int &numDecimals) const -> std::string
   writer.write(*_geometry, exactWrite);
   return oss.str();
 }
+
+auto
+PreparedGeometry::asEWKB(const bool asHex) const -> std::string
+{
+  detail::io::WkbWriter writer;
+  writer.write(*_geometry, _srid);
+  return writer.toString(asHex);
+}
+
 } // namespace SFCGAL

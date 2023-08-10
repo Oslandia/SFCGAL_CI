@@ -117,7 +117,13 @@ WkbReader::readInnerTriangle() -> Triangle
     return {};
   }
   try {
-    SFCGAL::LineString geom{readInnerPolygon().exteriorRing()};
+    SFCGAL::Polygon poly{readInnerPolygon()};
+    if (poly.isEmpty())
+      return {};
+
+    SFCGAL::LineString geom{poly.exteriorRing()};
+    if (geom.isEmpty())
+      return {};
 
     return SFCGAL::Triangle{geom.pointN(0), geom.pointN(1), geom.pointN(2)};
   } catch (std::exception &e) {

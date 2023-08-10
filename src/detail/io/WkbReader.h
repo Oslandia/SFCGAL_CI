@@ -31,9 +31,6 @@ namespace SFCGAL {
 namespace detail {
 namespace io {
 
-  const uint32_t wkbSRID = 0x20000000;
-  const uint32_t wkbM = 0x40000000;
-  const uint32_t wkbZ = 0x80000000;
 /**
  * read WKB geometry
  *
@@ -58,19 +55,24 @@ public:
     _geometry = readGeometry();
   }
 
-  auto 
-    geometry() -> std::unique_ptr<SFCGAL::Geometry>
-    {
-      return std::move(_geometry);
-    }
+  auto
+  geometry() -> std::unique_ptr<SFCGAL::Geometry>
+  {
+    return std::move(_geometry);
+  }
 
-  auto 
-    preparedGeometry() -> std::unique_ptr<SFCGAL::PreparedGeometry>
-    {
-      return std::make_unique<SFCGAL::PreparedGeometry>(std::move(_geometry), _srid);
-    }
+  auto
+  preparedGeometry() -> std::unique_ptr<SFCGAL::PreparedGeometry>
+  {
+    return std::make_unique<SFCGAL::PreparedGeometry>(std::move(_geometry),
+                                                      _srid);
+  }
+
   [[nodiscard]] auto
-    srid() const -> srid_t { return _srid;}
+  srid() const -> srid_t
+  {
+    return _srid;
+  }
 
 private:
   template <typename T>
@@ -110,22 +112,20 @@ private:
   {
     auto geometryType = read<uint32_t>();
 
-    if ( (geometryType & wkbSRID) == wkbSRID)
-    {
-      readSRID();
+    if (_isEWKB || ((geometryType & wkbSRID) == wkbSRID)) {
+      if (!_isEWKB) {
+        readSRID();
+        _isEWKB = true;
+      }
 
-      if ( (geometryType & wkbZ) == wkbZ)
-      {
+      if ((geometryType & wkbZ) == wkbZ) {
         _is3D = true;
       }
-      if ( (geometryType & wkbM) == wkbM)
-      {
+      if ((geometryType & wkbM) == wkbM) {
         _isMeasured = true;
       }
-        geometryType &= 0xF;
-    }
-    else
-    {
+      geometryType &= 0x0FFFFFFF;
+    } else {
       if (geometryType >= COORDINATE_XYZM) {
         _is3D       = true;
         _isMeasured = true;
@@ -195,7 +195,10 @@ private:
    *
    */
   auto
-  readSRID() -> void { _srid = read<uint32_t>(); }
+  readSRID() -> void
+  {
+    _srid = read<uint32_t>();
+  }
 
   /**
    * Read Point content from wkb
@@ -277,6 +280,7 @@ private:
 
   srid_t _srid = 0;
 
+  bool                              _isEWKB = false;
   std::unique_ptr<SFCGAL::Geometry> _geometry;
 };
 

@@ -12,6 +12,8 @@
 #include <SFCGAL/Geometry.h>
 #include <SFCGAL/config.h>
 
+typedef uint32_t srid_t;
+
 namespace SFCGAL {
 namespace detail {
 namespace io {
@@ -24,6 +26,10 @@ class SFCGAL_API WkbWriter {
 public:
   void
   write(const Geometry      &g,
+        boost::endian::order wkbOrder = boost::endian::order::native);
+
+  void
+  write(const Geometry &g, const srid_t &srid,
         boost::endian::order wkbOrder = boost::endian::order::native);
 
   auto
@@ -145,6 +151,10 @@ private:
                   boost::endian::order wkbOrder = boost::endian::order::native);
   ;
 
+  void
+  writeGeometryType(const Geometry &g, boost::endian::order wkbOrder =
+                                           boost::endian::order::native);
+  ;
   // for recursive call use
   void
   writeRec(const Geometry      &g,
@@ -152,6 +162,11 @@ private:
   ;
 
   std::vector<std::byte> _wkb;
+
+  srid_t _srid;
+
+  bool _useSrid = false;
+  bool _isEWKB  = false;
 };
 
 } // namespace io
