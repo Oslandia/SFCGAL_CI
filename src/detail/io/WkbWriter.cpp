@@ -220,10 +220,12 @@ WkbWriter::writeGeometryType(const Geometry &g, boost::endian::order wkbOrder)
 
     uint32_t ewkbtype = g.geometryTypeId();
 
-    if (g.is3D())
+    if (g.is3D()) {
       ewkbtype |= wkbZ;
-    if (g.isMeasured())
+    }
+    if (g.isMeasured()) {
       ewkbtype |= wkbM;
+    }
     if (_useSrid) {
       ewkbtype |= wkbSRID;
     }

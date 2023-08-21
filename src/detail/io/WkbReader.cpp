@@ -53,7 +53,7 @@ WkbReader::readInnerPoint() -> Point
 
     double m{read<double>()};
     if (!(std::isfinite(m))) {
-      return SFCGAL::Point();
+      return {};
     }
     SFCGAL::Point result{x, y};
     result.setM(m);
@@ -117,12 +117,14 @@ WkbReader::readInnerTriangle() -> Triangle
   }
   try {
     SFCGAL::Polygon poly{readInnerPolygon()};
-    if (poly.isEmpty())
+    if (poly.isEmpty()) {
       return {};
+    }
 
     SFCGAL::LineString geom{poly.exteriorRing()};
-    if (geom.isEmpty())
+    if (geom.isEmpty()) {
       return {};
+    }
 
     return SFCGAL::Triangle{geom.pointN(0), geom.pointN(1), geom.pointN(2)};
   } catch (std::exception &e) {
