@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(writeWkb)
   BOOST_REQUIRE(ifs.good());
 
   std::string expectedData(SFCGAL_TEST_DIRECTORY);
-  expectedData += "/data/WKT_expected.txt";
+  expectedData += "/data/WKB_expected.txt";
   std::ifstream efs(expectedData.c_str());
   BOOST_REQUIRE(efs.good());
 
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(readWkb)
   BOOST_REQUIRE(ifs.good());
 
   std::string expectedData(SFCGAL_TEST_DIRECTORY);
-  expectedData += "/data/WKT_expected.txt";
+  expectedData += "/data/WKB_expected.txt";
   std::ifstream efs(expectedData.c_str());
   BOOST_REQUIRE(efs.good());
 
