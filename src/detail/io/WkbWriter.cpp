@@ -500,7 +500,7 @@ WkbWriter::writeInner(const Triangle &g, boost::endian::order wkbOrder)
     const std::array<std::byte, 4> fourPoints =
         toByte(static_cast<uint32_t>(4), wkbOrder);
     _wkb.insert(_wkb.end(), fourPoints.begin(), fourPoints.end());
-    for (size_t i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
       writeCoordinate(g.vertex(i), wkbOrder);
     }
   }
