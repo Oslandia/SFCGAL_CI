@@ -60,17 +60,7 @@ void
 writeInner(const M &g, boost::endian::order wkbOrder);
 
   void
-  writeInner(const MultiSolid    &g,
-             boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
-
-  void
   writeInner(const Triangle      &g,
-             boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
-
-  void
-  writeInner(const Solid         &g,
              boost::endian::order wkbOrder = boost::endian::order::native);
   ;
 
