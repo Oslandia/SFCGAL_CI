@@ -134,59 +134,18 @@ WkbReader::readInnerTriangle() -> Triangle
 }
 
 /**
- * Read MultiPoint content from wkb
+ * Read MultiGeometries content from wkb
  */
+template <typename M, typename G>
 auto
-WkbReader::readInnerMultiPoint() -> MultiPoint
+WkbReader::readInnerMultiGeometries() -> M
 {
-  SFCGAL::MultiPoint result;
+  M result;
   try {
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
       readWkb();
-      SFCGAL::Point geom{_geometry->as<SFCGAL::Point>()};
-      result.addGeometry(geom);
-    }
-  } catch (std::exception &e) {
-    std::cerr << e.what();
-    return {};
-  }
-  return result;
-}
-
-/**
- * Read MultiLineString content from wkb
- */
-auto
-WkbReader::readInnerMultiLineString() -> MultiLineString
-{
-  SFCGAL::MultiLineString result;
-  try {
-    const uint32_t numGeoms{read<uint32_t>()};
-    for (uint32_t i = 0; i < numGeoms; ++i) {
-      readWkb();
-      SFCGAL::LineString geom{_geometry->as<SFCGAL::LineString>()};
-      result.addGeometry(geom);
-    }
-  } catch (std::exception &e) {
-    std::cerr << e.what();
-    return {};
-  }
-  return result;
-}
-
-/**
- * Read MultiPolygon content from wkb
- */
-auto
-WkbReader::readInnerMultiPolygon() -> MultiPolygon
-{
-  SFCGAL::MultiPolygon result;
-  try {
-    const uint32_t numGeoms{read<uint32_t>()};
-    for (uint32_t i = 0; i < numGeoms; ++i) {
-      readWkb();
-      SFCGAL::Polygon geom{_geometry->as<SFCGAL::Polygon>()};
+      G geom{_geometry->template as<G>()};
       result.addGeometry(geom);
     }
   } catch (std::exception &e) {

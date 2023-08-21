@@ -158,14 +158,14 @@ private:
           readInnerGeometryCollection().clone());
 
     case TYPE_MULTIPOINT:
-      return std::unique_ptr<SFCGAL::Geometry>(readInnerMultiPoint().clone());
+      return std::unique_ptr<SFCGAL::Geometry>(readInnerMultiGeometries<MultiPoint, Point>().clone());
 
     case TYPE_MULTILINESTRING:
       return std::unique_ptr<SFCGAL::Geometry>(
-          readInnerMultiLineString().clone());
+          readInnerMultiGeometries<MultiLineString, LineString>().clone());
 
     case TYPE_MULTIPOLYGON:
-      return std::unique_ptr<SFCGAL::Geometry>(readInnerMultiPolygon().clone());
+      return std::unique_ptr<SFCGAL::Geometry>(readInnerMultiGeometries<MultiPolygon, Polygon>().clone());
 
     case TYPE_TRIANGLE:
       return std::unique_ptr<SFCGAL::Geometry>(readInnerTriangle().clone());
@@ -216,28 +216,17 @@ private:
   readInnerPolygon() -> Polygon;
 
   /**
+   * Read MultiGeometries (MultiPoint, MultiLineString, MultiPolygon content from Wkb
+   */
+  template <typename M, typename G>
+  auto
+  readInnerMultiGeometries() -> M;
+
+  /**
    * Read Triangle content from wkb
    */
   auto
   readInnerTriangle() -> Triangle;
-
-  /**
-   * Read MultiPoint content from wkb
-   */
-  auto
-  readInnerMultiPoint() -> MultiPoint;
-
-  /**
-   * Read MultiLineString content from wkb
-   */
-  auto
-  readInnerMultiLineString() -> MultiLineString;
-
-  /**
-   * Read MultiPolygon content from wkb
-   */
-  auto
-  readInnerMultiPolygon() -> MultiPolygon;
 
   /**
    * Read GeometryCollection content from wkb
