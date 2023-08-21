@@ -16,12 +16,12 @@ namespace SFCGAL::io {
 ///
 ///
 ///
-// auto
-// readWkb(std::istream &s) -> std::unique_ptr<Geometry>
-// {
-//   WkbReader wkbReader(s);
-//   return std::unique_ptr<Geometry>(wkbReader.readGeometry());
-// }
+auto
+readWkb(std::istream &stream) -> std::unique_ptr<Geometry>
+{
+  std::string s{std::istreambuf_iterator<char>(stream), {}};
+  return readWkb(s);
+}
 
 ///
 ///
@@ -34,6 +34,29 @@ readWkb(const std::string &s) -> std::unique_ptr<Geometry>
   return wkbReader.geometry();
 }
 
+///
+///
+///
+auto
+readWkb(const char *str, size_t len) -> std::unique_ptr<Geometry>
+{
+  CharArrayBuffer buf(str, str + len);
+  std::istream    istr(&buf);
+
+  return readWkb(istr);
+}
+
+/**
+ * Read a WKB geometry from an input stream
+ */
+auto
+readEwkb(std::istream &stream) -> std::unique_ptr<PreparedGeometry>
+{
+
+  std::string s{std::istreambuf_iterator<char>(stream), {}};
+  return readEwkb(s);
+}
+
 auto
 readEwkb(const std::string &s) -> std::unique_ptr<PreparedGeometry>
 {
@@ -41,22 +64,17 @@ readEwkb(const std::string &s) -> std::unique_ptr<PreparedGeometry>
   wkbReader.readWkb();
   return wkbReader.preparedGeometry();
 }
-///
-///
-///
-// auto
-// readWkb(const char *str, size_t len) -> std::unique_ptr<Geometry>
-// {
-//   CharArrayBuffer           buf(str, str + len);
-//   std::istream              istr(&buf);
-//   WkbReader                 wkbReader(istr);
-//   std::unique_ptr<Geometry> geom(wkbReader.readGeometry());
-//   char                      extra = 0;
-//   if (istr >> extra) {
-//     std::string remaining(str + int(istr.tellg()) - 1, str + len);
-//     throw WkbParseException("Extra characters in WKB: " + remaining);
-//   }
-//   return geom;
-// }
+
+/**
+ * Read a WKB geometry from a char*
+ */
+auto
+readEwkb(const char *str, size_t len) -> std::unique_ptr<PreparedGeometry>
+{
+  CharArrayBuffer buf(str, str + len);
+  std::istream    istr(&buf);
+
+  return readEwkb(istr);
+}
 
 } // namespace SFCGAL::io
