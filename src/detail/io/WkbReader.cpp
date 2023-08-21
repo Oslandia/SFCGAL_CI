@@ -40,14 +40,14 @@ WkbReader::readInnerPoint() -> Point
     if (!(std::isfinite(z) && std::isfinite(m))) {
       return {};
     }
-    return SFCGAL::Point(x, y, z, m);
+    return SFCGAL::Point{x, y, z, m};
   }
   if (_is3D) {
     double z{read<double>()};
     if (!(std::isfinite(z))) {
       return {};
     }
-    return SFCGAL::Point(x, y, z);
+    return SFCGAL::Point{x, y, z};
   }
   if (_isMeasured) {
 
