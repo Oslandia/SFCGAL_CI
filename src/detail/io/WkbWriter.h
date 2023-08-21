@@ -54,20 +54,10 @@ protected:
              boost::endian::order      wkbOrder = boost::endian::order::native);
   ;
 
-  void
-  writeInner(const MultiPoint    &g,
-             boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
-
-  void
-  writeInner(const MultiLineString &g,
-             boost::endian::order   wkbOrder = boost::endian::order::native);
-  ;
-
-  void
-  writeInner(const MultiPolygon  &g,
-             boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
+  // for Multi Geometries (MultiPoint, MultiLineString, MultiPolygon, PolyhedralSurface and TriangulatedSurface)
+template <typename M, typename G>
+void
+writeInner(const M &g, boost::endian::order wkbOrder);
 
   void
   writeInner(const MultiSolid    &g,
@@ -77,16 +67,6 @@ protected:
   void
   writeInner(const Triangle      &g,
              boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
-
-  void
-  writeInner(const TriangulatedSurface &g,
-             boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
-
-  void
-  writeInner(const PolyhedralSurface &g,
-             boost::endian::order     wkbOrder = boost::endian::order::native);
   ;
 
   void
