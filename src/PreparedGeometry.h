@@ -102,7 +102,7 @@ public:
   asEWKT(const int &numDecimals = -1) const;
 
   std::string
-  asEWKB(const bool asHex=false) const;
+  asEWKB(const bool asHex = false) const;
 
   /**
    * Serializer

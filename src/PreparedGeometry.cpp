@@ -4,8 +4,8 @@
 
 #include <SFCGAL/PreparedGeometry.h>
 
-#include <SFCGAL/detail/io/WktWriter.h>
 #include <SFCGAL/detail/io/WkbWriter.h>
+#include <SFCGAL/detail/io/WktWriter.h>
 
 namespace SFCGAL {
 PreparedGeometry::PreparedGeometry() : _srid(0) {}

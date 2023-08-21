@@ -54,10 +54,11 @@ protected:
              boost::endian::order      wkbOrder = boost::endian::order::native);
   ;
 
-  // for Multi Geometries (MultiPoint, MultiLineString, MultiPolygon, PolyhedralSurface and TriangulatedSurface)
-template <typename M, typename G>
-void
-writeInner(const M &g, boost::endian::order wkbOrder);
+  // for Multi Geometries (MultiPoint, MultiLineString, MultiPolygon,
+  // PolyhedralSurface and TriangulatedSurface)
+  template <typename M, typename G>
+  void
+  writeInner(const M &g, boost::endian::order wkbOrder);
 
   void
   writeInner(const Triangle      &g,

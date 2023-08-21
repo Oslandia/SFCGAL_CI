@@ -24,7 +24,7 @@
 
 namespace SFCGAL::detail::io {
 
-template <typename T> 
+template <typename T>
 static auto
 toByte(const T x, boost::endian::order byteOrder)
     -> std::array<std::byte, sizeof(T)>
@@ -92,7 +92,8 @@ WkbWriter::writeRec(const Geometry &g, boost::endian::order wkbOrder)
     return;
 
   case TYPE_TRIANGULATEDSURFACE:
-    writeInner<TriangulatedSurface, Triangle>(g.as<TriangulatedSurface>(), wkbOrder);
+    writeInner<TriangulatedSurface, Triangle>(g.as<TriangulatedSurface>(),
+                                              wkbOrder);
     return;
 
   case TYPE_POLYHEDRALSURFACE:
@@ -171,11 +172,13 @@ WkbWriter::writeGeometryType(const Geometry &g, boost::endian::order wkbOrder)
     if (_useSrid) {
       ewkbtype |= wkbSRID;
     }
-    const std::array<std::byte, 4> wkbType{toByte<uint32_t>(ewkbtype, wkbOrder)};
+    const std::array<std::byte, 4> wkbType{
+        toByte<uint32_t>(ewkbtype, wkbOrder)};
     _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
     if (_useSrid) {
-      const std::array<std::byte, 4> sridByte{toByte<uint32_t>(_srid, wkbOrder)};
+      const std::array<std::byte, 4> sridByte{
+          toByte<uint32_t>(_srid, wkbOrder)};
       _wkb.insert(_wkb.end(), sridByte.begin(), sridByte.end());
 
       _useSrid = false;
@@ -333,6 +336,5 @@ WkbWriter::writeInner(const M &g, boost::endian::order wkbOrder)
     writeInner(g.geometryN(i).template as<G>(), wkbOrder);
   }
 }
-
 
 } // namespace SFCGAL::detail::io

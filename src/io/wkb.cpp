@@ -29,7 +29,7 @@ namespace SFCGAL::io {
 auto
 readWkb(const std::string &s) -> std::unique_ptr<Geometry>
 {
-  WkbReader                 wkbReader(s);
+  WkbReader wkbReader(s);
   wkbReader.readWkb();
   return wkbReader.geometry();
 }
@@ -37,7 +37,7 @@ readWkb(const std::string &s) -> std::unique_ptr<Geometry>
 auto
 readEwkb(const std::string &s) -> std::unique_ptr<PreparedGeometry>
 {
-  WkbReader                 wkbReader(s);
+  WkbReader wkbReader(s);
   wkbReader.readWkb();
   return wkbReader.preparedGeometry();
 }
