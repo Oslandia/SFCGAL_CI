@@ -124,45 +124,46 @@ WkbWriter::write(const Geometry &g, const srid_t &srid,
 void
 WkbWriter::write(const Geometry &g, boost::endian::order wkbOrder)
 {
+  _wkb.clear();
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
-    write(g.as<Point>(), wkbOrder);
+    writeInner(g.as<Point>(), wkbOrder);
     return;
 
   case TYPE_LINESTRING:
-    write(g.as<LineString>(), wkbOrder);
+    writeInner(g.as<LineString>(), wkbOrder);
     return;
 
   case TYPE_POLYGON:
-    write(g.as<Polygon>(), wkbOrder);
+    writeInner(g.as<Polygon>(), wkbOrder);
     return;
 
   case TYPE_GEOMETRYCOLLECTION:
-    write(g.as<GeometryCollection>(), wkbOrder);
+    writeInner(g.as<GeometryCollection>(), wkbOrder);
     return;
 
   case TYPE_MULTIPOINT:
-    write(g.as<MultiPoint>(), wkbOrder);
+    writeInner(g.as<MultiPoint>(), wkbOrder);
     return;
 
   case TYPE_MULTILINESTRING:
-    write(g.as<MultiLineString>(), wkbOrder);
+    writeInner(g.as<MultiLineString>(), wkbOrder);
     return;
 
   case TYPE_MULTIPOLYGON:
-    write(g.as<MultiPolygon>(), wkbOrder);
+    writeInner(g.as<MultiPolygon>(), wkbOrder);
     return;
 
   case TYPE_TRIANGLE:
-    write(g.as<Triangle>(), wkbOrder);
+    writeInner(g.as<Triangle>(), wkbOrder);
     return;
 
   case TYPE_TRIANGULATEDSURFACE:
-    write(g.as<TriangulatedSurface>(), wkbOrder);
+    writeInner(g.as<TriangulatedSurface>(), wkbOrder);
     return;
 
   case TYPE_POLYHEDRALSURFACE:
-    write(g.as<PolyhedralSurface>(), wkbOrder);
+    writeInner(g.as<PolyhedralSurface>(), wkbOrder);
     return;
 
   default:
@@ -238,16 +239,6 @@ WkbWriter::writeGeometryType(const Geometry &g, boost::endian::order wkbOrder)
 ///
 ///
 void
-WkbWriter::write(const Point &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
-}
-
-///
-///
-///
-void
 WkbWriter::writeInner(const Point &g, boost::endian::order wkbOrder)
 {
   // Endianness
@@ -270,16 +261,6 @@ WkbWriter::writeInner(const Point &g, boost::endian::order wkbOrder)
   } else {
     writeCoordinate(g, wkbOrder);
   }
-}
-
-///
-///
-///
-void
-WkbWriter::write(const LineString &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
 }
 
 ///
@@ -312,16 +293,6 @@ WkbWriter::writeInnerRing(const LineString &g, boost::endian::order wkbOrder)
 ///
 ///
 void
-WkbWriter::write(const Polygon &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
-}
-
-///
-///
-///
-void
 WkbWriter::writeInner(const Polygon &g, boost::endian::order wkbOrder)
 {
   // Endianness
@@ -338,16 +309,6 @@ WkbWriter::writeInner(const Polygon &g, boost::endian::order wkbOrder)
   for (size_t i = 0; i < g.numInteriorRings(); i++) {
     writeInnerRing(g.interiorRingN(i), wkbOrder);
   }
-}
-
-///
-///
-///
-void
-WkbWriter::write(const GeometryCollection &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
 }
 
 void
@@ -369,15 +330,6 @@ WkbWriter::writeInner(const GeometryCollection &g,
     writeRec(g.geometryN(i), wkbOrder);
   }
 }
-///
-///
-///
-void
-WkbWriter::write(const MultiPoint &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
-}
 
 void
 WkbWriter::writeInner(const MultiPoint &g, boost::endian::order wkbOrder)
@@ -396,15 +348,6 @@ WkbWriter::writeInner(const MultiPoint &g, boost::endian::order wkbOrder)
   for (size_t i = 0; i < g.numGeometries(); i++) {
     writeInner(g.geometryN(i).as<Point>(), wkbOrder);
   }
-}
-///
-///
-///
-void
-WkbWriter::write(const MultiLineString &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
 }
 
 void
@@ -425,15 +368,6 @@ WkbWriter::writeInner(const MultiLineString &g, boost::endian::order wkbOrder)
     writeInner(g.geometryN(i).as<LineString>(), wkbOrder);
   }
 }
-///
-///
-///
-void
-WkbWriter::write(const MultiPolygon &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
-}
 
 void
 WkbWriter::writeInner(const MultiPolygon &g, boost::endian::order wkbOrder)
@@ -452,16 +386,6 @@ WkbWriter::writeInner(const MultiPolygon &g, boost::endian::order wkbOrder)
   for (size_t i = 0; i < g.numGeometries(); i++) {
     writeInner(g.geometryN(i).as<Polygon>(), wkbOrder);
   }
-}
-
-///
-///
-///
-void
-WkbWriter::write(const Triangle &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
 }
 
 ///
@@ -492,16 +416,6 @@ WkbWriter::writeInner(const Triangle &g, boost::endian::order wkbOrder)
   }
 }
 
-///
-///
-///
-void
-WkbWriter::write(const TriangulatedSurface &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
-}
-
 void
 WkbWriter::writeInner(const TriangulatedSurface &g,
                       boost::endian::order       wkbOrder)
@@ -520,15 +434,6 @@ WkbWriter::writeInner(const TriangulatedSurface &g,
   for (size_t i = 0; i < g.numGeometries(); i++) {
     writeInner(g.geometryN(i).as<Triangle>(), wkbOrder);
   }
-}
-///
-///
-///
-void
-WkbWriter::write(const PolyhedralSurface &g, boost::endian::order wkbOrder)
-{
-  _wkb.clear();
-  writeInner(g, wkbOrder);
 }
 
 ///
