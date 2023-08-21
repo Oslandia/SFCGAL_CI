@@ -24,11 +24,12 @@
 
 namespace SFCGAL::detail::io {
 
+template <typename T> 
 static auto
-toByte(const double x, boost::endian::order byteOrder)
-    -> std::array<std::byte, 8>
+toByte(const T x, boost::endian::order byteOrder)
+    -> std::array<std::byte, sizeof(T)>
 {
-  double y = x;
+  T y = x;
   if (boost::endian::order::native == boost::endian::order::big &&
       byteOrder == boost::endian::order::little) {
     boost::endian::endian_reverse_inplace(y);
@@ -36,22 +37,7 @@ toByte(const double x, boost::endian::order byteOrder)
              byteOrder == boost::endian::order::big) {
     boost::endian::endian_reverse_inplace(y);
   }
-  return *reinterpret_cast<std::array<std::byte, 8> *>(&y);
-}
-
-static auto
-toByte(const uint32_t x, boost::endian::order byteOrder)
-    -> std::array<std::byte, 4>
-{
-  uint32_t y = x;
-  if (boost::endian::order::native == boost::endian::order::big &&
-      byteOrder == boost::endian::order::little) {
-    boost::endian::endian_reverse_inplace(y);
-  } else if (boost::endian::order::native == boost::endian::order::little &&
-             byteOrder == boost::endian::order::big) {
-    boost::endian::endian_reverse_inplace(y);
-  }
-  return *reinterpret_cast<std::array<std::byte, 4> *>(&y);
+  return *reinterpret_cast<std::array<std::byte, sizeof(T)> *>(&y);
 }
 
 auto
@@ -229,11 +215,11 @@ WkbWriter::writeGeometryType(const Geometry &g, boost::endian::order wkbOrder)
     if (_useSrid) {
       ewkbtype |= wkbSRID;
     }
-    const std::array<std::byte, 4> wkbType{toByte(ewkbtype, wkbOrder)};
+    const std::array<std::byte, 4> wkbType{toByte<uint32_t>(ewkbtype, wkbOrder)};
     _wkb.insert(_wkb.end(), wkbType.begin(), wkbType.end());
 
     if (_useSrid) {
-      const std::array<std::byte, 4> sridByte{toByte(_srid, wkbOrder)};
+      const std::array<std::byte, 4> sridByte{toByte<uint32_t>(_srid, wkbOrder)};
       _wkb.insert(_wkb.end(), sridByte.begin(), sridByte.end());
 
       _useSrid = false;
