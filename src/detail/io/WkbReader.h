@@ -1,5 +1,4 @@
-// Copyright (c) 2012-2013, IGN France.
-// Copyright (c) 2012-2022, Oslandia.
+// Copyright (c) 2023-2023, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #ifndef _SFCGAL_IO_WKBREADER_H_
@@ -27,9 +26,7 @@
 #include <boost/endian/conversion.hpp> // don't use bit, since it requires c++20
 #include <sys/endian.h>
 //
-namespace SFCGAL {
-namespace detail {
-namespace io {
+namespace SFCGAL::detail::io {
 
 /**
  * read WKB geometry
@@ -284,8 +281,6 @@ private:
   std::unique_ptr<SFCGAL::Geometry> _geometry;
 };
 
-} // namespace io
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::io
 
 #endif

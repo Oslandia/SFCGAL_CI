@@ -46,9 +46,9 @@ class ConstGeometryVisitor;
 
 namespace SFCGAL {
 
-    const uint32_t wkbSRID = 0x20000000;
-  const uint32_t wkbM = 0x40000000;
-  const uint32_t wkbZ = 0x80000000;
+const uint32_t wkbSRID = 0x20000000;
+const uint32_t wkbM    = 0x40000000;
+const uint32_t wkbZ    = 0x80000000;
 
 /**
  * [OGC/SFA]8.2.3 "A common list of codes for geometric types"

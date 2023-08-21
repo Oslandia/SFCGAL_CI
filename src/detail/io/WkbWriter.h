@@ -1,5 +1,4 @@
-// Copyright (c) 2012-2013, IGN France.
-// Copyright (c) 2012-2022, Oslandia.
+// Copyright (c) 2023-2023, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #ifndef _SFCGAL_IO_WKBWRITER_H_
@@ -14,9 +13,7 @@
 
 typedef uint32_t srid_t;
 
-namespace SFCGAL {
-namespace detail {
-namespace io {
+namespace SFCGAL::detail::io {
 
 /**
  * Writer for WKB
@@ -169,8 +166,6 @@ private:
   bool _isEWKB  = false;
 };
 
-} // namespace io
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::io
 
 #endif
