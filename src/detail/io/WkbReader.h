@@ -37,7 +37,8 @@ public:
   /**
    * read WKB from input stream
    */
-  explicit WkbReader(const std::string &wkbHexString) : _wkbData(wkbHexString)
+  explicit WkbReader(std::string wkbHexString)
+      : _wkbData(std::move(wkbHexString))
   {
   }
 
@@ -52,12 +53,22 @@ public:
     _geometry = readGeometry();
   }
 
+  /**
+   * Returns the geometry from the (E)WKB
+   *
+   * Must be used after readWkb
+   */
   auto
   geometry() -> std::unique_ptr<SFCGAL::Geometry>
   {
     return std::move(_geometry);
   }
 
+  /**
+   * Returns the prepared geometry from the (E)WKB
+   *
+   * Must be used after readWkb
+   */
   auto
   preparedGeometry() -> std::unique_ptr<SFCGAL::PreparedGeometry>
   {
@@ -65,6 +76,11 @@ public:
                                                       _srid);
   }
 
+  /**
+   * Returns the srid from the (E)WKB
+   *
+   * Must be used after readWkb
+   */
   [[nodiscard]] auto
   srid() const -> srid_t
   {
@@ -72,6 +88,9 @@ public:
   }
 
 private:
+  /**
+   * Convenient templated method to read bytes from _wkbData
+   */
   template <typename T>
   auto
   read() -> T
@@ -96,7 +115,9 @@ private:
     return d;
   }
 
-  // Méthode pour lire une géométrie à partir du WKB
+  /**
+   *
+   */
   auto
   readGeometry() -> std::unique_ptr<SFCGAL::Geometry>
   {
@@ -104,6 +125,12 @@ private:
     return readGeometryData(geometryType);
   }
 
+  /**
+   *
+   * Read the geometry type from (E)WKB and transform it
+   * to SFCGAL one.
+   *
+   */
   auto
   readGeometryType() -> GeometryType
   {
@@ -140,6 +167,9 @@ private:
     return static_cast<GeometryType>(geometryType);
   }
 
+  /**
+   * Main methods to dispatch reading methods according to the geometry type
+   */
   auto
   readGeometryData(GeometryType geometryType) -> std::unique_ptr<Geometry>
   {
@@ -185,13 +215,12 @@ private:
       oss << "WkbWriter : '" << geometryType << "' is not supported";
       std::cerr << oss.str() << std::endl;
 
-      return std::unique_ptr<SFCGAL::Geometry>();
-      // BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
+      return {};
     }
   }
+
   /**
-   * read an SRID, if present
-   *
+   * Read an SRID, if present
    */
   auto
   readSRID() -> void
@@ -263,13 +292,28 @@ private:
    */
   std::string _wkbData;
 
+  /**
+   * is needed to swap bytes
+   */
   bool _swapEndian = false;
 
+  /**
+   * sentinel parsing the _wkbData
+   */
   size_t _index = 0;
 
+  /**
+   * SRID value from EWKB
+   */
   srid_t _srid = 0;
 
-  bool                              _isEWKB = false;
+  /**
+   * flag if the _wkbData is an EWKB or simple WKB
+   */
+  bool _isEWKB = false;
+  /**
+   * The geometry from the WKB
+   */
   std::unique_ptr<SFCGAL::Geometry> _geometry;
 };
 
