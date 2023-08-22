@@ -112,9 +112,6 @@ WkbReader::readInnerPolygon() -> Polygon
 auto
 WkbReader::readInnerTriangle() -> Triangle
 {
-  if (_index >= _wkbData.size()) {
-    return {};
-  }
   try {
     SFCGAL::Polygon poly{readInnerPolygon()};
     if (poly.isEmpty()) {

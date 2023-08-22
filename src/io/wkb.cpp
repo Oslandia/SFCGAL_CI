@@ -19,8 +19,9 @@ namespace SFCGAL::io {
 auto
 readWkb(std::istream &stream) -> std::unique_ptr<Geometry>
 {
-  std::string s{std::istreambuf_iterator<char>(stream), {}};
-  return readWkb(s);
+  WkbReader wkbReader(stream);
+  wkbReader.readWkb();
+  return wkbReader.geometry();
 }
 
 ///
@@ -29,7 +30,8 @@ readWkb(std::istream &stream) -> std::unique_ptr<Geometry>
 auto
 readWkb(const std::string &s) -> std::unique_ptr<Geometry>
 {
-  WkbReader wkbReader(s);
+  std::istringstream iss(s);
+  WkbReader          wkbReader(iss);
   wkbReader.readWkb();
   return wkbReader.geometry();
 }
@@ -53,14 +55,16 @@ auto
 readEwkb(std::istream &stream) -> std::unique_ptr<PreparedGeometry>
 {
 
-  std::string s{std::istreambuf_iterator<char>(stream), {}};
-  return readEwkb(s);
+  WkbReader wkbReader(stream);
+  wkbReader.readWkb();
+  return wkbReader.preparedGeometry();
 }
 
 auto
 readEwkb(const std::string &s) -> std::unique_ptr<PreparedGeometry>
 {
-  WkbReader wkbReader(s);
+  std::istringstream iss(s);
+  WkbReader          wkbReader(iss);
   wkbReader.readWkb();
   return wkbReader.preparedGeometry();
 }

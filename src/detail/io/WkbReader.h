@@ -37,10 +37,7 @@ public:
   /**
    * read WKB from input stream
    */
-  explicit WkbReader(std::string wkbHexString)
-      : _wkbData(std::move(wkbHexString))
-  {
-  }
+  WkbReader(std::istream &wkbHexString) : _reader(wkbHexString) {}
 
   auto
   readWkb() -> void
@@ -96,10 +93,12 @@ private:
   read() -> T
   {
 
-    const size_t      nbElements = 2;
-    const size_t      sizeType   = sizeof(T);
-    const std::string s    = _wkbData.substr(_index, nbElements * sizeType);
-    const int         base = 16;
+    const size_t nbElements       = 2;
+    const size_t sizeType         = sizeof(T);
+    const size_t totalBytesToRead = nbElements * sizeType;
+    std::string  buffer(totalBytesToRead, '\0');
+    _reader.readBytes(buffer, totalBytesToRead);
+    const int base = 16;
     union {
       std::array<std::byte, sizeType> byteArray;
       T                               d;
@@ -107,7 +106,7 @@ private:
 
     for (size_t i = 0; i < sizeType; i++) {
       size_t      chunkPos = nbElements * i;
-      std::string byteStr  = s.substr(chunkPos, nbElements);
+      std::string byteStr  = buffer.substr(chunkPos, nbElements);
       byteArray[i] = static_cast<std::byte>(std::stoi(byteStr, nullptr, base));
     }
 
@@ -290,7 +289,7 @@ private:
   /**
    * wkb data
    */
-  std::string _wkbData;
+  tools::InputStreamReader _reader;
 
   /**
    * is needed to swap bytes
@@ -300,7 +299,7 @@ private:
   /**
    * sentinel parsing the _wkbData
    */
-  size_t _index = 0;
+  std::streamoff _index = 0;
 
   /**
    * SRID value from EWKB
