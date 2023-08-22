@@ -47,12 +47,10 @@ protected:
   void
   writeInner(const Polygon       &g,
              boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
 
   void
   writeInner(const GeometryCollection &g,
              boost::endian::order      wkbOrder = boost::endian::order::native);
-  ;
 
   // for Multi Geometries (MultiPoint, MultiLineString, MultiPolygon,
   // PolyhedralSurface and TriangulatedSurface)
@@ -63,7 +61,6 @@ protected:
   void
   writeInner(const Triangle      &g,
              boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
 
 private:
   void
@@ -74,7 +71,6 @@ private:
   void
   writeCoordinate(const Point         &g,
                   boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
 
   void
   writeGeometryType(const Geometry &g, boost::endian::order wkbOrder =
@@ -84,7 +80,6 @@ private:
   void
   writeRec(const Geometry      &g,
            boost::endian::order wkbOrder = boost::endian::order::native);
-  ;
 
   std::vector<std::byte> _wkb;
 
