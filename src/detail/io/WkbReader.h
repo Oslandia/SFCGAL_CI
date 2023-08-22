@@ -24,7 +24,7 @@
 #include <SFCGAL/detail/tools/InputStreamReader.h>
 
 #include <boost/endian/conversion.hpp> // don't use bit, since it requires c++20
-#include <sys/endian.h>
+
 //
 namespace SFCGAL::detail::io {
 
