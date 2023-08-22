@@ -30,18 +30,14 @@ toByte(const T x, boost::endian::order byteOrder)
     -> std::array<std::byte, sizeof(T)>
 {
   T y = x;
-  if (boost::endian::order::native == boost::endian::order::big &&
-      byteOrder == boost::endian::order::little) {
-    boost::endian::endian_reverse_inplace(y);
-  } else if (boost::endian::order::native == boost::endian::order::little &&
-             byteOrder == boost::endian::order::big) {
+  if (boost::endian::order::native != byteOrder) {
     boost::endian::endian_reverse_inplace(y);
   }
   return *reinterpret_cast<std::array<std::byte, sizeof(T)> *>(&y);
 }
 
 auto
-WkbWriter::toString(const bool asHex) -> std::string
+WkbWriter::toString(bool asHex) -> std::string
 {
   std::string       prefix{asHex ? "\\x" : ""};
   std::stringstream ss;
@@ -136,12 +132,15 @@ void
 WkbWriter::writeCoordinate(const Point &g, boost::endian::order wkbOrder)
 {
   std::array<std::byte, 8> coord;
+
   // x
   coord = toByte(CGAL::to_double(g.x()), wkbOrder);
   _wkb.insert(_wkb.end(), coord.begin(), coord.end());
+
   // y
   coord = toByte(CGAL::to_double(g.y()), wkbOrder);
   _wkb.insert(_wkb.end(), coord.begin(), coord.end());
+
   // z
   if (g.is3D()) {
     coord = toByte(CGAL::to_double(g.z()), wkbOrder);
@@ -181,6 +180,8 @@ WkbWriter::writeGeometryType(const Geometry &g, boost::endian::order wkbOrder)
           toByte<uint32_t>(_srid, wkbOrder)};
       _wkb.insert(_wkb.end(), sridByte.begin(), sridByte.end());
 
+      // once srid defined and written, we write geometry type without it
+      // so "disable" it.
       _useSrid = false;
     }
   } else {
@@ -281,7 +282,6 @@ WkbWriter::writeInner(const Triangle &g, boost::endian::order wkbOrder)
   // WkbType
   writeGeometryType(g, wkbOrder);
 
-  // 4 Points
   if (!g.isEmpty()) {
     // One Ring
     const std::array<std::byte, 4> oneRing =
