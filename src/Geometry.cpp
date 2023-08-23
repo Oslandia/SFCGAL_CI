@@ -47,11 +47,12 @@ Geometry::asText(const int &numDecimals) const -> std::string
 }
 
 auto
-Geometry::asWkb(const bool asHex) const -> std::string
+Geometry::asWkb(boost::endian::order wkbOrder, bool asHex) const -> std::string
 {
-  detail::io::WkbWriter writer;
-  writer.write(*this);
-  return writer.toString(asHex);
+  std::ostringstream    oss;
+  detail::io::WkbWriter writer(oss);
+  writer.write(*this, wkbOrder, asHex);
+  return oss.str();
 }
 ///
 ///

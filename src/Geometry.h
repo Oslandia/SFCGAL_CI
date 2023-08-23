@@ -7,6 +7,7 @@
 
 #include <SFCGAL/config.h>
 
+#include <boost/endian/conversion.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <memory>
@@ -202,7 +203,8 @@ public:
    * [OGC/SFA]returns the WKB string
    */
   std::string
-  asWkb(const bool asHex = false) const;
+  asWkb(boost::endian::order wkbOrder = boost::endian::order::native,
+        bool                 asHex    = false) const;
   /**
    * [OGC/SFA]Returns a polygon representing the BBOX of the geometry
    * @todo In order to adapt to 3D, would be better to define an "Envelope

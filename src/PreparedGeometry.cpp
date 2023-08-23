@@ -86,11 +86,13 @@ PreparedGeometry::asEWKT(const int &numDecimals) const -> std::string
 }
 
 auto
-PreparedGeometry::asEWKB(const bool asHex) const -> std::string
+PreparedGeometry::asEWKB(boost::endian::order wkbOrder, bool asHex) const
+    -> std::string
 {
-  detail::io::WkbWriter writer;
-  writer.write(*_geometry, _srid);
-  return writer.toString(asHex);
+  std::ostringstream    oss;
+  detail::io::WkbWriter writer(oss);
+  writer.write(*_geometry, _srid, wkbOrder, asHex);
+  return oss.str();
 }
 
 } // namespace SFCGAL

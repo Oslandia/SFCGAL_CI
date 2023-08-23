@@ -6,6 +6,8 @@
 
 #include <boost/endian/conversion.hpp>
 #include <cstddef>
+#include <iomanip>
+#include <iostream>
 #include <vector>
 
 #include <SFCGAL/Geometry.h>
@@ -21,13 +23,16 @@ namespace SFCGAL::detail::io {
  */
 class SFCGAL_API WkbWriter {
 public:
+  WkbWriter(std::ostream &s) : _s(s){};
+
   /**
    * write WKB for a geometry
    * wkbOrder is the native endianness by default.
    */
   void
   write(const Geometry      &g,
-        boost::endian::order wkbOrder = boost::endian::order::native);
+        boost::endian::order wkbOrder = boost::endian::order::native,
+        bool                 asHex    = false);
 
   /**
    * write EWKB for a geometry
@@ -35,15 +40,8 @@ public:
    */
   void
   write(const Geometry &g, const srid_t &srid,
-        boost::endian::order wkbOrder = boost::endian::order::native);
-
-  /**
-   * Export (E)WKB as a string
-   *
-   * asHex will transform the string with \x suffix.
-   */
-  auto
-  toString(bool asHex = false) -> std::string;
+        boost::endian::order wkbOrder = boost::endian::order::native,
+        bool                 asHex    = false);
 
 private:
   /**
@@ -120,12 +118,34 @@ private:
   writeRec(const Geometry      &g,
            boost::endian::order wkbOrder = boost::endian::order::native);
 
-  std::vector<std::byte> _wkb;
+  std::ostream &_s;
+
+  template <std::size_t N>
+  auto
+  toStream(const std::array<std::byte, N> &arr) -> void
+  {
+    for (const std::byte &byteVal : arr) {
+      _s << _prefix << std::hex << std::setw(2) << std::setfill('0')
+         << static_cast<int>(byteVal);
+    }
+  };
+
+  template <typename T>
+  auto
+  toByte(const T x, boost::endian::order byteOrder) -> void
+  {
+    T y = x;
+    if (boost::endian::order::native != byteOrder) {
+      boost::endian::endian_reverse_inplace(y);
+    }
+    toStream(*reinterpret_cast<std::array<std::byte, sizeof(T)> *>(&y));
+  }
 
   srid_t _srid;
 
-  bool _useSrid = false;
-  bool _isEWKB  = false;
+  bool        _useSrid = false;
+  bool        _isEWKB  = false;
+  std::string _prefix;
 };
 
 } // namespace SFCGAL::detail::io
