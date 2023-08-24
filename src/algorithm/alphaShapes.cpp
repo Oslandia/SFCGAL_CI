@@ -106,7 +106,7 @@ alpha_to_geometry(const Alpha_shape_2 &A, bool allow_holes)
     for (auto h = f->holes_begin(); h != f->holes_end(); h++) {
       auto he = *h;
       do {
-        ring->addPoint(he->source()->point());
+        ring->addPoint(he->vertex()->point());
       } while (++he != *h);
     }
 
