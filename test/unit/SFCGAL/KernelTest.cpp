@@ -22,7 +22,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include <SFCGAL/Kernel.h>
-#include <CGAL/mpq_class.h>
 #include <SFCGAL/Coordinate.h>
 #include <SFCGAL/LineString.h>
 
