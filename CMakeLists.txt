@@ -59,6 +59,9 @@ endif ()
 #-----------------------------------------------------------
 
 #-- find CGAL  ---------------------------------------------
+if( CGAL_USE_GMPXX )
+	add_definitions( "-DCGAL_USE_GMPXX" )
+endif()
 option( CGAL_USE_AUTOLINK "disable CGAL autolink" OFF )
 
 if( ${CGAL_USE_AUTOLINK} )
