@@ -55,5 +55,18 @@ translate(Geometry &g, const Kernel::FT dx, const Kernel::FT dy,
   translate(g, Kernel::Vector_3(dx, dy, dz));
 }
 
+///
+///
+///
+void
+translate(Geometry &g, const double &dx, const double &dy, const double &dz)
+{
+  if (!std::isfinite(dx) || !std::isfinite(dy) || !std::isfinite(dz)) {
+    BOOST_THROW_EXCEPTION(NonFiniteValueException(
+        "trying to translate with non finite value in direction"));
+  }
+
+  return translate(g, Kernel::FT(dx), Kernel::FT(dy), Kernel::FT(dz));
+}
 } // namespace algorithm
 } // namespace SFCGAL
