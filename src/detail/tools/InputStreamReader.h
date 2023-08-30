@@ -152,6 +152,15 @@ public:
     }
   }
 
+  auto
+  readBytes(std::string &buffer, size_t bytesToRead) -> void
+  {
+    begin();
+
+    _s.read(&buffer[0], bytesToRead);
+
+    commit();
+  }
   /// \brief save input stream state (read position)
   void
   begin()
