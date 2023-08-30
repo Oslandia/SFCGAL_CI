@@ -7,6 +7,7 @@
 
 #include <SFCGAL/config.h>
 
+#include <boost/endian/conversion.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <memory>
@@ -46,6 +47,10 @@ class ConstGeometryVisitor;
 
 namespace SFCGAL {
 
+const uint32_t wkbSRID = 0x20000000;
+const uint32_t wkbM    = 0x40000000;
+const uint32_t wkbZ    = 0x80000000;
+
 /**
  * [OGC/SFA]8.2.3 "A common list of codes for geometric types"
  *
@@ -73,7 +78,7 @@ enum GeometryType {
   //     TYPE_SURFACE             = 14, //abstract
   TYPE_POLYHEDRALSURFACE   = 15,
   TYPE_TRIANGULATEDSURFACE = 16,
-  TYPE_TRIANGLE   = 17,
+  TYPE_TRIANGLE            = 17,
 
   //-- not official codes
   TYPE_SOLID      = 101,
@@ -194,6 +199,12 @@ public:
   std::string
   asText(const int &numDecimals = -1) const;
 
+  /**
+   * [OGC/SFA]returns the WKB string
+   */
+  std::string
+  asWkb(boost::endian::order wkbOrder = boost::endian::order::native,
+        bool                 asHex    = false) const;
   /**
    * [OGC/SFA]Returns a polygon representing the BBOX of the geometry
    * @todo In order to adapt to 3D, would be better to define an "Envelope

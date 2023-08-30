@@ -7,6 +7,7 @@
 #include <SFCGAL/GeometryVisitor.h>
 #include <SFCGAL/Point.h>
 #include <SFCGAL/detail/GetPointsVisitor.h>
+#include <SFCGAL/detail/io/WkbWriter.h>
 #include <SFCGAL/detail/io/WktWriter.h>
 
 #include <SFCGAL/algorithm/BoundaryVisitor.h>
@@ -45,6 +46,14 @@ Geometry::asText(const int &numDecimals) const -> std::string
   return oss.str();
 }
 
+auto
+Geometry::asWkb(boost::endian::order wkbOrder, bool asHex) const -> std::string
+{
+  std::ostringstream    oss;
+  detail::io::WkbWriter writer(oss);
+  writer.write(*this, wkbOrder, asHex);
+  return oss.str();
+}
 ///
 ///
 ///

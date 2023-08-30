@@ -9,6 +9,7 @@
 
 #include <SFCGAL/Envelope.h>
 
+#include <boost/endian/conversion.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -100,6 +101,10 @@ public:
    */
   std::string
   asEWKT(const int &numDecimals = -1) const;
+
+  auto
+  asEWKB(boost::endian::order wkbOrder = boost::endian::order::native,
+         bool                 asHex    = false) const -> std::string;
 
   /**
    * Serializer
