@@ -97,14 +97,14 @@ private:
   writeInner(const M &g, boost::endian::order wkbOrder);
 
   /**
-   * Dedicated method to write Polygon into _wkb data
+   * Dedicated method to write Triangle into _wkb data
    */
   void
   writeInner(const Triangle      &g,
              boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**
-   * Dedicated method to write Polygon into _wkb data
+   * Dedicated method to write Point into _wkb data
    */
   void
   writeCoordinate(const Point         &g,
