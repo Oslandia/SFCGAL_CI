@@ -46,7 +46,7 @@ set_target_properties( SFCGAL PROPERTIES VERSION ${SFCGAL_VERSION}
 
 target_link_libraries( SFCGAL CGAL::CGAL CGAL::CGAL_Core)
 
-if( "${CGAL_VERSION}" VERSION_GREATER_EQUAL "5.0.0")
+if( CGAL_USE_GMPXX )
 target_link_libraries( SFCGAL gmpxx )
 endif()
 

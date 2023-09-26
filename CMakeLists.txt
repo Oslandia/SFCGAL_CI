@@ -59,7 +59,11 @@ endif ()
 #-----------------------------------------------------------
 
 #-- find CGAL  ---------------------------------------------
+if( CGAL_USE_GMPXX )
+	add_definitions( "-DCGAL_USE_GMPXX" )
+endif()
 option( CGAL_USE_AUTOLINK "disable CGAL autolink" OFF )
+
 if( ${CGAL_USE_AUTOLINK} )
 	add_definitions( "-DCGAL_NO_AUTOLINK" )
 endif()
@@ -67,12 +71,13 @@ endif()
 find_package( CGAL 5.3 COMPONENTS Core REQUIRED )
 message( STATUS "CGAL ${CGAL_VERSION} found" )
 
-# For CGAL >= 5
-add_definitions( "-DCGAL_USE_GMPXX=1" )
-
 include_directories( ${CMAKE_BINARY_DIR}/include )
 
 #-- BOOST --------------------------------------------------
+if( NOT CGAL_USE_GMPXX )
+	add_definitions( "-DCGAL_DO_NOT_USE_BOOST_MP" )
+endif()
+
 option( Boost_USE_AUTO_LINK "boost use autolink" OFF )
 if( NOT ${Boost_USE_AUTO_LINK} )
 	add_definitions( "-DBOOST_ALL_NO_LIB" )

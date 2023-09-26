@@ -36,6 +36,13 @@ SFCGAL_API void
 translate(Geometry &g, const Kernel::FT dx, const Kernel::FT dy,
           const Kernel::FT dz);
 
+/**
+ * @brief translate a geometry from double-coordinates
+ * @todo unittest
+ */
+SFCGAL_API void
+translate(Geometry &g, const double &dx, const double &dy, const double &dz);
+
 } // namespace algorithm
 } // namespace SFCGAL
 
