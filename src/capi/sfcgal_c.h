@@ -981,6 +981,17 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns the extrude straight skeleton of the given Polygon
+ * @pre geom must be a Polygon
+ * @pre isValid(geom) == true
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom, double height);
+
+/**
  * Returns the approximate medial axis for the given Polygon
  * Approximate medial axis is based on straight skeleton
  * @pre isValid(geom) == true

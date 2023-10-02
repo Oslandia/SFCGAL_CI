@@ -1171,6 +1171,26 @@ sfcgal_geometry_has_validity_flag(const sfcgal_geometry_t *geom) -> int
 }
 
 extern "C" auto
+sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom, double height)
+    -> sfcgal_geometry_t *
+{
+  const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::PolyhedralSurface> polys;
+
+  try {
+    polys = SFCGAL::algorithm::extrudeStraightSkeleton(*g1, height);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During straight_extrude_skeleton_distance(A):");
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  return polys.release();
+}
+
+extern "C" auto
 sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom)
     -> sfcgal_geometry_t *
 {
