@@ -2,6 +2,7 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
+#include "PolyhedralSurface.h"
 #include <SFCGAL/GeometryVisitor.h>
 #include <SFCGAL/PolyhedralSurface.h>
 
@@ -51,6 +52,25 @@ PolyhedralSurface::PolyhedralSurface(const MarkedPolyhedron &poly) : Surface()
     // close the ring
     face->addPoint(hit->vertex()->point());
     _polygons.push_back(new Polygon(face));
+  }
+}
+
+///
+///
+///
+PolyhedralSurface::PolyhedralSurface(const Mesh &sm) : Surface()
+{
+
+  typedef Mesh::Vertex_index vertex_descriptor;
+  typedef Mesh::Face_index   face_descriptor;
+  for (auto face : sm.faces()) {
+    auto *new_face = new LineString();
+    for (vertex_descriptor vd : vertices_around_face(sm.halfedge(face), sm)) {
+      new_face->addPoint(Point(sm.point(vd)));
+    }
+
+    new_face->addPoint(new_face->startPoint().clone());
+    _polygons.push_back(new Polygon(new_face));
   }
 }
 

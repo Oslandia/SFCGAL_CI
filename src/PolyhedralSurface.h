@@ -11,12 +11,16 @@
 #include <boost/serialization/base_object.hpp>
 #include <vector>
 
+#include <SFCGAL/Kernel.h>
 #include <SFCGAL/Point.h>
 #include <SFCGAL/Polygon.h>
 #include <SFCGAL/TriangulatedSurface.h>
 #include <SFCGAL/triangulate/triangulatePolygon.h>
 
 #include <CGAL/Polyhedron_3.h>
+#include <CGAL/Surface_mesh.h>
+
+using Mesh = CGAL::Surface_mesh<SFCGAL::Kernel::Point_3>;
 
 namespace SFCGAL {
 
@@ -42,6 +46,10 @@ public:
    * Constructor from a CGAL::Polyhedron_3
    */
   PolyhedralSurface(const detail::MarkedPolyhedron &poly);
+  /**
+   * Constructor from a CGAL::Surface_mesh
+   */
+  PolyhedralSurface(const Mesh &sm);
   /**
    * Copy constructor
    */
