@@ -10,6 +10,7 @@
 #include <SFCGAL/MultiLineString.h>
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/Polygon.h>
+#include <SFCGAL/PolyhedralSurface.h>
 #include <SFCGAL/Triangle.h>
 
 #include <SFCGAL/Exception.h>
@@ -20,7 +21,9 @@
 #include <SFCGAL/algorithm/translate.h>
 
 #include <CGAL/Straight_skeleton_converter_2.h>
+#include <CGAL/Surface_mesh.h>
 #include <CGAL/create_straight_skeleton_from_polygon_with_holes_2.h>
+#include <CGAL/extrude_skeleton.h>
 
 #include <memory>
 
@@ -28,9 +31,11 @@ namespace SFCGAL {
 namespace algorithm {
 
 using Point_2              = Kernel::Point_2;
+using Point_3              = Kernel::Point_3;
 using Polygon_2            = CGAL::Polygon_2<Kernel>;
 using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
 using Straight_skeleton_2  = CGAL::Straight_skeleton_2<Kernel>;
+using Mesh                 = CGAL::Surface_mesh<Point_3>;
 
 namespace { // anonymous
 
@@ -377,6 +382,34 @@ approximateMedialAxis(const Geometry &g) -> std::unique_ptr<MultiLineString>
 
   propagateValidityFlag(*mx, true);
   return mx;
+}
+
+auto
+extrudeStraightSkeleton(const Polygon &g, double height)
+    -> std::unique_ptr<PolyhedralSurface>
+{
+
+  Mesh sm;
+  CGAL::extrude_skeleton(g.toPolygon_with_holes_2(), sm,
+                         CGAL::parameters::maximum_height(height));
+  std::unique_ptr<PolyhedralSurface> polys(new PolyhedralSurface(sm));
+
+  return polys;
+}
+
+auto
+extrudeStraightSkeleton(const Geometry &g, double height)
+    -> std::unique_ptr<PolyhedralSurface>
+{
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
+
+  if (g.geometryTypeId() != TYPE_POLYGON) {
+    BOOST_THROW_EXCEPTION(Exception("Geometry must be a Polygon"));
+  }
+  std::unique_ptr<PolyhedralSurface> result(
+      extrudeStraightSkeleton(g.as<Polygon>(), height));
+  propagateValidityFlag(*result, true);
+  return result;
 }
 
 } // namespace algorithm

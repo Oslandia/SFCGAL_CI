@@ -84,6 +84,18 @@ SFCGAL_API std::unique_ptr<MultiLineString>
                             bool innerOnly = false, bool outputDistanceInM = false,
                             const double &toleranceAbs = 1e-8);
 
+/**
+ * @brief build a 3D straight skeleton extruded for a Polygon
+ * @ingroup detail
+ * @throws NotImplementedException If g is a Polygon with point touching rings.
+ */
+SFCGAL_API auto
+extrudedStraightSkeleton(const Polygon &g, double height)
+    -> std::unique_ptr<PolyhedralSurface>;
+
+SFCGAL_API auto
+extrudeStraightSkeleton(const Geometry &g, double height)
+    -> std::unique_ptr<PolyhedralSurface>;
 } // namespace algorithm
 } // namespace SFCGAL
 
