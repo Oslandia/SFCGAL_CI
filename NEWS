@@ -2,6 +2,7 @@
     * Add polygon partition (Raphaël Delhome, Loïc Bartoletti)
     * WKT: Fix triangle code (Loïc Bartoletti)
     * Straight Skeleton: Add a version with extrusion
+    * Add visibility algorithms (Loïc Bartoletti)
 1.4.1 (2022-01-27):
     * Add alpha-shapes algorithm (Loïc Bartoletti, Hugo Mercier)
     * Fix build and tests for MSYS2/MinGW (Loïc Bartoletti)
