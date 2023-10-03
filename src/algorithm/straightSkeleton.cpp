@@ -11,6 +11,7 @@
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/Polygon.h>
 #include <SFCGAL/PolyhedralSurface.h>
+#include <SFCGAL/Solid.h>
 #include <SFCGAL/Triangle.h>
 
 #include <SFCGAL/Exception.h>
@@ -18,6 +19,7 @@
 #include <SFCGAL/algorithm/intersection.h>
 #include <SFCGAL/algorithm/isValid.h>
 #include <SFCGAL/algorithm/orientation.h>
+#include <SFCGAL/algorithm/tesselate.h>
 #include <SFCGAL/algorithm/translate.h>
 
 #include <CGAL/Straight_skeleton_converter_2.h>
@@ -412,5 +414,19 @@ extrudeStraightSkeleton(const Geometry &g, double height)
   return result;
 }
 
+auto
+extrudeStraightSkeleton(const Geometry &g, double building_height,
+                        double roof_height)
+    -> std::unique_ptr<PolyhedralSurface>
+{
+  std::unique_ptr<PolyhedralSurface> roof{
+      extrudeStraightSkeleton(g, roof_height)};
+  translate(*roof, 0.0, 0.0, building_height);
+  std::unique_ptr<Geometry> building(extrude(g.as<Polygon>(), building_height));
+  std::unique_ptr<PolyhedralSurface> result{
+      new PolyhedralSurface(building->as<Solid>().exteriorShell())};
+  result->addPolygons(*roof);
+  return result;
+};
 } // namespace algorithm
 } // namespace SFCGAL

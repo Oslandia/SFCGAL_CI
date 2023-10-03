@@ -1171,14 +1171,37 @@ sfcgal_geometry_has_validity_flag(const sfcgal_geometry_t *geom) -> int
 }
 
 extern "C" auto
-sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom, double height)
-    -> sfcgal_geometry_t *
+sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom,
+                                          double height) -> sfcgal_geometry_t *
 {
   const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   std::unique_ptr<SFCGAL::PolyhedralSurface> polys;
 
   try {
     polys = SFCGAL::algorithm::extrudeStraightSkeleton(*g1, height);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During straight_extrude_skeleton_distance(A):");
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  return polys.release();
+}
+
+extern "C" auto
+sfcgal_geometry_extrude_polygon_straight_skeleton(const sfcgal_geometry_t *geom,
+                                                  double building_height,
+                                                  double roof_height)
+    -> sfcgal_geometry_t *
+{
+  const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> polys;
+
+  try {
+    polys = SFCGAL::algorithm::extrudeStraightSkeleton(*g1, building_height,
+                                                       roof_height);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During straight_extrude_skeleton_distance(A):");
     SFCGAL_WARNING("  with A: %s",
@@ -1279,7 +1302,6 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
   return result.release();
 }
 
-
 extern "C" sfcgal_geometry_t *
 sfcgal_y_monotone_partition_2(const sfcgal_geometry_t *geom)
 {
@@ -1287,7 +1309,8 @@ sfcgal_y_monotone_partition_2(const sfcgal_geometry_t *geom)
   std::unique_ptr<SFCGAL::Geometry> result;
 
   try {
-    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(), SFCGAL::algorithm::y_monotone);
+    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(),
+                                            SFCGAL::algorithm::y_monotone);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During y_monotone_partition_2(A):");
     SFCGAL_WARNING("  with A: %s",
@@ -1306,7 +1329,8 @@ sfcgal_approx_convex_partition_2(const sfcgal_geometry_t *geom)
   std::unique_ptr<SFCGAL::Geometry> result;
 
   try {
-    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(), SFCGAL::algorithm::approx_convex);
+    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(),
+                                            SFCGAL::algorithm::approx_convex);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During approx_convex_partition_2(A):");
     SFCGAL_WARNING("  with A: %s",
@@ -1325,7 +1349,9 @@ sfcgal_greene_approx_convex_partition_2(const sfcgal_geometry_t *geom)
   std::unique_ptr<SFCGAL::Geometry> result;
 
   try {
-    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(), SFCGAL::algorithm::greene_approx_convex);
+    result =
+        SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(),
+                                       SFCGAL::algorithm::greene_approx_convex);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During greene_approx_convex_partition_2(A):");
     SFCGAL_WARNING("  with A: %s",
@@ -1343,7 +1369,8 @@ sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom)
   std::unique_ptr<SFCGAL::Geometry> result;
 
   try {
-    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(), SFCGAL::algorithm::optimal_convex);
+    result = SFCGAL::algorithm::partition_2(g1->as<const SFCGAL::Geometry>(),
+                                            SFCGAL::algorithm::optimal_convex);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During optimal_convex_partition_2(A):");
     SFCGAL_WARNING("  with A: %s",

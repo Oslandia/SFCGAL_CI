@@ -5,8 +5,10 @@
 #ifndef _SFCGAL_ALGORITHM_STRAIGHTSKELETON_H_
 #define _SFCGAL_ALGORITHM_STRAIGHTSKELETON_H_
 
+#include <SFCGAL/PolyhedralSurface.h>
+#include <SFCGAL/algorithm/extrude.h>
+#include <SFCGAL/algorithm/union.h>
 #include <SFCGAL/config.h>
-
 #include <memory>
 
 namespace SFCGAL {
@@ -96,6 +98,12 @@ extrudedStraightSkeleton(const Polygon &g, double height)
 SFCGAL_API auto
 extrudeStraightSkeleton(const Geometry &g, double height)
     -> std::unique_ptr<PolyhedralSurface>;
+
+SFCGAL_API auto
+extrudeStraightSkeleton(const Geometry &g, double building_height,
+                        double roof_height)
+    -> std::unique_ptr<PolyhedralSurface>;
+
 } // namespace algorithm
 } // namespace SFCGAL
 

@@ -111,6 +111,8 @@ SFCGAL_API std::unique_ptr<Geometry>
 SFCGAL_API std::unique_ptr<Geometry>
            extrude(const Geometry &g, const Kernel::Vector_3 &v);
 
+SFCGAL_API std::unique_ptr<Geometry>
+           extrude(const Polygon &g, const double &height);
 } // namespace algorithm
 } // namespace SFCGAL
 

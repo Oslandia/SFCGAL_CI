@@ -57,7 +57,7 @@ typedef enum {
   //     TYPE_SURFACE             = 14, //abstract
   SFCGAL_TYPE_POLYHEDRALSURFACE   = 15,
   SFCGAL_TYPE_TRIANGULATEDSURFACE = 16,
-  SFCGAL_TYPE_TRIANGLE   = 17,
+  SFCGAL_TYPE_TRIANGLE            = 17,
 
   //-- not official codes
   SFCGAL_TYPE_SOLID      = 101,
@@ -989,7 +989,12 @@ sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom);
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom, double height);
+sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom,
+                                          double                   height);
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_extrude_polygon_straight_skeleton(const sfcgal_geometry_t *geom,
+                                                  double building_height,
+                                                  double roof_height);
 
 /**
  * Returns the approximate medial axis for the given Polygon
@@ -1075,7 +1080,8 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_approx_convex_partition_2(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the greene approximal convex partition of a geometry (polygon without hole)
+ * Returns the greene approximal convex partition of a geometry (polygon without
+ * hole)
  * @pre isValid(geom) == true
  * @post isValid(return) == true
  * @ingroup capi
