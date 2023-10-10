@@ -124,7 +124,8 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
     while (cont) {
       he++;
       if (he == arr.halfedges_end()) {
-        throw(std::exception());
+        BOOST_THROW_EXCEPTION(
+            Exception("Can not find corresponding half edge."));
       }
 
       cont = !Segment_2(he->source()->point(), he->target()->point())
@@ -178,7 +179,7 @@ visibility(const Geometry &polygon, const Geometry &pointA,
          he->target()->point() != endPoint) {
     he++;
     if (he == arr.halfedges_end()) {
-      throw(std::exception());
+      BOOST_THROW_EXCEPTION(Exception("Can not find corresponding half edge."));
     }
   }
 
