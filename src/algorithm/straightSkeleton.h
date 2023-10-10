@@ -5,8 +5,10 @@
 #ifndef _SFCGAL_ALGORITHM_STRAIGHTSKELETON_H_
 #define _SFCGAL_ALGORITHM_STRAIGHTSKELETON_H_
 
+#include <SFCGAL/PolyhedralSurface.h>
+#include <SFCGAL/algorithm/extrude.h>
+#include <SFCGAL/algorithm/union.h>
 #include <SFCGAL/config.h>
-
 #include <memory>
 
 namespace SFCGAL {
@@ -83,6 +85,24 @@ SFCGAL_API std::unique_ptr<MultiLineString>
            straightSkeleton(const MultiPolygon &g, bool autoOrientation = true,
                             bool innerOnly = false, bool outputDistanceInM = false,
                             const double &toleranceAbs = 1e-8);
+
+/**
+ * @brief build a 3D straight skeleton extruded for a Polygon
+ * @ingroup detail
+ * @throws NotImplementedException If g is a Polygon with point touching rings.
+ */
+SFCGAL_API auto
+extrudedStraightSkeleton(const Polygon &g, double height)
+    -> std::unique_ptr<PolyhedralSurface>;
+
+SFCGAL_API auto
+extrudeStraightSkeleton(const Geometry &g, double height)
+    -> std::unique_ptr<PolyhedralSurface>;
+
+SFCGAL_API auto
+extrudeStraightSkeleton(const Geometry &g, double building_height,
+                        double roof_height)
+    -> std::unique_ptr<PolyhedralSurface>;
 
 } // namespace algorithm
 } // namespace SFCGAL

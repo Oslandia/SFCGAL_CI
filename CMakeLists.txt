@@ -68,7 +68,7 @@ if( ${CGAL_USE_AUTOLINK} )
 	add_definitions( "-DCGAL_NO_AUTOLINK" )
 endif()
 
-find_package( CGAL 5.3 COMPONENTS Core REQUIRED )
+find_package( CGAL 5.6 COMPONENTS Core REQUIRED )
 message( STATUS "CGAL ${CGAL_VERSION} found" )
 
 include_directories( ${CMAKE_BINARY_DIR}/include )
