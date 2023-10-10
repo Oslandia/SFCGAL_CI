@@ -77,7 +77,7 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
   // Create Triangular Expansion Visibility object.
   TEV tev(arr);
 
-  // If the point is within a face, we can compute the visbility that way
+  // If the point is within a face, we can compute the visibility that way
   if (face != nullptr) {
     fh = tev.compute_visibility(queryPoint, *face, output_arr);
   } else {
@@ -161,7 +161,7 @@ visibility(const Geometry &polygon, const Geometry &pointA,
        hit != pwh.holes_end(); ++hit)
     CGAL::insert(arr, hit->edges_begin(), hit->edges_end());
 
-  // If the point in a boundary segment, find the corresponding half edge
+  // If the point is in a boundary segment, find the corresponding half edge
   Halfedge_const_handle he = arr.halfedges_begin();
   while (he->source()->point() != startPoint ||
          he->target()->point() != endPoint) {
