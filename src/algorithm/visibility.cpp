@@ -81,7 +81,7 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
   if (face != nullptr) {
     fh = tev.compute_visibility(queryPoint, *face, output_arr);
   } else {
-    // If the point in a boundary segment, find the corresponding half edge
+    // If the point is in a boundary segment, find the corresponding half edge
     he        = arr.halfedges_begin();
     bool cont = !Segment_2(he->source()->point(), he->target()->point())
                      .has_on(queryPoint) ||
