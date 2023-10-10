@@ -27,6 +27,38 @@ using Halfedge_const_handle = Arrangement_2::Halfedge_const_handle;
 using TEV =
     CGAL::Triangular_expansion_visibility_2<Arrangement_2, CGAL::Tag_true>;
 using PolygonWithHoles = CGAL::Polygon_with_holes_2<Kernel>;
+
+static auto
+query_visibility(Face_handle fh, Halfedge_const_handle he)
+    -> std::unique_ptr<Polygon>
+{
+
+  std::unique_ptr<LineString> extRing{new LineString()};
+  // Make sure the visibility polygon we find has an outer boundary
+  if (fh->has_outer_ccb()) {
+    Arrangement_2::Ccb_halfedge_circulator curr = fh->outer_ccb();
+
+    // find the right halfedge first
+    if (he != Halfedge_const_handle())
+      while (++curr != fh->outer_ccb())
+        if (curr->source()->point() == he->source()->point())
+          break;
+
+    Arrangement_2::Ccb_halfedge_circulator first = curr;
+    extRing->addPoint(Point(curr->source()->point()));
+
+    // Save the points from the visibility polygon
+    while (++curr != first) {
+      extRing->addPoint(Point(curr->source()->point()));
+    }
+  }
+
+  extRing->closes();
+  std::unique_ptr<Polygon> result{new Polygon(extRing.release())};
+
+  return result;
+}
+
 ///
 ///
 ///
@@ -103,29 +135,8 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
     // Use the half edge to compute the visibility
     fh = tev.compute_visibility(queryPoint, he, output_arr);
   }
-  // Make sure the visibility polygon we find has an outer boundary
-  if (fh->has_outer_ccb()) {
-    Arrangement_2::Ccb_halfedge_circulator curr = fh->outer_ccb();
 
-    // find the right halfedge first
-    if (he != Halfedge_const_handle())
-      while (++curr != fh->outer_ccb())
-        if (curr->source()->point() == he->source()->point())
-          break;
-
-    Arrangement_2::Ccb_halfedge_circulator first = curr;
-    extRing->addPoint(Point(curr->source()->point()));
-
-    // Save the points from the visibility polygon
-    while (++curr != first) {
-      extRing->addPoint(Point(curr->source()->point()));
-    }
-  }
-
-  extRing->closes();
-  std::unique_ptr<Polygon> result{new Polygon(extRing.release())};
-
-  return result;
+  return query_visibility(fh, he);
 }
 ///
 ///
@@ -176,21 +187,7 @@ visibility(const Geometry &polygon, const Geometry &pointA,
   TEV           tev(arr);
   Face_handle   fh = tev.compute_visibility(endPoint, he, output_arr);
 
-  // export the visibility region.
-  Arrangement_2::Ccb_halfedge_circulator curr = fh->outer_ccb();
-  std::unique_ptr<LineString>            extRing{new LineString()};
-
-  // Make sure the visibility polygon we find has an outer boundary
-  if (fh->has_outer_ccb()) {
-    extRing->addPoint(Point(curr->target()->point()));
-    while (++curr != fh->outer_ccb()) {
-      extRing->addPoint(Point(curr->target()->point()));
-    }
-  }
-  extRing->closes();
-  std::unique_ptr<Polygon> result{new Polygon(extRing.release())};
-
-  return result;
+  return query_visibility(fh, he);
 }
 
 } // namespace algorithm

@@ -147,9 +147,9 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygonHole)
   std::unique_ptr<Polygon> result(
       algorithm::visibility(poly, startPoint, endPoint));
   std::string expectedWkt =
-      "POLYGON((12.0 6.0,14.0 14.0,10.4 7.6,11.0 "
-      "7.0,11.0 6.0,10.0 6.0,9.6 6.0,9.0 5.0,1.0 2.0,4.7 "
-      "2.3,8.0 4.0,10.0 3.0,9.9 2.8,12.0 3.0,19.0 -2.0,12.0 6.0))";
+      "POLYGON((19.0 -2.0,12.0 6.0,14.0 14.0,10.4 7.6,11.0 7.0,11.0 6.0,10.0 "
+      "6.0,9.6 6.0,9.0 5.0,1.0 2.0,4.7 2.3,8.0 4.0,10.0 3.0,9.9 2.8,12.0 "
+      "3.0,19.0 -2.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 BOOST_AUTO_TEST_SUITE_END()
