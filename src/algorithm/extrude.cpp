@@ -38,7 +38,8 @@ extrude(const Point &g, const Kernel::Vector_3 &v) -> LineString *;
 auto
 extrude(const LineString &g, const Kernel::Vector_3 &v) -> PolyhedralSurface *;
 auto
-extrude(const Polygon &g, const Kernel::Vector_3 &v) -> Solid *;
+extrude(const Polygon &g, const Kernel::Vector_3 &v, bool addTop = true)
+    -> Solid *;
 auto
 extrude(const Triangle &g, const Kernel::Vector_3 &v) -> Solid *;
 
@@ -120,7 +121,7 @@ extrude(const LineString &g, const Kernel::Vector_3 &v) -> PolyhedralSurface *
 ///
 ///
 auto
-extrude(const Polygon &g, const Kernel::Vector_3 &v) -> Solid *
+extrude(const Polygon &g, const Kernel::Vector_3 &v, bool addTop) -> Solid *
 {
   if (g.isEmpty()) {
     return new Solid();
@@ -142,11 +143,12 @@ extrude(const Polygon &g, const Kernel::Vector_3 &v) -> Solid *
   polyhedralSurface.addPolygon(bottom);
 
   // "top"
-  Polygon top(bottom);
-  top.reverse();
-  translate(top, v);
-  polyhedralSurface.addPolygon(top);
-
+  if (addTop) {
+    Polygon top(bottom);
+    top.reverse();
+    translate(top, v);
+    polyhedralSurface.addPolygon(top);
+  }
   // exterior ring and interior rings extruded
   for (size_t i = 0; i < bottom.numRings(); i++) {
     std::unique_ptr<PolyhedralSurface> boundaryExtruded(
@@ -391,5 +393,17 @@ extrude(const Geometry &g, const double &dx, const double &dy, const double &dz)
   return extrude(g, Kernel::FT(dx), Kernel::FT(dy), Kernel::FT(dz));
 }
 
+SFCGAL_API auto
+extrude(const Polygon &g, const double &height) -> std::unique_ptr<Geometry>
+{
+
+  if (!std::isfinite(height)) {
+    BOOST_THROW_EXCEPTION(NonFiniteValueException(
+        "trying to extrude with non finite value in direction"));
+  }
+
+  return std::unique_ptr<Geometry>(
+      extrude(g, Kernel::Vector_3(0.0, 0.0, height), false));
+}
 } // namespace algorithm
 } // namespace SFCGAL

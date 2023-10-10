@@ -57,6 +57,24 @@ PolyhedralSurface::PolyhedralSurface(const MarkedPolyhedron &poly) : Surface()
 ///
 ///
 ///
+PolyhedralSurface::PolyhedralSurface(const Mesh &sm) : Surface()
+{
+
+  using vertex_descriptor = Mesh::Vertex_index;
+  for (auto face : sm.faces()) {
+    auto *new_face = new LineString();
+    for (vertex_descriptor vd : vertices_around_face(sm.halfedge(face), sm)) {
+      new_face->addPoint(Point(sm.point(vd)));
+    }
+
+    new_face->addPoint(new_face->startPoint().clone());
+    _polygons.push_back(new Polygon(new_face));
+  }
+}
+
+///
+///
+///
 auto
 PolyhedralSurface::operator=(PolyhedralSurface other) -> PolyhedralSurface &
 {
