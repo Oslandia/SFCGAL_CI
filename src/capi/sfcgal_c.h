@@ -984,7 +984,6 @@ sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom);
  * Returns the extrude straight skeleton of the given Polygon
  * @pre geom must be a Polygon
  * @pre isValid(geom) == true
- * @pre isValid(geom) == true
  * @post isValid(return) == true
  * @ingroup capi
  */
