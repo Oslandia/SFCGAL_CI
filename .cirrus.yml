@@ -36,7 +36,7 @@ task:
     - brew install cmake boost cgal gmp mpfr
     - cmake -DSFCGAL_BUILD_TESTS=ON -S . -B build
     - cmake --build build
-    - ctest --test-dir build
+    - ctest -VV --test-dir build
   matrix:
     macos_instance:
       image: ghcr.io/cirruslabs/macos-ventura-base:latest
