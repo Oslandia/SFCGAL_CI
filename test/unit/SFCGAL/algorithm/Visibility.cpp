@@ -22,8 +22,10 @@
 
 #include <SFCGAL/Point.h>
 #include <SFCGAL/Polygon.h>
+#include <SFCGAL/algorithm/covers.h>
 #include <SFCGAL/algorithm/visibility.h>
 
+#include <SFCGAL/io/wkt.h>
 using namespace SFCGAL;
 
 #include "../../../test_config.h"
@@ -51,11 +53,13 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygon)
   Point queryPoint(0.5, 2.0);
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
-std::string              expectedWkb = "0103000000010000000500000000000000000008400000000000000040000000000000f03f0000000000000040000000000000000000000000000010400000000000000000000000000000000000000000000008400000000000000040";
-    BOOST_CHECK_EQUAL(result->asWkb(), expectedWkb);
-  // std::string              expectedWkt =
-  //     "POLYGON((3.0 2.0,1.0 2.0,0.0 4.0,0.0 0.0,3.0 2.0))";
-  // BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+  std::string              expectedWkt =
+      "POLYGON((3.0 2.0,1.0 2.0,0.0 4.0,0.0 0.0,3.0 2.0))";
+  // results for differents architectures/compilers may differ due to rounding
+  // To avoid rounding errors in the results (-0.0 vs 0.0)
+  std::unique_ptr<Geometry> r(io::readWkt(result->asText(1)));
+  std::unique_ptr<Geometry> e(io::readWkt(expectedWkt));
+  BOOST_CHECK(algorithm::covers(*r, *e));
 }
 
 BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygonHole)
@@ -84,11 +88,13 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygonHole)
   Point queryPoint(0.5, 2.0);
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
-std::string              expectedWkb = "010300000001000000080000000000000000000000565555555555f93f9a9999999999c93f000000000000fc3fcdccccccccccec3fcdccccccccccfc3fb76ddbb66ddbfe3f264992244992f43f00000000000008400000000000000040000000000000f03f0000000000000040000000000000000000000000000010400000000000000000565555555555f93f";
-    BOOST_CHECK_EQUAL(result->asWkb(), expectedWkb);
-  // std::string expectedWkt = "POLYGON((0.0 1.6,0.2 1.8,0.9 1.8,1.9 1.3,3.0 "
-  //                           "2.0,1.0 2.0,0.0 4.0,0.0 1.6))";
-  // BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+  std::string expectedWkt = "POLYGON((0.0 1.6,0.2 1.8,0.9 1.8,1.9 1.3,3.0 "
+                            "2.0,1.0 2.0,0.0 4.0,0.0 1.6))";
+  // results for differents architectures/compilers may differ due to rounding
+  // To avoid rounding errors in the results (-0.0 vs 0.0)
+  std::unique_ptr<Geometry> r(io::readWkt(result->asText(1)));
+  std::unique_ptr<Geometry> e(io::readWkt(expectedWkt));
+  BOOST_CHECK(algorithm::covers(*r, *e));
 }
 
 BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygon)
@@ -110,11 +116,13 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygon)
 
   std::unique_ptr<Polygon> result(
       algorithm::visibility(poly, startPoint, endPoint));
-std::string              expectedWkb = "01030000000100000006000000000000000000f03f000000000000004000000000000000000000000000001040000000000000000000000000000000800000000000001040000000000000000000000000000010400000000000001040000000000000f03f0000000000000040";
-    BOOST_CHECK_EQUAL(result->asWkb(), expectedWkb);
-  // std::string expectedWkt =
-  //     "POLYGON((1.0 2.0,0.0 4.0,0.0 0.0,4.0 0.0,4.0 4.0,1.0 2.0))";
-  // BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+  std::string expectedWkt =
+      "POLYGON((1.0 2.0,0.0 4.0,0.0 0.0,4.0 0.0,4.0 4.0,1.0 2.0))";
+  // results for differents architectures/compilers may differ due to rounding
+  // To avoid rounding errors in the results (-0.0 vs 0.0)
+  std::unique_ptr<Geometry> r(io::readWkt(result->asText(1)));
+  std::unique_ptr<Geometry> e(io::readWkt(expectedWkt));
+  BOOST_CHECK(algorithm::covers(*r, *e));
 }
 
 BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygonHole)
@@ -152,12 +160,14 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygonHole)
 
   std::unique_ptr<Polygon> result(
       algorithm::visibility(poly, startPoint, endPoint));
-  // std::string expectedWkt =
-  //     "POLYGON((19.0 -2.0,12.0 6.0,14.0 14.0,10.4 7.6,11.0 7.0,11.0 6.0,10.0 "
-  //     "6.0,9.6 6.0,9.0 5.0,1.0 2.0,4.7 2.3,8.0 4.0,10.0 3.0,9.9 2.8,12.0 "
-  //     "3.0,19.0 -2.0))";
-  // BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
-  std::string expectedWkb = "01030000000100000010000000000000000000334000000000000000c0000000000000284000000000000018400000000000002c400000000000002c40b66ddbb66ddb24409224499224491e4000000000000026400000000000001c400000000000002640000000000000184000000000000024400000000000001840c8711cc7711c2340000000000000184000000000000022400000000000001440000000000000f03f0000000000000040aaaaaaaaaaaa1240aaaaaaaaaaaa02400000000000002040000000000000104000000000000024400000000000000840bef7de7befbd234074ce39e79c73064000000000000028400000000000000840000000000000334000000000000000c0";
-    BOOST_CHECK_EQUAL(result->asWkb(), expectedWkb);
+  std::string expectedWkt =
+      "POLYGON((19.0 -2.0,12.0 6.0,14.0 14.0,10.4 7.6,11.0 7.0,11.0 6.0,10.0 "
+      "6.0,9.6 6.0,9.0 5.0,1.0 2.0,4.7 2.3,8.0 4.0,10.0 3.0,9.9 2.8,12.0 "
+      "3.0,19.0 -2.0))";
+  // results for differents architectures/compilers may differ due to rounding
+  // To avoid rounding errors in the results (-0.0 vs 0.0)
+  std::unique_ptr<Geometry> r(io::readWkt(result->asText(1)));
+  std::unique_ptr<Geometry> e(io::readWkt(expectedWkt));
+  BOOST_CHECK(algorithm::covers(*r, *e));
 }
 BOOST_AUTO_TEST_SUITE_END()
