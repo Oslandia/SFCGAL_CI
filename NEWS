@@ -1,8 +1,16 @@
-1.5.0 (2023-xx-xx):
-    * Add polygon partition (Raphaël Delhome, Loïc Bartoletti)
-    * WKT: Fix triangle code (Loïc Bartoletti)
-    * Straight Skeleton: Add a version with extrusion
+1.5.0 (2023-10-23):
     * Add visibility algorithms (Loïc Bartoletti)
+    * Straight Skeleton: Add a version with extrusion
+    * WKT: Fix triangle code (Loïc Bartoletti)
+    * Allow to disable GMPXX (Loïc Bartoletti, Fixes #249 and #252)
+    * Add polygon partition (Raphaël Delhome, Loïc Bartoletti)
+    * Minor typo correction (Regina Obe, #280)
+    * Remove CGAL unit test (Fix #257, Loïc Bartoletti)
+    * [C API] Add sfcgal_point_create_from_xyzm and sfcgal_point_create_from_xym functions (Loïc Bartoletti #274)
+    * Update CI and add FreeBSD, macOs CI (Loïc Bartoletti)
+    * Minors fixes (Loïc Bartoletti #269 and #270)
+    * Remove useless garden tests (Loïc Bartoletti)
+    * Fix SPDX-License-Identifier (Loïc Bartoletti reported by Bas Couwenberg #250)
 1.4.1 (2022-01-27):
     * Add alpha-shapes algorithm (Loïc Bartoletti, Hugo Mercier)
     * Fix build and tests for MSYS2/MinGW (Loïc Bartoletti)
