@@ -42,6 +42,7 @@
 #include <SFCGAL/algorithm/straightSkeleton.h>
 #include <SFCGAL/algorithm/tesselate.h>
 #include <SFCGAL/algorithm/union.h>
+#include <SFCGAL/algorithm/visibility.h>
 #include <SFCGAL/algorithm/volume.h>
 #include <SFCGAL/triangulate/triangulate2DZ.h>
 
@@ -1377,6 +1378,76 @@ sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom)
                    ((const SFCGAL::Geometry *)(geom))->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return 0;
+  }
+
+  return result.release();
+}
+
+extern "C" sfcgal_geometry_t *
+sfcgal_geometry_visibility_point(const sfcgal_geometry_t *polygon,
+                                 const sfcgal_geometry_t *point)
+{
+
+  const auto *poly = reinterpret_cast<const SFCGAL::Geometry *>(polygon);
+  const auto *pt   = reinterpret_cast<const SFCGAL::Geometry *>(point);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  if (poly->geometryTypeId() != SFCGAL::TYPE_POLYGON) {
+    SFCGAL_ERROR("visibility() only applies to polygons");
+    return result.release();
+  }
+
+  if (pt->geometryTypeId() != SFCGAL::TYPE_POINT) {
+    SFCGAL_ERROR("second argument must be a point");
+    return result.release();
+  }
+
+  try {
+    result = SFCGAL::algorithm::visibility(poly->as<const SFCGAL::Polygon>(),
+                                           pt->as<const SFCGAL::Point>());
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During visibility(A, B) :");
+    SFCGAL_WARNING("  with A: %s", poly->asText().c_str());
+    SFCGAL_WARNING("  and B: %s", pt->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return result.release();
+  }
+
+  return result.release();
+}
+
+extern "C" sfcgal_geometry_t *
+sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
+                                   const sfcgal_geometry_t *pointA,
+                                   const sfcgal_geometry_t *pointB)
+{
+  const auto *poly = reinterpret_cast<const SFCGAL::Geometry *>(polygon);
+  const auto *ptA  = reinterpret_cast<const SFCGAL::Geometry *>(pointA);
+  const auto *ptB  = reinterpret_cast<const SFCGAL::Geometry *>(pointB);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  if (poly->geometryTypeId() != SFCGAL::TYPE_POLYGON) {
+    SFCGAL_ERROR("visibility() only applies to polygons");
+    return result.release();
+  }
+
+  if ((ptA->geometryTypeId() != SFCGAL::TYPE_POINT) ||
+      (ptB->geometryTypeId() != SFCGAL::TYPE_POINT)) {
+    SFCGAL_ERROR("second and third argument must be a point");
+    return result.release();
+  }
+
+  try {
+    result = SFCGAL::algorithm::visibility(poly->as<const SFCGAL::Polygon>(),
+                                           ptA->as<const SFCGAL::Point>(),
+                                           ptB->as<const SFCGAL::Point>());
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During visibility(A, B, C) :");
+    SFCGAL_WARNING("  with A: %s", poly->asText().c_str());
+    SFCGAL_WARNING("  and B: %s", ptA->asText().c_str());
+    SFCGAL_WARNING("  and C: %s", ptB->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return result.release();
   }
 
   return result.release();
