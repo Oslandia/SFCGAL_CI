@@ -1097,6 +1097,34 @@ sfcgal_greene_approx_convex_partition_2(const sfcgal_geometry_t *geom);
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom);
 
+/**
+ * Returns the visibility polygon of a Point inside a Polygon
+ * @param polygon input geometry
+ * @param point input geometry
+ * @ingroup capi
+ * @pre polygon is a valid geometry
+ * @pre point must be inside polygon or on the boundary
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_visibility_point(const sfcgal_geometry_t *polygon,
+                                 const sfcgal_geometry_t *point);
+
+/**
+ * @brief build the visibility polygon of the segment [pointA ; pointB] on a
+ * Polygon
+ * @param polygon input geometry
+ * @param pointA input geometry
+ * @param pointB input geometry
+ * @ingroup public_api
+ * @pre polygon is a valid geometry
+ * @pre pointA and pointB must be vertices of poly, adjacents and respect the
+ * direction
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
+                                   const sfcgal_geometry_t *pointA,
+                                   const sfcgal_geometry_t *pointB);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Error handling

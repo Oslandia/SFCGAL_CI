@@ -186,6 +186,15 @@ public:
   bool
   isClosed() const;
 
+  /**
+   * closes the LineString
+   */
+  inline void
+  closes()
+  {
+    _points.push_back(_points.front().clone());
+  }
+
   //-- iterators
 
   inline iterator
