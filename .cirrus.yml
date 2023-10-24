@@ -10,10 +10,11 @@ task:
     - pkg install -y cgal gmp mpfr boost-libs cmake ninja
 
   build_script:
-    - mkdir build
-    - cmake -DSFCGAL_BUILD_TESTS=ON
-    - make $(MAKE_FLAGS)
-    - ctest -VV
+    - fetch "https://github.com/CGAL/cgal/releases/download/v5.6/CGAL-5.6.tar.xz" -o CGAL-5.6.tar.xz
+    - tar xJf CGAL-5.6.tar.xz
+    - cmake -GNinja -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCGAL_DIR=CGAL-5.6
+    - cmake --build build
+    - ctest -VV --test-dir build
   freebsd_instance:
     cpu: 8
     memory: 24g
