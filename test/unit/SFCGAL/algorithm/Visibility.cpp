@@ -55,11 +55,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygon)
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
   std::string              expectedWkt =
       "POLYGON((3.0 2.0,1.0 2.0,0.0 4.0,0.0 0.0,3.0 2.0))";
-  // results for differents architectures/compilers may differ due to rounding
-  // To avoid rounding errors in the results (-0.0 vs 0.0)
-  std::unique_ptr<Geometry> r(io::readWkt(result->asText(1)));
-  std::unique_ptr<Geometry> e(io::readWkt(expectedWkt));
-  BOOST_CHECK(algorithm::covers(*r, *e));
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
 BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygonHole)
@@ -90,11 +86,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygonHole)
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
   std::string expectedWkt = "POLYGON((0.0 1.6,0.2 1.8,0.9 1.8,1.9 1.3,3.0 "
                             "2.0,1.0 2.0,0.0 4.0,0.0 1.6))";
-  // results for differents architectures/compilers may differ due to rounding
-  // To avoid rounding errors in the results (-0.0 vs 0.0)
-  std::unique_ptr<Geometry> r(io::readWkt(result->asText(1)));
-  std::unique_ptr<Geometry> e(io::readWkt(expectedWkt));
-  BOOST_CHECK(algorithm::covers(*r, *e));
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
 BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygon)
@@ -118,11 +110,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygon)
       algorithm::visibility(poly, startPoint, endPoint));
   std::string expectedWkt =
       "POLYGON((1.0 2.0,0.0 4.0,0.0 0.0,4.0 0.0,4.0 4.0,1.0 2.0))";
-  // results for differents architectures/compilers may differ due to rounding
-  // To avoid rounding errors in the results (-0.0 vs 0.0)
-  std::unique_ptr<Geometry> r(io::readWkt(result->asText(1)));
-  std::unique_ptr<Geometry> e(io::readWkt(expectedWkt));
-  BOOST_CHECK(algorithm::covers(*r, *e));
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
 BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygonHole)
@@ -164,10 +152,6 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygonHole)
       "POLYGON((19.0 -2.0,12.0 6.0,14.0 14.0,10.4 7.6,11.0 7.0,11.0 6.0,10.0 "
       "6.0,9.6 6.0,9.0 5.0,1.0 2.0,4.7 2.3,8.0 4.0,10.0 3.0,9.9 2.8,12.0 "
       "3.0,19.0 -2.0))";
-  // results for differents architectures/compilers may differ due to rounding
-  // To avoid rounding errors in the results (-0.0 vs 0.0)
-  std::unique_ptr<Geometry> r(io::readWkt(result->asText(1)));
-  std::unique_ptr<Geometry> e(io::readWkt(expectedWkt));
-  BOOST_CHECK(algorithm::covers(*r, *e));
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 BOOST_AUTO_TEST_SUITE_END()

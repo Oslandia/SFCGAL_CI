@@ -130,6 +130,15 @@ WktWriter::writeCoordinateType(const Geometry &g)
   }
 }
 
+static double
+fixZeroNeg(double val, int precision)
+{
+  if (std::abs(val) < std::pow(10, -precision)) {
+    return 0;
+  }
+  return val;
+}
+
 ///
 ///
 ///
@@ -145,16 +154,17 @@ WktWriter::writeCoordinate(const Point &g)
       impl::writeFT(_s, CGAL::exact(g.z()));
     }
   } else {
-    _s << g.x() << " " << g.y();
+    _s << fixZeroNeg(CGAL::to_double(g.x()), _s.precision()) << " "
+       << fixZeroNeg(CGAL::to_double(g.y()), _s.precision());
 
     if (g.is3D()) {
-      _s << " " << g.z();
+      _s << " " << fixZeroNeg(CGAL::to_double(g.z()), _s.precision());
     }
   }
 
   // m coordinate
   if (g.isMeasured()) {
-    _s << " " << g.m();
+    _s << " " << fixZeroNeg(CGAL::to_double(g.m()), _s.precision());
   }
 }
 
