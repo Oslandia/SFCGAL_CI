@@ -163,6 +163,14 @@ sfcgal_geometry_as_text_decim(const sfcgal_geometry_t *, int numDecimals,
                               char **buffer, size_t *len);
 
 /**
+ * Returns a WKB representation of the given geometry
+ * @post buffer is returned allocated and must be freed by the caller
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_geometry_as_wkb(const sfcgal_geometry_t *, char **buffer, size_t *len);
+
+/**
  * Creates an empty point
  * @ingroup capi
  */
@@ -692,6 +700,12 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_io_read_wkt(const char *, size_t len);
 SFCGAL_API sfcgal_prepared_geometry_t *
 sfcgal_io_read_ewkt(const char *, size_t len);
+
+/**
+ * io::readWKB
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_io_read_wkb(const char *, size_t len);
 
 /**
  * Serialization
