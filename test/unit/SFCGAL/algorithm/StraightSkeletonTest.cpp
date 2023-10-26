@@ -240,8 +240,8 @@ BOOST_AUTO_TEST_CASE(testDistanceInM)
       *g, /* autoOrientation */ true, /* innerOnly */ false,
       /* outputDistanceInM */ true));
   std::string               expectedWKT(
-      "MULTILINESTRING M((-0.0 -0.0 0.0,0.5 0.5 0.5),(1.0 -0.0 0.0,0.5 0.5 "
-                    "0.5),(1.0 1.0 0.0,0.5 0.5 0.5),(-0.0 1.0 0.0,0.5 0.5 0.5))");
+      "MULTILINESTRING M((0.0 0.0 0.0,0.5 0.5 0.5),(1.0 0.0 0.0,0.5 0.5 "
+                    "0.5),(1.0 1.0 0.0,0.5 0.5 0.5),(0.0 1.0 0.0,0.5 0.5 0.5))");
   BOOST_CHECK_EQUAL(out->asText(1), expectedWKT);
 }
 
