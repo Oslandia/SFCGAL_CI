@@ -21,6 +21,7 @@
 
 #include <SFCGAL/detail/io/Serialization.h>
 #include <SFCGAL/io/ewkt.h>
+#include <SFCGAL/io/wkb.h>
 #include <SFCGAL/io/wkt.h>
 
 #include <SFCGAL/algorithm/alphaShapes.h>
@@ -261,6 +262,17 @@ sfcgal_geometry_as_text_decim(const sfcgal_geometry_t *pgeom, int numDecimals,
               numDecimals);
       *buffer = (char *)sfcgal_alloc_handler(wkt.size() + 1); *len = wkt.size();
       strncpy(*buffer, wkt.c_str(), *len);)
+}
+
+extern "C" void
+sfcgal_geometry_as_wkb(const sfcgal_geometry_t *pgeom, char **buffer,
+                       size_t *len)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      std::string wkb =
+          reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb();
+      *buffer = (char *)sfcgal_alloc_handler(wkb.size() + 1); *len = wkb.size();
+      strncpy(*buffer, wkb.c_str(), *len);)
 }
 
 /**
@@ -733,6 +745,13 @@ sfcgal_io_read_wkt(const char *str, size_t len) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return SFCGAL::io::readWkt(str, len).release();)
+}
+
+extern "C" auto
+sfcgal_io_read_wkb(const char *str, size_t len) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return SFCGAL::io::readWkb(str, len).release();)
 }
 
 extern "C" void
