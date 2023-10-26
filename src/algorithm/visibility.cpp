@@ -84,7 +84,7 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
 
   // insert geometry into the arrangement
   CGAL::Polygon_with_holes_2 pwh{
-      polygon.as<Polygon>().toPolygon_with_holes_2()};
+      polygon.as<Polygon>().toPolygon_with_holes_2(true)};
   Arrangement_2 arr;
 
   CGAL::insert(arr, pwh.outer_boundary().edges_begin(),
@@ -164,7 +164,7 @@ visibility(const Geometry &polygon, const Geometry &pointA,
 
   // insert geometry into the arrangement
   CGAL::Polygon_with_holes_2 pwh{
-      polygon.as<Polygon>().toPolygon_with_holes_2()};
+      polygon.as<Polygon>().toPolygon_with_holes_2(true)};
   Arrangement_2 arr;
 
   CGAL::insert(arr, pwh.outer_boundary().edges_begin(),
