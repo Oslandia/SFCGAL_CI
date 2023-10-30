@@ -14,7 +14,7 @@ centos8_clang:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.3", "5.4"]
+      - CGAL_VERSION: ["5.6"]
 
 centos8_gcc:
   stage: test
@@ -32,4 +32,4 @@ centos8_gcc:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.3", "5.4"]
+      - CGAL_VERSION: ["5.6"]
