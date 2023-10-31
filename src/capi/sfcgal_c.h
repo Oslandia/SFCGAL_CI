@@ -998,12 +998,21 @@ sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom);
  * Returns the extrude straight skeleton of the given Polygon
  * @pre geom must be a Polygon
  * @pre isValid(geom) == true
- * @post isValid(return) == true
+ * @pre height != 0
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom,
                                           double                   height);
+
+/**
+ * Returns the union of the polygon z-extrusion (with respect to building_height) and the extrude
+ * straight skeleton (with respect to roof_height) of the given Polygon
+ * @pre geom must be a Polygon
+ * @pre isValid(geom) == true
+ * @pre roof_height != 0
+ * @ingroup capi
+ */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_extrude_polygon_straight_skeleton(const sfcgal_geometry_t *geom,
                                                   double building_height,
