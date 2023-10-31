@@ -12,11 +12,11 @@ debian_testing_gcc:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.3", "5.4"]
+      - CGAL_VERSION: ["5.6"]
 
-debian_buster_gcc:
+debian_bullseye_gcc:
   stage: test
-  image: debian:buster
+  image: debian:bullseye
 
   script:
     - apt-get update -qq
@@ -28,7 +28,7 @@ debian_buster_gcc:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.3", "5.4"]
+      - CGAL_VERSION: ["5.6"]
 
 debian_testing_clang:
   stage: test
@@ -44,11 +44,11 @@ debian_testing_clang:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.3", "5.4"]
+      - CGAL_VERSION: ["5.6"]
 
-debian_buster_clang:
+debian_bullseye_clang:
   stage: test
-  image: debian:buster
+  image: debian:bullseye
 
   script:
     - apt-get update -qq
@@ -60,4 +60,4 @@ debian_buster_clang:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.3", "5.4"]
+      - CGAL_VERSION: ["5.6"]

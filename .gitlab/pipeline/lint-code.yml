@@ -6,7 +6,7 @@
 clang-format:
   stage: lint
   image:
-    name: mikedld/clang-format:13-alpine
+    name: kszonek/clang-format-15
     entrypoint: [""]
   script:
     # We need to use simple BusyBox `find` syntax here.

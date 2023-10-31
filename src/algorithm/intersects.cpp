@@ -339,8 +339,7 @@ intersects(const PrimitiveHandle<Dim> &pa, const PrimitiveHandle<Dim> &pb)
   return dispatch_intersects_sym(pa, pb);
 }
 
-struct found_an_intersection {
-};
+struct found_an_intersection {};
 
 template <int Dim>
 struct intersects_cb {

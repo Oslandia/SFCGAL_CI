@@ -19,8 +19,7 @@ namespace SFCGAL {
 
 namespace algorithm {
 
-struct EmptyPrimitive {
-};
+struct EmptyPrimitive {};
 
 enum PrimitiveType {
   PrimitivePoint   = 0,
@@ -93,8 +92,7 @@ private:
 };
 
 template <int Dim>
-struct Surface_d {
-};
+struct Surface_d {};
 
 template <>
 struct Surface_d<3> : Triangle_3 {

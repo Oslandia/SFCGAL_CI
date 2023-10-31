@@ -47,8 +47,7 @@ propagateValidityFlag(Geometry &g, bool valid);
  * Tag used for variants of algorithm that do not do validity check
  * @ingroup public_api
  */
-struct NoValidityCheck {
-};
+struct NoValidityCheck {};
 
 } // namespace algorithm
 } // namespace SFCGAL
