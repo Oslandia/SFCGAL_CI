@@ -11,6 +11,8 @@
     * Minors fixes (Loïc Bartoletti #269 and #270)
     * Remove useless garden tests (Loïc Bartoletti)
     * Fix SPDX-License-Identifier (Loïc Bartoletti reported by Bas Couwenberg #250)
+NOTE: This is the last release on GitLab/Oslandia space.
+SFCGAL has now a dedicated space outside Oslandia one: https://gitlab.com/SFCGAL/.
 1.4.1 (2022-01-27):
     * Add alpha-shapes algorithm (Loïc Bartoletti, Hugo Mercier)
     * Fix build and tests for MSYS2/MinGW (Loïc Bartoletti)
