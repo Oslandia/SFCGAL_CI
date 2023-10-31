@@ -17,10 +17,19 @@ namespace algorithm {
  * @ingroup public_api
  * @since 1.4.2
  */
-enum PartitionAlgorithm { y_monotone, /*!< Y Monotone Partition: https://doc.cgal.org/latest/Partition_2/index.html#secpartition_2_monotone  */
-	approx_convex, /*!< Simple approximation algorithm of Hertel and Mehlhorn https://doc.cgal.org/latest/Partition_2/index.html#secpartition_2_convex */
-	greene_approx_convex, /*!< Sweep-line approximation algorithm of Greene https://doc.cgal.org/latest/Partition_2/index.html#secpartition_2_convex */
-	optimal_convex /*!< Optimal convex partition https://doc.cgal.org/latest/Partition_2/index.html#secpartition_2_convex */
+enum PartitionAlgorithm {
+  y_monotone,    /*!< Y Monotone Partition:
+                    https://doc.cgal.org/latest/Partition_2/index.html#secpartition_2_monotone
+                  */
+  approx_convex, /*!< Simple approximation algorithm of Hertel and Mehlhorn
+                    https://doc.cgal.org/latest/Partition_2/index.html#secpartition_2_convex
+                  */
+  greene_approx_convex, /*!< Sweep-line approximation algorithm of Greene
+                           https://doc.cgal.org/latest/Partition_2/index.html#secpartition_2_convex
+                         */
+  optimal_convex        /*!< Optimal convex partition
+                           https://doc.cgal.org/latest/Partition_2/index.html#secpartition_2_convex
+                         */
 };
 
 /**
@@ -30,12 +39,10 @@ enum PartitionAlgorithm { y_monotone, /*!< Y Monotone Partition: https://doc.cga
  * @since 1.4.2
  */
 SFCGAL_API auto
-partition_2(const Geometry &g, PartitionAlgorithm alg = y_monotone )
+partition_2(const Geometry &g, PartitionAlgorithm alg = y_monotone)
     -> std::unique_ptr<Geometry>;
-
 
 } // namespace algorithm
 } // namespace SFCGAL
-
 
 #endif

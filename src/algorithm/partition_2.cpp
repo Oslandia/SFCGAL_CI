@@ -81,7 +81,7 @@ polygons_to_geometry(const std::list<TPolygon_2> &polys)
 }
 
 auto
-partition_2(const Geometry &g, PartitionAlgorithm alg) 
+partition_2(const Geometry &g, PartitionAlgorithm alg)
     -> std::unique_ptr<Geometry>
 {
   using CGAL::object_cast;
@@ -97,26 +97,25 @@ partition_2(const Geometry &g, PartitionAlgorithm alg)
   const TPolygon_2 poly{toTPolygon_2(g.as<Polygon>())};
 
   std::list<TPolygon_2> partition_polys;
-  switch(alg) {
-	case y_monotone:
-		y_monotone_partition_2(poly.vertices_begin(), poly.vertices_end(),
-                         std::back_inserter(partition_polys));
-		break;
-	case optimal_convex:
-		optimal_convex_partition_2(poly.vertices_begin(), poly.vertices_end(),
-                         std::back_inserter(partition_polys));
-		break;
-	case greene_approx_convex:
-		greene_approx_convex_partition_2(poly.vertices_begin(), poly.vertices_end(),
-                         std::back_inserter(partition_polys));
-		break;
-	case approx_convex:
-		approx_convex_partition_2(poly.vertices_begin(), poly.vertices_end(),
-                         std::back_inserter(partition_polys));
-		break;
-	default:
-		break;
-
+  switch (alg) {
+  case y_monotone:
+    y_monotone_partition_2(poly.vertices_begin(), poly.vertices_end(),
+                           std::back_inserter(partition_polys));
+    break;
+  case optimal_convex:
+    optimal_convex_partition_2(poly.vertices_begin(), poly.vertices_end(),
+                               std::back_inserter(partition_polys));
+    break;
+  case greene_approx_convex:
+    greene_approx_convex_partition_2(poly.vertices_begin(), poly.vertices_end(),
+                                     std::back_inserter(partition_polys));
+    break;
+  case approx_convex:
+    approx_convex_partition_2(poly.vertices_begin(), poly.vertices_end(),
+                              std::back_inserter(partition_polys));
+    break;
+  default:
+    break;
   }
   return polygons_to_geometry(partition_polys);
 }

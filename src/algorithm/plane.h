@@ -7,7 +7,7 @@
 
 #include <boost/format.hpp>
 
-//#include <SFCGAL/detail/ublas.h>
+// #include <SFCGAL/detail/ublas.h>
 
 #include <SFCGAL/Exception.h>
 #include <SFCGAL/Polygon.h>
@@ -97,8 +97,7 @@ plane3D(const Polygon &polygon)
                                nrml);
 }
 
-struct Plane3DInexactUnsafe {
-};
+struct Plane3DInexactUnsafe {};
 
 /**
  * Returns the oriented 3D plane of a polygon (supposed to be planar) - inexact

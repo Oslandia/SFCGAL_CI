@@ -180,8 +180,7 @@ public:
   toPoint_3() const;
 
   // class for Empty coordinate
-  class Empty {
-  };
+  class Empty {};
 
 private:
   boost::variant<Empty, Kernel::Point_2, Kernel::Point_3> _storage;
