@@ -16,15 +16,15 @@
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          <a id="forkme_banner" target="#" href="https://gitlab.com/Oslandia/SFCGAL">View on GitLab</a>
+          <a id="forkme_banner" target="#" href="https://gitlab.com/SFCGAL/SFCGAL">View on GitLab</a>
 
           <h1 id="project_title">SFCGAL</h1>
 
           <a href="index.html">About</a> | <a href="authors.html">Authors</a> | <a href="documentation.html">Documentation</a> | <a href="dev.html">Development</a> | <a href="screencast.html">Screencast</a> | <a href="installation.html">Installation</a>
 
             <section id="downloads">
-              <a class="zip_download_link" href="https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.3.10/SFCGAL-v1.3.10.zip">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.3.10/SFCGAL-v1.3.10.tar.gz">Download this project as a tar.gz file</a>
+              <a class="zip_download_link" href="https://gitlab.com/SFCGAL/SFCGAL/-/archive/v1.5.0/SFCGAL-v1.5.0.zip">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://gitlab.com/SFCGAL/SFCGAL/-/archive/v1.5.0/SFCGAL-v1.5.0.tar.gz">Download this project as a tar.gz file</a>
             </section>
         </header>
     </div>
@@ -41,19 +41,20 @@
 
 <h4>Source code</h4>
 
-<p>SFCGAL source code is available on the corresponding <a href="https://gitlab.com/Oslandia/SFCGAL">gitlab repository</a>.</p>
+<p>SFCGAL source code is available on the corresponding <a href="https://gitlab.com/SFCGAL/SFCGAL">gitlab repository</a>.</p>
 
 <p>The master branch is the development branch and has a tag for each released version.</p>
 
-<p>Source code of the 1.3 release can be found with the tag v1.3.0 You can direclty download a <a href="https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.3.10/SFCGAL-v1.3.10.zip">zip</a> or <a href="https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.3.10/SFCGAL-v1.3.10.tar.gz">tarball</a>.</p>
+<p>Source code of the 1.5.0 release can be found with the tag v1.5.0 You can direclty download a <a href="https://gitlab.com/SFCGAL/SFCGAL/-/archive/v1.5.0/SFCGAL-v1.5.0.zip">zip</a> or <a href="https://gitlab.com/SFCGAL/SFCGAL/-/archive/v1.5.0/SFCGAL-v1.5.0.tar.gz">tarball</a>.</p>
 
 <h4>Supported platforms</h4>
 
 <p>SFCGAL has been successfully compiled and tested on the following platforms :</p>
 <ul>
-<li>Linux 32 and 64 bits with gcc and clang-3.0</li>
+<li>Linux 64 bits with gcc and clang</li>
 <li>Windows with mingw</li>
-<li>MacOSX with clang-4.0 (please note that a compilation error occures with clang-3.1)</li>
+<li>macOs</li>
+<li>FreeBSD</li>
 </ul>
 
 <h4>Requirements</h4>
@@ -61,7 +62,7 @@
 <ul>
 <li>A C++ compiler, see above for supported platforms</li>
 <li><a href="http://www.cmake.org">CMake</a> version &geq; 2.8.6</li>
-<li><a href="http://www.cgal.org">CGAL</a> version &geq; 4.3</li>
+<li><a href="http://www.cgal.org">CGAL</a> version &geq; 5.6</li>
 <li><a href="http://www.boost.org">Boost</a> version &geq; 1.54</li>
 <li><a href="http://mpfr.org">MPFR</a> version &geq; 2.2.1</li>
 <li><a href="http://gmplib.org">GMP</a> version &geq; 4.2</li>
@@ -71,13 +72,13 @@
 
 <ul>
 <li><a href="http://www.openscenegraph.org">OpenSceneGraph</a> version &geq; 3.1</li>
-<li><a href="http://qt-project.org">Qt4</a></li>
+<li><a href="http://qt-project.org">Qt5</a></li>
 
 <h4>Compilation</h4>
 
 <p>The compilation process is based on CMake. On linux run:</p>
 <pre>
-cmake . && make && sudo make install</pre>
+cmake -S . -B build && cmake --build build && sudo cmake --install build</pre>
 
 <p>You may specify dependencies locations with environment variables in case cmake doesn't find them automatically (see below).</p>
 
@@ -164,32 +165,9 @@ cmake . && make && sudo make install</pre>
     </tr>
 </table>
 
-<h4>Troubleshouting</h4>
-
-<p>Windows/MinGW</p>
-
-<ul>
-<li>MinGW fails to build boost thread for version 1.46.1 (fixed in boost 1.47.0, please upgrade your boost version)</li>
-<li>Use the same cmake option for boost with CGAL and SFCGAL (particularly <code>Boost_USE_STATIC_LIBS=OFF</code>)</li>
-<li>Missing boost definitions in CGAL-4.1 to use static libraries (dllexport/dllimport)</li>
-</ul>
-
-<p>Patch CGAL-4.1/CMakeLists.txt with the following lines to build with boost static libraries (<code>Boost_USE_STATIC_LIBS=ON</code>).</p>
-
-<pre>
-option( Boost_USE_STATIC_LIBS "boost use dynamic libraries" OFF )
-if( Boost_USE_STATIC_LIBS )
-  message( STATUS "Boost_USE_STATIC_LIBS=ON" )
-    add_definitions( "-DBOOST_THREAD_USE_LIB" )
-else()
-    message( STATUS "Boost_USE_STATIC_LIBS=OFF" )
-    add_definitions( "-DBOOST_ALL_DYN_LINK" )
-endif()
-</pre>
-
 <h3>Installation with PostGIS</h3>
 
-<p>On a recent PostGIS source tree (&geq; 2.1), an additional option for the <code>configure</code> script called <code>--with-sfcgal</code> is available.
+<p>On a PostGIS source tree an additional option for the <code>configure</code> script called <code>--with-sfcgal</code> is available.
 Set it to wherever your SFCGAL installation is. If you used the default directory <code>/usr/local</code> and if the <code>bin</code> sub-directory is present in your <code>PATH</code>, then SFCGAL should be detected without any aditionnal option.</p>
 
       </section>
@@ -198,7 +176,7 @@ Set it to wherever your SFCGAL installation is. If you used the default director
     <!-- FOOTER  -->
 <!--    <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">SFCGAL maintained by <a href="https://gitlab.com/Oslandia">Oslandia</a></p>
+        <p class="copyright">SFCGAL maintained by <a href="https://gitlab.com/SFCGAL">the SFCGAL Team</a></p>
         <p>Published with <a href="http://pages.gitlab.com">GitLab Pages</a></p>
       </footer>
     </div>
