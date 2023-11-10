@@ -808,10 +808,8 @@ recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
         // Else it is a polygon
         auto *ls = new LineString;
 
-        for (auto it =
-                 boundary.begin();
-             it != boundary.end(); ++it) {
-          ls->addPoint(*it);
+        for (auto & it : boundary) {
+          ls->addPoint(it);
         }
 
         output.push_back(new Polygon(ls));

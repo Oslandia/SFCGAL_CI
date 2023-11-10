@@ -533,7 +533,7 @@ isValid(const Solid &solid, const double &toleranceAbs) -> const Validity
 }
   }
 
-  if (solid.numInteriorShells() != 0u) {
+  if (solid.numInteriorShells() != 0U) {
     BOOST_THROW_EXCEPTION(
         Exception("function is not fully implemented (orientation, covering "
                   "and intersections of interior shells missing"));

@@ -106,10 +106,8 @@ approximate(const Offset_polygon_2 &polygon, const int &n = 0) -> Polygon_2
   bool            isFirst = true;
   Kernel::Point_2 last;
 
-  for (auto it =
-           pair_list.begin();
-       it != pair_list.end(); ++it) {
-    Kernel::Point_2 const point(it->first, it->second);
+  for (auto & it : pair_list) {
+    Kernel::Point_2 const point(it.first, it.second);
 
     if (isFirst) {
       isFirst = false;
@@ -152,9 +150,8 @@ polygonSetToMultiPolygon(const Offset_polygon_set_2 &polygonSet, const int &n)
 
   std::unique_ptr<MultiPolygon> result(new MultiPolygon);
 
-  for (auto it = res.begin();
-       it != res.end(); ++it) {
-    result->addGeometry(new Polygon(approximate(*it, n)));
+  for (auto & re : res) {
+    result->addGeometry(new Polygon(approximate(re, n)));
   }
 
   return result;
@@ -179,10 +176,9 @@ circleToPolygon(const Kernel::Circle_2 &circle) -> Offset_polygon_2
   // Construct the polygon.
   Offset_polygon_2 result;
 
-  for (auto it = parts.begin();
-       it != parts.end(); ++it) {
+  for (auto & part : parts) {
     Offset_x_monotone_curve_2 arc;
-    CGAL::assign(arc, *it);
+    CGAL::assign(arc, part);
     result.push_back(arc);
   }
 

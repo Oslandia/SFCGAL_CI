@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(testEmpty)
   std::vector<std::string> const typeNames =
       tools::Registry::instance().getGeometryTypes();
 
-  for (auto &typeName : typeNames) {
+  for (const auto &typeName : typeNames) {
     std::unique_ptr<Geometry> const g(registry.newGeometryByTypeName(typeName));
     BOOST_CHECK(algorithm::offset(*g, 1.0)->isEmpty());
   }

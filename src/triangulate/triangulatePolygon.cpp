@@ -154,7 +154,7 @@ triangulatePolygon3D(const Polygon       &polygon,
      * note, we do not include the last point, since it's equal to the last and
      * that
      */
-    if (ring.numPoints() == 0u) {
+    if (ring.numPoints() == 0U) {
       continue;
     }
 

@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_AreaTest )
 BOOST_AUTO_TEST_CASE( testEmpty2D3D )
 {
     tools::Registry const& registry = tools::Registry::instance() ;
-    std::vector< std::string > typeNames = tools::Registry::instance().getGeometryTypes();
+    std::vector< std::string > const typeNames = tools::Registry::instance().getGeometryTypes();
 
     for (auto & typeName : typeNames) {
         BOOST_TEST_MESSAGE( typeName ) ;

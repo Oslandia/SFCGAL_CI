@@ -110,7 +110,7 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
 
       LineString            roofFaceRing;
       Halfedge_const_handle h                 = it->halfedge();
-      Halfedge_const_handle done(h);
+      Halfedge_const_handle const done(h);
       bool                  infiniteTimeFound = false;
 
       do {

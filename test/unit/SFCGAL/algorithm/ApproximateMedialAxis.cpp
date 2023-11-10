@@ -124,11 +124,9 @@ BOOST_AUTO_TEST_CASE( testInvalidTypes )
     wkt.emplace_back("POINT(1 2)" );
     wkt.emplace_back("LINESTRING(0 0,1 1)" );
 
-    for ( auto it=wkt.begin(),
-                                                     itE=wkt.end();
-          it != itE; ++it )
+    for (auto & it : wkt)
     {
-      std::unique_ptr< Geometry > const g( io::readWkt( *it ) );
+      std::unique_ptr< Geometry > const g( io::readWkt( it ) );
       std::unique_ptr< MultiLineString > result(
           algorithm::approximateMedialAxis( *g )
       );

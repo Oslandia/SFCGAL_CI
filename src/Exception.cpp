@@ -16,7 +16,7 @@ Exception::Exception() noexcept : _message("unknown exception") {}
 ///
 ///
 ///
-Exception::Exception(std::string message) throw() : _message(std::move(message)) {}
+Exception::Exception(std::string message) noexcept : _message(std::move(message)) {}
 
 ///
 ///

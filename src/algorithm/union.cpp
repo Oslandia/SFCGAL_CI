@@ -215,9 +215,8 @@ struct Surface_d<3> : Triangle_3 {
         lines.push_back(current);
       }
 
-      for (auto l = lines.begin();
-           l != lines.end(); ++l) {
-        l->pieces(std::back_inserter(filtered));
+      for (auto & line : lines) {
+        line.pieces(std::back_inserter(filtered));
       }
     }
 
@@ -230,10 +229,9 @@ struct Surface_d<3> : Triangle_3 {
           triangulate::ConstraintDelaunayTriangulation::Vertex_handle;
       triangulate::ConstraintDelaunayTriangulation cdt;
 
-      for (auto f = filtered.begin();
-           f != filtered.end(); ++f) {
-        Vertex_handle const s = cdt.addVertex(f->source());
-        Vertex_handle const t = cdt.addVertex(f->target());
+      for (auto & f : filtered) {
+        Vertex_handle const s = cdt.addVertex(f.source());
+        Vertex_handle const t = cdt.addVertex(f.target());
         cdt.addConstraint(s, t);
       }
 
@@ -737,9 +735,8 @@ union_segment_volume(Handle<3> a, Handle<3> b)
     collidingTriangles(collisions, std::back_inserter(triangles));
 
     // first step, substract faces
-    for (auto tri = triangles.begin();
-         tri != triangles.end(); ++tri) {
-      Handle<3> const h(*tri);
+    for (auto & triangle : triangles) {
+      Handle<3> const h(triangle);
       union_segment_surface(a, h);
     }
 
@@ -747,9 +744,8 @@ union_segment_volume(Handle<3> a, Handle<3> b)
     // middle point to know if it's in or out
     std::vector<Point_3> points;
 
-    for (auto tri = triangles.begin();
-         tri != triangles.end(); ++tri) {
-      CGAL::Object const inter = CGAL::intersection(segment, *tri);
+    for (auto & triangle : triangles) {
+      CGAL::Object const inter = CGAL::intersection(segment, triangle);
       const auto  *p     = CGAL::object_cast<Point_3>(&inter);
 
       if (p != nullptr) {
@@ -757,7 +753,7 @@ union_segment_volume(Handle<3> a, Handle<3> b)
       }
     }
 
-    if (!points.empty() != 0u) {
+    if (static_cast<unsigned int>(!points.empty()) != 0U) {
       std::sort(points.begin(), points.end(),
                 Nearer<Point_3>(segment.source()));
 
@@ -826,10 +822,8 @@ union_surface_volume(Handle<3> a, Handle<3> b)
   detail::GeometrySet<3> res;
   _intersection_solid_triangle(b.asVolume(), a.asSurface(), res);
 
-  for (auto it =
-           res.surfaces().begin();
-       it != res.surfaces().end(); ++it) {
-    a.asSurface().remove(it->primitive());
+  for (auto & it : res.surfaces()) {
+    a.asSurface().remove(it.primitive());
   }
 }
 
@@ -854,7 +848,7 @@ union_volume_volume(Handle<3> a, Handle<3> b)
   intersection(detail::GeometrySet<3>(a.asVolume()),
                detail::GeometrySet<3>(b.asVolume()), inter);
 
-  if ((!inter.volumes().empty() != 0u) || (!inter.surfaces().empty() != 0u)) {
+  if ((static_cast<unsigned int>(!inter.volumes().empty()) != 0U) || (static_cast<unsigned int>(!inter.surfaces().empty()) != 0U)) {
 
     MarkedPolyhedron output;
     bool             const res =

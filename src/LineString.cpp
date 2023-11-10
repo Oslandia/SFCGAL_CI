@@ -10,7 +10,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-LineString::LineString()  {}
+LineString::LineString()  = default;
 
 ///
 ///

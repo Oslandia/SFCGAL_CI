@@ -12,7 +12,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-GeometryCollection::GeometryCollection()  {}
+GeometryCollection::GeometryCollection()  = default;
 
 ///
 ///

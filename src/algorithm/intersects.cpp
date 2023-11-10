@@ -57,7 +57,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Segment vs. Segment
   //
 
-  else if (pa.handle.which() == PrimitiveSegment &&
+  if (pa.handle.which() == PrimitiveSegment &&
            pb.handle.which() == PrimitiveSegment) {
     const auto *seg1 = pa.as<CGAL::Segment_2<Kernel>>();
     const auto *seg2 = pb.as<CGAL::Segment_2<Kernel>>();
@@ -279,7 +279,7 @@ _intersects(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb) -> bool
     const auto *seg = pa.as<CGAL::Segment_3<Kernel>>();
     const auto *pt  = pb.as<CGAL::Point_3<Kernel>>();
     return seg->has_on(*pt);
-  } else if (pa.handle.which() == PrimitiveSegment &&
+  } if (pa.handle.which() == PrimitiveSegment &&
              pb.handle.which() == PrimitiveSegment) {
     const auto *sega = pa.as<CGAL::Segment_3<Kernel>>();
     const auto *segb = pb.as<CGAL::Segment_3<Kernel>>();

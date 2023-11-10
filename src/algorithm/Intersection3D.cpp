@@ -159,14 +159,13 @@ _intersection_solid_triangle(const MarkedPolyhedron         &pa,
     return;
   }
 
-  for (auto lit = polylines.begin();
-       lit != polylines.end(); ++lit) {
-    if (lit->size() == 1) {
+  for (auto & polyline : polylines) {
+    if (polyline.size() == 1) {
       // it's a point
-      output.addPrimitive((*lit)[0]);
+      output.addPrimitive(polyline[0]);
     } else {
-      for (size_t k = 1; k < lit->size(); ++k) {
-        CGAL::Segment_3<Kernel> const seg((*lit)[k - 1], (*lit)[k]);
+      for (size_t k = 1; k < polyline.size(); ++k) {
+        CGAL::Segment_3<Kernel> const seg(polyline[k - 1], polyline[k]);
         output.addPrimitive(seg);
       }
     }

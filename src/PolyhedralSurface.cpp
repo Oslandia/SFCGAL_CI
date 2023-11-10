@@ -12,7 +12,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-PolyhedralSurface::PolyhedralSurface()  {}
+PolyhedralSurface::PolyhedralSurface()  = default;
 
 ///
 ///

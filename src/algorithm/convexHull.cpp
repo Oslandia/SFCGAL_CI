@@ -68,12 +68,12 @@ for (auto &point : getPointVisitor.points) {
   if (epoints.size() == 1) {
     return std::unique_ptr<Geometry>(new Point(*epoints.begin()));
   } if (epoints.size() == 2) {
-    std::list<Point_2>::const_iterator it = epoints.begin();
+    auto it = epoints.begin();
     return std::unique_ptr<Geometry>(
         new LineString(Point(*it++), Point(*it++)));
   }
   // GEOS does not seem to return triangles
-  else if (epoints.size() == 3) {
+  if (epoints.size() == 3) {
     std::list<Point_2>::const_iterator it = epoints.begin();
     Point_2                            p(*it++);
     Point_2                            q(*it++);
@@ -129,7 +129,7 @@ for (auto &point : getPointVisitor.points) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
   } if (const auto *point = object_cast<Point_3>(&hull)) {
     return std::unique_ptr<Geometry>(new Point(*point));
-  } else if (const auto *segment = object_cast<Segment_3>(&hull)) {
+  } if (const auto *segment = object_cast<Segment_3>(&hull)) {
     return std::unique_ptr<Geometry>(
         new LineString(Point(segment->start()), Point(segment->end())));
   } else if (const auto *triangle = object_cast<Triangle_3>(&hull)) {

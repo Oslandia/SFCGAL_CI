@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE( testDifferenceXPoint )
     BOOST_CHECK( *algorithm::difference( Point( 0,0 ), Point( 1,0 ) ) == Point( 0,0 ) );
 
     // check difference(X, point) == X
-    std::vector<std::string> typeNames;
+    std::vector<std::string> const typeNames;
 
     for (auto & typeName : typeNames) {
         std::unique_ptr<Geometry> const newGeo( tools::Registry::instance().newGeometryByTypeName( typeName ) );
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE( testDifferenceXLineString )
 
     // check difference(X, linestring) == X, with dimension(X) > 1
     // TODO: add generators of random geometries to avoid empty geometries here ?
-    std::vector<std::string> typeNames;
+    std::vector<std::string> const typeNames;
 
     for (auto & typeName : typeNames) {
         std::unique_ptr<Geometry> newGeo( tools::Registry::instance().newGeometryByTypeName( typeName ) );

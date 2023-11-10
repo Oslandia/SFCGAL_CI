@@ -14,7 +14,7 @@ namespace SFCGAL::triangulate {
 ///
 ///
 ///
-ConstraintDelaunayTriangulation::ConstraintDelaunayTriangulation()  {}
+ConstraintDelaunayTriangulation::ConstraintDelaunayTriangulation()  = default;
 
 ///
 ///

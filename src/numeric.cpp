@@ -37,10 +37,9 @@ round(const CGAL::Gmpq &v) -> CGAL::Gmpz
     return ceil(v - CGAL::Gmpq(1, 2));
   } if (v == 0) {
     return 0;
-  } else {
-    // floor( v + 0.5 ) ;
+  }     // floor( v + 0.5 ) ;
     return floor(v + CGAL::Gmpq(1, 2));
-  }
+ 
 }
 
 #ifdef CGAL_USE_GMPXX
@@ -77,11 +76,10 @@ round(const mpq_class &v) -> mpz_class
     return ceil(tmp);
   } if (v == 0) {
     return 0;
-  } else {
-    // floor( v + 0.5 ) ;
+  }     // floor( v + 0.5 ) ;
     mpq_class tmp = v + mpq_class(1, 2);
     return floor(tmp);
-  }
+ 
 }
 #endif
 

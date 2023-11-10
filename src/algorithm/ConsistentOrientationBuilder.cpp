@@ -155,7 +155,7 @@ ConsistentOrientationBuilder::_computeNeighbors()
           _graph.edges(source, target);
 
       // use marker to fill neighborGraph
-      for (auto &neighborEdge : neighborEdges) {
+      for (const auto &neighborEdge : neighborEdges) {
         auto idOtherTriangle = (size_t)_graph[neighborEdge.first].face;
 
         if (idOtherTriangle == i) {

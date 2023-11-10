@@ -10,7 +10,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-TriangulatedSurface::TriangulatedSurface()  {}
+TriangulatedSurface::TriangulatedSurface()  = default;
 
 ///
 ///

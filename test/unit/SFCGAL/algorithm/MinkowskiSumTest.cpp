@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( testEmpty )
     std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((0 0,1 0,1 1,0 1,0 0))" ) );
 
     tools::Registry const& registry = tools::Registry::instance() ;
-    std::vector< std::string > typeNames = tools::Registry::instance().getGeometryTypes();
+    std::vector< std::string > const typeNames = tools::Registry::instance().getGeometryTypes();
 
     for (auto & typeName : typeNames) {
         std::unique_ptr< Geometry > const g( registry.newGeometryByTypeName( typeName ) ) ;

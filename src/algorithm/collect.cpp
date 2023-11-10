@@ -25,7 +25,7 @@ collect(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
       mls->addGeometry(ga);
       mls->addGeometry(gb);
       return std::unique_ptr<Geometry>(mls);
-    } else if (ga.geometryTypeId() == TYPE_POLYGON) {
+    } if (ga.geometryTypeId() == TYPE_POLYGON) {
       auto *mp = new MultiPolygon();
       mp->addGeometry(ga);
       mp->addGeometry(gb);

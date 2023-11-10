@@ -24,9 +24,8 @@ polygonSetToMultiPolygon(const CGAL::Polygon_set_2<Kernel> &polygonSet)
 
   std::unique_ptr<MultiPolygon> result(new MultiPolygon);
 
-  for (auto it = res.begin();
-       it != res.end(); ++it) {
-    result->addGeometry(new Polygon(*it));
+  for (auto & re : res) {
+    result->addGeometry(new Polygon(re));
   }
 
   return result;

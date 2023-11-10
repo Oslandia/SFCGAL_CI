@@ -196,10 +196,8 @@ BOOST_AUTO_TEST_CASE(testInvalidTypes)
   wkt.emplace_back("POINT(1 2)");
   wkt.emplace_back("LINESTRING(0 0,1 1)");
 
-  for (auto it  = wkt.begin(),
-                                                itE = wkt.end();
-       it != itE; ++it) {
-    std::unique_ptr<Geometry>        const g(io::readWkt(*it));
+  for (auto & it : wkt) {
+    std::unique_ptr<Geometry>        const g(io::readWkt(it));
     std::unique_ptr<MultiLineString> result(algorithm::straightSkeleton(*g));
     BOOST_CHECK_EQUAL(result->numGeometries(), 0U);
   }

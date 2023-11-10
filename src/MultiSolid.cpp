@@ -10,7 +10,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-MultiSolid::MultiSolid()  {}
+MultiSolid::MultiSolid()  = default;
 
 ///
 ///

@@ -24,7 +24,7 @@ Surface::dimension() const -> int
 ///
 ///
 ///
-Surface::Surface()  {}
+Surface::Surface()  = default;
 
 ///
 ///

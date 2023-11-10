@@ -156,8 +156,8 @@ auto
 intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
-  GeometrySet<2> gsa(ga);
-  GeometrySet<2> gsb(gb);
+  GeometrySet<2> const gsa(ga);
+  GeometrySet<2> const gsb(gb);
   GeometrySet<2> output;
   algorithm::intersection(gsa, gsb, output);
 
@@ -180,8 +180,8 @@ auto
 intersection3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
-  GeometrySet<3> gsa(ga);
-  GeometrySet<3> gsb(gb);
+  GeometrySet<3> const gsa(ga);
+  GeometrySet<3> const gsb(gb);
   GeometrySet<3> output;
   algorithm::intersection(gsa, gsb, output);
 

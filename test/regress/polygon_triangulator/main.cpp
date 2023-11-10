@@ -82,7 +82,7 @@ auto main( int argc, char* argv[] ) -> int
     po::store( po::parse_command_line( argc, argv, desc ), vm );
     po::notify( vm );
 
-    if ( vm.count( "help" ) != 0u ) {
+    if ( vm.count( "help" ) != 0U ) {
         std::cout << desc << std::endl ;
         return 0;
     }
@@ -93,7 +93,7 @@ auto main( int argc, char* argv[] ) -> int
 
     std::string filename ;
 
-    if ( vm.count( "filename" ) != 0u ) {
+    if ( vm.count( "filename" ) != 0U ) {
         filename = vm["filename"].as< std::string >() ;
     }
     else {
@@ -104,7 +104,7 @@ auto main( int argc, char* argv[] ) -> int
 
     int oneLine = -1;
 
-    if ( vm.count( "line" ) != 0u ) {
+    if ( vm.count( "line" ) != 0U ) {
         oneLine = vm["line"].as< int >();
     }
 

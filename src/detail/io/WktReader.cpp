@@ -143,7 +143,7 @@ WktReader::readGeometryType() -> GeometryType
     return TYPE_POINT;
   } if (_reader.imatch("LINESTRING")) {
     return TYPE_LINESTRING;
-  } else if (_reader.imatch("POLYGON")) {
+  } if (_reader.imatch("POLYGON")) {
     return TYPE_POLYGON;
   } else if (_reader.imatch("TRIANGLE")) {
     // not official
