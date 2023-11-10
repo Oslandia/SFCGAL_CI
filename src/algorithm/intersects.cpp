@@ -74,7 +74,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
     const auto *pt   = pb.as<CGAL::Point_2<Kernel>>();
 
-    int b1 = poly->outer_boundary().bounded_side(*pt);
+    int const b1 = poly->outer_boundary().bounded_side(*pt);
 
     if (b1 == CGAL::ON_BOUNDARY) {
       return true;
@@ -84,7 +84,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
       CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator it;
 
       for (it = poly->holes_begin(); it != poly->holes_end(); ++it) {
-        int b = it->bounded_side(*pt);
+        int const b = it->bounded_side(*pt);
 
         if (b == CGAL::ON_BOUNDED_SIDE) {
           return false;
@@ -101,7 +101,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Polygon vs. Segment
   //
 
-  else if (pa.handle.which() == PrimitiveSurface &&
+  if (pa.handle.which() == PrimitiveSurface &&
            pb.handle.which() == PrimitiveSegment) {
     const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
     const auto *seg  = pb.as<CGAL::Segment_2<Kernel>>();

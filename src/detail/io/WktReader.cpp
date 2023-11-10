@@ -148,7 +148,7 @@ WktReader::readGeometryType() -> GeometryType
   } if (_reader.imatch("TRIANGLE")) {
     // not official
     return TYPE_TRIANGLE;
-  } else if (_reader.imatch("MULTIPOINT")) {
+  } if (_reader.imatch("MULTIPOINT")) {
     return TYPE_MULTIPOINT;
   } else if (_reader.imatch("MULTILINESTRING")) {
     return TYPE_MULTILINESTRING;

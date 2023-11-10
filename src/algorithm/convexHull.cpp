@@ -82,7 +82,7 @@ for (auto &point : getPointVisitor.points) {
   } if (epoints.size() > 3) {
     auto *poly = new Polygon;
 
-    for (std::list<Point_2>::const_iterator it = epoints.begin();
+    for (auto it = epoints.begin();
          it != epoints.end(); ++it) {
       poly->exteriorRing().addPoint(*it);
     }
@@ -90,10 +90,9 @@ for (auto &point : getPointVisitor.points) {
     // add back the first point to close the ring
     poly->exteriorRing().addPoint(*epoints.begin());
     return std::unique_ptr<Geometry>(poly);
-  } else {
-    BOOST_THROW_EXCEPTION(
+  }     BOOST_THROW_EXCEPTION(
         Exception("unexpected CGAL output type in CGAL::convex_hull_2"));
-  }
+ 
 }
 
 ///
@@ -136,7 +135,7 @@ for (auto &point : getPointVisitor.points) {
     return std::unique_ptr<Geometry>(new Triangle(Point(triangle->vertex(0)),
                                                   Point(triangle->vertex(1)),
                                                   Point(triangle->vertex(2))));
-  } else if (const auto *polyhedron = object_cast<Polyhedron_3>(&hull)) {
+  } if (const auto *polyhedron = object_cast<Polyhedron_3>(&hull)) {
     std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface());
 
     for (Polyhedron_3::Facet_const_iterator it_facet =
