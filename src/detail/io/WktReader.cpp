@@ -152,7 +152,7 @@ WktReader::readGeometryType() -> GeometryType
     return TYPE_MULTIPOINT;
   } if (_reader.imatch("MULTILINESTRING")) {
     return TYPE_MULTILINESTRING;
-  } else if (_reader.imatch("MULTIPOLYGON")) {
+  } if (_reader.imatch("MULTIPOLYGON")) {
     return TYPE_MULTIPOLYGON;
   } else if (_reader.imatch("GEOMETRYCOLLECTION")) {
     return TYPE_GEOMETRYCOLLECTION;

@@ -153,7 +153,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     // 2. else, if poly1 is inside poly2 or poly1 inside poly2 (but not in
     // holes), returns true
 
-    GeometrySet<2> rings1, rings2;
+    GeometrySet<2> rings1;
+    GeometrySet<2> rings2;
     rings1.addSegments(poly1->outer_boundary().edges_begin(),
                        poly1->outer_boundary().edges_end());
 
@@ -174,19 +175,20 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     }
 
     // 2.
-    CGAL::Bbox_2 box1, box2;
+    CGAL::Bbox_2 box1;
+    CGAL::Bbox_2 box2;
     box1 = poly1->bbox();
     box2 = poly2->bbox();
-    Envelope e1(box1.xmin(), box1.xmax(), box1.ymin(), box1.ymax());
-    Envelope e2(box2.xmin(), box2.xmax(), box2.ymin(), box2.ymax());
+    Envelope const e1(box1.xmin(), box1.xmax(), box1.ymin(), box1.ymax());
+    Envelope const e2(box2.xmin(), box2.xmax(), box2.ymin(), box2.ymax());
 
     // if pa is inside pb
     if (Envelope::contains(e2, e1)) {
       // is pa inside one of pb's holes ?
-      CGAL::Point_2<Kernel> pt = *poly1->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel> const pt = *poly1->outer_boundary().vertices_begin();
 
       for (auto it = poly2->holes_begin(); it != poly2->holes_end(); ++it) {
-        CGAL::Bounded_side b2 = it->bounded_side(pt);
+        CGAL::Bounded_side const b2 = it->bounded_side(pt);
 
         if (b2 == CGAL::ON_BOUNDED_SIDE) {
           return false;
@@ -199,10 +201,10 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     // if pb is inside pa
     if (Envelope::contains(e1, e2)) {
       // is pa inside one of pb's holes ?
-      CGAL::Point_2<Kernel> pt = *poly2->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel> const pt = *poly2->outer_boundary().vertices_begin();
 
       for (auto it = poly1->holes_begin(); it != poly1->holes_end(); ++it) {
-        CGAL::Bounded_side b2 = it->bounded_side(pt);
+        CGAL::Bounded_side const b2 = it->bounded_side(pt);
 
         if (b2 == CGAL::ON_BOUNDED_SIDE) {
           return false;
