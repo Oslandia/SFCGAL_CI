@@ -160,7 +160,7 @@ WktReader::readGeometryType() -> GeometryType
     return TYPE_TRIANGULATEDSURFACE;
   } if (_reader.imatch("POLYHEDRALSURFACE")) {
     return TYPE_POLYHEDRALSURFACE;
-  } else if (_reader.imatch("SOLID")) {
+  } if (_reader.imatch("SOLID")) {
     // not official
     return TYPE_SOLID;
   } else if (_reader.imatch("MULTISOLID")) {
