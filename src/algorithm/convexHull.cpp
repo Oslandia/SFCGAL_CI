@@ -23,8 +23,7 @@
 #include <CGAL/point_generators_3.h>
 #include <vector>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 using Point_3      = CGAL::Point_3<Kernel>;
 using Segment_3    = CGAL::Segment_3<Kernel>;
@@ -50,13 +49,14 @@ convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
 
   // collect points
 
-  if (getPointVisitor.points.size() == 0) {
+  if (getPointVisitor.points.empty()) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
   }
 
   std::vector<Point_2> points;
 
-  for (auto &point : getPointVisitor.points) {
+  points.reserve(getPointVisitor.points.size());
+for (auto &point : getPointVisitor.points) {
     points.push_back(point->toPoint_2());
   }
 
@@ -67,7 +67,7 @@ convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
 
   if (epoints.size() == 1) {
     return std::unique_ptr<Geometry>(new Point(*epoints.begin()));
-  } else if (epoints.size() == 2) {
+  } if (epoints.size() == 2) {
     std::list<Point_2>::const_iterator it = epoints.begin();
     return std::unique_ptr<Geometry>(
         new LineString(Point(*it++), Point(*it++)));
@@ -111,7 +111,8 @@ convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
 
   std::vector<Point_3> points;
 
-  for (auto &point : getPointVisitor.points) {
+  points.reserve(getPointVisitor.points.size());
+for (auto &point : getPointVisitor.points) {
     points.push_back(point->toPoint_3());
   }
 
@@ -126,7 +127,7 @@ convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
 
   if (hull.empty()) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
-  } else if (const auto *point = object_cast<Point_3>(&hull)) {
+  } if (const auto *point = object_cast<Point_3>(&hull)) {
     return std::unique_ptr<Geometry>(new Point(*point));
   } else if (const auto *segment = object_cast<Segment_3>(&hull)) {
     return std::unique_ptr<Geometry>(
@@ -162,5 +163,4 @@ convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
   }
 }
 
-} // namespace algorithm
 } // namespace SFCGAL

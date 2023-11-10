@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE( triangulatedSurface_Empty )
 
 BOOST_AUTO_TEST_CASE( triangulatedSurface_fourTriangles )
 {
-    std::string wkt = "TIN("
+    std::string const wkt = "TIN("
                       "((0 0 0, 0 0 1, 0 1 0, 0 0 0)),"
                       "((0 0 0, 0 1 0, 1 0 0, 0 0 0)),"
                       "((0 0 0, 1 0 0, 0 0 1, 0 0 0)),"
@@ -244,10 +244,13 @@ BOOST_AUTO_TEST_CASE( wkt_exactTest )
     BOOST_CHECK( g->is< LineString >() );
     BOOST_CHECK( ! g->isEmpty() );
     BOOST_REQUIRE_EQUAL( g->as< LineString >().numPoints(), 2U );
-    Kernel::Exact_kernel::FT x = CGAL::exact( g->as<LineString>().pointN( 0 ).x() );
-    Kernel::Exact_kernel::FT y = CGAL::exact( g->as<LineString>().pointN( 0 ).y() );
+    Kernel::Exact_kernel::FT const x = CGAL::exact( g->as<LineString>().pointN( 0 ).x() );
+    Kernel::Exact_kernel::FT const y = CGAL::exact( g->as<LineString>().pointN( 0 ).y() );
 
-    CGAL::Fraction_traits<Kernel::Exact_kernel::FT>::Numerator_type xn, xd, yn, yd;
+    CGAL::Fraction_traits<Kernel::Exact_kernel::FT>::Numerator_type xn;
+    CGAL::Fraction_traits<Kernel::Exact_kernel::FT>::Numerator_type xd;
+    CGAL::Fraction_traits<Kernel::Exact_kernel::FT>::Numerator_type yn;
+    CGAL::Fraction_traits<Kernel::Exact_kernel::FT>::Numerator_type yd;
     CGAL::Fraction_traits<Kernel::Exact_kernel::FT>::Decompose decomp;
     decomp(x, xn, xd);
     decomp(y, yn, yd);
@@ -272,11 +275,11 @@ BOOST_AUTO_TEST_CASE( wktExtraCharacters )
     bool threw = false;
     try
     {
-        std::unique_ptr< Geometry > g( readWkt( "POINT(0 0)POINT(1 0)" ) );
+        std::unique_ptr< Geometry > const g( readWkt( "POINT(0 0)POINT(1 0)" ) );
     }
     catch ( WktParseException& e )
     {
-        std::string err( e.what() );
+        std::string const err( e.what() );
         BOOST_CHECK_EQUAL( err, "Extra characters in WKT: POINT(1 0)" );
         threw = true;
     }
@@ -286,11 +289,11 @@ BOOST_AUTO_TEST_CASE( wktExtraCharacters )
     try
     {
         char str[] = "POINT(0 0)POINT(1 0)";
-        std::unique_ptr< Geometry > g( readWkt( str, strlen( str ) ) );
+        std::unique_ptr< Geometry > const g( readWkt( str, strlen( str ) ) );
     }
     catch ( WktParseException& e )
     {
-        std::string err( e.what() );
+        std::string const err( e.what() );
         BOOST_CHECK_EQUAL( err, "Extra characters in WKT: POINT(1 0)" );
         threw = true;
     }

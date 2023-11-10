@@ -61,14 +61,14 @@ BOOST_AUTO_TEST_CASE( testFileDistanceTest )
     std::ifstream ifs( filename.c_str() );
     BOOST_REQUIRE( ifs.good() ) ;
 
-    int argc = framework::master_test_suite().argc;
+    int const argc = framework::master_test_suite().argc;
     char** argv = framework::master_test_suite().argv;
 
     // look for options
     int test_one_line = -1;
 
     for ( int i = 0; i < argc; ++i ) {
-        std::string argi( argv[i] );
+        std::string const argi( argv[i] );
 
         if ( argi == "--line" ) {
             // only test one line
@@ -99,7 +99,8 @@ BOOST_AUTO_TEST_CASE( testFileDistanceTest )
         std::istringstream iss( line );
 
         std::string distanceDimension ;
-        std::string wktGA, wktGB ;
+        std::string wktGA;
+        std::string wktGB ;
         double expectedDistance = NAN ;
 
         std::getline( iss, distanceDimension, '|' ) ;
@@ -108,7 +109,7 @@ BOOST_AUTO_TEST_CASE( testFileDistanceTest )
         iss >> expectedDistance ;
 
         std::unique_ptr< Geometry > gA( io::readWkt( wktGA ) );
-        std::unique_ptr< Geometry > gB( io::readWkt( wktGB ) );
+        std::unique_ptr< Geometry > const gB( io::readWkt( wktGB ) );
 
         //if (43!=lineNo ) continue;
         //if (43==lineNo )

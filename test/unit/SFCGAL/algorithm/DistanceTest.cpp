@@ -118,8 +118,8 @@ BOOST_AUTO_TEST_CASE( testDistancePointPoint3D )
 //testPointLineString
 BOOST_AUTO_TEST_CASE( testDistancePointLineString_pointOnLineString )
 {
-    Point point( 1.0,1.0 );
-    LineString lineString(
+    Point const point( 1.0,1.0 );
+    LineString const lineString(
         Point( 0.0,0.0 ),
         Point( 2.0,2.0 )
     );
@@ -127,14 +127,14 @@ BOOST_AUTO_TEST_CASE( testDistancePointLineString_pointOnLineString )
 }
 BOOST_AUTO_TEST_CASE( testDistancePointLineString_pointOnLineString_badLineStringDefinition )
 {
-    Point point( 3.0,4.0 );
+    Point const point( 3.0,4.0 );
     LineString lineString ;
     lineString.addPoint( Point( 0.0,0.0 ) );
     BOOST_CHECK_THROW( point.distance( lineString ), GeometryInvalidityException );
 }
 BOOST_AUTO_TEST_CASE( testDistancePointLineString_pointOnLineString_collapsedSegments )
 {
-    Point point( 3.0,4.0 );
+    Point const point( 3.0,4.0 );
     LineString lineString ;
     lineString.addPoint( Point( 0.0,0.0 ) );
     lineString.addPoint( Point( 0.0,0.0 ) );
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE( testDistancePointLineString_pointOnLineString_collapsedSeg
 }
 BOOST_AUTO_TEST_CASE( testDistancePointLineString3D_pointOnLineString_collapsedSegments )
 {
-    Point point( 0.0,3.0,4.0 );
+    Point const point( 0.0,3.0,4.0 );
     LineString lineString ;
     lineString.addPoint( Point( 0.0,0.0,0.0 ) );
     lineString.addPoint( Point( 0.0,-1.0,-1.0 ) );
@@ -153,8 +153,8 @@ BOOST_AUTO_TEST_CASE( testDistancePointLineString3D_pointOnLineString_collapsedS
 
 BOOST_AUTO_TEST_CASE( testDistancePointLineString_pointOutOfLineString )
 {
-    Point point( 0.0,1.0 );
-    LineString lineString(
+    Point const point( 0.0,1.0 );
+    LineString const lineString(
         Point( 0.0,0.0 ),
         Point( 2.0,2.0 )
     );
@@ -165,13 +165,13 @@ BOOST_AUTO_TEST_CASE( testDistancePointLineString_pointOutOfLineString )
 BOOST_AUTO_TEST_CASE( testDistancePointPolygon_pointInPolygon )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "POINT(0.5 0.5)" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((0.0 0.0,1.0 0.0,1.0 1.0,0.0 1.0,0.0 0.0))" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "POLYGON((0.0 0.0,1.0 0.0,1.0 1.0,0.0 1.0,0.0 0.0))" ) );
     BOOST_CHECK_EQUAL( gA->distance( *gB ), 0.0 );
 }
 BOOST_AUTO_TEST_CASE( testDistancePointPolygon_pointOutOfPolygon )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "POINT(0.0 1.0)" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((0.0 0.0,2.0 2.0,2.0 0.0,0.0 0.0))" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "POLYGON((0.0 0.0,2.0 2.0,2.0 0.0,0.0 0.0))" ) );
     BOOST_CHECK_EQUAL( gA->distance( *gB ), sqrt( 2.0 )/2.0 );
 }
 
@@ -179,14 +179,14 @@ BOOST_AUTO_TEST_CASE( testDistancePointPolygon_pointOutOfPolygon )
 BOOST_AUTO_TEST_CASE( testDistanceLineStringLineString_zeroLengthSegments )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "LINESTRING(0.0 0.0,-1.0 -1.0)" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "LINESTRING(3.0 4.0,4.0 5.0)" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "LINESTRING(3.0 4.0,4.0 5.0)" ) );
     BOOST_CHECK_EQUAL( gA->distance( *gB ), 5.0 );
 }
 // LineString / LineString 3D
 BOOST_AUTO_TEST_CASE( testDistanceLineStringLineString3D_zeroLengthSegments )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "LINESTRING(0.0 0.0 0.0,-1.0 -1.0 -1.0)" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "LINESTRING(0.0 3.0 4.0,0.0 4.0 5.0)" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "LINESTRING(0.0 3.0 4.0,0.0 4.0 5.0)" ) );
     BOOST_CHECK_EQUAL( gA->distance3D( *gB ), 5.0 );
 }
 
@@ -194,13 +194,13 @@ BOOST_AUTO_TEST_CASE( testDistanceLineStringLineString3D_zeroLengthSegments )
 BOOST_AUTO_TEST_CASE( testDistance3DLineStringTriangle_lineStringInTriangle )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "LINESTRING(-1.0 0.0 1.0,1.0 0.0 1.0)" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "TRIANGLE((-4.0 0.0 1.0,4.0 0.0 1.0,0.0 4.0 1.0,-4.0 0.0 1.0))" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "TRIANGLE((-4.0 0.0 1.0,4.0 0.0 1.0,0.0 4.0 1.0,-4.0 0.0 1.0))" ) );
     BOOST_CHECK_EQUAL( gA->distance3D( *gB ), 0.0 );
 }
 BOOST_AUTO_TEST_CASE( testDistance3DLineStringTriangle_lineStringStartPointIsNearest )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "LINESTRING(-1.0 0.0 2.0,1.0 0.0 3.0)" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "TRIANGLE((-4.0 0.0 1.0,4.0 0.0 1.0,0.0 4.0 1.0,-4.0 0.0 1.0))" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "TRIANGLE((-4.0 0.0 1.0,4.0 0.0 1.0,0.0 4.0 1.0,-4.0 0.0 1.0))" ) );
     BOOST_CHECK_EQUAL( gA->distance3D( *gB ), 1.0 );
 }
 
@@ -208,13 +208,13 @@ BOOST_AUTO_TEST_CASE( testDistance3DLineStringTriangle_lineStringStartPointIsNea
 BOOST_AUTO_TEST_CASE( testDistance3DTriangleTriangle_contained )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "TRIANGLE((-3.0 0.0 1.0,3.0 0.0 1.0,0.0 3.0 1.0,-3.0 0.0 1.0))" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "TRIANGLE((-4.0 0.0 1.0,4.0 0.0 1.0,0.0 4.0 1.0,-4.0 0.0 1.0))" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "TRIANGLE((-4.0 0.0 1.0,4.0 0.0 1.0,0.0 4.0 1.0,-4.0 0.0 1.0))" ) );
     BOOST_CHECK_EQUAL( gA->distance3D( *gB ), 0.0 );
 }
 BOOST_AUTO_TEST_CASE( testDistance3DTriangleTriangle_parallel )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "TRIANGLE((-3.0 0.0 1.0,3.0 0.0 1.0,0.0 3.0 1.0,-3.0 0.0 1.0))" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "TRIANGLE((-4.0 0.0 2.0,4.0 0.0 2.0,0.0 4.0 2.0,-4.0 0.0 2.0))" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "TRIANGLE((-4.0 0.0 2.0,4.0 0.0 2.0,0.0 4.0 2.0,-4.0 0.0 2.0))" ) );
     BOOST_CHECK_EQUAL( gA->distance3D( *gB ), 1.0 );
 }
 
@@ -223,14 +223,14 @@ BOOST_AUTO_TEST_CASE( testDistance3DTriangleTriangle_parallel )
 BOOST_AUTO_TEST_CASE( testDistancePolygonPolygon_disjoint )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "POLYGON((0.0 0.0,1.0 0.0,1.0 1.0,0.0 1.0,0.0 0.0))" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((2.0 0.0,3.0 0.0,3.0 1.0,2.0 1.0,2.0 0.0))" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "POLYGON((2.0 0.0,3.0 0.0,3.0 1.0,2.0 1.0,2.0 0.0))" ) );
     BOOST_CHECK_EQUAL( gA->distance( *gB ), 1.0 );
 }
 
 BOOST_AUTO_TEST_CASE( testDistanceMultiPointMultiPoint_disjoint )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "MULTIPOINT((0.0 0.0),(1.0 0.0),(1.0 1.0),(0.0 1.0))" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "MULTIPOINT((8.0 8.0),(4.0 5.0))" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "MULTIPOINT((8.0 8.0),(4.0 5.0))" ) );
     BOOST_CHECK_EQUAL( gA->distance( *gB ), 5.0 );
 }
 
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE( testDistanceMultiPointMultiPoint_disjoint )
 BOOST_AUTO_TEST_CASE( testDistancePolygonSolid )
 {
     std::unique_ptr< Geometry > gA( io::readWkt( "POLYGON((1 -1 -1,1 1 -1,1 1 1,1 -1 1,1 -1 -1))" ) );
-    std::unique_ptr< Geometry > gB( io::readWkt( "SOLID((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),((1 1 1,0 1 1,0 0 1,1 0 1,1 1 1)),((1 1 1,1 0 1,1 0 0,1 1 0,1 1 1)),((1 1 1,1 1 0,0 1 0,0 1 1,1 1 1))))" ) );
+    std::unique_ptr< Geometry > const gB( io::readWkt( "SOLID((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),((1 1 1,0 1 1,0 0 1,1 0 1,1 1 1)),((1 1 1,1 0 1,1 0 0,1 1 0,1 1 1)),((1 1 1,1 1 0,0 1 0,0 1 1,1 1 1))))" ) );
     BOOST_CHECK_EQUAL( gA->distance3D( *gB ), 0 );
 }
 

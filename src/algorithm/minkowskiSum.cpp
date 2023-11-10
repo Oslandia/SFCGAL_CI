@@ -27,8 +27,7 @@ using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
 using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
 using Polygon_set_2        = CGAL::Polygon_set_2<SFCGAL::Kernel>;
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 //-- private interface
 
@@ -119,7 +118,7 @@ minkowskiSum(const Point &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
 {
   BOOST_ASSERT(gB.size());
 
-  CGAL::Aff_transformation_2<Kernel> translate(CGAL::TRANSLATION,
+  CGAL::Aff_transformation_2<Kernel> const translate(CGAL::TRANSLATION,
                                                gA.toVector_2());
 
   Polygon_2 sum;
@@ -150,7 +149,7 @@ minkowskiSum(const LineString &gA, const Polygon_2 &gB,
     return;
   }
 
-  int npt = gA.numPoints();
+  int const npt = gA.numPoints();
 
   for (int i = 0; i < npt - 1; i++) {
     Polygon_2 P;
@@ -165,7 +164,7 @@ minkowskiSum(const LineString &gA, const Polygon_2 &gB,
 #if CGAL_VERSION_NR < 1040701000 // version 4.7
     Polygon_with_holes_2 part = minkowski_sum_2(P, gB);
 #else
-    Polygon_with_holes_2 part = minkowski_sum_by_full_convolution_2(P, gB);
+    Polygon_with_holes_2 const part = minkowski_sum_by_full_convolution_2(P, gB);
 #endif
 
     // merge into a polygon set
@@ -191,7 +190,7 @@ minkowskiSum(const Polygon &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
    * Invoke minkowski_sum_2 for exterior ring
    */
   {
-    Polygon_with_holes_2 sum =
+    Polygon_with_holes_2 const sum =
         minkowski_sum_2(gA.exteriorRing().toPolygon_2(), gB);
 
     if (polygonSet.is_empty()) {
@@ -255,7 +254,7 @@ minkowskiSumCollection(const Geometry &gA, const Polygon_2 &gB,
 }
 
 auto
-minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck)
+minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
   if (gB.isEmpty()) {
@@ -284,5 +283,4 @@ minkowskiSum(const Geometry &gA, const Polygon &gB) -> std::unique_ptr<Geometry>
   return result;
 }
 
-} // namespace algorithm
 } // namespace SFCGAL

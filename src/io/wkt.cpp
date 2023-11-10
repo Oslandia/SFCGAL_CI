@@ -11,8 +11,7 @@
 
 using namespace SFCGAL::detail::io;
 
-namespace SFCGAL {
-namespace io {
+namespace SFCGAL::io {
 
 ///
 ///
@@ -36,7 +35,7 @@ readWkt(const std::string &s) -> std::unique_ptr<Geometry>
 
   char extra = 0;
   if (iss >> extra) {
-    std::string remaining(s.substr(int(iss.tellg()) - 1));
+    std::string const remaining(s.substr(int(iss.tellg()) - 1));
     throw WktParseException("Extra characters in WKT: " + remaining);
   }
   return geom;
@@ -54,11 +53,10 @@ readWkt(const char *str, size_t len) -> std::unique_ptr<Geometry>
   std::unique_ptr<Geometry> geom(wktReader.readGeometry());
   char                      extra = 0;
   if (istr >> extra) {
-    std::string remaining(str + int(istr.tellg()) - 1, str + len);
+    std::string const remaining(str + int(istr.tellg()) - 1, str + len);
     throw WktParseException("Extra characters in WKT: " + remaining);
   }
   return geom;
 }
 
-} // namespace io
 } // namespace SFCGAL

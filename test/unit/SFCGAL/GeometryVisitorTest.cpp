@@ -48,53 +48,53 @@ using namespace boost::unit_test ;
 class DemoVisitorGetType : public ConstGeometryVisitor {
 public:
 
-    void visit( const Point& ) override {
+    void visit( const Point&  /*g*/) override {
         type = "Point";
     }
-    void visit( const LineString& ) override {
+    void visit( const LineString&  /*g*/) override {
         type = "LineString";
     }
-    void visit( const Polygon& ) override {
+    void visit( const Polygon&  /*g*/) override {
         type = "Polygon";
     }
-    void visit( const Triangle& ) override {
+    void visit( const Triangle&  /*g*/) override {
         type = "Triangle";
     }
-    void visit( const Solid& ) override {
+    void visit( const Solid&  /*g*/) override {
         type = "Solid";
     }
-    void visit( const MultiPoint& ) override {
+    void visit( const MultiPoint&  /*g*/) override {
         type = "MultiPoint";
     }
-    void visit( const MultiLineString& ) override {
+    void visit( const MultiLineString&  /*g*/) override {
         type = "MultiLineString";
     }
-    void visit( const MultiPolygon& ) override {
+    void visit( const MultiPolygon&  /*g*/) override {
         type = "MultiPolygon";
     }
-    void visit( const MultiSolid& ) override {
+    void visit( const MultiSolid&  /*g*/) override {
         type = "MultiSolid";
     }
 
-    void visit( const GeometryCollection& ) override {
+    void visit( const GeometryCollection&  /*g*/) override {
         type = "GeometryCollection";
     }
 
-    void visit( const PolyhedralSurface& ) override {
+    void visit( const PolyhedralSurface&  /*g*/) override {
         type = "PolyhedralSurface";
     }
 
-    void visit( const TriangulatedSurface& ) override {
+    void visit( const TriangulatedSurface&  /*g*/) override {
         type = "TriangulatedSurface";
     }
 
-public:
+
     std::string type ;
 };
 
 
 template < typename T >
-std::string getTypeWithVisitor()
+auto getTypeWithVisitor() -> std::string
 {
     std::unique_ptr< Geometry > geometry( new T() );
     DemoVisitorGetType visitor;

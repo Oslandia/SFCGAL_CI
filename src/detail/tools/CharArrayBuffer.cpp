@@ -20,7 +20,7 @@ CharArrayBuffer::CharArrayBuffer(const char *str)
 
 auto
 CharArrayBuffer::seekoff(std::streamoff off, std::ios_base::seekdir way,
-                         std::ios_base::openmode) -> std::streampos
+                         std::ios_base::openmode /*__which*/) -> std::streampos
 {
   if (way == std::ios_base::cur) {
     if (current_ + off < end_) {
@@ -40,7 +40,7 @@ CharArrayBuffer::seekoff(std::streamoff off, std::ios_base::seekdir way,
 }
 
 auto
-CharArrayBuffer::seekpos(std::streampos pos, std::ios_base::openmode)
+CharArrayBuffer::seekpos(std::streampos pos, std::ios_base::openmode /*__which*/)
     -> std::streampos
 {
   if (begin_ + pos >= end_) {

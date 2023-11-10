@@ -47,18 +47,18 @@ BOOST_AUTO_TEST_CASE( testEmpty )
 {
     std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((0 0,1 0,1 1,0 1,0 0))" ) );
 
-    tools::Registry& registry = tools::Registry::instance() ;
+    tools::Registry const& registry = tools::Registry::instance() ;
     std::vector< std::string > typeNames = tools::Registry::instance().getGeometryTypes();
 
-    for ( size_t i = 0; i < typeNames.size(); i++ ) {
-        std::unique_ptr< Geometry > g( registry.newGeometryByTypeName( typeNames[i] ) ) ;
+    for (auto & typeName : typeNames) {
+        std::unique_ptr< Geometry > const g( registry.newGeometryByTypeName( typeName ) ) ;
         BOOST_CHECK( algorithm::minkowskiSum( *g, gB->as< Polygon >() )->isEmpty() );
     }
 }
 
 BOOST_AUTO_TEST_CASE( testEmptyPoint )
 {
-    std::unique_ptr< Geometry > gA( io::readWkt( "MULTIPOINT EMPTY" ) );
+    std::unique_ptr< Geometry > const gA( io::readWkt( "MULTIPOINT EMPTY" ) );
     std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((0 0,1 0,1 1,0 1,0 0))" ) );
 
     std::unique_ptr< Geometry > sum( algorithm::minkowskiSum( *gA, gB->as< Polygon >() ) );
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE( testEmptyPoint )
 
 BOOST_AUTO_TEST_CASE( testPoint )
 {
-    std::unique_ptr< Geometry > gA( io::readWkt( "POINT(0 0)" ) );
+    std::unique_ptr< Geometry > const gA( io::readWkt( "POINT(0 0)" ) );
     std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((0 0,1 0,1 1,0 1,0 0))" ) );
 
     std::unique_ptr< Geometry > sum( algorithm::minkowskiSum( *gA, gB->as< Polygon >() ) );
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( testPoint )
 }
 BOOST_AUTO_TEST_CASE( testLineString )
 {
-    std::unique_ptr< Geometry > gA( io::readWkt( "LINESTRING(0 0,5 0)" ) );
+    std::unique_ptr< Geometry > const gA( io::readWkt( "LINESTRING(0 0,5 0)" ) );
     std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((-1 0,0 -1,1 0,0 1,-1 0))" ) );
 
     std::unique_ptr< Geometry > sum( algorithm::minkowskiSum( *gA, gB->as< Polygon >() ) );
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( testLineString )
  */
 BOOST_AUTO_TEST_CASE( testLineString2 )
 {
-    std::unique_ptr< Geometry > gA( io::readWkt( "LINESTRING(0 0,5 0)" ) );
+    std::unique_ptr< Geometry > const gA( io::readWkt( "LINESTRING(0 0,5 0)" ) );
     std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((0 0,1 -1,2 0,1 1,0 0))" ) );
 
     std::unique_ptr< Geometry > sum( algorithm::minkowskiSum( *gA, gB->as< Polygon >() ) );
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE( testLineString2 )
 
 BOOST_AUTO_TEST_CASE( testLineString3 )
 {
-    std::unique_ptr< Geometry > gA( io::readWkt( "LINESTRING(5 5,0 5,5 0,0 0)" ) );
+    std::unique_ptr< Geometry > const gA( io::readWkt( "LINESTRING(5 5,0 5,5 0,0 0)" ) );
     std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((-1 0,0 -1,1 0,0 1,-1 0))" ) );
 
     std::unique_ptr< Geometry > sum( algorithm::minkowskiSum( *gA, gB->as< Polygon >() ) );
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE( testLineString3 )
 
 BOOST_AUTO_TEST_CASE( testPolygonWithHole )
 {
-    std::string wkt = "POLYGON((11.966308 -10.211022,18.007885 1.872133,39.364158 2.434140,53.554839 -6.557975,43.438710 -22.856183,20.396416 -28.476254,5.643728 -25.525717,13.090323 -20.889158,32.479570 -21.310663,38.521147 -15.831093,46.248746 -9.087007,34.446595 -1.359409,22.784946 -14.988082,11.966308 -10.211022),(20.396416 -1.640412,15.900358 -7.260484,18.007885 -9.508513,22.644444 -9.368011,25.173477 -2.342921,20.396416 -1.640412),(41.050179 -0.797401,40.207168 -2.202419,47.934767 -6.557975,48.496774 -5.433961,41.050179 -0.797401))" ;
+    std::string const wkt = "POLYGON((11.966308 -10.211022,18.007885 1.872133,39.364158 2.434140,53.554839 -6.557975,43.438710 -22.856183,20.396416 -28.476254,5.643728 -25.525717,13.090323 -20.889158,32.479570 -21.310663,38.521147 -15.831093,46.248746 -9.087007,34.446595 -1.359409,22.784946 -14.988082,11.966308 -10.211022),(20.396416 -1.640412,15.900358 -7.260484,18.007885 -9.508513,22.644444 -9.368011,25.173477 -2.342921,20.396416 -1.640412),(41.050179 -0.797401,40.207168 -2.202419,47.934767 -6.557975,48.496774 -5.433961,41.050179 -0.797401))" ;
     std::unique_ptr< Geometry > gA( io::readWkt( wkt ) );
 
     std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((-1 0,0 -1,1 0,0 1,-1 0))" ) );
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE( testPolygonWithHole )
 
 BOOST_AUTO_TEST_CASE( testMultiPoint )
 {
-    std::unique_ptr< Geometry > gA( io::readWkt( "MULTIPOINT(0 0,5 5)" ) );
+    std::unique_ptr< Geometry > const gA( io::readWkt( "MULTIPOINT(0 0,5 5)" ) );
     std::unique_ptr< Geometry > gB( io::readWkt( "POLYGON((-1 0,0 -1,1 0,0 1,-1 0))" ) );
 
     std::unique_ptr< Geometry > sum( algorithm::minkowskiSum( *gA, gB->as< Polygon >() ) );

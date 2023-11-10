@@ -64,13 +64,13 @@ BOOST_AUTO_TEST_CASE( addLineString )
     GeometryGraphBuilder graphBuilder( graph );
 
     std::vector< Point > points ;
-    points.push_back( Point( 0.0,0.0,0.0 ) );
-    points.push_back( Point( 1.0,0.0,0.0 ) );
-    points.push_back( Point( 1.0,1.0,0.0 ) );
-    points.push_back( Point( 0.0,1.0,0.0 ) );
-    points.push_back( Point( 0.0,0.0,0.0 ) );
+    points.emplace_back( 0.0,0.0,0.0 );
+    points.emplace_back( 1.0,0.0,0.0 );
+    points.emplace_back( 1.0,1.0,0.0 );
+    points.emplace_back( 0.0,1.0,0.0 );
+    points.emplace_back( 0.0,0.0,0.0 );
 
-    LineString lineString( points );
+    LineString const lineString( points );
     std::vector< edge_descriptor > sharedLineString = graphBuilder.addLineString( lineString );
 
     BOOST_CHECK_EQUAL( graph.numVertices(), 4U );

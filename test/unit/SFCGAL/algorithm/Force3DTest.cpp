@@ -46,13 +46,13 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_Force3DTest )
 
 BOOST_AUTO_TEST_CASE( testIgnoreEmpty )
 {
-    tools::Registry& registry = tools::Registry::instance() ;
+    tools::Registry const& registry = tools::Registry::instance() ;
     std::vector< std::string > typeNames = tools::Registry::instance().getGeometryTypes();
 
-    for ( size_t i = 0; i < typeNames.size(); i++ ) {
-        BOOST_TEST_MESSAGE( typeNames[i] ) ;
+    for (auto & typeName : typeNames) {
+        BOOST_TEST_MESSAGE( typeName ) ;
 
-        std::unique_ptr< Geometry > g( registry.newGeometryByTypeName( typeNames[i] ) ) ;
+        std::unique_ptr< Geometry > g( registry.newGeometryByTypeName( typeName ) ) ;
         BOOST_REQUIRE( g.get() != NULL ) ;
         algorithm::force3D( *g ) ;
         BOOST_CHECK( g->isEmpty() ) ;

@@ -10,7 +10,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-MultiPoint::MultiPoint() : GeometryCollection() {}
+MultiPoint::MultiPoint()  {}
 
 ///
 ///

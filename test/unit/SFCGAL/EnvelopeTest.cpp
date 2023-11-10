@@ -63,23 +63,23 @@ BOOST_AUTO_TEST_CASE( constructorWithTwoCoordinateXY )
 //bool isEmpty() const ;
 BOOST_AUTO_TEST_CASE( testIsEmpty )
 {
-    Envelope box ;
+    Envelope const box ;
     BOOST_CHECK( box.isEmpty() );
 }
 BOOST_AUTO_TEST_CASE( testIsNotEmpty )
 {
-    Envelope box( Coordinate( 0.0,0.0 ) ) ;
+    Envelope const box( Coordinate( 0.0,0.0 ) ) ;
     BOOST_CHECK( ! box.isEmpty() );
 }
 //bool is3D() const ;
 BOOST_AUTO_TEST_CASE( testIs3D )
 {
-    Envelope box( Coordinate( 0.0,0.0,0.0 ) ) ;
+    Envelope const box( Coordinate( 0.0,0.0,0.0 ) ) ;
     BOOST_CHECK( box.is3D() );
 }
 BOOST_AUTO_TEST_CASE( testNotIs3D )
 {
-    Envelope box( Coordinate( 0.0,0.0 ) ) ;
+    Envelope const box( Coordinate( 0.0,0.0 ) ) ;
     BOOST_CHECK( ! box.is3D() );
 }
 //void expandToInclude( const Coordinate & coordinate ) ;
@@ -114,14 +114,14 @@ BOOST_AUTO_TEST_CASE( testExpandToInclude )
 //std::unique_ptr< LineString > toRing() const ;
 BOOST_AUTO_TEST_CASE( testToRing )
 {
-    Envelope box( 0.0,1.0,2.0,3.0 );
+    Envelope const box( 0.0,1.0,2.0,3.0 );
     BOOST_CHECK_EQUAL( box.toRing()->asText( 0 ), "LINESTRING(0 2,1 2,1 3,0 3,0 2)" );
 }
 
 //std::unique_ptr< Polygon >    toPolygon() const ;
 BOOST_AUTO_TEST_CASE( testToPolygon )
 {
-    Envelope box( 0.0,1.0,2.0,3.0,4.0,5.0 );
+    Envelope const box( 0.0,1.0,2.0,3.0,4.0,5.0 );
     BOOST_CHECK_EQUAL( box.toSolid()->asText( 0 ), "SOLID Z((((0 2 4,0 3 4,1 3 4,1 2 4,0 2 4)),((0 2 5,1 2 5,1 3 5,0 3 5,0 2 5)),((0 2 4,1 2 4,1 2 5,0 2 5,0 2 4)),((1 3 4,0 3 4,0 3 5,1 3 5,1 3 4)),((1 2 4,1 3 4,1 3 5,1 2 5,1 2 4)),((0 2 4,0 2 5,0 3 5,0 3 4,0 2 4))))" );
 }
 

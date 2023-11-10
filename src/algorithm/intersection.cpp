@@ -128,13 +128,16 @@ void
 intersection(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
              GeometrySet<Dim> &output)
 {
-  typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles, bhandles;
-  typename SFCGAL::detail::BoxCollection<Dim>::Type    aboxes, bboxes;
+  typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles;
+  typename SFCGAL::detail::HandleCollection<Dim>::Type bhandles;
+  typename SFCGAL::detail::BoxCollection<Dim>::Type    aboxes;
+  typename SFCGAL::detail::BoxCollection<Dim>::Type    bboxes;
   a.computeBoundingBoxes(ahandles, aboxes);
   b.computeBoundingBoxes(bhandles, bboxes);
 
-  GeometrySet<Dim>     temp, temp2;
-  intersection_cb<Dim> cb(temp);
+  GeometrySet<Dim>     temp;
+  GeometrySet<Dim>     temp2;
+  intersection_cb<Dim> const cb(temp);
   CGAL::box_intersection_d(aboxes.begin(), aboxes.end(), bboxes.begin(),
                            bboxes.end(), cb);
 
@@ -150,10 +153,12 @@ intersection<3>(const GeometrySet<3> &a, const GeometrySet<3> &b,
                 GeometrySet<3> &);
 
 auto
-intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
-  GeometrySet<2> gsa(ga), gsb(gb), output;
+  GeometrySet<2> gsa(ga);
+  GeometrySet<2> gsb(gb);
+  GeometrySet<2> output;
   algorithm::intersection(gsa, gsb, output);
 
   GeometrySet<2> filtered;
@@ -172,10 +177,12 @@ intersection(const Geometry &ga, const Geometry &gb)
 }
 
 auto
-intersection3D(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+intersection3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
-  GeometrySet<3> gsa(ga), gsb(gb), output;
+  GeometrySet<3> gsa(ga);
+  GeometrySet<3> gsb(gb);
+  GeometrySet<3> output;
   algorithm::intersection(gsa, gsb, output);
 
   GeometrySet<3> filtered;

@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE( testConvexHull2D_ColinearProduceLineString )
     BOOST_REQUIRE( hull->is< LineString >() );
     BOOST_CHECK_EQUAL( hull->as< LineString >().numPoints(), 2U );
 
-    std::string hullWKT = hull->asText( 1 ) ;
+    std::string const hullWKT = hull->asText( 1 ) ;
     BOOST_CHECK(
         ( hullWKT == "LINESTRING(0.0 0.0,2.0 2.0)" )
         ||  ( hullWKT == "LINESTRING(2.0 2.0,0.0 0.0)" )
@@ -74,12 +74,12 @@ BOOST_AUTO_TEST_CASE( testConvexHull2D_ColinearProduceLineString )
 BOOST_AUTO_TEST_CASE( testConvexHull2D_Triangle )
 {
     std::vector< Point > points ;
-    points.push_back( Point( 0.0,0.0 ) );
-    points.push_back( Point( 0.5,0.5 ) );
-    points.push_back( Point( 1.0,0.0 ) );
-    points.push_back( Point( 0.0,1.0 ) );
+    points.emplace_back( 0.0,0.0 );
+    points.emplace_back( 0.5,0.5 );
+    points.emplace_back( 1.0,0.0 );
+    points.emplace_back( 0.0,1.0 );
 
-    LineString lineString( points ) ;
+    LineString const lineString( points ) ;
     std::unique_ptr< Geometry > hull( algorithm::convexHull( lineString ) );
     BOOST_CHECK( hull->is<Triangle>() );
 }
@@ -87,12 +87,12 @@ BOOST_AUTO_TEST_CASE( testConvexHull2D_Triangle )
 BOOST_AUTO_TEST_CASE( testConvexHull2D_Polygon )
 {
     std::vector< Point > points ;
-    points.push_back( Point( 0.0,0.0 ) );
-    points.push_back( Point( 1.0,0.0 ) );
-    points.push_back( Point( 1.0,1.0 ) );
-    points.push_back( Point( 0.0,1.0 ) );
+    points.emplace_back( 0.0,0.0 );
+    points.emplace_back( 1.0,0.0 );
+    points.emplace_back( 1.0,1.0 );
+    points.emplace_back( 0.0,1.0 );
 
-    LineString lineString( points ) ;
+    LineString const lineString( points ) ;
     std::unique_ptr< Geometry > hull( algorithm::convexHull( lineString ) );
     BOOST_CHECK( hull->is<Polygon>() );
 }
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE( testConvexHull3D_Empty )
 
 BOOST_AUTO_TEST_CASE( testConvexHull3D_Point )
 {
-    Point p( 1.0,2.0,3.0 );
+    Point const p( 1.0,2.0,3.0 );
     std::unique_ptr< Geometry > hull( algorithm::convexHull3D( p ) );
     BOOST_CHECK( hull->is< Point >() );
     BOOST_CHECK_EQUAL( hull->as< Point >().x(), 1.0 ) ;
@@ -127,12 +127,12 @@ BOOST_AUTO_TEST_CASE( testConvexHull3D_Point )
 BOOST_AUTO_TEST_CASE( testConvexHull3D_LineStringCollinear )
 {
     std::vector< Point > points ;
-    points.push_back( Point( 0.0,0.0,0.0 )  );
-    points.push_back( Point( 1.0,1.0,1.0 )  );
-    points.push_back( Point( 2.0,2.0,2.0 )  );
-    points.push_back( Point( 3.0,3.0,3.0 )  );
+    points.emplace_back( 0.0,0.0,0.0  );
+    points.emplace_back( 1.0,1.0,1.0  );
+    points.emplace_back( 2.0,2.0,2.0  );
+    points.emplace_back( 3.0,3.0,3.0  );
 
-    LineString lineString( points ) ;
+    LineString const lineString( points ) ;
     std::unique_ptr< Geometry > hull( algorithm::convexHull3D( lineString ) );
     BOOST_CHECK( hull->is< LineString >() );
 }
@@ -140,12 +140,12 @@ BOOST_AUTO_TEST_CASE( testConvexHull3D_LineStringCollinear )
 BOOST_AUTO_TEST_CASE( testConvexHull3D_LineStringCoplanar )
 {
     std::vector< Point > points ;
-    points.push_back( Point( 0.0,0.0,1.0 )  );
-    points.push_back( Point( 1.0,0.0,1.0 )  );
-    points.push_back( Point( 1.0,1.0,1.0 )  );
-    points.push_back( Point( 0.0,1.0,1.0 )  );
+    points.emplace_back( 0.0,0.0,1.0  );
+    points.emplace_back( 1.0,0.0,1.0  );
+    points.emplace_back( 1.0,1.0,1.0  );
+    points.emplace_back( 0.0,1.0,1.0  );
 
-    LineString lineString( points ) ;
+    LineString const lineString( points ) ;
     std::unique_ptr< Geometry > hull( algorithm::convexHull3D( lineString ) );
     BOOST_CHECK( hull->is< PolyhedralSurface >() );
     BOOST_CHECK_EQUAL( hull->as< PolyhedralSurface >().numPolygons(), 2U );
@@ -157,12 +157,12 @@ BOOST_AUTO_TEST_CASE( testConvexHull3D_LineStringCoplanar )
 BOOST_AUTO_TEST_CASE( testConvexHull3D_Tetrahedron )
 {
     std::vector< Point > points ;
-    points.push_back( Point( 0.0,0.0,0.0 ) );
-    points.push_back( Point( 1.0,0.0,0.0 ) );
-    points.push_back( Point( 0.0,1.0,0.0 ) );
-    points.push_back( Point( 0.0,0.0,1.0 ) );
+    points.emplace_back( 0.0,0.0,0.0 );
+    points.emplace_back( 1.0,0.0,0.0 );
+    points.emplace_back( 0.0,1.0,0.0 );
+    points.emplace_back( 0.0,0.0,1.0 );
 
-    LineString lineString( points ) ;
+    LineString const lineString( points ) ;
     std::unique_ptr< Geometry > hull( algorithm::convexHull3D( lineString ) );
     BOOST_CHECK( hull->is< PolyhedralSurface >() );
     BOOST_CHECK_EQUAL( hull->as< PolyhedralSurface >().numPolygons(), 4U );

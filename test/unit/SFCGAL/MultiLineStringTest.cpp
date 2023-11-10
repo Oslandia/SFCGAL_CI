@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_MultiLineStringTest )
 
 BOOST_AUTO_TEST_CASE( defaultConstructor )
 {
-    MultiLineString g;
+    MultiLineString const g;
     BOOST_CHECK( g.isEmpty() ) ;
     BOOST_CHECK( ! g.is3D() );
     BOOST_CHECK_EQUAL( g.numGeometries(), 0U );
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE( addLineStringThrow )
 
 BOOST_AUTO_TEST_CASE( asTextEmpty )
 {
-    MultiLineString g;
+    MultiLineString const g;
     BOOST_CHECK_EQUAL( g.asText( 1 ), "MULTILINESTRING EMPTY" );
 }
 
@@ -72,13 +72,13 @@ BOOST_AUTO_TEST_CASE( asText2d )
 
 BOOST_AUTO_TEST_CASE( isGeometryCollection )
 {
-    MultiLineString g;
+    MultiLineString const g;
     BOOST_CHECK( g.is< GeometryCollection >() );
 }
 
 BOOST_AUTO_TEST_CASE( isMultiLineString )
 {
-    MultiLineString g;
+    MultiLineString const g;
     BOOST_CHECK( g.is< MultiLineString >() );
 }
 

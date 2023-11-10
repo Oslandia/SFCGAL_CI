@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_PolygonTest )
 //Polygon() ;
 BOOST_AUTO_TEST_CASE( defaultConstructor )
 {
-    Polygon g;
+    Polygon const g;
     BOOST_CHECK( g.isEmpty() );
     BOOST_CHECK( ! g.is3D() );
     BOOST_CHECK_EQUAL( g.numInteriorRings(), 0U );
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE( testClone )
     exteriorRing.addPoint( Point( 0.0,1.0 ) );
     exteriorRing.addPoint( Point( 0.0,0.0 ) );
 
-    Polygon g( exteriorRing );
+    Polygon const g( exteriorRing );
     std::unique_ptr< Polygon > copy( g.clone() );
 
     BOOST_CHECK( ! copy->isEmpty() );
@@ -170,14 +170,14 @@ BOOST_AUTO_TEST_CASE( testBoundaryEmpty )
 }
 BOOST_AUTO_TEST_CASE( testBoundaryWithoutHoles )
 {
-    std::string wkt( "POLYGON((0 0,0 1,1 1,0 0))" ) ;
+    std::string const wkt( "POLYGON((0 0,0 1,1 1,0 0))" ) ;
     std::unique_ptr< Geometry > boundary( io::readWkt( wkt )->boundary() );
     BOOST_CHECK( ! boundary->isEmpty() );
     BOOST_CHECK_EQUAL( boundary->asText( 0 ), "LINESTRING(0 0,0 1,1 1,0 0)" );
 }
 BOOST_AUTO_TEST_CASE( testBoundaryWithHoles )
 {
-    std::string wkt( "POLYGON((0 0,0 5,5 5,0 5,0 0),(1 1,2 1,2 2,1 1))" ) ;
+    std::string const wkt( "POLYGON((0 0,0 5,5 5,0 5,0 0),(1 1,2 1,2 2,1 1))" ) ;
     std::unique_ptr< Geometry > boundary( io::readWkt( wkt )->boundary() );
     BOOST_CHECK( ! boundary->isEmpty() );
     BOOST_CHECK_EQUAL( boundary->asText( 0 ), "MULTILINESTRING((0 0,0 5,5 5,0 5,0 0),(1 1,2 1,2 2,1 1))" );
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE( testBoundaryWithHoles )
 //std::string          Geometry::asText( const int & numDecimals = -1 ) const ;
 BOOST_AUTO_TEST_CASE( asTextEmpty )
 {
-    Polygon g;
+    Polygon const g;
     BOOST_CHECK_EQUAL( g.asText( 1 ), "POLYGON EMPTY" );
 }
 BOOST_AUTO_TEST_CASE( asText2d )
@@ -216,19 +216,19 @@ BOOST_AUTO_TEST_CASE( asText3d )
 //virtual std::string  Geometry::geometryType() const = 0 ;
 BOOST_AUTO_TEST_CASE( testGeometryType )
 {
-    Polygon g;
+    Polygon const g;
     BOOST_CHECK_EQUAL( g.geometryType(), "Polygon" );
 }
 //virtual GeometryType Geometry::geometryTypeId() const = 0 ;
 BOOST_AUTO_TEST_CASE( testGeometryTypeId )
 {
-    Polygon g;
+    Polygon const g;
     BOOST_CHECK_EQUAL( g.geometryTypeId(), TYPE_POLYGON );
 }
 //virtual int          Geometry::dimension() const = 0 ;
 BOOST_AUTO_TEST_CASE( testDimension )
 {
-    Polygon g;
+    Polygon const g;
     BOOST_CHECK_EQUAL( g.dimension(), 2 );
 }
 //virtual int          Geometry::coordinateDimension() const = 0 ;
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE( testDimension )
 //template < typename Derived > inline bool Geometry::is() const
 BOOST_AUTO_TEST_CASE( isPolygon )
 {
-    Polygon g;
+    Polygon const g;
     BOOST_CHECK( g.is< Polygon >() );
 }
 //template < typename Derived > inline const Derived &  Geometry::as() const

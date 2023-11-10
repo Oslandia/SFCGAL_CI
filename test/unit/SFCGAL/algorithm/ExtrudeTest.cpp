@@ -34,7 +34,6 @@
 #include <SFCGAL/io/wkt.h>
 #include <SFCGAL/algorithm/extrude.h>
 #include <SFCGAL/detail/transform/ForceZ.h>
-#include <SFCGAL/io/wkt.h>
 
 using namespace SFCGAL ;
 
@@ -46,7 +45,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_ExtrudeTest )
 
 BOOST_AUTO_TEST_CASE( testExtrudePoint )
 {
-    Point g( 0.0,0.0,0.0 );
+    Point const g( 0.0,0.0,0.0 );
     std::unique_ptr< Geometry > ext( algorithm::extrude( g, 0.0, 0.0, 1.0 ) );
     BOOST_CHECK( ext->is< LineString >() );
     BOOST_CHECK( ext->as< LineString >().is3D() );
@@ -56,7 +55,7 @@ BOOST_AUTO_TEST_CASE( testExtrudePoint )
 
 BOOST_AUTO_TEST_CASE( testExtrudeLineString )
 {
-    LineString g(
+    LineString const g(
         Point( 0.0,0.0,0.0 ),
         Point( 1.0,0.0,0.0 )
     );
@@ -71,14 +70,14 @@ BOOST_AUTO_TEST_CASE( testExtrudeLineString )
 BOOST_AUTO_TEST_CASE( testExtrudeSquare )
 {
     std::vector< Point > points;
-    points.push_back( Point( 0.0,0.0,0.0 ) );
-    points.push_back( Point( 1.0,0.0,0.0 ) );
-    points.push_back( Point( 1.0,1.0,0.0 ) );
-    points.push_back( Point( 0.0,1.0,0.0 ) );
-    points.push_back( Point( 0.0,0.0,0.0 ) );
+    points.emplace_back( 0.0,0.0,0.0 );
+    points.emplace_back( 1.0,0.0,0.0 );
+    points.emplace_back( 1.0,1.0,0.0 );
+    points.emplace_back( 0.0,1.0,0.0 );
+    points.emplace_back( 0.0,0.0,0.0 );
 
-    LineString exteriorRing( points ) ;
-    Polygon g( exteriorRing );
+    LineString const exteriorRing( points ) ;
+    Polygon const g( exteriorRing );
     std::unique_ptr< Geometry > ext( algorithm::extrude( g, 0.0, 0.0, 1.0 ) );
     BOOST_CHECK( ext->is< Solid >() );
     BOOST_CHECK_EQUAL( ext->as< Solid >().numShells(), 1U );
@@ -87,7 +86,7 @@ BOOST_AUTO_TEST_CASE( testExtrudeSquare )
 
 BOOST_AUTO_TEST_CASE( testExtrudePolyhedral )
 {
-    std::unique_ptr<Geometry> g = io::readWkt( "POLYHEDRALSURFACE(((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)))" );
+    std::unique_ptr<Geometry> const g = io::readWkt( "POLYHEDRALSURFACE(((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)))" );
 
     std::unique_ptr< Geometry > ext = algorithm::extrude( *g, 0.0, 0.0, 1.0 );
     BOOST_CHECK( ext->is< Solid >() );
@@ -97,23 +96,23 @@ BOOST_AUTO_TEST_CASE( testExtrudePolyhedral )
 BOOST_AUTO_TEST_CASE( testExtrudeMultiPolygon )
 {
     std::vector< Point > points;
-    points.push_back( Point( 0.0,0.0,0.0 ) );
-    points.push_back( Point( 1.0,0.0,0.0 ) );
-    points.push_back( Point( 1.0,1.0,0.0 ) );
-    points.push_back( Point( 0.0,1.0,0.0 ) );
-    points.push_back( Point( 0.0,0.0,0.0 ) );
+    points.emplace_back( 0.0,0.0,0.0 );
+    points.emplace_back( 1.0,0.0,0.0 );
+    points.emplace_back( 1.0,1.0,0.0 );
+    points.emplace_back( 0.0,1.0,0.0 );
+    points.emplace_back( 0.0,0.0,0.0 );
 
     std::vector< Point > points2;
-    points2.push_back( Point( 2.0,0.0,0.0 ) );
-    points2.push_back( Point( 3.0,0.0,0.0 ) );
-    points2.push_back( Point( 3.0,1.0,0.0 ) );
-    points2.push_back( Point( 2.0,1.0,0.0 ) );
-    points2.push_back( Point( 2.0,0.0,0.0 ) );
+    points2.emplace_back( 2.0,0.0,0.0 );
+    points2.emplace_back( 3.0,0.0,0.0 );
+    points2.emplace_back( 3.0,1.0,0.0 );
+    points2.emplace_back( 2.0,1.0,0.0 );
+    points2.emplace_back( 2.0,0.0,0.0 );
 
-    LineString exteriorRing( points ) ;
-    LineString exteriorRing2( points2 ) ;
-    Polygon g1( exteriorRing );
-    Polygon g2( exteriorRing2 );
+    LineString const exteriorRing( points ) ;
+    LineString const exteriorRing2( points2 ) ;
+    Polygon const g1( exteriorRing );
+    Polygon const g2( exteriorRing2 );
     MultiPolygon mp;
     mp.addGeometry( g1 );
     mp.addGeometry( g2 );
@@ -129,27 +128,27 @@ BOOST_AUTO_TEST_CASE( testExtrudeSquareWithHole )
     std::vector< LineString > rings;
     {
         std::vector< Point > points;
-        points.push_back( Point( 0.0,0.0,0.0 ) );
-        points.push_back( Point( 1.0,0.0,0.0 ) );
-        points.push_back( Point( 1.0,1.0,0.0 ) );
-        points.push_back( Point( 0.0,1.0,0.0 ) );
-        points.push_back( Point( 0.0,0.0,0.0 ) );
-        rings.push_back( LineString( points ) );
+        points.emplace_back( 0.0,0.0,0.0 );
+        points.emplace_back( 1.0,0.0,0.0 );
+        points.emplace_back( 1.0,1.0,0.0 );
+        points.emplace_back( 0.0,1.0,0.0 );
+        points.emplace_back( 0.0,0.0,0.0 );
+        rings.emplace_back( points );
     }
     {
         std::vector< Point > points;
-        points.push_back( Point( 0.2,0.2,0.0 ) );
-        points.push_back( Point( 0.8,0.2,0.0 ) );
-        points.push_back( Point( 0.8,0.8,0.0 ) );
-        points.push_back( Point( 0.2,0.8,0.0 ) );
-        points.push_back( Point( 0.2,0.2,0.0 ) );
+        points.emplace_back( 0.2,0.2,0.0 );
+        points.emplace_back( 0.8,0.2,0.0 );
+        points.emplace_back( 0.8,0.8,0.0 );
+        points.emplace_back( 0.2,0.8,0.0 );
+        points.emplace_back( 0.2,0.2,0.0 );
 
         std::reverse( points.begin(), points.end() );
 
-        rings.push_back( LineString( points ) );
+        rings.emplace_back( points );
     }
 
-    Polygon g( rings );
+    Polygon const g( rings );
     std::unique_ptr< Geometry > ext( algorithm::extrude( g, 0.0, 0.0, 1.0 ) );
     BOOST_CHECK( ext->is< Solid >() );
     BOOST_CHECK_EQUAL( ext->as< Solid >().numShells(), 1U );

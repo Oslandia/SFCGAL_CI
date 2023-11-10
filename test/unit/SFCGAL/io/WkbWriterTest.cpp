@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(PostgisEWkb)
   while (std::getline(ifs, inputWkb)) {
     std::getline(efs, expectedWkt);
     std::unique_ptr<Geometry>         gWkt(io::readWkt(expectedWkt));
-    std::string                       ewkt = "SRID=3946;" + expectedWkt;
+    std::string                       const ewkt = "SRID=3946;" + expectedWkt;
     std::unique_ptr<PreparedGeometry> gEwkt(io::readEwkt(ewkt));
     if (!(expectedWkt.find("EMPTY") != std::string::npos) &&
         !inputWkb.empty()) {

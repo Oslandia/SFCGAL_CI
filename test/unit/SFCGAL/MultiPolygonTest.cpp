@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_MultiPolygonTest )
 
 BOOST_AUTO_TEST_CASE( defaultConstructor )
 {
-    MultiPolygon g;
+    MultiPolygon const g;
     BOOST_CHECK( g.isEmpty() ) ;
     BOOST_CHECK( ! g.is3D() );
     BOOST_CHECK_EQUAL( g.numGeometries(), 0U );
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE( defaultConstructor )
 
 BOOST_AUTO_TEST_CASE( testGeometryTypeId )
 {
-    MultiPolygon g;
+    MultiPolygon const g;
     BOOST_CHECK_EQUAL( g.geometryTypeId(), TYPE_MULTIPOLYGON );
 }
 
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE( addLineStringThrow )
 
 BOOST_AUTO_TEST_CASE( asTextEmpty )
 {
-    MultiPolygon g;
+    MultiPolygon const g;
     BOOST_CHECK_EQUAL( g.asText( 1 ), "MULTIPOLYGON EMPTY" );
 }
 BOOST_AUTO_TEST_CASE( asText2d )
@@ -78,13 +78,13 @@ BOOST_AUTO_TEST_CASE( asText2d )
 
 BOOST_AUTO_TEST_CASE( isGeometryCollection )
 {
-    MultiPolygon g;
+    MultiPolygon const g;
     BOOST_CHECK( g.is< GeometryCollection >() );
 }
 
 BOOST_AUTO_TEST_CASE( isMultiPolygon )
 {
-    MultiPolygon g;
+    MultiPolygon const g;
     BOOST_CHECK( g.is< MultiPolygon >() );
 }
 

@@ -10,13 +10,13 @@ namespace SFCGAL {
 ///
 ///
 ///
-TriangulatedSurface::TriangulatedSurface() : Surface(), _triangles() {}
+TriangulatedSurface::TriangulatedSurface()  {}
 
 ///
 ///
 ///
 TriangulatedSurface::TriangulatedSurface(const std::vector<Triangle> &triangles)
-    : Surface()
+     
 {
   for (const auto &triangle : triangles) {
     _triangles.push_back(triangle.clone());
@@ -91,9 +91,8 @@ TriangulatedSurface::coordinateDimension() const -> int
 {
   if (_triangles.empty()) {
     return 0;
-  } else {
-    return _triangles[0].coordinateDimension();
-  }
+  }     return _triangles[0].coordinateDimension();
+ 
 }
 
 ///
@@ -219,7 +218,7 @@ public:
     // thanks to a binary tree (PointMap)
     for (size_t i = 0; i < surf.numGeometries(); i++) {
       for (size_t j = 0; j < 3; j++) {
-        Point p = surf.geometryN(i).vertex(j).toPoint_3();
+        Point const p = surf.geometryN(i).vertex(j).toPoint_3();
 
         if (points.find(p) == points.end()) {
           B.add_vertex(p);
@@ -237,10 +236,10 @@ public:
 
     for (size_t i = 0; i < surf.numGeometries(); i++) {
       B.begin_facet();
-      CGAL::Triangle_3<K> tri(surf.geometryN(i).toTriangle_3());
-      CGAL::Point_3<K>    pa(tri[0]);
-      CGAL::Point_3<K>    pb(tri[1]);
-      CGAL::Point_3<K>    pc(tri[2]);
+      CGAL::Triangle_3<K> const tri(surf.geometryN(i).toTriangle_3());
+      CGAL::Point_3<K>    const pa(tri[0]);
+      CGAL::Point_3<K>    const pb(tri[1]);
+      CGAL::Point_3<K>    const pc(tri[2]);
 
       if (edges.find(std::make_pair(pa, pb)) != edges.end() ||
           edges.find(std::make_pair(pb, pc)) != edges.end() ||
@@ -275,7 +274,7 @@ struct Plane_from_facet {
   auto
   operator()(typename Polyhedron::Facet &f) -> typename Polyhedron::Plane_3
   {
-    typename Polyhedron::Halfedge_handle h = f.halfedge();
+    typename Polyhedron::Halfedge_handle const h = f.halfedge();
     return typename Polyhedron::Plane_3(h->vertex()->point(),
                                         h->next()->vertex()->point(),
                                         h->opposite()->vertex()->point());

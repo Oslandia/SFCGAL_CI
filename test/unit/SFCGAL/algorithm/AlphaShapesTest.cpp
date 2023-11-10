@@ -47,14 +47,14 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_AlphaShapesTest)
 
 BOOST_AUTO_TEST_CASE(testAlphaShapes2D_ComputeAlpha) {
   std::vector<Point> points;
-  points.push_back(Point(0.0, 0.0));
-  points.push_back(Point(1.0, 0.0));
-  points.push_back(Point(1.0, 1.0));
-  points.push_back(Point(0.0, 1.0));
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(1.0, 0.0);
+  points.emplace_back(1.0, 1.0);
+  points.emplace_back(0.0, 1.0);
 
-  LineString lineString(points);
-  size_t nb_comp = 3;
-  std::unique_ptr<Geometry> alphaShapes(
+  LineString const lineString(points);
+  size_t const nb_comp = 3;
+  std::unique_ptr<Geometry> const alphaShapes(
       algorithm::optimal_alpha_shapes(lineString, false, nb_comp));
 }
 
@@ -78,30 +78,30 @@ BOOST_AUTO_TEST_CASE(testAlphaShapes2D_ColinearProduceEmpty) {
 
 BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Triangle) {
   std::vector<Point> points;
-  points.push_back(Point(0.0, 0.0));
-  points.push_back(Point(0.5, 0.5));
-  points.push_back(Point(1.0, 0.0));
-  points.push_back(Point(0.0, 1.0));
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(0.5, 0.5);
+  points.emplace_back(1.0, 0.0);
+  points.emplace_back(0.0, 1.0);
 
-  LineString lineString(points);
+  LineString const lineString(points);
   std::unique_ptr<Geometry> alphaShapes(algorithm::alphaShapes(lineString));
   BOOST_CHECK(alphaShapes->is<Polygon>());
-  std::string expectedWkt =
+  std::string const expectedWkt =
       "POLYGON((0.0 0.0,0.0 1.0,0.5 0.5,1.0 0.0,0.0 0.0))";
   BOOST_CHECK_EQUAL(alphaShapes->asText(1), expectedWkt);
 }
 
 BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Polygon) {
   std::vector<Point> points;
-  points.push_back(Point(0.0, 0.0));
-  points.push_back(Point(1.0, 0.0));
-  points.push_back(Point(1.0, 1.0));
-  points.push_back(Point(0.0, 1.0));
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(1.0, 0.0);
+  points.emplace_back(1.0, 1.0);
+  points.emplace_back(0.0, 1.0);
 
-  LineString lineString(points);
+  LineString const lineString(points);
   std::unique_ptr<Geometry> alphaShapes(algorithm::alphaShapes(lineString));
   BOOST_CHECK(alphaShapes->is<Polygon>());
-  std::string expectedWkt =
+  std::string const expectedWkt =
       "POLYGON((0.0 0.0,0.0 1.0,1.0 1.0,1.0 0.0,0.0 0.0))";
   BOOST_CHECK_EQUAL(alphaShapes->asText(1), expectedWkt);
 }

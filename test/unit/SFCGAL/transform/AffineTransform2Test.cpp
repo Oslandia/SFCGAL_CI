@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE( simpleTranslate )
 {
     LineString g( Point( 0.0,0.0 ), Point( 1.0,1.0 ) ) ;
 
-    CGAL::Aff_transformation_2< Kernel > affine(
+    CGAL::Aff_transformation_2< Kernel > const affine(
         CGAL::TRANSLATION,
         CGAL::Vector_2< Kernel >( 1.0,2.0 )
     );

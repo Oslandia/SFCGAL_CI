@@ -19,8 +19,7 @@
 #include <list>
 #include <vector>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 using Traits     = CGAL::Partition_traits_2<Kernel>;
 using TPoint_2   = Traits::Point_2;
@@ -44,12 +43,12 @@ toTPolygon_2(const Polygon &poly) -> CGAL::Partition_traits_2<Kernel>::Polygon_2
        pit != pend; ++pit) {
     if (pit == poly.exteriorRing().begin()) {
       lastP = *pit;
-      TPoint_2 point2(pit->coordinate().x(), pit->coordinate().y());
+      TPoint_2 const point2(pit->coordinate().x(), pit->coordinate().y());
       points.push_back(point2);
     }
 
     if (lastP != *pit) {
-      TPoint_2 point2(pit->coordinate().x(), pit->coordinate().y());
+      TPoint_2 const point2(pit->coordinate().x(), pit->coordinate().y());
       points.push_back(point2);
     }
 
@@ -66,12 +65,12 @@ polygons_to_geometry(const std::list<TPolygon_2> &polys)
     -> std::unique_ptr<Geometry>
 {
 
-  GeometryCollection *geoms = new GeometryCollection;
+  auto *geoms = new GeometryCollection;
 
   std::list<TPolygon_2>::const_iterator poly_it;
   for (poly_it = polys.begin(); poly_it != polys.end(); ++poly_it) {
     auto *poly = new Polygon;
-    for (TPoint_2 p : poly_it->container()) {
+    for (const TPoint_2& const p : poly_it->container()) {
       poly->exteriorRing().addPoint(p);
     }
     poly->exteriorRing().addPoint(*(poly_it->vertices_begin()));
@@ -120,5 +119,4 @@ partition_2(const Geometry &g, PartitionAlgorithm alg)
   return polygons_to_geometry(partition_polys);
 }
 
-} // namespace algorithm
 } // namespace SFCGAL

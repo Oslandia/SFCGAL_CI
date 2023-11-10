@@ -47,19 +47,19 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_OffsetTest)
 
 BOOST_AUTO_TEST_CASE(testEmpty)
 {
-  tools::Registry         &registry = tools::Registry::instance();
-  std::vector<std::string> typeNames =
+  tools::Registry          const&registry = tools::Registry::instance();
+  std::vector<std::string> const typeNames =
       tools::Registry::instance().getGeometryTypes();
 
   for (auto &typeName : typeNames) {
-    std::unique_ptr<Geometry> g(registry.newGeometryByTypeName(typeName));
+    std::unique_ptr<Geometry> const g(registry.newGeometryByTypeName(typeName));
     BOOST_CHECK(algorithm::offset(*g, 1.0)->isEmpty());
   }
 }
 
 BOOST_AUTO_TEST_CASE(testSimple)
 {
-  std::unique_ptr<Geometry> gA(
+  std::unique_ptr<Geometry> const gA(
       io::readWkt("POLYGON((0 0,10 0,10 10,0 10,0 0))"));
 
   std::unique_ptr<MultiPolygon> result(algorithm::offset(*gA, 1.0));
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(testSimple)
 
 BOOST_AUTO_TEST_CASE(testHoles)
 {
-  std::unique_ptr<Geometry> gA(
+  std::unique_ptr<Geometry> const gA(
       io::readWkt("POLYGON((13.652901 8.978070,13.921068 13.219992,20.454603 "
                   "13.268750,18.967492 11.001516,16.432091 11.220926,15.091253 "
                   "13.024961,14.481782 11.976670,14.676813 10.708970,15.798240 "
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(testHoles)
 
 BOOST_AUTO_TEST_CASE(testPoint)
 {
-  std::unique_ptr<Geometry>     gA(io::readWkt("POINT(1 1)"));
+  std::unique_ptr<Geometry>     const gA(io::readWkt("POINT(1 1)"));
   std::unique_ptr<MultiPolygon> result(algorithm::offset(*gA, 1.0));
   BOOST_CHECK_EQUAL(
       result->asText(2),
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(testPoint)
 
 BOOST_AUTO_TEST_CASE(testLineString)
 {
-  std::unique_ptr<Geometry> gA(
+  std::unique_ptr<Geometry> const gA(
       io::readWkt("LINESTRING(13.652901 8.978070,13.921068 13.219992,20.454603 "
                   "13.268750,18.967492 11.001516,16.432091 11.220926,15.091253 "
                   "13.024961,14.481782 11.976670,14.676813 10.708970,15.798240 "
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(testLineString)
                   "10.952758,17.431624 11.001516,18.162990 10.099498,18.138611 "
                   "8.368599,14.774328 9.416890,14.530540 8.929313,13.945447 "
                   "8.441735,13.652901 8.978070)"));
-  std::unique_ptr<MultiPolygon> result(algorithm::offset(*gA, 0.5));
+  std::unique_ptr<MultiPolygon> const result(algorithm::offset(*gA, 0.5));
   //	BOOST_CHECK_EQUAL( result->asText(7),
   //"MULTIPOLYGON(((20.9546030 13.2687500,20.8916366 13.5116525,20.8286702 13.6005236,20.7657038
   // 13.6601785,20.7027374 13.7028345,20.6397710 13.7331989,20.5768046 13.7535869,20.5138382
@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(testLineString)
 
 BOOST_AUTO_TEST_CASE(testPolygonWithHoles)
 {
-  std::unique_ptr<Geometry>     gA(io::readWkt(
+  std::unique_ptr<Geometry>     const gA(io::readWkt(
           "POLYGON((11.966308 -10.211022,18.007885 1.872133,39.364158 "
               "2.434140,53.554839 -6.557975,43.438710 -22.856183,20.396416 "
               "-28.476254,5.643728 -25.525717,13.090323 -20.889158,32.479570 "
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE(testPolygonWithHoles)
               "-9.368011,25.173477 -2.342921,20.396416 -1.640412),(41.050179 "
               "-0.797401,40.207168 -2.202419,47.934767 -6.557975,48.496774 "
               "-5.433961,41.050179 -0.797401))"));
-  std::unique_ptr<MultiPolygon> result(algorithm::offset(*gA, 0.5));
+  std::unique_ptr<MultiPolygon> const result(algorithm::offset(*gA, 0.5));
 
   // @todo works in Release, not in Debug... Something strange with holes?
   // BOOST_CHECK_EQUAL(result->asText(),
@@ -433,11 +433,11 @@ BOOST_AUTO_TEST_CASE(testPolygonWithHoles)
 
 BOOST_AUTO_TEST_CASE(testMultiPoint)
 {
-  std::unique_ptr<Geometry> gA(
+  std::unique_ptr<Geometry> const gA(
       io::readWkt("MULTIPOINT(2 0,1 1,0 2,-1 1,-2 0,-1 -1,0 -2,1 -1)"));
-  std::unique_ptr<Geometry> result(
+  std::unique_ptr<Geometry> const result(
       io::readWkt(algorithm::offset(*gA, 1.0)->asText(7)));
-  std::unique_ptr<Geometry> expected(io::readWkt(
+  std::unique_ptr<Geometry> const expected(io::readWkt(
       "MULTIPOLYGON(((3.0000000 0.0000000,2.8750000 0.4841229,2.7500000 "
       "0.6614378,2.6250000 0.7806247,2.5000000 0.8660254,2.3750000 "
       "0.9270248,2.2500000 0.9682458,2.1250000 0.9921567,2.0000000 "
@@ -483,10 +483,10 @@ BOOST_AUTO_TEST_CASE(testMultiPoint)
 
 BOOST_AUTO_TEST_CASE(testMultiLineString)
 {
-  std::unique_ptr<Geometry> gA(
+  std::unique_ptr<Geometry> const gA(
       io::readWkt("MULTILINESTRING((0.0 0.0,1.0 0.0),(2.0 2.0,3.0 2.0))"));
   std::unique_ptr<Geometry> result{algorithm::offset(*gA, 1.0)};
-  std::unique_ptr<Geometry> expected{io::readWkt(
+  std::unique_ptr<Geometry> const expected{io::readWkt(
       "MULTIPOLYGON(((2/1 0/1,15/8 4360591588697965/9007199254740992,7/4 "
       "2978851154656373/4503599627370496,13/8 "
       "3515621332314565/4503599627370496,3/2 "
@@ -549,10 +549,10 @@ BOOST_AUTO_TEST_CASE(testMultiLineString)
 
 BOOST_AUTO_TEST_CASE(testMultiPolygon)
 {
-  std::unique_ptr<Geometry> gA(
+  std::unique_ptr<Geometry> const gA(
       io::readWkt("MULTIPOLYGON(((0 0,1 0,1 1,0 0)),((2 1,2 0,3 0,2 1)))"));
   std::unique_ptr<Geometry> result{algorithm::offset(*gA, 1.0)};
-  std::unique_ptr<Geometry> expected{io::readWkt(
+  std::unique_ptr<Geometry> const expected{io::readWkt(
       "MULTIPOLYGON(((-3184560061929027/4503599627370496 "
       "1592245805114451/2251799813685248,-6698880015218421/9007199254740992 "
       "1505295754916495/2251799813685248,-1757159976644697/2251799813685248 "
@@ -626,11 +626,11 @@ BOOST_AUTO_TEST_CASE(testMultiPolygon)
 
 BOOST_AUTO_TEST_CASE(testGeometryCollection)
 {
-  std::unique_ptr<Geometry> gA(
+  std::unique_ptr<Geometry> const gA(
       io::readWkt("GEOMETRYCOLLECTION(POINT(0 0),LINESTRING(1 1,2 2))"));
-  std::unique_ptr<Geometry> result(
+  std::unique_ptr<Geometry> const result(
       io::readWkt(algorithm::offset(*gA, 1.0)->asText(2)));
-  std::unique_ptr<Geometry> expected(io::readWkt(
+  std::unique_ptr<Geometry> const expected(io::readWkt(
       "MULTIPOLYGON(((-0.00 1.00,-0.12 0.99,-0.25 0.97,-0.38 0.93,-0.50 "
       "0.87,-0.62 0.78,-0.75 0.66,-0.88 0.48,-1.00 0.00,-0.75 -0.66,-0.50 "
       "-0.87,-0.25 -0.97,0.00 -1.00,0.25 -0.97,0.50 -0.87,0.75 -0.66,1.00 "

@@ -8,8 +8,7 @@
 
 #include <utility>
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 ///
 ///
@@ -28,11 +27,11 @@ AffineTransform2::transform(Point &p)
   if (!p.isEmpty()) {
     // FIXME add a Point::Point( Kernel::Point_2&, double m );
     Point pt(p.toPoint_2().transform(_transform));
-    if (p.isMeasured())
+    if (p.isMeasured()) {
       pt.setM(p.m());
+}
     p = pt;
   }
 }
 
-} // namespace transform
 } // namespace SFCGAL

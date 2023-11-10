@@ -27,8 +27,7 @@
 #include <SFCGAL/Exception.h>
 #include <boost/format.hpp>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 using Point_2    = CGAL::Point_2<SFCGAL::Kernel>;
 using Triangle_2 = CGAL::Triangle_2<SFCGAL::Kernel>;
@@ -42,7 +41,7 @@ using Plane_3    = CGAL::Plane_3<SFCGAL::Kernel>;
 ///
 ///
 auto
-area(const Geometry &g, NoValidityCheck) -> double
+area(const Geometry &g, NoValidityCheck /*unused*/) -> double
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
@@ -92,7 +91,7 @@ area(const Geometry &g) -> double
 auto
 signedArea(const Triangle &g) -> Kernel::FT
 {
-  Triangle_2 triangle = g.toTriangle_2();
+  Triangle_2 const triangle = g.toTriangle_2();
   return triangle.area();
 }
 
@@ -123,7 +122,7 @@ area(const Polygon &g) -> double
   Kernel::RT result = 0.0;
 
   for (size_t i = 0; i < g.numRings(); i++) {
-    Kernel::FT ringArea = CGAL::abs(signedArea(g.ringN(i)));
+    Kernel::FT const ringArea = CGAL::abs(signedArea(g.ringN(i)));
 
     if (i == 0) {
       // exterior ring
@@ -190,7 +189,7 @@ area(const PolyhedralSurface &g) -> double
 ///
 ///
 auto
-area3D(const Geometry &g, NoValidityCheck) -> double
+area3D(const Geometry &g, NoValidityCheck /*unused*/) -> double
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
@@ -241,7 +240,9 @@ area3D(const Polygon &g) -> double
     return result;
   }
 
-  CGAL::Point_3<Kernel> a, b, c;
+  CGAL::Point_3<Kernel> a;
+  CGAL::Point_3<Kernel> b;
+  CGAL::Point_3<Kernel> c;
   algorithm::plane3D<Kernel>(g, a, b, c);
 
   /*
@@ -255,7 +256,7 @@ area3D(const Polygon &g) -> double
   CGAL::Vector_3<Kernel> uz = CGAL::cross_product(ux, a - b);
   ux = ux / CGAL::sqrt(CGAL::to_double(ux.squared_length()));
   uz = uz / CGAL::sqrt(CGAL::to_double(uz.squared_length()));
-  CGAL::Vector_3<Kernel> uy = CGAL::cross_product(uz, ux);
+  CGAL::Vector_3<Kernel> const uy = CGAL::cross_product(uz, ux);
 
   /*
    * compute the area for each ring in the local basis
@@ -266,8 +267,8 @@ area3D(const Polygon &g) -> double
     CGAL::Polygon_2<Kernel> projectedPolygon;
 
     for (size_t j = 0; j < ring.numPoints() - 1; j++) {
-      CGAL::Point_3<Kernel> point = ring.pointN(j).toPoint_3();
-      CGAL::Point_2<Kernel> projectedPoint((point - b) * ux, (point - b) * uy);
+      CGAL::Point_3<Kernel> const point = ring.pointN(j).toPoint_3();
+      CGAL::Point_2<Kernel> const projectedPoint((point - b) * ux, (point - b) * uy);
       projectedPolygon.push_back(projectedPoint);
     }
 
@@ -289,7 +290,7 @@ area3D(const Polygon &g) -> double
 auto
 area3D(const Triangle &g) -> double
 {
-  CGAL::Triangle_3<Kernel> triangle(g.vertex(0).toPoint_3(),
+  CGAL::Triangle_3<Kernel> const triangle(g.vertex(0).toPoint_3(),
                                     g.vertex(1).toPoint_3(),
                                     g.vertex(2).toPoint_3());
   return sqrt(CGAL::to_double(triangle.squared_area()));
@@ -340,5 +341,4 @@ area3D(const TriangulatedSurface &g) -> double
   return result;
 }
 
-} // namespace algorithm
 } // namespace SFCGAL

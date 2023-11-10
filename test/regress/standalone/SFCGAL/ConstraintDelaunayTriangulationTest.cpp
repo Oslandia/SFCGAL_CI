@@ -58,7 +58,9 @@ BOOST_AUTO_TEST_CASE( testTriangulateRGC )
     std::ifstream ifs( filename.c_str() );
     BOOST_REQUIRE( ifs.good() ) ;
 
-    double x = NAN,y = NAN,z = NAN ;
+    double x = NAN;
+    double y = NAN;
+    double z = NAN ;
 
     while ( ifs >> x >> y >> z ) {
         triangulation.addVertex( Coordinate( x,y,z ) );

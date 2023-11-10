@@ -45,13 +45,13 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_AreaTest )
 
 BOOST_AUTO_TEST_CASE( testEmpty2D3D )
 {
-    tools::Registry& registry = tools::Registry::instance() ;
+    tools::Registry const& registry = tools::Registry::instance() ;
     std::vector< std::string > typeNames = tools::Registry::instance().getGeometryTypes();
 
-    for ( size_t i = 0; i < typeNames.size(); i++ ) {
-        BOOST_TEST_MESSAGE( typeNames[i] ) ;
+    for (auto & typeName : typeNames) {
+        BOOST_TEST_MESSAGE( typeName ) ;
 
-        std::unique_ptr< Geometry > g( registry.newGeometryByTypeName( typeNames[i] ) ) ;
+        std::unique_ptr< Geometry > const g( registry.newGeometryByTypeName( typeName ) ) ;
         BOOST_REQUIRE( g.get() != NULL ) ;
         BOOST_CHECK_EQUAL( algorithm::area( *g ), 0.0 );
         BOOST_CHECK_EQUAL( algorithm::area3D( *g ), 0.0 );
@@ -152,21 +152,21 @@ BOOST_AUTO_TEST_CASE( testArea2D_PolygonWithHoleWithBadOrientation )
 
 BOOST_AUTO_TEST_CASE( testArea3D_Triangle1 )
 {
-    Triangle triangle( Point( 0.0,0.0,0.0 ), Point( 0.0,0.0,1.0 ), Point( 0.0,1.0, 0.0 ) );
+    Triangle const triangle( Point( 0.0,0.0,0.0 ), Point( 0.0,0.0,1.0 ), Point( 0.0,1.0, 0.0 ) );
     BOOST_CHECK_EQUAL( algorithm::area3D( triangle ), 0.5 );
 }
 
 BOOST_AUTO_TEST_CASE( testArea3D_Triangle2 )
 {
-    Triangle triangle( Point( 0.0,0.0,0.0 ), Point( 0.0,0.0,4.0 ), Point( 0.0,4.0, 0.0 ) );
+    Triangle const triangle( Point( 0.0,0.0,0.0 ), Point( 0.0,0.0,4.0 ), Point( 0.0,4.0, 0.0 ) );
     BOOST_CHECK_EQUAL( algorithm::area3D( triangle ), 8.0 );
 }
 
 BOOST_AUTO_TEST_CASE( testArea2D_Triangle )
 {
-    Triangle triangle1( Point( 0.0,0.0 ), Point( 4.0,0.0 ), Point( 4.0,4.0 ) );
+    Triangle const triangle1( Point( 0.0,0.0 ), Point( 4.0,0.0 ), Point( 4.0,4.0 ) );
     // the same, inverted
-    Triangle triangle2( Point( 0.0,0.0 ), Point( 0.0,4.0 ), Point( 4.0,4.0 ) );
+    Triangle const triangle2( Point( 0.0,0.0 ), Point( 0.0,4.0 ), Point( 4.0,4.0 ) );
     BOOST_CHECK_EQUAL( algorithm::area( triangle1 ), 8.0 );
     BOOST_CHECK_EQUAL( algorithm::area( triangle2 ), 8.0 );
 }
@@ -180,15 +180,15 @@ BOOST_AUTO_TEST_CASE( testArea3D_Square1x1 )
 
 BOOST_AUTO_TEST_CASE( testArea3D_Square4X4 )
 {
-    std::string wkt( "POLYGON((0.0 0.0 0.0,0.0 0.0 4.0,0.0 4.0 4.0,0.0 4.0 0.0,0.0 0.0 0.0))" );
-    std::unique_ptr< Geometry > g( io::readWkt( wkt ) );
+    std::string const wkt( "POLYGON((0.0 0.0 0.0,0.0 0.0 4.0,0.0 4.0 4.0,0.0 4.0 0.0,0.0 0.0 0.0))" );
+    std::unique_ptr< Geometry > const g( io::readWkt( wkt ) );
     BOOST_CHECK_CLOSE( algorithm::area3D( *g ), 16.0, 1e-10 );
 }
 
 BOOST_AUTO_TEST_CASE( testArea3D_Square4X4WithHole )
 {
-    std::string wkt( "POLYGON((0.0 0.0 0.0,0.0 0.0 4.0,0.0 4.0 4.0,0.0 4.0 0.0,0.0 0.0 0.0),(0.0 2.0 2.0,0.0 3.0 2.0,0.0 3.0 3.0,0.0 2.0 3.0,0.0 2.0 2.0))" );
-    std::unique_ptr< Geometry > g( io::readWkt( wkt ) );
+    std::string const wkt( "POLYGON((0.0 0.0 0.0,0.0 0.0 4.0,0.0 4.0 4.0,0.0 4.0 0.0,0.0 0.0 0.0),(0.0 2.0 2.0,0.0 3.0 2.0,0.0 3.0 3.0,0.0 2.0 3.0,0.0 2.0 2.0))" );
+    std::unique_ptr< Geometry > const g( io::readWkt( wkt ) );
     BOOST_CHECK_CLOSE( algorithm::area3D( *g ), 15.0, 1e-10 );
 }
 

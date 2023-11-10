@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_LineStringTest )
 ///LineString() ;
 BOOST_AUTO_TEST_CASE( defaultConstructor )
 {
-    LineString g;
+    LineString const g;
     BOOST_CHECK( g.isEmpty() );
     BOOST_CHECK( ! g.is3D() );
     BOOST_CHECK( ! g.isMeasured() );
@@ -45,8 +45,8 @@ BOOST_AUTO_TEST_CASE( defaultConstructor )
 BOOST_AUTO_TEST_CASE( constructorFromVector )
 {
     std::vector< Point > points ;
-    points.push_back( Point( 1.0,1.0 ) );
-    points.push_back( Point( 2.0,2.0 ) );
+    points.emplace_back( 1.0,1.0 );
+    points.emplace_back( 2.0,2.0 );
 
     LineString g( points );
     BOOST_REQUIRE_EQUAL( g.numPoints(), 2U );
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE( constructorFromVector )
 
 BOOST_AUTO_TEST_CASE( twoPointsConstructor )
 {
-    LineString g( Point( 0.0,0.0 ), Point( 2.0,3.0 ) );
+    LineString const g( Point( 0.0,0.0 ), Point( 2.0,3.0 ) );
     BOOST_CHECK( ! g.isEmpty() );
     BOOST_CHECK( ! g.is3D() );
     BOOST_CHECK_EQUAL( g.asText( 1 ), "LINESTRING(0.0 0.0,2.0 3.0)" );
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE( testReverse_twoPoints )
 ///size_t                 numSegments() const ;
 BOOST_AUTO_TEST_CASE( testNumSegments_empty )
 {
-    LineString g ;
+    LineString const g ;
     BOOST_CHECK_EQUAL( g.numSegments(), 0U );
 }
 BOOST_AUTO_TEST_CASE( testNumSegments_onlyOnePoint )
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE( testNumSegments_onlyOnePoint )
 }
 BOOST_AUTO_TEST_CASE( testNumSegments_twoPoints )
 {
-    LineString g( Point( 0.0,0.0 ), Point( 1.0,1.0 ) );
+    LineString const g( Point( 0.0,0.0 ), Point( 1.0,1.0 ) );
     BOOST_CHECK_EQUAL( g.numSegments(), 1U );
 }
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE( testNumSegments_twoPoints )
 ///bool isClosed() const ;
 BOOST_AUTO_TEST_CASE( testIsClosed_empty )
 {
-    LineString g;
+    LineString const g;
     BOOST_CHECK( ! g.isClosed() );
 }
 BOOST_AUTO_TEST_CASE( testIsClosed_noClosed )
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE( simpleIteratorTest )
     g.addPoint( Point( 2.0, 2.0 ) );
 
     LineString::const_iterator it  = g.begin() ;
-    LineString::const_iterator end = g.end() ;
+    LineString::const_iterator const end = g.end() ;
     BOOST_CHECK_EQUAL( it->asText( 3 ), "POINT(0.000 0.000)" );
     ++it ;
     BOOST_CHECK( it != end );
@@ -177,20 +177,22 @@ BOOST_AUTO_TEST_CASE( simpleIteratorTest )
 BOOST_AUTO_TEST_CASE( iteratorTests )
 {
     std::vector<Point> points;
-    points.push_back( Point( 2.0, 3.0, 1.0 ) );
-    points.push_back( Point( 4.0, 5.0, 1.0 ) );
-    points.push_back( Point( 6.0, 7.0, 1.0 ) );
-    points.push_back( Point( 8.0, 9.0, 1.0 ) );
+    points.emplace_back( 2.0, 3.0, 1.0 );
+    points.emplace_back( 4.0, 5.0, 1.0 );
+    points.emplace_back( 6.0, 7.0, 1.0 );
+    points.emplace_back( 8.0, 9.0, 1.0 );
     LineString g( points );
 
-    LineString::Point_2_const_iterator pi, pi_end;
+    LineString::Point_2_const_iterator pi;
+    LineString::Point_2_const_iterator pi_end;
     int i = 0;
 
     for ( boost::tie( pi, pi_end ) = g.points_2(); pi != pi_end; pi++, i++ ) {
         BOOST_CHECK_EQUAL( *pi, g.pointN( i ).toPoint_2() );
     }
 
-    LineString::Point_3_const_iterator ppi, ppi_end;
+    LineString::Point_3_const_iterator ppi;
+    LineString::Point_3_const_iterator ppi_end;
     i = 0;
 
     for ( boost::tie( ppi, ppi_end ) = g.points_3(); ppi != ppi_end; ppi++, i++ ) {
@@ -204,8 +206,8 @@ BOOST_AUTO_TEST_CASE( iteratorTests )
 ///CGAL::Polygon_2< Kernel > toPolygon_2() const;
 BOOST_AUTO_TEST_CASE( testToPolygon_2_Empty )
 {
-    LineString g ;
-    CGAL::Polygon_2< Kernel > polygon = g.toPolygon_2();
+    LineString const g ;
+    CGAL::Polygon_2< Kernel > const polygon = g.toPolygon_2();
     BOOST_CHECK( polygon.is_empty() );
 }
 BOOST_AUTO_TEST_CASE( testToPolygon_2_checkOrientation )
@@ -218,13 +220,13 @@ BOOST_AUTO_TEST_CASE( testToPolygon_2_checkOrientation )
 
     //keep orientation
     {
-        CGAL::Polygon_2< Kernel > polygon = g.toPolygon_2( false );
+        CGAL::Polygon_2< Kernel > const polygon = g.toPolygon_2( false );
         BOOST_CHECK( ! polygon.is_empty() );
         BOOST_CHECK( polygon.is_clockwise_oriented() );
     }
     //fix orientation
     {
-        CGAL::Polygon_2< Kernel > polygon = g.toPolygon_2( true );
+        CGAL::Polygon_2< Kernel > const polygon = g.toPolygon_2( true );
         BOOST_CHECK( ! polygon.is_empty() );
         BOOST_CHECK( polygon.is_counterclockwise_oriented() );
     }
@@ -248,7 +250,7 @@ BOOST_AUTO_TEST_CASE( testClone )
 //virtual Geometry*    Geometry::boundary() const ;
 BOOST_AUTO_TEST_CASE( testBoundary_empty )
 {
-    LineString g ;
+    LineString const g ;
     std::unique_ptr< Geometry > boundary( g.boundary() );
     BOOST_CHECK( boundary->isEmpty() );
     BOOST_CHECK( boundary->is< GeometryCollection >() );
@@ -291,7 +293,7 @@ BOOST_AUTO_TEST_CASE( testEnvelope_2D )
     g.addPoint( Point( 2.0,7.0 ) );
     g.addPoint( Point( 3.0,9.0 ) );
 
-    Envelope box = g.envelope() ;
+    Envelope const box = g.envelope() ;
     BOOST_CHECK( ! box.isEmpty() );
     BOOST_CHECK( ! box.is3D() );
 
@@ -307,7 +309,7 @@ BOOST_AUTO_TEST_CASE( testEnvelope_3D )
     g.addPoint( Point( 2.0,7.0,15.0 ) );
     g.addPoint( Point( 3.0,9.0,17.0 ) );
 
-    Envelope box = g.envelope() ;
+    Envelope const box = g.envelope() ;
     BOOST_CHECK( ! box.isEmpty() );
     BOOST_CHECK( box.is3D() );
 
@@ -322,12 +324,12 @@ BOOST_AUTO_TEST_CASE( testEnvelope_3D )
 //std::string          Geometry::asText( const int & numDecimals = -1 ) const ;
 BOOST_AUTO_TEST_CASE( asTextEmpty )
 {
-    LineString g;
+    LineString const g;
     BOOST_CHECK_EQUAL( g.asText( 1 ), "LINESTRING EMPTY" );
 }
 BOOST_AUTO_TEST_CASE( asText2d )
 {
-    LineString g(
+    LineString const g(
         Point( 2.0,3.0 ),
         Point( 4.0,5.0 )
     );
@@ -335,7 +337,7 @@ BOOST_AUTO_TEST_CASE( asText2d )
 }
 BOOST_AUTO_TEST_CASE( asText3d )
 {
-    LineString g(
+    LineString const g(
         Point( 2.0,3.0,7.0 ),
         Point( 4.0,5.0,8.0 )
     );
@@ -345,14 +347,14 @@ BOOST_AUTO_TEST_CASE( asText3d )
 //virtual std::string  Geometry::geometryType() const = 0 ;
 BOOST_AUTO_TEST_CASE( testGeometryType )
 {
-    LineString g;
+    LineString const g;
     BOOST_CHECK_EQUAL( g.geometryType(), "LineString" );
 }
 
 //virtual GeometryType Geometry::geometryTypeId() const = 0 ;
 BOOST_AUTO_TEST_CASE( testGeometryTypeId )
 {
-    LineString g;
+    LineString const g;
     BOOST_CHECK_EQUAL( g.geometryTypeId(), TYPE_LINESTRING );
 }
 
@@ -362,24 +364,24 @@ BOOST_AUTO_TEST_CASE( testGeometryTypeId )
 //virtual bool         Geometry::isEmpty() const = 0 ;
 BOOST_AUTO_TEST_CASE( testIsEmpty_true )
 {
-    LineString g;
+    LineString const g;
     BOOST_CHECK( g.isEmpty() );
 }
 BOOST_AUTO_TEST_CASE( testIsEmpty_false )
 {
-    LineString g( Point( 0.0,0.0 ), Point( 1.0,1.0 ) );
+    LineString const g( Point( 0.0,0.0 ), Point( 1.0,1.0 ) );
     BOOST_CHECK( ! g.isEmpty() );
 }
 
 //virtual bool         Geometry::is3D() const = 0 ;
 BOOST_AUTO_TEST_CASE( testIs3D_false )
 {
-    LineString g( Point( 0.0,0.0 ), Point( 1.0,1.0 ) );
+    LineString const g( Point( 0.0,0.0 ), Point( 1.0,1.0 ) );
     BOOST_CHECK( ! g.is3D() );
 }
 BOOST_AUTO_TEST_CASE( testIs3D_true )
 {
-    LineString g( Point( 0.0,0.0,0.0 ), Point( 1.0,1.0,1.0 ) );
+    LineString const g( Point( 0.0,0.0,0.0 ), Point( 1.0,1.0,1.0 ) );
     BOOST_CHECK( g.is3D() );
 }
 
@@ -389,7 +391,7 @@ BOOST_AUTO_TEST_CASE( testIs3D_true )
 //template < typename Derived > inline bool Geometry::is() const
 BOOST_AUTO_TEST_CASE( isLineString )
 {
-    LineString g;
+    LineString const g;
     BOOST_CHECK( g.is< LineString >() );
 }
 //template < typename Derived > inline const Derived &  Geometry::as() const

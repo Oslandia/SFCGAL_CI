@@ -75,7 +75,8 @@ BOOST_AUTO_TEST_CASE( testFileIntersectsTest )
         std::istringstream iss( line );
 
         std::string distanceDimension ;
-        std::string wktGA, wktGB ;
+        std::string wktGA;
+        std::string wktGB ;
         std::string trueOrFalse ;
 
         std::getline( iss, distanceDimension, '|' ) ;
@@ -83,7 +84,7 @@ BOOST_AUTO_TEST_CASE( testFileIntersectsTest )
         std::getline( iss, wktGB, '|' ) ;
         std::getline( iss, trueOrFalse, '|' ) ;
 
-        bool expected = ( trueOrFalse == "true" ) ? true : false ;
+        bool const expected = trueOrFalse == "true" ;
 
         std::unique_ptr< Geometry > gA( io::readWkt( wktGA ) );
         std::unique_ptr< Geometry > gB( io::readWkt( wktGB ) );

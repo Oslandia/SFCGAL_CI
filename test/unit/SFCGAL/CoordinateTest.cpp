@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_CoordinateTest)
 /// Coordinate() ;
 BOOST_AUTO_TEST_CASE(testDefaultConstructor)
 {
-  Coordinate g;
+  Coordinate const g;
   BOOST_CHECK(g.isEmpty());
   BOOST_CHECK_THROW(g.x(), Exception);
   BOOST_CHECK_THROW(g.y(), Exception);
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(testDefaultConstructor)
 /// Coordinate( const Kernel::FT & x, const Kernel::FT & y ) ;
 BOOST_AUTO_TEST_CASE(testXYConstructor)
 {
-  Coordinate g(3, 4);
+  Coordinate const g(3, 4);
   BOOST_CHECK(!g.isEmpty());
   BOOST_CHECK(!g.is3D());
   BOOST_CHECK_EQUAL(g.x(), 3);
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(testXYConstructor)
 /// ) ;
 BOOST_AUTO_TEST_CASE(testXYZConstructor)
 {
-  Coordinate g(3, 4, 5);
+  Coordinate const g(3, 4, 5);
   BOOST_CHECK(!g.isEmpty());
   BOOST_CHECK(g.is3D());
   BOOST_CHECK_EQUAL(g.x(), 3);
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(testXYZConstructor)
 /// Coordinate( const double & x, const double & y ) ;
 BOOST_AUTO_TEST_CASE(testXYConstructorDouble)
 {
-  Coordinate g(3.0, 4.0);
+  Coordinate const g(3.0, 4.0);
   BOOST_CHECK(!g.isEmpty());
   BOOST_CHECK(!g.is3D());
   BOOST_CHECK_EQUAL(g.x(), 3);
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(testXYConstructorDouble)
 /// Coordinate( const double & x, const double & y, const double& z ) ;
 BOOST_AUTO_TEST_CASE(testXYZConstructorDouble)
 {
-  Coordinate g(3.0, 4.0, 5.0);
+  Coordinate const g(3.0, 4.0, 5.0);
   BOOST_CHECK(!g.isEmpty());
   BOOST_CHECK(g.is3D());
   BOOST_CHECK_EQUAL(g.x(), 3);
@@ -91,14 +91,14 @@ BOOST_AUTO_TEST_CASE(testXYZConstructorDouble)
 /// Coordinate( const Coordinate & other ) ;
 BOOST_AUTO_TEST_CASE(testCopyConstructorEmpty)
 {
-  Coordinate g;
-  Coordinate copy(g);
+  Coordinate const g;
+  const Coordinate& const copy(g);
   BOOST_CHECK(copy.isEmpty());
 }
 BOOST_AUTO_TEST_CASE(testCopyConstructorXY)
 {
-  Coordinate g(3, 4);
-  Coordinate copy(g);
+  Coordinate const g(3, 4);
+  const Coordinate& const copy(g);
   BOOST_CHECK_EQUAL(copy.x(), 3);
   BOOST_CHECK_EQUAL(copy.y(), 4);
 }
@@ -108,17 +108,17 @@ BOOST_AUTO_TEST_CASE(testCopyConstructorXY)
 /// int          coordinateDimension() const ;
 BOOST_AUTO_TEST_CASE(testCoordinateDimensionEmpty)
 {
-  Coordinate g;
+  Coordinate const g;
   BOOST_CHECK_EQUAL(g.coordinateDimension(), 0);
 }
 BOOST_AUTO_TEST_CASE(testCoordinateDimensionXY)
 {
-  Coordinate g(3, 4);
+  Coordinate const g(3, 4);
   BOOST_CHECK_EQUAL(g.coordinateDimension(), 2);
 }
 BOOST_AUTO_TEST_CASE(testCoordinateDimensionXYZ)
 {
-  Coordinate g(3, 4, 5);
+  Coordinate const g(3, 4, 5);
   BOOST_CHECK_EQUAL(g.coordinateDimension(), 3);
 }
 
@@ -153,8 +153,8 @@ BOOST_AUTO_TEST_CASE(testRoundOneDecimal)
 /// bool operator < ( const Coordinate & other ) const ;
 BOOST_AUTO_TEST_CASE(testLessEmpty)
 {
-  Coordinate gA;
-  Coordinate gB;
+  Coordinate const gA;
+  Coordinate const gB;
   BOOST_CHECK_THROW((gA < gB), Exception);
 }
 BOOST_AUTO_TEST_CASE(testLessXY_XY)

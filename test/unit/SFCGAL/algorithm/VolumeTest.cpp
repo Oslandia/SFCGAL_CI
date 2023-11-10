@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(cubeWithHoleVolume)
 
 BOOST_AUTO_TEST_CASE(invertedCubeVolume)
 {
-  std::unique_ptr<Geometry> s =
+  std::unique_ptr<Geometry> const s =
       io::readWkt("SOLID((((0 0 0,0 1 0,0 1 1,0 0 1,0 0 0)),\
                                                      ((0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)),\
                                                      ((0 0 0,0 0 1,1 0 1,1 0 0,0 0 0)),\
@@ -88,10 +88,10 @@ BOOST_AUTO_TEST_CASE(polyhedronVolume)
       "((1 0 0, 0 1 0, 0 0 1, 1 0 0 )) )");
 
   std::unique_ptr<Geometry> geometry0(io::readWkt(block0));
-  Solid                     solid(geometry0->as<PolyhedralSurface>());
+  Solid                     const solid(geometry0->as<PolyhedralSurface>());
   auto                      vol{algorithm::volume(solid)};
   BOOST_CHECK_EQUAL(vol * 6, 1.0);
-  CGAL::Nef_polyhedron_3<SFCGAL::Kernel> n;
+  CGAL::Nef_polyhedron_3<SFCGAL::Kernel> const n;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

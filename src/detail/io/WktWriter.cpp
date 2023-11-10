@@ -20,9 +20,7 @@
 #include <boost/exception/all.hpp>
 #include <exception>
 
-namespace SFCGAL {
-namespace detail {
-namespace io {
+namespace SFCGAL::detail::io {
 
 namespace impl {
 auto
@@ -130,8 +128,8 @@ WktWriter::writeCoordinateType(const Geometry &g)
   }
 }
 
-static double
-fixZeroNeg(double val, int precision)
+static auto
+fixZeroNeg(double val, int precision) -> double
 {
   if (std::abs(val) < std::pow(10, -precision)) {
     return 0;
@@ -542,6 +540,4 @@ WktWriter::writeInner(const Solid &g)
   _s << ")"; // end SOLID
 }
 
-} // namespace io
-} // namespace detail
 } // namespace SFCGAL

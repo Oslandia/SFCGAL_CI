@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE( testComputeArea )
 
         RotateCoordinate rotateCoordinate ;
         g->accept( rotateCoordinate );
-        double areaRotate = algorithm::area3D( *g ) ;
+        double const areaRotate = algorithm::area3D( *g ) ;
 
         //check area == areaRotate
         BOOST_CHECK_CLOSE( area, areaRotate, 0.5 );

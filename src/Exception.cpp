@@ -4,28 +4,30 @@
 
 #include <SFCGAL/Exception.h>
 
+#include <utility>
+
 namespace SFCGAL {
 
 ///
 ///
 ///
-Exception::Exception() throw() : _message("unknown exception") {}
+Exception::Exception() noexcept : _message("unknown exception") {}
 
 ///
 ///
 ///
-Exception::Exception(std::string const &message) throw() : _message(message) {}
+Exception::Exception(std::string message) throw() : _message(std::move(message)) {}
 
 ///
 ///
 ///
-Exception::~Exception() throw() {}
+Exception::~Exception() noexcept = default;
 
 ///
 ///
 ///
-const char *
-Exception::what() const throw()
+auto
+Exception::what() const noexcept -> const char *
 {
   return _message.c_str();
 }
@@ -33,8 +35,8 @@ Exception::what() const throw()
 ///
 ///
 ///
-std::string
-Exception::diagnostic() const throw()
+auto
+Exception::diagnostic() const noexcept -> std::string
 {
   return boost::diagnostic_information(*this);
 }

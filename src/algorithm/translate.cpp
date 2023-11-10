@@ -20,8 +20,7 @@
 #include <SFCGAL/detail/transform/AffineTransform2.h>
 #include <SFCGAL/detail/transform/AffineTransform3.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 ///
 ///
@@ -49,8 +48,8 @@ translate(Geometry &g, const Kernel::Vector_2 &v)
 ///
 ///
 void
-translate(Geometry &g, const Kernel::FT dx, const Kernel::FT dy,
-          const Kernel::FT dz)
+translate(Geometry &g, const Kernel::FT& dx, const Kernel::FT& dy,
+          const Kernel::FT& dz)
 {
   translate(g, Kernel::Vector_3(dx, dy, dz));
 }
@@ -68,5 +67,4 @@ translate(Geometry &g, const double &dx, const double &dy, const double &dz)
 
   return translate(g, Kernel::FT(dx), Kernel::FT(dy), Kernel::FT(dz));
 }
-} // namespace algorithm
 } // namespace SFCGAL

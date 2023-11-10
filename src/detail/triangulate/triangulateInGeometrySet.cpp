@@ -13,8 +13,7 @@
 
 using namespace SFCGAL::detail;
 
-namespace SFCGAL {
-namespace triangulate {
+namespace SFCGAL::triangulate {
 
 /**
  * vertex information with original coordinates
@@ -51,7 +50,7 @@ triangulate(const MarkedPolyhedron &polyhedron, GeometrySet<3> &geometry)
       ++pit;
       const CGAL::Point_3<Kernel> &pt3 = pit->vertex()->point();
 
-      CGAL::Triangle_3<Kernel> tri(pt1, pt2, pt3);
+      CGAL::Triangle_3<Kernel> const tri(pt1, pt2, pt3);
       geometry.addPrimitive(tri);
     }
 
@@ -66,16 +65,16 @@ triangulate(const MarkedPolyhedron &polyhedron, GeometrySet<3> &geometry)
 
     triangulation.clear();
 
-    CGAL::Plane_3<Kernel> plane = fit->plane();
+    CGAL::Plane_3<Kernel> const plane = fit->plane();
     BOOST_ASSERT(!plane.is_degenerate());
 
     pit = fit->facet_begin();
 
     do {
       const CGAL::Point_3<Kernel> &pt3 = pit->vertex()->point();
-      CGAL::Point_2<Kernel>        pt2 = plane.to_2d(pt3);
+      CGAL::Point_2<Kernel>        const pt2 = plane.to_2d(pt3);
 
-      Triangulation::Vertex_handle vh = triangulation.insert(pt2);
+      Triangulation::Vertex_handle const vh = triangulation.insert(pt2);
       vh->info().original             = &pt3;
 
       pit++;
@@ -88,7 +87,7 @@ triangulate(const MarkedPolyhedron &polyhedron, GeometrySet<3> &geometry)
       const CGAL::Point_3<Kernel> *b = tit->vertex(1)->info().original;
       const CGAL::Point_3<Kernel> *c = tit->vertex(2)->info().original;
 
-      CGAL::Triangle_3<Kernel> tri(*a, *b, *c);
+      CGAL::Triangle_3<Kernel> const tri(*a, *b, *c);
       geometry.addPrimitive(tri);
     }
   }
@@ -102,7 +101,7 @@ triangulate(const CGAL::Polygon_with_holes_2<Kernel> &polygon,
             GeometrySet<2>                           &output)
 {
   // FIXME: lots of copies here, can we avoid this ?
-  Polygon             poly(polygon);
+  Polygon             const poly(polygon);
   TriangulatedSurface surf;
   triangulatePolygon3D(poly, surf);
 
@@ -111,5 +110,4 @@ triangulate(const CGAL::Polygon_with_holes_2<Kernel> &polygon,
   }
 }
 
-} // namespace triangulate
 } // namespace SFCGAL

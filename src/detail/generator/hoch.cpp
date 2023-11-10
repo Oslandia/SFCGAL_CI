@@ -7,8 +7,7 @@
 #include <SFCGAL/LineString.h>
 #include <SFCGAL/Polygon.h>
 
-namespace SFCGAL {
-namespace generator {
+namespace SFCGAL::generator {
 
 auto
 _hoch(const std::vector<Kernel::Vector_2> &points)
@@ -16,14 +15,14 @@ _hoch(const std::vector<Kernel::Vector_2> &points)
 {
   std::vector<Kernel::Vector_2> result;
   result.reserve(points.size() * 2);
-  size_t numPoints = points.size();
+  size_t const numPoints = points.size();
 
   for (size_t i = 0; i < numPoints; i++) {
     const Kernel::Vector_2 &a = points[i];
     const Kernel::Vector_2 &b = points[(i + 1) % numPoints];
 
-    Kernel::Vector_2 ab = b - a;
-    Kernel::Vector_2 normal(-ab.y(), ab.x());
+    Kernel::Vector_2 const ab = b - a;
+    Kernel::Vector_2 const normal(-ab.y(), ab.x());
 
     result.push_back(a);
     result.push_back(a + ab / 3);
@@ -52,7 +51,7 @@ hoch(const unsigned int &order) -> std::unique_ptr<Polygon>
   std::unique_ptr<Polygon>    result(new Polygon());
   std::unique_ptr<LineString> ring(new LineString());
 
-  for (std::vector<Kernel::Vector_2>::const_iterator it = points.begin();
+  for (auto it = points.begin();
        it != points.end(); ++it) {
     ring->addPoint(new Point(it->x(), it->y()));
   }
@@ -64,5 +63,4 @@ hoch(const unsigned int &order) -> std::unique_ptr<Polygon>
   return result;
 }
 
-} // namespace generator
 } // namespace SFCGAL

@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_BoundaryTest )
 
 BOOST_AUTO_TEST_CASE( emptyPoint )
 {
-    Point g;
+    Point const g;
     std::unique_ptr< Geometry > boundary( g.boundary() );
 
     BOOST_CHECK( boundary->is< GeometryCollection >() );
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE( emptyPoint )
 }
 BOOST_AUTO_TEST_CASE( pointXY )
 {
-    Point g( 2.0,3.0 );
+    Point const g( 2.0,3.0 );
     std::unique_ptr< Geometry > boundary( g.boundary() );
 
     BOOST_CHECK( boundary->is< GeometryCollection >() );
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( pointXY )
 
 BOOST_AUTO_TEST_CASE( emptyLineString )
 {
-    LineString g;
+    LineString const g;
     std::unique_ptr< Geometry > boundary( g.boundary() );
 
     BOOST_CHECK( boundary->is< GeometryCollection >() );

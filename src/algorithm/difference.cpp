@@ -21,9 +21,7 @@
 
 using namespace SFCGAL::detail;
 
-namespace SFCGAL {
-
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 template <int Dim>
 struct CollisionMapper {
@@ -222,7 +220,7 @@ difference(const Primitive &primitive, PrimitiveHandleConstIterator begin,
   for (PrimitiveHandleConstIterator b = begin; b != end; ++b) {
     std::vector<Primitive> new_primitives;
 
-    for (typename std::vector<Primitive>::const_iterator a = primitives.begin();
+    for (auto a = primitives.begin();
          a != primitives.end(); ++a) {
       difference(*a, *(*b), std::back_inserter(new_primitives));
     }
@@ -344,16 +342,19 @@ difference(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
            GeometrySet<Dim> &output)
 {
   using BoxCollection = typename SFCGAL::detail::BoxCollection<Dim>::Type;
-  typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles, bhandles;
-  BoxCollection                                        aboxes, bboxes;
+  typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles;
+  typename SFCGAL::detail::HandleCollection<Dim>::Type bhandles;
+  BoxCollection                                        aboxes;
+  BoxCollection                                        bboxes;
   a.computeBoundingBoxes(ahandles, aboxes);
   b.computeBoundingBoxes(bhandles, bboxes);
 
   // here we use box_intersection_d to build the list of operations
   // that actually need to be performed
-  GeometrySet<Dim>                   temp, temp2;
+  GeometrySet<Dim>                   temp;
+  GeometrySet<Dim>                   temp2;
   typename CollisionMapper<Dim>::Map map;
-  CollisionMapper<Dim>               cb(map);
+  CollisionMapper<Dim>               const cb(map);
   CGAL::box_intersection_d(aboxes.begin(), aboxes.end(), bboxes.begin(),
                            bboxes.end(), cb);
 
@@ -361,8 +362,8 @@ difference(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
   // we can put in the result right away all the primitives
   // that are not keys in this map
   {
-    typename BoxCollection::const_iterator       ait = aboxes.begin();
-    const typename BoxCollection::const_iterator end = aboxes.end();
+    auto       ait = aboxes.begin();
+    const auto end = aboxes.end();
 
     for (; ait != end; ++ait) {
       if (map.find(ait->handle()) == map.end()) {
@@ -373,8 +374,8 @@ difference(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
 
   // then we delegate the operations according to type
   {
-    typename CollisionMapper<Dim>::Map::const_iterator       cbit = map.begin();
-    const typename CollisionMapper<Dim>::Map::const_iterator end  = map.end();
+    auto       cbit = map.begin();
+    const auto end  = map.end();
 
     for (; cbit != end; ++cbit) {
       appendDifference(*cbit->first, cbit->second.begin(), cbit->second.end(),
@@ -394,10 +395,12 @@ difference<3>(const GeometrySet<3> &a, const GeometrySet<3> &b,
               GeometrySet<3> &);
 
 auto
-difference(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+difference(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
-  GeometrySet<2> gsa(ga), gsb(gb), output;
+  GeometrySet<2> gsa(ga);
+  GeometrySet<2> gsb(gb);
+  GeometrySet<2> output;
   algorithm::difference(gsa, gsb, output);
 
   GeometrySet<2> filtered;
@@ -415,10 +418,12 @@ difference(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
 }
 
 auto
-difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
-  GeometrySet<3> gsa(ga), gsb(gb), output;
+  GeometrySet<3> gsa(ga);
+  GeometrySet<3> gsb(gb);
+  GeometrySet<3> output;
   algorithm::difference(gsa, gsb, output);
 
   GeometrySet<3> filtered;
@@ -436,5 +441,4 @@ difference3D(const Geometry &ga, const Geometry &gb)
 
   return difference3D(ga, gb, NoValidityCheck());
 }
-} // namespace algorithm
 } // namespace SFCGAL

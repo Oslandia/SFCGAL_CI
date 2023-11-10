@@ -33,14 +33,13 @@ using Segment_3  = Kernel::Segment_3;
 using Triangle_3 = Kernel::Triangle_3;
 using Plane_3    = Kernel::Plane_3;
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 ///
 ///
 ///
 auto
-distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck) -> double
+distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/) -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distance3D(%s,%s)") % gA.asText() %
   // gB.asText() );
@@ -269,8 +268,8 @@ distanceLineStringLineString3D(const LineString &gA, const LineString &gB)
     return std::numeric_limits<double>::infinity();
   }
 
-  size_t nsA = gA.numSegments();
-  size_t nsB = gB.numSegments();
+  size_t const nsA = gA.numSegments();
+  size_t const nsB = gB.numSegments();
 
   double dMin = std::numeric_limits<double>::infinity();
 
@@ -504,18 +503,18 @@ struct Sphere {
   {
   }
   Sphere() = default;
-  auto
+  [[nodiscard]] auto
   isEmpty() const -> bool
   {
     return _empty;
   }
-  auto
+  [[nodiscard]] auto
   radius() const -> double
   {
     BOOST_ASSERT(!_empty);
     return _radius;
   }
-  auto
+  [[nodiscard]] auto
   center() const -> const CGAL::Vector_3<Kernel> &
   {
     BOOST_ASSERT(!_empty);
@@ -539,19 +538,19 @@ boundingSphere(const Geometry &geom) -> const Sphere
   GetPointsVisitor v;
   const_cast<Geometry &>(geom).accept(v);
 
-  if (!v.points.size()) {
+  if (v.points.empty()) {
     return Sphere();
   }
 
   using Vector_3 = CGAL::Vector_3<Kernel>;
 
-  const GetPointsVisitor::const_iterator end = v.points.end();
+  const auto end = v.points.end();
 
   // centroid
   Vector_3 c(0, 0, 0);
   int      numPoint = 0;
 
-  for (GetPointsVisitor::const_iterator x = v.points.begin(); x != end; ++x) {
+  for (auto x = v.points.begin(); x != end; ++x) {
     c = c + (*x)->toVector_3();
     ++numPoint;
   }
@@ -563,7 +562,7 @@ boundingSphere(const Geometry &geom) -> const Sphere
   Vector_3   f             = c;
   Kernel::FT maxDistanceSq = 0;
 
-  for (GetPointsVisitor::const_iterator x = v.points.begin(); x != end; ++x) {
+  for (auto x = v.points.begin(); x != end; ++x) {
     const Vector_3   cx  = (*x)->toVector_3() - c;
     const Kernel::FT dSq = cx * cx;
 
@@ -607,7 +606,7 @@ distanceGeometryCollectionToGeometry3D(const Geometry &gA, const Geometry &gB)
       bsA.push_back(boundingSphere(gA.geometryN(i)));
     }
 
-    Sphere bsB(boundingSphere(gB));
+    Sphere const bsB(boundingSphere(gB));
 
     if (bsB.isEmpty()) {
       return std::numeric_limits<double>::infinity();
@@ -727,10 +726,10 @@ distancePointTriangle3D(const Point &p_, const Point &a_, const Point &b_,
   BOOST_ASSERT(!b_.isEmpty());
   BOOST_ASSERT(!c_.isEmpty());
 
-  Point_3    p = p_.toPoint_3();
-  Triangle_3 abc(a_.toPoint_3(), b_.toPoint_3(), c_.toPoint_3());
+  Point_3    const p = p_.toPoint_3();
+  Triangle_3 const abc(a_.toPoint_3(), b_.toPoint_3(), c_.toPoint_3());
 
-  squared_distance_t dMin = squaredDistancePointTriangle3D(p, abc);
+  squared_distance_t const dMin = squaredDistancePointTriangle3D(p, abc);
   return CGAL::sqrt(CGAL::to_double(dMin));
 }
 
@@ -761,8 +760,9 @@ squaredDistanceSegmentTriangle3D(const Segment_3 &sAB, const Triangle_3 &tABC)
   /*
    * If [sAsB] intersects the triangle (tA,tB,tC), distance is 0.0
    */
-  if (CGAL::do_intersect(sAB, tABC))
+  if (CGAL::do_intersect(sAB, tABC)) {
     return 0.0;
+}
 
   /*
    * else, distance is the min of the following values :
@@ -796,16 +796,16 @@ distanceSegmentTriangle3D(const Point &sA_, const Point &sB_, const Point &tA_,
   BOOST_ASSERT(!tB_.isEmpty());
   BOOST_ASSERT(!tC_.isEmpty());
 
-  Point_3   sA = sA_.toPoint_3();
-  Point_3   sB = sB_.toPoint_3();
-  Segment_3 sAB(sA, sB);
+  Point_3   const sA = sA_.toPoint_3();
+  Point_3   const sB = sB_.toPoint_3();
+  Segment_3 const sAB(sA, sB);
 
-  Point_3    tA = tA_.toPoint_3();
-  Point_3    tB = tB_.toPoint_3();
-  Point_3    tC = tC_.toPoint_3();
-  Triangle_3 tABC(tA, tB, tC);
+  Point_3    const tA = tA_.toPoint_3();
+  Point_3    const tB = tB_.toPoint_3();
+  Point_3    const tC = tC_.toPoint_3();
+  Triangle_3 const tABC(tA, tB, tC);
 
-  squared_distance_t dMin = squaredDistanceSegmentTriangle3D(sAB, tABC);
+  squared_distance_t const dMin = squaredDistanceSegmentTriangle3D(sAB, tABC);
   return CGAL::sqrt(CGAL::to_double(dMin));
 }
 
@@ -817,8 +817,9 @@ squaredDistanceTriangleTriangle3D(const Triangle_3 &triangleA,
                                   const Triangle_3 &triangleB)
     -> squared_distance_t
 {
-  if (CGAL::do_intersect(triangleA, triangleB))
+  if (CGAL::do_intersect(triangleA, triangleB)) {
     return {0};
+}
 
   /*
    * min of distance from A segments to B triangle and B segments to A triangle
@@ -856,13 +857,12 @@ distanceTriangleTriangle3D(const Triangle &gA, const Triangle &gB) -> double
     return std::numeric_limits<double>::infinity();
   }
 
-  Triangle_3 triangleA = gA.toTriangle_3();
-  Triangle_3 triangleB = gB.toTriangle_3();
+  Triangle_3 const triangleA = gA.toTriangle_3();
+  Triangle_3 const triangleB = gB.toTriangle_3();
 
-  squared_distance_t dMin =
+  squared_distance_t const dMin =
       squaredDistanceTriangleTriangle3D(triangleA, triangleB);
   return CGAL::sqrt(CGAL::to_double(dMin));
 }
 
-} // namespace algorithm
 } // namespace SFCGAL

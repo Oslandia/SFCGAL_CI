@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_MultiPointTest )
 
 BOOST_AUTO_TEST_CASE( defaultConstructor )
 {
-    MultiPoint g;
+    MultiPoint const g;
     BOOST_CHECK( g.isEmpty() ) ;
     BOOST_CHECK( ! g.is3D() );
     BOOST_CHECK_EQUAL( g.numGeometries(), 0U );
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( defaultConstructor )
 
 BOOST_AUTO_TEST_CASE( testGeometryTypeId )
 {
-    MultiPoint g;
+    MultiPoint const g;
     BOOST_CHECK_EQUAL( g.geometryTypeId(), TYPE_MULTIPOINT );
 }
 
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( addLineStringThrow )
 
 BOOST_AUTO_TEST_CASE( asTextEmpty )
 {
-    MultiPoint g;
+    MultiPoint const g;
     BOOST_CHECK_EQUAL( g.asText( 1 ), "MULTIPOINT EMPTY" );
 }
 
@@ -77,13 +77,13 @@ BOOST_AUTO_TEST_CASE( asText2d )
 
 BOOST_AUTO_TEST_CASE( isGeometryCollection )
 {
-    MultiPoint g;
+    MultiPoint const g;
     BOOST_CHECK( g.is< GeometryCollection >() );
 }
 
 BOOST_AUTO_TEST_CASE( isMultiPoint )
 {
-    MultiPoint g;
+    MultiPoint const g;
     BOOST_CHECK( g.is< MultiPoint >() );
 }
 

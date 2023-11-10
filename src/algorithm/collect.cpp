@@ -10,8 +10,7 @@
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/MultiSolid.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 auto
 collect(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
 {
@@ -21,7 +20,7 @@ collect(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
       mp->addGeometry(ga);
       mp->addGeometry(gb);
       return std::unique_ptr<Geometry>(mp);
-    } else if (ga.geometryTypeId() == TYPE_LINESTRING) {
+    } if (ga.geometryTypeId() == TYPE_LINESTRING) {
       auto *mls = new MultiLineString();
       mls->addGeometry(ga);
       mls->addGeometry(gb);
@@ -45,5 +44,4 @@ collect(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
   coll->addGeometry(gb);
   return std::unique_ptr<Geometry>(coll);
 }
-} // namespace algorithm
 } // namespace SFCGAL

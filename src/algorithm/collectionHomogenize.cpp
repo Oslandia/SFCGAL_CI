@@ -10,8 +10,7 @@
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/MultiSolid.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 // If nothing has to be built, g will be moved to the result without
 // copying and a new allocation. Otherwise, a new geometry is built and
@@ -73,5 +72,4 @@ collectionHomogenize(std::unique_ptr<Geometry> g) -> std::unique_ptr<Geometry>
   return std::unique_ptr<Geometry>(ret_geo);
 }
 
-} // namespace algorithm
 } // namespace SFCGAL

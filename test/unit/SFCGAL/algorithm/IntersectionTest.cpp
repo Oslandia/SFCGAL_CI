@@ -54,7 +54,7 @@ using namespace boost::unit_test ;
 
 void insertOrReplace( boost::ptr_map<std::string, Geometry >& map, std::string key, Geometry* value )
 {
-    boost::ptr_map<std::string, Geometry >::iterator found =  map.find( key );
+    boost::ptr_map<std::string, Geometry >::iterator const found =  map.find( key );
 
     if ( found != map.end() ) {
         map.erase( found );
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_IntersectionTest )
 
 BOOST_AUTO_TEST_CASE( testFileIntersectionTest )
 {
-    int argc = framework::master_test_suite().argc;
+    int const argc = framework::master_test_suite().argc;
     char** argv = framework::master_test_suite().argv;
 
     // look for options
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE( testFileIntersectionTest )
     bool print_line_number = false;
 
     for ( int i = 0; i < argc; ++i ) {
-        std::string argi( argv[i] );
+        std::string const argi( argv[i] );
 
         if ( argi == "--line" ) {
             // only test one line
@@ -121,7 +121,8 @@ BOOST_AUTO_TEST_CASE( testFileIntersectionTest )
         std::istringstream iss( line );
 
         std::string dimension ;
-        std::string wktGA, wktGB ;
+        std::string wktGA;
+        std::string wktGB ;
         std::string wktOut ;
 
         std::getline( iss, dimension, '|' ) ;
@@ -140,9 +141,8 @@ BOOST_AUTO_TEST_CASE( testFileIntersectionTest )
             if ( numLine != test_one_line ) {
                 continue;
             }
-            else {
-                BOOST_TEST_MESSAGE( boost::format( "line#%s:%s" ) % numLine % line );
-            }
+                            BOOST_TEST_MESSAGE( boost::format( "line#%s:%s" ) % numLine % line );
+           
         }
 
         std::unique_ptr< Geometry > gA;
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE( testFileIntersectionTest )
 
         if ( wktGA[0] == '@' ) {
             // stored geometry reference
-            std::string name = wktGA.substr( 1 );
+            std::string const name = wktGA.substr( 1 );
             const boost::ptr_map<std::string, Geometry >::const_iterator found =  storedGeom.find( name );
 
             if ( found == storedGeom.end() ) {
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE( testFileIntersectionTest )
 
         if ( wktGB[0] == '@' ) {
             // stored geometry reference
-            std::string name = wktGB.substr( 1 );
+            std::string const name = wktGB.substr( 1 );
             const boost::ptr_map<std::string, Geometry >::const_iterator found =  storedGeom.find( name );
 
             if ( found == storedGeom.end() ) {
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE( testFileIntersectionTest )
 
         if ( wktOut[0] == '@' ) {
             // stored geometry reference
-            std::string name = wktOut.substr( 1 );
+            std::string const name = wktOut.substr( 1 );
             const boost::ptr_map<std::string, Geometry >::const_iterator found =  storedGeom.find( name );
 
             if ( found == storedGeom.end() ) {

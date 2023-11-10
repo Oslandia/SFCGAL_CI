@@ -17,8 +17,7 @@
 #include <SFCGAL/Triangle.h>
 #include <SFCGAL/TriangulatedSurface.h>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 ///
 ///
@@ -155,5 +154,4 @@ EnvelopeVisitor::visit(const TriangulatedSurface &g)
   }
 }
 
-} // namespace detail
 } // namespace SFCGAL

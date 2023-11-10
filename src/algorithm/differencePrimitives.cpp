@@ -6,13 +6,11 @@
 // GOTCHA do not include the header, this is a trick to avoid ambiguous def in
 // CGAL
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 auto
 intersection(const CGAL::Triangle_3<Kernel> &a,
              const CGAL::Triangle_3<Kernel> &b) -> CGAL::Object
 {
   return CGAL::intersection(a, b);
 }
-} // namespace algorithm
 } // namespace SFCGAL

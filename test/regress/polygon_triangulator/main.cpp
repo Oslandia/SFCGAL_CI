@@ -63,7 +63,7 @@ namespace po = boost::program_options ;
  * Triangulate each polygon in an input file containing lines in the following format :
  * <id> "|" ( <wkt polygon> | <wkt multipolygon> )
  */
-int main( int argc, char* argv[] )
+auto main( int argc, char* argv[] ) -> int
 {
     /*
      * declare options
@@ -82,18 +82,18 @@ int main( int argc, char* argv[] )
     po::store( po::parse_command_line( argc, argv, desc ), vm );
     po::notify( vm );
 
-    if ( vm.count( "help" ) ) {
+    if ( vm.count( "help" ) != 0u ) {
         std::cout << desc << std::endl ;
         return 0;
     }
 
-    bool verbose  = vm.count( "verbose" ) != 0 ;
-    bool progress = vm.count( "progress" ) != 0 ;
-    bool force2d  = vm.count( "force2d" ) != 0 ;
+    bool const verbose  = vm.count( "verbose" ) != 0 ;
+    bool const progress = vm.count( "progress" ) != 0 ;
+    bool const force2d  = vm.count( "force2d" ) != 0 ;
 
     std::string filename ;
 
-    if ( vm.count( "filename" ) ) {
+    if ( vm.count( "filename" ) != 0u ) {
         filename = vm["filename"].as< std::string >() ;
     }
     else {
@@ -104,7 +104,7 @@ int main( int argc, char* argv[] )
 
     int oneLine = -1;
 
-    if ( vm.count( "line" ) ) {
+    if ( vm.count( "line" ) != 0u ) {
         oneLine = vm["line"].as< int >();
     }
 
@@ -138,14 +138,16 @@ int main( int argc, char* argv[] )
 
 
     //boost::timer timer ;
-    boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
+    boost::chrono::system_clock::time_point const start = boost::chrono::system_clock::now();
 
     std::vector< std::string > invalidGeom;
     std::vector< std::string > inapropriateGeom;
     /*
      * process file
      */
-    int lineNumber = 0 , numFailed = 0 , numSuccess = 0 ;
+    int lineNumber = 0 ;
+    int numFailed = 0 ;
+    int numSuccess = 0 ;
     std::string line ;
 
     while ( std::getline( ifs, line ) ) {
@@ -170,7 +172,7 @@ int main( int argc, char* argv[] )
 
         if ( progress && lineNumber % 1000 == 0 ) {
             std::cout.width( 12 ) ;
-            boost::chrono::duration<double> elapsed = boost::chrono::system_clock::now() - start;
+            boost::chrono::duration<double> const elapsed = boost::chrono::system_clock::now() - start;
             std::cout << std::left << lineNumber << "(" << elapsed << " s)"<< std::endl ;
         }
 
@@ -207,10 +209,10 @@ int main( int argc, char* argv[] )
             triangulate::triangulatePolygon3D( *g, triangulatedSurface ) ;
 
             //check area
-            double areaPolygons  = algorithm::area3D( *g ) ;
-            double areaTriangles = algorithm::area3D( triangulatedSurface );
+            double const areaPolygons  = algorithm::area3D( *g ) ;
+            double const areaTriangles = algorithm::area3D( triangulatedSurface );
 
-            double ratio = fabs( areaPolygons - areaTriangles ) / std::max( areaPolygons, areaTriangles );
+            double const ratio = fabs( areaPolygons - areaTriangles ) / std::max( areaPolygons, areaTriangles );
 
             if ( ratio > 0.1 ) {
                 std::cerr << filename << ":" << lineNumber << " error:" << id << "|" << "area(polygon) != area(tin) ( " << areaPolygons << " !=" << areaTriangles <<  ")" << "|" << g->asText() << "|" << triangulatedSurface.asText() << std::endl ;
@@ -243,14 +245,14 @@ int main( int argc, char* argv[] )
     tri_ofs.close();
 
 
-    boost::chrono::duration<double> elapsed = boost::chrono::system_clock::now() - start;
+    boost::chrono::duration<double> const elapsed = boost::chrono::system_clock::now() - start;
 
-    for ( size_t i=0; i!=invalidGeom.size(); ++i ) {
-        std::cout << "    " << invalidGeom[i] << " is invalid\n";
+    for (auto & i : invalidGeom) {
+        std::cout << "    " << i << " is invalid\n";
     }
 
-    for ( size_t i=0; i!=inapropriateGeom.size(); ++i ) {
-        std::cout << "    " << inapropriateGeom[i] << " is inapropriate for triangulation\n";
+    for (auto & i : inapropriateGeom) {
+        std::cout << "    " << i << " is inapropriate for triangulation\n";
     }
 
     std::cout << filename << " complete (" << elapsed << " s)---" << std::endl;
@@ -261,8 +263,7 @@ int main( int argc, char* argv[] )
         boost::filesystem::remove( error_filename );
         return EXIT_SUCCESS ;
     }
-    else {
-        return EXIT_FAILURE ;
-    }
+            return EXIT_FAILURE ;
+   
 }
 

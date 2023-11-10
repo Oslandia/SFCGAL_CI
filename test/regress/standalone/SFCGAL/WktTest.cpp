@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( testReadWriter )
          * parse wkt and check symmetry
          */
         std::unique_ptr< Geometry > g( io::readWkt( inputWkt ) );
-        std::string outputWkt = g->asText( 1 );
+        std::string const outputWkt = g->asText( 1 );
         BOOST_CHECK_EQUAL( inputWkt, outputWkt );
     }
 }

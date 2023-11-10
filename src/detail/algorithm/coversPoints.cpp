@@ -9,9 +9,7 @@
 #include <SFCGAL/detail/GetPointsVisitor.h>
 #include <SFCGAL/detail/algorithm/coversPoints.h>
 
-namespace SFCGAL {
-namespace detail {
-namespace algorithm {
+namespace SFCGAL::detail::algorithm {
 template <int Dim>
 auto
 _coversPoints(const Geometry &ga, const Geometry &gb) -> bool
@@ -20,18 +18,18 @@ _coversPoints(const Geometry &ga, const Geometry &gb) -> bool
     return false;
   }
 
-  GeometrySet<Dim> gsa(ga);
+  GeometrySet<Dim> const gsa(ga);
 
   // get all points of gb;
   detail::GetPointsVisitor visitor;
   gb.accept(visitor);
 
-  for (detail::GetPointsVisitor::const_iterator it = visitor.points.begin();
+  for (auto it = visitor.points.begin();
        it != visitor.points.end(); ++it) {
     const Point *ppt = *it;
 
     // a geometry set of one point
-    GeometrySet<Dim> gsp(*ppt);
+    GeometrySet<Dim> const gsp(*ppt);
 
     if (!SFCGAL::algorithm::intersects(gsp, gsa)) {
       return false;
@@ -52,6 +50,4 @@ coversPoints3D(const Geometry &ga, const Geometry &gb) -> bool
 {
   return _coversPoints<3>(ga, gb);
 }
-} // namespace algorithm
-} // namespace detail
 } // namespace SFCGAL

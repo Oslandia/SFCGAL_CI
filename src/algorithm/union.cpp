@@ -15,9 +15,7 @@
   if (0)                                                                       \
   std::cerr << __FILE__ << ":" << __LINE__ << " debug: "
 
-namespace SFCGAL {
-
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 struct EmptyPrimitive {};
 
@@ -51,7 +49,7 @@ struct Segment_d : detail::Segment_d<Dim>::Type {
   }
 
   template <class OutputIterator>
-  auto
+  [[nodiscard]] [[nodiscard]] auto
   pieces(OutputIterator out) const -> OutputIterator
   {
     PointVector points(1, this->source());
@@ -60,14 +58,15 @@ struct Segment_d : detail::Segment_d<Dim>::Type {
     std::sort(points.begin() + 1, points.end() - 1,
               Nearer<PointType>(this->source()));
 
-    for (typename PointVector::const_iterator p = points.begin(), q = p + 1;
+    for (auto p = points.begin(), q = p + 1;
          q != points.end(); ++p, q++) {
       if (*p != *q) {
-        PointType m = CGAL::midpoint(*p, *q);
+        PointType const m = CGAL::midpoint(*p, *q);
         auto      r = _remove.begin();
 
-        for (; r != _remove.end() && !r->has_on(m); ++r)
+        for (; r != _remove.end() && !r->has_on(m); ++r) {
           ;
+}
 
         if (r == _remove.end()) {
           *out++ = SegmentType(*p, *q);
@@ -78,7 +77,7 @@ struct Segment_d : detail::Segment_d<Dim>::Type {
     return out;
   }
 
-  auto
+  [[nodiscard]] auto
   pieces() const -> SegmentVector
   {
     SegmentVector result;
@@ -127,7 +126,8 @@ struct Surface_d<3> : Triangle_3 {
       return;
     }
 
-    Point3Iterator s = begin, t = s + 1;
+    Point3Iterator s = begin;
+    Point3Iterator t = s + 1;
 
     for (; t != end; ++t, ++s) {
       _split.push_back(Segment_2(_plane.to_2d(*s), _plane.to_2d(*t)));
@@ -193,19 +193,19 @@ struct Surface_d<3> : Triangle_3 {
     {
       std::vector<Segment_d<2>> lines(_split.begin(), _split.begin() + 3);
 
-      for (typename SegmentVector::const_iterator c = _split.begin() + 3;
+      for (auto c = _split.begin() + 3;
            c != _split.end(); ++c) {
         Segment_d<2> current(*c);
 
         for (auto &line : lines) {
-          CGAL::Object inter = CGAL::intersection(line, current);
+          CGAL::Object const inter = CGAL::intersection(line, current);
           const auto  *p     = CGAL::object_cast<Point_2>(&inter);
           const auto  *s     = CGAL::object_cast<Segment_2>(&inter);
 
-          if (p) {
+          if (p != nullptr) {
             current.splitAt(*p);
             line.splitAt(*p);
-          } else if (s) {
+          } else if (s != nullptr) {
             current.remove(*s);
             line.splitAt(s->source());
             line.splitAt(s->target());
@@ -215,7 +215,7 @@ struct Surface_d<3> : Triangle_3 {
         lines.push_back(current);
       }
 
-      for (std::vector<Segment_d<2>>::const_iterator l = lines.begin();
+      for (auto l = lines.begin();
            l != lines.end(); ++l) {
         l->pieces(std::back_inserter(filtered));
       }
@@ -230,10 +230,10 @@ struct Surface_d<3> : Triangle_3 {
           triangulate::ConstraintDelaunayTriangulation::Vertex_handle;
       triangulate::ConstraintDelaunayTriangulation cdt;
 
-      for (std::vector<Segment_2>::const_iterator f = filtered.begin();
+      for (auto f = filtered.begin();
            f != filtered.end(); ++f) {
-        Vertex_handle s = cdt.addVertex(f->source());
-        Vertex_handle t = cdt.addVertex(f->target());
+        Vertex_handle const s = cdt.addVertex(f->source());
+        Vertex_handle const t = cdt.addVertex(f->target());
         cdt.addConstraint(s, t);
       }
 
@@ -251,13 +251,14 @@ struct Surface_d<3> : Triangle_3 {
       const Point_2 point(a + (Vector_2(a, b) + Vector_2(a, c)) / 3);
 
       // find if triangle is in a removed spot
-      SurfaceVector::const_iterator r = _remove.begin();
+      auto r = _remove.begin();
 
       for (; r != _remove.end() &&
              CGAL::bounded_side_2(r->begin(), r->end(), point, Kernel()) ==
                  CGAL::ON_UNBOUNDED_SIDE;
-           ++r)
+           ++r) {
         ;
+}
 
       if (r == _remove.end()) {
         res.emplace_back(_plane.to_3d(a), _plane.to_3d(b), _plane.to_3d(c));
@@ -295,7 +296,7 @@ struct Surface_d<2> : PolygonWH_2 {
     _split.insert(_split.end(), other._split.begin(), other._split.end());
   }
 
-  auto
+  [[nodiscard]] auto
   pieces() const -> std::vector<PolygonWH_2>
   {
     std::vector<PolygonWH_2> res;
@@ -524,7 +525,7 @@ auto
 compute_bboxes(const detail::GeometrySet<Dim> &gs, OutputIterator out)
     -> OutputIterator
 {
-  typename HandledBox<Dim>::Vector bboxes;
+  typename HandledBox<Dim>::Vector const bboxes;
 
   for (auto it = gs.points().begin(); it != gs.points().end(); ++it) {
     *out++ = typename HandledBox<Dim>::Type(it->primitive().bbox(),
@@ -588,7 +589,7 @@ union_point_surface(Handle<3> a, Handle<3> b)
 }
 
 void
-union_point_volume(const Handle<2> &, const Handle<2> &)
+union_point_volume(const Handle<2> & /*unused*/, const Handle<2> & /*unused*/)
 {
   BOOST_ASSERT(false); // there shouldn't be any volume in 2D
 }
@@ -598,7 +599,7 @@ union_point_volume(Handle<3> a, Handle<3> b)
 {
   //@todo put is in poly in a struct derived from MarkedPolyhedron to avoid
   // rebuilding point inside every time
-  CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_poly(
+  CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> const is_in_poly(
       b.asVolume());
 
   if (CGAL::ON_UNBOUNDED_SIDE != is_in_poly(a.asPoint())) {
@@ -613,7 +614,7 @@ union_segment_segment(Handle<Dim> a, Handle<Dim> b)
   using SegmentType = typename detail::TypeForDimension<Dim>::Segment;
   using PointType   = typename detail::TypeForDimension<Dim>::Point;
 
-  CGAL::Object inter = CGAL::intersection(a.asSegment(), b.asSegment());
+  CGAL::Object const inter = CGAL::intersection(a.asSegment(), b.asSegment());
   const auto  *p     = CGAL::object_cast<PointType>(&inter);
   const auto  *s     = CGAL::object_cast<SegmentType>(&inter);
 
@@ -656,13 +657,13 @@ union_segment_surface(Handle<2> a, Handle<2> b)
                              : *(target - 1),
                          *target);
 
-      CGAL::Object inter = CGAL::intersection(a.asSegment(), sc);
+      CGAL::Object const inter = CGAL::intersection(a.asSegment(), sc);
       const auto  *p     = CGAL::object_cast<Point_2>(&inter);
       const auto  *s     = CGAL::object_cast<Segment_2>(&inter);
 
-      if (p) {
+      if (p != nullptr) {
         points.push_back(*p);
-      } else if (s) {
+      } else if (s != nullptr) {
         a.asSegment().remove(*s);
       }
     }
@@ -675,7 +676,7 @@ union_segment_surface(Handle<2> a, Handle<2> b)
 
   // cut segment with pieces that have length and wich midpoint is inside
   // polygon
-  for (std::vector<Point_2>::const_iterator p = points.begin(), q = p + 1;
+  for (auto p = points.begin(), q = p + 1;
        q != points.end(); ++p, ++q) {
     if (*p != *q && do_intersect(CGAL::midpoint(*p, *q), b.asSurface())) {
       const Segment_2 s(*p, *q);
@@ -688,17 +689,17 @@ union_segment_surface(Handle<2> a, Handle<2> b)
 void
 union_segment_surface(Handle<3> a, Handle<3> b)
 {
-  CGAL::Object inter = CGAL::intersection(a.asSegment(), b.asSurface());
+  CGAL::Object const inter = CGAL::intersection(a.asSegment(), b.asSurface());
   const auto  *s     = CGAL::object_cast<Segment_3>(&inter);
 
-  if (s) {
+  if (s != nullptr) {
     a.asSegment().remove(*s);
     b.asSurface().splitAt(*s);
   }
 }
 
 void
-union_segment_volume(const Handle<2> &, const Handle<2> &)
+union_segment_volume(const Handle<2> & /*unused*/, const Handle<2> & /*unused*/)
 {
   BOOST_ASSERT(false); // there shouldn't be any volume in 2D
 }
@@ -719,13 +720,13 @@ union_segment_volume(Handle<3> a, Handle<3> b)
                                                                   // it's not
                                                                   // used anyway
   FaceSegmentCollide::CollisionVector collisions;
-  FaceSegmentCollide                  cb(collisions);
+  FaceSegmentCollide                  const cb(collisions);
   CGAL::box_intersection_d(bbox.begin(), bbox.end(), bboxes.begin(),
                            bboxes.end(), cb);
 
-  CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_poly(polyhedron);
+  CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> const is_in_poly(polyhedron);
 
-  if (!collisions.size()) {
+  if (collisions.empty()) {
     // completely in or out, we just test one point
 
     if (CGAL::ON_UNBOUNDED_SIDE != is_in_poly(segment.source())) {
@@ -736,9 +737,9 @@ union_segment_volume(Handle<3> a, Handle<3> b)
     collidingTriangles(collisions, std::back_inserter(triangles));
 
     // first step, substract faces
-    for (std::vector<Triangle_3>::const_iterator tri = triangles.begin();
+    for (auto tri = triangles.begin();
          tri != triangles.end(); ++tri) {
-      Handle<3> h(*tri);
+      Handle<3> const h(*tri);
       union_segment_surface(a, h);
     }
 
@@ -746,23 +747,23 @@ union_segment_volume(Handle<3> a, Handle<3> b)
     // middle point to know if it's in or out
     std::vector<Point_3> points;
 
-    for (std::vector<Triangle_3>::const_iterator tri = triangles.begin();
+    for (auto tri = triangles.begin();
          tri != triangles.end(); ++tri) {
-      CGAL::Object inter = CGAL::intersection(segment, *tri);
+      CGAL::Object const inter = CGAL::intersection(segment, *tri);
       const auto  *p     = CGAL::object_cast<Point_3>(&inter);
 
-      if (p) {
+      if (p != nullptr) {
         points.push_back(*p);
       }
     }
 
-    if (points.size()) {
+    if (!points.empty() != 0u) {
       std::sort(points.begin(), points.end(),
                 Nearer<Point_3>(segment.source()));
 
       // mark segments pieces that have length and wich midpoint is inside
       // polyhedron
-      for (std::vector<Point_3>::const_iterator p = points.begin(), q = p + 1;
+      for (auto p = points.begin(), q = p + 1;
            q != points.end(); ++p, ++q) {
         if (*p != *q &&
             CGAL::ON_UNBOUNDED_SIDE != is_in_poly(CGAL::midpoint(*p, *q))) {
@@ -792,29 +793,29 @@ union_surface_surface(Handle<2> a, Handle<2> b)
 void
 union_surface_surface(Handle<3> a, Handle<3> b)
 {
-  CGAL::Object inter = intersection(a.asSurface(), b.asSurface());
+  CGAL::Object const inter = intersection(a.asSurface(), b.asSurface());
   const auto  *p     = CGAL::object_cast<Point_3>(&inter);
   const auto  *s     = CGAL::object_cast<Segment_3>(&inter);
   const auto  *t     = CGAL::object_cast<Triangle_3>(&inter);
   const auto  *v     = CGAL::object_cast<std::vector<Point_3>>(&inter);
 
-  if (p) {
+  if (p != nullptr) {
     a.asSurface().splitAt(*p);
     b.asSurface().splitAt(*p);
-  } else if (s) {
+  } else if (s != nullptr) {
     a.asSurface().splitAt(*s);
     b.asSurface().splitAt(*s);
-  } else if (t) {
+  } else if (t != nullptr) {
     a.asSurface().splitAt(*t);
     b.asSurface().remove(*t);
-  } else if (v) {
+  } else if (v != nullptr) {
     a.asSurface().splitAt(*v);
     b.asSurface().remove(*v);
   }
 }
 
 void
-union_surface_volume(const Handle<2> &, const Handle<2> &)
+union_surface_volume(const Handle<2> & /*unused*/, const Handle<2> & /*unused*/)
 {
   BOOST_ASSERT(false); // there shouldn't be any volume in 2D
 }
@@ -825,7 +826,7 @@ union_surface_volume(Handle<3> a, Handle<3> b)
   detail::GeometrySet<3> res;
   _intersection_solid_triangle(b.asVolume(), a.asSurface(), res);
 
-  for (detail::GeometrySet<3>::SurfaceCollection::const_iterator it =
+  for (auto it =
            res.surfaces().begin();
        it != res.surfaces().end(); ++it) {
     a.asSurface().remove(it->primitive());
@@ -833,7 +834,7 @@ union_surface_volume(Handle<3> a, Handle<3> b)
 }
 
 void
-union_volume_volume(const Handle<2> &, const Handle<2> &)
+union_volume_volume(const Handle<2> & /*unused*/, const Handle<2> & /*unused*/)
 {
   BOOST_ASSERT(false); // there shouldn't be any volume in 2D
 }
@@ -853,10 +854,10 @@ union_volume_volume(Handle<3> a, Handle<3> b)
   intersection(detail::GeometrySet<3>(a.asVolume()),
                detail::GeometrySet<3>(b.asVolume()), inter);
 
-  if (inter.volumes().size() || inter.surfaces().size()) {
+  if ((!inter.volumes().empty() != 0u) || (!inter.surfaces().empty() != 0u)) {
 
     MarkedPolyhedron output;
-    bool             res =
+    bool             const res =
         CGAL::Polygon_mesh_processing::corefine_and_compute_union(p, q, output);
 
     if (res && std::next(vertices(output).first) != vertices(output).second) {
@@ -1019,7 +1020,7 @@ collectPrimitives(const typename HandledBox<Dim>::Vector &boxes,
 }
 
 auto
-union_(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+union_(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
   HandledBox<2>::Vector boxes;
@@ -1046,7 +1047,7 @@ union_(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
 }
 
 auto
-union3D(const Geometry &ga, const Geometry &gb, NoValidityCheck)
+union3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
   HandledBox<3>::Vector boxes;
@@ -1075,12 +1076,11 @@ union3D(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
 void
 handleLeakTest()
 {
-  Handle<2> h0(Point_2(0, 0));
+  Handle<2> const h0(Point_2(0, 0));
   Handle<2> h1(Point_2(1, 1));
   Handle<2> empty;
   empty.registerObservers(empty);
   empty.registerObservers(h0);
   h1.registerObservers(h0);
 }
-} // namespace algorithm
 } // namespace SFCGAL

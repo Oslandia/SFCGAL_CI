@@ -33,15 +33,15 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_TriangleTest )
 //Triangle();
 BOOST_AUTO_TEST_CASE( testDefaultConstructor )
 {
-    Triangle g ;
+    Triangle const g ;
     BOOST_CHECK( g.isEmpty() );
 }
 //Triangle( const Kernel::Triangle_2 & triangle ) ;
 BOOST_AUTO_TEST_CASE( testConstructorTriangle_2 )
 {
-    Kernel::Point_2 a( 0.0,0.0 );
-    Kernel::Point_2 b( 1.0,0.0 );
-    Kernel::Point_2 c( 1.0,1.0 );
+    Kernel::Point_2 const a( 0.0,0.0 );
+    Kernel::Point_2 const b( 1.0,0.0 );
+    Kernel::Point_2 const c( 1.0,1.0 );
 
     Triangle g( Kernel::Triangle_2( a,b,c ) ) ;
     BOOST_CHECK( ! g.isEmpty() );
@@ -54,9 +54,9 @@ BOOST_AUTO_TEST_CASE( testConstructorTriangle_2 )
 //Triangle( const Kernel::Triangle_3 & triangle ) ;
 BOOST_AUTO_TEST_CASE( testConstructorTriangle_3 )
 {
-    Kernel::Point_3 a( 0.0,0.0,1.0 );
-    Kernel::Point_3 b( 1.0,0.0,2.0 );
-    Kernel::Point_3 c( 1.0,1.0,3.0 );
+    Kernel::Point_3 const a( 0.0,0.0,1.0 );
+    Kernel::Point_3 const b( 1.0,0.0,2.0 );
+    Kernel::Point_3 const c( 1.0,1.0,3.0 );
 
     Triangle g( Kernel::Triangle_3( a,b,c ) ) ;
     BOOST_CHECK( ! g.isEmpty() );
@@ -74,9 +74,9 @@ BOOST_AUTO_TEST_CASE( testConstructorTriangle_3 )
 //void                   reverse() ;
 BOOST_AUTO_TEST_CASE( testReverse )
 {
-    Kernel::Point_3 a( 0.0,0.0,1.0 );
-    Kernel::Point_3 b( 1.0,0.0,2.0 );
-    Kernel::Point_3 c( 1.0,1.0,3.0 );
+    Kernel::Point_3 const a( 0.0,0.0,1.0 );
+    Kernel::Point_3 const b( 1.0,0.0,2.0 );
+    Kernel::Point_3 const c( 1.0,1.0,3.0 );
 
     Triangle g( Kernel::Triangle_3( a,b,c ) ) ;
     g.reverse();
@@ -101,11 +101,11 @@ BOOST_AUTO_TEST_CASE( testReverse )
 //virtual Geometry *   Geometry::clone() const = 0 ;
 BOOST_AUTO_TEST_CASE( testClone )
 {
-    Kernel::Point_3 a( 0.0,0.0,1.0 );
-    Kernel::Point_3 b( 1.0,0.0,2.0 );
-    Kernel::Point_3 c( 1.0,1.0,3.0 );
+    Kernel::Point_3 const a( 0.0,0.0,1.0 );
+    Kernel::Point_3 const b( 1.0,0.0,2.0 );
+    Kernel::Point_3 const c( 1.0,1.0,3.0 );
 
-    Triangle g( Kernel::Triangle_3( a,b,c ) ) ;
+    Triangle const g( Kernel::Triangle_3( a,b,c ) ) ;
 
     std::unique_ptr< Geometry > copy( g.clone() );
     BOOST_REQUIRE( copy->is< Triangle >() );
@@ -115,11 +115,11 @@ BOOST_AUTO_TEST_CASE( testClone )
 //virtual Geometry*    Geometry::boundary() const ;
 BOOST_AUTO_TEST_CASE( testBoundary )
 {
-    Kernel::Point_2 a( 0.0,0.0 );
-    Kernel::Point_2 b( 1.0,0.0 );
-    Kernel::Point_2 c( 1.0,1.0 );
+    Kernel::Point_2 const a( 0.0,0.0 );
+    Kernel::Point_2 const b( 1.0,0.0 );
+    Kernel::Point_2 const c( 1.0,1.0 );
 
-    Triangle g( Kernel::Triangle_2( a,b,c ) ) ;
+    Triangle const g( Kernel::Triangle_2( a,b,c ) ) ;
 
     std::unique_ptr< Geometry > boundary( g.boundary() );
     BOOST_CHECK_EQUAL( boundary->asText( 0 ), "LINESTRING(0 0,1 0,1 1,0 0)" );
@@ -128,20 +128,20 @@ BOOST_AUTO_TEST_CASE( testBoundary )
 //Envelope             Geometry::envelope() const ;
 BOOST_AUTO_TEST_CASE( testEnvelope_empty )
 {
-    Triangle g ;
+    Triangle const g ;
 
-    Envelope bbox = g.envelope() ;
+    Envelope const bbox = g.envelope() ;
     BOOST_CHECK( bbox.isEmpty() );
 }
 BOOST_AUTO_TEST_CASE( testEnvelope_2d )
 {
-    Kernel::Point_2 a( 0.0,-1.0 );
-    Kernel::Point_2 b( 0.5,0.2 );
-    Kernel::Point_2 c( 1.0,1.5 );
+    Kernel::Point_2 const a( 0.0,-1.0 );
+    Kernel::Point_2 const b( 0.5,0.2 );
+    Kernel::Point_2 const c( 1.0,1.5 );
 
-    Triangle g( Kernel::Triangle_2( a,b,c ) ) ;
+    Triangle const g( Kernel::Triangle_2( a,b,c ) ) ;
 
-    Envelope bbox = g.envelope() ;
+    Envelope const bbox = g.envelope() ;
     BOOST_CHECK( ! bbox.isEmpty() );
     BOOST_CHECK( ! bbox.is3D() );
 
@@ -152,13 +152,13 @@ BOOST_AUTO_TEST_CASE( testEnvelope_2d )
 }
 BOOST_AUTO_TEST_CASE( testEnvelope_3d )
 {
-    Kernel::Point_3 a( 0.0,-1.0,2.0 );
-    Kernel::Point_3 b( 0.5,0.2,4.0 );
-    Kernel::Point_3 c( 1.0,1.5,8.0 );
+    Kernel::Point_3 const a( 0.0,-1.0,2.0 );
+    Kernel::Point_3 const b( 0.5,0.2,4.0 );
+    Kernel::Point_3 const c( 1.0,1.5,8.0 );
 
-    Triangle g( Kernel::Triangle_3( a,b,c ) ) ;
+    Triangle const g( Kernel::Triangle_3( a,b,c ) ) ;
 
-    Envelope bbox = g.envelope() ;
+    Envelope const bbox = g.envelope() ;
     BOOST_CHECK( ! bbox.isEmpty() );
     BOOST_CHECK( bbox.is3D() );
     BOOST_CHECK_EQUAL( bbox.xMin(), 0.0 );
@@ -172,12 +172,12 @@ BOOST_AUTO_TEST_CASE( testEnvelope_3d )
 //std::string          Geometry::asText( const int & numDecimals = -1 ) const ;
 BOOST_AUTO_TEST_CASE( asTextEmpty )
 {
-    Triangle g;
+    Triangle const g;
     BOOST_CHECK_EQUAL( g.asText( 1 ), "TRIANGLE EMPTY" );
 }
 BOOST_AUTO_TEST_CASE( asText2d )
 {
-    Triangle g(
+    Triangle const g(
         Point( 0.0,0.0 ),
         Point( 1.0,0.0 ),
         Point( 1.0,1.0 )
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE( asText2d )
 }
 BOOST_AUTO_TEST_CASE( asText3d )
 {
-    Triangle g(
+    Triangle const g(
         Point( 0.0,0.0,2.0 ),
         Point( 1.0,0.0,3.0 ),
         Point( 1.0,1.0,4.0 )
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE( testIsEmpty )
 //template < typename Derived > inline bool Geometry::is() const
 BOOST_AUTO_TEST_CASE( isTriangle )
 {
-    Triangle g;
+    Triangle const g;
     BOOST_CHECK( g.is< Triangle >() );
 }
 

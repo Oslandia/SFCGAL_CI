@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE( geometryIsValid )
             continue;
         }
 
-        Validity v = algorithm::isValid( *g );
+        Validity const v = algorithm::isValid( *g );
         BOOST_CHECK_MESSAGE( v == tg.isValid, ( boost::format( "%d:%s should be %s (%s)%s%s : %s" ) % t % g->geometryType() % ( tg.isValid?"valid":"invalid" ) % tg.comment % ( v?".":", reason: " ) % v.reason() % tg.wkt ) );
     }
 
@@ -77,8 +77,8 @@ BOOST_AUTO_TEST_CASE( geometryWithNan )
 
 BOOST_AUTO_TEST_CASE( disconnectedTIN )
 {
-    std::unique_ptr< Geometry > g( io::readWkt( "TIN(((0 0,1 0,0 1,0 0)),((2 0,3 0,2 1,2 0)))" ) );
-    Validity v = algorithm::isValid( *g );
+    std::unique_ptr< Geometry > const g( io::readWkt( "TIN(((0 0,1 0,0 1,0 0)),((2 0,3 0,2 1,2 0)))" ) );
+    Validity const v = algorithm::isValid( *g );
     BOOST_CHECK( !v );
 }
 BOOST_AUTO_TEST_SUITE_END()

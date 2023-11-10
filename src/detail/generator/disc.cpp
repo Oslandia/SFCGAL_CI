@@ -13,10 +13,10 @@
 #include <SFCGAL/Polygon.h>
 
 #include <cmath>
+#include <cstddef>
 #include <memory>
 
-namespace SFCGAL {
-namespace generator {
+namespace SFCGAL::generator {
 
 ///
 ///
@@ -29,10 +29,10 @@ disc(const Point &center, const double &radius,
 
   std::unique_ptr<LineString> exteriorRing(new LineString());
 
-  double dTheta = M_PI_4 / nQuadrantSegments;
+  double const dTheta = M_PI_4 / nQuadrantSegments;
 
-  for (size_t i = 0; i < nQuadrantSegments * 4; i++) {
-    Kernel::Vector_2 p =
+  for (size_t i = 0; i < static_cast<unsigned long>(nQuadrantSegments * )4; i++) {
+    Kernel::Vector_2 const p =
         center.toVector_2() +
         radius * Kernel::Vector_2(cos(i * dTheta), sin(i * dTheta));
     exteriorRing->addPoint(new Point(p.x(), p.y()));
@@ -43,5 +43,4 @@ disc(const Point &center, const double &radius,
   return std::make_unique<Polygon>(exteriorRing.release());
 }
 
-} // namespace generator
 } // namespace SFCGAL

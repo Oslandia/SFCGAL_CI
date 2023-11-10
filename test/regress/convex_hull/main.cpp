@@ -55,7 +55,7 @@ namespace po = boost::program_options ;
  * Triangulate each polygon in an input file containing lines in the following format :
  * <id> "|" ( <wkt polygon> | <wkt multipolygon> )
  */
-int main( int argc, char* argv[] )
+auto main( int argc, char* argv[] ) -> int
 {
     /*
      * declare options
@@ -72,17 +72,17 @@ int main( int argc, char* argv[] )
     po::store( po::parse_command_line( argc, argv, desc ), vm );
     po::notify( vm );
 
-    if ( vm.count( "help" ) ) {
+    if ( vm.count( "help" ) != 0u ) {
         std::cout << desc << std::endl ;
         return 0;
     }
 
-    bool verbose  = vm.count( "verbose" ) != 0 ;
-    bool progress = vm.count( "progress" ) != 0 ;
+    bool const verbose  = vm.count( "verbose" ) != 0 ;
+    bool const progress = vm.count( "progress" ) != 0 ;
 
     std::string filename ;
 
-    if ( vm.count( "filename" ) ) {
+    if ( vm.count( "filename" ) != 0u ) {
         filename = vm["filename"].as< std::string >() ;
     }
     else {
@@ -101,7 +101,7 @@ int main( int argc, char* argv[] )
         return 1;
     }
 
-    std::string tri_filename( filename+".convex.wkt" );
+    std::string const tri_filename( filename+".convex.wkt" );
     std::ofstream ofs_result( tri_filename.c_str() ) ;
 
     if ( ! ofs_result.good() ) {
@@ -109,7 +109,7 @@ int main( int argc, char* argv[] )
         return 1;
     }
 
-    std::string error_filename( filename+".error.wkt" );
+    std::string const error_filename( filename+".error.wkt" );
     std::ofstream ofs_error( error_filename.c_str() ) ;
 
     if ( ! ofs_error.good() ) {
@@ -119,12 +119,14 @@ int main( int argc, char* argv[] )
 
 
     //boost::timer timer ;
-    boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
+    boost::chrono::system_clock::time_point const start = boost::chrono::system_clock::now();
 
     /*
      * process file
      */
-    int lineNumber = 0 , numFailed = 0 , numSuccess = 0 ;
+    int lineNumber = 0 ;
+    int numFailed = 0 ;
+    int numSuccess = 0 ;
     std::string line ;
 
     while ( std::getline( ifs, line ) ) {
@@ -144,7 +146,7 @@ int main( int argc, char* argv[] )
 
         if ( progress && lineNumber % 1000 == 0 ) {
             std::cout.width( 12 ) ;
-            boost::chrono::duration<double> elapsed = boost::chrono::system_clock::now() - start;
+            boost::chrono::duration<double> const elapsed = boost::chrono::system_clock::now() - start;
             std::cout << std::left << lineNumber << "(" << elapsed << " s)"<< std::endl ;
         }
 
@@ -168,7 +170,8 @@ int main( int argc, char* argv[] )
 
         bool failed = true ;
 
-        std::unique_ptr< Geometry > hull, hull3D ;
+        std::unique_ptr< Geometry > hull;
+        std::unique_ptr< Geometry > hull3D ;
 
         try {
             std::unique_ptr< Geometry > g;
@@ -204,7 +207,7 @@ int main( int argc, char* argv[] )
     ofs_result.close();
 
 
-    boost::chrono::duration<double> elapsed = boost::chrono::system_clock::now() - start;
+    boost::chrono::duration<double> const elapsed = boost::chrono::system_clock::now() - start;
     std::cout << filename << " complete (" << elapsed << " s)---" << std::endl;
     std::cout << numFailed << " failed /" << ( numFailed + numSuccess ) << std::endl ;
 
@@ -213,8 +216,7 @@ int main( int argc, char* argv[] )
         boost::filesystem::remove( error_filename );
         return EXIT_SUCCESS ;
     }
-    else {
-        return EXIT_FAILURE ;
-    }
+            return EXIT_FAILURE ;
+   
 }
 

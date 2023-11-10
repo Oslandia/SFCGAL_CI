@@ -93,15 +93,16 @@ BOOST_AUTO_TEST_CASE( testLimitsIntersects )
     std::ifstream ifs( filename.c_str() );
     BOOST_REQUIRE( ifs.good() ) ;
 
-    std::string wkt1, wkt2;
+    std::string wkt1;
+    std::string wkt2;
     std::getline( ifs, wkt1 );
     std::getline( ifs, wkt2 );
 
-    std::unique_ptr< Geometry > g1( io::readWkt( wkt1 ) );
-    std::unique_ptr< Geometry > g2( io::readWkt( wkt2 ) );
+    std::unique_ptr< Geometry > const g1( io::readWkt( wkt1 ) );
+    std::unique_ptr< Geometry > const g2( io::readWkt( wkt2 ) );
 
     // check that a call to intersects() does not throw
-    bool throws = false;
+    bool const throws = false;
     algorithm::intersects( *g1, *g2 );
     BOOST_CHECK_EQUAL( throws, false );
 }
@@ -112,11 +113,11 @@ BOOST_AUTO_TEST_SUITE_END()
 // https://gitlab.com/Oslandia/SFCGAL/-/issues/253
 BOOST_AUTO_TEST_CASE( issue_gitlab_253 )
 {
-  std::unique_ptr< Geometry > g1( io::readWkt( "POLYHEDRALSURFACE Z (((2 0.5 0.5, 0 0 1, 0 0 0, 2 0.5 0.5)), ((2 0.5 0.5, 0 1 1, 0 0 1, 2 0.5 0.5)), ((2 0.5 0.5, 0 1 0, 0 1 1, 2 0.5 0.5)), ((2 0.5 0.5, 0 0 0, 0 1 0, 2 0.5 0.5)), ((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)))" ));
-  std::unique_ptr< Geometry > g2( io::readWkt( "POINT (0 0.5 0.5)" ));
+  std::unique_ptr< Geometry > const g1( io::readWkt( "POLYHEDRALSURFACE Z (((2 0.5 0.5, 0 0 1, 0 0 0, 2 0.5 0.5)), ((2 0.5 0.5, 0 1 1, 0 0 1, 2 0.5 0.5)), ((2 0.5 0.5, 0 1 0, 0 1 1, 2 0.5 0.5)), ((2 0.5 0.5, 0 0 0, 0 1 0, 2 0.5 0.5)), ((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)))" ));
+  std::unique_ptr< Geometry > const g2( io::readWkt( "POINT (0 0.5 0.5)" ));
 
     // check that a call to intersects() does not throw
-    bool throws = false;
+    bool const throws = false;
     bool intersects = algorithm::intersects3D( *g1, *g2 );
     BOOST_CHECK_EQUAL( intersects, true );
     intersects = algorithm::intersects3D( *g2, *g1 );

@@ -50,14 +50,14 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_algorithm_CoversTest )
  */
 BOOST_AUTO_TEST_CASE( testFileCoversTest )
 {
-    int argc = framework::master_test_suite().argc;
+    int const argc = framework::master_test_suite().argc;
     char** argv = framework::master_test_suite().argv;
 
     // look for options
     int test_one_line = -1;
 
     for ( int i = 0; i < argc; ++i ) {
-        std::string argi( argv[i] );
+        std::string const argi( argv[i] );
 
         if ( argi == "--line" ) {
             // only test one line
@@ -94,7 +94,8 @@ BOOST_AUTO_TEST_CASE( testFileCoversTest )
         std::istringstream iss( line );
 
         std::string distanceDimension ;
-        std::string wktGA, wktGB ;
+        std::string wktGA;
+        std::string wktGB ;
         std::string trueOrFalse ;
 
         std::getline( iss, distanceDimension, '|' ) ;
@@ -102,7 +103,7 @@ BOOST_AUTO_TEST_CASE( testFileCoversTest )
         std::getline( iss, wktGB, '|' ) ;
         std::getline( iss, trueOrFalse, '|' ) ;
 
-        bool expected = ( trueOrFalse == "true" ) ? true : false ;
+        bool const expected = trueOrFalse == "true" ;
 
         std::unique_ptr< Geometry > gA( io::readWkt( wktGA ) );
         std::unique_ptr< Geometry > gB( io::readWkt( wktGB ) );
@@ -112,7 +113,7 @@ BOOST_AUTO_TEST_CASE( testFileCoversTest )
                 BOOST_CHECK_MESSAGE( algorithm::covers( *gA,*gB ) == expected, numLine << ": covers(" << gA->asText() << ", " << gB->asText() << ") should be " << ( expected ? "TRUE" : "FALSE" ) );
             }
             else if ( distanceDimension == "3" ) {
-                bool got = algorithm::covers3D( *gA,*gB );
+                bool const got = algorithm::covers3D( *gA,*gB );
                 BOOST_CHECK_MESSAGE( got == expected, numLine << ": covers3D(" << gA->asText() << ", " << gB->asText() << ") should be " << ( expected ? "TRUE" : "FALSE" ) );
             }
             else {

@@ -10,7 +10,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-MultiSolid::MultiSolid() : GeometryCollection() {}
+MultiSolid::MultiSolid()  {}
 
 ///
 ///

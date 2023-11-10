@@ -87,17 +87,17 @@ Coordinate::~Coordinate() = default;
 class CoordinateDimensionVisitor : public boost::static_visitor<int> {
 public:
   auto
-  operator()(const Coordinate::Empty &) const -> int
+  operator()(const Coordinate::Empty & /*unused*/) const -> int
   {
     return 0;
   }
   auto
-  operator()(const Kernel::Point_2 &) const -> int
+  operator()(const Kernel::Point_2 & /*unused*/) const -> int
   {
     return 2;
   }
   auto
-  operator()(const Kernel::Point_3 &) const -> int
+  operator()(const Kernel::Point_3 & /*unused*/) const -> int
   {
     return 3;
   }
@@ -134,7 +134,7 @@ Coordinate::is3D() const -> bool
 class GetXVisitor : public boost::static_visitor<Kernel::FT> {
 public:
   auto
-  operator()(const Coordinate::Empty &) const -> Kernel::FT
+  operator()(const Coordinate::Empty & /*unused*/) const -> Kernel::FT
   {
     BOOST_THROW_EXCEPTION(
         Exception("trying to get an empty coordinate x value"));
@@ -165,7 +165,7 @@ Coordinate::x() const -> Kernel::FT
 class GetYVisitor : public boost::static_visitor<Kernel::FT> {
 public:
   auto
-  operator()(const Coordinate::Empty &) const -> Kernel::FT
+  operator()(const Coordinate::Empty & /*unused*/) const -> Kernel::FT
   {
     BOOST_THROW_EXCEPTION(
         Exception("trying to get an empty coordinate y value"));
@@ -196,14 +196,14 @@ Coordinate::y() const -> Kernel::FT
 class GetZVisitor : public boost::static_visitor<Kernel::FT> {
 public:
   auto
-  operator()(const Coordinate::Empty &) const -> Kernel::FT
+  operator()(const Coordinate::Empty & /*unused*/) const -> Kernel::FT
   {
     BOOST_THROW_EXCEPTION(
         Exception("trying to get an empty coordinate z value"));
     return 0;
   }
   auto
-  operator()(const Kernel::Point_2 &) const -> Kernel::FT
+  operator()(const Kernel::Point_2 & /*unused*/) const -> Kernel::FT
   {
     return 0;
   }
@@ -231,7 +231,7 @@ public:
   RoundVisitor(const long &scaleFactor) : _scaleFactor(scaleFactor) {}
 
   void
-  operator()(Coordinate::Empty &) const
+  operator()(Coordinate::Empty & /*unused*/) const
   {
   }
   void
@@ -249,7 +249,7 @@ public:
 private:
   long _scaleFactor;
 
-  auto
+  [[nodiscard]] auto
   _roundFT(const Kernel::FT &v) const -> Kernel::FT
   {
 #ifdef CGAL_USE_GMPXX
@@ -276,7 +276,7 @@ Coordinate::round(const long &scaleFactor) -> Coordinate &
 class ToPoint2Visitor : public boost::static_visitor<Kernel::Point_2> {
 public:
   auto
-  operator()(const Coordinate::Empty &) const -> Kernel::Point_2
+  operator()(const Coordinate::Empty & /*unused*/) const -> Kernel::Point_2
   {
     return Kernel::Point_2(CGAL::ORIGIN);
   }
@@ -353,14 +353,14 @@ Coordinate::operator<(const Coordinate &other) const -> bool
   // comparison along x
   if (x() < other.x()) {
     return true;
-  } else if (other.x() < x()) {
+  } if (other.x() < x()) {
     return false;
   }
 
   // comparison along y
   if (y() < other.y()) {
     return true;
-  } else if (other.y() < y()) {
+  } if (other.y() < y()) {
     return false;
   }
 
@@ -368,7 +368,7 @@ Coordinate::operator<(const Coordinate &other) const -> bool
   if (is3D()) {
     if (z() < other.z()) {
       return true;
-    } else if (other.z() < z()) {
+    } if (other.z() < z()) {
       return false;
     }
   }

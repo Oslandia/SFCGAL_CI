@@ -5,14 +5,13 @@
 #include <SFCGAL/algorithm/ConsistentOrientationBuilder.h>
 #include <SFCGAL/detail/graph/algorithm/orientation.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 ///
 ///
 ///
 ConsistentOrientationBuilder::ConsistentOrientationBuilder()
-    : _graph(), _graphBuilder(_graph), _triangles()
+    : _graph(), _graphBuilder(_graph) 
 {
 }
 
@@ -102,8 +101,9 @@ ConsistentOrientationBuilder::_makeOrientationConsistent()
     // orient neighbors
     const std::set<size_t> &neighbors = _neighbors[currentTriangle];
 
-    for (unsigned long neighbor : neighbors) {
-      bool hasOppositeEdge = false, hasParallelEdge = false;
+    for (unsigned long const neighbor : neighbors) {
+      bool hasOppositeEdge = false;
+      bool hasParallelEdge = false;
       graph::algorithm::studyOrientation(_graph, _triangles[currentTriangle],
                                          _triangles[neighbor], hasOppositeEdge,
                                          hasParallelEdge);
@@ -151,7 +151,7 @@ ConsistentOrientationBuilder::_computeNeighbors()
       vertex_descriptor target = _graph.target(j);
 
       // get neighbor edges
-      std::vector<directed_edge_descriptor> neighborEdges =
+      std::vector<directed_edge_descriptor> const neighborEdges =
           _graph.edges(source, target);
 
       // use marker to fill neighborGraph
@@ -207,5 +207,4 @@ ConsistentOrientationBuilder::_findNextTriangle() -> int
   return result;
 }
 
-} // namespace algorithm
 } // namespace SFCGAL

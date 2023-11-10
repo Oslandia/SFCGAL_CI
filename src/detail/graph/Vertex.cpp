@@ -4,13 +4,11 @@
 
 #include <SFCGAL/detail/graph/Vertex.h>
 
-namespace SFCGAL {
-namespace graph {
+namespace SFCGAL::graph {
 
 ///
 ///
 ///
 Vertex::Vertex(const Coordinate &coordinate_) : coordinate(coordinate_) {}
 
-} // namespace graph
 } // namespace SFCGAL

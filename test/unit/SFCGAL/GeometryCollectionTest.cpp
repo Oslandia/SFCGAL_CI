@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_GeometryCollectionTest )
 //GeometryCollection() ;
 BOOST_AUTO_TEST_CASE( defaultConstructor )
 {
-    GeometryCollection g ;
+    GeometryCollection const g ;
     BOOST_CHECK( g.isEmpty() );
 }
 
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE( testIterators )
 //std::string          Geometry::asText( const int & numDecimals = -1 ) const ;
 BOOST_AUTO_TEST_CASE( asTextEmpty )
 {
-    GeometryCollection g;
+    GeometryCollection const g;
     BOOST_CHECK_EQUAL( g.asText( 1 ), "GEOMETRYCOLLECTION EMPTY" );
 }
 BOOST_AUTO_TEST_CASE( asText2d )
@@ -124,13 +124,13 @@ BOOST_AUTO_TEST_CASE( asText3d )
 //virtual std::string  Geometry::geometryType() const = 0 ;
 BOOST_AUTO_TEST_CASE( testGeometryType )
 {
-    GeometryCollection g;
+    GeometryCollection const g;
     BOOST_CHECK_EQUAL( g.geometryType(), "GeometryCollection" );
 }
 //virtual GeometryType Geometry::geometryTypeId() const = 0 ;
 BOOST_AUTO_TEST_CASE( testGeometryTypeId )
 {
-    GeometryCollection g;
+    GeometryCollection const g;
     BOOST_CHECK_EQUAL( g.geometryTypeId(), TYPE_GEOMETRYCOLLECTION );
 }
 

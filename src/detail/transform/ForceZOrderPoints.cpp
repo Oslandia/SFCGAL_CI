@@ -10,8 +10,7 @@
 
 #include <utility>
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 ///
 ///
@@ -72,5 +71,4 @@ ForceZOrderPoints::visit(Polygon &p)
   }
 }
 
-} // namespace transform
 } // namespace SFCGAL

@@ -45,11 +45,11 @@ BOOST_AUTO_TEST_CASE( testNormal1 )
     typedef CGAL::Vector_3< Kernel > Vector_3 ;
     typedef CGAL::Point_3< Kernel > Point_3 ;
 
-    Point_3 a( 0.0, 0.0, 0.0 );
-    Point_3 b( 1.0, 0.0, 0.0 );
-    Point_3 c( 1.0, 1.0, 0.0 );
+    Point_3 const a( 0.0, 0.0, 0.0 );
+    Point_3 const b( 1.0, 0.0, 0.0 );
+    Point_3 const c( 1.0, 1.0, 0.0 );
 
-    Vector_3 normal = algorithm::normal3D( a, b, c );
+    Vector_3 const normal = algorithm::normal3D( a, b, c );
     BOOST_CHECK_EQUAL( normal.x(), 0.0 );
     BOOST_CHECK_EQUAL( normal.y(), 0.0 );
     BOOST_CHECK_EQUAL( normal.z(), 1.0 );
@@ -66,21 +66,21 @@ BOOST_AUTO_TEST_CASE( testNormal2 )
     std::unique_ptr<Geometry> gC( io::readWkt( "POLYGON((0 0,0.5 0.5,1 0,1 1,0 1,0 0))" ) );
 
     {
-        CGAL::Vector_3<Kernel> normal = algorithm::normal3D<Kernel>( gA->as<Polygon>() );
+        CGAL::Vector_3<Kernel> const normal = algorithm::normal3D<Kernel>( gA->as<Polygon>() );
         BOOST_CHECK_EQUAL( normal.x(), 0.0 );
         BOOST_CHECK_EQUAL( normal.y(), 0.0 );
         BOOST_CHECK_EQUAL( normal.z(), 2.0 );
     }
 
     {
-        CGAL::Vector_3<Kernel> normal = algorithm::normal3D<Kernel>( gB->as<Polygon>() );
+        CGAL::Vector_3<Kernel> const normal = algorithm::normal3D<Kernel>( gB->as<Polygon>() );
         BOOST_CHECK_EQUAL( normal.x(), 0.0 );
         BOOST_CHECK_EQUAL( normal.y(), 0.0 );
         BOOST_CHECK_EQUAL( normal.z(), -2.0 );
     }
 
     {
-        CGAL::Vector_3<Kernel> normal = algorithm::normal3D<Kernel>( gC->as<Polygon>() );
+        CGAL::Vector_3<Kernel> const normal = algorithm::normal3D<Kernel>( gC->as<Polygon>() );
         BOOST_CHECK_EQUAL( normal.x(), 0.0 );
         BOOST_CHECK_EQUAL( normal.y(), 0.0 );
         // ok, the normal is pointing up (z > 0)
@@ -94,17 +94,17 @@ BOOST_AUTO_TEST_CASE( testNormal3 )
     std::unique_ptr<Geometry> gA( io::readWkt( "POLYGON((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0))" ) );
     // exact
     {
-        CGAL::Vector_3<Kernel> normal = algorithm::normal3D<Kernel>( gA->as<Polygon>(), true );
+        CGAL::Vector_3<Kernel> const normal = algorithm::normal3D<Kernel>( gA->as<Polygon>(), true );
         //std::cout << CGAL::exact(normal) << std::endl;
-        CGAL::Plane_3<Kernel> plane( gA->as<Polygon>().exteriorRing().startPoint().toPoint_3(), normal );
+        CGAL::Plane_3<Kernel> const plane( gA->as<Polygon>().exteriorRing().startPoint().toPoint_3(), normal );
         //std::cout << CGAL::exact(plane) << std::endl;
         BOOST_CHECK( ! plane.is_degenerate() );
     }
     // round
     {
-        CGAL::Vector_3<Kernel> normal = algorithm::normal3D<Kernel>( gA->as<Polygon>(), false );
+        CGAL::Vector_3<Kernel> const normal = algorithm::normal3D<Kernel>( gA->as<Polygon>(), false );
         //std::cout << CGAL::exact(normal) << std::endl;
-        CGAL::Plane_3<Kernel> plane( gA->as<Polygon>().exteriorRing().startPoint().toPoint_3(), normal );
+        CGAL::Plane_3<Kernel> const plane( gA->as<Polygon>().exteriorRing().startPoint().toPoint_3(), normal );
         //std::cout << CGAL::exact(plane) << std::endl;
         BOOST_CHECK( ! plane.is_degenerate() );
     }

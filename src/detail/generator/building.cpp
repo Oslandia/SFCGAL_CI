@@ -16,8 +16,7 @@
 
 #include <boost/format.hpp>
 
-namespace SFCGAL {
-namespace generator {
+namespace SFCGAL::generator {
 
 using Point_2              = Kernel::Point_2;
 using Point_3              = Kernel::Point_3;
@@ -42,7 +41,7 @@ void
 _buildingWall(const Polygon_2 &ring, const Kernel::FT &wallHeight,
               PolyhedralSurface &shell)
 {
-  size_t npt = ring.size();
+  size_t const npt = ring.size();
 
   for (size_t i = 0; i < npt; i++) {
     const Point_2 &a = ring.vertex(i);
@@ -77,7 +76,7 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
   // fix orientation
   algorithm::makeValidOrientation(polygon);
 
-  boost::shared_ptr<Straight_skeleton_2> skeleton =
+  boost::shared_ptr<Straight_skeleton_2> const skeleton =
       create_interior_straight_skeleton_2(
           polygon.outer_boundary().vertices_begin(),
           polygon.outer_boundary().vertices_end(), polygon.holes_begin(),
@@ -98,7 +97,7 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
     _buildingWall(polygon.outer_boundary(), wallHeight, *shell);
 
     // interior rings
-    for (Polygon_with_holes_2::Hole_const_iterator it = polygon.holes_begin();
+    for (auto it = polygon.holes_begin();
          it != polygon.holes_end(); ++it) {
       _buildingWall(*it, wallHeight, *shell);
     }
@@ -110,14 +109,15 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
          it != skeleton->faces_end(); ++it) {
 
       LineString            roofFaceRing;
-      Halfedge_const_handle h                 = it->halfedge(), done(h);
+      Halfedge_const_handle h                 = it->halfedge();
+      Halfedge_const_handle done(h);
       bool                  infiniteTimeFound = false;
 
       do {
         infiniteTimeFound = infiniteTimeFound || h->has_infinite_time();
 
-        Point_2    point  = h->vertex()->point();
-        Kernel::FT zPoint = wallHeight + h->vertex()->time() * roofSlope;
+        Point_2    const point  = h->vertex()->point();
+        Kernel::FT const zPoint = wallHeight + h->vertex()->time() * roofSlope;
 
         roofFaceRing.addPoint(Point(point.x(), point.y(), zPoint));
 
@@ -174,5 +174,4 @@ building(const Geometry &g, const Kernel::FT &wallHeight,
   }
 }
 
-} // namespace generator
 } // namespace SFCGAL

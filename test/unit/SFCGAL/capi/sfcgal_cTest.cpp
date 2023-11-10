@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_sfcgal_cTest )
 
 bool hasError = false;
 
-int on_error( const char* /*msg*/, ... )
+auto on_error( const char* /*msg*/, ... ) -> int
 {
     hasError = true;
     return 0;
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( testErrorOnBadGeometryType )
 {
     sfcgal_set_error_handlers( printf, on_error );
 
-    std::unique_ptr<Geometry> l( io::readWkt( "LINESTRING(0 0, 0 1)" ) );
+    std::unique_ptr<Geometry> const l( io::readWkt( "LINESTRING(0 0, 0 1)" ) );
     std::unique_ptr<Geometry> p( io::readWkt( "POINT(0 2)" ) );
     sfcgal_geometry_t* gl = l.get();
 
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( testErrorOnBadGeometryType )
     BOOST_CHECK( hasError == false );
 
     hasError = false;
-    BOOST_CHECK( sfcgal_triangle_vertex( gl, 0 ) == 0 ); // should fail
+    BOOST_CHECK( sfcgal_triangle_vertex( gl, 0 ) == nullptr ); // should fail
     BOOST_CHECK( hasError == true );
 
     sfcgal_geometry_t* gp = p.release();
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE( testStraightSkeletonPolygon )
 {
     sfcgal_set_error_handlers( printf, on_error );
 
-    std::unique_ptr<Geometry> g( io::readWkt(
+    std::unique_ptr<Geometry> const g( io::readWkt(
 "POLYGON((0 0, 20 0, 20 10, 0 10, 0 0))"
     ) );
 
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE( testStraightSkeletonMultiPolygon )
 {
     sfcgal_set_error_handlers( printf, on_error );
 
-    std::unique_ptr<Geometry> g( io::readWkt(
+    std::unique_ptr<Geometry> const g( io::readWkt(
 "MULTIPOLYGON(((0 0, 20 0, 20 10, 0 10, 0 0)),((100 0,200 0,150 100,100 0)))"
     ) );
 
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE( testApproximateMedialAxis )
 {
     sfcgal_set_error_handlers( printf, on_error );
 
-    std::unique_ptr<Geometry> g( io::readWkt(
+    std::unique_ptr<Geometry> const g( io::readWkt(
 "POLYGON((-42 9,-44 9,-42 8,-22 7,-22 21,1 22,-5 13,-5 12,-4 13,2 23,-23 22,-23 8,-42 9))"
     ) );
 
@@ -126,10 +126,10 @@ BOOST_AUTO_TEST_CASE( testCovers )
 {
     sfcgal_set_error_handlers( printf, on_error );
 
-    std::unique_ptr<Geometry> g1( io::readWkt(
+    std::unique_ptr<Geometry> const g1( io::readWkt(
 "MULTIPOLYGON(((0 0, 20 0, 20 10, 0 10, 0 0)),((100 0,200 0,150 100,100 0)))"
     ) );
-    std::unique_ptr<Geometry> g2( io::readWkt(
+    std::unique_ptr<Geometry> const g2( io::readWkt(
 "MULTIPOLYGON(((100 0,200 0,150 100,100 0)), ((0 0, 20 0, 20 10, 0 10, 0 0)))"
     ) );
 
@@ -139,8 +139,8 @@ BOOST_AUTO_TEST_CASE( testCovers )
 BOOST_AUTO_TEST_CASE( testLineSubstring )
 {
     sfcgal_set_error_handlers( printf, on_error );
-    std::unique_ptr<Geometry> g1( io::readWkt( "LINESTRING Z(0 0 0, 0 0 10)" ) );
-    std::unique_ptr<Geometry> g2( io::readWkt( "LINESTRING Z(0 0 3, 0 0 7)" ) );
+    std::unique_ptr<Geometry> const g1( io::readWkt( "LINESTRING Z(0 0 0, 0 0 10)" ) );
+    std::unique_ptr<Geometry> const g2( io::readWkt( "LINESTRING Z(0 0 3, 0 0 7)" ) );
     hasError = false;
     sfcgal_geometry_t* ls = sfcgal_geometry_line_sub_string( g1.get(), 0.3, 0.7);
     BOOST_CHECK( hasError == false );

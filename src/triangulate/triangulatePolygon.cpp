@@ -17,8 +17,7 @@
 
 #include <iostream>
 
-namespace SFCGAL {
-namespace triangulate {
+namespace SFCGAL::triangulate {
 
 using Vertex_handle = ConstraintDelaunayTriangulation::Vertex_handle;
 
@@ -140,7 +139,7 @@ triangulatePolygon3D(const Polygon       &polygon,
   /*
    * find polygon plane
    */
-  Kernel::Plane_3 polygonPlane =
+  Kernel::Plane_3 const polygonPlane =
       algorithm::plane3D<Kernel>(polygon, algorithm::Plane3DInexactUnsafe());
 
   cdt.setProjectionPlane(polygonPlane);
@@ -155,15 +154,15 @@ triangulatePolygon3D(const Polygon       &polygon,
      * note, we do not include the last point, since it's equal to the last and
      * that
      */
-    if (!ring.numPoints()) {
+    if (ring.numPoints() == 0u) {
       continue;
     }
 
     Vertex_handle v_prev = cdt.addVertex(ring.pointN(0).coordinate());
-    Vertex_handle v_0    = v_prev;
+    Vertex_handle const v_0    = v_prev;
 
     for (size_t j = 1; j < ring.numPoints() - 1; j++) {
-      Vertex_handle vh = cdt.addVertex(ring.pointN(j).coordinate());
+      Vertex_handle const vh = cdt.addVertex(ring.pointN(j).coordinate());
       cdt.addConstraint(v_prev, vh);
       v_prev = vh;
     }
@@ -201,5 +200,4 @@ triangulatePolygon3D(const Solid &g, TriangulatedSurface &triangulatedSurface)
   }
 }
 
-} // namespace triangulate
 } // namespace SFCGAL

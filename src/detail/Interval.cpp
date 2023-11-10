@@ -7,8 +7,7 @@
 
 #include <algorithm>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 ///
 ///
@@ -118,7 +117,7 @@ Interval::intersects(const Interval &other) const -> bool
     return false;
   }
 
-  return !(_lower > other._upper || _upper < other._lower);
+  return _lower <= other._upper && _upper >= other._lower;
 }
 
 ///
@@ -143,5 +142,4 @@ Interval::operator!=(const Interval &other) const -> bool
   return !((*this) == other);
 }
 
-} // namespace detail
 } // namespace SFCGAL

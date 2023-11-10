@@ -8,11 +8,10 @@
 #include <SFCGAL/algorithm/tesselate.h>
 #include <SFCGAL/algorithm/volume.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 auto
-volume(const Solid &solid, NoValidityCheck) -> const Kernel::FT
+volume(const Solid &solid, NoValidityCheck /*unused*/) -> const Kernel::FT
 {
   Kernel::FT                  vol = 0;
   const CGAL::Point_3<Kernel> origin(0, 0, 0);
@@ -77,5 +76,4 @@ volume(const Geometry &g) -> const Kernel::FT
   return 0; // to avoid warning
 }
 
-} // namespace algorithm
 } // namespace SFCGAL

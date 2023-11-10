@@ -46,7 +46,7 @@ namespace
                                       , start_frac
                                       , end_frac
                                       );
-        std::unique_ptr<Geometry> expected = io::readWkt( expected_wkt );
+        std::unique_ptr<Geometry> const expected = io::readWkt( expected_wkt );
         if ( verify_using_covers )
         {
             BOOST_CHECK( algorithm::covers3D( *result, *expected ) );

@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_detail_IntervalTest )
 //Interval() ;
 BOOST_AUTO_TEST_CASE( testDefaultConstructor )
 {
-    Interval bound;
+    Interval const bound;
     BOOST_CHECK( std::isnan( bound.lower() ) );
     BOOST_CHECK( std::isnan( bound.upper() ) );
 }
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE( testDefaultConstructor )
 //Interval( const double & value ) ;
 BOOST_AUTO_TEST_CASE( testConstructorWithValue )
 {
-    Interval bound( 5.0 );
+    Interval const bound( 5.0 );
     BOOST_CHECK_EQUAL( bound.lower(), 5.0 );
     BOOST_CHECK_EQUAL( bound.upper(), 5.0 );
 }
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE( testConstructorWithValue )
 //Interval( const double & v1, const double & v2 ) ;
 BOOST_AUTO_TEST_CASE( testConstructorWithTwoValues )
 {
-    Interval bound( 5.0,3.0 );
+    Interval const bound( 5.0,3.0 );
     BOOST_CHECK_EQUAL( bound.lower(), 3.0 );
     BOOST_CHECK_EQUAL( bound.upper(), 5.0 );
 }
@@ -63,12 +63,12 @@ BOOST_AUTO_TEST_CASE( testConstructorWithTwoValues )
 //bool isEmpty() const ;
 BOOST_AUTO_TEST_CASE( testEmpty )
 {
-    Interval bound ;
+    Interval const bound ;
     BOOST_CHECK( bound.isEmpty() );
 }
 BOOST_AUTO_TEST_CASE( testNotEmpty )
 {
-    Interval bound( 5.0 );
+    Interval const bound( 5.0 );
     BOOST_CHECK( ! bound.isEmpty() );
 }
 
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE( testNotEmpty )
 //inline double         width() const { return _upper - _lower ; }
 BOOST_AUTO_TEST_CASE( testWidth )
 {
-    Interval bound( 4.0,5.0 );
+    Interval const bound( 4.0,5.0 );
     BOOST_CHECK_EQUAL( bound.width(), 1.0 );
 }
 

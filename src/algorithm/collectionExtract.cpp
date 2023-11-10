@@ -12,8 +12,7 @@
 
 #include <SFCGAL/detail/transform/ForceZ.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 // If nothing has to be built, g will be moved to the result without
 // copying and a new allocation. Otherwise, a new geometry is built and
@@ -71,5 +70,4 @@ collectionExtractPolygons(std::unique_ptr<Geometry> g)
   return std::unique_ptr<Geometry>(ret_geo);
 }
 
-} // namespace algorithm
 } // namespace SFCGAL

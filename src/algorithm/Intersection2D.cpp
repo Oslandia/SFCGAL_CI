@@ -16,8 +16,7 @@
 
 using namespace SFCGAL::detail;
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 // local function : get the number of intersection points between rings of a
 // polygon
@@ -39,7 +38,8 @@ numIntersectionPoints(const CGAL::Polygon_with_holes_2<Kernel> &poly) -> int
     }
 
     for (auto hjt = hit; hjt != poly.holes_end(); ++hjt) {
-      GeometrySet<2> ringJ, inter;
+      GeometrySet<2> ringJ;
+      GeometrySet<2> inter;
       ringJ.addSegments(hjt->edges_begin(), hjt->edges_end());
 
       algorithm::intersection(ringI, ringJ, inter);
@@ -54,7 +54,7 @@ numIntersectionPoints(const CGAL::Polygon_with_holes_2<Kernel> &poly) -> int
 // must be called with pa's dimension larger than pb's
 void
 intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
-             GeometrySet<2> &output, dim_t<2>)
+             GeometrySet<2> &output, dim_t<2> /*unused*/)
 {
   // everything vs a point
   if (pb.handle.which() == PrimitivePoint) {
@@ -72,18 +72,18 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
         poly2->holes_begin() == poly2->holes_end() &&
         poly2->outer_boundary().size() == 3) {
       auto                     vit1 = poly1->outer_boundary().vertices_begin();
-      CGAL::Point_2<Kernel>    pa1  = *vit1++;
-      CGAL::Point_2<Kernel>    pa2  = *vit1++;
-      CGAL::Point_2<Kernel>    pa3  = *vit1;
-      CGAL::Triangle_2<Kernel> tri1(pa1, pa2, pa3);
+      CGAL::Point_2<Kernel>    const pa1  = *vit1++;
+      CGAL::Point_2<Kernel>    const pa2  = *vit1++;
+      CGAL::Point_2<Kernel>    const pa3  = *vit1;
+      CGAL::Triangle_2<Kernel> const tri1(pa1, pa2, pa3);
 
       auto                     vit2 = poly2->outer_boundary().vertices_begin();
-      CGAL::Point_2<Kernel>    pb1  = *vit2++;
-      CGAL::Point_2<Kernel>    pb2  = *vit2++;
-      CGAL::Point_2<Kernel>    pb3  = *vit2;
-      CGAL::Triangle_2<Kernel> tri2(pb1, pb2, pb3);
+      CGAL::Point_2<Kernel>    const pb1  = *vit2++;
+      CGAL::Point_2<Kernel>    const pb2  = *vit2++;
+      CGAL::Point_2<Kernel>    const pb3  = *vit2;
+      CGAL::Triangle_2<Kernel> const tri2(pb1, pb2, pb3);
 
-      CGAL::Object interObj = CGAL::intersection(tri1, tri2);
+      CGAL::Object const interObj = CGAL::intersection(tri1, tri2);
       output.addPrimitive(interObj, /* pointsAsRing */ true);
       return;
     }
@@ -91,7 +91,8 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
     // CGAL::intersection does not work when the intersection is a point or a
     // segment We have to call intersection on boundaries first
 
-    GeometrySet<2> gpoly1, gpoly2;
+    GeometrySet<2> gpoly1;
+    GeometrySet<2> gpoly2;
     gpoly1.addBoundary(*poly1);
     gpoly2.addBoundary(*poly2);
 
@@ -116,7 +117,7 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
              pb.handle.which() == PrimitiveSegment) {
     const auto  *seg1     = pa.as<CGAL::Segment_2<Kernel>>();
     const auto  *seg2     = pb.as<CGAL::Segment_2<Kernel>>();
-    CGAL::Object interObj = CGAL::intersection(*seg1, *seg2);
+    CGAL::Object const interObj = CGAL::intersection(*seg1, *seg2);
     output.addPrimitive(interObj);
   } else if (pa.handle.which() == PrimitiveSurface &&
              pb.handle.which() == PrimitiveSegment) {
@@ -128,17 +129,18 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
         poly->outer_boundary().size() == 3) {
       // no holes and 3 vertices => it is a triangle
       auto                     vit = poly->outer_boundary().vertices_begin();
-      CGAL::Point_2<Kernel>    p1(*vit++);
-      CGAL::Point_2<Kernel>    p2(*vit++);
-      CGAL::Point_2<Kernel>    p3(*vit++);
-      CGAL::Triangle_2<Kernel> tri(p1, p2, p3);
-      CGAL::Object             interObj = CGAL::intersection(tri, *seg);
+      CGAL::Point_2<Kernel>    const p1(*vit++);
+      CGAL::Point_2<Kernel>    const p2(*vit++);
+      CGAL::Point_2<Kernel>    const p3(*vit++);
+      CGAL::Triangle_2<Kernel> const tri(p1, p2, p3);
+      CGAL::Object             const interObj = CGAL::intersection(tri, *seg);
       output.addPrimitive(interObj);
       return;
     }
 
     // if it s a regulat polygon, triangulate it and recurse call
-    GeometrySet<2> triangles, g;
+    GeometrySet<2> triangles;
+    GeometrySet<2> g;
     triangulate::triangulate(*poly, triangles);
     g.addPrimitive(pb);
 
@@ -146,5 +148,4 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
     algorithm::intersection(triangles, g, output);
   }
 }
-} // namespace algorithm
 } // namespace SFCGAL

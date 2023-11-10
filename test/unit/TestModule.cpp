@@ -26,11 +26,11 @@ using namespace boost::unit_test ;
 
 #include <SFCGAL/detail/tools/Log.h>
 
-test_suite* init_unit_test_suite( int, char** const )
+auto init_unit_test_suite( int /*unused*/, char** const  /*unused*/) -> test_suite*
 {
 //	std::cerr << "init test suite" << std::endl;
     SFCGAL::Logger::get()->setLogLevel( SFCGAL::Logger::Info );
-    return 0;
+    return nullptr;
 }
 
 

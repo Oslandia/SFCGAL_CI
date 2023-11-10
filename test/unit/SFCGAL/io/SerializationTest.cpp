@@ -46,10 +46,10 @@ BOOST_AUTO_TEST_SUITE( SFCGAL_io_SerializationTest )
 
 BOOST_AUTO_TEST_CASE( textTest )
 {
-    Coordinate pt1( 2.3, 8.9 );
+    Coordinate const pt1( 2.3, 8.9 );
     Coordinate rpt1;
     // 2/3
-    CGAL::Gmpq q1( 2, 3 );
+    CGAL::Gmpq const q1( 2, 3 );
     CGAL::Gmpq rq1;
 
     std::ostringstream ostr;
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( textTest )
     arc << pt1;
     arc << q1;
 
-    std::string str = ostr.str();
+    std::string const str = ostr.str();
 
     std::istringstream istr( str );
     boost::archive::text_iarchive iarc( istr );
@@ -70,14 +70,14 @@ BOOST_AUTO_TEST_CASE( textTest )
 
 BOOST_AUTO_TEST_CASE( binaryTest )
 {
-    Coordinate pt( 2.3, 4.5 );
+    Coordinate const pt( 2.3, 4.5 );
     Coordinate rpt;
 
     std::ostringstream ostr;
     io::BinarySerializer arc( ostr );
     arc << pt;
 
-    std::string str = ostr.str();
+    std::string const str = ostr.str();
 
     std::istringstream istr( str );
     io::BinaryUnserializer iarc( istr );
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( extBinaryTest )
     SFCGAL::Geometry* mg1 = ng1.release();
     SFCGAL::Geometry* ng2 = nullptr;
 
-    std::string str;
+    std::string const str;
     std::ostringstream ostr( str );
     io::BinarySerializer arc( ostr );
     arc << mg1;
