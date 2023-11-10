@@ -134,9 +134,9 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     }
 
     // 2. call the polygon, point version
-    CGAL::Point_2<Kernel> pt = seg->source();
-    PrimitiveHandle<2>    ppoly(poly);
-    PrimitiveHandle<2>    ppt(&pt);
+    CGAL::Point_2<Kernel> const pt = seg->source();
+    PrimitiveHandle<2>    const ppoly(poly);
+    PrimitiveHandle<2>    const ppt(&pt);
     return intersects(ppoly, ppt);
   }
 
@@ -144,7 +144,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Polygon vs. Polygon
   //
 
-  else if (pa.handle.which() == PrimitiveSurface &&
+  if (pa.handle.which() == PrimitiveSurface &&
            pb.handle.which() == PrimitiveSurface) {
     const auto *poly1 = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
     const auto *poly2 = pb.as<CGAL::Polygon_with_holes_2<Kernel>>();

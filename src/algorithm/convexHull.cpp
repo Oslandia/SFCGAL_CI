@@ -82,9 +82,8 @@ for (auto &point : getPointVisitor.points) {
   } if (epoints.size() > 3) {
     auto *poly = new Polygon;
 
-    for (auto it = epoints.begin();
-         it != epoints.end(); ++it) {
-      poly->exteriorRing().addPoint(*it);
+    for (auto & epoint : epoints) {
+      poly->exteriorRing().addPoint(epoint);
     }
 
     // add back the first point to close the ring
@@ -156,10 +155,9 @@ for (auto &point : getPointVisitor.points) {
     }
 
     return std::unique_ptr<Geometry>(result.release());
-  } else {
-    BOOST_THROW_EXCEPTION(
+  }     BOOST_THROW_EXCEPTION(
         Exception("unexpected CGAL output type in CGAL::convex_hull_3"));
-  }
+ 
 }
 
 } // namespace SFCGAL
