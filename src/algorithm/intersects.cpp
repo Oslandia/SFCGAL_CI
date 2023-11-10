@@ -68,7 +68,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Polygon vs. Point
   //
 
-  else if (pa.handle.which() == PrimitiveSurface &&
+  if (pa.handle.which() == PrimitiveSurface &&
            pb.handle.which() == PrimitivePoint) {
     // Polygon versus Point
     const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();

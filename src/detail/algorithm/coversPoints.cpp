@@ -24,7 +24,7 @@ _coversPoints(const Geometry &ga, const Geometry &gb) -> bool
   detail::GetPointsVisitor visitor;
   gb.accept(visitor);
 
-  for (auto ppt : visitor.points) {
+  for (const auto *ppt : visitor.points) {
     // a geometry set of one point
     GeometrySet<Dim> const gsp(*ppt);
 

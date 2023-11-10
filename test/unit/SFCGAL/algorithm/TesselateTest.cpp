@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE( testEmpty )
 
     std::vector< std::string > const geometryTypes = registry.getGeometryTypes() ;
 
-    for (auto & geometryType : geometryTypes) {
+    for (const auto & geometryType : geometryTypes) {
         std::unique_ptr< Geometry > g( registry.newGeometryByTypeName( geometryType ) ) ;
         BOOST_TEST_MESSAGE( boost::format( "tesselate(%s)" ) % g->asText() );
         std::unique_ptr< Geometry > result = algorithm::tesselate( *g ) ;

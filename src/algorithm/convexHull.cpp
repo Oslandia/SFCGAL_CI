@@ -74,12 +74,12 @@ for (auto &point : getPointVisitor.points) {
   }
   // GEOS does not seem to return triangles
   if (epoints.size() == 3) {
-    std::list<Point_2>::const_iterator it = epoints.begin();
-    Point_2                            p(*it++);
-    Point_2                            q(*it++);
-    Point_2                            r(*it++);
+    auto it = epoints.begin();
+    Point_2                            const p(*it++);
+    Point_2                            const q(*it++);
+    Point_2                            const r(*it++);
     return std::unique_ptr<Geometry>(new Triangle(p, q, r));
-  } else if (epoints.size() > 3) {
+  } if (epoints.size() > 3) {
     auto *poly = new Polygon;
 
     for (std::list<Point_2>::const_iterator it = epoints.begin();
@@ -132,7 +132,7 @@ for (auto &point : getPointVisitor.points) {
   } if (const auto *segment = object_cast<Segment_3>(&hull)) {
     return std::unique_ptr<Geometry>(
         new LineString(Point(segment->start()), Point(segment->end())));
-  } else if (const auto *triangle = object_cast<Triangle_3>(&hull)) {
+  } if (const auto *triangle = object_cast<Triangle_3>(&hull)) {
     return std::unique_ptr<Geometry>(new Triangle(Point(triangle->vertex(0)),
                                                   Point(triangle->vertex(1)),
                                                   Point(triangle->vertex(2))));

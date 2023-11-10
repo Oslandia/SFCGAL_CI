@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( testEmpty )
     tools::Registry const& registry = tools::Registry::instance() ;
     std::vector< std::string > const typeNames = tools::Registry::instance().getGeometryTypes();
 
-    for (auto & typeName : typeNames) {
+    for (const auto & typeName : typeNames) {
         BOOST_TEST_MESSAGE( typeName ) ;
 
         std::unique_ptr< Geometry > g( registry.newGeometryByTypeName( typeName ) ) ;

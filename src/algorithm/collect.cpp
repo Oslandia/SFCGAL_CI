@@ -30,7 +30,7 @@ collect(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
       mp->addGeometry(ga);
       mp->addGeometry(gb);
       return std::unique_ptr<Geometry>(mp);
-    } else if (ga.geometryTypeId() == TYPE_SOLID) {
+    } if (ga.geometryTypeId() == TYPE_SOLID) {
       auto *mp = new MultiSolid();
       mp->addGeometry(ga);
       mp->addGeometry(gb);

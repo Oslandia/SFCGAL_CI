@@ -77,7 +77,7 @@ round(const mpq_class &v) -> mpz_class
   } if (v == 0) {
     return 0;
   }     // floor( v + 0.5 ) ;
-    mpq_class tmp = v + mpq_class(1, 2);
+    mpq_class const tmp = v + mpq_class(1, 2);
     return floor(tmp);
  
 }
