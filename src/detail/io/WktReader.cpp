@@ -154,7 +154,7 @@ WktReader::readGeometryType() -> GeometryType
     return TYPE_MULTILINESTRING;
   } if (_reader.imatch("MULTIPOLYGON")) {
     return TYPE_MULTIPOLYGON;
-  } else if (_reader.imatch("GEOMETRYCOLLECTION")) {
+  } if (_reader.imatch("GEOMETRYCOLLECTION")) {
     return TYPE_GEOMETRYCOLLECTION;
   } else if (_reader.imatch("TIN")) {
     return TYPE_TRIANGULATEDSURFACE;
