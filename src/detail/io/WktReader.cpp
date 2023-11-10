@@ -163,7 +163,7 @@ WktReader::readGeometryType() -> GeometryType
   } if (_reader.imatch("SOLID")) {
     // not official
     return TYPE_SOLID;
-  } else if (_reader.imatch("MULTISOLID")) {
+  } if (_reader.imatch("MULTISOLID")) {
     // not official
     return TYPE_MULTISOLID;
   }
