@@ -32,6 +32,7 @@ Coordinate::Coordinate(const Kernel::FT &x, const Kernel::FT &y,
 {
 }
 
+
 ///
 ///
 ///
@@ -252,7 +253,8 @@ private:
   [[nodiscard]] auto
   _roundFT(const Kernel::FT &v) const -> Kernel::FT
   {
-#ifdef CGAL_USE_GMPXX
+
+#if defined(CGAL_USE_GMPXX)
     ::mpq_class q(SFCGAL::round(v.exact() * _scaleFactor), _scaleFactor);
     q.canonicalize();
     return Kernel::FT(q);
@@ -260,6 +262,7 @@ private:
     return Kernel::FT(
         CGAL::Gmpq(SFCGAL::round(v.exact() * _scaleFactor), _scaleFactor));
 #endif
+
   }
 };
 

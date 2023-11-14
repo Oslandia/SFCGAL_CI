@@ -16,7 +16,7 @@ namespace SFCGAL::transform {
 ///
 ///
 ForceZOrderPoints::ForceZOrderPoints(Kernel::FT defaultZ)
-    : _defaultZ(std::move(defaultZ))
+    : _defaultZ(defaultZ)
 {
 }
 

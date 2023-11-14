@@ -43,7 +43,7 @@ Interval::operator=(const Interval &other) -> Interval & = default;
 ///
 ///
 ///
-Interval::~Interval() = default;
+
 
 ///
 ///

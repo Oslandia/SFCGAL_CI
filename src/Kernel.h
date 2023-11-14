@@ -12,7 +12,8 @@ namespace SFCGAL {
 /**
  * default Kernel
  */
-typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
+
+using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
 
 /**
  * Quotient type

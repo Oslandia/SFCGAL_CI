@@ -12,7 +12,7 @@ namespace SFCGAL::transform {
 ///
 ///
 ///
-ForceZ::ForceZ(Kernel::FT  defaultZ) : _defaultZ(std::move(defaultZ)) {}
+ForceZ::ForceZ(Kernel::FT  defaultZ) : _defaultZ(defaultZ) {}
 
 ///
 ///

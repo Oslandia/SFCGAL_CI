@@ -36,10 +36,6 @@ public:
    */
   Interval &
   operator=(const Interval &other);
-  /**
-   * destructor
-   */
-  ~Interval();
 
   /**
    * indicates if the interval is empty
