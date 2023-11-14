@@ -98,12 +98,12 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
 auto
 angle(const Point &a, const Point &b, const Point &c) -> double
 {
-  Point const ab(to_double(b.x() - a.x()), to_double(b.y() - a.y()));
-  Point const cb(to_double(b.x() - c.x()), to_double(b.y() - c.y()));
+  Point const ab(CGAL::to_double(b.x() - a.x()), CGAL::to_double(b.y() - a.y()));
+  Point const cb(CGAL::to_double(b.x() - c.x()), CGAL::to_double(b.y() - c.y()));
 
-  double const dot = (to_double(ab.x() * cb.x() + ab.y() * cb.y())); /* dot product */
+  double const dot = (CGAL::to_double(ab.x() * cb.x() + ab.y() * cb.y())); /* dot product */
   double const cross =
-      (to_double(ab.x() * cb.y() - ab.y() * cb.x())); /* cross product */
+      (CGAL::to_double(ab.x() * cb.y() - ab.y() * cb.x())); /* cross product */
 
   double const alpha = std::atan2(cross, dot);
 
@@ -422,7 +422,7 @@ extrudeStraightSkeleton(const Geometry &g, double building_height,
                         double roof_height)
     -> std::unique_ptr<PolyhedralSurface>
 {
-  std::unique_ptr<PolyhedralSurface> roof{
+  std::unique_ptr<PolyhedralSurface> const roof{
       extrudeStraightSkeleton(g, roof_height)};
   translate(*roof, 0.0, 0.0, building_height);
   std::unique_ptr<Geometry> building(extrude(g.as<Polygon>(), building_height));
