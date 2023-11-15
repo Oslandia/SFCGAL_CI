@@ -612,8 +612,8 @@ WktReader::readInnerMultiSolid(MultiSolid &g)
 auto
 WktReader::readPointCoordinate(Point &p) -> bool
 {
-  std::vector<Kernel::Exact_kernel::FT> coordinates;
-  Kernel::Exact_kernel::FT              d;
+  std::vector<SFCGAL::Kernel::FT> coordinates;
+  SFCGAL::Kernel::FT              d;
 
   if (_reader.imatch("EMPTY")) {
     p = Point();

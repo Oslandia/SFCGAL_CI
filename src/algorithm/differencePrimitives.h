@@ -12,8 +12,6 @@
 #include "SFCGAL/triangulate/triangulatePolygon.h"
 
 #include <CGAL/Boolean_set_operations_2.h>
-#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Polygon_mesh_processing/corefinement.h>
 #include <CGAL/Side_of_triangle_mesh.h>
 #include <CGAL/box_intersection_d.h>

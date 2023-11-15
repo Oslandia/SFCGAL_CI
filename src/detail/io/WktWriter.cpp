@@ -30,6 +30,7 @@ writeFT(std::ostream &s, const CGAL::Gmpq &ft) -> std::ostream &
   return s;
 }
 
+#ifdef _SFCGAL_EXACT_
 #ifdef CGAL_USE_GMPXX
 auto
 writeFT(std::ostream &s, const mpq_class &ft) -> std::ostream &
@@ -37,6 +38,7 @@ writeFT(std::ostream &s, const mpq_class &ft) -> std::ostream &
   s << ft.get_num() << "/" << ft.get_den();
   return s;
 }
+#endif
 #endif
 } // namespace impl
 
@@ -143,6 +145,7 @@ fixZeroNeg(double val, int precision) -> double
 void
 WktWriter::writeCoordinate(const Point &g)
 {
+#ifdef _SFCGAL_EXACT_
   if (_exactWrite) {
     impl::writeFT(_s, CGAL::exact(g.x())) << " ";
     impl::writeFT(_s, CGAL::exact(g.y()));
@@ -159,7 +162,16 @@ WktWriter::writeCoordinate(const Point &g)
       _s << " " << fixZeroNeg(CGAL::to_double(g.z()), _s.precision());
     }
   }
+#else
 
+  _s << fixZeroNeg(CGAL::to_double(g.x()), _s.precision()) << " "
+     << fixZeroNeg(CGAL::to_double(g.y()), _s.precision());
+
+  if (g.is3D()) {
+    _s << " " << fixZeroNeg(CGAL::to_double(g.z()), _s.precision());
+  }
+
+#endif
   // m coordinate
   if (g.isMeasured()) {
     _s << " " << fixZeroNeg(CGAL::to_double(g.m()), _s.precision());

@@ -28,7 +28,7 @@ public:
    * Empty Coordinate constructor
    */
   Coordinate();
-
+#if defined(_SFCGAL_EXACT_)
   /**
    * XY Constructor with exact coordinates
    */
@@ -38,6 +38,7 @@ public:
    */
   Coordinate(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z);
 
+#endif
   /**
    * XYZ constructor
    * @warning x,y,z must not be not be NaN nor inf

@@ -225,6 +225,7 @@ BOOST_AUTO_TEST_CASE(triangulatedSurface_fourTriangles)
   BOOST_CHECK_EQUAL(g->as<TriangulatedSurface>().numGeometries(), 4U);
 }
 
+#ifdef _SFCGAL_EXACT_
 BOOST_AUTO_TEST_CASE(wkt_exactTest)
 {
   std::unique_ptr<Geometry> g(readWkt("LINESTRING(2/3 3/2,5/4 2/3)"));
@@ -249,6 +250,7 @@ BOOST_AUTO_TEST_CASE(wkt_exactTest)
   BOOST_CHECK_EQUAL(yn, 3);
   BOOST_CHECK_EQUAL(yd, 2);
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(charArrayRead)
 {

@@ -213,8 +213,12 @@ template <class Archive>
 void
 save(Archive &ar, const SFCGAL::Kernel::FT &q, const unsigned int /*version*/)
 {
+#ifdef _SFCGAL_EXACT_
   SFCGAL::Kernel::Exact_kernel::FT eq = CGAL::exact(q);
   ar << eq;
+#else
+  ar << q;
+#endif
 }
 
 /**
@@ -224,9 +228,13 @@ template <class Archive>
 void
 load(Archive &ar, SFCGAL::Kernel::FT &q, const unsigned int /*version*/)
 {
+#ifdef _SFCGAL_EXACT_
   SFCGAL::Kernel::Exact_kernel::FT eq;
   ar >> eq;
   q = eq;
+#else
+  ar >> q;
+#endif
 }
 template <class Archive>
 void

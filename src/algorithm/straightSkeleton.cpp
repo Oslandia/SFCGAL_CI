@@ -33,11 +33,11 @@
 
 namespace SFCGAL::algorithm {
 
-using Point_2              = Kernel::Point_2;
-using Point_3              = Kernel::Point_3;
-using Polygon_2            = CGAL::Polygon_2<Kernel>;
-using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
-using Straight_skeleton_2  = CGAL::Straight_skeleton_2<Kernel>;
+using Point_2              = SFCGAL::Kernel::Point_2;
+using Point_3              = SFCGAL::Kernel::Point_3;
+using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
+using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
+using Straight_skeleton_2  = CGAL::Straight_skeleton_2<SFCGAL::Kernel>;
 using Mesh                 = CGAL::Surface_mesh<Point_3>;
 using Segment_2            = Kernel::Segment_2;
 using Arrangement_2 = CGAL::Arrangement_2<CGAL::Arr_segment_traits_2<Kernel>>;

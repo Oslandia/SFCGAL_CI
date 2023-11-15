@@ -18,6 +18,7 @@ Coordinate::Coordinate() : _storage(Coordinate::Empty()) {}
 ///
 ///
 ///
+#ifdef _SFCGAL_EXACT_
 Coordinate::Coordinate(const Kernel::FT &x, const Kernel::FT &y)
     : _storage(Kernel::Point_2(x, y))
 {
@@ -31,7 +32,7 @@ Coordinate::Coordinate(const Kernel::FT &x, const Kernel::FT &y,
     : _storage(Kernel::Point_3(x, y, z))
 {
 }
-
+#endif
 ///
 ///
 ///
@@ -253,7 +254,8 @@ private:
   _roundFT(const Kernel::FT &v) const -> Kernel::FT
   {
 
-#if defined(CGAL_USE_GMPXX)
+#ifdef _SFCGAL_EXACT_
+#ifdef CGAL_USE_GMPXX
     ::mpq_class q(SFCGAL::round(v.exact() * _scaleFactor), _scaleFactor);
     q.canonicalize();
     return Kernel::FT(q);
@@ -261,6 +263,9 @@ private:
     return Kernel::FT(
         CGAL::Gmpq(SFCGAL::round(v.exact() * _scaleFactor), _scaleFactor));
 #endif
+#else
+    return v;
+#endif // _SFCGAL_EXACT_
   }
 };
 

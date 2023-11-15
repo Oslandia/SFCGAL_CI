@@ -31,6 +31,7 @@ public:
    * Constructor with Coordinate
    */
   Point(const Coordinate &coordinate);
+#if defined(_SFCGAL_EXACT_)
   /**
    * XY Constructor with exact coordinates
    */
@@ -40,6 +41,7 @@ public:
    */
   Point(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z,
         const double &m = NaN());
+#endif
   /**
    * XY constructor
    */

@@ -47,12 +47,14 @@ translate(Geometry &g, const Kernel::Vector_2 &v)
 ///
 ///
 ///
+#ifdef _SFCGAL_EXACT_
 void
 translate(Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
           const Kernel::FT &dz)
 {
   translate(g, Kernel::Vector_3(dx, dy, dz));
 }
+#endif
 
 ///
 ///
@@ -65,6 +67,10 @@ translate(Geometry &g, const double &dx, const double &dy, const double &dz)
         "trying to translate with non finite value in direction"));
   }
 
+#ifdef _SFCGAL_EXACT_
   return translate(g, Kernel::FT(dx), Kernel::FT(dy), Kernel::FT(dz));
+#else
+  return translate(g, Kernel::Vector_3(dx, dy, dz));
+#endif // _SFCGAL_EXACT_
 }
 } // namespace SFCGAL::algorithm

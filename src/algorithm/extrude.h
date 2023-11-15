@@ -16,6 +16,8 @@ namespace algorithm {
 // Class forward declarations.
 struct NoValidityCheck;
 
+#ifdef _SFCGAL_EXACT_
+
 /**
  * @brief Returns a Geometry equal to the specified Geometry,
  *   extruded by the specified displacement.
@@ -65,6 +67,7 @@ extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
 SFCGAL_API std::unique_ptr<Geometry>
 extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
         const Kernel::FT &dz, NoValidityCheck &nvc);
+#endif // _SFCGAL_EXACT_
 
 /**
  * @brief Returns a Geometry equal to the specified Geometry,

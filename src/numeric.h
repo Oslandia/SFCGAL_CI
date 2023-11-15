@@ -44,6 +44,7 @@ almostEqual(const double a, const double b, const double epsilon) -> bool
   return diff <= epsilon * std::max(absA, absB); // adaptative epsilon
 }
 
+#if defined(_SFCGAL_EXACT_)
 inline auto
 almostEqual(const Kernel::FT &a, const Kernel::FT &b, const Kernel::FT &epsilon)
     -> bool
@@ -63,6 +64,8 @@ almostEqual(const Kernel::FT &a, const Kernel::FT &b, const Kernel::FT &epsilon)
 
   return diff <= epsilon * std::max(absA, absB); // adaptative epsilon
 }
+
+#endif // defined(_SFCGAL_EXACT_)
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
