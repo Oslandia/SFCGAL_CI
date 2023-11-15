@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include <SFCGAL/Exception.h>
+#include <SFCGAL/Kernel.h>
 #include <SFCGAL/algorithm/collect.h>
 #include <SFCGAL/algorithm/collectionHomogenize.h>
 #include <SFCGAL/algorithm/intersection.h>
@@ -12,8 +13,6 @@
 #include <SFCGAL/detail/tools/Registry.h>
 
 #include <CGAL/Boolean_set_operations_2.h>
-#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/box_intersection_d.h>
 
 //

@@ -370,6 +370,7 @@ extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
   return extrude(g, Kernel::Vector_3(dx, dy, dz));
 }
 
+#ifdef _SFCGAL_EXACT_
 auto
 extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz)
     -> std::unique_ptr<Geometry>
@@ -380,6 +381,7 @@ extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz)
   propagateValidityFlag(*result, true);
   return result;
 }
+#endif // _SFCGAL_EXACT_
 
 SFCGAL_API auto
 extrude(const Geometry &g, const double &dx, const double &dy, const double &dz)
@@ -390,7 +392,7 @@ extrude(const Geometry &g, const double &dx, const double &dy, const double &dz)
         "trying to extrude with non finite value in direction"));
   }
 
-  return extrude(g, Kernel::FT(dx), Kernel::FT(dy), Kernel::FT(dz));
+  return extrude(g, Kernel::Vector_3(dx, dy, dz));
 }
 
 SFCGAL_API auto

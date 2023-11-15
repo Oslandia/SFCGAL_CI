@@ -32,11 +32,11 @@
 namespace SFCGAL {
 namespace algorithm {
 
-using Point_2              = Kernel::Point_2;
-using Point_3              = Kernel::Point_3;
-using Polygon_2            = CGAL::Polygon_2<Kernel>;
-using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
-using Straight_skeleton_2  = CGAL::Straight_skeleton_2<Kernel>;
+using Point_2              = SFCGAL::Kernel::Point_2;
+using Point_3              = SFCGAL::Kernel::Point_3;
+using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
+using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
+using Straight_skeleton_2  = CGAL::Straight_skeleton_2<SFCGAL::Kernel>;
 using Mesh                 = CGAL::Surface_mesh<Point_3>;
 
 namespace { // anonymous
@@ -99,12 +99,12 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
 static auto
 angle(const Point &a, const Point &b, const Point &c) -> double
 {
-  Point ab(to_double(b.x() - a.x()), to_double(b.y() - a.y()));
-  Point cb(to_double(b.x() - c.x()), to_double(b.y() - c.y()));
+  Point ab(CGAL::to_double(b.x() - a.x()), CGAL::to_double(b.y() - a.y()));
+  Point cb(CGAL::to_double(b.x() - c.x()), CGAL::to_double(b.y() - c.y()));
 
-  double dot = (to_double(ab.x() * cb.x() + ab.y() * cb.y())); /* dot product */
+  double dot = (CGAL::to_double(ab.x() * cb.x() + ab.y() * cb.y())); /* dot product */
   double cross =
-      (to_double(ab.x() * cb.y() - ab.y() * cb.x())); /* cross product */
+      (CGAL::to_double(ab.x() * cb.y() - ab.y() * cb.x())); /* cross product */
 
   double alpha = std::atan2(cross, dot);
 

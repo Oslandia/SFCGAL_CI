@@ -32,6 +32,7 @@ writeFT(std::ostream &s, const CGAL::Gmpq &ft) -> std::ostream &
   return s;
 }
 
+#ifdef _SFCGAL_EXACT_
 #ifdef CGAL_USE_GMPXX
 auto
 writeFT(std::ostream &s, const mpq_class &ft) -> std::ostream &
@@ -39,6 +40,7 @@ writeFT(std::ostream &s, const mpq_class &ft) -> std::ostream &
   s << ft.get_num() << "/" << ft.get_den();
   return s;
 }
+#endif
 #endif
 } // namespace impl
 

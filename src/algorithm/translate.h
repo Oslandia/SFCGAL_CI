@@ -28,6 +28,8 @@ translate(Geometry &g, const Kernel::Vector_3 &v);
  */
 SFCGAL_API void
 translate(Geometry &g, const Kernel::Vector_2 &v);
+
+#ifdef _SFCGAL_EXACT_
 /**
  * @brief translate a geometry from a given vector
  * @todo unittest
@@ -35,6 +37,7 @@ translate(Geometry &g, const Kernel::Vector_2 &v);
 SFCGAL_API void
 translate(Geometry &g, const Kernel::FT dx, const Kernel::FT dy,
           const Kernel::FT dz);
+#endif
 
 /**
  * @brief translate a geometry from double-coordinates

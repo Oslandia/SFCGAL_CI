@@ -26,6 +26,7 @@ Point::Point(const Coordinate &coordinate) : _coordinate(coordinate), _m(NaN())
 ///
 ///
 ///
+#ifdef _SFCGAL_EXACT_
 Point::Point(const Kernel::FT &x, const Kernel::FT &y)
     : _coordinate(x, y), _m(NaN())
 {
@@ -39,6 +40,7 @@ Point::Point(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z,
     : _coordinate(x, y, z), _m(m)
 {
 }
+#endif // _SFCGAL_EXACT_
 
 ///
 ///

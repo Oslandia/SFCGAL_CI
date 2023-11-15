@@ -13,10 +13,9 @@
 #include <SFCGAL/Triangle.h>
 #include <SFCGAL/TriangulatedSurface.h>
 
+#include <SFCGAL/Kernel.h>
 #include <SFCGAL/Exception.h>
 #include <SFCGAL/detail/tools/Log.h>
-
-#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 
 #include <SFCGAL/algorithm/intersects.h>
 #include <SFCGAL/algorithm/isValid.h>
@@ -24,14 +23,13 @@
 #include <SFCGAL/detail/transform/AffineTransform3.h>
 #include <SFCGAL/triangulate/triangulatePolygon.h>
 
-using Kernel             = CGAL::Exact_predicates_exact_constructions_kernel;
-using squared_distance_t = Kernel::FT;
+using squared_distance_t = SFCGAL::Kernel::FT;
 
-using Point_3    = Kernel::Point_3;
-using Vector_3   = Kernel::Vector_3;
-using Segment_3  = Kernel::Segment_3;
-using Triangle_3 = Kernel::Triangle_3;
-using Plane_3    = Kernel::Plane_3;
+using Point_3    = SFCGAL::Kernel::Point_3;
+using Vector_3   = SFCGAL::Kernel::Vector_3;
+using Segment_3  = SFCGAL::Kernel::Segment_3;
+using Triangle_3 = SFCGAL::Kernel::Triangle_3;
+using Plane_3    = SFCGAL::Kernel::Plane_3;
 
 namespace SFCGAL {
 namespace algorithm {

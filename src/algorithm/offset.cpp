@@ -12,6 +12,7 @@
 #include <SFCGAL/Triangle.h>
 
 #include <SFCGAL/Exception.h>
+#include <SFCGAL/Kernel.h>
 
 #include <SFCGAL/algorithm/isValid.h>
 #include <SFCGAL/detail/polygonSetToMultiPolygon.h>
