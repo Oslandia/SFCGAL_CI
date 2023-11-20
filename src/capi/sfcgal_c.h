@@ -1006,8 +1006,9 @@ sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom,
                                           double                   height);
 
 /**
- * Returns the union of the polygon z-extrusion (with respect to building_height) and the extrude
- * straight skeleton (with respect to roof_height) of the given Polygon
+ * Returns the union of the polygon z-extrusion (with respect to
+ * building_height) and the extrude straight skeleton (with respect to
+ * roof_height) of the given Polygon
  * @pre geom must be a Polygon
  * @pre isValid(geom) == true
  * @pre roof_height != 0
