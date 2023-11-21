@@ -31,7 +31,7 @@ disc(const Point &center, const double &radius,
 
   double const dTheta = M_PI_4 / nQuadrantSegments;
 
-  for (size_t i = 0; i < static_cast<unsigned long>(nQuadrantSegments * )4; i++) {
+  for (size_t i = 0; i < static_cast<unsigned long>(nQuadrantSegments ) * 4; i++) {
     Kernel::Vector_2 const p =
         center.toVector_2() +
         radius * Kernel::Vector_2(cos(i * dTheta), sin(i * dTheta));
