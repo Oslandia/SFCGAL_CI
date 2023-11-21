@@ -10,7 +10,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-MultiLineString::MultiLineString()  = default;
+MultiLineString::MultiLineString() = default;
 
 ///
 ///

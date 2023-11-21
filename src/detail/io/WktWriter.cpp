@@ -540,4 +540,4 @@ WktWriter::writeInner(const Solid &g)
   _s << ")"; // end SOLID
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::io

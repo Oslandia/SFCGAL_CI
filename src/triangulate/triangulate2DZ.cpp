@@ -34,7 +34,8 @@ triangulate2DZ(const LineString                &g,
   Vertex_handle last;
 
   for (size_t i = 0; i < g.numPoints(); i++) {
-    Vertex_handle const vertex = triangulation.addVertex(g.pointN(i).coordinate());
+    Vertex_handle const vertex =
+        triangulation.addVertex(g.pointN(i).coordinate());
 
     if (i != 0) {
       triangulation.addConstraint(last, vertex);
@@ -63,7 +64,8 @@ triangulate2DZ(const Triangle                  &g,
   Vertex_handle last;
 
   for (size_t i = 0; i < 4; i++) {
-    Vertex_handle const vertex = triangulation.addVertex(g.vertex(i).coordinate());
+    Vertex_handle const vertex =
+        triangulation.addVertex(g.vertex(i).coordinate());
 
     if (i != 0) {
       triangulation.addConstraint(last, vertex);
@@ -150,4 +152,4 @@ triangulate2DZ(const Geometry &g) -> ConstraintDelaunayTriangulation
   return triangulation;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::triangulate

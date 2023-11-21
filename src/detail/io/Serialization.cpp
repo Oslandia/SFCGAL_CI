@@ -107,7 +107,7 @@ readBinaryPrepared(const std::string &str) -> std::unique_ptr<PreparedGeometry>
   iarc >> pg;
   return std::unique_ptr<PreparedGeometry>(pg);
 }
-} // namespace SFCGAL
+} // namespace SFCGAL::io
 namespace boost::serialization {
 
 void
@@ -125,10 +125,10 @@ void
 save(boost::archive::binary_oarchive &ar, const CGAL::Gmpz &z,
      const unsigned int /* version*/)
 {
-  const mpz_t &mpz  = z.mpz();
-  int32_t      const size = mpz->_mp_size;
-  ar          &size;
-  uint32_t     const rsize = size >= 0 ? size : -size;
+  const mpz_t   &mpz  = z.mpz();
+  int32_t const  size = mpz->_mp_size;
+  ar            &size;
+  uint32_t const rsize = size >= 0 ? size : -size;
 
   for (uint32_t i = 0; i < rsize; ++i) {
     ar & mpz->_mp_d[i];
@@ -179,10 +179,10 @@ void
 save(boost::archive::binary_oarchive &ar, const mpz_class &z,
      const unsigned int /* version*/)
 {
-  mpz_srcptr mpz  = z.get_mpz_t();
-  int32_t    const size = mpz->_mp_size;
-  ar        &size;
-  uint32_t   const rsize = size >= 0 ? size : -size;
+  mpz_srcptr     mpz  = z.get_mpz_t();
+  int32_t const  size = mpz->_mp_size;
+  ar            &size;
+  uint32_t const rsize = size >= 0 ? size : -size;
 
   for (uint32_t i = 0; i < rsize; ++i) {
     ar & mpz->_mp_d[i];
@@ -218,4 +218,4 @@ load(boost::archive::binary_iarchive &ar, mpz_class &z,
 }
 #endif
 
-} // namespace boost
+} // namespace boost::serialization

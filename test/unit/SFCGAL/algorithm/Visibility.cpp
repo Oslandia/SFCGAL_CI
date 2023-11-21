@@ -48,12 +48,12 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygon)
   points.emplace_back(0.0, 4.0);
 
   LineString const lineString(points);
-  Polygon    const poly(lineString);
+  Polygon const    poly(lineString);
 
   Point const queryPoint(0.5, 2.0);
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
-  std::string              const expectedWkt =
+  std::string const        expectedWkt =
       "POLYGON((3.0 2.0,1.0 2.0,0.0 4.0,0.0 0.0,3.0 2.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
@@ -128,8 +128,9 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygonHole)
   Point const queryPoint(0.5, 2.0);
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
-  std::string const expectedWkt = "POLYGON((0.0 1.6,0.2 1.8,0.9 1.8,1.9 1.3,3.0 "
-                            "2.0,1.0 2.0,0.0 4.0,0.0 1.6))";
+  std::string const        expectedWkt =
+      "POLYGON((0.0 1.6,0.2 1.8,0.9 1.8,1.9 1.3,3.0 "
+      "2.0,1.0 2.0,0.0 4.0,0.0 1.6))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
@@ -268,7 +269,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygon)
   points.emplace_back(0.0, 4.0);
 
   LineString const lineString(points);
-  Polygon    const poly(lineString);
+  Polygon const    poly(lineString);
 
   Point const startPoint(1.0, 2.0);
   Point const endPoint(4.0, 4.0);

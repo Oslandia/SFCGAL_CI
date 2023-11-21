@@ -43,9 +43,9 @@ query_visibility(Face_handle fh, Halfedge_const_handle he)
       while (++curr != fh->outer_ccb()) {
         if (curr->source()->point() == he->source()->point()) {
           break;
-}
-}
-}
+        }
+      }
+    }
 
     Arrangement_2::Ccb_halfedge_circulator const first = curr;
     extRing->addPoint(Point(curr->source()->point()));
@@ -78,11 +78,11 @@ visibility(const Geometry &polygon, const Geometry &point)
 }
 
 auto
-visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck /*unused*/)
-    -> std::unique_ptr<Polygon>
+visibility(const Geometry &polygon, const Geometry &point,
+           NoValidityCheck /*unused*/) -> std::unique_ptr<Polygon>
 {
 
-  Point_2                     const queryPoint{point.as<Point>().toPoint_2()};
+  Point_2 const                     queryPoint{point.as<Point>().toPoint_2()};
   std::unique_ptr<LineString> const extRing{new LineString()};
 
   // insert geometry into the arrangement
@@ -93,14 +93,13 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck /*unu
   CGAL::insert(arr, pwh.outer_boundary().edges_begin(),
                pwh.outer_boundary().edges_end());
   // the holes
-  for (auto hit = pwh.holes_begin();
-       hit != pwh.holes_end(); ++hit) {
+  for (auto hit = pwh.holes_begin(); hit != pwh.holes_end(); ++hit) {
     CGAL::insert(arr, hit->edges_begin(), hit->edges_end());
-}
+  }
 
   // Find the face
   Arrangement_2::Face_const_handle                    *face;
-  CGAL::Arr_naive_point_location<Arrangement_2>        const pl(arr);
+  CGAL::Arr_naive_point_location<Arrangement_2> const  pl(arr);
   CGAL::Arr_point_location_result<Arrangement_2>::Type obj =
       pl.locate(queryPoint);
 
@@ -174,7 +173,8 @@ visibility(const Geometry &polygon, const Geometry &pointA,
 
 auto
 visibility(const Geometry &polygon, const Geometry &pointA,
-           const Geometry &pointB, NoValidityCheck /*unused*/) -> std::unique_ptr<Polygon>
+           const Geometry &pointB, NoValidityCheck /*unused*/)
+    -> std::unique_ptr<Polygon>
 {
 
   Point_2 const startPoint{pointA.as<Point>().toPoint_2()};
@@ -188,10 +188,9 @@ visibility(const Geometry &polygon, const Geometry &pointA,
 
   CGAL::insert(arr, pwh.outer_boundary().edges_begin(),
                pwh.outer_boundary().edges_end());
-  for (auto hit = pwh.holes_begin();
-       hit != pwh.holes_end(); ++hit) {
+  for (auto hit = pwh.holes_begin(); hit != pwh.holes_end(); ++hit) {
     CGAL::insert(arr, hit->edges_begin(), hit->edges_end());
-}
+  }
 
   // If the point is in a boundary segment, find the corresponding half edge
   Halfedge_const_handle he = arr.halfedges_begin();
@@ -213,11 +212,11 @@ visibility(const Geometry &polygon, const Geometry &pointA,
   }
 
   // visibility query
-  Arrangement_2 output_arr;
-  TEV           const tev(arr);
-  Face_handle   const fh = tev.compute_visibility(endPoint, he, output_arr);
+  Arrangement_2     output_arr;
+  TEV const         tev(arr);
+  Face_handle const fh = tev.compute_visibility(endPoint, he, output_arr);
 
   return query_visibility(fh, he);
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

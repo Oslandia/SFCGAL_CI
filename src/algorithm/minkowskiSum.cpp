@@ -119,7 +119,7 @@ minkowskiSum(const Point &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
   BOOST_ASSERT(gB.size());
 
   CGAL::Aff_transformation_2<Kernel> const translate(CGAL::TRANSLATION,
-                                               gA.toVector_2());
+                                                     gA.toVector_2());
 
   Polygon_2 sum;
 
@@ -164,7 +164,8 @@ minkowskiSum(const LineString &gA, const Polygon_2 &gB,
 #if CGAL_VERSION_NR < 1040701000 // version 4.7
     Polygon_with_holes_2 part = minkowski_sum_2(P, gB);
 #else
-    Polygon_with_holes_2 const part = minkowski_sum_by_full_convolution_2(P, gB);
+    Polygon_with_holes_2 const part =
+        minkowski_sum_by_full_convolution_2(P, gB);
 #endif
 
     // merge into a polygon set
@@ -283,4 +284,4 @@ minkowskiSum(const Geometry &gA, const Polygon &gB) -> std::unique_ptr<Geometry>
   return result;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

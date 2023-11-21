@@ -59,4 +59,4 @@ readWkt(const char *str, size_t len) -> std::unique_ptr<Geometry>
   return geom;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::io

@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 #include <boost/test/unit_test.hpp>
 
@@ -23,73 +24,72 @@
 
 #include <SFCGAL/Envelope.h>
 #include <SFCGAL/LineString.h>
-#include <SFCGAL/Polygon.h>
 #include <SFCGAL/MultiPolygon.h>
+#include <SFCGAL/Polygon.h>
 
-using namespace boost::unit_test ;
-using namespace SFCGAL ;
+using namespace boost::unit_test;
+using namespace SFCGAL;
 
-BOOST_AUTO_TEST_SUITE( SFCGAL_MultiPolygonTest )
+BOOST_AUTO_TEST_SUITE(SFCGAL_MultiPolygonTest)
 
-BOOST_AUTO_TEST_CASE( defaultConstructor )
+BOOST_AUTO_TEST_CASE(defaultConstructor)
 {
-    MultiPolygon const g;
-    BOOST_CHECK( g.isEmpty() ) ;
-    BOOST_CHECK( ! g.is3D() );
-    BOOST_CHECK_EQUAL( g.numGeometries(), 0U );
+  MultiPolygon const g;
+  BOOST_CHECK(g.isEmpty());
+  BOOST_CHECK(!g.is3D());
+  BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
 }
 
-BOOST_AUTO_TEST_CASE( testGeometryTypeId )
+BOOST_AUTO_TEST_CASE(testGeometryTypeId)
 {
-    MultiPolygon const g;
-    BOOST_CHECK_EQUAL( g.geometryTypeId(), TYPE_MULTIPOLYGON );
+  MultiPolygon const g;
+  BOOST_CHECK_EQUAL(g.geometryTypeId(), TYPE_MULTIPOLYGON);
 }
 
 //-- addAllowedGeometry
-BOOST_AUTO_TEST_CASE( addPolygon )
+BOOST_AUTO_TEST_CASE(addPolygon)
 {
-    MultiPolygon g;
-    g.addGeometry( new Polygon() );
-    BOOST_CHECK_EQUAL( g.numGeometries(), 1U );
+  MultiPolygon g;
+  g.addGeometry(new Polygon());
+  BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
 }
 //-- addForbidenGeometry
-BOOST_AUTO_TEST_CASE( addLineStringThrow )
+BOOST_AUTO_TEST_CASE(addLineStringThrow)
 {
-    MultiPolygon g;
-    BOOST_CHECK_THROW( g.addGeometry( LineString() ), std::exception );
+  MultiPolygon g;
+  BOOST_CHECK_THROW(g.addGeometry(LineString()), std::exception);
 }
 
 //-- asText
 
-BOOST_AUTO_TEST_CASE( asTextEmpty )
+BOOST_AUTO_TEST_CASE(asTextEmpty)
 {
-    MultiPolygon const g;
-    BOOST_CHECK_EQUAL( g.asText( 1 ), "MULTIPOLYGON EMPTY" );
+  MultiPolygon const g;
+  BOOST_CHECK_EQUAL(g.asText(1), "MULTIPOLYGON EMPTY");
 }
-BOOST_AUTO_TEST_CASE( asText2d )
+BOOST_AUTO_TEST_CASE(asText2d)
 {
-    MultiPolygon g;
-    g.addGeometry( Envelope( 0.0,1.0,0.0,1.0 ).toPolygon().release() );
-    g.addGeometry( Envelope( 2.0,3.0,4.0,5.0 ).toPolygon().release() );
-    BOOST_CHECK_EQUAL( g.asText( 3 ), "MULTIPOLYGON(((0.000 0.000,1.000 0.000,1.000 1.000,0.000 1.000,0.000 0.000)),((2.000 4.000,3.000 4.000,3.000 5.000,2.000 5.000,2.000 4.000)))" );
+  MultiPolygon g;
+  g.addGeometry(Envelope(0.0, 1.0, 0.0, 1.0).toPolygon().release());
+  g.addGeometry(Envelope(2.0, 3.0, 4.0, 5.0).toPolygon().release());
+  BOOST_CHECK_EQUAL(g.asText(3),
+                    "MULTIPOLYGON(((0.000 0.000,1.000 0.000,1.000 1.000,0.000 "
+                    "1.000,0.000 0.000)),((2.000 4.000,3.000 4.000,3.000 "
+                    "5.000,2.000 5.000,2.000 4.000)))");
 }
 
 //-- is< T >
 
-BOOST_AUTO_TEST_CASE( isGeometryCollection )
+BOOST_AUTO_TEST_CASE(isGeometryCollection)
 {
-    MultiPolygon const g;
-    BOOST_CHECK( g.is< GeometryCollection >() );
+  MultiPolygon const g;
+  BOOST_CHECK(g.is<GeometryCollection>());
 }
 
-BOOST_AUTO_TEST_CASE( isMultiPolygon )
+BOOST_AUTO_TEST_CASE(isMultiPolygon)
 {
-    MultiPolygon const g;
-    BOOST_CHECK( g.is< MultiPolygon >() );
+  MultiPolygon const g;
+  BOOST_CHECK(g.is<MultiPolygon>());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
-
-
-

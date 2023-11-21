@@ -45,20 +45,22 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_AlphaShapesTest)
 
 // algorithm::alphaShapes
 
-BOOST_AUTO_TEST_CASE(testAlphaShapes2D_ComputeAlpha) {
+BOOST_AUTO_TEST_CASE(testAlphaShapes2D_ComputeAlpha)
+{
   std::vector<Point> points;
   points.emplace_back(0.0, 0.0);
   points.emplace_back(1.0, 0.0);
   points.emplace_back(1.0, 1.0);
   points.emplace_back(0.0, 1.0);
 
-  LineString const lineString(points);
-  size_t const nb_comp = 3;
+  LineString const                lineString(points);
+  size_t const                    nb_comp = 3;
   std::unique_ptr<Geometry> const alphaShapes(
       algorithm::optimal_alpha_shapes(lineString, false, nb_comp));
 }
 
-BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Empty) {
+BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Empty)
+{
   GeometryCollection collect;
   collect.addGeometry(Polygon());
   collect.addGeometry(Polygon());
@@ -66,7 +68,8 @@ BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Empty) {
   BOOST_CHECK(alphaShapes->isEmpty());
 }
 
-BOOST_AUTO_TEST_CASE(testAlphaShapes2D_ColinearProduceEmpty) {
+BOOST_AUTO_TEST_CASE(testAlphaShapes2D_ColinearProduceEmpty)
+{
   LineString lineString;
   lineString.addPoint(Point(0.0, 0.0));
   lineString.addPoint(Point(1.0, 1.0));
@@ -76,14 +79,15 @@ BOOST_AUTO_TEST_CASE(testAlphaShapes2D_ColinearProduceEmpty) {
   BOOST_CHECK(alphaShapes->isEmpty());
 }
 
-BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Triangle) {
+BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Triangle)
+{
   std::vector<Point> points;
   points.emplace_back(0.0, 0.0);
   points.emplace_back(0.5, 0.5);
   points.emplace_back(1.0, 0.0);
   points.emplace_back(0.0, 1.0);
 
-  LineString const lineString(points);
+  LineString const          lineString(points);
   std::unique_ptr<Geometry> alphaShapes(algorithm::alphaShapes(lineString));
   BOOST_CHECK(alphaShapes->is<Polygon>());
   std::string const expectedWkt =
@@ -91,14 +95,15 @@ BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Triangle) {
   BOOST_CHECK_EQUAL(alphaShapes->asText(1), expectedWkt);
 }
 
-BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Polygon) {
+BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Polygon)
+{
   std::vector<Point> points;
   points.emplace_back(0.0, 0.0);
   points.emplace_back(1.0, 0.0);
   points.emplace_back(1.0, 1.0);
   points.emplace_back(0.0, 1.0);
 
-  LineString const lineString(points);
+  LineString const          lineString(points);
   std::unique_ptr<Geometry> alphaShapes(algorithm::alphaShapes(lineString));
   BOOST_CHECK(alphaShapes->is<Polygon>());
   std::string const expectedWkt =
@@ -106,7 +111,8 @@ BOOST_AUTO_TEST_CASE(testAlphaShapes2D_Polygon) {
   BOOST_CHECK_EQUAL(alphaShapes->asText(1), expectedWkt);
 }
 
-BOOST_AUTO_TEST_CASE(testAlphaShapes2D_MultiPoint) {
+BOOST_AUTO_TEST_CASE(testAlphaShapes2D_MultiPoint)
+{
   std::string inputData(SFCGAL_TEST_DIRECTORY);
   inputData += "/data/AlphaShapesWkt.txt";
   std::ifstream ifs(inputData.c_str());

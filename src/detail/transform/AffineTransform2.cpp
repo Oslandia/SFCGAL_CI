@@ -29,9 +29,9 @@ AffineTransform2::transform(Point &p)
     Point pt(p.toPoint_2().transform(_transform));
     if (p.isMeasured()) {
       pt.setM(p.m());
-}
+    }
     p = pt;
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

@@ -53,8 +53,8 @@ auto
 WktReader::readGeometry() -> Geometry *
 {
   GeometryType const geometryType = readGeometryType();
-  _is3D                     = _reader.imatch("Z");
-  _isMeasured               = _reader.imatch("M");
+  _is3D                           = _reader.imatch("Z");
+  _isMeasured                     = _reader.imatch("M");
 
   switch (geometryType) {
   case TYPE_POINT: {
@@ -141,29 +141,40 @@ WktReader::readGeometryType() -> GeometryType
 {
   if (_reader.imatch("POINT")) {
     return TYPE_POINT;
-  } if (_reader.imatch("LINESTRING")) {
+  }
+  if (_reader.imatch("LINESTRING")) {
     return TYPE_LINESTRING;
-  } if (_reader.imatch("POLYGON")) {
+  }
+  if (_reader.imatch("POLYGON")) {
     return TYPE_POLYGON;
-  } if (_reader.imatch("TRIANGLE")) {
+  }
+  if (_reader.imatch("TRIANGLE")) {
     // not official
     return TYPE_TRIANGLE;
-  } if (_reader.imatch("MULTIPOINT")) {
+  }
+  if (_reader.imatch("MULTIPOINT")) {
     return TYPE_MULTIPOINT;
-  } if (_reader.imatch("MULTILINESTRING")) {
+  }
+  if (_reader.imatch("MULTILINESTRING")) {
     return TYPE_MULTILINESTRING;
-  } if (_reader.imatch("MULTIPOLYGON")) {
+  }
+  if (_reader.imatch("MULTIPOLYGON")) {
     return TYPE_MULTIPOLYGON;
-  } if (_reader.imatch("GEOMETRYCOLLECTION")) {
+  }
+  if (_reader.imatch("GEOMETRYCOLLECTION")) {
     return TYPE_GEOMETRYCOLLECTION;
-  } if (_reader.imatch("TIN")) {
+  }
+  if (_reader.imatch("TIN")) {
     return TYPE_TRIANGULATEDSURFACE;
-  } if (_reader.imatch("POLYHEDRALSURFACE")) {
+  }
+  if (_reader.imatch("POLYHEDRALSURFACE")) {
     return TYPE_POLYHEDRALSURFACE;
-  } if (_reader.imatch("SOLID")) {
+  }
+  if (_reader.imatch("SOLID")) {
     // not official
     return TYPE_SOLID;
-  } if (_reader.imatch("MULTISOLID")) {
+  }
+  if (_reader.imatch("MULTISOLID")) {
     // not official
     return TYPE_MULTISOLID;
   }
@@ -355,7 +366,7 @@ WktReader::readInnerMultiPoint(MultiPoint &g)
 
     if (!p->isEmpty()) {
       g.addGeometry(p.release());
-}
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -388,7 +399,7 @@ WktReader::readInnerMultiLineString(MultiLineString &g)
     readInnerLineString(*lineString);
     if (!lineString->isEmpty()) {
       g.addGeometry(lineString.release());
-}
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -421,7 +432,7 @@ WktReader::readInnerMultiPolygon(MultiPolygon &g)
     readInnerPolygon(*polygon);
     if (!polygon->isEmpty()) {
       g.addGeometry(polygon.release());
-}
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -454,7 +465,7 @@ WktReader::readInnerGeometryCollection(GeometryCollection &g)
     Geometry *gg = readGeometry();
     if (!gg->isEmpty()) {
       g.addGeometry(gg);
-}
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -582,7 +593,7 @@ WktReader::readInnerMultiSolid(MultiSolid &g)
     readInnerSolid(*solid);
     if (!solid->isEmpty()) {
       g.addGeometry(solid.release());
-}
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -664,4 +675,4 @@ WktReader::parseErrorMessage() -> std::string
   return oss.str();
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::io

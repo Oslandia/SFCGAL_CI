@@ -32,7 +32,6 @@ Coordinate::Coordinate(const Kernel::FT &x, const Kernel::FT &y,
 {
 }
 
-
 ///
 ///
 ///
@@ -262,7 +261,6 @@ private:
     return Kernel::FT(
         CGAL::Gmpq(SFCGAL::round(v.exact() * _scaleFactor), _scaleFactor));
 #endif
-
   }
 };
 
@@ -356,14 +354,16 @@ Coordinate::operator<(const Coordinate &other) const -> bool
   // comparison along x
   if (x() < other.x()) {
     return true;
-  } if (other.x() < x()) {
+  }
+  if (other.x() < x()) {
     return false;
   }
 
   // comparison along y
   if (y() < other.y()) {
     return true;
-  } if (other.y() < y()) {
+  }
+  if (other.y() < y()) {
     return false;
   }
 
@@ -371,7 +371,8 @@ Coordinate::operator<(const Coordinate &other) const -> bool
   if (is3D()) {
     if (z() < other.z()) {
       return true;
-    } if (other.z() < z()) {
+    }
+    if (other.z() < z()) {
       return false;
     }
   }

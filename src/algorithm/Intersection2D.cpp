@@ -71,16 +71,16 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
         poly1->outer_boundary().size() == 3 &&
         poly2->holes_begin() == poly2->holes_end() &&
         poly2->outer_boundary().size() == 3) {
-      auto                     vit1 = poly1->outer_boundary().vertices_begin();
-      CGAL::Point_2<Kernel>    const pa1  = *vit1++;
-      CGAL::Point_2<Kernel>    const pa2  = *vit1++;
-      CGAL::Point_2<Kernel>    const pa3  = *vit1;
+      auto vit1 = poly1->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel> const    pa1 = *vit1++;
+      CGAL::Point_2<Kernel> const    pa2 = *vit1++;
+      CGAL::Point_2<Kernel> const    pa3 = *vit1;
       CGAL::Triangle_2<Kernel> const tri1(pa1, pa2, pa3);
 
-      auto                     vit2 = poly2->outer_boundary().vertices_begin();
-      CGAL::Point_2<Kernel>    const pb1  = *vit2++;
-      CGAL::Point_2<Kernel>    const pb2  = *vit2++;
-      CGAL::Point_2<Kernel>    const pb3  = *vit2;
+      auto vit2 = poly2->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel> const    pb1 = *vit2++;
+      CGAL::Point_2<Kernel> const    pb2 = *vit2++;
+      CGAL::Point_2<Kernel> const    pb3 = *vit2;
       CGAL::Triangle_2<Kernel> const tri2(pb1, pb2, pb3);
 
       CGAL::Object const interObj = CGAL::intersection(tri1, tri2);
@@ -115,8 +115,8 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
     CGAL::intersection(*poly1, *poly2, std::back_inserter(output.surfaces()));
   } else if (pa.handle.which() == PrimitiveSegment &&
              pb.handle.which() == PrimitiveSegment) {
-    const auto  *seg1     = pa.as<CGAL::Segment_2<Kernel>>();
-    const auto  *seg2     = pb.as<CGAL::Segment_2<Kernel>>();
+    const auto        *seg1     = pa.as<CGAL::Segment_2<Kernel>>();
+    const auto        *seg2     = pb.as<CGAL::Segment_2<Kernel>>();
     CGAL::Object const interObj = CGAL::intersection(*seg1, *seg2);
     output.addPrimitive(interObj);
   } else if (pa.handle.which() == PrimitiveSurface &&
@@ -128,12 +128,12 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
     if (poly->holes_begin() == poly->holes_end() &&
         poly->outer_boundary().size() == 3) {
       // no holes and 3 vertices => it is a triangle
-      auto                     vit = poly->outer_boundary().vertices_begin();
-      CGAL::Point_2<Kernel>    const p1(*vit++);
-      CGAL::Point_2<Kernel>    const p2(*vit++);
-      CGAL::Point_2<Kernel>    const p3(*vit++);
+      auto                        vit = poly->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel> const p1(*vit++);
+      CGAL::Point_2<Kernel> const p2(*vit++);
+      CGAL::Point_2<Kernel> const p3(*vit++);
       CGAL::Triangle_2<Kernel> const tri(p1, p2, p3);
-      CGAL::Object             const interObj = CGAL::intersection(tri, *seg);
+      CGAL::Object const             interObj = CGAL::intersection(tri, *seg);
       output.addPrimitive(interObj);
       return;
     }
@@ -148,4 +148,4 @@ intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
     algorithm::intersection(triangles, g, output);
   }
 }
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

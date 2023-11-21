@@ -44,7 +44,6 @@ Interval::operator=(const Interval &other) -> Interval & = default;
 ///
 ///
 
-
 ///
 ///
 ///
@@ -142,4 +141,4 @@ Interval::operator!=(const Interval &other) const -> bool
   return !((*this) == other);
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::detail

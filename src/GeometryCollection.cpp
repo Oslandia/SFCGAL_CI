@@ -12,7 +12,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-GeometryCollection::GeometryCollection()  = default;
+GeometryCollection::GeometryCollection() = default;
 
 ///
 ///
@@ -90,8 +90,8 @@ GeometryCollection::coordinateDimension() const -> int
 {
   if (isEmpty()) {
     return 0;
-  }     return _geometries.front().coordinateDimension();
- 
+  }
+  return _geometries.front().coordinateDimension();
 }
 
 ///

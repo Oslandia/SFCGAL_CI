@@ -10,7 +10,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-MultiPoint::MultiPoint()  = default;
+MultiPoint::MultiPoint() = default;
 
 ///
 ///

@@ -135,8 +135,8 @@ intersection(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
   a.computeBoundingBoxes(ahandles, aboxes);
   b.computeBoundingBoxes(bhandles, bboxes);
 
-  GeometrySet<Dim>     temp;
-  GeometrySet<Dim>     temp2;
+  GeometrySet<Dim>           temp;
+  GeometrySet<Dim>           temp2;
   intersection_cb<Dim> const cb(temp);
   CGAL::box_intersection_d(aboxes.begin(), aboxes.end(), bboxes.begin(),
                            bboxes.end(), cb);
@@ -158,7 +158,7 @@ intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
 {
   GeometrySet<2> const gsa(ga);
   GeometrySet<2> const gsb(gb);
-  GeometrySet<2> output;
+  GeometrySet<2>       output;
   algorithm::intersection(gsa, gsb, output);
 
   GeometrySet<2> filtered;
@@ -177,12 +177,12 @@ intersection(const Geometry &ga, const Geometry &gb)
 }
 
 auto
-intersection3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
-    -> std::unique_ptr<Geometry>
+intersection3D(const Geometry &ga, const Geometry &gb,
+               NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
   GeometrySet<3> const gsa(ga);
   GeometrySet<3> const gsb(gb);
-  GeometrySet<3> output;
+  GeometrySet<3>       output;
   algorithm::intersection(gsa, gsb, output);
 
   GeometrySet<3> filtered;

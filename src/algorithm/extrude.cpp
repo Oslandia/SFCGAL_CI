@@ -364,18 +364,18 @@ extrude(const Geometry &g, const Kernel::Vector_3 &v)
 ///
 auto
 extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
-        const Kernel::FT &dz, NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
+        const Kernel::FT &dz, NoValidityCheck /*unused*/)
+    -> std::unique_ptr<Geometry>
 {
   return extrude(g, Kernel::Vector_3(dx, dy, dz));
 }
 
 auto
-extrude(const Geometry &g, const Kernel::FT& dx, const Kernel::FT& dy, const Kernel::FT& dz)
-    -> std::unique_ptr<Geometry>
+extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
+        const Kernel::FT &dz) -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY(g);
-  std::unique_ptr<Geometry> result(extrude(g, dx, dy,
-                                           dz, NoValidityCheck()));
+  std::unique_ptr<Geometry> result(extrude(g, dx, dy, dz, NoValidityCheck()));
   propagateValidityFlag(*result, true);
   return result;
 }
@@ -404,4 +404,4 @@ extrude(const Polygon &g, const double &height) -> std::unique_ptr<Geometry>
   return std::unique_ptr<Geometry>(
       extrude(g, Kernel::Vector_3(0.0, 0.0, height), false));
 }
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

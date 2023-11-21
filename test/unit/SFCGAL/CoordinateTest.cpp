@@ -91,14 +91,14 @@ BOOST_AUTO_TEST_CASE(testXYZConstructorDouble)
 /// Coordinate( const Coordinate & other ) ;
 BOOST_AUTO_TEST_CASE(testCopyConstructorEmpty)
 {
-  Coordinate const g;
-  const Coordinate& copy(g);
+  Coordinate const  g;
+  const Coordinate &copy(g);
   BOOST_CHECK(copy.isEmpty());
 }
 BOOST_AUTO_TEST_CASE(testCopyConstructorXY)
 {
-  Coordinate const g(3, 4);
-  const Coordinate& copy(g);
+  Coordinate const  g(3, 4);
+  const Coordinate &copy(g);
   BOOST_CHECK_EQUAL(copy.x(), 3);
   BOOST_CHECK_EQUAL(copy.y(), 4);
 }

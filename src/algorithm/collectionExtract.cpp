@@ -70,4 +70,4 @@ collectionExtractPolygons(std::unique_ptr<Geometry> g)
   return std::unique_ptr<Geometry>(ret_geo);
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

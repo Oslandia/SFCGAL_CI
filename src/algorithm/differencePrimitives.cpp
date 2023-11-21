@@ -13,4 +13,4 @@ intersection(const CGAL::Triangle_3<Kernel> &a,
 {
   return CGAL::intersection(a, b);
 }
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

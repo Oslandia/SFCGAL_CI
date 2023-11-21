@@ -21,7 +21,7 @@ length(const LineString &g) -> double
 
   for (size_t i = 0; i < g.numSegments(); i++) {
     Kernel::Segment_2 const segment(g.pointN(i).toPoint_2(),
-                              g.pointN(i + 1).toPoint_2());
+                                    g.pointN(i + 1).toPoint_2());
     result += CGAL::sqrt(CGAL::to_double(segment.squared_length()));
   }
 
@@ -92,7 +92,7 @@ length3D(const LineString &g) -> double
 
   for (size_t i = 0; i < g.numSegments(); i++) {
     Kernel::Segment_3 const segment(g.pointN(i).toPoint_3(),
-                              g.pointN(i + 1).toPoint_3());
+                                    g.pointN(i + 1).toPoint_3());
     result += CGAL::sqrt(CGAL::to_double(segment.squared_length()));
   }
 
@@ -151,4 +151,4 @@ length3D(const Geometry &g) -> double
   return 0.0;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

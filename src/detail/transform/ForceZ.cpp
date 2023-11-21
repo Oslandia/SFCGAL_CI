@@ -12,7 +12,7 @@ namespace SFCGAL::transform {
 ///
 ///
 ///
-ForceZ::ForceZ(Kernel::FT  defaultZ) : _defaultZ(defaultZ) {}
+ForceZ::ForceZ(Kernel::FT defaultZ) : _defaultZ(defaultZ) {}
 
 ///
 ///
@@ -24,9 +24,9 @@ ForceZ::transform(Point &p)
     Point pt(p.x(), p.y(), _defaultZ);
     if (p.isMeasured()) {
       pt.setM(p.m());
-}
+    }
     p = pt;
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

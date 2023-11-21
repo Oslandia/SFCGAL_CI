@@ -154,4 +154,4 @@ EnvelopeVisitor::visit(const TriangulatedSurface &g)
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::detail

@@ -17,4 +17,4 @@ force3D(Geometry &g, const Kernel::FT &defaultZ)
   g.accept(t);
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

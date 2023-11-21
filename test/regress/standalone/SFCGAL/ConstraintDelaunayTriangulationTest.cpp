@@ -15,7 +15,8 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 #include <fstream>
 
@@ -35,55 +36,49 @@
 #include <SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h>
 #include <cmath>
 
-
 #include "../../../test_config.h"
 
 #include <boost/test/unit_test.hpp>
-using namespace boost::unit_test ;
+using namespace boost::unit_test;
 
-using namespace SFCGAL ;
-using namespace SFCGAL::triangulate ;
+using namespace SFCGAL;
+using namespace SFCGAL::triangulate;
 
-BOOST_AUTO_TEST_SUITE( SFCGAL_ConstraintDelaunayTriangulationTest )
+BOOST_AUTO_TEST_SUITE(SFCGAL_ConstraintDelaunayTriangulationTest)
 
-BOOST_AUTO_TEST_CASE( testTriangulateRGC )
+BOOST_AUTO_TEST_CASE(testTriangulateRGC)
 {
-    ConstraintDelaunayTriangulation triangulation ;
+  ConstraintDelaunayTriangulation triangulation;
 
-    /*
-     * read points from file
-     */
-    std::string filename( SFCGAL_TEST_DIRECTORY );
-    filename += "/data/rgc-france-ign.xyz" ;
-    std::ifstream ifs( filename.c_str() );
-    BOOST_REQUIRE( ifs.good() ) ;
+  /*
+   * read points from file
+   */
+  std::string filename(SFCGAL_TEST_DIRECTORY);
+  filename += "/data/rgc-france-ign.xyz";
+  std::ifstream ifs(filename.c_str());
+  BOOST_REQUIRE(ifs.good());
 
-    double x = NAN;
-    double y = NAN;
-    double z = NAN ;
+  double x = NAN;
+  double y = NAN;
+  double z = NAN;
 
-    while ( ifs >> x >> y >> z ) {
-        triangulation.addVertex( Coordinate( x,y,z ) );
-    }
+  while (ifs >> x >> y >> z) {
+    triangulation.addVertex(Coordinate(x, y, z));
+  }
 
-    ifs.close();
+  ifs.close();
 
-    //std::string wkt = triangulation.getTriangulatedSurface()->asText(5.0) ;
-    //std::cerr << "INSERT INTO draw (geometry) VALUES ( '" << "MULTIPOLYGON" << wkt.substr(3) << "'::geometry );" << std::endl;
+  // std::string wkt = triangulation.getTriangulatedSurface()->asText(5.0) ;
+  // std::cerr << "INSERT INTO draw (geometry) VALUES ( '" << "MULTIPOLYGON" <<
+  // wkt.substr(3) << "'::geometry );" << std::endl;
 
-    BOOST_CHECK_EQUAL( triangulation.numVertices(), 36566U );
-    BOOST_CHECK_EQUAL( triangulation.numTriangles(), 73114U );
+  BOOST_CHECK_EQUAL(triangulation.numVertices(), 36566U);
+  BOOST_CHECK_EQUAL(triangulation.numTriangles(), 73114U);
 
-    std::unique_ptr< TriangulatedSurface > triangulatedSurface = triangulation.getTriangulatedSurface() ;
-    BOOST_CHECK_EQUAL( triangulatedSurface->numTriangles(), 73114U );
-    BOOST_CHECK_CLOSE( algorithm::area( *triangulatedSurface ), 818056610000.0, 0.1 );
+  std::unique_ptr<TriangulatedSurface> triangulatedSurface =
+      triangulation.getTriangulatedSurface();
+  BOOST_CHECK_EQUAL(triangulatedSurface->numTriangles(), 73114U);
+  BOOST_CHECK_CLOSE(algorithm::area(*triangulatedSurface), 818056610000.0, 0.1);
 }
 
-
-
-
 BOOST_AUTO_TEST_SUITE_END()
-
-
-
-

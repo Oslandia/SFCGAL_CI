@@ -14,7 +14,7 @@ namespace SFCGAL::triangulate {
 ///
 ///
 ///
-ConstraintDelaunayTriangulation::ConstraintDelaunayTriangulation()  = default;
+ConstraintDelaunayTriangulation::ConstraintDelaunayTriangulation() = default;
 
 ///
 ///
@@ -96,9 +96,9 @@ ConstraintDelaunayTriangulation::projectionPlane() const -> Kernel::Plane_3
 {
   if (_projectionPlane) {
     return *_projectionPlane;
-  }     return Kernel::Plane_3(Kernel::RT(0), Kernel::RT(0), Kernel::RT(1),
-                           Kernel::RT(0));
- 
+  }
+  return Kernel::Plane_3(Kernel::RT(0), Kernel::RT(0), Kernel::RT(1),
+                         Kernel::RT(0));
 }
 
 ///
@@ -151,4 +151,4 @@ ConstraintDelaunayTriangulation::getTriangulatedSurface() const
   return result;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::triangulate

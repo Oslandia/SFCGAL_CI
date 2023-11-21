@@ -15,8 +15,7 @@ namespace SFCGAL::transform {
 ///
 ///
 ///
-ForceZOrderPoints::ForceZOrderPoints(Kernel::FT defaultZ)
-    : _defaultZ(defaultZ)
+ForceZOrderPoints::ForceZOrderPoints(Kernel::FT defaultZ) : _defaultZ(defaultZ)
 {
 }
 
@@ -71,4 +70,4 @@ ForceZOrderPoints::visit(Polygon &p)
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

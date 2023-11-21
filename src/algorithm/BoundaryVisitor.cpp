@@ -218,8 +218,8 @@ BoundaryVisitor::releaseBoundary() -> Geometry *
 {
   if (_boundary != nullptr) {
     return _boundary.release();
-  }     return new GeometryCollection();
- 
+  }
+  return new GeometryCollection();
 }
 
 ///
@@ -299,4 +299,4 @@ BoundaryVisitor::getBoundaryFromPolygons(const graph::GeometryGraph &g)
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

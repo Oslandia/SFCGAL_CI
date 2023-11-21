@@ -160,4 +160,4 @@ ForceValidityVisitor::visit(TriangulatedSurface &g)
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::detail

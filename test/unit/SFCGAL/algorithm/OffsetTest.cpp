@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_OffsetTest)
 
 BOOST_AUTO_TEST_CASE(testEmpty)
 {
-  tools::Registry          const&registry = tools::Registry::instance();
+  tools::Registry const         &registry = tools::Registry::instance();
   std::vector<std::string> const typeNames =
       tools::Registry::instance().getGeometryTypes();
 
@@ -191,8 +191,8 @@ BOOST_AUTO_TEST_CASE(testHoles)
 
 BOOST_AUTO_TEST_CASE(testPoint)
 {
-  std::unique_ptr<Geometry>     const gA(io::readWkt("POINT(1 1)"));
-  std::unique_ptr<MultiPolygon> result(algorithm::offset(*gA, 1.0));
+  std::unique_ptr<Geometry> const gA(io::readWkt("POINT(1 1)"));
+  std::unique_ptr<MultiPolygon>   result(algorithm::offset(*gA, 1.0));
   BOOST_CHECK_EQUAL(
       result->asText(2),
       "MULTIPOLYGON(((2.00 1.00,1.75 1.66,1.50 1.87,1.25 1.97,1.00 2.00,0.75 "
@@ -263,16 +263,16 @@ BOOST_AUTO_TEST_CASE(testLineString)
 
 BOOST_AUTO_TEST_CASE(testPolygonWithHoles)
 {
-  std::unique_ptr<Geometry>     const gA(io::readWkt(
-          "POLYGON((11.966308 -10.211022,18.007885 1.872133,39.364158 "
-              "2.434140,53.554839 -6.557975,43.438710 -22.856183,20.396416 "
-              "-28.476254,5.643728 -25.525717,13.090323 -20.889158,32.479570 "
-              "-21.310663,38.521147 -15.831093,46.248746 -9.087007,34.446595 "
-              "-1.359409,22.784946 -14.988082,11.966308 -10.211022),(20.396416 "
-              "-1.640412,15.900358 -7.260484,18.007885 -9.508513,22.644444 "
-              "-9.368011,25.173477 -2.342921,20.396416 -1.640412),(41.050179 "
-              "-0.797401,40.207168 -2.202419,47.934767 -6.557975,48.496774 "
-              "-5.433961,41.050179 -0.797401))"));
+  std::unique_ptr<Geometry> const     gA(io::readWkt(
+      "POLYGON((11.966308 -10.211022,18.007885 1.872133,39.364158 "
+          "2.434140,53.554839 -6.557975,43.438710 -22.856183,20.396416 "
+          "-28.476254,5.643728 -25.525717,13.090323 -20.889158,32.479570 "
+          "-21.310663,38.521147 -15.831093,46.248746 -9.087007,34.446595 "
+          "-1.359409,22.784946 -14.988082,11.966308 -10.211022),(20.396416 "
+          "-1.640412,15.900358 -7.260484,18.007885 -9.508513,22.644444 "
+          "-9.368011,25.173477 -2.342921,20.396416 -1.640412),(41.050179 "
+          "-0.797401,40.207168 -2.202419,47.934767 -6.557975,48.496774 "
+          "-5.433961,41.050179 -0.797401))"));
   std::unique_ptr<MultiPolygon> const result(algorithm::offset(*gA, 0.5));
 
   // @todo works in Release, not in Debug... Something strange with holes?
@@ -485,7 +485,7 @@ BOOST_AUTO_TEST_CASE(testMultiLineString)
 {
   std::unique_ptr<Geometry> const gA(
       io::readWkt("MULTILINESTRING((0.0 0.0,1.0 0.0),(2.0 2.0,3.0 2.0))"));
-  std::unique_ptr<Geometry> result{algorithm::offset(*gA, 1.0)};
+  std::unique_ptr<Geometry>       result{algorithm::offset(*gA, 1.0)};
   std::unique_ptr<Geometry> const expected{io::readWkt(
       "MULTIPOLYGON(((2/1 0/1,15/8 4360591588697965/9007199254740992,7/4 "
       "2978851154656373/4503599627370496,13/8 "
@@ -551,7 +551,7 @@ BOOST_AUTO_TEST_CASE(testMultiPolygon)
 {
   std::unique_ptr<Geometry> const gA(
       io::readWkt("MULTIPOLYGON(((0 0,1 0,1 1,0 0)),((2 1,2 0,3 0,2 1)))"));
-  std::unique_ptr<Geometry> result{algorithm::offset(*gA, 1.0)};
+  std::unique_ptr<Geometry>       result{algorithm::offset(*gA, 1.0)};
   std::unique_ptr<Geometry> const expected{io::readWkt(
       "MULTIPOLYGON(((-3184560061929027/4503599627370496 "
       "1592245805114451/2251799813685248,-6698880015218421/9007199254740992 "

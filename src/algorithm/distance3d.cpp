@@ -39,7 +39,8 @@ namespace SFCGAL::algorithm {
 ///
 ///
 auto
-distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/) -> double
+distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
+    -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distance3D(%s,%s)") % gA.asText() %
   // gB.asText() );
@@ -726,7 +727,7 @@ distancePointTriangle3D(const Point &p_, const Point &a_, const Point &b_,
   BOOST_ASSERT(!b_.isEmpty());
   BOOST_ASSERT(!c_.isEmpty());
 
-  Point_3    const p = p_.toPoint_3();
+  Point_3 const    p = p_.toPoint_3();
   Triangle_3 const abc(a_.toPoint_3(), b_.toPoint_3(), c_.toPoint_3());
 
   squared_distance_t const dMin = squaredDistancePointTriangle3D(p, abc);
@@ -762,7 +763,7 @@ squaredDistanceSegmentTriangle3D(const Segment_3 &sAB, const Triangle_3 &tABC)
    */
   if (CGAL::do_intersect(sAB, tABC)) {
     return 0.0;
-}
+  }
 
   /*
    * else, distance is the min of the following values :
@@ -796,13 +797,13 @@ distanceSegmentTriangle3D(const Point &sA_, const Point &sB_, const Point &tA_,
   BOOST_ASSERT(!tB_.isEmpty());
   BOOST_ASSERT(!tC_.isEmpty());
 
-  Point_3   const sA = sA_.toPoint_3();
-  Point_3   const sB = sB_.toPoint_3();
+  Point_3 const   sA = sA_.toPoint_3();
+  Point_3 const   sB = sB_.toPoint_3();
   Segment_3 const sAB(sA, sB);
 
-  Point_3    const tA = tA_.toPoint_3();
-  Point_3    const tB = tB_.toPoint_3();
-  Point_3    const tC = tC_.toPoint_3();
+  Point_3 const    tA = tA_.toPoint_3();
+  Point_3 const    tB = tB_.toPoint_3();
+  Point_3 const    tC = tC_.toPoint_3();
   Triangle_3 const tABC(tA, tB, tC);
 
   squared_distance_t const dMin = squaredDistanceSegmentTriangle3D(sAB, tABC);
@@ -819,7 +820,7 @@ squaredDistanceTriangleTriangle3D(const Triangle_3 &triangleA,
 {
   if (CGAL::do_intersect(triangleA, triangleB)) {
     return {0};
-}
+  }
 
   /*
    * min of distance from A segments to B triangle and B segments to A triangle
@@ -865,4 +866,4 @@ distanceTriangleTriangle3D(const Triangle &gA, const Triangle &gB) -> double
   return CGAL::sqrt(CGAL::to_double(dMin));
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

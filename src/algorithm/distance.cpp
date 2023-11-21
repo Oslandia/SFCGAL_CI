@@ -37,7 +37,8 @@ namespace SFCGAL::algorithm {
 ///
 ///
 auto
-distance(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/) -> double
+distance(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
+    -> double
 {
   switch (gA.geometryTypeId()) {
   case TYPE_POINT:
@@ -590,4 +591,4 @@ distanceSegmentSegment(const Point &a, const Point &b, const Point &c,
       CGAL::Segment_2<Kernel>(c.toPoint_2(), d.toPoint_2()))));
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

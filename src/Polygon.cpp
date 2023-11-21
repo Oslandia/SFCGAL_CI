@@ -13,12 +13,12 @@ namespace SFCGAL {
 ///
 ///
 ///
-Polygon::Polygon()  { _rings.push_back(new LineString()); }
+Polygon::Polygon() { _rings.push_back(new LineString()); }
 
 ///
 ///
 ///
-Polygon::Polygon(const std::vector<LineString> &rings)  
+Polygon::Polygon(const std::vector<LineString> &rings)
 {
   if (rings.empty()) {
     _rings.resize(1, new LineString());
@@ -32,7 +32,7 @@ Polygon::Polygon(const std::vector<LineString> &rings)
 ///
 ///
 ///
-Polygon::Polygon(const LineString &exteriorRing)  
+Polygon::Polygon(const LineString &exteriorRing)
 {
   _rings.push_back(exteriorRing.clone());
 }
@@ -40,15 +40,12 @@ Polygon::Polygon(const LineString &exteriorRing)
 ///
 ///
 ///
-Polygon::Polygon(LineString *exteriorRing)  
-{
-  _rings.push_back(exteriorRing);
-}
+Polygon::Polygon(LineString *exteriorRing) { _rings.push_back(exteriorRing); }
 
 ///
 ///
 ///
-Polygon::Polygon(const Triangle &triangle)  
+Polygon::Polygon(const Triangle &triangle)
 {
   _rings.push_back(new LineString());
 
@@ -255,7 +252,8 @@ Polygon::toPolygon_with_holes_2(bool fixOrientation) const
     holes.push_back(inner);
   }
 
-  CGAL::Polygon_2<Kernel> const outer = exteriorRing().toPolygon_2(fixOrientation);
+  CGAL::Polygon_2<Kernel> const outer =
+      exteriorRing().toPolygon_2(fixOrientation);
   return CGAL::Polygon_with_holes_2<Kernel>(outer, holes.begin(), holes.end());
 }
 

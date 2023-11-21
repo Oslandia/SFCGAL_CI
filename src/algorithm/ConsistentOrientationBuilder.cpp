@@ -11,7 +11,7 @@ namespace SFCGAL::algorithm {
 ///
 ///
 ConsistentOrientationBuilder::ConsistentOrientationBuilder()
-    : _graph(), _graphBuilder(_graph) 
+    : _graph(), _graphBuilder(_graph)
 {
 }
 
@@ -207,4 +207,4 @@ ConsistentOrientationBuilder::_findNextTriangle() -> int
   return result;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

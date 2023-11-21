@@ -51,7 +51,7 @@ hoch(const unsigned int &order) -> std::unique_ptr<Polygon>
   std::unique_ptr<Polygon>    result(new Polygon());
   std::unique_ptr<LineString> ring(new LineString());
 
-  for (auto & point : points) {
+  for (auto &point : points) {
     ring->addPoint(new Point(point.x(), point.y()));
   }
 
@@ -62,4 +62,4 @@ hoch(const unsigned int &order) -> std::unique_ptr<Polygon>
   return result;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::generator

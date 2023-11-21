@@ -17,9 +17,9 @@ Force2D::transform(Point &p)
     Point pt(p.x(), p.y());
     if (p.isMeasured()) {
       pt.setM(p.m());
-}
+    }
     p = pt;
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

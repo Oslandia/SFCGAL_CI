@@ -158,7 +158,7 @@ triangulatePolygon3D(const Polygon       &polygon,
       continue;
     }
 
-    Vertex_handle v_prev = cdt.addVertex(ring.pointN(0).coordinate());
+    Vertex_handle       v_prev = cdt.addVertex(ring.pointN(0).coordinate());
     Vertex_handle const v_0    = v_prev;
 
     for (size_t j = 1; j < ring.numPoints() - 1; j++) {
@@ -200,4 +200,4 @@ triangulatePolygon3D(const Solid &g, TriangulatedSurface &triangulatedSurface)
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::triangulate

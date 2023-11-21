@@ -47,7 +47,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   //
 
   if (pa.handle.which() == PrimitiveSegment &&
-           pb.handle.which() == PrimitivePoint) {
+      pb.handle.which() == PrimitivePoint) {
     const auto *seg = pa.as<CGAL::Segment_2<Kernel>>();
     const auto *pt  = pb.as<CGAL::Point_2<Kernel>>();
     return seg->has_on(*pt);
@@ -58,7 +58,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   //
 
   if (pa.handle.which() == PrimitiveSegment &&
-           pb.handle.which() == PrimitiveSegment) {
+      pb.handle.which() == PrimitiveSegment) {
     const auto *seg1 = pa.as<CGAL::Segment_2<Kernel>>();
     const auto *seg2 = pb.as<CGAL::Segment_2<Kernel>>();
     return CGAL::do_intersect(*seg1, *seg2);
@@ -69,7 +69,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   //
 
   if (pa.handle.which() == PrimitiveSurface &&
-           pb.handle.which() == PrimitivePoint) {
+      pb.handle.which() == PrimitivePoint) {
     // Polygon versus Point
     const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
     const auto *pt   = pb.as<CGAL::Point_2<Kernel>>();
@@ -102,7 +102,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   //
 
   if (pa.handle.which() == PrimitiveSurface &&
-           pb.handle.which() == PrimitiveSegment) {
+      pb.handle.which() == PrimitiveSegment) {
     const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
     const auto *seg  = pb.as<CGAL::Segment_2<Kernel>>();
 
@@ -135,8 +135,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
 
     // 2. call the polygon, point version
     CGAL::Point_2<Kernel> const pt = seg->source();
-    PrimitiveHandle<2>    const ppoly(poly);
-    PrimitiveHandle<2>    const ppt(&pt);
+    PrimitiveHandle<2> const    ppoly(poly);
+    PrimitiveHandle<2> const    ppt(&pt);
     return intersects(ppoly, ppt);
   }
 
@@ -145,7 +145,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   //
 
   if (pa.handle.which() == PrimitiveSurface &&
-           pb.handle.which() == PrimitiveSurface) {
+      pb.handle.which() == PrimitiveSurface) {
     const auto *poly1 = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
     const auto *poly2 = pb.as<CGAL::Polygon_with_holes_2<Kernel>>();
 
@@ -185,7 +185,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     // if pa is inside pb
     if (Envelope::contains(e2, e1)) {
       // is pa inside one of pb's holes ?
-      CGAL::Point_2<Kernel> const pt = *poly1->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel> const pt =
+          *poly1->outer_boundary().vertices_begin();
 
       for (auto it = poly2->holes_begin(); it != poly2->holes_end(); ++it) {
         CGAL::Bounded_side const b2 = it->bounded_side(pt);
@@ -201,7 +202,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     // if pb is inside pa
     if (Envelope::contains(e1, e2)) {
       // is pa inside one of pb's holes ?
-      CGAL::Point_2<Kernel> const pt = *poly2->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel> const pt =
+          *poly2->outer_boundary().vertices_begin();
 
       for (auto it = poly1->holes_begin(); it != poly1->holes_end(); ++it) {
         CGAL::Bounded_side const b2 = it->bounded_side(pt);
@@ -276,13 +278,15 @@ _intersects(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb) -> bool
       pb.handle.which() == PrimitivePoint) {
     return *boost::get<const CGAL::Point_3<Kernel> *>(pa.handle) ==
            *boost::get<const CGAL::Point_3<Kernel> *>(pb.handle);
-  } if (pa.handle.which() == PrimitiveSegment &&
-             pb.handle.which() == PrimitivePoint) {
+  }
+  if (pa.handle.which() == PrimitiveSegment &&
+      pb.handle.which() == PrimitivePoint) {
     const auto *seg = pa.as<CGAL::Segment_3<Kernel>>();
     const auto *pt  = pb.as<CGAL::Point_3<Kernel>>();
     return seg->has_on(*pt);
-  } if (pa.handle.which() == PrimitiveSegment &&
-             pb.handle.which() == PrimitiveSegment) {
+  }
+  if (pa.handle.which() == PrimitiveSegment &&
+      pb.handle.which() == PrimitiveSegment) {
     const auto *sega = pa.as<CGAL::Segment_3<Kernel>>();
     const auto *segb = pb.as<CGAL::Segment_3<Kernel>>();
     return CGAL::do_intersect(*sega, *segb);
@@ -327,8 +331,8 @@ dispatch_intersects_sym(const PrimitiveHandle<Dim> &pa,
   // assume types are ordered by dimension within the boost::variant
   if (pa.handle.which() >= pb.handle.which()) {
     return _intersects(pa, pb);
-  }     return _intersects(pb, pa);
- 
+  }
+  return _intersects(pb, pa);
 }
 
 template <int Dim>
@@ -410,7 +414,8 @@ intersects3D(const Geometry &ga, const Geometry &gb) -> bool
 }
 
 auto
-intersects(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/) -> bool
+intersects(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
+    -> bool
 {
   GeometrySet<2> const gsa(ga);
   GeometrySet<2> const gsb(gb);
@@ -419,7 +424,8 @@ intersects(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/) -
 }
 
 auto
-intersects3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/) -> bool
+intersects3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
+    -> bool
 {
   GeometrySet<3> const gsa(ga);
   GeometrySet<3> const gsb(gb);
@@ -493,12 +499,12 @@ selfIntersectsImpl(const LineString &line) -> bool
 
       if (inter.get() && inter->is<LineString>()) {
         return true; // segments overlap
-      } if (inter.get() && inter->is<Point>() &&
-                 !(i + 1 ==
-                   j) // one contact point between consecutive segments is ok
-                 && !((i == 0) && (j + 1 == numSegments) &&
-                      inter->as<Point>() == l.startPoint() &&
-                      inter->as<Point>() == l.endPoint())) {
+      }
+      if (inter.get() && inter->is<Point>() &&
+          !(i + 1 == j) // one contact point between consecutive segments is ok
+          && !((i == 0) && (j + 1 == numSegments) &&
+               inter->as<Point>() == l.startPoint() &&
+               inter->as<Point>() == l.endPoint())) {
         return true; // contact point that is not a contact between startPoint
                      // and endPoint
       }
@@ -627,4 +633,4 @@ selfIntersects3D(const TriangulatedSurface &tin, const SurfaceGraph &g) -> bool
   return selfIntersectsImpl<3>(tin, g);
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

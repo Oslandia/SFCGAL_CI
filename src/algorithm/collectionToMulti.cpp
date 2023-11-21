@@ -103,4 +103,4 @@ collectionToMulti(std::unique_ptr<Geometry> g) -> std::unique_ptr<Geometry>
   return std::unique_ptr<Geometry>(ret_geo);
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

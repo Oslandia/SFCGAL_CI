@@ -24,11 +24,11 @@ polygonSetToMultiPolygon(const CGAL::Polygon_set_2<Kernel> &polygonSet)
 
   std::unique_ptr<MultiPolygon> result(new MultiPolygon);
 
-  for (auto & re : res) {
+  for (auto &re : res) {
     result->addGeometry(new Polygon(re));
   }
 
   return result;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::detail

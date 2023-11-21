@@ -42,7 +42,7 @@ AffineTransform3::transform(Point &p)
     Point pt(p.toPoint_3().transform(_transform));
     if (p.isMeasured()) {
       pt.setM(p.m());
-}
+    }
     p = pt;
   }
 }
@@ -117,4 +117,4 @@ AffineTransform3::transform(Solid &solid)
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

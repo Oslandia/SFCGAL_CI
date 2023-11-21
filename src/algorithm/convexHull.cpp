@@ -56,7 +56,7 @@ convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
   std::vector<Point_2> points;
 
   points.reserve(getPointVisitor.points.size());
-for (auto &point : getPointVisitor.points) {
+  for (auto &point : getPointVisitor.points) {
     points.push_back(point->toPoint_2());
   }
 
@@ -67,31 +67,33 @@ for (auto &point : getPointVisitor.points) {
 
   if (epoints.size() == 1) {
     return std::unique_ptr<Geometry>(new Point(*epoints.begin()));
-  } if (epoints.size() == 2) {
+  }
+  if (epoints.size() == 2) {
     auto it = epoints.begin();
     return std::unique_ptr<Geometry>(
         new LineString(Point(*it++), Point(*it++)));
   }
   // GEOS does not seem to return triangles
   if (epoints.size() == 3) {
-    auto it = epoints.begin();
-    Point_2                            const p(*it++);
-    Point_2                            const q(*it++);
-    Point_2                            const r(*it++);
+    auto          it = epoints.begin();
+    Point_2 const p(*it++);
+    Point_2 const q(*it++);
+    Point_2 const r(*it++);
     return std::unique_ptr<Geometry>(new Triangle(p, q, r));
-  } if (epoints.size() > 3) {
+  }
+  if (epoints.size() > 3) {
     auto *poly = new Polygon;
 
-    for (auto & epoint : epoints) {
+    for (auto &epoint : epoints) {
       poly->exteriorRing().addPoint(epoint);
     }
 
     // add back the first point to close the ring
     poly->exteriorRing().addPoint(*epoints.begin());
     return std::unique_ptr<Geometry>(poly);
-  }     BOOST_THROW_EXCEPTION(
-        Exception("unexpected CGAL output type in CGAL::convex_hull_2"));
- 
+  }
+  BOOST_THROW_EXCEPTION(
+      Exception("unexpected CGAL output type in CGAL::convex_hull_2"));
 }
 
 ///
@@ -110,7 +112,7 @@ convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
   std::vector<Point_3> points;
 
   points.reserve(getPointVisitor.points.size());
-for (auto &point : getPointVisitor.points) {
+  for (auto &point : getPointVisitor.points) {
     points.push_back(point->toPoint_3());
   }
 
@@ -125,16 +127,20 @@ for (auto &point : getPointVisitor.points) {
 
   if (hull.empty()) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
-  } if (const auto *point = object_cast<Point_3>(&hull)) {
+  }
+  if (const auto *point = object_cast<Point_3>(&hull)) {
     return std::unique_ptr<Geometry>(new Point(*point));
-  } if (const auto *segment = object_cast<Segment_3>(&hull)) {
+  }
+  if (const auto *segment = object_cast<Segment_3>(&hull)) {
     return std::unique_ptr<Geometry>(
         new LineString(Point(segment->start()), Point(segment->end())));
-  } if (const auto *triangle = object_cast<Triangle_3>(&hull)) {
+  }
+  if (const auto *triangle = object_cast<Triangle_3>(&hull)) {
     return std::unique_ptr<Geometry>(new Triangle(Point(triangle->vertex(0)),
                                                   Point(triangle->vertex(1)),
                                                   Point(triangle->vertex(2))));
-  } if (const auto *polyhedron = object_cast<Polyhedron_3>(&hull)) {
+  }
+  if (const auto *polyhedron = object_cast<Polyhedron_3>(&hull)) {
     std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface());
 
     for (Polyhedron_3::Facet_const_iterator it_facet =
@@ -155,9 +161,9 @@ for (auto &point : getPointVisitor.points) {
     }
 
     return std::unique_ptr<Geometry>(result.release());
-  }     BOOST_THROW_EXCEPTION(
-        Exception("unexpected CGAL output type in CGAL::convex_hull_3"));
- 
+  }
+  BOOST_THROW_EXCEPTION(
+      Exception("unexpected CGAL output type in CGAL::convex_hull_3"));
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

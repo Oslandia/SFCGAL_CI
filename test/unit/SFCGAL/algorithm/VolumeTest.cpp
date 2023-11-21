@@ -62,9 +62,9 @@ BOOST_AUTO_TEST_CASE(cubeWithHoleVolume)
                 ((.2 .8 .2,.8 .8 .2,.8 .8 .8,.2 .8 .8,.2 .8 .2))))");
   const Kernel::FT c(.6);
   const Kernel::FT ref = 1 - c * c * c;
-  BOOST_CHECK(algorithm::volume(
-                        s->as<Solid>(), algorithm::NoValidityCheck())
-                    - ref < 0.001);
+  BOOST_CHECK(algorithm::volume(s->as<Solid>(), algorithm::NoValidityCheck()) -
+                  ref <
+              0.001);
 }
 
 BOOST_AUTO_TEST_CASE(invertedCubeVolume)
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(polyhedronVolume)
       "((1 0 0, 0 1 0, 0 0 1, 1 0 0 )) )");
 
   std::unique_ptr<Geometry> geometry0(io::readWkt(block0));
-  Solid                     const solid(geometry0->as<PolyhedralSurface>());
+  Solid const               solid(geometry0->as<PolyhedralSurface>());
   auto                      vol{algorithm::volume(solid)};
   BOOST_CHECK_EQUAL(vol * 6, 1.0);
   CGAL::Nef_polyhedron_3<SFCGAL::Kernel> const n;

@@ -22,4 +22,4 @@ RoundTransform::transform(Point &p)
   p.coordinate().round(_scale);
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

@@ -10,12 +10,12 @@ namespace SFCGAL {
 ///
 ///
 ///
-LineString::LineString()  = default;
+LineString::LineString() = default;
 
 ///
 ///
 ///
-LineString::LineString(const std::vector<Point> &points)  
+LineString::LineString(const std::vector<Point> &points)
 {
   for (const auto &point : points) {
     _points.push_back(point.clone());
@@ -26,7 +26,7 @@ LineString::LineString(const std::vector<Point> &points)
 ///
 ///
 LineString::LineString(const Point &startPoint, const Point &endPoint)
-     
+
 {
   _points.push_back(startPoint.clone());
   _points.push_back(endPoint.clone());
@@ -154,8 +154,8 @@ LineString::numSegments() const -> size_t
 {
   if (_points.empty()) {
     return 0;
-  }     return _points.size() - 1;
- 
+  }
+  return _points.size() - 1;
 }
 
 ///

@@ -47,4 +47,4 @@ coversPoints3D(const Geometry &ga, const Geometry &gb) -> bool
 {
   return _coversPoints<3>(ga, gb);
 }
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::algorithm

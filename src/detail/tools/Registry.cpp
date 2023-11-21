@@ -66,7 +66,7 @@ Registry::getGeometryTypes() const -> std::vector<std::string>
   std::vector<std::string> names;
 
   names.reserve(_prototypes.size());
-for (auto *_prototype : _prototypes) {
+  for (auto *_prototype : _prototypes) {
     names.push_back(_prototype->geometryType());
   }
 
@@ -126,7 +126,7 @@ Registry::instance() -> Registry &
 ///
 ///
 ///
-Registry::Registry()  
+Registry::Registry()
 {
   addPrototype(Point());
   addPrototype(LineString());
@@ -145,4 +145,4 @@ Registry::Registry()
   addPrototype(PolyhedralSurface());
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::tools

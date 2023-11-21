@@ -72,10 +72,10 @@ triangulate(const MarkedPolyhedron &polyhedron, GeometrySet<3> &geometry)
 
     do {
       const CGAL::Point_3<Kernel> &pt3 = pit->vertex()->point();
-      CGAL::Point_2<Kernel>        const pt2 = plane.to_2d(pt3);
+      CGAL::Point_2<Kernel> const  pt2 = plane.to_2d(pt3);
 
       Triangulation::Vertex_handle const vh = triangulation.insert(pt2);
-      vh->info().original             = &pt3;
+      vh->info().original                   = &pt3;
 
       pit++;
     } while (pit != fit->facet_begin());
@@ -101,7 +101,7 @@ triangulate(const CGAL::Polygon_with_holes_2<Kernel> &polygon,
             GeometrySet<2>                           &output)
 {
   // FIXME: lots of copies here, can we avoid this ?
-  Polygon             const poly(polygon);
+  Polygon const       poly(polygon);
   TriangulatedSurface surf;
   triangulatePolygon3D(poly, surf);
 
@@ -110,4 +110,4 @@ triangulate(const CGAL::Polygon_with_holes_2<Kernel> &polygon,
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::triangulate

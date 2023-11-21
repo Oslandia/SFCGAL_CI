@@ -11,4 +11,4 @@ namespace SFCGAL::graph {
 ///
 Edge::Edge(const int &face_) : face(face_) {}
 
-} // namespace SFCGAL
+} // namespace SFCGAL::graph

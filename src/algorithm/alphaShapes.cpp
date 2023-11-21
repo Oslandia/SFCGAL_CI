@@ -76,7 +76,7 @@ computeAlpha(const Geometry &g, Alpha_shape_2 &alphaShape, double alpha = 0,
   std::vector<Point_2> points;
 
   points.reserve(getPointVisitor.points.size());
-for (auto &point : getPointVisitor.points) {
+  for (auto &point : getPointVisitor.points) {
     points.push_back(point->toPoint_2());
   }
 
@@ -154,4 +154,4 @@ alphaShapes(const Geometry &g, double alpha, bool allow_holes)
   return alpha_to_geometry(A, allow_holes);
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

@@ -56,7 +56,8 @@ namespace SFCGAL::detail {
 
 void
 _decompose_triangle(const Triangle                    &tri,
-                    GeometrySet<2>::SurfaceCollection &surfaces, dim_t<2> /*unused*/)
+                    GeometrySet<2>::SurfaceCollection &surfaces,
+                    dim_t<2> /*unused*/)
 {
   CGAL::Polygon_2<Kernel> outer;
   outer.push_back(tri.vertex(0).toPoint_2());
@@ -71,24 +72,27 @@ _decompose_triangle(const Triangle                    &tri,
 }
 void
 _decompose_triangle(const Triangle                    &tri,
-                    GeometrySet<3>::SurfaceCollection &surfaces, dim_t<3> /*unused*/)
+                    GeometrySet<3>::SurfaceCollection &surfaces,
+                    dim_t<3> /*unused*/)
 {
   CGAL::Triangle_3<Kernel> const outtri(tri.vertex(0).toPoint_3(),
-                                  tri.vertex(1).toPoint_3(),
-                                  tri.vertex(2).toPoint_3());
+                                        tri.vertex(1).toPoint_3(),
+                                        tri.vertex(2).toPoint_3());
   surfaces.push_back(outtri);
 }
 
 void
 _decompose_polygon(const Polygon                     &poly,
-                   GeometrySet<2>::SurfaceCollection &surfaces, dim_t<2> /*unused*/)
+                   GeometrySet<2>::SurfaceCollection &surfaces,
+                   dim_t<2> /*unused*/)
 {
   BOOST_ASSERT(!poly.isEmpty());
   surfaces.push_back(poly.toPolygon_with_holes_2());
 }
 void
 _decompose_polygon(const Polygon                     &poly,
-                   GeometrySet<3>::SurfaceCollection &surfaces, dim_t<3> /*unused*/)
+                   GeometrySet<3>::SurfaceCollection &surfaces,
+                   dim_t<3> /*unused*/)
 {
   BOOST_ASSERT(!poly.isEmpty());
   TriangulatedSurface surf;
@@ -103,7 +107,9 @@ _decompose_polygon(const Polygon                     &poly,
 }
 
 void
-_decompose_solid(const Solid & /*unused*/, GeometrySet<2>::VolumeCollection & /*unused*/, dim_t<2> /*unused*/)
+_decompose_solid(const Solid & /*unused*/,
+                 GeometrySet<2>::VolumeCollection & /*unused*/,
+                 dim_t<2> /*unused*/)
 {
 }
 void
@@ -539,7 +545,7 @@ GeometrySet<Dim>::computeBoundingBoxes(
 
   for (auto it = _points.begin(); it != _points.end(); ++it) {
     const typename TypeForDimension<Dim>::Point *pt = &(it->primitive());
-    PrimitiveHandle<Dim>                         const h(pt);
+    PrimitiveHandle<Dim> const                   h(pt);
     handles.push_back(h);
     boxes.push_back(typename PrimitiveBox<Dim>::Type(it->primitive().bbox(),
                                                      &handles.back()));
@@ -572,10 +578,10 @@ recompose_points(const typename GeometrySet<Dim>::PointCollection &points,
   if (points.empty()) {
     return;
     //			rpoints.push_back( new Point() );
-  }     for (auto it = points.begin(); it != points.end(); ++it) {
-      rpoints.push_back(new Point(it->primitive()));
-    }
- 
+  }
+  for (auto it = points.begin(); it != points.end(); ++it) {
+    rpoints.push_back(new Point(it->primitive()));
+  }
 }
 
 // compare less than
@@ -618,11 +624,9 @@ recompose_segments(const typename GeometrySet<Dim>::SegmentCollection &segments,
     PointMap pointMap;
 
     for (auto it = segments.begin(); it != segments.end(); ++it) {
-      const auto foundSource =
-          pointMap.find(it->primitive().source());
-      const auto foundTarget =
-          pointMap.find(it->primitive().target());
-      const int sourceId =
+      const auto foundSource = pointMap.find(it->primitive().source());
+      const auto foundTarget = pointMap.find(it->primitive().target());
+      const int  sourceId =
           foundSource != pointMap.end() ? foundSource->second : points.size();
 
       if (foundSource == pointMap.end()) {
@@ -690,7 +694,7 @@ recompose_segments(const typename GeometrySet<Dim>::SegmentCollection &segments,
 
 void
 recompose_surfaces(const GeometrySet<2>::SurfaceCollection &surfaces,
-                   std::vector<Geometry *>                 &output, dim_t<2> /*unused*/)
+                   std::vector<Geometry *> &output, dim_t<2> /*unused*/)
 {
   for (const auto &surface : surfaces) {
     if (surface.primitive().holes_begin() == surface.primitive().holes_end() &&
@@ -708,7 +712,7 @@ recompose_surfaces(const GeometrySet<2>::SurfaceCollection &surfaces,
 
 void
 recompose_surfaces(const GeometrySet<3>::SurfaceCollection &surfaces,
-                   std::vector<Geometry *>                 &output, dim_t<3> /*unused*/)
+                   std::vector<Geometry *> &output, dim_t<3> /*unused*/)
 {
   if (surfaces.empty()) {
     return;
@@ -727,7 +731,7 @@ recompose_surfaces(const GeometrySet<3>::SurfaceCollection &surfaces,
   }
 
   algorithm::SurfaceGraph const graph(*tri);
-  std::vector<size_t>     component(boost::num_vertices(graph.faceGraph()));
+  std::vector<size_t> component(boost::num_vertices(graph.faceGraph()));
   BOOST_ASSERT(tri->numTriangles() == component.size());
   const size_t numComponents =
       boost::connected_components(graph.faceGraph(), component.data());
@@ -758,7 +762,7 @@ recompose_volumes(const GeometrySet<2>::VolumeCollection & /*unused*/,
 
 void
 recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
-                  std::vector<Geometry *>                &output, dim_t<3> /*unused*/)
+                  std::vector<Geometry *> &output, dim_t<3> /*unused*/)
 {
   if (volumes.empty()) {
     return;
@@ -796,8 +800,8 @@ recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
       if (boundary.size() == 3) {
         // It is a triangle
 
-        Point                                            p[3];
-        auto it = boundary.begin();
+        Point p[3];
+        auto  it = boundary.begin();
 
         for (size_t i = 0; i < 3; ++i, ++it) {
           p[i] = *it;
@@ -808,7 +812,7 @@ recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
         // Else it is a polygon
         auto *ls = new LineString;
 
-        for (auto & it : boundary) {
+        for (auto &it : boundary) {
           ls->addPoint(it);
         }
 
@@ -843,8 +847,8 @@ GeometrySet<Dim>::recompose() const -> std::unique_ptr<Geometry>
   }
 
   // else we have a mix of different types
-  bool hasCommonType = true;
-  int  const commonType    = geometries[0]->geometryTypeId();
+  bool      hasCommonType = true;
+  int const commonType    = geometries[0]->geometryTypeId();
 
   for (auto &geometrie : geometries) {
     if (geometrie->geometryTypeId() != commonType) {
@@ -907,7 +911,8 @@ _collect_points(const CGAL::Triangle_3<Kernel>  &tri,
 }
 
 void
-_collect_points(const NoVolume & /*unused*/, GeometrySet<2>::PointCollection & /*unused*/)
+_collect_points(const NoVolume & /*unused*/,
+                GeometrySet<2>::PointCollection & /*unused*/)
 {
 }
 
@@ -1072,15 +1077,16 @@ auto
 operator<<(std::ostream &ostr, const GeometrySet<2> &g) -> std::ostream &
 {
   ostr << "points: ";
-  std::ostream_iterator<CollectionElement<Point_d<2>::Type>> const out_pt(ostr, ", ");
+  std::ostream_iterator<CollectionElement<Point_d<2>::Type>> const out_pt(ostr,
+                                                                          ", ");
   std::copy(g.points().begin(), g.points().end(), out_pt);
   ostr << std::endl << "segments: ";
-  std::ostream_iterator<CollectionElement<Segment_d<2>::Type>> const out_seg(ostr,
-                                                                       ", ");
+  std::ostream_iterator<CollectionElement<Segment_d<2>::Type>> const out_seg(
+      ostr, ", ");
   std::copy(g.segments().begin(), g.segments().end(), out_seg);
   ostr << std::endl << "surfaces: ";
-  std::ostream_iterator<CollectionElement<Surface_d<2>::Type>> const out_surf(ostr,
-                                                                        ", ");
+  std::ostream_iterator<CollectionElement<Surface_d<2>::Type>> const out_surf(
+      ostr, ", ");
   std::copy(g.surfaces().begin(), g.surfaces().end(), out_surf);
   ostr << std::endl;
   return ostr;
@@ -1090,19 +1096,20 @@ auto
 operator<<(std::ostream &ostr, const GeometrySet<3> &g) -> std::ostream &
 {
   ostr << "points: ";
-  std::ostream_iterator<CollectionElement<Point_d<3>::Type>> const out_pt(ostr, ", ");
+  std::ostream_iterator<CollectionElement<Point_d<3>::Type>> const out_pt(ostr,
+                                                                          ", ");
   std::copy(g.points().begin(), g.points().end(), out_pt);
   ostr << std::endl << "segments: ";
-  std::ostream_iterator<CollectionElement<Segment_d<3>::Type>> const out_seg(ostr,
-                                                                       ", ");
+  std::ostream_iterator<CollectionElement<Segment_d<3>::Type>> const out_seg(
+      ostr, ", ");
   std::copy(g.segments().begin(), g.segments().end(), out_seg);
   ostr << std::endl << "surfaces: ";
-  std::ostream_iterator<CollectionElement<Surface_d<3>::Type>> const out_surf(ostr,
-                                                                        ", ");
+  std::ostream_iterator<CollectionElement<Surface_d<3>::Type>> const out_surf(
+      ostr, ", ");
   std::copy(g.surfaces().begin(), g.surfaces().end(), out_surf);
   ostr << std::endl << "volumes: ";
-  std::ostream_iterator<CollectionElement<Volume_d<3>::Type>> const out_vol(ostr,
-                                                                      ", ");
+  std::ostream_iterator<CollectionElement<Volume_d<3>::Type>> const out_vol(
+      ostr, ", ");
   std::copy(g.volumes().begin(), g.volumes().end(), out_vol);
   ostr << std::endl;
   return ostr;
@@ -1110,4 +1117,4 @@ operator<<(std::ostream &ostr, const GeometrySet<3> &g) -> std::ostream &
 
 template class GeometrySet<2>;
 template class GeometrySet<3>;
-} // namespace SFCGAL
+} // namespace SFCGAL::detail

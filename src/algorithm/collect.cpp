@@ -20,17 +20,20 @@ collect(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
       mp->addGeometry(ga);
       mp->addGeometry(gb);
       return std::unique_ptr<Geometry>(mp);
-    } if (ga.geometryTypeId() == TYPE_LINESTRING) {
+    }
+    if (ga.geometryTypeId() == TYPE_LINESTRING) {
       auto *mls = new MultiLineString();
       mls->addGeometry(ga);
       mls->addGeometry(gb);
       return std::unique_ptr<Geometry>(mls);
-    } if (ga.geometryTypeId() == TYPE_POLYGON) {
+    }
+    if (ga.geometryTypeId() == TYPE_POLYGON) {
       auto *mp = new MultiPolygon();
       mp->addGeometry(ga);
       mp->addGeometry(gb);
       return std::unique_ptr<Geometry>(mp);
-    } if (ga.geometryTypeId() == TYPE_SOLID) {
+    }
+    if (ga.geometryTypeId() == TYPE_SOLID) {
       auto *mp = new MultiSolid();
       mp->addGeometry(ga);
       mp->addGeometry(gb);
@@ -44,4 +47,4 @@ collect(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
   coll->addGeometry(gb);
   return std::unique_ptr<Geometry>(coll);
 }
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

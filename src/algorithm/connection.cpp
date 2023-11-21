@@ -30,10 +30,8 @@ SurfaceGraph::addRing(const LineString &ring, FaceIndex faceIndex)
                                                          // the index of ring
                                                          // start point instead
                                                          // of finding it
-    const auto startFound =
-        _coordinateMap.find(startCoord);
-    const auto endFound =
-        _coordinateMap.find(endCoord);
+    const auto startFound = _coordinateMap.find(startCoord);
+    const auto endFound   = _coordinateMap.find(endCoord);
     BOOST_ASSERT(s + 1 != numSegments ||
                  endFound != _coordinateMap.end()); // ring not closed
 
@@ -43,8 +41,7 @@ SurfaceGraph::addRing(const LineString &ring, FaceIndex faceIndex)
       const VertexIndex                         startIndex = startFound->second;
       const VertexIndex                         endIndex   = endFound->second;
       const std::pair<VertexIndex, VertexIndex> edge(startIndex, endIndex);
-      const auto             foundEdgeWithBadOrientation =
-          _edgeMap.find(edge);
+      const auto foundEdgeWithBadOrientation = _edgeMap.find(edge);
 
       if (foundEdgeWithBadOrientation != _edgeMap.end()) {
         _isValid = Validity::invalid(
@@ -163,4 +160,4 @@ isClosed(const SurfaceGraph &graph) -> bool
   return true;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

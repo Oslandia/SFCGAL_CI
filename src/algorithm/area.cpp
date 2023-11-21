@@ -268,7 +268,8 @@ area3D(const Polygon &g) -> double
 
     for (size_t j = 0; j < ring.numPoints() - 1; j++) {
       CGAL::Point_3<Kernel> const point = ring.pointN(j).toPoint_3();
-      CGAL::Point_2<Kernel> const projectedPoint((point - b) * ux, (point - b) * uy);
+      CGAL::Point_2<Kernel> const projectedPoint((point - b) * ux,
+                                                 (point - b) * uy);
       projectedPolygon.push_back(projectedPoint);
     }
 
@@ -291,8 +292,8 @@ auto
 area3D(const Triangle &g) -> double
 {
   CGAL::Triangle_3<Kernel> const triangle(g.vertex(0).toPoint_3(),
-                                    g.vertex(1).toPoint_3(),
-                                    g.vertex(2).toPoint_3());
+                                          g.vertex(1).toPoint_3(),
+                                          g.vertex(2).toPoint_3());
   return sqrt(CGAL::to_double(triangle.squared_area()));
 }
 
@@ -341,4 +342,4 @@ area3D(const TriangulatedSurface &g) -> double
   return result;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

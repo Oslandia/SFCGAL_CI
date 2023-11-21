@@ -17,7 +17,8 @@ using namespace SFCGAL::detail;
 namespace SFCGAL::algorithm {
 
 auto
-covers(const PrimitiveHandle<3> & /*unused*/, const PrimitiveHandle<3> & /*unused*/) -> bool
+covers(const PrimitiveHandle<3> & /*unused*/,
+       const PrimitiveHandle<3> & /*unused*/) -> bool
 {
   return false;
 }
@@ -248,4 +249,4 @@ covers3D(const Geometry &ga, const Geometry &gb) -> bool
 
   return covers(gsa, gsb);
 }
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

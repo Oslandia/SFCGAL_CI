@@ -155,4 +155,4 @@ isCounterClockWiseOriented(const Polygon &poly) -> bool
   return isCounterClockWiseOriented(poly.exteriorRing());
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

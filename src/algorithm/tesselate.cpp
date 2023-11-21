@@ -15,7 +15,8 @@ namespace SFCGAL::algorithm {
 ///
 ///
 auto
-tesselate(const Geometry &g, NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
+tesselate(const Geometry &g, NoValidityCheck /*unused*/)
+    -> std::unique_ptr<Geometry>
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
@@ -74,4 +75,4 @@ tesselate(const Geometry &g) -> std::unique_ptr<Geometry>
   return tesselate(g, NoValidityCheck());
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

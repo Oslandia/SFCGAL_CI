@@ -15,31 +15,34 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 #include <boost/test/unit_test.hpp>
 
 #include <SFCGAL/detail/ComplexComparator.h>
 #include <SFCGAL/numeric.h>
 
-using namespace SFCGAL ;
-using namespace SFCGAL::detail ;
+using namespace SFCGAL;
+using namespace SFCGAL::detail;
 
 // always after CGAL
-using namespace boost::unit_test ;
+using namespace boost::unit_test;
 
+BOOST_AUTO_TEST_SUITE(SFCGAL_detail_ComplexComparatorTest)
 
-BOOST_AUTO_TEST_SUITE( SFCGAL_detail_ComplexComparatorTest )
-
-BOOST_AUTO_TEST_CASE( testComparator )
+BOOST_AUTO_TEST_CASE(testComparator)
 {
-    ComplexComparator const less ;
+  ComplexComparator const less;
 
-    BOOST_CHECK( ! less( std::complex< double >( 1.0,0.0 ), std::complex< double >( 0.0,0.0 ) ) );
-    BOOST_CHECK( ! less( std::complex< double >( 0.0,0.0 ), std::complex< double >( 0.0,0.0 ) ) );
-    BOOST_CHECK( less( std::complex< double >( 0.0,0.0 ), std::complex< double >( 1.0,0.0 ) ) );
-    BOOST_CHECK( less( std::complex< double >( 0.0,0.0 ), std::complex< double >( 0.0,1.0 ) ) );
+  BOOST_CHECK(
+      !less(std::complex<double>(1.0, 0.0), std::complex<double>(0.0, 0.0)));
+  BOOST_CHECK(
+      !less(std::complex<double>(0.0, 0.0), std::complex<double>(0.0, 0.0)));
+  BOOST_CHECK(
+      less(std::complex<double>(0.0, 0.0), std::complex<double>(1.0, 0.0)));
+  BOOST_CHECK(
+      less(std::complex<double>(0.0, 0.0), std::complex<double>(0.0, 1.0)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

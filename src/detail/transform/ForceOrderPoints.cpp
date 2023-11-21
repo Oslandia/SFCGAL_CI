@@ -81,4 +81,4 @@ ForceOrderPoints::visit(Polygon &p)
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

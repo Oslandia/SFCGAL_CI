@@ -76,4 +76,4 @@ volume(const Geometry &g) -> const Kernel::FT
   return 0; // to avoid warning
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

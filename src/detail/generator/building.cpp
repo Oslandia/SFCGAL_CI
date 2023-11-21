@@ -97,8 +97,7 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
     _buildingWall(polygon.outer_boundary(), wallHeight, *shell);
 
     // interior rings
-    for (auto it = polygon.holes_begin();
-         it != polygon.holes_end(); ++it) {
+    for (auto it = polygon.holes_begin(); it != polygon.holes_end(); ++it) {
       _buildingWall(*it, wallHeight, *shell);
     }
   }
@@ -108,15 +107,15 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
     for (Face_const_iterator it = skeleton->faces_begin();
          it != skeleton->faces_end(); ++it) {
 
-      LineString            roofFaceRing;
-      Halfedge_const_handle h                 = it->halfedge();
+      LineString                  roofFaceRing;
+      Halfedge_const_handle       h = it->halfedge();
       Halfedge_const_handle const done(h);
-      bool                  infiniteTimeFound = false;
+      bool                        infiniteTimeFound = false;
 
       do {
         infiniteTimeFound = infiniteTimeFound || h->has_infinite_time();
 
-        Point_2    const point  = h->vertex()->point();
+        Point_2 const    point  = h->vertex()->point();
         Kernel::FT const zPoint = wallHeight + h->vertex()->time() * roofSlope;
 
         roofFaceRing.addPoint(Point(point.x(), point.y(), zPoint));
@@ -174,4 +173,4 @@ building(const Geometry &g, const Kernel::FT &wallHeight,
   }
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::generator

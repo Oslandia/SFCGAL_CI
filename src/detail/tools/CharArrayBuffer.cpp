@@ -40,8 +40,8 @@ CharArrayBuffer::seekoff(std::streamoff off, std::ios_base::seekdir way,
 }
 
 auto
-CharArrayBuffer::seekpos(std::streampos pos, std::ios_base::openmode /*__which*/)
-    -> std::streampos
+CharArrayBuffer::seekpos(std::streampos pos,
+                         std::ios_base::openmode /*__which*/) -> std::streampos
 {
   if (begin_ + pos >= end_) {
     return -1;

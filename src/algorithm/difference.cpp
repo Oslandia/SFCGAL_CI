@@ -220,8 +220,7 @@ difference(const Primitive &primitive, PrimitiveHandleConstIterator begin,
   for (PrimitiveHandleConstIterator b = begin; b != end; ++b) {
     std::vector<Primitive> new_primitives;
 
-    for (auto a = primitives.begin();
-         a != primitives.end(); ++a) {
+    for (auto a = primitives.begin(); a != primitives.end(); ++a) {
       difference(*a, *(*b), std::back_inserter(new_primitives));
     }
 
@@ -354,7 +353,7 @@ difference(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
   GeometrySet<Dim>                   temp;
   GeometrySet<Dim>                   temp2;
   typename CollisionMapper<Dim>::Map map;
-  CollisionMapper<Dim>               const cb(map);
+  CollisionMapper<Dim> const         cb(map);
   CGAL::box_intersection_d(aboxes.begin(), aboxes.end(), bboxes.begin(),
                            bboxes.end(), cb);
 
@@ -400,7 +399,7 @@ difference(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
 {
   GeometrySet<2> const gsa(ga);
   GeometrySet<2> const gsb(gb);
-  GeometrySet<2> output;
+  GeometrySet<2>       output;
   algorithm::difference(gsa, gsb, output);
 
   GeometrySet<2> filtered;
@@ -423,7 +422,7 @@ difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
 {
   GeometrySet<3> const gsa(ga);
   GeometrySet<3> const gsb(gb);
-  GeometrySet<3> output;
+  GeometrySet<3>       output;
   algorithm::difference(gsa, gsb, output);
 
   GeometrySet<3> filtered;
@@ -441,4 +440,4 @@ difference3D(const Geometry &ga, const Geometry &gb)
 
   return difference3D(ga, gb, NoValidityCheck());
 }
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

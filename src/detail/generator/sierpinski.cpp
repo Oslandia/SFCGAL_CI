@@ -56,4 +56,4 @@ sierpinski(const unsigned int &order) -> std::unique_ptr<MultiPolygon>
   return result;
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::generator

@@ -10,13 +10,13 @@ namespace SFCGAL {
 ///
 ///
 ///
-TriangulatedSurface::TriangulatedSurface()  = default;
+TriangulatedSurface::TriangulatedSurface() = default;
 
 ///
 ///
 ///
 TriangulatedSurface::TriangulatedSurface(const std::vector<Triangle> &triangles)
-     
+
 {
   for (const auto &triangle : triangles) {
     _triangles.push_back(triangle.clone());
@@ -91,8 +91,8 @@ TriangulatedSurface::coordinateDimension() const -> int
 {
   if (_triangles.empty()) {
     return 0;
-  }     return _triangles[0].coordinateDimension();
- 
+  }
+  return _triangles[0].coordinateDimension();
 }
 
 ///
@@ -237,9 +237,9 @@ public:
     for (size_t i = 0; i < surf.numGeometries(); i++) {
       B.begin_facet();
       CGAL::Triangle_3<K> const tri(surf.geometryN(i).toTriangle_3());
-      CGAL::Point_3<K>    const pa(tri[0]);
-      CGAL::Point_3<K>    const pb(tri[1]);
-      CGAL::Point_3<K>    const pc(tri[2]);
+      CGAL::Point_3<K> const    pa(tri[0]);
+      CGAL::Point_3<K> const    pb(tri[1]);
+      CGAL::Point_3<K> const    pc(tri[2]);
 
       if (edges.find(std::make_pair(pa, pb)) != edges.end() ||
           edges.find(std::make_pair(pb, pc)) != edges.end() ||

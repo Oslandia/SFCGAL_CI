@@ -208,7 +208,7 @@ isValid(const Polygon &p, const double &toleranceAbs) -> const Validity
     size_t            i     = 0;
     for (; i < ring.numPoints() && start == ring.pointN(i); i++) {
       ; // noop
-}
+    }
     if (i == ring.numPoints()) {
       return Validity::invalid(
           (boost::format("ring %d degenerated to a point") % r).str());
@@ -273,7 +273,8 @@ isValid(const Polygon &p, const double &toleranceAbs) -> const Validity
           return Validity::invalid(
               (boost::format("intersection between ring %d and %d") % ri % rj)
                   .str());
-        } if (!inter->isEmpty() && inter->is<Point>()) {
+        }
+        if (!inter->isEmpty() && inter->is<Point>()) {
           touchingRings.emplace_back(ri, rj);
         }
       }
@@ -287,7 +288,7 @@ isValid(const Polygon &p, const double &toleranceAbs) -> const Validity
 
       Graph g(touchingRings.begin(), touchingRings.end(), numRings);
 
-      bool         hasLoop = false;
+      bool               hasLoop = false;
       LoopDetector const vis(hasLoop);
       undirected_dfs(g, root_vertex(vertex_t(0))
                             .visitor(vis)
@@ -357,7 +358,7 @@ isValid(const MultiLineString &ml, const double &toleranceAbs) -> const Validity
       return Validity::invalid(
           (boost::format("LineString %d is invalid: %s") % l % v.reason())
               .str());
-}
+    }
   }
 
   return Validity::valid();
@@ -378,7 +379,7 @@ isValid(const MultiPolygon &mp, const double &toleranceAbs) -> const Validity
     if (!v) {
       return Validity::invalid(
           (boost::format("Polygon %d is invalid: %s") % p % v.reason()).str());
-}
+    }
   }
 
   for (size_t pi = 0; pi != numPolygons; ++pi) {
@@ -416,7 +417,7 @@ isValid(const GeometryCollection &gc, const double &toleranceAbs)
       return Validity::invalid((boost::format("%s %d is invalid: %s") %
                                 gc.geometryN(g).geometryType() % g % v.reason())
                                    .str());
-}
+    }
   }
 
   return Validity::valid();
@@ -438,7 +439,7 @@ isValid(const TriangulatedSurface &tin, const SurfaceGraph &graph,
     if (!v) {
       return Validity::invalid(
           (boost::format("Triangle %d is invalid: %s") % t % v.reason()).str());
-}
+    }
   }
 
   if (!isConnected(graph)) {
@@ -480,7 +481,7 @@ isValid(const PolyhedralSurface &s, const SurfaceGraph &graph,
     if (!v) {
       return Validity::invalid(
           (boost::format("Polygon %d is invalid: %s") % p % v.reason()).str());
-}
+    }
   }
 
   if (!isConnected(graph)) {
@@ -517,20 +518,20 @@ isValid(const Solid &solid, const double &toleranceAbs) -> const Validity
 
   for (size_t s = 0; s != numShells; ++s) {
     const SurfaceGraph graph(solid.shellN(s));
-    Validity           const v = isValid(solid.shellN(s), graph, toleranceAbs);
+    Validity const     v = isValid(solid.shellN(s), graph, toleranceAbs);
 
     if (!v) {
       return Validity::invalid(
           (boost::format("PolyhedralSurface (shell) %d is invalid: %s") % s %
            v.reason())
               .str());
-}
+    }
 
     if (!isClosed(graph)) {
       return Validity::invalid(
           (boost::format("PolyhedralSurface (shell) %d is not closed") % s)
               .str());
-}
+    }
   }
 
   if (solid.numInteriorShells() != 0U) {
@@ -557,7 +558,7 @@ isValid(const MultiSolid &ms, const double &toleranceAbs) -> const Validity
     if (!v) {
       return Validity::invalid(
           (boost::format("Solid %d is invalid: %s") % s % v.reason()).str());
-}
+    }
   }
 
   return Validity::valid();

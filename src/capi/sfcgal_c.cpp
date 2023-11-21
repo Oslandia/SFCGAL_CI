@@ -186,20 +186,20 @@ sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
   // invalidity location is not supported for now
   if (invalidity_location != nullptr) {
     *invalidity_location = nullptr;
-}
+  }
   // set to null for now
   if (invalidity_reason != nullptr) {
     *invalidity_reason = nullptr;
-}
+  }
 
   const auto *g = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   if (g->hasValidityFlag()) {
     return 1;
-}
+  }
   bool is_valid = false;
   try {
     SFCGAL::Validity const validity = SFCGAL::algorithm::isValid(*g);
-    is_valid                  = validity;
+    is_valid                        = validity;
     if (!is_valid && (invalidity_reason != nullptr)) {
       *invalidity_reason = strdup(validity.reason().c_str());
     }
@@ -774,7 +774,7 @@ extern "C" auto
 sfcgal_io_read_binary_prepared(const char *str, size_t len)
     -> sfcgal_prepared_geometry_t *
 {
-  std::string                               const sstr(str, len);
+  std::string const                         sstr(str, len);
   std::unique_ptr<SFCGAL::PreparedGeometry> g;
 
   try {
@@ -1308,7 +1308,8 @@ sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
 
 extern "C" auto
 sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
-                                     bool allow_holes, size_t nb_components) -> sfcgal_geometry_t *
+                                     bool allow_holes, size_t nb_components)
+    -> sfcgal_geometry_t *
 {
   const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   std::unique_ptr<SFCGAL::Geometry> result;
@@ -1317,8 +1318,8 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
     result = SFCGAL::algorithm::optimal_alpha_shapes(
         g1->as<const SFCGAL::Geometry>(), allow_holes, nb_components);
   } catch (std::exception &e) {
-    SFCGAL_WARNING("During optimal_alpha_shapes(A, %g %g):", static_cast<int>(allow_holes),
-                   nb_components);
+    SFCGAL_WARNING("During optimal_alpha_shapes(A, %g %g):",
+                   static_cast<int>(allow_holes), nb_components);
     SFCGAL_WARNING("  with A: %s",
                    ((const SFCGAL::Geometry *)(geom))->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
@@ -1330,7 +1331,8 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
 #endif
 
 extern "C" auto
-sfcgal_y_monotone_partition_2(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
+sfcgal_y_monotone_partition_2(const sfcgal_geometry_t *geom)
+    -> sfcgal_geometry_t *
 {
   const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   std::unique_ptr<SFCGAL::Geometry> result;
@@ -1350,7 +1352,8 @@ sfcgal_y_monotone_partition_2(const sfcgal_geometry_t *geom) -> sfcgal_geometry_
 }
 
 extern "C" auto
-sfcgal_approx_convex_partition_2(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
+sfcgal_approx_convex_partition_2(const sfcgal_geometry_t *geom)
+    -> sfcgal_geometry_t *
 {
   const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   std::unique_ptr<SFCGAL::Geometry> result;
@@ -1370,7 +1373,8 @@ sfcgal_approx_convex_partition_2(const sfcgal_geometry_t *geom) -> sfcgal_geomet
 }
 
 extern "C" auto
-sfcgal_greene_approx_convex_partition_2(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
+sfcgal_greene_approx_convex_partition_2(const sfcgal_geometry_t *geom)
+    -> sfcgal_geometry_t *
 {
   const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   std::unique_ptr<SFCGAL::Geometry> result;
@@ -1390,7 +1394,8 @@ sfcgal_greene_approx_convex_partition_2(const sfcgal_geometry_t *geom) -> sfcgal
   return result.release();
 }
 extern "C" auto
-sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
+sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom)
+    -> sfcgal_geometry_t *
 {
   const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   std::unique_ptr<SFCGAL::Geometry> result;
@@ -1411,7 +1416,8 @@ sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom) -> sfcgal_geome
 
 extern "C" auto
 sfcgal_geometry_visibility_point(const sfcgal_geometry_t *polygon,
-                                 const sfcgal_geometry_t *point) -> sfcgal_geometry_t *
+                                 const sfcgal_geometry_t *point)
+    -> sfcgal_geometry_t *
 {
 
   const auto *poly = reinterpret_cast<const SFCGAL::Geometry *>(polygon);
@@ -1445,7 +1451,8 @@ sfcgal_geometry_visibility_point(const sfcgal_geometry_t *polygon,
 extern "C" auto
 sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
                                    const sfcgal_geometry_t *pointA,
-                                   const sfcgal_geometry_t *pointB) -> sfcgal_geometry_t *
+                                   const sfcgal_geometry_t *pointB)
+    -> sfcgal_geometry_t *
 {
   const auto *poly = reinterpret_cast<const SFCGAL::Geometry *>(polygon);
   const auto *ptA  = reinterpret_cast<const SFCGAL::Geometry *>(pointA);

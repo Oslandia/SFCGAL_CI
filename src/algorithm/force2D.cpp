@@ -17,4 +17,4 @@ force2D(Geometry &g)
   g.accept(t);
 }
 
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
