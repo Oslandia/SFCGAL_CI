@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygon)
   std::unique_ptr<Polygon> result(
       algorithm::visibility(poly, startPoint, endPoint));
   std::string expectedWkt =
-      "POLYGON((1.0 2.0,0.0 4.0,0.0 0.0,4.0 0.0,4.0 4.0,1.0 2.0))";
+      "POLYGON((4.0 0.0,4.0 4.0,1.0 2.0,0.0 1.3,0.0 0.0,3.0 2.0,4.0 0.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
