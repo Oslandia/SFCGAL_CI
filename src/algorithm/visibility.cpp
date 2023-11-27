@@ -161,6 +161,7 @@ visibility(const Geometry &polygon, const Geometry &pointA,
 
   Point_2 startPoint{pointA.as<Point>().toPoint_2()};
   Point_2 endPoint{pointB.as<Point>().toPoint_2()};
+  Point_2 queryPoint{pointB.as<Point>().toPoint_2()};
 
   // insert geometry into the arrangement
   CGAL::Polygon_with_holes_2 pwh{
@@ -175,12 +176,21 @@ visibility(const Geometry &polygon, const Geometry &pointA,
 
   // If the point is in a boundary segment, find the corresponding half edge
   Halfedge_const_handle he = arr.halfedges_begin();
-  while (he->source()->point() != startPoint ||
-         he->target()->point() != endPoint) {
+  bool cont = !Segment_2(he->source()->point(), he->target()->point())
+                   .has_on(queryPoint) ||
+              he->source()->point() == startPoint ||
+              he->target()->point() == endPoint || he->face()->is_unbounded();
+  // While we are not in the right half edge, or while q is the source,
+  // continue
+  while (cont) {
     he++;
     if (he == arr.halfedges_end()) {
       BOOST_THROW_EXCEPTION(Exception("Can not find corresponding half edge."));
     }
+
+    cont = !Segment_2(he->source()->point(), he->target()->point())
+                .has_on(queryPoint) ||
+           he->source()->point() == queryPoint || he->face()->is_unbounded();
   }
 
   // visibility query
