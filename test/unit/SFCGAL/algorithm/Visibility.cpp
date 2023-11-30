@@ -154,4 +154,59 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygonHole)
       "3.0,19.0 -2.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
+
+BOOST_AUTO_TEST_CASE(testVisibility_PointOutPolygon)
+{
+  std::vector<Point> points;
+
+  points.emplace_back(24.2222222, 40);
+  points.emplace_back(24.183792760806462, 39.609819355967744);
+  points.emplace_back(24.069981265022573, 39.23463313526982);
+  points.emplace_back(23.88516142460509, 38.8888595339608);
+  points.emplace_back(23.636435762373097, 38.58578643762691);
+  points.emplace_back(23.333362666039207, 38.33706077539491);
+  points.emplace_back(22.98758906473018, 38.15224093497743);
+  points.emplace_back(22.612402844032257, 38.038429439193536);
+  points.emplace_back(22.2222222, 38);
+  points.emplace_back(21.832041555967745, 38.038429439193536);
+  points.emplace_back(21.45685533526982, 38.15224093497743);
+  points.emplace_back(21.1110817339608, 38.33706077539491);
+  points.emplace_back(20.808008637626905, 38.58578643762691);
+  points.emplace_back(20.55928297539491, 38.8888595339608);
+  points.emplace_back(20.37446313497743, 39.23463313526982);
+  points.emplace_back(20.26065163919354, 39.609819355967744);
+  points.emplace_back(20.2222222, 40);
+  points.emplace_back(20.26065163919354, 40.390180644032256);
+  points.emplace_back(20.37446313497743, 40.76536686473018);
+  points.emplace_back(20.55928297539491, 41.1111404660392);
+  points.emplace_back(20.808008637626905, 41.41421356237309);
+  points.emplace_back(21.111081733960795, 41.66293922460509);
+  points.emplace_back(21.45685533526982, 41.84775906502257);
+  points.emplace_back(21.832041555967745, 41.96157056080646);
+  points.emplace_back(22.2222222, 42);
+  points.emplace_back(22.612402844032257, 41.961570560806464);
+  points.emplace_back(22.98758906473018, 41.84775906502257);
+  points.emplace_back(23.333362666039204, 41.66293922460509);
+  points.emplace_back(23.636435762373097, 41.41421356237309);
+  points.emplace_back(23.88516142460509, 41.1111404660392);
+  points.emplace_back(24.069981265022573, 40.76536686473018);
+  points.emplace_back(24.183792760806462, 40.390180644032256);
+  points.emplace_back(24.2222222, 40);
+
+  LineString lineString(points);
+  lineString.reverse();
+  Polygon const poly(lineString);
+
+  Point const queryPoint(-10, 60);
+
+  try {
+    std::unique_ptr<Polygon> const result(
+        algorithm::visibility(poly, queryPoint));
+  }
+  catch ( std::exception &e ) {
+      BOOST_CHECK_MESSAGE( true, ( "Can not find corresponding face." ) );
+  }
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
