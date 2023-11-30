@@ -58,6 +58,50 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygon)
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
+BOOST_AUTO_TEST_CASE(testVisibility_PointOnPolygon)
+{
+  std::vector<Point> points;
+  points.push_back(Point(0.0, 4.0));
+  points.push_back(Point(0.0, 0.0));
+  points.push_back(Point(3.0, 2.0));
+  points.push_back(Point(4.0, 0.0));
+  points.push_back(Point(4.0, 4.0));
+  points.push_back(Point(1.0, 2.0));
+  points.push_back(Point(0.0, 4.0));
+
+  LineString lineString(points);
+  Polygon    poly(lineString);
+
+  Point queryPoint(0.0, 2.0);
+
+  std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
+  std::string              expectedWkt =
+      "POLYGON((1.0 2.0,0.0 4.0,0.0 0.0,3.0 2.0,1.0 2.0))";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnPolygon)
+{
+  std::vector<Point> points;
+  points.push_back(Point(0.0, 4.0));
+  points.push_back(Point(0.0, 0.0));
+  points.push_back(Point(3.0, 2.0));
+  points.push_back(Point(4.0, 0.0));
+  points.push_back(Point(4.0, 4.0));
+  points.push_back(Point(1.0, 2.0));
+  points.push_back(Point(0.0, 4.0));
+
+  LineString lineString(points);
+  Polygon    poly(lineString);
+
+  Point queryPoint(3.0, 2.0);
+
+  std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
+  std::string              expectedWkt =
+      "POLYGON((0.0 0.0,3.0 2.0,4.0 0.0,4.0 4.0,1.0 2.0,0.0 2.0,0.0 0.0))";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
 BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygonHole)
 {
   std::vector<Point> points;
@@ -86,6 +130,129 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygonHole)
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
   std::string expectedWkt = "POLYGON((0.0 1.6,0.2 1.8,0.9 1.8,1.9 1.3,3.0 "
                             "2.0,1.0 2.0,0.0 4.0,0.0 1.6))";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testVisibility_PointOnPolygonHole)
+{
+  std::vector<Point> points;
+  points.push_back(Point(0.0, 4.0));
+  points.push_back(Point(0.0, 0.0));
+  points.push_back(Point(3.0, 2.0));
+  points.push_back(Point(4.0, 0.0));
+  points.push_back(Point(4.0, 4.0));
+  points.push_back(Point(1.0, 2.0));
+  points.push_back(Point(0.0, 4.0));
+
+  std::vector<Point> points_hole;
+  points_hole.push_back(Point(0.2, 1.75));
+  points_hole.push_back(Point(0.9, 1.8));
+  points_hole.push_back(Point(0.7, 1.2));
+  points_hole.push_back(Point(0.2, 1.75));
+
+  LineString lineString(points);
+  LineString hole(points_hole);
+
+  Polygon poly(lineString);
+  poly.addInteriorRing(hole);
+
+  Point queryPoint(0.0, 2.0);
+
+  std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
+  std::string expectedWkt = "POLYGON((1.0 2.0,0.0 4.0,0.0 0.0,1.0 0.7,0.2 "
+                            "1.8,0.9 1.8,2.2 1.5,3.0 2.0,1.0 2.0))";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnPolygonHole)
+{
+  std::vector<Point> points;
+  points.push_back(Point(0.0, 4.0));
+  points.push_back(Point(0.0, 0.0));
+  points.push_back(Point(3.0, 2.0));
+  points.push_back(Point(4.0, 0.0));
+  points.push_back(Point(4.0, 4.0));
+  points.push_back(Point(1.0, 2.0));
+  points.push_back(Point(0.0, 4.0));
+
+  std::vector<Point> points_hole;
+  points_hole.push_back(Point(0.2, 1.75));
+  points_hole.push_back(Point(0.9, 1.8));
+  points_hole.push_back(Point(0.7, 1.2));
+  points_hole.push_back(Point(0.2, 1.75));
+
+  LineString lineString(points);
+  LineString hole(points_hole);
+
+  Polygon poly(lineString);
+  poly.addInteriorRing(hole);
+
+  Point queryPoint(3.0, 2.0);
+
+  std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
+  std::string              expectedWkt =
+      "POLYGON((0.0 0.0,3.0 2.0,4.0 0.0,4.0 4.0,1.0 2.0,0.0 2.0,0.0 1.7,0.2 "
+      "1.8,0.9 1.8,0.7 1.2,0.0 1.0,0.0 0.0))";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testVisibility_PointOnHolePolygonHole)
+{
+  std::vector<Point> points;
+  points.push_back(Point(0.0, 4.0));
+  points.push_back(Point(0.0, 0.0));
+  points.push_back(Point(3.0, 2.0));
+  points.push_back(Point(4.0, 0.0));
+  points.push_back(Point(4.0, 4.0));
+  points.push_back(Point(1.0, 2.0));
+  points.push_back(Point(0.0, 4.0));
+
+  std::vector<Point> points_hole;
+  points_hole.push_back(Point(0.2, 1.75));
+  points_hole.push_back(Point(0.9, 1.8));
+  points_hole.push_back(Point(0.7, 1.2));
+  points_hole.push_back(Point(0.2, 1.75));
+
+  LineString lineString(points);
+  LineString hole(points_hole);
+
+  Polygon poly(lineString);
+  poly.addInteriorRing(hole);
+
+  Point queryPoint(0.550, 1.775);
+
+  std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
+  std::string expectedWkt = "POLYGON((0.7 1.2,0.9 1.8,0.2 1.8,0.7 1.2))";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnHolePolygonHole)
+{
+  std::vector<Point> points;
+  points.push_back(Point(0.0, 4.0));
+  points.push_back(Point(0.0, 0.0));
+  points.push_back(Point(3.0, 2.0));
+  points.push_back(Point(4.0, 0.0));
+  points.push_back(Point(4.0, 4.0));
+  points.push_back(Point(1.0, 2.0));
+  points.push_back(Point(0.0, 4.0));
+
+  std::vector<Point> points_hole;
+  points_hole.push_back(Point(0.2, 1.75));
+  points_hole.push_back(Point(0.9, 1.8));
+  points_hole.push_back(Point(0.7, 1.2));
+  points_hole.push_back(Point(0.2, 1.75));
+
+  LineString lineString(points);
+  LineString hole(points_hole);
+
+  Polygon poly(lineString);
+  poly.addInteriorRing(hole);
+
+  Point queryPoint(0.9, 1.8);
+
+  std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
+  std::string expectedWkt = "POLYGON((0.7 1.2,0.9 1.8,0.2 1.8,0.7 1.2))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
@@ -202,11 +369,9 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointOutPolygon)
   try {
     std::unique_ptr<Polygon> const result(
         algorithm::visibility(poly, queryPoint));
-  }
-  catch ( std::exception &e ) {
-      BOOST_CHECK_MESSAGE( true, ( "Can not find corresponding face." ) );
+  } catch (std::exception &e) {
+    BOOST_CHECK_EQUAL(e.what(), "Can not find corresponding face.");
   }
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()

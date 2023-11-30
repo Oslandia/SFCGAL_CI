@@ -23,6 +23,7 @@ using Segment_2             = Kernel::Segment_2;
 using Traits_2              = CGAL::Arr_segment_traits_2<Kernel>;
 using Arrangement_2         = CGAL::Arrangement_2<Traits_2>;
 using Face_handle           = Arrangement_2::Face_handle;
+using Face_const_handle     = Arrangement_2::Face_const_handle;
 using Halfedge_const_handle = Arrangement_2::Halfedge_const_handle;
 using TEV =
     CGAL::Triangular_expansion_visibility_2<Arrangement_2, CGAL::Tag_true>;
@@ -95,29 +96,20 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
     CGAL::insert(arr, hit->edges_begin(), hit->edges_end());
 
   // Find the face
-  Arrangement_2::Face_const_handle                    *face = nullptr;
   CGAL::Arr_naive_point_location<Arrangement_2>        pl(arr);
   CGAL::Arr_point_location_result<Arrangement_2>::Type obj =
       pl.locate(queryPoint);
 
-  // The query point locates in the interior of a face
-  face = boost::get<Arrangement_2::Face_const_handle>(&obj);
-  Arrangement_2         output_arr;
-  Face_handle           fh;
-  Halfedge_const_handle he = Halfedge_const_handle();
+  Arrangement_2 output_arr;
+  Face_handle   fh;
 
   // Create Triangular Expansion Visibility object.
   TEV tev(arr);
 
-  // If the point is within a face, we can compute the visibility that way
-  if ( face != nullptr ) {
-    if ( (*face)->is_unbounded() )
-    {
-        BOOST_THROW_EXCEPTION(
-            Exception("Can not find corresponding face."));
-    }
-    fh = tev.compute_visibility(queryPoint, *face, output_arr);
-  } else {
+  if (obj.which() == 0) {
+
+    Halfedge_const_handle he = Halfedge_const_handle();
+
     // If the point is in a boundary segment, find the corresponding half edge
     he        = arr.halfedges_begin();
     bool cont = !Segment_2(he->source()->point(), he->target()->point())
@@ -130,7 +122,7 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
       he++;
       if (he == arr.halfedges_end()) {
         BOOST_THROW_EXCEPTION(
-            Exception("Can not find corresponding half edge."));
+            Exception("Can not find corresponding half edge (from vertex)."));
       }
 
       cont = !Segment_2(he->source()->point(), he->target()->point())
@@ -140,9 +132,26 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
 
     // Use the half edge to compute the visibility
     fh = tev.compute_visibility(queryPoint, he, output_arr);
+
+  } else if (obj.which() == 1) {
+    Halfedge_const_handle *he =
+        boost::get<Arrangement_2::Halfedge_const_handle>(&obj);
+    if (he != nullptr) {
+      fh = tev.compute_visibility(queryPoint, *he, output_arr);
+    } else {
+      BOOST_THROW_EXCEPTION(Exception("Can not find corresponding hedge."));
+    }
+  } else if (obj.which() == 2) {
+    Face_const_handle *face =
+        boost::get<Arrangement_2::Face_const_handle>(&obj);
+    if ((face != nullptr) && !((*face)->is_unbounded())) {
+      fh = tev.compute_visibility(queryPoint, *face, output_arr);
+    } else {
+      BOOST_THROW_EXCEPTION(Exception("Can not find corresponding face."));
+    }
   }
 
-  return query_visibility(fh, he);
+  return query_visibility(fh, fh->outer_ccb());
 }
 ///
 ///
