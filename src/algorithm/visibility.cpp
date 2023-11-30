@@ -95,7 +95,7 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
     CGAL::insert(arr, hit->edges_begin(), hit->edges_end());
 
   // Find the face
-  Arrangement_2::Face_const_handle                    *face;
+  Arrangement_2::Face_const_handle                    *face = nullptr;
   CGAL::Arr_naive_point_location<Arrangement_2>        pl(arr);
   CGAL::Arr_point_location_result<Arrangement_2>::Type obj =
       pl.locate(queryPoint);
@@ -110,7 +110,12 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
   TEV tev(arr);
 
   // If the point is within a face, we can compute the visibility that way
-  if (face != nullptr) {
+  if ( face != nullptr ) {
+    if ( (*face)->is_unbounded() )
+    {
+        BOOST_THROW_EXCEPTION(
+            Exception("Can not find corresponding face."));
+    }
     fh = tev.compute_visibility(queryPoint, *face, output_arr);
   } else {
     // If the point is in a boundary segment, find the corresponding half edge
