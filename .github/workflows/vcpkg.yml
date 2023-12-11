@@ -1,0 +1,33 @@
+name: Build with vcpkg on Windows
+
+on: [push, pull_request]
+
+jobs:
+  msvc:
+    name: MSVC
+    runs-on: windows-latest
+    env:
+      VCPKG_VERSION: a42af01b72c28a8e1d7b48107b33e4f286a55ef6
+      vcpkg_packages: cgal boost-program-options boost-timer boost-test
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Restore from cache and run vcpkg
+        uses: lukka/run-vcpkg@v7
+        with:
+          vcpkgArguments: ${{env.vcpkg_packages}}
+          vcpkgDirectory: '${{ github.workspace }}\vcpkg'
+          appendedCacheKey: x64-windows
+          vcpkgGitCommitId: ${{ env.VCPKG_VERSION }}
+          vcpkgTriplet: x64-windows
+
+      - name: Configure project with vcpkg/cmake
+        run: |
+            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSFCGAL_BUILD_TESTS=ON -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake"
+    
+      - name: Build SFCGAL
+        run: cmake --build build --config Release
+
+      # - name: Test SFCGAL
+      #   run: ctest -VV --output-on-failure --test-dir build
+
