@@ -1061,6 +1061,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_line_sub_string(const sfcgal_geometry_t *geom, double start,
                                 double end);
 
+#if !_MSC_VER
 /**
  * Returns the alpha shapes of geom
  * @pre isValid(geom) == true
@@ -1083,6 +1084,7 @@ sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
                                      bool allow_holes, size_t nb_components);
+#endif
 
 /**
  * Returns the y monotone partition of a geometry (polygon without hole)

@@ -7,6 +7,11 @@ if( SFCGAL_USE_STATIC_LIBS )
 endif()
 
 file( GLOB_RECURSE SFCGAL_UNIT_TEST_SOURCES *.cpp )
+
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC )
+    list(REMOVE_ITEM SFCGAL_UNIT_TEST_SOURCES ${CMAKE_SOURCE_DIR}/test/unit/SFCGAL/algorithm/AlphaShapesTest.cpp)
+endif()
+
 add_executable( unit-test-SFCGAL ${SFCGAL_UNIT_TEST_SOURCES} )
 target_link_libraries( unit-test-SFCGAL SFCGAL)
 target_link_libraries(unit-test-SFCGAL ${CGAL_3RD_PARTY_LIBRARIES} ${Boost_LIBRARIES})

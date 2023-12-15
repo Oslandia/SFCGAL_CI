@@ -24,7 +24,9 @@
 #include <SFCGAL/io/wkb.h>
 #include <SFCGAL/io/wkt.h>
 
+#if !_MSC_VER
 #include <SFCGAL/algorithm/alphaShapes.h>
+#endif
 #include <SFCGAL/algorithm/area.h>
 #include <SFCGAL/algorithm/convexHull.h>
 #include <SFCGAL/algorithm/covers.h>
@@ -1279,6 +1281,7 @@ sfcgal_geometry_line_sub_string(const sfcgal_geometry_t *geom, double start,
   return ls.release();
 }
 
+#if !_MSC_VER
 extern "C" sfcgal_geometry_t *
 sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
                              bool allow_holes)
@@ -1321,6 +1324,7 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
 
   return result.release();
 }
+#endif
 
 extern "C" sfcgal_geometry_t *
 sfcgal_y_monotone_partition_2(const sfcgal_geometry_t *geom)
