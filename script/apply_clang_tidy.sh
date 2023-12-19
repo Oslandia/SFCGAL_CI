@@ -5,7 +5,7 @@ RUN_CLANG_TIDY_BIN=${RUN_CLANG_TIDY_BIN:-/usr/bin/run-clang-tidy}
 APPLY_CLANG_TIDY_BIN=${APPLY_CLANG_TIDY_BIN:-/usr/bin/clang-apply-replacements}
 
 run_clang_tidy() {
-    checks=$(clang-tidy15 --list-checks | awk '/  /{print $1}')
+    checks=$(${CLANG_TIDY_BIN} --list-checks | awk '/  /{print $1}')
 
     # Iterate over each check and run clang-tidy with fixes
     while IFS= read -r check; do
