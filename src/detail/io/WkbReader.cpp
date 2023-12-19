@@ -27,15 +27,15 @@ namespace SFCGAL::detail::io {
 auto
 WkbReader::readInnerPoint() -> Point
 {
-  double x{read<double>()};
-  double y{read<double>()};
+  double const x{read<double>()};
+  double const y{read<double>()};
 
   if (!(std::isfinite(x) && std::isfinite(y))) {
     return {};
   }
   if (_is3D && _isMeasured) {
-    double z{read<double>()};
-    double m{read<double>()};
+    double const z{read<double>()};
+    double const m{read<double>()};
 
     if (!(std::isfinite(z) && std::isfinite(m))) {
       return {};
@@ -43,7 +43,7 @@ WkbReader::readInnerPoint() -> Point
     return SFCGAL::Point{x, y, z, m};
   }
   if (_is3D) {
-    double z{read<double>()};
+    double const z{read<double>()};
     if (!(std::isfinite(z))) {
       return {};
     }
@@ -51,7 +51,7 @@ WkbReader::readInnerPoint() -> Point
   }
   if (_isMeasured) {
 
-    double m{read<double>()};
+    double const m{read<double>()};
     if (!(std::isfinite(m))) {
       return {};
     }
@@ -91,7 +91,7 @@ WkbReader::readInnerPolygon() -> Polygon
   try {
     const uint32_t numRings{read<uint32_t>()};
     for (uint32_t i = 0; i < numRings; ++i) {
-      SFCGAL::LineString ls{readInnerLineString()};
+      SFCGAL::LineString const ls{readInnerLineString()};
 
       if (i == 0) {
         result.setExteriorRing(ls);
@@ -163,7 +163,7 @@ WkbReader::readInnerGeometryCollection() -> GeometryCollection
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
       readWkb();
-      if (_geometry.get() != nullptr) {
+      if (_geometry != nullptr) {
         result.addGeometry(_geometry.release());
       }
     }
@@ -185,8 +185,8 @@ WkbReader::readInnerTriangulatedSurface() -> TriangulatedSurface
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
       readWkb();
-      if (_geometry.get() != nullptr) {
-        SFCGAL::Triangle geom{_geometry->as<SFCGAL::Triangle>()};
+      if (_geometry != nullptr) {
+        SFCGAL::Triangle const geom{_geometry->as<SFCGAL::Triangle>()};
         result.addTriangle(geom);
       }
     }
@@ -208,7 +208,7 @@ WkbReader::readInnerPolyhedralSurface() -> PolyhedralSurface
     const uint32_t numGeoms{read<uint32_t>()};
     for (uint32_t i = 0; i < numGeoms; ++i) {
       readWkb();
-      if (_geometry.get() != nullptr) {
+      if (_geometry != nullptr) {
         geoms.push_back(_geometry->as<SFCGAL::Polygon>());
       }
     }
@@ -216,7 +216,7 @@ WkbReader::readInnerPolyhedralSurface() -> PolyhedralSurface
     std::cerr << e.what();
     return {};
   }
-  SFCGAL::PolyhedralSurface result{geoms};
+  SFCGAL::PolyhedralSurface const result{geoms};
   return result;
 }
 

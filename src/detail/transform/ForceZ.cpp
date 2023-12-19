@@ -7,13 +7,12 @@
 
 #include <utility>
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 ///
 ///
 ///
-ForceZ::ForceZ(const Kernel::FT defaultZ) : _defaultZ(std::move(defaultZ)) {}
+ForceZ::ForceZ(Kernel::FT defaultZ) : _defaultZ(defaultZ) {}
 
 ///
 ///
@@ -23,11 +22,11 @@ ForceZ::transform(Point &p)
 {
   if (!p.isEmpty() && !p.is3D()) {
     Point pt(p.x(), p.y(), _defaultZ);
-    if (p.isMeasured())
+    if (p.isMeasured()) {
       pt.setM(p.m());
+    }
     p = pt;
   }
 }
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

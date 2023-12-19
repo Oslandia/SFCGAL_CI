@@ -12,8 +12,7 @@
 
 using namespace SFCGAL::detail::io;
 
-namespace SFCGAL {
-namespace io {
+namespace SFCGAL::io {
 
 ///
 ///
@@ -22,7 +21,7 @@ auto
 readEwkt(std::istream &s) -> std::unique_ptr<PreparedGeometry>
 {
   WktReader                         wktReader(s);
-  srid_t                            srid = wktReader.readSRID();
+  srid_t const                      srid = wktReader.readSRID();
   std::unique_ptr<Geometry>         g(wktReader.readGeometry());
   std::unique_ptr<PreparedGeometry> uptr(
       new PreparedGeometry(std::move(g), srid));
@@ -37,7 +36,7 @@ readEwkt(const std::string &s) -> std::unique_ptr<PreparedGeometry>
 {
   std::istringstream        iss(s);
   WktReader                 wktReader(iss);
-  srid_t                    srid = wktReader.readSRID();
+  srid_t const              srid = wktReader.readSRID();
   std::unique_ptr<Geometry> g(wktReader.readGeometry());
   return std::make_unique<PreparedGeometry>(std::move(g), srid);
 }
@@ -51,10 +50,9 @@ readEwkt(const char *str, size_t len) -> std::unique_ptr<PreparedGeometry>
   CharArrayBuffer           buf(str, str + len);
   std::istream              istr(&buf);
   WktReader                 wktReader(istr);
-  srid_t                    srid = wktReader.readSRID();
+  srid_t const              srid = wktReader.readSRID();
   std::unique_ptr<Geometry> g(wktReader.readGeometry());
   return std::make_unique<PreparedGeometry>(std::move(g), srid);
 }
 
-} // namespace io
-} // namespace SFCGAL
+} // namespace SFCGAL::io

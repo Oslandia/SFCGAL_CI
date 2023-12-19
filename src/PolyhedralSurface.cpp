@@ -12,13 +12,13 @@ namespace SFCGAL {
 ///
 ///
 ///
-PolyhedralSurface::PolyhedralSurface() : Surface(), _polygons() {}
+PolyhedralSurface::PolyhedralSurface() = default;
 
 ///
 ///
 ///
 PolyhedralSurface::PolyhedralSurface(const std::vector<Polygon> &polygons)
-    : Surface()
+
 {
   for (const auto &polygon : polygons) {
     _polygons.push_back(polygon.clone());
@@ -35,7 +35,7 @@ PolyhedralSurface::PolyhedralSurface(const PolyhedralSurface &other)
 ///
 ///
 ///
-PolyhedralSurface::PolyhedralSurface(const MarkedPolyhedron &poly) : Surface()
+PolyhedralSurface::PolyhedralSurface(const MarkedPolyhedron &poly)
 {
   for (MarkedPolyhedron::Facet_const_iterator fit = poly.facets_begin();
        fit != poly.facets_end(); ++fit) {
@@ -57,13 +57,14 @@ PolyhedralSurface::PolyhedralSurface(const MarkedPolyhedron &poly) : Surface()
 ///
 ///
 ///
-PolyhedralSurface::PolyhedralSurface(const Mesh &sm) : Surface()
+PolyhedralSurface::PolyhedralSurface(const Mesh &sm)
 {
 
   using vertex_descriptor = Mesh::Vertex_index;
   for (auto face : sm.faces()) {
     auto *new_face = new LineString();
-    for (vertex_descriptor vd : vertices_around_face(sm.halfedge(face), sm)) {
+    for (vertex_descriptor const vd :
+         vertices_around_face(sm.halfedge(face), sm)) {
       new_face->addPoint(Point(sm.point(vd)));
     }
 
@@ -131,9 +132,8 @@ PolyhedralSurface::coordinateDimension() const -> int
 {
   if (isEmpty()) {
     return 0;
-  } else {
-    return _polygons.front().coordinateDimension();
   }
+  return _polygons.front().coordinateDimension();
 }
 
 ///
@@ -153,9 +153,8 @@ PolyhedralSurface::is3D() const -> bool
 {
   if (isEmpty()) {
     return false;
-  } else {
-    return _polygons.front().is3D();
   }
+  return _polygons.front().is3D();
 }
 
 ///
@@ -166,9 +165,8 @@ PolyhedralSurface::isMeasured() const -> bool
 {
   if (isEmpty()) {
     return false;
-  } else {
-    return _polygons.front().isMeasured();
   }
+  return _polygons.front().isMeasured();
 }
 
 ///

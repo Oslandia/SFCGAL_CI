@@ -17,8 +17,7 @@
 #include <SFCGAL/Triangle.h>
 #include <SFCGAL/TriangulatedSurface.h>
 
-namespace SFCGAL {
-namespace io {
+namespace SFCGAL::io {
 
 BinarySerializer::BinarySerializer(std::ostream &ostr)
     : boost::archive::binary_oarchive(ostr)
@@ -108,10 +107,8 @@ readBinaryPrepared(const std::string &str) -> std::unique_ptr<PreparedGeometry>
   iarc >> pg;
   return std::unique_ptr<PreparedGeometry>(pg);
 }
-} // namespace io
-} // namespace SFCGAL
-namespace boost {
-namespace serialization {
+} // namespace SFCGAL::io
+namespace boost::serialization {
 
 void
 save(boost::archive::text_oarchive &ar, const CGAL::Gmpz &z,
@@ -119,7 +116,7 @@ save(boost::archive::text_oarchive &ar, const CGAL::Gmpz &z,
 {
   std::ostringstream ostr;
   ostr << z;
-  std::string str = ostr.str();
+  std::string const str = ostr.str();
   ar << str;
 }
 
@@ -128,10 +125,10 @@ void
 save(boost::archive::binary_oarchive &ar, const CGAL::Gmpz &z,
      const unsigned int /* version*/)
 {
-  const mpz_t &mpz  = z.mpz();
-  int32_t      size = mpz->_mp_size;
-  ar          &size;
-  uint32_t     rsize = size >= 0 ? size : -size;
+  const mpz_t   &mpz  = z.mpz();
+  int32_t const  size = mpz->_mp_size;
+  ar            &size;
+  uint32_t const rsize = size >= 0 ? size : -size;
 
   for (uint32_t i = 0; i < rsize; ++i) {
     ar & mpz->_mp_d[i];
@@ -173,7 +170,7 @@ save(boost::archive::text_oarchive &ar, const mpz_class &z,
 {
   std::ostringstream ostr;
   ostr << z;
-  std::string str = ostr.str();
+  std::string const str = ostr.str();
   ar << str;
 }
 
@@ -182,10 +179,10 @@ void
 save(boost::archive::binary_oarchive &ar, const mpz_class &z,
      const unsigned int /* version*/)
 {
-  mpz_srcptr mpz  = z.get_mpz_t();
-  int32_t    size = mpz->_mp_size;
-  ar        &size;
-  uint32_t   rsize = size >= 0 ? size : -size;
+  mpz_srcptr     mpz  = z.get_mpz_t();
+  int32_t const  size = mpz->_mp_size;
+  ar            &size;
+  uint32_t const rsize = size >= 0 ? size : -size;
 
   for (uint32_t i = 0; i < rsize; ++i) {
     ar & mpz->_mp_d[i];
@@ -221,5 +218,4 @@ load(boost::archive::binary_iarchive &ar, mpz_class &z,
 }
 #endif
 
-} // namespace serialization
-} // namespace boost
+} // namespace boost::serialization

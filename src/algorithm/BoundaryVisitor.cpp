@@ -21,15 +21,15 @@
 #include <complex>
 #include <map>
 #include <memory>
+#include <utility>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 ///
 ///
 ///
 void
-BoundaryVisitor::visit(const Point &)
+BoundaryVisitor::visit(const Point & /*g*/)
 {
   _boundary.reset();
 }
@@ -51,7 +51,7 @@ BoundaryVisitor::visit(const LineString &g)
     std::unique_ptr<MultiPoint> boundary(new MultiPoint);
     boundary->addGeometry(g.startPoint());
     boundary->addGeometry(g.endPoint());
-    _boundary.reset(boundary.release());
+    _boundary = std::move(boundary);
   }
 }
 
@@ -75,7 +75,7 @@ BoundaryVisitor::visit(const Polygon &g)
       boundary->addGeometry(g.ringN(i));
     }
 
-    _boundary.reset(boundary.release());
+    _boundary = std::move(boundary);
   }
 }
 
@@ -96,7 +96,7 @@ BoundaryVisitor::visit(const Triangle &g)
     boundary->addPoint(g.vertex(i));
   }
 
-  _boundary.reset(boundary.release());
+  _boundary = std::move(boundary);
 }
 
 ///
@@ -115,7 +115,7 @@ BoundaryVisitor::visit(const Solid &g)
 ///
 ///
 void
-BoundaryVisitor::visit(const MultiPoint &)
+BoundaryVisitor::visit(const MultiPoint & /*g*/)
 {
   _boundary.reset();
 }
@@ -216,11 +216,10 @@ BoundaryVisitor::visit(const TriangulatedSurface &g)
 auto
 BoundaryVisitor::releaseBoundary() -> Geometry *
 {
-  if (_boundary.get()) {
+  if (_boundary != nullptr) {
     return _boundary.release();
-  } else {
-    return new GeometryCollection();
   }
+  return new GeometryCollection();
 }
 
 ///
@@ -234,7 +233,8 @@ BoundaryVisitor::getBoundaryFromLineStrings(const graph::GeometryGraph &graph)
 
   std::vector<vertex_descriptor> vertices;
 
-  vertex_iterator it, end;
+  vertex_iterator it;
+  vertex_iterator end;
 
   for (boost::tie(it, end) = graph.vertices(); it != end; ++it) {
     vertex_descriptor vertex = *it;
@@ -255,7 +255,7 @@ BoundaryVisitor::getBoundaryFromLineStrings(const graph::GeometryGraph &graph)
       boundary->addGeometry(new Point(graph[vertice].coordinate));
     }
 
-    _boundary.reset(boundary.release());
+    _boundary = std::move(boundary);
   }
 }
 
@@ -272,7 +272,8 @@ BoundaryVisitor::getBoundaryFromPolygons(const graph::GeometryGraph &g)
 
   std::vector<edge_descriptor> boundaryEdges;
 
-  edge_iterator it, end;
+  edge_iterator it;
+  edge_iterator end;
 
   for (boost::tie(it, end) = g.edges(); it != end; ++it) {
     if (g.edges(g.source(*it), g.target(*it)).size() == 1U) {
@@ -294,9 +295,8 @@ BoundaryVisitor::getBoundaryFromPolygons(const graph::GeometryGraph &g)
                                            Point(g[target].coordinate)));
     }
 
-    _boundary.reset(boundary.release());
+    _boundary = std::move(boundary);
   }
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

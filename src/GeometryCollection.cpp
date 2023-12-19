@@ -12,7 +12,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-GeometryCollection::GeometryCollection() : _geometries() {}
+GeometryCollection::GeometryCollection() = default;
 
 ///
 ///
@@ -90,9 +90,8 @@ GeometryCollection::coordinateDimension() const -> int
 {
   if (isEmpty()) {
     return 0;
-  } else {
-    return _geometries.front().coordinateDimension();
   }
+  return _geometries.front().coordinateDimension();
 }
 
 ///
@@ -181,7 +180,7 @@ GeometryCollection::addGeometry(Geometry const &geometry)
 ///
 ///
 auto
-GeometryCollection::isAllowed(Geometry const &) -> bool
+GeometryCollection::isAllowed(Geometry const & /*unused*/) -> bool
 {
   // GeometryCollection accepts all subtypes
   return true;

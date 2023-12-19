@@ -28,6 +28,7 @@ public:
    * Empty Coordinate constructor
    */
   Coordinate();
+
   /**
    * XY Constructor with exact coordinates
    */
@@ -36,6 +37,7 @@ public:
    * XYZ Constructor with exact coordinates
    */
   Coordinate(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z);
+
   /**
    * XYZ constructor
    * @warning x,y,z must not be not be NaN nor inf

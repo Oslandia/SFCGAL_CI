@@ -12,18 +12,15 @@
 #include <SFCGAL/algorithm/length.h>
 #include <SFCGAL/algorithm/lineSubstring.h>
 
-namespace SFCGAL {
-
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 namespace {
-static const double tol = 1.0e-9;
+const double tol = 1.0e-9;
 
 auto
 find_position(const LineString &ls, const long N, const double target_length,
-              const double offset, const double tol, const bool find_start,
-              std::size_t &idx, double &frac, bool &on_point,
-              double &len_to_idx) -> Point
+              const double offset, const double tol, std::size_t &idx,
+              double &frac, bool &on_point, double &len_to_idx) -> Point
 {
   BOOST_ASSERT(!(offset < 0.0));
   BOOST_ASSERT(!(target_length < 0.0));
@@ -64,7 +61,8 @@ find_position(const LineString &ls, const long N, const double target_length,
       on_point = true;
 
       break;
-    } else if (cur_length > target_length) {
+    }
+    if (cur_length > target_length) {
       // We went too far. Subtract seg_length so
       // cur_length is the distance along ls
       // to the idx'th point.
@@ -196,21 +194,18 @@ lineSubstring(const LineString &ls, double start, double end)
   double      start_frac       = 0.0;
   bool        on_start         = false;
   double      len_to_start_idx = 0.0;
-  Point       pstart =
-      find_position(ls, N, len * start, 0.0, tol, true // Find start.
-                    ,
-                    start_idx, start_frac, on_start, len_to_start_idx);
+  Point       pstart = find_position(ls, N, len * start, 0.0, tol, start_idx,
+                                     start_frac, on_start, len_to_start_idx);
 
   // Find Point immediately before/on end position.
   std::size_t end_idx        = start_idx; // Must initialise first.
   double      end_frac       = 0.0;
   bool        on_end         = false;
   double      len_to_end_idx = 0.0;
-  Point       pend           = find_position(
-      ls, N, len * end, len_to_start_idx, tol, false // Find end.
-      ,
-      end_idx, end_frac, on_end, len_to_end_idx // This result is not used.
-  );
+  Point       pend =
+      find_position(ls, N, len * end, len_to_start_idx, tol, end_idx, end_frac,
+                    on_end, len_to_end_idx // This result is not used.
+      );
 
   if (reverse && closed) {
     // For closed lines we always want to follow the
@@ -289,6 +284,4 @@ lineSubstring(const LineString &ls, double start, double end)
   return substring;
 }
 
-} // namespace algorithm
-
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

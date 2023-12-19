@@ -12,7 +12,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-Triangle::Triangle() : Surface()
+Triangle::Triangle()
 {
   _vertices[0] = Point();
   _vertices[1] = Point();
@@ -42,7 +42,7 @@ Triangle::Triangle(const Kernel::Triangle_3 &triangle)
 ///
 ///
 ///
-Triangle::Triangle(const Point &p, const Point &q, const Point &r) : Surface()
+Triangle::Triangle(const Point &p, const Point &q, const Point &r)
 {
   _vertices[0] = p;
   _vertices[1] = q;

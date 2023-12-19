@@ -17,8 +17,7 @@
 #include <SFCGAL/Triangle.h>
 #include <SFCGAL/TriangulatedSurface.h>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 ///
 ///
@@ -150,5 +149,4 @@ GetPointsVisitor::visit(const TriangulatedSurface &g)
   }
 }
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail

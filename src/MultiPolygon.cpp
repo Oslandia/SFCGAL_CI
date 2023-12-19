@@ -10,7 +10,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-MultiPolygon::MultiPolygon() : GeometryCollection() {}
+MultiPolygon::MultiPolygon() = default;
 
 ///
 ///

@@ -10,7 +10,7 @@ namespace SFCGAL {
 ///
 ///
 ///
-MultiLineString::MultiLineString() : GeometryCollection() {}
+MultiLineString::MultiLineString() = default;
 
 ///
 ///

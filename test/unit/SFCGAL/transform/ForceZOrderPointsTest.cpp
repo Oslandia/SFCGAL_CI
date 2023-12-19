@@ -15,39 +15,34 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 #include <boost/test/unit_test.hpp>
 
 #include <SFCGAL/Kernel.h>
-#include <SFCGAL/io/wkt.h>
-#include <SFCGAL/detail/io/WktWriter.h>
 #include <SFCGAL/Polygon.h>
+#include <SFCGAL/detail/io/WktWriter.h>
 #include <SFCGAL/detail/transform/ForceZOrderPoints.h>
+#include <SFCGAL/io/wkt.h>
 
-using namespace boost::unit_test ;
-using namespace SFCGAL ;
+using namespace boost::unit_test;
+using namespace SFCGAL;
 
-BOOST_AUTO_TEST_SUITE( SFCGAL_transform_ForceZOrderPointsTest )
+BOOST_AUTO_TEST_SUITE(SFCGAL_transform_ForceZOrderPointsTest)
 
-BOOST_AUTO_TEST_CASE( simple )
+BOOST_AUTO_TEST_CASE(simple)
 {
-    std::unique_ptr<Geometry> g1 = io::readWkt( "POLYGON((0 0,0 1,1 1,1 0,0 0))" );
+  std::unique_ptr<Geometry> g1 = io::readWkt("POLYGON((0 0,0 1,1 1,1 0,0 0))");
 
-    const Polygon& p = g1->as<Polygon>();
-    BOOST_CHECK( ! p.isCounterClockWiseOriented() );
+  const Polygon &p = g1->as<Polygon>();
+  BOOST_CHECK(!p.isCounterClockWiseOriented());
 
-    transform::ForceZOrderPoints forceZ;
-    g1->accept( forceZ );
+  transform::ForceZOrderPoints forceZ;
+  g1->accept(forceZ);
 
-    BOOST_CHECK( g1->is3D() );
-    BOOST_CHECK( g1->as<Polygon>().isCounterClockWiseOriented() );
+  BOOST_CHECK(g1->is3D());
+  BOOST_CHECK(g1->as<Polygon>().isCounterClockWiseOriented());
 }
 
-
-
 BOOST_AUTO_TEST_SUITE_END()
-
-
-
-

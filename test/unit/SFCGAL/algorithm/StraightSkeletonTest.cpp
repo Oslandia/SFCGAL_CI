@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(testTriangle)
 {
   std::unique_ptr<Geometry> g(io::readWkt("TRIANGLE((1 1,2 1,2 2,1 1))"));
 
-  std::string expectedWKT(
+  std::string const expectedWKT(
       "MULTILINESTRING((1.0 1.0,1.7 1.3),(2.0 1.0,1.7 1.3),(2.0 2.0,1.7 1.3))");
   {
     std::unique_ptr<MultiLineString> result(algorithm::straightSkeleton(*g));
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(testPolygon)
   std::unique_ptr<Geometry> g(
       io::readWkt("POLYGON((1 1,11 1,11 11,1 11,1 1))"));
 
-  std::string expectedWKT(
+  std::string const expectedWKT(
       "MULTILINESTRING((1 1,6 6),(11 1,6 6),(11 11,6 6),(1 11,6 6))");
   {
     std::unique_ptr<MultiLineString> result(algorithm::straightSkeleton(*g));
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(testPolygon)
 
 BOOST_AUTO_TEST_CASE(testPolygonWithHole)
 {
-  std::unique_ptr<Geometry> g(
+  std::unique_ptr<Geometry> const g(
       io::readWkt("POLYGON( (-1.0 -1.0,1.0 -1.0,1.0 1.0,-1.0 1.0,-1.0 -1.0)"
                   ", (-0.5 -0.5,-0.5 0.5,0.5 0.5,-0.5 -0.5)"
                   ")"));
@@ -124,14 +124,14 @@ BOOST_AUTO_TEST_CASE(testPolygonWithHole)
   // To avoid rounding errors in the results (-3730904090310553/9007199254740992
   // vs -466363011288819/1125899906842624), a text comparison is used. This is
   // not optimal.
-  std::unique_ptr<Geometry> r(io::readWkt(result->asText(10)));
-  std::unique_ptr<Geometry> e(io::readWkt(expected->asText(10)));
+  std::unique_ptr<Geometry> const r(io::readWkt(result->asText(10)));
+  std::unique_ptr<Geometry> const e(io::readWkt(expected->asText(10)));
   BOOST_CHECK(algorithm::covers(*r, *e));
 }
 
 BOOST_AUTO_TEST_CASE(testPolygonWithHoleTouchingShell)
 {
-  std::unique_ptr<Geometry> g(
+  std::unique_ptr<Geometry> const g(
       io::readWkt("POLYGON((-1.0 -1.0,1.0 -1.0,1.0 1.0,-1.0 1.0,-1.0 "
                   "-1.0),(-0.5 -0.5,-0.5 0.5,0.5 0.5,1.0 -0.5,-0.5 -0.5))"));
   BOOST_CHECK_THROW(algorithm::straightSkeleton(*g), NotImplementedException);
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(testPolygonWithHoleTouchingShell)
 
 BOOST_AUTO_TEST_CASE(testPolygonWithTouchingHoles)
 {
-  std::unique_ptr<Geometry> g(
+  std::unique_ptr<Geometry> const g(
       io::readWkt("POLYGON((-1.0 -1.0,1.0 -1.0,1.0 1.0,-1.0 1.0,-1.0 "
                   "-1.0),(-0.5 -0.5,-0.5 0.5,-0.1 0.5,0.1 -0.5,-0.5 -0.5),(0.1 "
                   "-0.5,0.1 0.5,0.5 0.5,0.5 -0.5,0.1 -0.5))"));
@@ -149,43 +149,43 @@ BOOST_AUTO_TEST_CASE(testPolygonWithTouchingHoles)
 
 BOOST_AUTO_TEST_CASE(testMultiPolygon)
 {
-  std::unique_ptr<Geometry>        g(io::readWkt(
+  std::unique_ptr<Geometry> const  g(io::readWkt(
       "MULTIPOLYGON(((3.000000 0.000000,2.875000 0.484123,2.750000 "
-             "0.661438,2.625000 0.780625,2.500000 0.866025,2.375000 0.927025,2.250000 "
-             "0.968246,2.125000 0.992157,2.000000 1.000000,1.875000 1.484123,1.750000 "
-             "1.661438,1.625000 1.780625,1.500000 1.866025,1.375000 1.927025,1.250000 "
-             "1.968246,1.125000 1.992157,1.000000 2.000000,0.750000 2.661438,0.500000 "
-             "2.866025,0.250000 2.968246,0.000000 3.000000,-0.250000 "
-             "2.968246,-0.500000 2.866025,-0.750000 2.661438,-1.000000 "
-             "2.000000,-1.125000 1.992157,-1.250000 1.968246,-1.375000 "
-             "1.927025,-1.500000 1.866025,-1.625000 1.780625,-1.750000 "
-             "1.661438,-1.875000 1.484123,-2.000000 1.000000,-2.125000 "
-             "0.992157,-2.250000 0.968246,-2.375000 0.927025,-2.500000 "
-             "0.866025,-2.625000 0.780625,-2.750000 0.661438,-2.875000 "
-             "0.484123,-3.000000 0.000000,-2.875000 -0.484123,-2.750000 "
-             "-0.661438,-2.625000 -0.780625,-2.500000 -0.866025,-2.375000 "
-             "-0.927025,-2.250000 -0.968246,-2.125000 -0.992157,-2.000000 "
-             "-1.000000,-1.875000 -1.484123,-1.750000 -1.661438,-1.625000 "
-             "-1.780625,-1.500000 -1.866025,-1.375000 -1.927025,-1.250000 "
-             "-1.968246,-1.125000 -1.992157,-1.000000 -2.000000,-0.750000 "
-             "-2.661438,-0.500000 -2.866025,-0.250000 -2.968246,0.000000 "
-             "-3.000000,0.250000 -2.968246,0.500000 -2.866025,0.750000 "
-             "-2.661438,1.000000 -2.000000,1.125000 -1.992157,1.250000 "
-             "-1.968246,1.375000 -1.927025,1.500000 -1.866025,1.625000 "
-             "-1.780625,1.750000 -1.661438,1.875000 -1.484123,2.000000 "
-             "-1.000000,2.125000 -0.992157,2.250000 -0.968246,2.375000 "
-             "-0.927025,2.500000 -0.866025,2.625000 -0.780625,2.750000 "
-             "-0.661438,2.875000 -0.484123,3.000000 0.000000),(0.000000 "
-             "1.000000,0.125000 0.515877,0.250000 0.338562,0.375000 0.219375,0.500000 "
-             "0.133975,0.625000 0.072975,0.750000 0.031754,0.875000 0.007843,1.000000 "
-             "0.000000,0.875000 -0.007843,0.750000 -0.031754,0.625000 "
-             "-0.072975,0.500000 -0.133975,0.375000 -0.219375,0.250000 "
-             "-0.338562,0.125000 -0.515877,0.000000 -1.000000,-0.125000 "
-             "-0.515877,-0.250000 -0.338562,-0.375000 -0.219375,-0.500000 "
-             "-0.133975,-0.625000 -0.072975,-0.750000 -0.031754,-0.875000 "
-             "-0.007843,-1.000000 0.000000,-0.875000 0.007843,-0.750000 "
-             "0.031754,-0.625000 0.072975,-0.500000 0.133975,-0.375000 "
-             "0.219375,-0.250000 0.338562,-0.125000 0.515877,0.000000 1.000000)))"));
+       "0.661438,2.625000 0.780625,2.500000 0.866025,2.375000 0.927025,2.250000 "
+       "0.968246,2.125000 0.992157,2.000000 1.000000,1.875000 1.484123,1.750000 "
+       "1.661438,1.625000 1.780625,1.500000 1.866025,1.375000 1.927025,1.250000 "
+       "1.968246,1.125000 1.992157,1.000000 2.000000,0.750000 2.661438,0.500000 "
+       "2.866025,0.250000 2.968246,0.000000 3.000000,-0.250000 "
+       "2.968246,-0.500000 2.866025,-0.750000 2.661438,-1.000000 "
+       "2.000000,-1.125000 1.992157,-1.250000 1.968246,-1.375000 "
+       "1.927025,-1.500000 1.866025,-1.625000 1.780625,-1.750000 "
+       "1.661438,-1.875000 1.484123,-2.000000 1.000000,-2.125000 "
+       "0.992157,-2.250000 0.968246,-2.375000 0.927025,-2.500000 "
+       "0.866025,-2.625000 0.780625,-2.750000 0.661438,-2.875000 "
+       "0.484123,-3.000000 0.000000,-2.875000 -0.484123,-2.750000 "
+       "-0.661438,-2.625000 -0.780625,-2.500000 -0.866025,-2.375000 "
+       "-0.927025,-2.250000 -0.968246,-2.125000 -0.992157,-2.000000 "
+       "-1.000000,-1.875000 -1.484123,-1.750000 -1.661438,-1.625000 "
+       "-1.780625,-1.500000 -1.866025,-1.375000 -1.927025,-1.250000 "
+       "-1.968246,-1.125000 -1.992157,-1.000000 -2.000000,-0.750000 "
+       "-2.661438,-0.500000 -2.866025,-0.250000 -2.968246,0.000000 "
+       "-3.000000,0.250000 -2.968246,0.500000 -2.866025,0.750000 "
+       "-2.661438,1.000000 -2.000000,1.125000 -1.992157,1.250000 "
+       "-1.968246,1.375000 -1.927025,1.500000 -1.866025,1.625000 "
+       "-1.780625,1.750000 -1.661438,1.875000 -1.484123,2.000000 "
+       "-1.000000,2.125000 -0.992157,2.250000 -0.968246,2.375000 "
+       "-0.927025,2.500000 -0.866025,2.625000 -0.780625,2.750000 "
+       "-0.661438,2.875000 -0.484123,3.000000 0.000000),(0.000000 "
+       "1.000000,0.125000 0.515877,0.250000 0.338562,0.375000 0.219375,0.500000 "
+       "0.133975,0.625000 0.072975,0.750000 0.031754,0.875000 0.007843,1.000000 "
+       "0.000000,0.875000 -0.007843,0.750000 -0.031754,0.625000 "
+       "-0.072975,0.500000 -0.133975,0.375000 -0.219375,0.250000 "
+       "-0.338562,0.125000 -0.515877,0.000000 -1.000000,-0.125000 "
+       "-0.515877,-0.250000 -0.338562,-0.375000 -0.219375,-0.500000 "
+       "-0.133975,-0.625000 -0.072975,-0.750000 -0.031754,-0.875000 "
+       "-0.007843,-1.000000 0.000000,-0.875000 0.007843,-0.750000 "
+       "0.031754,-0.625000 0.072975,-0.500000 0.133975,-0.375000 "
+       "0.219375,-0.250000 0.338562,-0.125000 0.515877,0.000000 1.000000)))"));
   std::unique_ptr<MultiLineString> result(algorithm::straightSkeleton(*g));
   BOOST_CHECK_EQUAL(result->numGeometries(), 220U);
 }
@@ -193,13 +193,11 @@ BOOST_AUTO_TEST_CASE(testMultiPolygon)
 BOOST_AUTO_TEST_CASE(testInvalidTypes)
 {
   std::vector<std::string> wkt;
-  wkt.push_back("POINT(1 2)");
-  wkt.push_back("LINESTRING(0 0,1 1)");
+  wkt.emplace_back("POINT(1 2)");
+  wkt.emplace_back("LINESTRING(0 0,1 1)");
 
-  for (std::vector<std::string>::const_iterator it  = wkt.begin(),
-                                                itE = wkt.end();
-       it != itE; ++it) {
-    std::unique_ptr<Geometry>        g(io::readWkt(*it));
+  for (auto &it : wkt) {
+    std::unique_ptr<Geometry> const  g(io::readWkt(it));
     std::unique_ptr<MultiLineString> result(algorithm::straightSkeleton(*g));
     BOOST_CHECK_EQUAL(result->numGeometries(), 0U);
   }
@@ -208,7 +206,7 @@ BOOST_AUTO_TEST_CASE(testInvalidTypes)
 // See https://github.com/Oslandia/SFCGAL/issues/75
 BOOST_AUTO_TEST_CASE(testPostgisIssue3107)
 {
-  std::unique_ptr<Geometry> g(io::readWkt(
+  std::unique_ptr<Geometry> const g(io::readWkt(
       "POLYGON((1347259.25 7184745.94,1347273.17 7184758.16,1347280.39 "
       "7184749.95,1347278.04 7184747.88,1347281.66 7184743.76,1347284.01 "
       "7184745.83,1347293.5 7184735.05,1347279.61 7184722.85,1347269.29 "
@@ -222,7 +220,7 @@ BOOST_AUTO_TEST_CASE(testPostgisIssue3107)
 // See https://github.com/Oslandia/SFCGAL/issues/91
 BOOST_AUTO_TEST_CASE(testMultiPolygonWithTouchingHoles)
 {
-  std::unique_ptr<Geometry> g(io::readWkt(
+  std::unique_ptr<Geometry> const g(io::readWkt(
       "MULTIPOLYGON(((1347259.25 7184745.94,1347273.17 7184758.16,1347280.39 "
       "7184749.95,1347278.04 7184747.88,1347281.66 7184743.76,1347284.01 "
       "7184745.83,1347293.5 7184735.05,1347279.61 7184722.85,1347269.29 "
@@ -235,28 +233,29 @@ BOOST_AUTO_TEST_CASE(testMultiPolygonWithTouchingHoles)
 
 BOOST_AUTO_TEST_CASE(testDistanceInM)
 {
-  std::unique_ptr<Geometry> g(io::readWkt("POLYGON((0 0,1 0,1 1,0 1,0 0))"));
+  std::unique_ptr<Geometry> const g(
+      io::readWkt("POLYGON((0 0,1 0,1 1,0 1,0 0))"));
   std::unique_ptr<Geometry> out(algorithm::straightSkeleton(
       *g, /* autoOrientation */ true, /* innerOnly */ false,
       /* outputDistanceInM */ true));
-  std::string               expectedWKT(
+  std::string const         expectedWKT(
       "MULTILINESTRING M((0.0 0.0 0.0,0.5 0.5 0.5),(1.0 0.0 0.0,0.5 0.5 "
-                    "0.5),(1.0 1.0 0.0,0.5 0.5 0.5),(0.0 1.0 0.0,0.5 0.5 0.5))");
+              "0.5),(1.0 1.0 0.0,0.5 0.5 0.5),(0.0 1.0 0.0,0.5 0.5 0.5))");
   BOOST_CHECK_EQUAL(out->asText(1), expectedWKT);
 }
 
 BOOST_AUTO_TEST_CASE(testMultiEmptyEmpty)
 {
-  std::unique_ptr<Geometry> g(io::readWkt("MULTIPOLYGON(EMPTY,EMPTY)"));
-  std::unique_ptr<Geometry> out(algorithm::straightSkeleton(*g));
-  std::string               expectedWKT("MULTILINESTRING EMPTY");
+  std::unique_ptr<Geometry> const g(io::readWkt("MULTIPOLYGON(EMPTY,EMPTY)"));
+  std::unique_ptr<Geometry>       out(algorithm::straightSkeleton(*g));
+  std::string const               expectedWKT("MULTILINESTRING EMPTY");
   BOOST_CHECK_EQUAL(out->asText(1), expectedWKT);
 }
 
 // See https://gitlab.com/Oslandia/SFCGAL/-/issues/194
 BOOST_AUTO_TEST_CASE(testDegenerateMultiLineString)
 {
-  std::unique_ptr<Geometry> g(io::readWkt(
+  std::unique_ptr<Geometry> const g(io::readWkt(
       "Polygon ((1294585.78643762995488942 200985.78643762698629871, 1294000 "
       "202400, 1294000 212400, 1294585.78643762995488942 "
       "213814.21356237301370129, 1296000 214400, 1297000 214400, "
@@ -265,8 +264,9 @@ BOOST_AUTO_TEST_CASE(testDegenerateMultiLineString)
       "1297000 200400, 1296000 200400, 1294585.78643762995488942 "
       "200985.78643762698629871),(1297000 202400, 1297000 212400, 1296000 "
       "212400, 1296000 202400, 1297000 202400))"));
-  const double              tolerance = 1e-8;
-  std::unique_ptr<Geometry> out(algorithm::straightSkeleton(*g, tolerance));
+  const double                    tolerance = 1e-8;
+  std::unique_ptr<Geometry>       out(
+      algorithm::straightSkeleton(*g, tolerance != 0.0));
   for (size_t i = 0; i < out->numGeometries(); i++) {
     BOOST_CHECK(algorithm::length(out->geometryN(i)) > tolerance);
   }
@@ -275,11 +275,11 @@ BOOST_AUTO_TEST_CASE(testDegenerateMultiLineString)
 BOOST_AUTO_TEST_CASE(testExtrudeStraightSkeleton)
 {
 
-  std::unique_ptr<Geometry> g(
+  std::unique_ptr<Geometry> const g(
       io::readWkt("POLYGON (( 0 0, 5 0, 5 5, 4 5, 4 4, 0 4, 0 0 ))"));
   std::unique_ptr<PolyhedralSurface> out(
       algorithm::extrudeStraightSkeleton(*g, 2.0));
-  std::string expectedWKT(
+  std::string const expectedWKT(
       "POLYHEDRALSURFACE Z(((4.00 5.00 0.00,5.00 5.00 0.00,4.00 4.00 0.00,4.00 "
       "5.00 0.00)),((0.00 4.00 0.00,4.00 4.00 0.00,0.00 0.00 0.00,0.00 4.00 "
       "0.00)),((4.00 4.00 0.00,5.00 0.00 0.00,0.00 0.00 0.00,4.00 4.00 "
@@ -303,12 +303,12 @@ BOOST_AUTO_TEST_CASE(testExtrudeStraightSkeleton)
 BOOST_AUTO_TEST_CASE(testExtrudeStraightSkeletonPolygonWithHole)
 {
 
-  std::unique_ptr<Geometry> g(
+  std::unique_ptr<Geometry> const g(
       io::readWkt("POLYGON (( 0 0, 5 0, 5 5, 4 5, 4 4, 0 4, 0 0 ), (1 1, 1 2, "
                   "2 2, 2 1, 1 1))"));
   std::unique_ptr<PolyhedralSurface> out(
       algorithm::extrudeStraightSkeleton(*g, 2.0));
-  std::string expectedWKT(
+  std::string const expectedWKT(
       "POLYHEDRALSURFACE Z(((4.00 5.00 0.00,5.00 5.00 0.00,4.00 4.00 0.00,4.00 "
       "5.00 0.00)),((2.00 1.00 0.00,5.00 0.00 0.00,0.00 0.00 0.00,2.00 1.00 "
       "0.00)),((5.00 5.00 0.00,5.00 0.00 0.00,4.00 4.00 0.00,5.00 5.00 "
@@ -354,12 +354,12 @@ BOOST_AUTO_TEST_CASE(testExtrudeStraightSkeletonPolygonWithHole)
 BOOST_AUTO_TEST_CASE(testExtrudeStraightSkeletonGenerateBuilding)
 {
 
-  std::unique_ptr<Geometry> g(
+  std::unique_ptr<Geometry> const g(
       io::readWkt("POLYGON (( 0 0, 5 0, 5 5, 4 5, 4 4, 0 4, 0 0 ), (1 1, 1 2, "
                   "2 2, 2 1, 1 1))"));
   std::unique_ptr<Geometry> out(
       algorithm::extrudeStraightSkeleton(*g, 9.0, 2.0));
-  std::string expectedWKT(
+  std::string const expectedWKT(
       "POLYHEDRALSURFACE Z(((0.00 0.00 0.00,0.00 4.00 0.00,4.00 4.00 0.00,4.00 "
       "5.00 0.00,5.00 5.00 0.00,5.00 0.00 0.00,0.00 0.00 0.00),(1.00 1.00 "
       "0.00,2.00 1.00 0.00,2.00 2.00 0.00,1.00 2.00 0.00,1.00 1.00 "

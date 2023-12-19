@@ -10,14 +10,12 @@
 
 #include <utility>
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 ///
 ///
 ///
-ForceZOrderPoints::ForceZOrderPoints(Kernel::FT defaultZ)
-    : _defaultZ(std::move(defaultZ))
+ForceZOrderPoints::ForceZOrderPoints(Kernel::FT defaultZ) : _defaultZ(defaultZ)
 {
 }
 
@@ -72,5 +70,4 @@ ForceZOrderPoints::visit(Polygon &p)
   }
 }
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

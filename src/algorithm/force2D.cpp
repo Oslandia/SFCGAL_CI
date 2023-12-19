@@ -5,8 +5,7 @@
 #include <SFCGAL/algorithm/force2D.h>
 #include <SFCGAL/detail/transform/Force2D.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 ///
 ///
@@ -18,5 +17,4 @@ force2D(Geometry &g)
   g.accept(t);
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

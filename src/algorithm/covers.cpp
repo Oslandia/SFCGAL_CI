@@ -14,11 +14,11 @@
 
 using namespace SFCGAL::detail;
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 auto
-covers(const PrimitiveHandle<3> &, const PrimitiveHandle<3> &) -> bool
+covers(const PrimitiveHandle<3> & /*unused*/,
+       const PrimitiveHandle<3> & /*unused*/) -> bool
 {
   return false;
 }
@@ -55,7 +55,9 @@ solidsVolume(const GeometrySet<3> &gs, bool planarSurface = false) -> double
 
     BOOST_ASSERT(poly.is_pure_triangle());
 
-    CGAL::Point_3<Kernel> p1, p2, p3;
+    CGAL::Point_3<Kernel> p1;
+    CGAL::Point_3<Kernel> p2;
+    CGAL::Point_3<Kernel> p3;
 
     for (MarkedPolyhedron::Facet_const_iterator fit = poly.facets_begin();
          fit != poly.facets_end(); ++fit) {
@@ -66,7 +68,7 @@ solidsVolume(const GeometrySet<3> &gs, bool planarSurface = false) -> double
       p2 = cit->vertex()->point();
       cit++;
       p3 = cit->vertex()->point();
-      CGAL::Triangle_3<Kernel> tri(p1, p2, p3);
+      CGAL::Triangle_3<Kernel> const tri(p1, p2, p3);
       result = result + sqrt(CGAL::to_double(tri.squared_area()));
     }
   }
@@ -108,7 +110,7 @@ surfacesArea(const GeometrySet<3> &gs) -> double
 }
 
 auto
-solidsVolume(const GeometrySet<2> &) -> double
+solidsVolume(const GeometrySet<2> & /*unused*/) -> double
 {
   return 0.0;
 }
@@ -125,7 +127,7 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
   // - area for surfaces
   // - should be volume for volumes. We use area here
 
-  double tol = 1e-9;
+  double const tol = 1e-9;
 
   switch (dim) {
   case 0: {
@@ -138,9 +140,9 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
 
     //
     // Compare lengths
-    double lengthA = segmentsLength(a);
-    double lengthB = segmentsLength(b);
-    double cmp     = (lengthA - lengthB) * (lengthA - lengthB);
+    double const lengthA = segmentsLength(a);
+    double const lengthB = segmentsLength(b);
+    double const cmp     = (lengthA - lengthB) * (lengthA - lengthB);
 
     if (cmp > tol) {
       return false;
@@ -150,9 +152,9 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
   case 2: {
     //
     // Compare areas
-    double areaA = surfacesArea(a);
-    double areaB = surfacesArea(b);
-    double cmp   = (areaA - areaB) * (areaA - areaB);
+    double const areaA = surfacesArea(a);
+    double const areaB = surfacesArea(b);
+    double const cmp   = (areaA - areaB) * (areaA - areaB);
 
     if (cmp > tol) {
       return false;
@@ -161,9 +163,9 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
 
   case 3: {
     // Compare volumes
-    double volA = solidsVolume(a);
-    double volB = solidsVolume(b);
-    double cmp  = (volA - volB) * (volA - volB);
+    double const volA = solidsVolume(a);
+    double const volB = solidsVolume(b);
+    double const cmp  = (volA - volB) * (volA - volB);
 
     if (cmp > tol) {
       return false;
@@ -178,8 +180,8 @@ template <int Dim>
 auto
 covers(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
 {
-  int dimA = a.dimension();
-  int dimB = b.dimension();
+  int const dimA = a.dimension();
+  int const dimB = b.dimension();
 
   if (dimA == -1 || dimB == -1) {
     return false;
@@ -229,8 +231,8 @@ covers(const Geometry &ga, const Geometry &gb) -> bool
     return false;
   }
 
-  GeometrySet<2> gsa(ga);
-  GeometrySet<2> gsb(gb);
+  GeometrySet<2> const gsa(ga);
+  GeometrySet<2> const gsb(gb);
 
   return covers(gsa, gsb);
 }
@@ -242,10 +244,9 @@ covers3D(const Geometry &ga, const Geometry &gb) -> bool
     return false;
   }
 
-  GeometrySet<3> gsa(ga);
-  GeometrySet<3> gsb(gb);
+  GeometrySet<3> const gsa(ga);
+  GeometrySet<3> const gsb(gb);
 
   return covers(gsa, gsb);
 }
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

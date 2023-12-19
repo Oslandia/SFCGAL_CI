@@ -5,8 +5,7 @@
 #include <SFCGAL/algorithm/force3D.h>
 #include <SFCGAL/detail/transform/ForceZ.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 ///
 ///
@@ -18,5 +17,4 @@ force3D(Geometry &g, const Kernel::FT &defaultZ)
   g.accept(t);
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

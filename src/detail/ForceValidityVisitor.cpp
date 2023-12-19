@@ -17,8 +17,7 @@
 #include <SFCGAL/Triangle.h>
 #include <SFCGAL/TriangulatedSurface.h>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 ///
 ///
@@ -161,5 +160,4 @@ ForceValidityVisitor::visit(TriangulatedSurface &g)
   }
 }
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail

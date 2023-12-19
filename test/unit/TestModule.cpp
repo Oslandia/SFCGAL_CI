@@ -15,27 +15,22 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 #define BOOST_TEST_MODULE UnitTestSFCGAL
 
 #define BOOST_TEST_ALTERNATIVE_INIT_API
 
 #include <boost/test/unit_test.hpp>
-using namespace boost::unit_test ;
+using namespace boost::unit_test;
 
 #include <SFCGAL/detail/tools/Log.h>
 
-test_suite* init_unit_test_suite( int, char** const )
+auto
+init_unit_test_suite(int /*unused*/, char **const /*unused*/) -> test_suite *
 {
-//	std::cerr << "init test suite" << std::endl;
-    SFCGAL::Logger::get()->setLogLevel( SFCGAL::Logger::Info );
-    return 0;
+  //	std::cerr << "init test suite" << std::endl;
+  SFCGAL::Logger::get()->setLogLevel(SFCGAL::Logger::Info);
+  return nullptr;
 }
-
-
-
-
-
-
-

@@ -6,8 +6,7 @@
 
 #include <SFCGAL/Point.h>
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 ///
 ///
@@ -23,5 +22,4 @@ RoundTransform::transform(Point &p)
   p.coordinate().round(_scale);
 }
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

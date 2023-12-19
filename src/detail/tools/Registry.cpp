@@ -21,8 +21,7 @@
 #include <SFCGAL/Exception.h>
 #include <SFCGAL/detail/tools/Log.h>
 
-namespace SFCGAL {
-namespace tools {
+namespace SFCGAL::tools {
 
 Registry *Registry::_instance = nullptr;
 
@@ -43,7 +42,7 @@ void
 Registry::addPrototype(const Geometry &g)
 {
   // find prototype by name
-  const_prototype_iterator it = _prototypes.begin();
+  auto it = _prototypes.begin();
 
   for (; it != _prototypes.end(); ++it) {
     if ((*it)->geometryTypeId() == g.geometryTypeId()) {
@@ -66,7 +65,8 @@ Registry::getGeometryTypes() const -> std::vector<std::string>
 {
   std::vector<std::string> names;
 
-  for (auto _prototype : _prototypes) {
+  names.reserve(_prototypes.size());
+  for (auto *_prototype : _prototypes) {
     names.push_back(_prototype->geometryType());
   }
 
@@ -80,7 +80,7 @@ auto
 Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
     -> Geometry *
 {
-  for (auto _prototype : _prototypes) {
+  for (auto *_prototype : _prototypes) {
     if (geometryTypeName == _prototype->geometryType()) {
       return _prototype->clone();
     }
@@ -98,7 +98,7 @@ Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
 auto
 Registry::newGeometryByTypeId(int typeId) const -> Geometry *
 {
-  for (auto _prototype : _prototypes) {
+  for (auto *_prototype : _prototypes) {
     if (typeId == _prototype->geometryTypeId()) {
       return _prototype->clone();
     }
@@ -116,7 +116,7 @@ Registry::newGeometryByTypeId(int typeId) const -> Geometry *
 auto
 Registry::instance() -> Registry &
 {
-  if (!Registry::_instance) {
+  if (Registry::_instance == nullptr) {
     Registry::_instance = new Registry();
   }
 
@@ -126,7 +126,7 @@ Registry::instance() -> Registry &
 ///
 ///
 ///
-Registry::Registry() : _prototypes()
+Registry::Registry()
 {
   addPrototype(Point());
   addPrototype(LineString());
@@ -145,5 +145,4 @@ Registry::Registry() : _prototypes()
   addPrototype(PolyhedralSurface());
 }
 
-} // namespace tools
-} // namespace SFCGAL
+} // namespace SFCGAL::tools

@@ -29,8 +29,7 @@
 
 #include <memory>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 using Point_2              = Kernel::Point_2;
 using Point_3              = Kernel::Point_3;
@@ -54,8 +53,8 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
   using Halfedge_const_handle   = typename Ss::Halfedge_const_handle;
   using Halfedge_const_iterator = typename Ss::Halfedge_const_iterator;
 
-  Halfedge_const_handle null_halfedge;
-  Vertex_const_handle   null_vertex;
+  Halfedge_const_handle const null_halfedge;
+  Vertex_const_handle const   null_vertex;
 
   for (Halfedge_const_iterator it = ss.halfedges_begin();
        it != ss.halfedges_end(); ++it) {
@@ -96,17 +95,20 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
 /**
  * Return abc angle in radians
  */
-static auto
+auto
 angle(const Point &a, const Point &b, const Point &c) -> double
 {
-  Point ab(to_double(b.x() - a.x()), to_double(b.y() - a.y()));
-  Point cb(to_double(b.x() - c.x()), to_double(b.y() - c.y()));
+  Point const ab(CGAL::to_double(b.x() - a.x()),
+                 CGAL::to_double(b.y() - a.y()));
+  Point const cb(CGAL::to_double(b.x() - c.x()),
+                 CGAL::to_double(b.y() - c.y()));
 
-  double dot = (to_double(ab.x() * cb.x() + ab.y() * cb.y())); /* dot product */
-  double cross =
-      (to_double(ab.x() * cb.y() - ab.y() * cb.x())); /* cross product */
+  double const dot =
+      (CGAL::to_double(ab.x() * cb.x() + ab.y() * cb.y())); /* dot product */
+  double const cross =
+      (CGAL::to_double(ab.x() * cb.y() - ab.y() * cb.x())); /* cross product */
 
-  double alpha = std::atan2(cross, dot);
+  double const alpha = std::atan2(cross, dot);
 
   return alpha;
 }
@@ -162,10 +164,11 @@ straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &ss,
       const Point &p2 = de1->vertex()->point();
       const Point &p3 = de1->opposite()->vertex()->point();
 
-      double ang = angle(p1, p2, p3);
+      double const ang = angle(p1, p2, p3);
 
-      if (ang > maxTouchingAngle)
+      if (ang > maxTouchingAngle) {
         continue;
+      }
     }
 
     std::unique_ptr<LineString> ls(
@@ -180,14 +183,15 @@ auto
 straightSkeleton(const Polygon_with_holes_2 &poly)
     -> boost::shared_ptr<Straight_skeleton_2>
 {
-  boost::shared_ptr<CGAL::Straight_skeleton_2<CGAL::Epick>> sk =
+  boost::shared_ptr<CGAL::Straight_skeleton_2<CGAL::Epick>> const sk =
       CGAL::create_interior_straight_skeleton_2(
           poly.outer_boundary().vertices_begin(),
           poly.outer_boundary().vertices_end(), poly.holes_begin(),
           poly.holes_end(), CGAL::Epick());
   boost::shared_ptr<Straight_skeleton_2> ret;
-  if (sk)
+  if (sk) {
     ret = CGAL::convert_straight_skeleton_2<Straight_skeleton_2>(*sk);
+  }
   return ret;
 }
 
@@ -223,8 +227,8 @@ preparePolygon(const Polygon &poly, Kernel::Vector_2 &trans)
     -> Polygon_with_holes_2
 {
   checkNoTouchingHoles(poly);
-  Envelope env = poly.envelope();
-  trans        = Kernel::Vector_2(-env.xMin(), -env.yMin());
+  Envelope const env = poly.envelope();
+  trans              = Kernel::Vector_2(-env.xMin(), -env.yMin());
 
   // @todo: avoid cloning !
   std::unique_ptr<Polygon> cloned(poly.clone());
@@ -263,9 +267,10 @@ extractPolygons(const Geometry &g, std::vector<Polygon> &vect)
 ///
 ///
 auto
-straightSkeleton(const Geometry &g, bool autoOrientation, NoValidityCheck,
-                 bool innerOnly, bool outputDistanceInM,
-                 const double &toleranceAbs) -> std::unique_ptr<MultiLineString>
+straightSkeleton(const Geometry &g, bool          autoOrientation,
+                 NoValidityCheck /*unused*/, bool innerOnly,
+                 bool outputDistanceInM, const double & /*toleranceAbs*/)
+    -> std::unique_ptr<MultiLineString>
 {
   switch (g.geometryTypeId()) {
   case TYPE_TRIANGLE:
@@ -287,7 +292,7 @@ straightSkeleton(const Geometry &g, bool autoOrientation, NoValidityCheck,
 
 auto
 straightSkeleton(const Geometry &g, bool autoOrientation, bool innerOnly,
-                 bool outputDistanceInM, const double &toleranceAbs)
+                 bool outputDistanceInM, const double & /*toleranceAbs*/)
     -> std::unique_ptr<MultiLineString>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
@@ -311,20 +316,22 @@ straightSkeleton(const Polygon &g, bool /*autoOrientation*/, bool innerOnly,
     return result;
   }
 
-  Kernel::Vector_2                       trans;
-  Polygon_with_holes_2                   polygon  = preparePolygon(g, trans);
-  boost::shared_ptr<Straight_skeleton_2> skeleton = straightSkeleton(polygon);
+  Kernel::Vector_2           trans;
+  Polygon_with_holes_2 const polygon = preparePolygon(g, trans);
+  boost::shared_ptr<Straight_skeleton_2> const skeleton =
+      straightSkeleton(polygon);
 
-  if (!skeleton.get()) {
+  if (skeleton == nullptr) {
     BOOST_THROW_EXCEPTION(Exception("CGAL failed to create straightSkeleton"));
   }
 
-  if (outputDistanceInM)
+  if (outputDistanceInM) {
     straightSkeletonToMultiLineString<Kernel, true>(
         *skeleton, *result, innerOnly, trans, toleranceAbs);
-  else
+  } else {
     straightSkeletonToMultiLineString<Kernel, false>(
         *skeleton, *result, innerOnly, trans, toleranceAbs);
+  }
   return result;
 }
 
@@ -339,21 +346,23 @@ straightSkeleton(const MultiPolygon &g, bool /*autoOrientation*/,
   std::unique_ptr<MultiLineString> result(new MultiLineString);
 
   for (size_t i = 0; i < g.numGeometries(); i++) {
-    Kernel::Vector_2     trans;
-    Polygon_with_holes_2 polygon = preparePolygon(g.polygonN(i), trans);
-    boost::shared_ptr<Straight_skeleton_2> skeleton = straightSkeleton(polygon);
+    Kernel::Vector_2           trans;
+    Polygon_with_holes_2 const polygon = preparePolygon(g.polygonN(i), trans);
+    boost::shared_ptr<Straight_skeleton_2> const skeleton =
+        straightSkeleton(polygon);
 
-    if (!skeleton.get()) {
+    if (skeleton == nullptr) {
       BOOST_THROW_EXCEPTION(
           Exception("CGAL failed to create straightSkeleton"));
     }
 
-    if (outputDistanceInM)
+    if (outputDistanceInM) {
       straightSkeletonToMultiLineString<Kernel, true>(
           *skeleton, *result, innerOnly, trans, toleranceAbs);
-    else
+    } else {
       straightSkeletonToMultiLineString<Kernel, false>(
           *skeleton, *result, innerOnly, trans, toleranceAbs);
+    }
   }
 
   return result;
@@ -370,11 +379,12 @@ approximateMedialAxis(const Geometry &g) -> std::unique_ptr<MultiLineString>
   extractPolygons(g, polys);
 
   for (auto &poly : polys) {
-    Kernel::Vector_2     trans;
-    Polygon_with_holes_2 polygon = preparePolygon(poly, trans);
-    boost::shared_ptr<Straight_skeleton_2> skeleton = straightSkeleton(polygon);
+    Kernel::Vector_2           trans;
+    Polygon_with_holes_2 const polygon = preparePolygon(poly, trans);
+    boost::shared_ptr<Straight_skeleton_2> const skeleton =
+        straightSkeleton(polygon);
 
-    if (!skeleton.get()) {
+    if (skeleton == nullptr) {
       BOOST_THROW_EXCEPTION(
           Exception("CGAL failed to create straightSkeleton"));
     }
@@ -419,7 +429,7 @@ extrudeStraightSkeleton(const Geometry &g, double building_height,
                         double roof_height)
     -> std::unique_ptr<PolyhedralSurface>
 {
-  std::unique_ptr<PolyhedralSurface> roof{
+  std::unique_ptr<PolyhedralSurface> const roof{
       extrudeStraightSkeleton(g, roof_height)};
   translate(*roof, 0.0, 0.0, building_height);
   std::unique_ptr<Geometry> building(extrude(g.as<Polygon>(), building_height));
@@ -428,5 +438,4 @@ extrudeStraightSkeleton(const Geometry &g, double building_height,
   result->addPolygons(*roof);
   return result;
 };
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

@@ -4,13 +4,11 @@
 
 #include <SFCGAL/detail/graph/Edge.h>
 
-namespace SFCGAL {
-namespace graph {
+namespace SFCGAL::graph {
 
 ///
 ///
 ///
 Edge::Edge(const int &face_) : face(face_) {}
 
-} // namespace graph
-} // namespace SFCGAL
+} // namespace SFCGAL::graph

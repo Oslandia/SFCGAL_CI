@@ -63,6 +63,7 @@ almostEqual(const Kernel::FT &a, const Kernel::FT &b, const Kernel::FT &epsilon)
 
   return diff <= epsilon * std::max(absA, absB); // adaptative epsilon
 }
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GCC__)

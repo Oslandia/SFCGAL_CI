@@ -13,8 +13,7 @@
 
 #include <limits>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 const size_t SurfaceGraph::INVALID_INDEX = std::numeric_limits<size_t>::max();
 
@@ -31,10 +30,8 @@ SurfaceGraph::addRing(const LineString &ring, FaceIndex faceIndex)
                                                          // the index of ring
                                                          // start point instead
                                                          // of finding it
-    const CoordinateMap::const_iterator startFound =
-        _coordinateMap.find(startCoord);
-    const CoordinateMap::const_iterator endFound =
-        _coordinateMap.find(endCoord);
+    const auto startFound = _coordinateMap.find(startCoord);
+    const auto endFound   = _coordinateMap.find(endCoord);
     BOOST_ASSERT(s + 1 != numSegments ||
                  endFound != _coordinateMap.end()); // ring not closed
 
@@ -44,8 +41,7 @@ SurfaceGraph::addRing(const LineString &ring, FaceIndex faceIndex)
       const VertexIndex                         startIndex = startFound->second;
       const VertexIndex                         endIndex   = endFound->second;
       const std::pair<VertexIndex, VertexIndex> edge(startIndex, endIndex);
-      const EdgeMap::const_iterator             foundEdgeWithBadOrientation =
-          _edgeMap.find(edge);
+      const auto foundEdgeWithBadOrientation = _edgeMap.find(edge);
 
       if (foundEdgeWithBadOrientation != _edgeMap.end()) {
         _isValid = Validity::invalid(
@@ -58,7 +54,7 @@ SurfaceGraph::addRing(const LineString &ring, FaceIndex faceIndex)
       const std::pair<VertexIndex, VertexIndex> reversedEdge(endIndex,
                                                              startIndex);
 
-      const EdgeMap::iterator foundEdge = _edgeMap.find(reversedEdge);
+      const auto foundEdge = _edgeMap.find(reversedEdge);
 
       if (foundEdge != _edgeMap.end()) {
         // edit edge
@@ -146,14 +142,14 @@ isConnected(const SurfaceGraph &graph) -> bool
   std::vector<SurfaceGraph::FaceIndex> component(
       boost::num_vertices(graph.faceGraph()));
   const size_t numComponents =
-      boost::connected_components(graph.faceGraph(), &component[0]);
+      boost::connected_components(graph.faceGraph(), component.data());
   return 1 == numComponents;
 }
 
 auto
 isClosed(const SurfaceGraph &graph) -> bool
 {
-  const SurfaceGraph::EdgeMap::const_iterator end = graph.edgeMap().end();
+  const auto end = graph.edgeMap().end();
 
   for (auto e = graph.edgeMap().begin(); e != end; ++e) {
     if (e->second.second == SurfaceGraph::INVALID_INDEX) {
@@ -164,5 +160,4 @@ isClosed(const SurfaceGraph &graph) -> bool
   return true;
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
