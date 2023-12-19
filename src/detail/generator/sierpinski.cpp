@@ -7,8 +7,7 @@
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/Triangle.h>
 
-namespace SFCGAL {
-namespace generator {
+namespace SFCGAL::generator {
 
 auto
 _sierpinski(const std::vector<Kernel::Triangle_2> &triangles)
@@ -22,9 +21,9 @@ _sierpinski(const std::vector<Kernel::Triangle_2> &triangles)
     const Kernel::Point_2 &b = triangle.vertex(1);
     const Kernel::Point_2 &c = triangle.vertex(2);
 
-    Kernel::Point_2 iAB = a + (b - a) / 2;
-    Kernel::Point_2 iBC = b + (c - b) / 2;
-    Kernel::Point_2 iCA = c + (a - c) / 2;
+    Kernel::Point_2 const iAB = a + (b - a) / 2;
+    Kernel::Point_2 const iBC = b + (c - b) / 2;
+    Kernel::Point_2 const iCA = c + (a - c) / 2;
 
     result.emplace_back(a, iAB, iCA);
     result.emplace_back(b, iBC, iAB);
@@ -57,5 +56,4 @@ sierpinski(const unsigned int &order) -> std::unique_ptr<MultiPolygon>
   return result;
 }
 
-} // namespace generator
-} // namespace SFCGAL
+} // namespace SFCGAL::generator

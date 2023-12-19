@@ -12,8 +12,7 @@
 
 #include <SFCGAL/detail/graph/algorithm/orientation.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 ///
 ///
@@ -156,5 +155,4 @@ isCounterClockWiseOriented(const Polygon &poly) -> bool
   return isCounterClockWiseOriented(poly.exteriorRing());
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

@@ -5,8 +5,7 @@
 #include <SFCGAL/Point.h>
 #include <SFCGAL/detail/transform/Force2D.h>
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 ///
 ///
@@ -16,11 +15,11 @@ Force2D::transform(Point &p)
 {
   if (!p.isEmpty() && p.is3D()) {
     Point pt(p.x(), p.y());
-    if (p.isMeasured())
+    if (p.isMeasured()) {
       pt.setM(p.m());
+    }
     p = pt;
   }
 }
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

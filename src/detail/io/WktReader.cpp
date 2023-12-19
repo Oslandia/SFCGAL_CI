@@ -21,9 +21,7 @@
 
 #include <SFCGAL/Exception.h>
 
-namespace SFCGAL {
-namespace detail {
-namespace io {
+namespace SFCGAL::detail::io {
 
 ///
 ///
@@ -54,9 +52,9 @@ WktReader::readSRID() -> srid_t
 auto
 WktReader::readGeometry() -> Geometry *
 {
-  GeometryType geometryType = readGeometryType();
-  _is3D                     = _reader.imatch("Z");
-  _isMeasured               = _reader.imatch("M");
+  GeometryType const geometryType = readGeometryType();
+  _is3D                           = _reader.imatch("Z");
+  _isMeasured                     = _reader.imatch("M");
 
   switch (geometryType) {
   case TYPE_POINT: {
@@ -143,29 +141,40 @@ WktReader::readGeometryType() -> GeometryType
 {
   if (_reader.imatch("POINT")) {
     return TYPE_POINT;
-  } else if (_reader.imatch("LINESTRING")) {
+  }
+  if (_reader.imatch("LINESTRING")) {
     return TYPE_LINESTRING;
-  } else if (_reader.imatch("POLYGON")) {
+  }
+  if (_reader.imatch("POLYGON")) {
     return TYPE_POLYGON;
-  } else if (_reader.imatch("TRIANGLE")) {
+  }
+  if (_reader.imatch("TRIANGLE")) {
     // not official
     return TYPE_TRIANGLE;
-  } else if (_reader.imatch("MULTIPOINT")) {
+  }
+  if (_reader.imatch("MULTIPOINT")) {
     return TYPE_MULTIPOINT;
-  } else if (_reader.imatch("MULTILINESTRING")) {
+  }
+  if (_reader.imatch("MULTILINESTRING")) {
     return TYPE_MULTILINESTRING;
-  } else if (_reader.imatch("MULTIPOLYGON")) {
+  }
+  if (_reader.imatch("MULTIPOLYGON")) {
     return TYPE_MULTIPOLYGON;
-  } else if (_reader.imatch("GEOMETRYCOLLECTION")) {
+  }
+  if (_reader.imatch("GEOMETRYCOLLECTION")) {
     return TYPE_GEOMETRYCOLLECTION;
-  } else if (_reader.imatch("TIN")) {
+  }
+  if (_reader.imatch("TIN")) {
     return TYPE_TRIANGULATEDSURFACE;
-  } else if (_reader.imatch("POLYHEDRALSURFACE")) {
+  }
+  if (_reader.imatch("POLYHEDRALSURFACE")) {
     return TYPE_POLYHEDRALSURFACE;
-  } else if (_reader.imatch("SOLID")) {
+  }
+  if (_reader.imatch("SOLID")) {
     // not official
     return TYPE_SOLID;
-  } else if (_reader.imatch("MULTISOLID")) {
+  }
+  if (_reader.imatch("MULTISOLID")) {
     // not official
     return TYPE_MULTISOLID;
   }
@@ -355,8 +364,9 @@ WktReader::readInnerMultiPoint(MultiPoint &g)
       }
     }
 
-    if (!p->isEmpty())
+    if (!p->isEmpty()) {
       g.addGeometry(p.release());
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -387,8 +397,9 @@ WktReader::readInnerMultiLineString(MultiLineString &g)
 
     std::unique_ptr<LineString> lineString(new LineString());
     readInnerLineString(*lineString);
-    if (!lineString->isEmpty())
+    if (!lineString->isEmpty()) {
       g.addGeometry(lineString.release());
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -419,8 +430,9 @@ WktReader::readInnerMultiPolygon(MultiPolygon &g)
 
     std::unique_ptr<Polygon> polygon(new Polygon());
     readInnerPolygon(*polygon);
-    if (!polygon->isEmpty())
+    if (!polygon->isEmpty()) {
       g.addGeometry(polygon.release());
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -451,8 +463,9 @@ WktReader::readInnerGeometryCollection(GeometryCollection &g)
 
     // read a full wkt geometry ex : POINT(2.0 6.0)
     Geometry *gg = readGeometry();
-    if (!gg->isEmpty())
+    if (!gg->isEmpty()) {
       g.addGeometry(gg);
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -578,8 +591,9 @@ WktReader::readInnerMultiSolid(MultiSolid &g)
 
     std::unique_ptr<Solid> solid(new Solid());
     readInnerSolid(*solid);
-    if (!solid->isEmpty())
+    if (!solid->isEmpty()) {
       g.addGeometry(solid.release());
+    }
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -661,6 +675,4 @@ WktReader::parseErrorMessage() -> std::string
   return oss.str();
 }
 
-} // namespace io
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::io

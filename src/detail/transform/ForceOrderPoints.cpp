@@ -8,8 +8,7 @@
 #include <SFCGAL/algorithm/orientation.h>
 #include <SFCGAL/detail/transform/ForceOrderPoints.h>
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 ///
 ///
@@ -20,7 +19,7 @@ ForceOrderPoints::ForceOrderPoints(bool orientCCW) : _orientCCW(orientCCW) {}
 ///
 ///
 void
-ForceOrderPoints::transform(Point &)
+ForceOrderPoints::transform(Point & /*p*/)
 {
 }
 
@@ -82,5 +81,4 @@ ForceOrderPoints::visit(Polygon &p)
   }
 }
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

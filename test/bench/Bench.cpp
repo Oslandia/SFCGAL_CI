@@ -15,75 +15,72 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 #include "Bench.h"
-
 
 namespace SFCGAL {
 
 ///
 ///
 ///
-Bench::~Bench()
-{
+Bench::~Bench() {}
 
+///
+///
+///
+void
+Bench::start(const std::string &description)
+{
+  _timers.push(std::make_pair(description, timer_t()));
+  _timers.top().second.start();
 }
 
 ///
 ///
 ///
-void Bench::start( const std::string& description )
+void
+Bench::start(const boost::basic_format<char> &description)
 {
-    _timers.push( std::make_pair( description, timer_t() ) );
-    _timers.top().second.start();
+  start(description.str());
 }
 
 ///
 ///
 ///
-void Bench::start( const boost::basic_format<char>& description )
+void
+Bench::stop()
 {
-    start( description.str() );
+  BOOST_ASSERT(!_timers.empty());
+  _timers.top().second.stop();
+  s() << _timers.top().first << "\t"
+      << (_timers.top().second.elapsed().wall * 1.0e-9) << std::endl;
+  _timers.pop();
 }
 
 ///
 ///
 ///
-void Bench::stop()
+Bench &
+Bench::instance()
 {
-    BOOST_ASSERT( ! _timers.empty() ) ;
-    _timers.top().second.stop();
-    s() << _timers.top().first << "\t" << ( _timers.top().second.elapsed().wall * 1.0e-9 ) << std::endl ;
-    _timers.pop() ;
+  static Bench bench;
+  return bench;
 }
 
 ///
 ///
 ///
-Bench& Bench::instance()
+std::ostream &
+Bench::s()
 {
-    static Bench bench ;
-    return bench ;
+  return *_s;
 }
 
 ///
 ///
 ///
-std::ostream& Bench::s()
-{
-    return *_s ;
-}
-
-///
-///
-///
-Bench::Bench():
-    _s( &std::cout )
-{
-
-}
-
+Bench::Bench() : _s(&std::cout) {}
 
 } // namespace SFCGAL
-

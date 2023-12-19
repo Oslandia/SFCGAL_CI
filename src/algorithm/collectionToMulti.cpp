@@ -12,8 +12,7 @@
 
 #include <SFCGAL/detail/transform/ForceZ.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 // If nothing has to be built, g will be moved to the result without
 // copying and a new allocation. Otherwise, a new geometry is built and
@@ -56,7 +55,7 @@ collectionToMulti(std::unique_ptr<Geometry> g) -> std::unique_ptr<Geometry>
     }
   }
 
-  bool force3d = has2d && has3d;
+  bool const force3d = has2d && has3d;
 
   auto *ret_geo = new MultiPolygon;
 
@@ -104,5 +103,4 @@ collectionToMulti(std::unique_ptr<Geometry> g) -> std::unique_ptr<Geometry>
   return std::unique_ptr<Geometry>(ret_geo);
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

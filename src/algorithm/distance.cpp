@@ -31,14 +31,14 @@ using Segment_2 = SFCGAL::Kernel::Segment_2;
 using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
 using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 ///
 ///
 ///
 auto
-distance(const Geometry &gA, const Geometry &gB, NoValidityCheck) -> double
+distance(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
+    -> double
 {
   switch (gA.geometryTypeId()) {
   case TYPE_POINT:
@@ -145,12 +145,12 @@ distancePointLineString(const Point &gA, const LineString &gB) -> double
     return std::numeric_limits<double>::infinity();
   }
 
-  size_t numSegments = gB.numSegments();
+  size_t const numSegments = gB.numSegments();
 
   double dMin = std::numeric_limits<double>::infinity();
 
   for (size_t i = 0; i < numSegments; i++) {
-    double d = distancePointSegment(gA, gB.pointN(i), gB.pointN(i + 1));
+    double const d = distancePointSegment(gA, gB.pointN(i), gB.pointN(i + 1));
 
     if (i == 0 || d < dMin) {
       dMin = d;
@@ -178,7 +178,7 @@ distancePointPolygon(const Point &gA, const Polygon &gB) -> double
 
   // check if the point is in the polygon
   for (size_t i = 0; i < gB.numRings(); i++) {
-    double d = distancePointLineString(gA, gB.ringN(i));
+    double const d = distancePointLineString(gA, gB.ringN(i));
 
     if (i == 0 || d < dMin) {
       dMin = d;
@@ -252,8 +252,8 @@ distanceLineStringLineString(const LineString &gA, const LineString &gB)
     return std::numeric_limits<double>::infinity();
   }
 
-  size_t nsA = gA.numSegments();
-  size_t nsB = gB.numSegments();
+  size_t const nsA = gA.numSegments();
+  size_t const nsB = gB.numSegments();
 
   double dMin = std::numeric_limits<double>::infinity();
 
@@ -285,7 +285,7 @@ distanceLineStringPolygon(const LineString &gA, const Polygon &gB) -> double
   double dMin = std::numeric_limits<double>::infinity();
 
   for (size_t i = 0; i < gB.numRings(); i++) {
-    double d = distanceLineStringLineString(gA, gB.ringN(i));
+    double const d = distanceLineStringLineString(gA, gB.ringN(i));
 
     if (d < dMin) {
       dMin = d;
@@ -366,7 +366,7 @@ distancePolygonPolygon(const Polygon &gA, const Polygon &gB) -> double
 
   for (size_t i = 0; i < gA.numRings(); i++) {
     for (size_t j = 0; j < gB.numRings(); j++) {
-      double d = distanceLineStringLineString(gA.ringN(i), gB.ringN(j));
+      double const d = distanceLineStringLineString(gA.ringN(i), gB.ringN(j));
 
       if (d < dMin) {
         dMin = d;
@@ -401,18 +401,18 @@ struct Circle {
   {
   }
   Circle() = default;
-  auto
+  [[nodiscard]] auto
   isEmpty() const -> bool
   {
     return _empty;
   }
-  auto
+  [[nodiscard]] auto
   radius() const -> double
   {
     BOOST_ASSERT(!_empty);
     return _radius;
   }
-  auto
+  [[nodiscard]] auto
   center() const -> const CGAL::Vector_2<Kernel> &
   {
     BOOST_ASSERT(!_empty);
@@ -436,19 +436,19 @@ boundingCircle(const Geometry &geom) -> const Circle
   GetPointsVisitor v;
   const_cast<Geometry &>(geom).accept(v);
 
-  if (!v.points.size()) {
+  if (v.points.empty()) {
     return Circle();
   }
 
   using Vector_2 = CGAL::Vector_2<Kernel>;
 
-  const GetPointsVisitor::const_iterator end = v.points.end();
+  const auto end = v.points.end();
 
   // centroid
   Vector_2 c(0, 0);
   int      numPoint = 0;
 
-  for (GetPointsVisitor::const_iterator x = v.points.begin(); x != end; ++x) {
+  for (auto x = v.points.begin(); x != end; ++x) {
     c = c + (*x)->toVector_2();
     ++numPoint;
   }
@@ -460,7 +460,7 @@ boundingCircle(const Geometry &geom) -> const Circle
   Vector_2   f             = c;
   Kernel::FT maxDistanceSq = 0;
 
-  for (GetPointsVisitor::const_iterator x = v.points.begin(); x != end; ++x) {
+  for (auto x = v.points.begin(); x != end; ++x) {
     const Vector_2   cx  = (*x)->toVector_2() - c;
     const Kernel::FT dSq = cx * cx;
 
@@ -500,7 +500,7 @@ distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
       bcA.push_back(boundingCircle(gA.geometryN(i)));
     }
 
-    Circle bcB(boundingCircle(gB));
+    Circle const bcB(boundingCircle(gB));
 
     if (bcB.isEmpty()) {
       return std::numeric_limits<double>::infinity();
@@ -591,5 +591,4 @@ distanceSegmentSegment(const Point &a, const Point &b, const Point &c,
       CGAL::Segment_2<Kernel>(c.toPoint_2(), d.toPoint_2()))));
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

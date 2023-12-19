@@ -22,8 +22,7 @@
 
 #include <utility>
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 ///
 ///
@@ -41,8 +40,9 @@ AffineTransform3::transform(Point &p)
 {
   if (!p.isEmpty()) {
     Point pt(p.toPoint_3().transform(_transform));
-    if (p.isMeasured())
+    if (p.isMeasured()) {
       pt.setM(p.m());
+    }
     p = pt;
   }
 }
@@ -117,5 +117,4 @@ AffineTransform3::transform(Solid &solid)
   }
 }
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform

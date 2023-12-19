@@ -26,8 +26,7 @@
 
 using namespace SFCGAL::detail;
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 //
 // Type of pa must be of larger dimension than type of pb
 auto
@@ -47,8 +46,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Segment vs. Point
   //
 
-  else if (pa.handle.which() == PrimitiveSegment &&
-           pb.handle.which() == PrimitivePoint) {
+  if (pa.handle.which() == PrimitiveSegment &&
+      pb.handle.which() == PrimitivePoint) {
     const auto *seg = pa.as<CGAL::Segment_2<Kernel>>();
     const auto *pt  = pb.as<CGAL::Point_2<Kernel>>();
     return seg->has_on(*pt);
@@ -58,8 +57,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Segment vs. Segment
   //
 
-  else if (pa.handle.which() == PrimitiveSegment &&
-           pb.handle.which() == PrimitiveSegment) {
+  if (pa.handle.which() == PrimitiveSegment &&
+      pb.handle.which() == PrimitiveSegment) {
     const auto *seg1 = pa.as<CGAL::Segment_2<Kernel>>();
     const auto *seg2 = pb.as<CGAL::Segment_2<Kernel>>();
     return CGAL::do_intersect(*seg1, *seg2);
@@ -69,13 +68,13 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Polygon vs. Point
   //
 
-  else if (pa.handle.which() == PrimitiveSurface &&
-           pb.handle.which() == PrimitivePoint) {
+  if (pa.handle.which() == PrimitiveSurface &&
+      pb.handle.which() == PrimitivePoint) {
     // Polygon versus Point
     const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
     const auto *pt   = pb.as<CGAL::Point_2<Kernel>>();
 
-    int b1 = poly->outer_boundary().bounded_side(*pt);
+    int const b1 = poly->outer_boundary().bounded_side(*pt);
 
     if (b1 == CGAL::ON_BOUNDARY) {
       return true;
@@ -85,7 +84,7 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
       CGAL::Polygon_with_holes_2<Kernel>::Hole_const_iterator it;
 
       for (it = poly->holes_begin(); it != poly->holes_end(); ++it) {
-        int b = it->bounded_side(*pt);
+        int const b = it->bounded_side(*pt);
 
         if (b == CGAL::ON_BOUNDED_SIDE) {
           return false;
@@ -102,8 +101,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Polygon vs. Segment
   //
 
-  else if (pa.handle.which() == PrimitiveSurface &&
-           pb.handle.which() == PrimitiveSegment) {
+  if (pa.handle.which() == PrimitiveSurface &&
+      pb.handle.which() == PrimitiveSegment) {
     const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
     const auto *seg  = pb.as<CGAL::Segment_2<Kernel>>();
 
@@ -135,9 +134,9 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     }
 
     // 2. call the polygon, point version
-    CGAL::Point_2<Kernel> pt = seg->source();
-    PrimitiveHandle<2>    ppoly(poly);
-    PrimitiveHandle<2>    ppt(&pt);
+    CGAL::Point_2<Kernel> const pt = seg->source();
+    PrimitiveHandle<2> const    ppoly(poly);
+    PrimitiveHandle<2> const    ppt(&pt);
     return intersects(ppoly, ppt);
   }
 
@@ -145,8 +144,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Polygon vs. Polygon
   //
 
-  else if (pa.handle.which() == PrimitiveSurface &&
-           pb.handle.which() == PrimitiveSurface) {
+  if (pa.handle.which() == PrimitiveSurface &&
+      pb.handle.which() == PrimitiveSurface) {
     const auto *poly1 = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
     const auto *poly2 = pb.as<CGAL::Polygon_with_holes_2<Kernel>>();
 
@@ -154,7 +153,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     // 2. else, if poly1 is inside poly2 or poly1 inside poly2 (but not in
     // holes), returns true
 
-    GeometrySet<2> rings1, rings2;
+    GeometrySet<2> rings1;
+    GeometrySet<2> rings2;
     rings1.addSegments(poly1->outer_boundary().edges_begin(),
                        poly1->outer_boundary().edges_end());
 
@@ -175,19 +175,21 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     }
 
     // 2.
-    CGAL::Bbox_2 box1, box2;
+    CGAL::Bbox_2 box1;
+    CGAL::Bbox_2 box2;
     box1 = poly1->bbox();
     box2 = poly2->bbox();
-    Envelope e1(box1.xmin(), box1.xmax(), box1.ymin(), box1.ymax());
-    Envelope e2(box2.xmin(), box2.xmax(), box2.ymin(), box2.ymax());
+    Envelope const e1(box1.xmin(), box1.xmax(), box1.ymin(), box1.ymax());
+    Envelope const e2(box2.xmin(), box2.xmax(), box2.ymin(), box2.ymax());
 
     // if pa is inside pb
     if (Envelope::contains(e2, e1)) {
       // is pa inside one of pb's holes ?
-      CGAL::Point_2<Kernel> pt = *poly1->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel> const pt =
+          *poly1->outer_boundary().vertices_begin();
 
       for (auto it = poly2->holes_begin(); it != poly2->holes_end(); ++it) {
-        CGAL::Bounded_side b2 = it->bounded_side(pt);
+        CGAL::Bounded_side const b2 = it->bounded_side(pt);
 
         if (b2 == CGAL::ON_BOUNDED_SIDE) {
           return false;
@@ -200,10 +202,11 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
     // if pb is inside pa
     if (Envelope::contains(e1, e2)) {
       // is pa inside one of pb's holes ?
-      CGAL::Point_2<Kernel> pt = *poly2->outer_boundary().vertices_begin();
+      CGAL::Point_2<Kernel> const pt =
+          *poly2->outer_boundary().vertices_begin();
 
       for (auto it = poly1->holes_begin(); it != poly1->holes_end(); ++it) {
-        CGAL::Bounded_side b2 = it->bounded_side(pt);
+        CGAL::Bounded_side const b2 = it->bounded_side(pt);
 
         if (b2 == CGAL::ON_BOUNDED_SIDE) {
           return false;
@@ -240,7 +243,7 @@ struct intersects_volume_x : public boost::static_visitor<bool> {
       // this test is needed only if its a volume
       // if the polyhedron is not closed, this is not a volume, actually
 
-      CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> is_in_poly(
+      CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> const is_in_poly(
           *polyhedron);
 
       GeometrySet<3> points;
@@ -275,13 +278,15 @@ _intersects(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb) -> bool
       pb.handle.which() == PrimitivePoint) {
     return *boost::get<const CGAL::Point_3<Kernel> *>(pa.handle) ==
            *boost::get<const CGAL::Point_3<Kernel> *>(pb.handle);
-  } else if (pa.handle.which() == PrimitiveSegment &&
-             pb.handle.which() == PrimitivePoint) {
+  }
+  if (pa.handle.which() == PrimitiveSegment &&
+      pb.handle.which() == PrimitivePoint) {
     const auto *seg = pa.as<CGAL::Segment_3<Kernel>>();
     const auto *pt  = pb.as<CGAL::Point_3<Kernel>>();
     return seg->has_on(*pt);
-  } else if (pa.handle.which() == PrimitiveSegment &&
-             pb.handle.which() == PrimitiveSegment) {
+  }
+  if (pa.handle.which() == PrimitiveSegment &&
+      pb.handle.which() == PrimitiveSegment) {
     const auto *sega = pa.as<CGAL::Segment_3<Kernel>>();
     const auto *segb = pb.as<CGAL::Segment_3<Kernel>>();
     return CGAL::do_intersect(*sega, *segb);
@@ -326,9 +331,8 @@ dispatch_intersects_sym(const PrimitiveHandle<Dim> &pa,
   // assume types are ordered by dimension within the boost::variant
   if (pa.handle.which() >= pb.handle.which()) {
     return _intersects(pa, pb);
-  } else {
-    return _intersects(pb, pa);
   }
+  return _intersects(pb, pa);
 }
 
 template <int Dim>
@@ -357,13 +361,15 @@ template <int Dim>
 auto
 intersects(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
 {
-  typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles, bhandles;
-  typename SFCGAL::detail::BoxCollection<Dim>::Type    aboxes, bboxes;
+  typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles;
+  typename SFCGAL::detail::HandleCollection<Dim>::Type bhandles;
+  typename SFCGAL::detail::BoxCollection<Dim>::Type    aboxes;
+  typename SFCGAL::detail::BoxCollection<Dim>::Type    bboxes;
   a.computeBoundingBoxes(ahandles, aboxes);
   b.computeBoundingBoxes(bhandles, bboxes);
 
   try {
-    intersects_cb<Dim> cb;
+    intersects_cb<Dim> const cb;
     CGAL::box_intersection_d(aboxes.begin(), aboxes.end(), bboxes.begin(),
                              bboxes.end(), cb);
   } catch (found_an_intersection &e) {
@@ -389,8 +395,8 @@ intersects(const Geometry &ga, const Geometry &gb) -> bool
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ga);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gb);
 
-  GeometrySet<2> gsa(ga);
-  GeometrySet<2> gsb(gb);
+  GeometrySet<2> const gsa(ga);
+  GeometrySet<2> const gsb(gb);
 
   return intersects(gsa, gsb);
 }
@@ -401,26 +407,28 @@ intersects3D(const Geometry &ga, const Geometry &gb) -> bool
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(ga);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gb);
 
-  GeometrySet<3> gsa(ga);
-  GeometrySet<3> gsb(gb);
+  GeometrySet<3> const gsa(ga);
+  GeometrySet<3> const gsb(gb);
 
   return intersects(gsa, gsb);
 }
 
 auto
-intersects(const Geometry &ga, const Geometry &gb, NoValidityCheck) -> bool
+intersects(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
+    -> bool
 {
-  GeometrySet<2> gsa(ga);
-  GeometrySet<2> gsb(gb);
+  GeometrySet<2> const gsa(ga);
+  GeometrySet<2> const gsb(gb);
 
   return intersects(gsa, gsb);
 }
 
 auto
-intersects3D(const Geometry &ga, const Geometry &gb, NoValidityCheck) -> bool
+intersects3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
+    -> bool
 {
-  GeometrySet<3> gsa(ga);
-  GeometrySet<3> gsb(gb);
+  GeometrySet<3> const gsa(ga);
+  GeometrySet<3> const gsb(gb);
 
   return intersects(gsa, gsb);
 }
@@ -491,12 +499,12 @@ selfIntersectsImpl(const LineString &line) -> bool
 
       if (inter.get() && inter->is<LineString>()) {
         return true; // segments overlap
-      } else if (inter.get() && inter->is<Point>() &&
-                 !(i + 1 ==
-                   j) // one contact point between consecutive segments is ok
-                 && !((i == 0) && (j + 1 == numSegments) &&
-                      inter->as<Point>() == l.startPoint() &&
-                      inter->as<Point>() == l.endPoint())) {
+      }
+      if (inter.get() && inter->is<Point>() &&
+          !(i + 1 == j) // one contact point between consecutive segments is ok
+          && !((i == 0) && (j + 1 == numSegments) &&
+               inter->as<Point>() == l.startPoint() &&
+               inter->as<Point>() == l.endPoint())) {
         return true; // contact point that is not a contact between startPoint
                      // and endPoint
       }
@@ -522,7 +530,7 @@ auto
 selfIntersectsImpl(const PolyhedralSurface &s, const SurfaceGraph &graph)
     -> bool
 {
-  size_t numPolygons = s.numPolygons();
+  size_t const numPolygons = s.numPolygons();
 
   for (size_t pi = 0; pi != numPolygons; ++pi) {
     for (size_t pj = pi + 1; pj < numPolygons; ++pj) {
@@ -535,7 +543,7 @@ selfIntersectsImpl(const PolyhedralSurface &s, const SurfaceGraph &graph)
         // - neighbors can have a line as intersection
         // - non neighbors can only have a point or a set of points
         using Iterator = SurfaceGraph::FaceGraph::adjacency_iterator;
-        std::pair<Iterator, Iterator> neighbors =
+        std::pair<Iterator, Iterator> const neighbors =
             boost::adjacent_vertices(pi, graph.faceGraph());
 
         if (neighbors.second !=
@@ -576,7 +584,7 @@ auto
 selfIntersectsImpl(const TriangulatedSurface &tin, const SurfaceGraph &graph)
     -> bool
 {
-  size_t numTriangles = tin.numTriangles();
+  size_t const numTriangles = tin.numTriangles();
 
   for (size_t ti = 0; ti != numTriangles; ++ti) {
     for (size_t tj = ti + 1; tj < numTriangles; ++tj) {
@@ -589,7 +597,7 @@ selfIntersectsImpl(const TriangulatedSurface &tin, const SurfaceGraph &graph)
         // - neighbors can have a line as intersection
         // - non neighbors can only have a point or a set of points
         using Iterator = SurfaceGraph::FaceGraph::adjacency_iterator;
-        std::pair<Iterator, Iterator> neighbors =
+        std::pair<Iterator, Iterator> const neighbors =
             boost::adjacent_vertices(ti, graph.faceGraph());
 
         if (neighbors.second !=
@@ -625,5 +633,4 @@ selfIntersects3D(const TriangulatedSurface &tin, const SurfaceGraph &g) -> bool
   return selfIntersectsImpl<3>(tin, g);
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

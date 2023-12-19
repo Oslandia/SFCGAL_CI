@@ -143,13 +143,13 @@ auto
 Envelope::overlaps(const Envelope &a, const Envelope &b) -> bool
 {
   if (a.is3D()) {
-    CGAL::Bbox_3 abox = a.toBbox_3();
-    CGAL::Bbox_3 bbox = b.toBbox_3();
+    CGAL::Bbox_3 const abox = a.toBbox_3();
+    CGAL::Bbox_3 const bbox = b.toBbox_3();
     return CGAL::do_overlap(abox, bbox);
   }
 
-  CGAL::Bbox_2 abox = a.toBbox_2();
-  CGAL::Bbox_2 bbox = b.toBbox_2();
+  CGAL::Bbox_2 const abox = a.toBbox_2();
+  CGAL::Bbox_2 const bbox = b.toBbox_2();
   return CGAL::do_overlap(abox, bbox);
 }
 
@@ -195,15 +195,15 @@ Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
     return shell;
   }
 
-  Point a(xMin(), yMin(), zMin());
-  Point b(xMax(), yMin(), zMin());
-  Point c(xMax(), yMax(), zMin());
-  Point d(xMin(), yMax(), zMin());
+  Point const a(xMin(), yMin(), zMin());
+  Point const b(xMax(), yMin(), zMin());
+  Point const c(xMax(), yMax(), zMin());
+  Point const d(xMin(), yMax(), zMin());
 
-  Point e(xMin(), yMin(), zMax());
-  Point f(xMax(), yMin(), zMax());
-  Point g(xMax(), yMax(), zMax());
-  Point h(xMin(), yMax(), zMax());
+  Point const e(xMin(), yMin(), zMax());
+  Point const f(xMax(), yMin(), zMax());
+  Point const g(xMax(), yMax(), zMax());
+  Point const h(xMin(), yMax(), zMax());
 
   // bottom : a,d,c,b
   {

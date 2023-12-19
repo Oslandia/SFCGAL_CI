@@ -28,8 +28,7 @@
 
 #include <utility>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 //-- private interface
 
@@ -81,8 +80,8 @@ extrude(const Point &g, const Kernel::Vector_3 &v) -> LineString *
     return new LineString();
   }
 
-  Kernel::Point_3 a = g.toPoint_3();
-  Kernel::Point_3 b = a + v;
+  Kernel::Point_3 const a = g.toPoint_3();
+  Kernel::Point_3 const b = a + v;
 
   return new LineString(Point(a), Point(b));
 }
@@ -103,8 +102,8 @@ extrude(const LineString &g, const Kernel::Vector_3 &v) -> PolyhedralSurface *
   for (size_t i = 0; i < g.numPoints() - 1; i++) {
     std::unique_ptr<LineString> ring(new LineString);
 
-    Kernel::Point_3 a = g.pointN(i).toPoint_3();
-    Kernel::Point_3 b = g.pointN(i + 1).toPoint_3();
+    Kernel::Point_3 const a = g.pointN(i).toPoint_3();
+    Kernel::Point_3 const b = g.pointN(i + 1).toPoint_3();
     ring->addPoint(new Point(a));
     ring->addPoint(new Point(b));
     ring->addPoint(new Point(b + v));
@@ -127,7 +126,7 @@ extrude(const Polygon &g, const Kernel::Vector_3 &v, bool addTop) -> Solid *
     return new Solid();
   }
 
-  bool reverseOrientation = (v * normal3D<Kernel>(g)) > 0;
+  bool const reverseOrientation = (v * normal3D<Kernel>(g)) > 0;
 
   // resulting shell
   PolyhedralSurface polyhedralSurface;
@@ -365,18 +364,18 @@ extrude(const Geometry &g, const Kernel::Vector_3 &v)
 ///
 auto
 extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
-        const Kernel::FT &dz, NoValidityCheck) -> std::unique_ptr<Geometry>
+        const Kernel::FT &dz, NoValidityCheck /*unused*/)
+    -> std::unique_ptr<Geometry>
 {
   return extrude(g, Kernel::Vector_3(dx, dy, dz));
 }
 
 auto
-extrude(const Geometry &g, Kernel::FT dx, Kernel::FT dy, Kernel::FT dz)
-    -> std::unique_ptr<Geometry>
+extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
+        const Kernel::FT &dz) -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY(g);
-  std::unique_ptr<Geometry> result(extrude(g, std::move(dx), std::move(dy),
-                                           std::move(dz), NoValidityCheck()));
+  std::unique_ptr<Geometry> result(extrude(g, dx, dy, dz, NoValidityCheck()));
   propagateValidityFlag(*result, true);
   return result;
 }
@@ -405,5 +404,4 @@ extrude(const Polygon &g, const double &height) -> std::unique_ptr<Geometry>
   return std::unique_ptr<Geometry>(
       extrude(g, Kernel::Vector_3(0.0, 0.0, height), false));
 }
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

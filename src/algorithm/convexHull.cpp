@@ -23,8 +23,7 @@
 #include <CGAL/point_generators_3.h>
 #include <vector>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 using Point_3      = CGAL::Point_3<Kernel>;
 using Segment_3    = CGAL::Segment_3<Kernel>;
@@ -50,12 +49,13 @@ convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
 
   // collect points
 
-  if (getPointVisitor.points.size() == 0) {
+  if (getPointVisitor.points.empty()) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
   }
 
   std::vector<Point_2> points;
 
+  points.reserve(getPointVisitor.points.size());
   for (auto &point : getPointVisitor.points) {
     points.push_back(point->toPoint_2());
   }
@@ -67,33 +67,33 @@ convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
 
   if (epoints.size() == 1) {
     return std::unique_ptr<Geometry>(new Point(*epoints.begin()));
-  } else if (epoints.size() == 2) {
-    std::list<Point_2>::const_iterator it = epoints.begin();
+  }
+  if (epoints.size() == 2) {
+    auto it = epoints.begin();
     return std::unique_ptr<Geometry>(
         new LineString(Point(*it++), Point(*it++)));
   }
   // GEOS does not seem to return triangles
-  else if (epoints.size() == 3) {
-    std::list<Point_2>::const_iterator it = epoints.begin();
-    Point_2                            p(*it++);
-    Point_2                            q(*it++);
-    Point_2                            r(*it++);
+  if (epoints.size() == 3) {
+    auto          it = epoints.begin();
+    Point_2 const p(*it++);
+    Point_2 const q(*it++);
+    Point_2 const r(*it++);
     return std::unique_ptr<Geometry>(new Triangle(p, q, r));
-  } else if (epoints.size() > 3) {
+  }
+  if (epoints.size() > 3) {
     auto *poly = new Polygon;
 
-    for (std::list<Point_2>::const_iterator it = epoints.begin();
-         it != epoints.end(); ++it) {
-      poly->exteriorRing().addPoint(*it);
+    for (auto &epoint : epoints) {
+      poly->exteriorRing().addPoint(epoint);
     }
 
     // add back the first point to close the ring
     poly->exteriorRing().addPoint(*epoints.begin());
     return std::unique_ptr<Geometry>(poly);
-  } else {
-    BOOST_THROW_EXCEPTION(
-        Exception("unexpected CGAL output type in CGAL::convex_hull_2"));
   }
+  BOOST_THROW_EXCEPTION(
+      Exception("unexpected CGAL output type in CGAL::convex_hull_2"));
 }
 
 ///
@@ -111,6 +111,7 @@ convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
 
   std::vector<Point_3> points;
 
+  points.reserve(getPointVisitor.points.size());
   for (auto &point : getPointVisitor.points) {
     points.push_back(point->toPoint_3());
   }
@@ -126,16 +127,20 @@ convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
 
   if (hull.empty()) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
-  } else if (const auto *point = object_cast<Point_3>(&hull)) {
+  }
+  if (const auto *point = object_cast<Point_3>(&hull)) {
     return std::unique_ptr<Geometry>(new Point(*point));
-  } else if (const auto *segment = object_cast<Segment_3>(&hull)) {
+  }
+  if (const auto *segment = object_cast<Segment_3>(&hull)) {
     return std::unique_ptr<Geometry>(
         new LineString(Point(segment->start()), Point(segment->end())));
-  } else if (const auto *triangle = object_cast<Triangle_3>(&hull)) {
+  }
+  if (const auto *triangle = object_cast<Triangle_3>(&hull)) {
     return std::unique_ptr<Geometry>(new Triangle(Point(triangle->vertex(0)),
                                                   Point(triangle->vertex(1)),
                                                   Point(triangle->vertex(2))));
-  } else if (const auto *polyhedron = object_cast<Polyhedron_3>(&hull)) {
+  }
+  if (const auto *polyhedron = object_cast<Polyhedron_3>(&hull)) {
     std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface());
 
     for (Polyhedron_3::Facet_const_iterator it_facet =
@@ -156,11 +161,9 @@ convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
     }
 
     return std::unique_ptr<Geometry>(result.release());
-  } else {
-    BOOST_THROW_EXCEPTION(
-        Exception("unexpected CGAL output type in CGAL::convex_hull_3"));
   }
+  BOOST_THROW_EXCEPTION(
+      Exception("unexpected CGAL output type in CGAL::convex_hull_3"));
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

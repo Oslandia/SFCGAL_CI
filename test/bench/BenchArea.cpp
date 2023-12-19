@@ -15,23 +15,23 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 #include <fstream>
 
-
-#include <SFCGAL/Point.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/Solid.h>
 #include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/MultiPoint.h>
+#include <SFCGAL/LineString.h>
 #include <SFCGAL/MultiLineString.h>
+#include <SFCGAL/MultiPoint.h>
 #include <SFCGAL/MultiPolygon.h>
 #include <SFCGAL/MultiSolid.h>
+#include <SFCGAL/Point.h>
+#include <SFCGAL/Polygon.h>
+#include <SFCGAL/PolyhedralSurface.h>
+#include <SFCGAL/Solid.h>
+#include <SFCGAL/Triangle.h>
+#include <SFCGAL/TriangulatedSurface.h>
 
 #include "../test_config.h"
 #include "Bench.h"
@@ -42,41 +42,35 @@
 
 #include <SFCGAL/algorithm/area.h>
 
-using namespace boost::unit_test ;
-using namespace SFCGAL ;
+using namespace boost::unit_test;
+using namespace SFCGAL;
 
-BOOST_AUTO_TEST_SUITE( SFCGAL_BenchArea )
+BOOST_AUTO_TEST_SUITE(SFCGAL_BenchArea)
 
-
-BOOST_AUTO_TEST_CASE( testAreaSierpinski )
+BOOST_AUTO_TEST_CASE(testAreaSierpinski)
 {
-    std::unique_ptr< MultiPolygon > fractal( generator::sierpinski( 9 ) ) ;
+  std::unique_ptr<MultiPolygon> fractal(generator::sierpinski(9));
 
-    bench().start( "area sierpinski" ) ;
+  bench().start("area sierpinski");
 
-    for ( int i = 0; i < 10; i++ ) {
-        algorithm::area( *fractal ) ;
-    }
+  for (int i = 0; i < 10; i++) {
+    algorithm::area(*fractal);
+  }
 
-    bench().stop();
+  bench().stop();
 }
 
-BOOST_AUTO_TEST_CASE( testAreaSierpinski3D )
+BOOST_AUTO_TEST_CASE(testAreaSierpinski3D)
 {
-    std::unique_ptr< MultiPolygon > fractal( generator::sierpinski( 9 ) ) ;
+  std::unique_ptr<MultiPolygon> fractal(generator::sierpinski(9));
 
-    bench().start( "area sierpinski" ) ;
+  bench().start("area sierpinski");
 
-    for ( int i = 0; i < 10; i++ ) {
-        algorithm::area3D( *fractal ) ;
-    }
+  for (int i = 0; i < 10; i++) {
+    algorithm::area3D(*fractal);
+  }
 
-    bench().stop() ;
+  bench().stop();
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
-
-
-
-
