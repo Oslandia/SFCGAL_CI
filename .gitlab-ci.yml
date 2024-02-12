@@ -27,4 +27,5 @@ stages:
 include:
   - local: /.gitlab/pipeline/sonar.yml
   - local: /.gitlab/pipeline/lint-code.yml
+  - local: /.gitlab/pipeline/clang-tidy.yml
   - local: /.gitlab/pipeline/test-code.yml

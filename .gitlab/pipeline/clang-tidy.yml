@@ -1,0 +1,27 @@
+######################
+# clang-tidy checker #
+######################
+clang-tidy:
+  stage: build
+  image: debian:bullseye
+  before_script:
+    - apt update -qq
+    - apt install -y --no-install-recommends git wget clang clang-tidy
+    - ./ci/debian/before_install.sh 5.6
+    # clang-tidy use compile_commands.json to have the corred include directories
+    - mkdir build
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+  script:
+    # run clang-tidy on the modified files only
+    - git fetch --depth 1 origin $CI_MERGE_REQUEST_DIFF_BASE_SHA
+    - CHANGED_FILES=$(git diff-tree --name-only -r $CI_MERGE_REQUEST_DIFF_BASE_SHA $CI_COMMIT_SHA '***.cpp' '***.hpp' '***.c' '***.h')
+    - echo $CHANGED_FILES
+    - clang-tidy -p build --use-color --export-fixes=errors.yml $CHANGED_FILES
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "src/**/*.{c,h,cpp,hpp}"
+        - ".clang-tidy"
+  artifacts:
+    paths:
+      - errors.yml
