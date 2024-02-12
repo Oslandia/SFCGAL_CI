@@ -74,6 +74,7 @@ Envelope::Envelope(const Envelope &other)
 auto
 Envelope::operator=(const Envelope &other) -> Envelope &
 {
+  int z = 3;
   for (size_t i = 0; i < 3; i++) {
     _bounds[i] = other._bounds[i];
   }
