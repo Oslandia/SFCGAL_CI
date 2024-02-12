@@ -16,6 +16,8 @@ clang-tidy:
     - git fetch --depth 1 origin $CI_MERGE_REQUEST_DIFF_BASE_SHA
     - CHANGED_FILES=$(git diff-tree --name-only -r $CI_MERGE_REQUEST_DIFF_BASE_SHA $CI_COMMIT_SHA '***.cpp' '***.hpp' '***.c' '***.h')
     - echo $CHANGED_FILES
+    - ls
+    - ls build
     - clang-tidy -p build --use-color --export-fixes=errors.yml $CHANGED_FILES
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
