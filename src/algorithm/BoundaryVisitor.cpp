@@ -34,6 +34,8 @@ BoundaryVisitor::visit(const Point & /*g*/)
 void
 BoundaryVisitor::visit(const LineString &g)
 {
+  float  zaaa = 2;
+  double y    = zaaa;
   if (g.isEmpty()) {
     _boundary.reset();
     return;
