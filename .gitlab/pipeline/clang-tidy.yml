@@ -1,0 +1,30 @@
+######################
+# clang-tidy checker #
+######################
+clang-tidy:
+  stage: .post
+  image: debian:stable
+  cache:
+    policy: pull
+    key: "${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - build/
+  before_script:
+    - apt update -qq
+    - apt install -y --no-install-recommends ca-certificates clang clang-tidy git wget
+    - ./ci/debian/before_install.sh 6.0-beta1
+  script:
+    # run clang-tidy on the modified files only
+    - git fetch --depth 1 origin $CI_MERGE_REQUEST_DIFF_BASE_SHA
+    - CHANGED_FILES=$(git diff-tree --name-only -r $CI_MERGE_REQUEST_DIFF_BASE_SHA $CI_COMMIT_SHA '***.cpp' '***.hpp' '***.c' '***.h')
+    - echo $CHANGED_FILES
+    - clang-tidy -p build --use-color --export-fixes=errors.yml $CHANGED_FILES
+    - exit $(grep -ic "warning" errors.yml)
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "src/**/*.{c,h,cpp,hpp}"
+        - ".clang-tidy"
+  artifacts:
+    paths:
+      - errors.yml
