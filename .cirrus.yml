@@ -19,15 +19,15 @@ task:
     cpu: 8
     memory: 24g
   matrix:
-    - name: 14-CURRENT
+    - name: 15.0-CURRENT
       freebsd_instance:
-        image_family: freebsd-14-0-snap
+        image_family: freebsd-15-0-snap
+    - name: 14.0-RELEASE
+      freebsd_instance:
+        image_family: freebsd-14-0
     - name: 13.2-RELEASE
       freebsd_instance:
         image_family: freebsd-13-2
-    - name: 12.4-RELEASE
-      freebsd_instance:
-        image_family: freebsd-12-4
 
 task:
   name: macOS
