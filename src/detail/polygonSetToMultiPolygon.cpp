@@ -2,7 +2,7 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/detail/polygonSetToMultiPolygon.h>
+#include "SFCGAL/detail/polygonSetToMultiPolygon.h"
 
 #include <CGAL/Polygon_with_holes_2.h>
 

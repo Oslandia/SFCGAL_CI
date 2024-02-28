@@ -5,10 +5,10 @@
 #ifndef SFCGAL_COLLECT_ALGORITHM
 #define SFCGAL_COLLECT_ALGORITHM
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/GeometryCollection.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/GeometryCollection.h"
 
 namespace SFCGAL {
 namespace algorithm {

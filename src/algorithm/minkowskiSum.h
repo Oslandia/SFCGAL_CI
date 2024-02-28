@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_ALGORITHM_MINKOWSKISUM_H_
 #define _SFCGAL_ALGORITHM_MINKOWSKISUM_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 #include <memory>
 
 namespace SFCGAL {

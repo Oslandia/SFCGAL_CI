@@ -5,16 +5,16 @@
 #ifndef _SFCGAL_COORDINATE_H_
 #define _SFCGAL_COORDINATE_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <boost/array.hpp>
 #include <boost/assert.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/variant.hpp>
 
-#include <SFCGAL/numeric.h>
+#include "SFCGAL/numeric.h"
 
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Kernel.h"
 
 namespace SFCGAL {
 

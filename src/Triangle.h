@@ -9,9 +9,9 @@
 
 #include <boost/serialization/base_object.hpp>
 
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Surface.h>
-#include <SFCGAL/detail/TypeForDimension.h>
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Surface.h"
+#include "SFCGAL/detail/TypeForDimension.h"
 
 #include <CGAL/Triangle_2.h>
 #include <CGAL/Triangle_3.h>

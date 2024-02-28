@@ -1,15 +1,15 @@
 // Copyright (c) 2022-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/partition_2.h>
+#include "SFCGAL/algorithm/partition_2.h"
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/Polygon.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Polygon.h"
 
-#include <SFCGAL/detail/GetPointsVisitor.h>
+#include "SFCGAL/detail/GetPointsVisitor.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Kernel.h"
 #include <boost/format.hpp>
 
 #include <CGAL/algorithm.h>

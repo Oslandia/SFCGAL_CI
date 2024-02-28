@@ -5,11 +5,11 @@
 #ifndef _SFCGAL_ALGORITHM_DIFFERENCEPRIMITIVES_H_
 #define _SFCGAL_ALGORITHM_DIFFERENCEPRIMITIVES_H_
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/detail/GeometrySet.h>
-#include <SFCGAL/triangulate/triangulatePolygon.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/detail/GeometrySet.h"
+#include "SFCGAL/triangulate/triangulatePolygon.h"
 
 #include <CGAL/Boolean_set_operations_2.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>

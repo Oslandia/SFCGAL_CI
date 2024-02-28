@@ -5,10 +5,10 @@
 #ifndef _SFCGAL_TRIANGULATE_TRIANGULATE2DZ_H_
 #define _SFCGAL_TRIANGULATE_TRIANGULATE2DZ_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h"
 
 namespace SFCGAL {
 namespace triangulate {

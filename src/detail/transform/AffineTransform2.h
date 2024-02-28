@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_TRANSFORM_AFFINETRANSFORM2_H_
 #define _SFCGAL_TRANSFORM_AFFINETRANSFORM2_H_
 
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/Transform.h>
-#include <SFCGAL/config.h>
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/Transform.h"
+#include "SFCGAL/config.h"
 
 #include <CGAL/Aff_transformation_2.h>
 

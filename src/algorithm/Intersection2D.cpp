@@ -8,11 +8,11 @@
 #include <CGAL/Boolean_set_operations_2.h>
 #include <CGAL/intersections.h>
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/detail/GeometrySet.h>
-#include <SFCGAL/detail/triangulate/triangulateInGeometrySet.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/detail/GeometrySet.h"
+#include "SFCGAL/detail/triangulate/triangulateInGeometrySet.h"
 
 using namespace SFCGAL::detail;
 

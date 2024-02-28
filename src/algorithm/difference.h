@@ -5,7 +5,7 @@
 #ifndef SFCGAL_DIFFERENCE_ALGORITHM
 #define SFCGAL_DIFFERENCE_ALGORITHM
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <memory>
 

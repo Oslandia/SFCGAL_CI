@@ -2,15 +2,15 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/collectionExtract.h>
+#include "SFCGAL/algorithm/collectionExtract.h"
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPoint.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/MultiSolid.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
 
-#include <SFCGAL/detail/transform/ForceZ.h>
+#include "SFCGAL/detail/transform/ForceZ.h"
 
 namespace SFCGAL::algorithm {
 

@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include <SFCGAL/detail/tools/CharArrayBuffer.h>
+#include "SFCGAL/detail/tools/CharArrayBuffer.h"
 
 #include <cstring>
 

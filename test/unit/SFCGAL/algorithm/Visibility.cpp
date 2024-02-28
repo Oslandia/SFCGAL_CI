@@ -20,12 +20,12 @@
  */
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/algorithm/covers.h>
-#include <SFCGAL/algorithm/visibility.h>
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/algorithm/covers.h"
+#include "SFCGAL/algorithm/visibility.h"
 
-#include <SFCGAL/io/wkt.h>
+#include "SFCGAL/io/wkt.h"
 using namespace SFCGAL;
 
 #include "../../../test_config.h"

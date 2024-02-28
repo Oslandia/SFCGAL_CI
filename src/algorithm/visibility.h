@@ -4,7 +4,7 @@
 #ifndef _SFCGAL_ALGORITHM_VISIBILITY2D_H_
 #define _SFCGAL_ALGORITHM_VISIBILITY2D_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <memory>
 

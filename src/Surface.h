@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_SURFACE_H_
 #define _SFCGAL_SURFACE_H_
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 
 namespace SFCGAL {
 

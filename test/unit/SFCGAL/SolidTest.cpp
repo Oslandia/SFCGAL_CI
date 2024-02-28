@@ -18,11 +18,11 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Kernel.h"
 
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/io/wkt.h>
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/io/wkt.h"
 
 #include <boost/test/unit_test.hpp>
 using namespace boost::unit_test;

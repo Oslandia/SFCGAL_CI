@@ -20,8 +20,8 @@
  */
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/Coordinate.h>
-#include <SFCGAL/Exception.h>
+#include "SFCGAL/Coordinate.h"
+#include "SFCGAL/Exception.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

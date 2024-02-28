@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_GRAPH_VERTEX_H_
 #define _SFCGAL_GRAPH_VERTEX_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Coordinate.h>
+#include "SFCGAL/Coordinate.h"
 
 namespace SFCGAL {
 namespace graph {

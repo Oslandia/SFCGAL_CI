@@ -2,10 +2,10 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/detail/generator/hoch.h>
+#include "SFCGAL/detail/generator/hoch.h"
 
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Polygon.h>
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Polygon.h"
 
 namespace SFCGAL::generator {
 

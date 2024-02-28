@@ -23,13 +23,13 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/io/wkt.h>
-#include <SFCGAL/detail/generator/building.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/io/wkt.h"
+#include "SFCGAL/detail/generator/building.h"
 
 // optional osg support for outputs
-#include <SFCGAL/io/osg.h>
+#include "SFCGAL/io/osg.h"
 
 using namespace SFCGAL ;
 

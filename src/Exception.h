@@ -5,7 +5,7 @@
 #ifndef _IGN_EXCEPTION_H_
 #define _IGN_EXCEPTION_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <string>
 

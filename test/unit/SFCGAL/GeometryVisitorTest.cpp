@@ -20,22 +20,22 @@
  */
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPoint.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/MultiSolid.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
 #include <cmath>
 
-#include <SFCGAL/GeometryVisitor.h>
+#include "SFCGAL/GeometryVisitor.h"
 
 using namespace SFCGAL;
 

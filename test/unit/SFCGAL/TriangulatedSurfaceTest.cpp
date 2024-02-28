@@ -18,13 +18,13 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/io/wkt.h>
-#include <SFCGAL/triangulate/triangulatePolygon.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/io/wkt.h"
+#include "SFCGAL/triangulate/triangulatePolygon.h"
 
 #include <boost/test/unit_test.hpp>
 using namespace boost::unit_test;

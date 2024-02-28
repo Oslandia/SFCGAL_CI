@@ -20,11 +20,11 @@
  */
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/io/wkt.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/io/wkt.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

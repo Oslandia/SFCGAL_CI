@@ -8,9 +8,9 @@
 #include <complex>
 #include <set>
 
-#include <SFCGAL/detail/ComplexComparator.h>
+#include "SFCGAL/detail/ComplexComparator.h"
 
-#include <SFCGAL/detail/graph/GeometryGraph.h>
+#include "SFCGAL/detail/graph/GeometryGraph.h"
 
 #include <boost/graph/connected_components.hpp>
 #include <boost/graph/copy.hpp>

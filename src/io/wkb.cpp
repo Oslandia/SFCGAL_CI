@@ -2,12 +2,12 @@
 // Copyright (c) 2012-2023, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/io/wkb.h>
+#include "SFCGAL/io/wkb.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/detail/io/WkbReader.h>
-#include <SFCGAL/detail/io/WkbWriter.h>
-#include <SFCGAL/detail/tools/CharArrayBuffer.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/detail/io/WkbReader.h"
+#include "SFCGAL/detail/io/WkbWriter.h"
+#include "SFCGAL/detail/tools/CharArrayBuffer.h"
 
 using namespace SFCGAL::detail::io;
 

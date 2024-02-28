@@ -13,9 +13,9 @@
 
 #include <CGAL/Polygon_with_holes_2.h>
 
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Surface.h>
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Surface.h"
 
 namespace SFCGAL {
 

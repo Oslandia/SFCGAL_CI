@@ -15,9 +15,9 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Triangle.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Triangle.h"
 
 namespace SFCGAL {
 

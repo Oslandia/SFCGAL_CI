@@ -2,25 +2,25 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/distance.h>
-#include <SFCGAL/algorithm/straightSkeleton.h>
+#include "SFCGAL/algorithm/straightSkeleton.h"
+#include "SFCGAL/algorithm/distance.h"
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
 
-#include <SFCGAL/Exception.h>
+#include "SFCGAL/Exception.h"
 
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/orientation.h>
-#include <SFCGAL/algorithm/tesselate.h>
-#include <SFCGAL/algorithm/translate.h>
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/orientation.h"
+#include "SFCGAL/algorithm/tesselate.h"
+#include "SFCGAL/algorithm/translate.h"
 
 #include <CGAL/Straight_skeleton_converter_2.h>
 #include <CGAL/Surface_mesh.h>

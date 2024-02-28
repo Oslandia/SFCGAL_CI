@@ -2,22 +2,22 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 #ifdef SFCGAL_WITH_OSG
 
-#include <SFCGAL/detail/io/OsgFactory.h>
+#include "SFCGAL/detail/io/OsgFactory.h"
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/triangulate/triangulatePolygon.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/triangulate/triangulatePolygon.h"
 
 namespace SFCGAL {
 namespace detail {

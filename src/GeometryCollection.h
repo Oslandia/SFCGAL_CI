@@ -11,7 +11,7 @@
 #include <boost/serialization/base_object.hpp>
 #include <vector>
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 
 namespace SFCGAL {
 

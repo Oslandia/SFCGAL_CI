@@ -2,23 +2,23 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 
-#include <SFCGAL/GeometryVisitor.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/detail/GetPointsVisitor.h>
-#include <SFCGAL/detail/io/WkbWriter.h>
-#include <SFCGAL/detail/io/WktWriter.h>
+#include "SFCGAL/GeometryVisitor.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/detail/GetPointsVisitor.h"
+#include "SFCGAL/detail/io/WkbWriter.h"
+#include "SFCGAL/detail/io/WktWriter.h"
 
-#include <SFCGAL/algorithm/BoundaryVisitor.h>
-#include <SFCGAL/algorithm/distance.h>
-#include <SFCGAL/algorithm/distance3d.h>
+#include "SFCGAL/algorithm/BoundaryVisitor.h"
+#include "SFCGAL/algorithm/distance.h"
+#include "SFCGAL/algorithm/distance3d.h"
 
-#include <SFCGAL/detail/EnvelopeVisitor.h>
+#include "SFCGAL/detail/EnvelopeVisitor.h"
 
-#include <SFCGAL/detail/transform/RoundTransform.h>
+#include "SFCGAL/detail/transform/RoundTransform.h"
 
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Kernel.h"
 
 namespace SFCGAL {
 

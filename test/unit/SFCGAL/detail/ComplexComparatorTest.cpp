@@ -20,8 +20,8 @@
  */
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/detail/ComplexComparator.h>
-#include <SFCGAL/numeric.h>
+#include "SFCGAL/detail/ComplexComparator.h"
+#include "SFCGAL/numeric.h"
 
 using namespace SFCGAL;
 using namespace SFCGAL::detail;

@@ -2,7 +2,7 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/version.h>
+#include "SFCGAL/version.h"
 
 namespace SFCGAL {
 

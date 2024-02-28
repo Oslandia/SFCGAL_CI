@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_REGISTRY_H_
 #define _SFCGAL_REGISTRY_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <map>
 #include <string>

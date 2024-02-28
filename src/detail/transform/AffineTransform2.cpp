@@ -2,9 +2,9 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/detail/transform/AffineTransform2.h>
+#include "SFCGAL/detail/transform/AffineTransform2.h"
 
-#include <SFCGAL/Point.h>
+#include "SFCGAL/Point.h"
 
 #include <utility>
 

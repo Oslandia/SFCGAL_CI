@@ -7,8 +7,8 @@
 
 #include <sstream>
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/config.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 namespace detail {

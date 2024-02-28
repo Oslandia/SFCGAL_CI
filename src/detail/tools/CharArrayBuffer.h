@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_TOOLS_CHARARRAYBUFFER_H_
 #define _SFCGAL_TOOLS_CHARARRAYBUFFER_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <streambuf>
 

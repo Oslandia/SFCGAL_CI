@@ -2,12 +2,12 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h>
+#include "SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
-#include <SFCGAL/detail/triangulate/markDomains.h>
+#include "SFCGAL/detail/triangulate/markDomains.h"
 
 namespace SFCGAL::triangulate {
 

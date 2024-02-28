@@ -11,11 +11,11 @@
 #include <boost/serialization/base_object.hpp>
 #include <vector>
 
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/triangulate/triangulatePolygon.h>
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/triangulate/triangulatePolygon.h"
 
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>

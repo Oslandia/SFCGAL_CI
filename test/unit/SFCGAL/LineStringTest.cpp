@@ -22,10 +22,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiPoint.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiPoint.h"
 
 using namespace SFCGAL;
 using namespace boost::unit_test;

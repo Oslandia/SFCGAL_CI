@@ -5,8 +5,8 @@
 #ifndef _SFCGAL_TRANSFORM_H_
 #define _SFCGAL_TRANSFORM_H_
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/GeometryVisitor.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/GeometryVisitor.h"
 
 namespace SFCGAL {
 

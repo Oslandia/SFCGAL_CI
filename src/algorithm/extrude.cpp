@@ -2,29 +2,29 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/extrude.h>
+#include "SFCGAL/algorithm/extrude.h"
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPoint.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/MultiSolid.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
-#include <SFCGAL/Exception.h>
+#include "SFCGAL/Exception.h"
 
-#include <SFCGAL/algorithm/force3D.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/normal.h>
-#include <SFCGAL/algorithm/translate.h>
+#include "SFCGAL/algorithm/force3D.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/normal.h"
+#include "SFCGAL/algorithm/translate.h"
 
-#include <SFCGAL/detail/tools/Log.h>
+#include "SFCGAL/detail/tools/Log.h"
 
 #include <utility>
 

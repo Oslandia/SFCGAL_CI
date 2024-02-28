@@ -23,21 +23,21 @@
 #include <cmath>
 #include <fstream>
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPoint.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/MultiSolid.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/algorithm/covers.h>
-#include <SFCGAL/io/wkt.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/algorithm/covers.h"
+#include "SFCGAL/io/wkt.h"
 
 #include "../../../test_config.h"
 

@@ -2,10 +2,10 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/detail/generator/sierpinski.h>
+#include "SFCGAL/detail/generator/sierpinski.h"
 
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/Triangle.h>
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/Triangle.h"
 
 namespace SFCGAL::generator {
 

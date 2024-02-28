@@ -4,9 +4,9 @@
 #ifndef SFCGAL_ALGORITHM_PARTITION_2_H_
 #define SFCGAL_ALGORITHM_PARTITION_2_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 
 namespace SFCGAL {
 namespace algorithm {

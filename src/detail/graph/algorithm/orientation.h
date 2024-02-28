@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_GRAPH_ALGORITHM_MAKECONSISTENTORIENTATION_H_
 #define _SFCGAL_GRAPH_ALGORITHM_MAKECONSISTENTORIENTATION_H_
 
-#include <SFCGAL/detail/graph/GeometryGraph.h>
+#include "SFCGAL/detail/graph/GeometryGraph.h"
 #include <map>
 
 namespace SFCGAL {

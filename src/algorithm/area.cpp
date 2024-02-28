@@ -2,19 +2,19 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/area.h>
+#include "SFCGAL/algorithm/area.h"
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/plane.h>
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/plane.h"
 
 #include <CGAL/Point_2.h>
 #include <CGAL/Polygon_2.h>
@@ -24,7 +24,7 @@
 #include <CGAL/Point_3.h>
 #include <CGAL/Triangle_3.h>
 
-#include <SFCGAL/Exception.h>
+#include "SFCGAL/Exception.h"
 #include <boost/format.hpp>
 
 namespace SFCGAL::algorithm {

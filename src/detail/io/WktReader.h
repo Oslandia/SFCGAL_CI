@@ -7,12 +7,12 @@
 
 #include <sstream>
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/PreparedGeometry.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/PreparedGeometry.h"
 
-#include <SFCGAL/detail/tools/InputStreamReader.h>
+#include "SFCGAL/detail/tools/InputStreamReader.h"
 
 namespace SFCGAL {
 namespace detail {

@@ -6,11 +6,11 @@
 #define _USE_MATH_DEFINES
 #endif
 
-#include <SFCGAL/detail/generator/disc.h>
+#include "SFCGAL/detail/generator/disc.h"
 
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
 
 #include <cmath>
 #include <cstddef>

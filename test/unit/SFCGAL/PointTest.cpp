@@ -18,12 +18,12 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Kernel.h"
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/Point.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Point.h"
 
 #include <boost/test/unit_test.hpp>
 using namespace boost::unit_test;

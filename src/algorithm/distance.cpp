@@ -2,27 +2,27 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/distance.h>
+#include "SFCGAL/algorithm/distance.h"
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/algorithm/isValid.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/algorithm/isValid.h"
 
 #include <CGAL/Polygon_2_algorithms.h>
 #include <CGAL/Polygon_with_holes_2.h>
 
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/detail/GetPointsVisitor.h>
-#include <SFCGAL/detail/transform/AffineTransform3.h>
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/detail/GetPointsVisitor.h"
+#include "SFCGAL/detail/transform/AffineTransform3.h"
 
 using Point_2   = SFCGAL::Kernel::Point_2;
 using Vector_2  = SFCGAL::Kernel::Vector_2;

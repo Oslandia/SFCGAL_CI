@@ -5,8 +5,8 @@
 #ifndef _SFCGAL_ALGORITHM_AREA_H_
 #define _SFCGAL_ALGORITHM_AREA_H_
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
 
 namespace SFCGAL {
 namespace algorithm {

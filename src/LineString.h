@@ -12,7 +12,7 @@
 #include <boost/ptr_container/serialize_ptr_vector.hpp>
 #include <boost/serialization/base_object.hpp>
 
-#include <SFCGAL/Point.h>
+#include "SFCGAL/Point.h"
 
 #include <CGAL/Polygon_2.h>
 

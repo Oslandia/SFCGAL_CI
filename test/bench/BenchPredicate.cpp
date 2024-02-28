@@ -23,9 +23,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/detail/GetPointsVisitor.h>
-#include <SFCGAL/detail/generator/sierpinski.h>
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/detail/GetPointsVisitor.h"
+#include "SFCGAL/detail/generator/sierpinski.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_PREPARED_GEOMETRY_H_
 #define _SFCGAL_PREPARED_GEOMETRY_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Envelope.h>
+#include "SFCGAL/Envelope.h"
 
 #include <boost/endian/conversion.hpp>
 #include <boost/noncopyable.hpp>

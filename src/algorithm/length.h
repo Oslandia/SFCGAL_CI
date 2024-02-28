@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_ALGORITHM_LENGTH_H_
 #define _SFCGAL_ALGORITHM_LENGTH_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 class Geometry;

@@ -22,8 +22,8 @@
 
 #include <exception>
 
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiPoint.h>
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiPoint.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

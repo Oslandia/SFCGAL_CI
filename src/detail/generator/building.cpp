@@ -2,15 +2,15 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/detail/generator/building.h>
+#include "SFCGAL/detail/generator/building.h"
 
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/MultiSolid.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
 
-#include <SFCGAL/algorithm/force3D.h>
-#include <SFCGAL/algorithm/orientation.h>
+#include "SFCGAL/algorithm/force3D.h"
+#include "SFCGAL/algorithm/orientation.h"
 
 #include <CGAL/create_straight_skeleton_from_polygon_with_holes_2.h>
 

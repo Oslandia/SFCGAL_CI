@@ -7,8 +7,8 @@
 
 #include <boost/optional.hpp>
 
-#include <SFCGAL/Coordinate.h>
-#include <SFCGAL/config.h>
+#include "SFCGAL/Coordinate.h"
+#include "SFCGAL/config.h"
 
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
 #include <CGAL/Triangulation_face_base_with_info_2.h>

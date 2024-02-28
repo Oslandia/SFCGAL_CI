@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_ALGORITHM_FORCE3D_H_
 #define _SFCGAL_ALGORITHM_FORCE3D_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Kernel.h"
 
 namespace SFCGAL {
 class Geometry;

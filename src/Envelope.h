@@ -11,10 +11,10 @@
 #include <CGAL/Bbox_2.h>
 #include <CGAL/Bbox_3.h>
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Coordinate.h>
-#include <SFCGAL/detail/Interval.h>
+#include "SFCGAL/Coordinate.h"
+#include "SFCGAL/detail/Interval.h"
 
 namespace SFCGAL {
 

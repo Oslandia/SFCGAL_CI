@@ -21,9 +21,9 @@
 #ifndef SFCGAL_ALGORITHM_ALPHASHAPES_H_
 #define SFCGAL_ALGORITHM_ALPHASHAPES_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 
 namespace SFCGAL {
 namespace algorithm {

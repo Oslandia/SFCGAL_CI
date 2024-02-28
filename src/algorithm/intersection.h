@@ -5,7 +5,7 @@
 #ifndef SFCGAL_INTERSECTION_ALGORITHM
 #define SFCGAL_INTERSECTION_ALGORITHM
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <memory>
 

@@ -2,15 +2,15 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/triangulate/triangulate2DZ.h>
+#include "SFCGAL/triangulate/triangulate2DZ.h"
 
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/Triangle.h>
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/Triangle.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/algorithm/isValid.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/algorithm/isValid.h"
 
 namespace SFCGAL::triangulate {
 

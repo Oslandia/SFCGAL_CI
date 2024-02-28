@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_GEOMETRY_H_
 #define _SFCGAL_GEOMETRY_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <boost/endian/conversion.hpp>
 #include <boost/shared_ptr.hpp>

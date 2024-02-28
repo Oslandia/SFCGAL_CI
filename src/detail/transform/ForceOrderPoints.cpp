@@ -2,11 +2,11 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/algorithm/orientation.h>
-#include <SFCGAL/detail/transform/ForceOrderPoints.h>
+#include "SFCGAL/detail/transform/ForceOrderPoints.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/algorithm/orientation.h"
 
 namespace SFCGAL::transform {
 

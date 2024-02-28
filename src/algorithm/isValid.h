@@ -5,10 +5,10 @@
 #ifndef _SFCGAL_ALGORITHM_ISVALID_H_
 #define _SFCGAL_ALGORITHM_ISVALID_H_
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/Validity.h>
-#include <SFCGAL/algorithm/force2D.h>
-#include <SFCGAL/algorithm/force3D.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/Validity.h"
+#include "SFCGAL/algorithm/force2D.h"
+#include "SFCGAL/algorithm/force3D.h"
 
 namespace SFCGAL {
 

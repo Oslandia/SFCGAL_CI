@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_DETAIL_ENVELOPEVISITOR_H_
 #define _SFCGAL_DETAIL_ENVELOPEVISITOR_H_
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/GeometryVisitor.h>
-#include <SFCGAL/config.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/GeometryVisitor.h"
+#include "SFCGAL/config.h"
 
 #include <vector>
 

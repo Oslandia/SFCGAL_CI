@@ -2,13 +2,13 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/algorithm/covers.h>
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/detail/GeometrySet.h>
-#include <SFCGAL/detail/TypeForDimension.h>
+#include "SFCGAL/algorithm/covers.h"
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/detail/GeometrySet.h"
+#include "SFCGAL/detail/TypeForDimension.h"
 
 #include <CGAL/box_intersection_d.h>
 

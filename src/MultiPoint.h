@@ -10,8 +10,8 @@
 
 #include <boost/serialization/base_object.hpp>
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/Point.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Point.h"
 
 namespace SFCGAL {
 

@@ -2,11 +2,11 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h>
-#include <SFCGAL/detail/triangulate/triangulateInGeometrySet.h>
-#include <SFCGAL/triangulate/triangulatePolygon.h>
+#include "SFCGAL/detail/triangulate/triangulateInGeometrySet.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h"
+#include "SFCGAL/triangulate/triangulatePolygon.h"
 
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Triangulation_vertex_base_with_info_2.h>

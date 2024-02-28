@@ -2,11 +2,11 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/GeometryVisitor.h>
-#include <SFCGAL/Polygon.h>
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/GeometryVisitor.h"
 
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/algorithm/orientation.h>
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/algorithm/orientation.h"
 
 namespace SFCGAL {
 

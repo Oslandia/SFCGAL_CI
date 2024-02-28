@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include <SFCGAL/detail/tools/Log.h>
+#include "SFCGAL/detail/tools/Log.h"
 
 namespace SFCGAL {
 

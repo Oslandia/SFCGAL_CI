@@ -25,7 +25,7 @@
 #include <boost/test/unit_test.hpp>
 using namespace boost::unit_test;
 
-#include <SFCGAL/detail/tools/Log.h>
+#include "SFCGAL/detail/tools/Log.h"
 
 auto
 init_unit_test_suite(int /*unused*/, char **const /*unused*/) -> test_suite *

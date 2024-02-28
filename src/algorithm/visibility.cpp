@@ -1,11 +1,11 @@
 // Copyright (c) 2023-2023, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/algorithm/visibility.h>
+#include "SFCGAL/algorithm/visibility.h"
+#include "SFCGAL/Polygon.h"
 
-#include <SFCGAL/algorithm/isValid.h>
+#include "SFCGAL/algorithm/isValid.h"
 
-#include <SFCGAL/Exception.h>
+#include "SFCGAL/Exception.h"
 
 #include <CGAL/Arr_segment_traits_2.h>
 #include <CGAL/Arrangement_2.h>

@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_LOG_H_
 #define _SFCGAL_LOG_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <boost/format.hpp>
 #include <string>

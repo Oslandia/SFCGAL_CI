@@ -5,11 +5,11 @@
 #ifndef _SFCGAL_GENERATOR_BUILDING_H_
 #define _SFCGAL_GENERATOR_BUILDING_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <memory>
 
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Kernel.h"
 
 namespace SFCGAL {
 class Geometry;

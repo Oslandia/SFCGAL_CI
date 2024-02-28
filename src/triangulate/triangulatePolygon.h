@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_TRIANGULATE_TRIANGULATEPOLYGON_H_
 #define _SFCGAL_TRIANGULATE_TRIANGULATEPOLYGON_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 
 namespace SFCGAL {
 namespace triangulate {

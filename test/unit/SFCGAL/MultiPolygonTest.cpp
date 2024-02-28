@@ -22,10 +22,10 @@
 
 #include <exception>
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/Polygon.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/Polygon.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

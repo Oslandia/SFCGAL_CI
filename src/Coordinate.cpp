@@ -2,11 +2,11 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Coordinate.h>
+#include "SFCGAL/Coordinate.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/numeric.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/numeric.h"
 
 namespace SFCGAL {
 
