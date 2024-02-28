@@ -21,6 +21,7 @@
 
 #include "SFCGAL/detail/io/Serialization.h"
 #include "SFCGAL/io/ewkt.h"
+#include "SFCGAL/io/vtk.h"
 #include "SFCGAL/io/wkb.h"
 #include "SFCGAL/io/wkt.h"
 
@@ -278,6 +279,13 @@ sfcgal_geometry_as_wkb(const sfcgal_geometry_t *pgeom, char **buffer,
           reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb();
       *buffer = (char *)sfcgal_alloc_handler(wkb.size() + 1); *len = wkb.size();
       strncpy(*buffer, wkb.c_str(), *len);)
+}
+
+extern "C" void
+sfcgal_geometry_as_vtk(const sfcgal_geometry_t *pgeom, char *filename)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      io::vtk(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom), filename);)
 }
 
 /**
