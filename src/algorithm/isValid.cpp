@@ -2,34 +2,34 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/isValid.h>
+#include "SFCGAL/algorithm/isValid.h"
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPoint.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/MultiSolid.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/algorithm/connection.h>
-#include <SFCGAL/algorithm/distance.h>
-#include <SFCGAL/algorithm/distance3d.h>
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/algorithm/length.h>
-#include <SFCGAL/algorithm/normal.h>
-#include <SFCGAL/algorithm/orientation.h>
-#include <SFCGAL/algorithm/plane.h>
-#include <SFCGAL/detail/ForceValidityVisitor.h>
-#include <SFCGAL/detail/GetPointsVisitor.h>
-#include <SFCGAL/detail/algorithm/coversPoints.h>
-#include <SFCGAL/detail/tools/Log.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/algorithm/connection.h"
+#include "SFCGAL/algorithm/distance.h"
+#include "SFCGAL/algorithm/distance3d.h"
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/algorithm/length.h"
+#include "SFCGAL/algorithm/normal.h"
+#include "SFCGAL/algorithm/orientation.h"
+#include "SFCGAL/algorithm/plane.h"
+#include "SFCGAL/detail/ForceValidityVisitor.h"
+#include "SFCGAL/detail/GetPointsVisitor.h"
+#include "SFCGAL/detail/algorithm/coversPoints.h"
+#include "SFCGAL/detail/tools/Log.h"
 
 #include <boost/format.hpp>
 #include <boost/graph/adjacency_list.hpp>

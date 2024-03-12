@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_DETAIL_FORCEVALIDITY_VISITOR_H_
 #define _SFCGAL_DETAIL_FORCEVALIDITY_VISITOR_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/GeometryVisitor.h>
+#include "SFCGAL/GeometryVisitor.h"
 
 namespace SFCGAL {
 namespace detail {

@@ -5,10 +5,10 @@
 #ifndef _SFCGAL_ALGORITHM_BOUNDARYVISITOR_H_
 #define _SFCGAL_ALGORITHM_BOUNDARYVISITOR_H_
 
-#include <SFCGAL/GeometryVisitor.h>
+#include "SFCGAL/GeometryVisitor.h"
 
-#include <SFCGAL/detail/graph/GeometryGraph.h>
-#include <SFCGAL/detail/graph/GeometryGraphBuilder.h>
+#include "SFCGAL/detail/graph/GeometryGraph.h"
+#include "SFCGAL/detail/graph/GeometryGraphBuilder.h"
 
 namespace SFCGAL {
 namespace algorithm {

@@ -5,10 +5,10 @@
 #ifndef _SFCGAL_ALGORITHM_STRAIGHTSKELETON_H_
 #define _SFCGAL_ALGORITHM_STRAIGHTSKELETON_H_
 
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/algorithm/extrude.h>
-#include <SFCGAL/algorithm/union.h>
-#include <SFCGAL/config.h>
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/algorithm/extrude.h"
+#include "SFCGAL/algorithm/union.h"
+#include "SFCGAL/config.h"
 #include <memory>
 
 namespace SFCGAL {

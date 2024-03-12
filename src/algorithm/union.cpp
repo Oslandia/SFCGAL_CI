@@ -2,11 +2,11 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/differencePrimitives.h>
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/union.h>
-#include <SFCGAL/triangulate/triangulate2DZ.h>
+#include "SFCGAL/algorithm/union.h"
+#include "SFCGAL/algorithm/differencePrimitives.h"
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/triangulate/triangulate2DZ.h"
 
 #include <algorithm>
 #include <cstdio>

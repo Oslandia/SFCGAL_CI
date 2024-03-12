@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Point.h>
-#include <SFCGAL/detail/transform/ForceZ.h>
+#include "SFCGAL/detail/transform/ForceZ.h"
+#include "SFCGAL/Point.h"
 
 #include <utility>
 

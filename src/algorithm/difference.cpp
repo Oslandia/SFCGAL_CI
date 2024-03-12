@@ -2,14 +2,14 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/algorithm/difference.h>
-#include <SFCGAL/algorithm/differencePrimitives.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/detail/GeometrySet.h>
-#include <SFCGAL/triangulate/triangulatePolygon.h>
+#include "SFCGAL/algorithm/difference.h"
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/algorithm/differencePrimitives.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/detail/GeometrySet.h"
+#include "SFCGAL/triangulate/triangulatePolygon.h"
 
 #include <CGAL/Boolean_set_operations_2.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>

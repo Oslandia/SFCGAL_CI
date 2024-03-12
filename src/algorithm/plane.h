@@ -7,12 +7,12 @@
 
 #include <boost/format.hpp>
 
-// #include <SFCGAL/detail/ublas.h>
+// #include "SFCGAL/detail/ublas.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/algorithm/normal.h>
-#include <SFCGAL/detail/GetPointsVisitor.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/algorithm/normal.h"
+#include "SFCGAL/detail/GetPointsVisitor.h"
 
 namespace SFCGAL {
 namespace algorithm {

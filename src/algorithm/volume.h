@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_ALGORITHM_VOLUME_H_
 #define _SFCGAL_ALGORITHM_VOLUME_H_
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/export.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/export.h"
 
 namespace SFCGAL {
 namespace algorithm {

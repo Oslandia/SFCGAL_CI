@@ -10,8 +10,8 @@
 #include <iostream>
 #include <vector>
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/config.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/config.h"
 
 using srid_t = uint32_t;
 

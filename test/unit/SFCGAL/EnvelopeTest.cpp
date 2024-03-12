@@ -20,10 +20,10 @@
  */
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/Solid.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/Solid.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

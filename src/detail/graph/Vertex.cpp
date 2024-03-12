@@ -2,7 +2,7 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/detail/graph/Vertex.h>
+#include "SFCGAL/detail/graph/Vertex.h"
 
 namespace SFCGAL::graph {
 

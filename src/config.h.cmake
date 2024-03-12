@@ -22,7 +22,7 @@
 
 #define CGAL_DO_NOT_USE_BOOST_MP 1
 
-#include <SFCGAL/export.h>
+#include "SFCGAL/export.h"
 
 /**
  * indicates if OpenSceneGraph dependency is activated

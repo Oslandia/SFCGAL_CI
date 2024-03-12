@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_IO_EWKT_H_
 #define _SFCGAL_IO_EWKT_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <memory>
 #include <sstream>

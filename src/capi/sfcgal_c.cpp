@@ -2,56 +2,56 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPoint.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/PreparedGeometry.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/version.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/PreparedGeometry.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/version.h"
 
-#include <SFCGAL/capi/sfcgal_c.h>
+#include "SFCGAL/capi/sfcgal_c.h"
 
-#include <SFCGAL/detail/io/Serialization.h>
-#include <SFCGAL/io/ewkt.h>
-#include <SFCGAL/io/wkb.h>
-#include <SFCGAL/io/wkt.h>
+#include "SFCGAL/detail/io/Serialization.h"
+#include "SFCGAL/io/ewkt.h"
+#include "SFCGAL/io/wkb.h"
+#include "SFCGAL/io/wkt.h"
 
 #if !_MSC_VER
-#include <SFCGAL/algorithm/alphaShapes.h>
+#include "SFCGAL/algorithm/alphaShapes.h"
 #endif
-#include <SFCGAL/algorithm/area.h>
-#include <SFCGAL/algorithm/convexHull.h>
-#include <SFCGAL/algorithm/covers.h>
-#include <SFCGAL/algorithm/difference.h>
-#include <SFCGAL/algorithm/distance.h>
-#include <SFCGAL/algorithm/distance3d.h>
-#include <SFCGAL/algorithm/extrude.h>
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/lineSubstring.h>
-#include <SFCGAL/algorithm/minkowskiSum.h>
-#include <SFCGAL/algorithm/offset.h>
-#include <SFCGAL/algorithm/partition_2.h>
-#include <SFCGAL/algorithm/plane.h>
-#include <SFCGAL/algorithm/straightSkeleton.h>
-#include <SFCGAL/algorithm/tesselate.h>
-#include <SFCGAL/algorithm/union.h>
-#include <SFCGAL/algorithm/visibility.h>
-#include <SFCGAL/algorithm/volume.h>
-#include <SFCGAL/triangulate/triangulate2DZ.h>
+#include "SFCGAL/algorithm/area.h"
+#include "SFCGAL/algorithm/convexHull.h"
+#include "SFCGAL/algorithm/covers.h"
+#include "SFCGAL/algorithm/difference.h"
+#include "SFCGAL/algorithm/distance.h"
+#include "SFCGAL/algorithm/distance3d.h"
+#include "SFCGAL/algorithm/extrude.h"
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/lineSubstring.h"
+#include "SFCGAL/algorithm/minkowskiSum.h"
+#include "SFCGAL/algorithm/offset.h"
+#include "SFCGAL/algorithm/partition_2.h"
+#include "SFCGAL/algorithm/plane.h"
+#include "SFCGAL/algorithm/straightSkeleton.h"
+#include "SFCGAL/algorithm/tesselate.h"
+#include "SFCGAL/algorithm/union.h"
+#include "SFCGAL/algorithm/visibility.h"
+#include "SFCGAL/algorithm/volume.h"
+#include "SFCGAL/triangulate/triangulate2DZ.h"
 
-#include <SFCGAL/detail/transform/ForceOrderPoints.h>
-#include <SFCGAL/detail/transform/ForceZOrderPoints.h>
-#include <SFCGAL/detail/transform/RoundTransform.h>
+#include "SFCGAL/detail/transform/ForceOrderPoints.h"
+#include "SFCGAL/detail/transform/ForceZOrderPoints.h"
+#include "SFCGAL/detail/transform/RoundTransform.h"
 #include <cmath>
 
 //

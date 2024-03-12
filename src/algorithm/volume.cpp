@@ -2,11 +2,11 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/tesselate.h>
-#include <SFCGAL/algorithm/volume.h>
+#include "SFCGAL/algorithm/volume.h"
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/tesselate.h"
 
 namespace SFCGAL::algorithm {
 

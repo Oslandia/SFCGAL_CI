@@ -21,7 +21,7 @@
 #ifndef _SFCGAL_VERSION_H_
 #define _SFCGAL_VERSION_H_
 
-#include <SFCGAL/export.h>
+#include "SFCGAL/export.h"
 
 #define SFCGAL_VERSION_MAJOR @SFCGAL_VERSION_MAJOR@
 #define SFCGAL_VERSION_MINOR @SFCGAL_VERSION_MINOR@

@@ -2,7 +2,7 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Triangle.h>
+#include "SFCGAL/Triangle.h"
 // GOTCHA do not include the header, this is a trick to avoid ambiguous def in
 // CGAL
 

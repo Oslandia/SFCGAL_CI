@@ -5,10 +5,10 @@
 #ifndef _SFCGAL_POINT_H_
 #define _SFCGAL_POINT_H_
 
-#include <SFCGAL/Coordinate.h>
+#include "SFCGAL/Coordinate.h"
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/detail/TypeForDimension.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/detail/TypeForDimension.h"
 
 #include <boost/serialization/base_object.hpp>
 

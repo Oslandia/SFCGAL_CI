@@ -2,9 +2,9 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/io/GeometryStreams.h>
+#include "SFCGAL/io/GeometryStreams.h"
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/Geometry.h"
 
 namespace SFCGAL {
 

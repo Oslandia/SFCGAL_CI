@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_TOOLS_INPUTSTREAMREADER_H_
 #define _SFCGAL_TOOLS_INPUTSTREAMREADER_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <cctype>
 #include <sstream>

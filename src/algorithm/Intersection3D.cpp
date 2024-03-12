@@ -8,10 +8,10 @@
 #include <CGAL/Polygon_mesh_processing/connected_components.h>
 #include <CGAL/Polygon_mesh_processing/corefinement.h>
 
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/detail/GeometrySet.h>
-#include <SFCGAL/detail/triangulate/triangulateInGeometrySet.h>
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/detail/GeometrySet.h"
+#include "SFCGAL/detail/triangulate/triangulateInGeometrySet.h"
 
 #include <CGAL/IO/Polyhedron_iostream.h>
 

@@ -6,9 +6,9 @@
 #define _SFCGAL_ALGORITHM_EXTRUDE_H_
 
 // SFCGAL
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/config.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 namespace algorithm {

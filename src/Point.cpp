@@ -2,10 +2,10 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/GeometryVisitor.h>
-#include <SFCGAL/Point.h>
+#include "SFCGAL/Point.h"
+#include "SFCGAL/GeometryVisitor.h"
 
-#include <SFCGAL/Exception.h>
+#include "SFCGAL/Exception.h"
 
 using namespace SFCGAL::detail;
 

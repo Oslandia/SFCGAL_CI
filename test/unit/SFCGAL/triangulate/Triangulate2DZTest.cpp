@@ -20,9 +20,9 @@
  */
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/io/wkt.h>
-#include <SFCGAL/triangulate/triangulate2DZ.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/io/wkt.h"
+#include "SFCGAL/triangulate/triangulate2DZ.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

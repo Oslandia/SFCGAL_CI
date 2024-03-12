@@ -20,9 +20,9 @@
  */
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/detail/transform/AffineTransform2.h>
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/detail/transform/AffineTransform2.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

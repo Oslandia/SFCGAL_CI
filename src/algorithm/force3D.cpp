@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/force3D.h>
-#include <SFCGAL/detail/transform/ForceZ.h>
+#include "SFCGAL/algorithm/force3D.h"
+#include "SFCGAL/detail/transform/ForceZ.h"
 
 namespace SFCGAL::algorithm {
 

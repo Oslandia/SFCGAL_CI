@@ -5,9 +5,9 @@
 #ifndef _SFCGAL_TRANSLATE_H_
 #define _SFCGAL_TRANSLATE_H_
 
-#include <SFCGAL/export.h>
+#include "SFCGAL/export.h"
 
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Kernel.h"
 
 namespace SFCGAL {
 class Geometry;

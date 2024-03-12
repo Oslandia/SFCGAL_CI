@@ -5,11 +5,11 @@
 #ifndef _SFCGAL_SERIALIZATION_
 #define _SFCGAL_SERIALIZATION_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/PreparedGeometry.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/PreparedGeometry.h"
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>

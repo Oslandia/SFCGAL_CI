@@ -5,7 +5,7 @@
 #ifndef SFCGAL_INTERSECTS_ALGORITHM
 #define SFCGAL_INTERSECTS_ALGORITHM
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 class Geometry;

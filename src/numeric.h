@@ -8,9 +8,9 @@
 #include <cmath>
 #include <limits>
 
-#include <SFCGAL/export.h>
+#include "SFCGAL/export.h"
 
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Kernel.h"
 
 namespace SFCGAL {
 

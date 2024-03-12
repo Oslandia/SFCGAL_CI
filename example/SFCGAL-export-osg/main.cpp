@@ -19,14 +19,14 @@
  */
 #include <iostream>
 
-#include <SFCGAL/io/wkt.h>
+#include "SFCGAL/io/wkt.h"
 
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/algorithm/translate.h>
-#include <SFCGAL/algorithm/offset.h>
-#include <SFCGAL/algorithm/extrude.h>
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/algorithm/translate.h"
+#include "SFCGAL/algorithm/offset.h"
+#include "SFCGAL/algorithm/extrude.h"
 
-#include <SFCGAL/detail/io/OsgFactory.h>
+#include "SFCGAL/detail/io/OsgFactory.h"
 
 
 

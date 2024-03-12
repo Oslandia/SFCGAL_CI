@@ -5,10 +5,10 @@
 #ifndef _SFCGAL_ALGORITHM_ORIENTATION_H_
 #define _SFCGAL_ALGORITHM_ORIENTATION_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/Kernel.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
 
 #include <CGAL/Polygon_2.h>
 #include <CGAL/Polygon_with_holes_2.h>

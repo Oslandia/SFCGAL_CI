@@ -22,7 +22,7 @@
 
 #include <exception>
 
-#include <SFCGAL/numeric.h>
+#include "SFCGAL/numeric.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

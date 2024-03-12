@@ -6,19 +6,19 @@
 #include <memory>
 #include <sstream>
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/algorithm/connection.h>
-#include <SFCGAL/algorithm/covers.h>
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/detail/GeometrySet.h>
-#include <SFCGAL/detail/triangulate/triangulateInGeometrySet.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/algorithm/connection.h"
+#include "SFCGAL/algorithm/covers.h"
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/detail/GeometrySet.h"
+#include "SFCGAL/detail/triangulate/triangulateInGeometrySet.h"
 
 #include <CGAL/box_intersection_d.h>
 

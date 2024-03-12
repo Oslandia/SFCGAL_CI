@@ -5,12 +5,12 @@
 #ifndef SFCGAL_COLLECTION_HOMOGENIZE_ALGORITHM
 #define SFCGAL_COLLECTION_HOMOGENIZE_ALGORITHM
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <memory>
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/GeometryCollection.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/GeometryCollection.h"
 
 namespace SFCGAL {
 namespace algorithm {

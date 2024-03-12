@@ -2,10 +2,10 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/PreparedGeometry.h>
+#include "SFCGAL/PreparedGeometry.h"
 
-#include <SFCGAL/detail/io/WkbWriter.h>
-#include <SFCGAL/detail/io/WktWriter.h>
+#include "SFCGAL/detail/io/WkbWriter.h"
+#include "SFCGAL/detail/io/WktWriter.h"
 
 namespace SFCGAL {
 PreparedGeometry::PreparedGeometry() : _srid(0) {}

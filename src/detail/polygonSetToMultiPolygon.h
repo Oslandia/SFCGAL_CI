@@ -5,10 +5,10 @@
 #ifndef _SFCGAL_DETAIL_POLYGONSETTOMULTIPOLYGON_H_
 #define _SFCGAL_DETAIL_POLYGONSETTOMULTIPOLYGON_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
+#include "SFCGAL/MultiPolygon.h"
 #include <CGAL/Polygon_set_2.h>
-#include <SFCGAL/MultiPolygon.h>
 
 namespace SFCGAL {
 namespace detail {

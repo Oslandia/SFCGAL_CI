@@ -20,11 +20,11 @@
  */
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/detail/io/WktWriter.h>
-#include <SFCGAL/detail/transform/ForceZOrderPoints.h>
-#include <SFCGAL/io/wkt.h>
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/detail/io/WktWriter.h"
+#include "SFCGAL/detail/transform/ForceZOrderPoints.h"
+#include "SFCGAL/io/wkt.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;

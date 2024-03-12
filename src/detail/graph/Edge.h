@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_GRAPH_EDGE_H_
 #define _SFCGAL_GRAPH_EDGE_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 namespace graph {

@@ -18,16 +18,16 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/algorithm/covers.h>
-#include <SFCGAL/algorithm/difference.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/volume.h>
-#include <SFCGAL/detail/tools/Registry.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/algorithm/covers.h"
+#include "SFCGAL/algorithm/difference.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/volume.h"
+#include "SFCGAL/detail/tools/Registry.h"
 
-#include <SFCGAL/io/vtk.h>
-#include <SFCGAL/io/wkt.h>
+#include "SFCGAL/io/vtk.h"
+#include "SFCGAL/io/wkt.h"
 
 #include <boost/test/unit_test.hpp>
 

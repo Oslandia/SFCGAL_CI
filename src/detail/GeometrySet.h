@@ -8,10 +8,10 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/variant.hpp>
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/detail/TypeForDimension.h>
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/detail/TypeForDimension.h"
 
 #include <CGAL/Bbox_2.h>
 #include <CGAL/Bbox_3.h>

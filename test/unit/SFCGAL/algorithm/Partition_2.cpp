@@ -3,9 +3,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/algorithm/partition_2.h>
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/algorithm/partition_2.h"
 
 using namespace SFCGAL;
 

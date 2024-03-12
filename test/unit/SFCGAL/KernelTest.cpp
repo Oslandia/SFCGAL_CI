@@ -22,9 +22,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <SFCGAL/Coordinate.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/LineString.h>
+#include "SFCGAL/Coordinate.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/LineString.h"
 
 using namespace SFCGAL;
 

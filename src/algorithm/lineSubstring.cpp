@@ -6,11 +6,11 @@
 #include <memory>
 
 // SFCGAL
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/length.h>
-#include <SFCGAL/algorithm/lineSubstring.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/length.h"
+#include "SFCGAL/algorithm/lineSubstring.h"
 
 namespace SFCGAL::algorithm {
 

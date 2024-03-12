@@ -2,18 +2,18 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/triangulate/triangulatePolygon.h>
+#include "SFCGAL/triangulate/triangulatePolygon.h"
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
 
-#include <SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h>
+#include "SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h"
 
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/normal.h>
-#include <SFCGAL/algorithm/plane.h>
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/normal.h"
+#include "SFCGAL/algorithm/plane.h"
 
 #include <iostream>
 

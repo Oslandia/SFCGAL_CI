@@ -7,8 +7,8 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
-#include <SFCGAL/detail/graph/Edge.h>
-#include <SFCGAL/detail/graph/Vertex.h>
+#include "SFCGAL/detail/graph/Edge.h"
+#include "SFCGAL/detail/graph/Vertex.h"
 
 namespace SFCGAL {
 namespace graph {

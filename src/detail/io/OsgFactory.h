@@ -5,7 +5,7 @@
 #ifndef _SFCGAL_IO_OSGFACTORY_H_
 #define _SFCGAL_IO_OSGFACTORY_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #ifndef SFCGAL_WITH_OSG
 #error                                                                         \
@@ -14,7 +14,7 @@
 
 #include <osg/Geometry>
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 
 namespace SFCGAL {
 namespace detail {

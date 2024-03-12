@@ -2,27 +2,27 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/distance3d.h>
+#include "SFCGAL/algorithm/distance3d.h"
 
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/detail/tools/Log.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/detail/tools/Log.h"
 
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/detail/GetPointsVisitor.h>
-#include <SFCGAL/detail/transform/AffineTransform3.h>
-#include <SFCGAL/triangulate/triangulatePolygon.h>
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/detail/GetPointsVisitor.h"
+#include "SFCGAL/detail/transform/AffineTransform3.h"
+#include "SFCGAL/triangulate/triangulatePolygon.h"
 
 using Kernel             = CGAL::Exact_predicates_exact_constructions_kernel;
 using squared_distance_t = Kernel::FT;

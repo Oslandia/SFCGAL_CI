@@ -5,7 +5,7 @@
 #ifndef SFCGAL_COVERS_POINTS_ALGORITHM
 #define SFCGAL_COVERS_POINTS_ALGORITHM
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <vector>
 

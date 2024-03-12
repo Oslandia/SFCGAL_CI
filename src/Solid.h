@@ -13,7 +13,7 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include <SFCGAL/PolyhedralSurface.h>
+#include "SFCGAL/PolyhedralSurface.h"
 
 namespace SFCGAL {
 

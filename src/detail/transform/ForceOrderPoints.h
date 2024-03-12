@@ -5,10 +5,10 @@
 #ifndef _SFCGAL_TRANSFORM_FORCE_ORDER_POINTS_H_
 #define _SFCGAL_TRANSFORM_FORCE_ORDER_POINTS_H_
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
-#include <SFCGAL/Kernel.h>
-#include <SFCGAL/Transform.h>
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/Transform.h"
 
 namespace SFCGAL {
 

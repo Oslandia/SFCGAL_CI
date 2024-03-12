@@ -7,7 +7,7 @@
 
 #include <ostream>
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 

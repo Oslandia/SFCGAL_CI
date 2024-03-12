@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <SFCGAL/algorithm/ConsistentOrientationBuilder.h>
-#include <SFCGAL/detail/graph/algorithm/orientation.h>
+#include "SFCGAL/algorithm/ConsistentOrientationBuilder.h"
+#include "SFCGAL/detail/graph/algorithm/orientation.h"
 
 namespace SFCGAL::algorithm {
 

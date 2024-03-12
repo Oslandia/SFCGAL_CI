@@ -20,11 +20,11 @@
  */
 
 #include <CGAL/Nef_polyhedron_3.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/volume.h>
-#include <SFCGAL/io/wkt.h>
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/volume.h"
+#include "SFCGAL/io/wkt.h"
 
 #include <boost/test/unit_test.hpp>
 

@@ -5,7 +5,7 @@
 #ifndef SFCGAL_UNION_ALGORITHM
 #define SFCGAL_UNION_ALGORITHM
 
-#include <SFCGAL/config.h>
+#include "SFCGAL/config.h"
 
 #include <memory>
 
