@@ -175,7 +175,7 @@ sfcgal_geometry_as_wkb(const sfcgal_geometry_t *, char **buffer, size_t *len);
  * @ingroup capi
  */
 SFCGAL_API void
-sfcgal_geometry_as_vtk(const sfcgal_geometry_t *, char *filename);
+sfcgal_geometry_as_vtk(const sfcgal_geometry_t *, const char *filename);
 
 /**
  * Creates an empty point

@@ -282,7 +282,7 @@ sfcgal_geometry_as_wkb(const sfcgal_geometry_t *pgeom, char **buffer,
 }
 
 extern "C" void
-sfcgal_geometry_as_vtk(const sfcgal_geometry_t *pgeom, char *filename)
+sfcgal_geometry_as_vtk(const sfcgal_geometry_t *pgeom, const char *filename)
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       io::vtk(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom), filename);)
