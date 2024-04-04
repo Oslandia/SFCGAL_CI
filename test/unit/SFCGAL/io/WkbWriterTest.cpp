@@ -100,7 +100,6 @@ BOOST_AUTO_TEST_CASE(PostgisEWkb)
 
   std::string inputWkb;
   std::string expectedWkt;
-  auto        i{0};
   while (std::getline(ifs, inputWkb)) {
     std::getline(efs, expectedWkt);
     std::unique_ptr<Geometry>         gWkt(io::readWkt(expectedWkt));
