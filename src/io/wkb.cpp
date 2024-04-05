@@ -17,9 +17,9 @@ namespace SFCGAL::io {
 ///
 ///
 auto
-readWkb(std::istream &stream) -> std::unique_ptr<Geometry>
+readWkb(std::istream &stream, bool asHexString) -> std::unique_ptr<Geometry>
 {
-  WkbReader wkbReader(stream);
+  WkbReader wkbReader(stream, asHexString);
   wkbReader.readWkb();
   return wkbReader.geometry();
 }
@@ -28,10 +28,10 @@ readWkb(std::istream &stream) -> std::unique_ptr<Geometry>
 ///
 ///
 auto
-readWkb(const std::string &s) -> std::unique_ptr<Geometry>
+readWkb(const std::string &s, bool asHexString) -> std::unique_ptr<Geometry>
 {
   std::istringstream iss(s);
-  WkbReader          wkbReader(iss);
+  WkbReader          wkbReader(iss, asHexString);
   wkbReader.readWkb();
   return wkbReader.geometry();
 }
@@ -40,31 +40,34 @@ readWkb(const std::string &s) -> std::unique_ptr<Geometry>
 ///
 ///
 auto
-readWkb(const char *str, size_t len) -> std::unique_ptr<Geometry>
+readWkb(const char *str, size_t len, bool asHexString)
+    -> std::unique_ptr<Geometry>
 {
   CharArrayBuffer buf(str, str + len);
   std::istream    istr(&buf);
 
-  return readWkb(istr);
+  return readWkb(istr, asHexString);
 }
 
 /**
  * Read a WKB geometry from an input stream
  */
 auto
-readEwkb(std::istream &stream) -> std::unique_ptr<PreparedGeometry>
+readEwkb(std::istream &stream, bool asHexString)
+    -> std::unique_ptr<PreparedGeometry>
 {
 
-  WkbReader wkbReader(stream);
+  WkbReader wkbReader(stream, asHexString);
   wkbReader.readWkb();
   return wkbReader.preparedGeometry();
 }
 
 auto
-readEwkb(const std::string &s) -> std::unique_ptr<PreparedGeometry>
+readEwkb(const std::string &s, bool asHexString)
+    -> std::unique_ptr<PreparedGeometry>
 {
   std::istringstream iss(s);
-  WkbReader          wkbReader(iss);
+  WkbReader          wkbReader(iss, asHexString);
   wkbReader.readWkb();
   return wkbReader.preparedGeometry();
 }
@@ -73,12 +76,13 @@ readEwkb(const std::string &s) -> std::unique_ptr<PreparedGeometry>
  * Read a WKB geometry from a char*
  */
 auto
-readEwkb(const char *str, size_t len) -> std::unique_ptr<PreparedGeometry>
+readEwkb(const char *str, size_t len, bool asHexString)
+    -> std::unique_ptr<PreparedGeometry>
 {
   CharArrayBuffer buf(str, str + len);
   std::istream    istr(&buf);
 
-  return readEwkb(istr);
+  return readEwkb(istr, asHexString);
 }
 
 } // namespace SFCGAL::io

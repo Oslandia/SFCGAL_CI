@@ -90,8 +90,8 @@ PreparedGeometry::asEWKB(boost::endian::order wkbOrder, bool asHex) const
     -> std::string
 {
   std::ostringstream    oss;
-  detail::io::WkbWriter writer(oss);
-  writer.write(*_geometry, _srid, wkbOrder, asHex);
+  detail::io::WkbWriter writer(oss, asHex);
+  writer.write(*_geometry, _srid, wkbOrder);
   return oss.str();
 }
 

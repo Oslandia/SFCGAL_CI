@@ -36,8 +36,15 @@ class SFCGAL_API WkbReader {
 public:
   /**
    * read WKB from input stream
+   * @param wkbString hexadecimal ascii string or binary string
+   * @param asHexString if false, will read the wkb as binary string, else will
+   * read the string as hex ascii string (ie. 2 chars for 1 byte with values
+   * matching [0-9A-F]
    */
-  WkbReader(std::istream &wkbHexString) : _reader(wkbHexString) {}
+  WkbReader(std::istream &wkbString, bool asHexString = false)
+      : _reader(wkbString), _asHexString(asHexString)
+  {
+  }
 
   auto
   readWkb() -> void
@@ -92,25 +99,36 @@ private:
   auto
   read() -> T
   {
-
-    const size_t nbElements       = 2;
-    const size_t sizeType         = sizeof(T);
-    const size_t totalBytesToRead = nbElements * sizeType;
-    std::string  buffer(totalBytesToRead, '\0');
-    _reader.readBytes(buffer, totalBytesToRead);
-    const int base = 16;
+    const size_t sizeType = sizeof(T);
     union {
       std::array<std::byte, sizeType> byteArray;
       T                               d;
     };
 
-    for (size_t i = 0; i < sizeType; i++) {
-      size_t      chunkPos = nbElements * i;
-      std::string byteStr  = buffer.substr(chunkPos, nbElements);
-      byteArray[i] = static_cast<std::byte>(std::stoi(byteStr, nullptr, base));
+    if (_asHexString) {
+      const size_t nbElements       = 2;
+      const size_t totalBytesToRead = nbElements * sizeType;
+      std::string  buffer(totalBytesToRead, '\0');
+      _reader.readBytes(buffer, totalBytesToRead);
+      const int base = 16;
+
+      for (size_t i = 0; i < sizeType; i++) {
+        size_t      chunkPos = nbElements * i;
+        std::string byteStr  = buffer.substr(chunkPos, nbElements);
+        byteArray[i] =
+            static_cast<std::byte>(std::stoi(byteStr, nullptr, base));
+      }
+
+      _index += sizeType * nbElements;
+    } else {
+      std::string buffer(sizeType, '\0');
+      _reader.readBytes(buffer, sizeType);
+      std::transform(buffer.begin(), buffer.end(), byteArray.begin(),
+                     [](char c) { return std::byte(c); });
+
+      _index += sizeType;
     }
 
-    _index += sizeType * nbElements;
     return d;
   }
 
@@ -211,7 +229,7 @@ private:
 
     default:
       std::ostringstream oss;
-      oss << "WkbWriter : '" << geometryType << "' is not supported";
+      oss << "WkbWriter: type '" << geometryType << "' is not supported";
       std::cerr << oss.str() << std::endl;
 
       return {};
@@ -290,6 +308,12 @@ private:
    * wkb data
    */
   tools::InputStreamReader _reader;
+
+  /**
+   * if false, will read the wkb as binary string, else will read the string as
+   * hex ascii string (ie. 2 chars for 1 byte with values matching [0-9A-F]
+   */
+  bool _asHexString;
 
   /**
    * is needed to swap bytes

@@ -50,8 +50,8 @@ auto
 Geometry::asWkb(boost::endian::order wkbOrder, bool asHex) const -> std::string
 {
   std::ostringstream    oss;
-  detail::io::WkbWriter writer(oss);
-  writer.write(*this, wkbOrder, asHex);
+  detail::io::WkbWriter writer(oss, asHex);
+  writer.write(*this, wkbOrder);
   return oss.str();
 }
 ///

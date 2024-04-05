@@ -73,22 +73,19 @@ WkbWriter::writeRec(const Geometry &g, boost::endian::order wkbOrder)
 
   default:
     std::ostringstream oss;
-    oss << "WkbWriter : '" << g.geometryType() << "' is not supported";
+    oss << "WkbWriter: type '" << g.geometryType() << "' is not supported";
     BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
   }
 }
 
 void
 WkbWriter::write(const Geometry &g, const srid_t &srid,
-                 boost::endian::order wkbOrder, bool asHex)
+                 boost::endian::order wkbOrder)
 {
 
   _useSrid = true;
   _isEWKB  = true;
   _srid    = srid;
-  if (asHex) {
-    _prefix = "\\x";
-  }
 
   write(g, wkbOrder);
 }
@@ -97,11 +94,8 @@ WkbWriter::write(const Geometry &g, const srid_t &srid,
 ///
 ///
 void
-WkbWriter::write(const Geometry &g, boost::endian::order wkbOrder, bool asHex)
+WkbWriter::write(const Geometry &g, boost::endian::order wkbOrder)
 {
-  if (asHex) {
-    _prefix = "\\x";
-  }
   writeRec(g, wkbOrder);
 }
 
