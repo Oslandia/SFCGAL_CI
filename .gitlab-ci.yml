@@ -1,9 +1,10 @@
-
 stages:
+  - .pre
   - lint
   - build
   - test
   - deploy
+  - .post
 
 # After ccache ci
 # coverage:
@@ -25,6 +26,10 @@ stages:
 #       cobertura: sfcgal_coverage.xml
 
 include:
+  - template: Security/SAST.gitlab-ci.yml
   - local: /.gitlab/pipeline/sonar.yml
   - local: /.gitlab/pipeline/lint-code.yml
   - local: /.gitlab/pipeline/test-code.yml
+
+sast:
+  stage: test
