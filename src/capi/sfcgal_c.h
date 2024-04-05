@@ -168,7 +168,8 @@ sfcgal_geometry_as_text_decim(const sfcgal_geometry_t *, int numDecimals,
  * @ingroup capi
  */
 SFCGAL_API void
-sfcgal_geometry_as_wkb(const sfcgal_geometry_t *, char **buffer, size_t *len);
+sfcgal_geometry_as_wkb(const sfcgal_geometry_t *, char **buffer, size_t *len,
+                       bool asHex = false);
 
 /**
  * Creates a VTK file of the given geometry
@@ -712,7 +713,7 @@ sfcgal_io_read_ewkt(const char *, size_t len);
  * io::readWKB
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_io_read_wkb(const char *, size_t len);
+sfcgal_io_read_wkb(const char *, size_t len, bool asHex = false);
 
 /**
  * Serialization

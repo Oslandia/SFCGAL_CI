@@ -272,11 +272,12 @@ sfcgal_geometry_as_text_decim(const sfcgal_geometry_t *pgeom, int numDecimals,
 
 extern "C" void
 sfcgal_geometry_as_wkb(const sfcgal_geometry_t *pgeom, char **buffer,
-                       size_t *len)
+                       size_t *len, bool asHex)
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       std::string wkb =
-          reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb();
+          reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb(
+              boost::endian::order::native, asHex);
       *buffer = (char *)sfcgal_alloc_handler(wkb.size() + 1); *len = wkb.size();
       strncpy(*buffer, wkb.c_str(), *len);)
 }
@@ -761,10 +762,11 @@ sfcgal_io_read_wkt(const char *str, size_t len) -> sfcgal_geometry_t *
 }
 
 extern "C" auto
-sfcgal_io_read_wkb(const char *str, size_t len) -> sfcgal_geometry_t *
+sfcgal_io_read_wkb(const char *str, size_t len, bool asHex)
+    -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
-      return SFCGAL::io::readWkb(str, len).release();)
+      return SFCGAL::io::readWkb(str, len, asHex).release();)
 }
 
 extern "C" void
