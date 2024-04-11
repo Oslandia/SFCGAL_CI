@@ -1,5 +1,7 @@
-Checks: '-p=build,-*,clang-analyzer-*,cert-*,bugprone-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-header-filter=.*'
+Checks: '-p=build,-*,clang-analyzer-*,cert-*,bugprone-*,modernize-*,performance-*,portability-*,readability-*,-header-filter=.*'
 CheckOptions:
     - key: bugprone-argument-comment.StrictMode
       value: 1
 FormatStyle: 'file'
+HeaderFileExtensions:         ['', 'h','hpp']
+ImplementationFileExtensions: ['c','cpp']
