@@ -4,6 +4,10 @@ project( SFCGAL )
 set( CMAKE_DEBUG_POSTFIX "d" )
 set(CMAKE_CXX_STANDARD 17)
 
+# ignore system installed SFCGAL to avoid conflicts during build/edit
+list(APPEND CMAKE_IGNORE_PREFIX_PATH "/usr/include/SFCGAL")
+list(APPEND CMAKE_IGNORE_PREFIX_PATH "/usr/local/include/SFCGAL")
+
 #
 # Cmake policies
 #
