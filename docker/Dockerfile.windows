@@ -1,0 +1,18 @@
+# Use sfcgal dependencies images
+FROM sfcgal/sfcgal-build-deps:windows-latest
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+WORKDIR "c:\SFCGAL"
+COPY . ./
+
+RUN cmake -S . -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DSFCGAL_BUILD_TESTS=OFF \
+    -DCMAKE_TOOLCHAIN_FILE="\"$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake\""; \
+    cmake --build build --config Release
+
+# Restore the default Windows shell for correct batch processing.
+SHELL ["cmd", "/S", "/C"]
+
+ENTRYPOINT ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
