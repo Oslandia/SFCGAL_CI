@@ -1,4 +1,4 @@
-/**
+ /**
  *   SFCGAL
  *
  *   Copyright (C) 2012-2013 Oslandia <infos@oslandia.com>
@@ -60,7 +60,7 @@ runTest(const boost::filesystem::path::string_type &filename)
   BOOST_REQUIRE(ifs.good());
 
   std::string       line;
-  std::string const lbl_base = boost::filesystem::basename(filename);
+  std::string const lbl_base = boost::filesystem::path(filename).filename().string();
 
   int lineno = 0;
   while (std::getline(ifs, line)) {
