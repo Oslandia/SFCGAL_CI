@@ -1,5 +1,6 @@
 1.5.2 (2024-03-XX):
     * Expose as_vtk to C Api (Loïc Bartoletti)
+    * Fix build with boost 1.85 (Dirk Stöcker, Fixes #266)
 1.5.1 (2023-12-21):
     * Rewrite and fix visibility algorithm (Loïc Bartoletti)
     * Apply clang-tidy fixes (Loïc Bartoletti)
