@@ -30,6 +30,7 @@ include:
   - local: /.gitlab/pipeline/sonar.yml
   - local: /.gitlab/pipeline/lint-code.yml
   - local: /.gitlab/pipeline/test-code.yml
+  - local: /.gitlab/pipeline/build-windows.yml
 
 sast:
   stage: test
