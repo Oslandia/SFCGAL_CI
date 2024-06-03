@@ -276,7 +276,20 @@ sfcgal_geometry_as_wkb(const sfcgal_geometry_t *pgeom, char **buffer,
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       std::string wkb =
-          reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb();
+          reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb(
+              boost::endian::order::native, false);
+      *buffer = (char *)sfcgal_alloc_handler(wkb.size() + 1); *len = wkb.size();
+      strncpy(*buffer, wkb.c_str(), *len);)
+}
+
+extern "C" void
+sfcgal_geometry_as_hexwkb(const sfcgal_geometry_t *pgeom, char **buffer,
+                          size_t *len)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      std::string wkb =
+          reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb(
+              boost::endian::order::native, true);
       *buffer = (char *)sfcgal_alloc_handler(wkb.size() + 1); *len = wkb.size();
       strncpy(*buffer, wkb.c_str(), *len);)
 }
@@ -764,7 +777,11 @@ extern "C" auto
 sfcgal_io_read_wkb(const char *str, size_t len) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
-      return SFCGAL::io::readWkb(str, len).release();)
+      if (len > 2 && str[0] == '0' &&
+          (str[1] == '0' || str[1] == '1')) return SFCGAL::io::readWkb(str, len,
+                                                                       true)
+          .release();
+      return SFCGAL::io::readWkb(str, len, false).release();)
 }
 
 extern "C" void

@@ -57,7 +57,8 @@ BOOST_AUTO_TEST_CASE(writeWkb)
   while (std::getline(ifs, inputWkt)) {
     std::unique_ptr<Geometry> g(io::readWkt(inputWkt));
     std::getline(efs, expectedWkb);
-    BOOST_CHECK_EQUAL(g->asWkb(), expectedWkb);
+    BOOST_CHECK_EQUAL(g->asWkb(boost::endian::order::native, true),
+                      expectedWkb);
   }
 }
 
@@ -75,13 +76,21 @@ BOOST_AUTO_TEST_CASE(readWkb)
 
   std::string inputWkt;
   std::string expectedWkb;
+  std::string wkbBinary;
   while (std::getline(ifs, inputWkt)) {
     std::getline(efs, expectedWkb);
     std::unique_ptr<Geometry> g(io::readWkt(inputWkt));
-    std::unique_ptr<Geometry> gWkb(io::readWkb(expectedWkb));
+    std::unique_ptr<Geometry> gWkb(io::readWkb(expectedWkb, true));
     if (std::find(allowedBeThyFail.begin(), allowedBeThyFail.end(), inputWkt) ==
         std::end(allowedBeThyFail)) {
       BOOST_CHECK_EQUAL(g->asText(0), gWkb->asText(0));
+      BOOST_CHECK_EQUAL(g->geometryTypeId(), gWkb->geometryTypeId());
+      // generate binary wkb (NO hex)
+      wkbBinary = gWkb->asWkb();
+      // read back binary wkb (NO hex)
+      std::unique_ptr<Geometry> g2(io::readWkb(wkbBinary));
+      // check geoms
+      BOOST_CHECK_EQUAL(g->asText(0), g2->asText(0));
     }
   }
 }
@@ -100,7 +109,6 @@ BOOST_AUTO_TEST_CASE(PostgisEWkb)
 
   std::string inputWkb;
   std::string expectedWkt;
-  auto        i{0};
   while (std::getline(ifs, inputWkb)) {
     std::getline(efs, expectedWkt);
     std::unique_ptr<Geometry>         gWkt(io::readWkt(expectedWkt));
@@ -108,7 +116,8 @@ BOOST_AUTO_TEST_CASE(PostgisEWkb)
     std::unique_ptr<PreparedGeometry> gEwkt(io::readEwkt(ewkt));
     if (!(expectedWkt.find("EMPTY") != std::string::npos) &&
         !inputWkb.empty()) {
-      BOOST_CHECK_EQUAL(gEwkt->asEWKB(), inputWkb);
+      BOOST_CHECK_EQUAL(gEwkt->asEWKB(boost::endian::order::native, true),
+                        inputWkb);
     }
 
     std::vector allowedBeThyFailFull = allowedBeThyFail;
@@ -123,7 +132,8 @@ BOOST_AUTO_TEST_CASE(PostgisEWkb)
     if (std::find(allowedBeThyFailFull.begin(), allowedBeThyFailFull.end(),
                   expectedWkt) == std::end(allowedBeThyFailFull)) {
       if (!inputWkb.empty()) {
-        std::unique_ptr<PreparedGeometry> gEwkbFile(io::readEwkb(inputWkb));
+        std::unique_ptr<PreparedGeometry> gEwkbFile(
+            io::readEwkb(inputWkb, true));
         BOOST_CHECK_EQUAL(gEwkbFile->geometry().asText(0), gWkt->asText(0));
         BOOST_CHECK_EQUAL(3946, gEwkbFile->SRID());
       }

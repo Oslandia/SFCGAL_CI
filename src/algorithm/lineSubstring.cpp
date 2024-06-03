@@ -39,7 +39,7 @@ find_position(const LineString &ls, const long N, const double target_length,
   double seg_length = 0.0;
   on_point          = false;
 
-  for (; idx < N; ++idx) {
+  for (; idx < static_cast<size_t>(N); ++idx) {
     const Point &p = ls.pointN(idx);
     const Point &q = ls.pointN(idx + 1);
 
@@ -154,7 +154,7 @@ lineSubstring(const LineString &ls, double start, double end)
     return std::make_unique<LineString>();
   }
 
-  const long N = static_cast<long>(ls.numPoints());
+  const unsigned long N = static_cast<unsigned long>(ls.numPoints());
 
   const bool closed = ls.isClosed();
 
