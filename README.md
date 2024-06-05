@@ -10,6 +10,68 @@ Please refer to the <a href="http://sfcgal.gitlab.io/SFCGAL">project page</a> fo
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/sfcgal.svg)](https://repology.org/project/sfcgal/versions)
 
+## Community Resources
+
+* Website: https://sfcgal.org
+* **git** repository: https://gitlab.com/sfcgal/SFCGAL
+* **#sfcgal** chat channel (all bridged):
+  * IRC: irc://irc.libera.chat/#sfcgal (https://kiwiirc.com/nextclient/irc.libera.chat/#sfcgal)
+
+## Build/Install
+
+See the [INSTALL](https://sfcgal.gitlab.io/SFCGAL/installation.html) page.
+
+## Reference Docs
+
+* [C API](https://sfcgal.gitlab.io/SFCGAL/doxygen/group__capi.html)
+* [C++ API](https://sfcgal.gitlab.io/SFCGAL/doxygen/group__public__api.html)
+
+## Client Applications
+
+### Using the C interface
+
+SFCGAL promises long-term stability of the C API. In general, successive releases
+of the C API may add new functions but will not remove or change existing types
+or function signatures. The C library uses the C++ interface, but the C library
+follows normal ABI-change-sensitive versioning, so programs that link only
+against the C library should work without relinking when SFCGAL is upgraded. For
+this reason, it is recommended to use the C API for software that is intended
+to be dynamically linked to a system install of SFCGAL.
+
+The `sfcgal-config` program can be used to determine appropriate compiler and
+linker flags for building against the C library:
+
+    CFLAGS += `sfcgal-config --cflags`
+    LDFLAGS += `sfcgal-config --ldflags --libs`
+
+All functionality of the C API is available through the `sfcgal_c.h` header file.
+
+Documentation for the C API is provided via comments in the `sfcgal_c.h` header
+file. C API usage examples can be found in the SFCGAL unit tests and in the
+source code of software that uses SFCGAL, such as PostGIS and the PySFCGAL package
+for Python.
+
+### Using other languages
+
+SFCGAL has bindings in many languages, see the [bindings
+page](https://sfcgal.gitlab.io/SFCGAL/dev.html).
+
+
+## Documentation
+
+API documentation can be generated using Doxygen. Documentation is not included
+in the default build. To build the documentation see the [dev](https://sfcgal.gitlab.io/SFCGAL/dev.html) page.
+
+
+## Style
+
+To format your code into the desired style, use the clang-format tools.
+
+
+## Testing
+
+See documentation in [dev](https://sfcgal.gitlab.io/SFCGAL/dev.html) page.
+
 ## Licence
 
 SFCGAL is provided under the following licence LGPL version 2 or later.
