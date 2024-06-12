@@ -279,7 +279,7 @@ sfcgal_geometry_as_wkb(const sfcgal_geometry_t *pgeom, char **buffer,
           reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb(
               boost::endian::order::native, false);
       *buffer = (char *)sfcgal_alloc_handler(wkb.size() + 1); *len = wkb.size();
-      strncpy(*buffer, wkb.c_str(), *len);)
+      memcpy(*buffer, wkb.data(), *len);)
 }
 
 extern "C" void

@@ -18,6 +18,7 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
+#include "SFCGAL/capi/sfcgal_c.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -30,7 +31,6 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
-#include "SFCGAL/capi/sfcgal_c.h"
 #include "SFCGAL/io/wkt.h"
 
 #include <boost/test/unit_test.hpp>
@@ -74,6 +74,28 @@ BOOST_AUTO_TEST_CASE(testErrorOnBadGeometryType)
   hasError = false;
   sfcgal_linestring_add_point(gl, gl); // should fail
   BOOST_CHECK(hasError == true);
+}
+
+BOOST_AUTO_TEST_CASE(testAsWkb)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // retrieve wkb from geometry via C++ api
+  std::unique_ptr<Geometry> const geom(
+      io::readWkt("POLYGON((0 0, 20 0, 20 10, 0 10, 0 0))"));
+
+  std::string strGeom;
+  strGeom = geom->asWkb();
+
+  // retrieve wkb from C api
+  char  *wkbApi;
+  size_t wkbLen;
+  sfcgal_geometry_as_wkb(geom.get(), &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+
+  // check
+  BOOST_CHECK_EQUAL(strGeom, strApi);
+  delete[] wkbApi;
 }
 
 BOOST_AUTO_TEST_CASE(testStraightSkeletonPolygon)
