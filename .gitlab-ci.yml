@@ -34,6 +34,7 @@ include:
   - local: /.gitlab/pipeline/lint-code.yml
   - local: /.gitlab/pipeline/test-code.yml
   - local: /.gitlab/pipeline/build-windows.yml
+  - local: /.gitlab/pipeline/build-debian-docker.yml
 
 sast:
   stage: test

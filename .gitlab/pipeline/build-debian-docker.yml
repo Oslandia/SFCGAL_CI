@@ -1,0 +1,69 @@
+build:debian-docker-image:
+  stage: build
+  image: docker:latest
+  services:
+    - name: docker:dind
+  only:
+    changes:
+      - "src/*"
+      - "docker/Dockerfile.debian"
+      - "docker/entrypoint.sh"
+      - ".gitlab-ci.yml"
+      - ".gitlab/**/*.yml"
+    refs:
+      - merge_requests
+      - master
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:debian-latest || true
+    - docker build
+      --pull
+      --cache-from $CI_REGISTRY_IMAGE:debian-latest
+      --tag $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA
+      --build-arg CGAL_VERSION=${BUILD_CGAL_VERSION}
+      -f docker/Dockerfile.debian
+      .
+    - docker push $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA
+  after_script:
+    - docker logout $CI_REGISTRY
+
+
+push:debian-docker-latest:
+  stage: deploy
+  image: docker:latest
+  services:
+    - name: docker:dind
+  variables:
+    GIT_STRATEGY: none
+  only:
+    refs:
+      - master
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:debian-latest
+    - docker push $CI_REGISTRY_IMAGE:debian-latest
+  after_script:
+    - docker logout $CI_REGISTRY
+
+
+push:debian-docker-tag:
+  stage: deploy
+  image: docker:latest
+  services:
+    - name: docker:dind
+  variables:
+    GIT_STRATEGY: none
+  only:
+    refs:
+      - tags
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_REF_NAME
+  after_script:
+    - docker logout $CI_REGISTRY

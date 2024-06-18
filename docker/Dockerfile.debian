@@ -1,0 +1,31 @@
+FROM debian:stable-slim AS builder
+
+WORKDIR /SFCGAL
+
+COPY src ./src
+COPY test ./test
+COPY CMakeLists.txt sfcgal.pc.in sfcgal-config.in ci/debian/before_install.sh ./
+
+RUN apt update -qq && \
+    apt install --no-install-recommends --yes sudo wget build-essential
+
+ARG CGAL_VERSION
+RUN ./before_install.sh $CGAL_VERSION
+
+RUN CGAL_DIR=/CGAL cmake -B build \
+    -DSFCGAL_BUILD_TESTS=ON \
+    -DCMAKE_C_COMPILER=/usr/bin/gcc \
+    -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
+    -DCMAKE_BUILD_TYPE=Release && \
+    cmake --build build
+
+FROM debian:stable-slim AS run
+
+RUN apt update -qq && \
+    apt install --no-install-recommends --yes libmpfr-dev libgmp-dev libboost-serialization1.74.0
+
+WORKDIR /SFCGAL
+COPY --from=builder /SFCGAL/build /SFCGAL/build
+COPY docker/entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh"]
