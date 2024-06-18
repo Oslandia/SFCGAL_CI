@@ -1,0 +1,70 @@
+build:debian-stable:
+  stage: build
+  image: docker:latest
+  services:
+    - name: docker:dind
+  rules:
+    # on default branch
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: always
+    # on a tag
+    - if: $CI_COMMIT_TAG
+      when: always
+    # on a MR if previous jobs are successful
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: always
+  variables:
+    CGAL_VERSION: "5.6"
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:debian-stable-latest || true
+    - docker build
+      --pull
+      --cache-from $CI_REGISTRY_IMAGE:debian-stable-latest
+      --tag $CI_REGISTRY_IMAGE:debian-stable-$CI_COMMIT_SHA
+      --build-arg CGAL_VERSION=$CGAL_VERSION
+      -f docker/Dockerfile.debian
+      .
+    - docker push $CI_REGISTRY_IMAGE:debian-stable-$CI_COMMIT_SHA
+  after_script:
+    - docker logout $env:CI_REGISTRY
+
+push:debian-stable-latest:
+  stage: deploy
+  image: docker:latest
+  services:
+    - name: docker:dind
+  variables:
+    GIT_STRATEGY: none
+  only:
+    refs:
+      - main
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:debian-stable-$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:debian-stable-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:debian-stable-latest
+    - docker push $CI_REGISTRY_IMAGE:debian-stable-latest
+  after_script:
+    - docker logout $CI_REGISTRY
+
+
+push:debian-stable-tag:
+  stage: deploy
+  image: docker:latest
+  services:
+    - name: docker:dind
+  variables:
+    GIT_STRATEGY: none
+  only:
+    refs:
+      - tags
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:debian-stable-$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:debian-stable-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:debian-stable-$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY_IMAGE:debian-stable-$CI_COMMIT_REF_NAME
+  after_script:
+    - docker logout $CI_REGISTRY

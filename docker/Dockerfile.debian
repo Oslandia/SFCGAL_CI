@@ -1,0 +1,13 @@
+FROM debian:bullseye
+
+WORKDIR /SFCGAL
+COPY . ./
+
+RUN apt-get update -qq && \
+    apt-get install --yes sudo wget build-essential
+
+ARG CGAL_VERSION
+RUN ./ci/debian/before_install.sh $CGAL_VERSION
+
+RUN CGAL_DIR=/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ && \
+    make
