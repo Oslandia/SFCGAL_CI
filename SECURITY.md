@@ -5,7 +5,7 @@
 We appreciate your efforts in responsibly disclosing any issues you may find. To report a security
 vulnerability, please follow these steps:
 
-1. **Privately disclose the issue** by sending an email to infos+sfcgal@oslandia.com. Please do not create publicly viewable issues for security vulnerabilities.
+1. **Privately disclose the issue** by sending an email to security@sfcgal.org. Please do not create publicly viewable issues for security vulnerabilities.
 
 2. **Provide detailed information** regarding the vulnerability, including:
     - Description of the vulnerability
