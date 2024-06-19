@@ -19,9 +19,9 @@ The PSC consists of experienced contributors who have demonstrated a strong comm
 
 ### Current Members
 
-- **Name 1** (Role, Affiliation)
-- **Name 2** (Role, Affiliation)
-- **Name 3** (Role, Affiliation)
+- **Loïc Bartoletti** (Chair)
+- **Raphaël Delhome**
+- **Jean Felder**
 
 ## Decision-Making Process
 
@@ -38,7 +38,7 @@ The PSC communicates primarily through the project's mailing list and issue trac
 ## Contact
 
 For any questions or to get in touch with the PSC, please use the following contact methods:
-- **Mailing List**: [project-email@example.com](mailto:project-email@example.com)
+- **Infos**: [infos@sfcgal.org](mailto:infos@sfcgal.org)
 - **Issue Tracker**: [SFCGAL Issues](https://gitlab.com/sfcgal/SFCGAL/-/issues)
 
 Thank you for your interest in the SFCGAL project and for considering contributing to its development and governance.
