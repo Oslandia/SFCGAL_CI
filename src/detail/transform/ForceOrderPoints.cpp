@@ -62,18 +62,12 @@ ForceOrderPoints::visit(Polygon &p)
       }
     }
 
+    const bool isCCWO{algorithm::isCounterClockWiseOriented(ext)};
     for (size_t i = 0; i < p.numInteriorRings(); ++i) {
-      LineString inter = p.interiorRingN(i);
+      LineString &inter = p.interiorRingN(i);
 
-      if (algorithm::isCounterClockWiseOriented(inter)) {
-        // interior ring is pointing up, reverse
-        if (_orientCCW) {
-          inter.reverse();
-        }
-      } else {
-        if (!_orientCCW) {
-          inter.reverse();
-        }
+      if (algorithm::isCounterClockWiseOriented(inter) == isCCWO) {
+        inter.reverse();
       }
     }
 
