@@ -29,50 +29,45 @@ ForceOrderPoints::transform(Point & /*p*/)
 void
 ForceOrderPoints::visit(Triangle &t)
 {
-  if (!t.is3D()) {
-    if (!algorithm::isCounterClockWiseOriented(t)) {
-      // not pointing up, reverse
-      if (_orientCCW) {
-        t.reverse();
-      }
-    } else {
-      if (!_orientCCW) {
-        t.reverse();
-      }
+  if (!algorithm::isCounterClockWiseOriented(t)) {
+    // not pointing up, reverse
+    if (_orientCCW) {
+      t.reverse();
     }
-
-    Transform::visit(t);
+  } else {
+    if (!_orientCCW) {
+      t.reverse();
+    }
   }
+
+  Transform::visit(t);
 }
 
 void
 ForceOrderPoints::visit(Polygon &p)
 {
-  if (!p.is3D()) {
-    LineString &ext = p.exteriorRing();
+  LineString &ext = p.exteriorRing();
 
-    if (!algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
-      // exterior ring not pointing up, reverse
-      if (_orientCCW) {
-        ext.reverse();
-      }
-    } else {
-      if (!_orientCCW) {
-        ext.reverse();
-      }
+  if (!algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
+    // exterior ring not pointing up, reverse
+    if (_orientCCW) {
+      ext.reverse();
     }
-
-    const bool isCCWO{algorithm::isCounterClockWiseOriented(ext)};
-    for (size_t i = 0; i < p.numInteriorRings(); ++i) {
-      LineString &inter = p.interiorRingN(i);
-
-      if (algorithm::isCounterClockWiseOriented(inter) == isCCWO) {
-        inter.reverse();
-      }
+  } else {
+    if (!_orientCCW) {
+      ext.reverse();
     }
-
-    Transform::visit(p);
   }
+  const bool isCCWO{algorithm::isCounterClockWiseOriented(ext)};
+  for (size_t i = 0; i < p.numInteriorRings(); ++i) {
+    LineString &inter = p.interiorRingN(i);
+
+    if (algorithm::isCounterClockWiseOriented(inter) == isCCWO) {
+      inter.reverse();
+    }
+  }
+
+  Transform::visit(p);
 }
 
 } // namespace SFCGAL::transform
