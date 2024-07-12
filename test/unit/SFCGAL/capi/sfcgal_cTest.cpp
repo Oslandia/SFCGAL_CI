@@ -214,4 +214,27 @@ BOOST_AUTO_TEST_CASE(testForceLHR)
   delete[] wkbApi;
 }
 
+BOOST_AUTO_TEST_CASE(testForceRHR_3D)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::string strGeom{"POLYGON((0 5 1,0 0 2,5 0 3,5 5 4,0 5 1),(2 1 1,1 1 2,1 "
+                      "2 3,2 2 4,2 1 1),(4 3 1,3 3 2,3 4 3,4 4 4,4 3 1))"};
+  std::string expectedGeom{
+      "POLYGON Z((0 5 1,5 5 4,5 0 3,0 0 2,0 5 1),(2 1 1,2 2 4,1 2 3,1 1 2,2 1 "
+      "1),(4 3 1,4 4 4,3 4 3,3 3 2,4 3 1))"};
+
+  std::unique_ptr<Geometry> const geom(io::readWkt(strGeom));
+
+  sfcgal_geometry_t *rhr = sfcgal_geometry_force_rhr(geom.get());
+  // retrieve wkb from C api
+  char  *wkbApi;
+  size_t wkbLen;
+  sfcgal_geometry_as_text_decim(rhr, 0, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+
+  // check
+  BOOST_CHECK_EQUAL(expectedGeom, strApi);
+  delete[] wkbApi;
+}
 BOOST_AUTO_TEST_SUITE_END()
