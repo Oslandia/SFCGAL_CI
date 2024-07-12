@@ -171,4 +171,47 @@ BOOST_AUTO_TEST_CASE(testLineSubstring)
 
   BOOST_CHECK(sfcgal_geometry_covers_3d(ls, g2.get()));
 }
+
+BOOST_AUTO_TEST_CASE(testForceRHR)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::string strGeom{"POLYGON((0 0,0 5,5 5,5 0,0 0),(1 1,2 1,2 2,1 2,1 1))"};
+
+  std::unique_ptr<Geometry> const geom(io::readWkt(strGeom));
+
+  sfcgal_geometry_t *rhr = sfcgal_geometry_force_rhr(geom.get());
+  // retrieve wkb from C api
+  char  *wkbApi;
+  size_t wkbLen;
+  sfcgal_geometry_as_text_decim(rhr, 0, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+
+  // check
+  BOOST_CHECK_EQUAL(strGeom, strApi);
+  delete[] wkbApi;
+}
+
+BOOST_AUTO_TEST_CASE(testForceLHR)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::string strGeom{"POLYGON((0 0,0 5,5 5,5 0,0 0),(1 1,2 1,2 2,1 2,1 1))"};
+  std::string expectedGeom{
+      "POLYGON((0 0,5 0,5 5,0 5,0 0),(1 1,1 2,2 2,2 1,1 1))"};
+
+  std::unique_ptr<Geometry> const geom(io::readWkt(strGeom));
+
+  sfcgal_geometry_t *lhr = sfcgal_geometry_force_lhr(geom.get());
+  // retrieve wkb from C api
+  char  *wkbApi;
+  size_t wkbLen;
+  sfcgal_geometry_as_text_decim(lhr, 0, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+
+  // check
+  BOOST_CHECK_EQUAL(expectedGeom, strApi);
+  delete[] wkbApi;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
