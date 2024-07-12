@@ -4,6 +4,7 @@ image: gcc
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
   GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  SONAR_SCANNER_VERSION: 6.1.0.4477-linux-x64
 
 get-sonar-binaries:
   stage: .pre
@@ -15,9 +16,9 @@ get-sonar-binaries:
       - sonar-scanner/
   script:
     # Download sonar-scanner
-    - curl -sSLo ./sonar-scanner.zip 'https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip'
+    - curl -sSLo ./sonar-scanner.zip "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip"
     - unzip -o sonar-scanner.zip
-    - mv sonar-scanner-5.0.1.3006-linux sonar-scanner
+    - mv sonar-scanner-${SONAR_SCANNER_VERSION} sonar-scanner
     # Download build-wrapper
     - curl -sSLo ./build-wrapper-linux-x86.zip "${SONAR_HOST_URL}/static/cpp/build-wrapper-linux-x86.zip"
     - unzip -oj build-wrapper-linux-x86.zip -d ./build-wrapper
