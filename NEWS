@@ -1,5 +1,10 @@
-1.5.2 (2024-03-XX):
+1.5.2 (2024-07-25):
+    * Force LHR / RHR: Fix invalid interior ring orientation and allow operation on 3D geometries too (Loïc Bartoletti, Fixes #268)
+    * Added community-oriented files: Code of Conduct, Contributing guidelines, Sponsors information, and Project Steering Committee (PSC) documentation (Raphaël Delhome, Loïc Bartoletti)
+    * WKB: add binary version of wkb for WkbReader and WkbWriter (Benoit De Mezzo)
     * Expose as_vtk to C Api (Loïc Bartoletti)
+    * Fix include. Use " instead of <> (Loïc Bartoletti)
+    * [CI] Fix MSYS test (Loïc Bartoletti)
     * Fix build with boost 1.85 (Dirk Stöcker, Fixes #266)
     * Add a CI job to build a windows docker image (Jean Felder)
 1.5.1 (2023-12-21):
