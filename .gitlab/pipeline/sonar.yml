@@ -1,5 +1,5 @@
 # SonarCloud
-image: gcc
+image: debian:stable
 
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
@@ -15,6 +15,8 @@ get-sonar-binaries:
       - build-wrapper/
       - sonar-scanner/
   script:
+    - apt-get update -qq
+    - apt-get install --yes sudo curl wget build-essential unzip
     # Download sonar-scanner
     - curl -sSLo ./sonar-scanner.zip "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip"
     - unzip -o sonar-scanner.zip
@@ -38,11 +40,12 @@ build:
       - bw-output/
       - build/ # the build has to be made available to the sonar-scanner for the analysis
   before_script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget build-essential
     - ./ci/debian/before_install.sh 6.0-beta1
   script:
     # prepare the build tree
-    - mkdir build
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     # run the build inside the build wrapper
     - build-wrapper/build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --config Release
   artifacts:
