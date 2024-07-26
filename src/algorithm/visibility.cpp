@@ -98,7 +98,6 @@ visibility(const Geometry &polygon, const Geometry &point,
   }
 
   // Find the face
-  Arrangement_2::Face_const_handle                    *face;
   CGAL::Arr_naive_point_location<Arrangement_2> const  pl(arr);
   CGAL::Arr_point_location_result<Arrangement_2>::Type obj =
       pl.locate(queryPoint);
@@ -108,9 +107,13 @@ visibility(const Geometry &polygon, const Geometry &point,
 
   // Create Triangular Expansion Visibility object.
   TEV const tev(arr);
-
-  if (obj.which() == 0) {
-
+#if CGAL_VERSION_MAJOR < 6
+  switch (obj.which())
+#else
+  switch (obj.index())
+#endif
+  {
+  case 0: {
     Halfedge_const_handle he = Halfedge_const_handle();
 
     // If the point is in a boundary segment, find the corresponding half edge
@@ -135,23 +138,38 @@ visibility(const Geometry &polygon, const Geometry &point,
 
     // Use the half edge to compute the visibility
     fh = tev.compute_visibility(queryPoint, he, output_arr);
-
-  } else if (obj.which() == 1) {
+    break;
+  }
+  case 1: {
     Halfedge_const_handle *he =
+#if CGAL_VERSION_MAJOR < 6
         boost::get<Arrangement_2::Halfedge_const_handle>(&obj);
+#else
+        std::get_if<Arrangement_2::Halfedge_const_handle>(&obj);
+#endif
     if (he != nullptr) {
       fh = tev.compute_visibility(queryPoint, *he, output_arr);
     } else {
       BOOST_THROW_EXCEPTION(Exception("Can not find corresponding hedge."));
     }
-  } else if (obj.which() == 2) {
+    break;
+  }
+  case 2: {
     Face_const_handle *face =
+#if CGAL_VERSION_MAJOR < 6
         boost::get<Arrangement_2::Face_const_handle>(&obj);
+#else
+        std::get_if<Arrangement_2::Face_const_handle>(&obj);
+#endif
     if ((face != nullptr) && !((*face)->is_unbounded())) {
       fh = tev.compute_visibility(queryPoint, *face, output_arr);
     } else {
       BOOST_THROW_EXCEPTION(Exception("Can not find corresponding face."));
     }
+    break;
+  }
+  default:
+    break;
   }
 
   return query_visibility(fh, fh->outer_ccb());

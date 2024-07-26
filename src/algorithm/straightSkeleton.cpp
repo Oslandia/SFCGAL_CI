@@ -38,6 +38,14 @@ using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
 using Straight_skeleton_2  = CGAL::Straight_skeleton_2<Kernel>;
 using Mesh                 = CGAL::Surface_mesh<Point_3>;
 
+#if CGAL_VERSION_MAJOR < 6
+template <class T>
+using SHARED_PTR = boost::shared_ptr<T>;
+#else
+template <class T>
+using SHARED_PTR = std::shared_ptr<T>;
+#endif
+
 namespace { // anonymous
 
 template <class K, bool outputDistanceInM>
@@ -181,14 +189,14 @@ straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &ss,
 
 auto
 straightSkeleton(const Polygon_with_holes_2 &poly)
-    -> boost::shared_ptr<Straight_skeleton_2>
+    -> SHARED_PTR<Straight_skeleton_2>
 {
-  boost::shared_ptr<CGAL::Straight_skeleton_2<CGAL::Epick>> const sk =
+  SHARED_PTR<CGAL::Straight_skeleton_2<CGAL::Epick>> const sk =
       CGAL::create_interior_straight_skeleton_2(
           poly.outer_boundary().vertices_begin(),
           poly.outer_boundary().vertices_end(), poly.holes_begin(),
           poly.holes_end(), CGAL::Epick());
-  boost::shared_ptr<Straight_skeleton_2> ret;
+  SHARED_PTR<Straight_skeleton_2> ret;
   if (sk) {
     ret = CGAL::convert_straight_skeleton_2<Straight_skeleton_2>(*sk);
   }
@@ -316,10 +324,9 @@ straightSkeleton(const Polygon &g, bool /*autoOrientation*/, bool innerOnly,
     return result;
   }
 
-  Kernel::Vector_2           trans;
-  Polygon_with_holes_2 const polygon = preparePolygon(g, trans);
-  boost::shared_ptr<Straight_skeleton_2> const skeleton =
-      straightSkeleton(polygon);
+  Kernel::Vector_2                      trans;
+  Polygon_with_holes_2 const            polygon  = preparePolygon(g, trans);
+  SHARED_PTR<Straight_skeleton_2> const skeleton = straightSkeleton(polygon);
 
   if (skeleton == nullptr) {
     BOOST_THROW_EXCEPTION(Exception("CGAL failed to create straightSkeleton"));
@@ -348,8 +355,7 @@ straightSkeleton(const MultiPolygon &g, bool /*autoOrientation*/,
   for (size_t i = 0; i < g.numGeometries(); i++) {
     Kernel::Vector_2           trans;
     Polygon_with_holes_2 const polygon = preparePolygon(g.polygonN(i), trans);
-    boost::shared_ptr<Straight_skeleton_2> const skeleton =
-        straightSkeleton(polygon);
+    SHARED_PTR<Straight_skeleton_2> const skeleton = straightSkeleton(polygon);
 
     if (skeleton == nullptr) {
       BOOST_THROW_EXCEPTION(
@@ -379,10 +385,9 @@ approximateMedialAxis(const Geometry &g) -> std::unique_ptr<MultiLineString>
   extractPolygons(g, polys);
 
   for (auto &poly : polys) {
-    Kernel::Vector_2           trans;
-    Polygon_with_holes_2 const polygon = preparePolygon(poly, trans);
-    boost::shared_ptr<Straight_skeleton_2> const skeleton =
-        straightSkeleton(polygon);
+    Kernel::Vector_2                      trans;
+    Polygon_with_holes_2 const            polygon = preparePolygon(poly, trans);
+    SHARED_PTR<Straight_skeleton_2> const skeleton = straightSkeleton(polygon);
 
     if (skeleton == nullptr) {
       BOOST_THROW_EXCEPTION(
