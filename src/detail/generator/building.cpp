@@ -75,8 +75,11 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
 
   // fix orientation
   algorithm::makeValidOrientation(polygon);
-
+#if CGAL_VERSION_MAJOR < 6
   boost::shared_ptr<Straight_skeleton_2> const skeleton =
+#else
+  std::shared_ptr<Straight_skeleton_2> const skeleton =
+#endif
       create_interior_straight_skeleton_2(
           polygon.outer_boundary().vertices_begin(),
           polygon.outer_boundary().vertices_end(), polygon.holes_begin(),
