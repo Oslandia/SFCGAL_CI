@@ -1,6 +1,6 @@
-fedora38_clang:
+fedora40_clang:
   stage: test
-  image: fedora:38
+  image: fedora:40
 
   script:
     - yum update -qy
@@ -12,11 +12,11 @@ fedora38_clang:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.6"]
+      - CGAL_VERSION: ["6.0-beta1"]
 
-fedora38_gcc:
+fedora40_gcc:
   stage: test
-  image: fedora:38
+  image: fedora:40
 
   script:
     - yum update -qy
@@ -28,4 +28,4 @@ fedora38_gcc:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.6"]
+      - CGAL_VERSION: ["6.0-beta1"]
