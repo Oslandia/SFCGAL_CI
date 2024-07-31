@@ -20,6 +20,9 @@
  */
 #include <boost/test/unit_test.hpp>
 
+#include <CGAL/Nef_polyhedron_3.h>
+#include <CGAL/minkowski_sum_3.h>
+
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/LineString.h"
@@ -36,6 +39,8 @@
 #include "SFCGAL/algorithm/minkowskiSum.h"
 #include "SFCGAL/detail/generator/hoch.h"
 #include "SFCGAL/io/wkt.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Sphere.h"
 
 #include "SFCGAL/detail/tools/Registry.h"
 
@@ -175,6 +180,53 @@ BOOST_AUTO_TEST_CASE(testMultiPoint)
   BOOST_CHECK_EQUAL(
       sum->asText(0),
       "MULTIPOLYGON(((0 1,-1 0,0 -1,1 0,0 1)),((5 6,4 5,5 4,6 5,5 6)))");
+}
+
+BOOST_AUTO_TEST_CASE(testBuffer3D)
+{
+
+    Kernel::FT radius{10};
+    int num_vertical{4};
+    int num_horizontal{8};
+
+    Kernel::Point_3 center(0, 0, 0);
+    SFCGAL::Sphere sphere(radius, center, num_vertical, num_horizontal);
+
+    // Generate and print point cloud
+    std::vector<SFCGAL::Kernel::Point_3> points = sphere.generatePoints();
+    std::cout << "Point cloud generated with " << points.size() << " points." << std::endl;
+
+    // Generate and print polyhedron
+    CGAL::Polyhedron_3<SFCGAL::Kernel> polyhedron = sphere.generatePolyhedron();
+    std::cout << "Polyhedron generated with " << polyhedron.size_of_vertices() << " vertices and "
+              << polyhedron.size_of_facets() << " facets." << std::endl;
+
+    // Convert Polyhedron to a Nef_polyhedron
+    CGAL::Nef_polyhedron_3<SFCGAL::Kernel> N0(polyhedron);
+
+    // Create a polyline for N1
+    std::vector<SFCGAL::Kernel::Point_3> polyline_points = {
+        SFCGAL::Kernel::Point_3(-100, 0, 0),
+        SFCGAL::Kernel::Point_3(40, -70, 0),
+        SFCGAL::Kernel::Point_3(40, 50, 40),
+        SFCGAL::Kernel::Point_3(-90, -60, 60),
+        SFCGAL::Kernel::Point_3(0, 0, -100),
+        SFCGAL::Kernel::Point_3(30, 0, 150)
+    };
+    
+    CGAL::Nef_polyhedron_3<SFCGAL::Kernel> N1(polyline_points.begin(), polyline_points.end(), 
+                                              CGAL::Nef_polyhedron_3<SFCGAL::Kernel>::Points_tag());
+
+    // Perform Minkowski sum
+    CGAL::Nef_polyhedron_3<SFCGAL::Kernel> result = CGAL::minkowski_sum_3(N0, N1);
+
+    std::cout << "Minkowski sum completed." << std::endl;
+
+    // Convert result to SFCGAL::PolyhedralSurface and print
+    SFCGAL::detail::MarkedPolyhedron out;
+    result.convert_to_polyhedron(out);
+    SFCGAL::PolyhedralSurface ps{out};
+    std::cout << ps.asText(1) << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
