@@ -6,6 +6,9 @@ stages:
   - deploy
   - .post
 
+variables:
+  BUILD_CGAL_VERSION: 6.0-beta1
+
 # After ccache ci
 # coverage:
 #   image: debian:testing

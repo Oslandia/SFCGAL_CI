@@ -12,7 +12,7 @@ fedora40_clang:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["6.0-beta1"]
+      - CGAL_VERSION: [$BUILD_CGAL_VERSION]
 
 fedora40_gcc:
   stage: test
@@ -28,4 +28,4 @@ fedora40_gcc:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["6.0-beta1"]
+      - CGAL_VERSION: [$BUILD_CGAL_VERSION]

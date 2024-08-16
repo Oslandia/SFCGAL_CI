@@ -42,7 +42,7 @@ build:
   before_script:
     - apt-get update -qq
     - apt-get install --yes sudo wget build-essential
-    - ./ci/debian/before_install.sh 6.0-beta1
+    - ./ci/debian/before_install.sh $BUILD_CGAL_VERSION
   script:
     # prepare the build tree
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
