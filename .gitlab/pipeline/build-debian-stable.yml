@@ -1,0 +1,26 @@
+build:debian-stable:
+  stage: build
+  cache:
+    policy: pull-push
+    key: "${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - build-wrapper/
+      - sonar-scanner/
+      - bw-output/
+      - build/ # the build has to be made available to the sonar-scanner for the analysis
+  before_script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget build-essential
+    - ./ci/debian/before_install.sh $BUILD_CGAL_VERSION
+  script:
+    # prepare the build tree
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    # run the build inside the build wrapper
+    - build-wrapper/build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --config Release
+  artifacts:
+    paths:
+      - build/
+  only:
+    - merge_requests
+    - master
+    - develop
