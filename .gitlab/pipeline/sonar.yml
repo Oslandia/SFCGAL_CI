@@ -48,7 +48,7 @@ sonar:build-test:
     - ./ci/debian/before_install.sh $SONAR_CGAL_VERSION
   script:
     # prepare the build tree
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     # run the build inside the build wrapper
     - build-wrapper/build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --config Release
     - cd build
@@ -56,6 +56,7 @@ sonar:build-test:
   artifacts:
     paths:
       - build/
+      - CGAL/
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: always
@@ -73,6 +74,7 @@ sonar:check:
       - sonar-scanner/
       - bw-output/
       - build/
+      - CGAL/
   needs: ["sonar:build-test"]
   script:
     - sonar-scanner/bin/sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}" -Dsonar.token="${SONAR_TOKEN}" -Dsonar.cfamily.build-wrapper-output=bw-output
