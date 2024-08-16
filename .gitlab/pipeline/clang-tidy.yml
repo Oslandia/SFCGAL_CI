@@ -1,0 +1,28 @@
+test:clang-tidy:
+  stage: plateform-build-test
+  image: debian:stable
+  variables:
+    CXX: /usr/bin/clang++-19
+  cache:
+    policy: pull
+    key: "${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - build/
+  needs: ["sonar:build-test"]
+  before_script:
+    - apt update -qq
+    - apt install -y --no-install-recommends ca-certificates clang-19 clang-tidy-19 git wget
+    - ./ci/debian/before_install.sh $SONAR_CGAL_VERSION
+  script:
+    # run clang-tidy on the changes only
+    - git fetch --depth 1 origin $CI_MERGE_REQUEST_DIFF_BASE_SHA
+    - git diff -U0 $CI_MERGE_REQUEST_DIFF_BASE_SHA $CI_COMMIT_SHA '***.cpp' '***.hpp' '***.c' '***.h' | /usr/bin/clang-tidy-diff-19.py -p1 -path=build -use-color -clang-tidy-binary /usr/bin/clang-tidy-19 -export-fixes=errors.yml
+    - exit $(grep -ic "warning" errors.yml)
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "src/**/*.{c,h,cpp,hpp}"
+        - ".clang-tidy"
+  artifacts:
+    paths:
+      - errors.yml
