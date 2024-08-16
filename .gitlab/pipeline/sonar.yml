@@ -6,7 +6,7 @@ variables:
   GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
   SONAR_SCANNER_VERSION: 6.1.0.4477-linux-x64
 
-get-sonar-binaries:
+sonarcloud-get-sonar-binaries:
   stage: .pre
   cache:
     policy: push
