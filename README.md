@@ -65,7 +65,15 @@ in the default build. To build the documentation see the [dev](https://sfcgal.gi
 
 ## Style
 
-To format your code into the desired style, use the clang-format tools.
+To format your code into the desired style, use the `clang-format` tools.
+
+It can be automatically called with a series of *git hooks* (thanks to the [pre-commit](https://pre-commit.com/)) tool). To install them:  
+
+```bash
+pre-commit install
+```
+
+To commit without the *git hooks*, add the `--no-verify` option to the `git commit` command.
 
 
 ## Testing
