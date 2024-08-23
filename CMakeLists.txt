@@ -29,6 +29,7 @@ endif()
 option( SFCGAL_BUILD_EXAMPLES "build examples" OFF )
 option( SFCGAL_BUILD_TESTS "build unit and regress tests" OFF )
 option( SFCGAL_BUILD_BENCH "Build benchmarks" OFF )
+option( SFCGAL_BUILD_DOC "Build documentation" OFF )
 
 option( SFCGAL_WITH_OSG "Compile with OpenSceneGraph support" OFF )
 
@@ -233,7 +234,9 @@ if( SFCGAL_BUILD_EXAMPLES )
 endif()
 
 #-- doxygen documentation (allows make doc when doxygen is found)
-add_subdirectory( doc )
+if( SFCGAL_BUILD_DOC )
+  add_subdirectory( doc )
+endif()
 
 #-- install directories
 install(DIRECTORY ${CMAKE_BINARY_DIR}/include DESTINATION .)
