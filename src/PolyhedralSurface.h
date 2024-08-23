@@ -42,6 +42,12 @@ public:
    * Constructor with a vector of polygons
    */
   PolyhedralSurface(const std::vector<Polygon> &polygons);
+
+  /**
+   * Constructor with a Geometry
+   */
+  PolyhedralSurface(const std::unique_ptr<Geometry> &geometry);
+
   /**
    * Constructor from a Polyhedron (detail::MarkedPolyhedron or
    * CGAL::Polyhedron_3)

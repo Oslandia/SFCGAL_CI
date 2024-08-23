@@ -30,6 +30,7 @@
 #include "SFCGAL/algorithm/alphaShapes.h"
 #endif
 #include "SFCGAL/algorithm/area.h"
+#include "SFCGAL/algorithm/buffer3D.h"
 #include "SFCGAL/algorithm/convexHull.h"
 #include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/difference.h"
@@ -1729,6 +1730,44 @@ sfcgal_geometry_straight_skeleton_partition(const sfcgal_geometry_t *geom,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During straight_skeleton_partition (A, %g) :",
                    autoOrientation);
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+  return result.release();
+}
+
+extern "C" auto
+sfcgal_geometry_buffer3d(const sfcgal_geometry_t *geom, double radius,
+                         int segments, sfcgal_buffer3d_type_t buffer_type)
+    -> sfcgal_geometry_t *
+{
+  std::unique_ptr<SFCGAL::Geometry> result;
+  try {
+    SFCGAL::algorithm::Buffer3D::BufferType type;
+
+    switch (buffer_type) {
+    case SFCGAL_BUFFER3D_ROUND:
+      type = SFCGAL::algorithm::Buffer3D::ROUND;
+      break;
+    case SFCGAL_BUFFER3D_CYLSPHERE:
+      type = SFCGAL::algorithm::Buffer3D::CYLSPHERE;
+      break;
+    case SFCGAL_BUFFER3D_FLAT:
+      type = SFCGAL::algorithm::Buffer3D::FLAT;
+      break;
+    default:
+      SFCGAL_ERROR("Invalid buffer type");
+      return nullptr;
+    }
+
+    SFCGAL::algorithm::Buffer3D buffer3d(*(const SFCGAL::Geometry *)(geom),
+                                         radius, segments);
+    result = buffer3d.compute(type);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During buffer3d (A, %g, %d, %d) :", radius, segments,
+                   buffer_type);
     SFCGAL_WARNING("  with A: %s",
                    ((const SFCGAL::Geometry *)(geom))->asText().c_str());
     SFCGAL_ERROR("%s", e.what());

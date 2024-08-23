@@ -1198,6 +1198,34 @@ sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
                                    const sfcgal_geometry_t *pointA,
                                    const sfcgal_geometry_t *pointB);
 
+/**
+ * Buffer3D types
+ * @ingroup capi
+ */
+typedef enum {
+  SFCGAL_BUFFER3D_ROUND,
+  SFCGAL_BUFFER3D_CYLSPHERE,
+  SFCGAL_BUFFER3D_FLAT
+} sfcgal_buffer3d_type_t;
+
+/**
+ * Computes a 3D buffer around a geometry
+ * @param geom The input geometry (must be a Point or LineString)
+ * @param radius The buffer radius
+ * @param segments The number of segments to use for approximating curved
+ * surfaces
+ * @param buffer_type The type of buffer to compute (ROUND, CYLSPHERE, or FLAT)
+ * @return A new geometry representing the 3D buffer
+ * @pre isValid(geom) == true
+ * @pre radius > 0
+ * @pre segments > 2
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_buffer3d(const sfcgal_geometry_t *geom, double radius,
+                         int segments, sfcgal_buffer3d_type_t buffer_type);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Transformation
