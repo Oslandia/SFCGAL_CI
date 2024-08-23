@@ -1,0 +1,293 @@
+#include <CGAL/Nef_polyhedron_3.h>
+#include <CGAL/Polygon_mesh_processing/corefinement.h>
+#include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
+#include <CGAL/minkowski_sum_3.h>
+#include <SFCGAL/Cylinder.h>
+#include <SFCGAL/Kernel.h>
+#include <SFCGAL/PolyhedralSurface.h>
+#include <SFCGAL/Sphere.h>
+#include <SFCGAL/algorithm/buffer3D.h>
+#include <SFCGAL/algorithm/minkowskiSum3D.h>
+#include <SFCGAL/algorithm/union.h>
+#include <SFCGAL/detail/GeometrySet.h>
+#include <SFCGAL/triangulate/triangulatePolygon.h>
+
+namespace SFCGAL {
+namespace algorithm {
+
+Buffer3D::Buffer3D(const Geometry &inputGeometry, double radius, int segments)
+    : _radius(radius), _segments(segments)
+{
+  if (inputGeometry.is<Point>()) {
+    _inputPoints.push_back(inputGeometry.as<Point>().toPoint_3());
+  } else if (inputGeometry.is<LineString>()) {
+    const LineString &ls = inputGeometry.as<LineString>();
+    for (size_t i = 0; i < ls.numPoints(); ++i) {
+      _inputPoints.push_back(ls.pointN(i).toPoint_3());
+    }
+  } else {
+    throw std::invalid_argument("Input geometry must be a Point or LineString");
+  }
+}
+
+PolyhedralSurface
+Buffer3D::compute(BufferType type) const
+{
+  if (_inputPoints.size() == 1) {
+    return computePointBuffer();
+  }
+
+  switch (type) {
+  case ROUND:
+    return computeRoundBuffer();
+  case CYLSPHERE:
+    return computeCylSphereBuffer();
+  case FLAT:
+    return computeFlatBuffer();
+  default:
+    throw std::invalid_argument("Invalid buffer type");
+  }
+}
+
+PolyhedralSurface
+Buffer3D::computePointBuffer() const
+{
+  Kernel::Point_3 center(_inputPoints[0].x(), _inputPoints[0].y(),
+                         _inputPoints[0].z());
+  Sphere          sphere(_radius, center, _segments / 2, _segments);
+  return PolyhedralSurface(sphere.generatePolyhedron());
+}
+
+PolyhedralSurface
+Buffer3D::computeRoundBuffer() const
+{
+  typedef Kernel::Point_3                           Point_3;
+  typedef Point_3                                  *point_iterator;
+  typedef std::pair<point_iterator, point_iterator> point_range;
+  typedef std::list<point_range>                    polyline;
+  typedef CGAL::Nef_polyhedron_3<Kernel>            Nef_polyhedron;
+
+  // Create sphere
+  Point_3        center(0, 0, 0);
+  SFCGAL::Sphere sphere(_radius, center, _segments / 2, _segments);
+
+  // Generate polyhedron from sphere
+  CGAL::Polyhedron_3<Kernel> spherePolyhedron = sphere.generatePolyhedron();
+
+  // Convert Polyhedron to a Nef_polyhedron
+  Nef_polyhedron N0(spherePolyhedron);
+
+  // Create a polyline from _inputPoints
+  polyline poly;
+  if (!_inputPoints.empty()) {
+    // Create a non-const copy of the points
+    std::vector<Point_3> points_copy(_inputPoints.begin(), _inputPoints.end());
+    poly.push_back(point_range(&points_copy.front(), &points_copy.back() + 1));
+
+    // Create a Nef_polyhedron from the polyline
+    Nef_polyhedron N1(poly.begin(), poly.end(),
+                      Nef_polyhedron::Polylines_tag());
+
+    // Perform Minkowski sum
+    Nef_polyhedron result = CGAL::minkowski_sum_3(N0, N1);
+
+    // Convert result to SFCGAL::PolyhedralSurface
+    SFCGAL::detail::MarkedPolyhedron out;
+    result.convert_to_polyhedron(out);
+    return PolyhedralSurface(out);
+  } else {
+    // If _inputPoints is empty, return an empty PolyhedralSurface
+    return PolyhedralSurface();
+  }
+}
+
+PolyhedralSurface
+Buffer3D::computeCylSphereBuffer() const
+{
+  std::vector<CGAL::Polyhedron_3<Kernel>> meshes;
+
+  for (size_t i = 0; i < _inputPoints.size() - 1; ++i) {
+    // Create and add cylinder
+    Kernel::Vector_3 axis(_inputPoints[i + 1].x() - _inputPoints[i].x(),
+                          _inputPoints[i + 1].y() - _inputPoints[i].y(),
+                          _inputPoints[i + 1].z() - _inputPoints[i].z());
+    Kernel::FT      height = CGAL::sqrt(CGAL::to_double(axis.squared_length()));
+    Kernel::Point_3 base(_inputPoints[i].x(), _inputPoints[i].y(),
+                         _inputPoints[i].z());
+    Cylinder        cyl(base, axis, _radius, height, _segments);
+    meshes.push_back(cyl.generatePolyhedron());
+
+    // Add sphere at joints
+    if (i > 0) {
+      Kernel::Point_3 sphereCenter(_inputPoints[i].x(), _inputPoints[i].y(),
+                                   _inputPoints[i].z());
+      Sphere          sphere(_radius, sphereCenter, _segments / 2, _segments);
+      meshes.push_back(sphere.generatePolyhedron());
+    }
+  }
+
+  // Add sphere at the end point
+  Kernel::Point_3 endSphereCenter(_inputPoints.back().x(),
+                                  _inputPoints.back().y(),
+                                  _inputPoints.back().z());
+  Sphere          endSphere(_radius, endSphereCenter, _segments / 2, _segments);
+  meshes.push_back(endSphere.generatePolyhedron());
+
+  // Combine all meshes into a single PolyhedralSurface
+  // TODO: Use Union3D to merge interior faces?
+  PolyhedralSurface poly_surface;
+  for (const auto &mesh : meshes) {
+    poly_surface.addPolygons(mesh);
+  }
+
+  return poly_surface;
+}
+
+PolyhedralSurface
+Buffer3D::computeFlatBuffer() const
+{
+  std::vector<Kernel::Point_3> line_points;
+  for (const auto &p : _inputPoints) {
+    line_points.emplace_back(p.x(), p.y(), p.z());
+  }
+
+  Cylinder::Surface_mesh                                         buffer;
+  std::vector<std::vector<Cylinder::Surface_mesh::Vertex_index>> rings;
+
+  std::vector<Kernel::Plane_3> bisector_planes;
+  for (size_t i = 1; i < line_points.size() - 1; ++i) {
+    bisector_planes.push_back(compute_bisector_plane(
+        line_points[i - 1], line_points[i], line_points[i + 1]));
+  }
+
+  for (size_t i = 0; i < line_points.size() - 1; ++i) {
+    Kernel::Vector_3 axis = normalize(line_points[i + 1] - line_points[i]);
+    Kernel::Point_3  extended_start =
+        extend_point(line_points[i], -axis, _radius);
+    Kernel::Point_3 extended_end =
+        extend_point(line_points[i + 1], axis, _radius);
+
+    std::vector<Kernel::Point_3> start_circle =
+        create_circle_points(extended_start, axis, _radius, _segments);
+    std::vector<Kernel::Point_3> end_circle =
+        create_circle_points(extended_end, axis, _radius, _segments);
+
+    std::vector<Cylinder::Surface_mesh::Vertex_index> start_ring, end_ring;
+
+    for (size_t j = 0; j < _segments; ++j) {
+      Kernel::Point_3 start_point = start_circle[j];
+      Kernel::Point_3 end_point   = end_circle[j];
+
+      if (i > 0) {
+        start_point = intersect_segment_plane(start_point, end_point,
+                                              bisector_planes[i - 1]);
+      }
+      if (i < line_points.size() - 2) {
+        end_point =
+            intersect_segment_plane(start_point, end_point, bisector_planes[i]);
+      }
+
+      Cylinder::Surface_mesh::Vertex_index v1 = buffer.add_vertex(start_point);
+      Cylinder::Surface_mesh::Vertex_index v2 = buffer.add_vertex(end_point);
+      start_ring.push_back(v1);
+      end_ring.push_back(v2);
+
+      if (j > 0) {
+        buffer.add_face(start_ring[j - 1], start_ring[j], end_ring[j],
+                        end_ring[j - 1]);
+      }
+    }
+    buffer.add_face(start_ring.back(), start_ring.front(), end_ring.front(),
+                    end_ring.back());
+
+    rings.push_back(start_ring);
+    if (i == line_points.size() - 2)
+      rings.push_back(end_ring);
+  }
+
+  // Add caps
+  Kernel::Point_3 start_center =
+      extend_point(line_points.front(),
+                   normalize(line_points[1] - line_points.front()), -_radius);
+  Kernel::Point_3 end_center = extend_point(
+      line_points.back(),
+      normalize(line_points.back() - line_points[line_points.size() - 2]),
+      _radius);
+  Cylinder::Surface_mesh::Vertex_index start_center_index =
+      buffer.add_vertex(start_center);
+  Cylinder::Surface_mesh::Vertex_index end_center_index =
+      buffer.add_vertex(end_center);
+
+  for (size_t i = 0; i < _segments; ++i) {
+    buffer.add_face(start_center_index, rings.front()[(i + 1) % _segments],
+                    rings.front()[i]);
+    buffer.add_face(end_center_index, rings.back()[i],
+                    rings.back()[(i + 1) % _segments]);
+  }
+
+  return PolyhedralSurface(buffer);
+}
+
+Kernel::Vector_3
+Buffer3D::normalize(const Kernel::Vector_3 &v) const
+{
+  double length = std::sqrt(CGAL::to_double(v.squared_length()));
+  return v / length;
+}
+
+Kernel::Point_3
+Buffer3D::extend_point(const Kernel::Point_3  &point,
+                       const Kernel::Vector_3 &direction, double distance) const
+{
+  return point + direction * distance;
+}
+
+std::vector<Kernel::Point_3>
+Buffer3D::create_circle_points(const Kernel::Point_3  &center,
+                               const Kernel::Vector_3 &axis, double radius,
+                               int segments) const
+{
+  std::vector<Kernel::Point_3> points;
+  Kernel::Vector_3             perpendicular =
+      CGAL::cross_product(axis, Kernel::Vector_3(0, 0, 1));
+  if (perpendicular == CGAL::NULL_VECTOR) {
+    perpendicular = CGAL::cross_product(axis, Kernel::Vector_3(0, 1, 0));
+  }
+  perpendicular = normalize(perpendicular);
+  Kernel::Vector_3 perpendicular2 =
+      normalize(CGAL::cross_product(axis, perpendicular));
+
+  for (int i = 0; i < segments; ++i) {
+    double           angle  = 2.0 * M_PI * i / segments;
+    Kernel::Vector_3 offset = radius * (std::cos(angle) * perpendicular +
+                                        std::sin(angle) * perpendicular2);
+    points.push_back(center + offset);
+  }
+  return points;
+}
+
+Kernel::Plane_3
+Buffer3D::compute_bisector_plane(const Kernel::Point_3 &p1,
+                                 const Kernel::Point_3 &p2,
+                                 const Kernel::Point_3 &p3) const
+{
+  Kernel::Vector_3 v1       = normalize(p2 - p1);
+  Kernel::Vector_3 v2       = normalize(p3 - p2);
+  Kernel::Vector_3 bisector = v1 + v2;
+  return Kernel::Plane_3(p2, bisector);
+}
+
+Kernel::Point_3
+Buffer3D::intersect_segment_plane(const Kernel::Point_3 &p1,
+                                  const Kernel::Point_3 &p2,
+                                  const Kernel::Plane_3 &plane) const
+{
+  Kernel::Vector_3 v = p2 - p1;
+  Kernel::FT       t =
+      -plane.a() * p1.x() - plane.b() * p1.y() - plane.c() * p1.z() - plane.d();
+  t /= plane.a() * v.x() + plane.b() * v.y() + plane.c() * v.z();
+  return p1 + t * v;
+}
+
+} // namespace algorithm
+} // namespace SFCGAL

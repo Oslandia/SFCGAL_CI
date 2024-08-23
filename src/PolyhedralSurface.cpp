@@ -25,6 +25,23 @@ PolyhedralSurface::PolyhedralSurface(const std::vector<Polygon> &polygons)
   }
 }
 
+PolyhedralSurface::PolyhedralSurface(const std::unique_ptr<Geometry> &geometry)
+{
+  if (geometry->is<PolyhedralSurface>()) {
+    *this = static_cast<const PolyhedralSurface &>(*geometry);
+  } else if (geometry->is<TriangulatedSurface>()) {
+    const TriangulatedSurface &triangulatedSurface =
+        geometry->as<TriangulatedSurface>();
+    for (size_t i = 0; i < triangulatedSurface.numTriangles(); ++i) {
+      this->addPolygon(triangulatedSurface.triangleN(i));
+    }
+  } else if (geometry->is<Polygon>()) {
+    this->addPolygon(geometry->as<Polygon>());
+  } else {
+    throw std::invalid_argument("Cannot convert geometry to PolyhedralSurface");
+  }
+}
+
 ///
 ///
 ///
