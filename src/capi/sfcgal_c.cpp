@@ -20,6 +20,7 @@
 #include "SFCGAL/capi/sfcgal_c.h"
 
 #include "SFCGAL/detail/io/Serialization.h"
+#include "SFCGAL/io/OBJ.h"
 #include "SFCGAL/io/ewkt.h"
 #include "SFCGAL/io/vtk.h"
 #include "SFCGAL/io/wkb.h"
@@ -298,7 +299,31 @@ extern "C" void
 sfcgal_geometry_as_vtk(const sfcgal_geometry_t *pgeom, const char *filename)
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
-      io::vtk(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom), filename);)
+      io::OBJ::save(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom),
+                    filename);)
+}
+
+extern "C" void
+sfcgal_geometry_as_obj_file(const sfcgal_geometry_t *pgeom,
+                            const char              *filename)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      io::OBJ::save(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom),
+                    filename);)
+}
+
+extern "C" void
+sfcgal_geometry_as_obj(const sfcgal_geometry_t *pgeom, char **buffer,
+                       size_t *len)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      std::string obj = io::OBJ::saveToString(
+          *reinterpret_cast<const SFCGAL::Geometry *>(pgeom));
+      *len = obj.size(); *buffer = (char *)sfcgal_alloc_handler(*len + 1);
+      if (*buffer) {
+        memcpy(*buffer, obj.c_str(), *len);
+        (*buffer)[*len] = '\0';
+      } else { *len = 0; })
 }
 
 /**
