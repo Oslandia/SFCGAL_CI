@@ -222,9 +222,10 @@ checkNoTouchingHoles(const Polygon &g)
       //       more than a single point, which may be
       //       still dangerous. @todo find out !
       if (!inter->isEmpty() && inter->is<Point>()) {
-        BOOST_THROW_EXCEPTION(
-            NotImplementedException("straight skeleton of Polygon with point "
-                                    "touching rings is not implemented."));
+        BOOST_THROW_EXCEPTION(NotImplementedException(
+            std::string("straight skeleton of Polygon with point ") +
+            "touching rings is not implemented. " + "Error at " +
+            inter->asText()));
       }
     }
   }
