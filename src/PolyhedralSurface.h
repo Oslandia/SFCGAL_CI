@@ -43,9 +43,11 @@ public:
    */
   PolyhedralSurface(const std::vector<Polygon> &polygons);
   /**
-   * Constructor from a CGAL::Polyhedron_3
+   * Constructor from a Polyhedron (detail::MarkedPolyhedron or
+   * CGAL::Polyhedron_3)
    */
-  PolyhedralSurface(const detail::MarkedPolyhedron &poly);
+  template <typename Polyhedron>
+  PolyhedralSurface(const Polyhedron &poly);
   /**
    * Constructor from a CGAL::Surface_mesh
    */

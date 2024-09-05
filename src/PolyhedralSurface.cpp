@@ -35,19 +35,18 @@ PolyhedralSurface::PolyhedralSurface(const PolyhedralSurface &other)
 ///
 ///
 ///
-PolyhedralSurface::PolyhedralSurface(const MarkedPolyhedron &poly)
+template <typename Polyhedron>
+PolyhedralSurface::PolyhedralSurface(const Polyhedron &poly)
 {
-  for (MarkedPolyhedron::Facet_const_iterator fit = poly.facets_begin();
+  for (typename Polyhedron::Facet_const_iterator fit = poly.facets_begin();
        fit != poly.facets_end(); ++fit) {
     auto *face = new LineString();
-    MarkedPolyhedron::Halfedge_around_facet_const_circulator hit =
+    typename Polyhedron::Halfedge_around_facet_const_circulator hit =
         fit->facet_begin();
-
     do {
       face->addPoint(hit->vertex()->point());
       ++hit;
     } while (hit != fit->facet_begin());
-
     // close the ring
     face->addPoint(hit->vertex()->point());
     _polygons.push_back(new Polygon(face));
@@ -254,4 +253,9 @@ PolyhedralSurface::accept(ConstGeometryVisitor &visitor) const
 {
   return visitor.visit(*this);
 }
+
+// Explicit instantiations
+template PolyhedralSurface::PolyhedralSurface(const detail::MarkedPolyhedron &);
+template PolyhedralSurface::PolyhedralSurface(
+    const CGAL::Polyhedron_3<Kernel> &);
 } // namespace SFCGAL
