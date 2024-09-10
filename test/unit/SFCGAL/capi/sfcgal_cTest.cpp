@@ -423,4 +423,28 @@ BOOST_AUTO_TEST_CASE(testRotateX)
   sfcgal_geometry_delete(rotated);
 }
 
+BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionC)
+{
+
+  sfcgal_set_error_handlers(printf, on_error);
+  std::unique_ptr<Geometry> const geom(
+      io::readWkt("POLYGON((0 0, 0 2, 1 2, 1 1, 2 1, 2 0, 0 0))"));
+  std::string const expectedWKT(
+      "MULTIPOLYGON(((0.00 0.00,0.50 0.50,0.50 1.50,0.00 2.00)),((2.00 "
+      "0.00,1.50 0.50,0.50 0.50,0.00 0.00)),((2.00 1.00,1.50 0.50,2.00 "
+      "0.00)),((1.00 1.00,0.50 0.50,1.50 0.50,2.00 1.00)),((1.00 2.00,0.50 "
+      "1.50,0.50 0.50,1.00 1.00)),((0.00 2.00,0.50 1.50,1.00 2.00)))");
+  sfcgal_geometry_t *result =
+      sfcgal_geometry_straight_skeleton_partition(geom.get(), true);
+  // retrieve wkb from C api
+  char  *wkbApi;
+  size_t wkbLen;
+  sfcgal_geometry_as_text_decim(result, 2, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+
+  // check
+  BOOST_CHECK_EQUAL(expectedWKT, strApi);
+  delete[] wkbApi;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
