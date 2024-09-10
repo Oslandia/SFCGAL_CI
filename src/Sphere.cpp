@@ -1,8 +1,12 @@
-// Copyright (c) 2024-2024, Oslandia.
-// SPDX-License-Identifier: LGPL-2.0-or-later
+/**
+ * @file Sphere.cpp
+ * @author SFCGAL
+ * @brief Implementation of the Sphere class
+ */
 
 #include "SFCGAL/Sphere.h"
 #include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <CGAL/Vector_3.h>
 #include <cmath>
 
 namespace SFCGAL {
@@ -10,14 +14,17 @@ namespace SFCGAL {
 using Point_3      = Kernel::Point_3;
 using Polyhedron_3 = CGAL::Polyhedron_3<Kernel>;
 
-// Helper class for building the sphere polyhedron
+/**
+ * @brief Helper class for building the sphere polyhedron
+ */
 template <class HDS>
 class Sphere_builder : public CGAL::Modifier_base<HDS> {
 public:
   Sphere_builder(double radius, int num_vertical, int num_horizontal,
-                 Point_3 center = Point_3(0, 0, 0))
+                 Point_3 center, Kernel::Vector_3 direction)
       : radius(radius), num_vertical(num_vertical),
-        num_horizontal(num_horizontal), center(center)
+        num_horizontal(num_horizontal), center(center),
+        direction(normalizeVector(direction))
   {
   }
 
@@ -43,12 +50,33 @@ public:
   }
 
 private:
-  // Add all vertices of the sphere
+  // Function to normalize a vector
+  Kernel::Vector_3
+  normalizeVector(const Kernel::Vector_3 &vec)
+  {
+    Kernel::FT length = CGAL::sqrt(CGAL::to_double(vec.squared_length()));
+    return (length > 0) ? vec / length : vec;
+  }
+
+  // Function to get an orthogonal vector in the XY plane
+  Kernel::Vector_3
+  get_orthogonal_vector(const Kernel::Vector_3 &vec)
+  {
+    if (vec.x() != 0 || vec.y() != 0) {
+      return Kernel::Vector_3(-vec.y(), vec.x(), 0);
+    } else {
+      return Kernel::Vector_3(0, -vec.z(), vec.y());
+    }
+  }
+
   void
   addVertices(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
   {
+    Kernel::Vector_3 v1 = normalizeVector(get_orthogonal_vector(direction));
+    Kernel::Vector_3 v2 = normalizeVector(CGAL::cross_product(direction, v1));
+
     // Add top vertex
-    B.add_vertex(Point_3(center.x(), center.y(), center.z() + radius));
+    B.add_vertex(Point_3(center + direction * radius));
 
     // Add middle vertices
     for (int i = 1; i < num_vertical; ++i) {
@@ -56,18 +84,17 @@ private:
       double z   = radius * std::cos(phi);
       double r   = radius * std::sin(phi);
       for (int j = 0; j < num_horizontal; ++j) {
-        double theta = 2 * M_PI * double(j) / double(num_horizontal);
-        double x     = r * std::cos(theta);
-        double y     = r * std::sin(theta);
-        B.add_vertex(Point_3(center.x() + x, center.y() + y, center.z() + z));
+        double           theta = 2 * M_PI * double(j) / double(num_horizontal);
+        Kernel::Vector_3 point_vec =
+            r * (std::cos(theta) * v1 + std::sin(theta) * v2) + z * direction;
+        B.add_vertex(Point_3(center + point_vec));
       }
     }
 
     // Add bottom vertex
-    B.add_vertex(Point_3(center.x(), center.y(), center.z() - radius));
+    B.add_vertex(Point_3(center - direction * radius));
   }
 
-  // Add faces connecting the top vertex to the first ring of vertices
   void
   addTopFaces(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
   {
@@ -80,7 +107,6 @@ private:
     }
   }
 
-  // Add faces for the middle rings of vertices
   void
   addMiddleFaces(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
   {
@@ -106,7 +132,6 @@ private:
     }
   }
 
-  // Add faces connecting the bottom vertex to the last ring of vertices
   void
   addBottomFaces(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
   {
@@ -121,16 +146,18 @@ private:
     }
   }
 
-  double  radius;
-  int     num_vertical;
-  int     num_horizontal;
-  Point_3 center;
+  double           radius;
+  int              num_vertical;
+  int              num_horizontal;
+  Point_3          center;
+  Kernel::Vector_3 direction;
 };
 
 Sphere::Sphere(const Kernel::FT &radius, const Point_3 &center,
-               int num_vertical, int num_horizontal)
+               int num_vertical, int num_horizontal,
+               const Kernel::Vector_3 &direction)
     : m_radius(radius), m_center(center), m_num_vertical(num_vertical),
-      m_num_horizontal(num_horizontal)
+      m_num_horizontal(num_horizontal), m_direction(normalizeVector(direction))
 {
 }
 
@@ -141,6 +168,7 @@ Sphere::operator=(Sphere other)
   std::swap(m_center, other.m_center);
   std::swap(m_num_vertical, other.m_num_vertical);
   std::swap(m_num_horizontal, other.m_num_horizontal);
+  std::swap(m_direction, other.m_direction);
   std::swap(m_polyhedron, other.m_polyhedron);
   std::swap(m_points, other.m_points);
   return *this;
@@ -159,7 +187,8 @@ Sphere::generateSpherePolyhedron()
 {
   Polyhedron_3                             P;
   Sphere_builder<Polyhedron_3::HalfedgeDS> builder(
-      CGAL::to_double(m_radius), m_num_vertical, m_num_horizontal, m_center);
+      CGAL::to_double(m_radius), m_num_vertical, m_num_horizontal, m_center,
+      m_direction);
   P.delegate(builder);
   return P;
 }
@@ -189,6 +218,9 @@ Sphere::generateSpherePoints()
   std::vector<Point_3> points;
   points.reserve(m_num_vertical * m_num_horizontal);
 
+  Kernel::Vector_3 v1 = normalizeVector(get_orthogonal_vector(m_direction));
+  Kernel::Vector_3 v2 = normalizeVector(CGAL::cross_product(m_direction, v1));
+
   Kernel::FT d_lat = CGAL_PI / (m_num_vertical - 1);
   Kernel::FT d_lon = 2 * CGAL_PI / m_num_horizontal;
 
@@ -197,10 +229,11 @@ Sphere::generateSpherePoints()
     Kernel::FT z   = m_radius * std::sin(CGAL::to_double(lat));
     Kernel::FT r   = m_radius * std::cos(CGAL::to_double(lat));
     for (int j = 0; j < m_num_horizontal; ++j) {
-      Kernel::FT lon = j * d_lon;
-      points.emplace_back(m_center.x() + r * std::cos(CGAL::to_double(lon)),
-                          m_center.y() + r * std::sin(CGAL::to_double(lon)),
-                          m_center.z() + z);
+      Kernel::FT       lon       = j * d_lon;
+      Kernel::Vector_3 point_vec = r * (std::cos(CGAL::to_double(lon)) * v1 +
+                                        std::sin(CGAL::to_double(lon)) * v2) +
+                                   z * m_direction;
+      points.emplace_back(m_center + point_vec);
     }
   }
   return points;

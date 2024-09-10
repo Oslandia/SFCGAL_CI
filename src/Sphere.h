@@ -1,5 +1,8 @@
-// Copyright (c) 2024-2024, Oslandia.
-// SPDX-License-Identifier: LGPL-2.0-or-later
+/**
+ * @file Sphere.h
+ * @author SFCGAL
+ * @brief Defines the Sphere class for 3D spheres
+ */
 
 #ifndef _SFCGAL_SPHERE_H_
 #define _SFCGAL_SPHERE_H_
@@ -8,6 +11,7 @@
 #include <vector>
 
 #include <CGAL/Polyhedron_3.h>
+#include <CGAL/squared_distance_3.h>
 
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/export.h"
@@ -28,10 +32,12 @@ public:
    * @param center The center point of the sphere
    * @param num_vertical The number of vertical divisions
    * @param num_horizontal The number of horizontal divisions
+   * @param direction The direction vector for sphere orientation
    */
   Sphere(const Kernel::FT      &radius = 1.0,
          const Kernel::Point_3 &center = Kernel::Point_3(0, 0, 0),
-         int num_vertical = 16, int num_horizontal = 32);
+         int num_vertical = 16, int num_horizontal = 32,
+         const Kernel::Vector_3 &direction = Kernel::Vector_3(0, 0, 1));
 
   /**
    * @brief Copy constructor
@@ -94,6 +100,17 @@ public:
   }
 
   /**
+   * @brief Sets the direction of the sphere
+   * @param direction The new direction vector
+   */
+  inline void
+  setDirection(const Kernel::Vector_3 &direction)
+  {
+    m_direction = normalizeVector(direction);
+    invalidateCache();
+  }
+
+  /**
    * @brief Gets the radius of the sphere
    * @return The radius
    */
@@ -134,6 +151,16 @@ public:
   }
 
   /**
+   * @brief Gets the direction of the sphere
+   * @return The direction vector
+   */
+  inline const Kernel::Vector_3 &
+  direction() const
+  {
+    return m_direction;
+  }
+
+  /**
    * @brief Generates a polyhedron representation of the sphere
    * @return A CGAL::Polyhedron_3 object representing the sphere
    */
@@ -149,8 +176,8 @@ public:
   generatePoints();
 
   /**
-   * @brief Volume of the Sphere
-   * @return Returns the volume of the sphere
+   * @brief Calculates the volume of the Sphere
+   * @return The volume of the sphere
    */
   double
   volume() const
@@ -160,8 +187,8 @@ public:
   }
 
   /**
-   * @brief Area of the Sphere
-   * @return Returns the area of the sphere
+   * @brief Calculates the surface area of the Sphere
+   * @return The surface area of the sphere
    */
   double
   area() const
@@ -174,6 +201,7 @@ private:
   Kernel::Point_3                             m_center;
   int                                         m_num_vertical;
   int                                         m_num_horizontal;
+  Kernel::Vector_3                            m_direction;
   std::optional<CGAL::Polyhedron_3<Kernel>>   m_polyhedron;
   std::optional<std::vector<Kernel::Point_3>> m_points;
 
@@ -183,6 +211,28 @@ private:
   generateSpherePolyhedron();
   std::vector<Kernel::Point_3>
   generateSpherePoints();
+
+  /**
+   * @brief Normalizes a vector
+   * @param v The vector to normalize
+   * @return The normalized vector
+   */
+  static Kernel::Vector_3
+  normalizeVector(const Kernel::Vector_3 &vec)
+  {
+    Kernel::FT length = CGAL::sqrt(CGAL::to_double(vec.squared_length()));
+    return (length > 0) ? vec / length : vec;
+  }
+  // Function to get an orthogonal vector in the XY plane
+  static Kernel::Vector_3
+  get_orthogonal_vector(const Kernel::Vector_3 &vec)
+  {
+    if (vec.x() != 0 || vec.y() != 0) {
+      return Kernel::Vector_3(-vec.y(), vec.x(), 0);
+    } else {
+      return Kernel::Vector_3(0, -vec.z(), vec.y());
+    }
+  }
 };
 
 } // namespace SFCGAL
