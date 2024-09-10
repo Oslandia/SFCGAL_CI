@@ -1716,3 +1716,23 @@ sfcgal_geometry_rotate_z(const sfcgal_geometry_t *geom, double angle)
       std::unique_ptr<SFCGAL::Geometry> result(g.clone());
       SFCGAL::algorithm::rotateZ(*result, angle); return result.release();)
 }
+
+extern "C" auto
+sfcgal_geometry_straight_skeleton_partition(const sfcgal_geometry_t *geom,
+                                            bool autoOrientation)
+    -> sfcgal_geometry_t *
+{
+  std::unique_ptr<SFCGAL::Geometry> result;
+  try {
+    result = SFCGAL::algorithm::straightSkeletonPartition(
+        *(const SFCGAL::Geometry *)(geom));
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During straight_skeleton_partition (A, %g) :",
+                   autoOrientation);
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+  return result.release();
+}

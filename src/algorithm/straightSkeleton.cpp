@@ -22,6 +22,8 @@
 #include "SFCGAL/algorithm/tesselate.h"
 #include "SFCGAL/algorithm/translate.h"
 
+#include <CGAL/Arr_segment_traits_2.h>
+#include <CGAL/Arrangement_2.h>
 #include <CGAL/Straight_skeleton_converter_2.h>
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/create_straight_skeleton_from_polygon_with_holes_2.h>
@@ -37,6 +39,8 @@ using Polygon_2            = CGAL::Polygon_2<Kernel>;
 using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
 using Straight_skeleton_2  = CGAL::Straight_skeleton_2<Kernel>;
 using Mesh                 = CGAL::Surface_mesh<Point_3>;
+using Segment_2            = Kernel::Segment_2;
+using Arrangement_2 = CGAL::Arrangement_2<CGAL::Arr_segment_traits_2<Kernel>>;
 
 #if CGAL_VERSION_MAJOR < 6
 template <class T>
@@ -443,5 +447,106 @@ extrudeStraightSkeleton(const Geometry &g, double building_height,
       new PolyhedralSurface(building->as<Solid>().exteriorShell())};
   result->addPolygons(*roof);
   return result;
-};
+}
+
+auto
+straightSkeletonPartition(const Geometry &g, bool autoOrientation)
+    -> std::unique_ptr<MultiPolygon>
+{
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
+
+  std::unique_ptr<MultiPolygon> result(new MultiPolygon);
+
+  switch (g.geometryTypeId()) {
+  case TYPE_TRIANGLE:
+    return straightSkeletonPartition(g.as<Triangle>().toPolygon(),
+                                     autoOrientation);
+  case TYPE_POLYGON:
+    return straightSkeletonPartition(g.as<Polygon>(), autoOrientation);
+  case TYPE_MULTIPOLYGON:
+    return straightSkeletonPartition(g.as<MultiPolygon>(), autoOrientation);
+  default:
+    BOOST_THROW_EXCEPTION(
+        Exception("Geometry must be a Polygon or MultiPolygon"));
+  }
+
+  return result;
+}
+
+auto
+straightSkeletonPartition(const MultiPolygon &g, bool autoOrientation)
+    -> std::unique_ptr<MultiPolygon>
+{
+  std::unique_ptr<MultiPolygon> result(new MultiPolygon);
+
+  for (size_t i = 0; i < g.numGeometries(); i++) {
+    std::unique_ptr<MultiPolygon> partitioned =
+        straightSkeletonPartition(g.polygonN(i), autoOrientation);
+    for (size_t j = 0; j < partitioned->numGeometries(); j++) {
+      result->addGeometry(partitioned->geometryN(j));
+    }
+  }
+
+  return result;
+}
+
+auto
+straightSkeletonPartition(const Polygon &g, bool /*autoOrientation*/)
+    -> std::unique_ptr<MultiPolygon>
+{
+  std::unique_ptr<MultiPolygon> result(new MultiPolygon);
+
+  if (g.isEmpty()) {
+    return result;
+  }
+
+  Kernel::Vector_2                      trans;
+  Polygon_with_holes_2 const            polygon  = preparePolygon(g, trans);
+  SHARED_PTR<Straight_skeleton_2> const skeleton = straightSkeleton(polygon);
+
+  if (skeleton == nullptr) {
+    BOOST_THROW_EXCEPTION(Exception("CGAL failed to create straightSkeleton"));
+  }
+
+  // Function to create a polygon from a face
+  auto create_polygon_from_face =
+      [&trans](const Straight_skeleton_2::Face_const_handle &face) {
+        std::vector<Point>                         points;
+        Straight_skeleton_2::Halfedge_const_handle start   = face->halfedge();
+        Straight_skeleton_2::Halfedge_const_handle current = start;
+        do {
+          const Point_2 &p = current->vertex()->point();
+          points.emplace_back(CGAL::to_double(p.x()), CGAL::to_double(p.y()));
+          current = current->next();
+        } while (current != start);
+
+        SFCGAL::Polygon poly(SFCGAL::LineString(std::move(points)));
+        algorithm::translate(poly, trans);
+        return poly;
+      };
+
+  // Function to check if a face corresponds to a hole
+  auto is_hole_face = [&polygon](
+                          const Straight_skeleton_2::Face_const_handle &face) {
+    Point_2 test_point = face->halfedge()->vertex()->point();
+    for (auto hit = polygon.holes_begin(); hit != polygon.holes_end(); ++hit) {
+      if (hit->bounded_side(test_point) == CGAL::ON_BOUNDED_SIDE) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Iterate through the faces of the skeleton
+  for (auto face = skeleton->faces_begin(); face != skeleton->faces_end();
+       ++face) {
+    // Skip the faces that correspond to holes
+    if (is_hole_face(face))
+      continue;
+
+    result->addGeometry(create_polygon_from_face(face));
+  }
+
+  return result;
+}
 } // namespace SFCGAL::algorithm

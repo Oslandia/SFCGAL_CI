@@ -1066,6 +1066,16 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_approximate_medial_axis(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns the straight skeleton partition for the given Polygon
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_straight_skeleton_partition(const sfcgal_geometry_t *geom,
+                                            bool autoOrientation);
+
+/**
  * Tests the coverage of geom1 and geom2
  * @pre isValid(geom1) == true
  * @pre isValid(geom2) == true
