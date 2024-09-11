@@ -44,6 +44,7 @@
 #include "SFCGAL/algorithm/offset.h"
 #include "SFCGAL/algorithm/partition_2.h"
 #include "SFCGAL/algorithm/plane.h"
+#include "SFCGAL/algorithm/rotate.h"
 #include "SFCGAL/algorithm/straightSkeleton.h"
 #include "SFCGAL/algorithm/tesselate.h"
 #include "SFCGAL/algorithm/union.h"
@@ -1534,4 +1535,90 @@ sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
   }
 
   return result.release();
+}
+
+extern "C" auto
+sfcgal_geometry_rotate(const sfcgal_geometry_t *geom, double angle)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::rotate(*result, angle); return result.release();)
+}
+
+extern "C" auto
+sfcgal_geometry_rotate_2d(const sfcgal_geometry_t *geom, double angle,
+                          double cx, double cy) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::rotate(*result, angle, SFCGAL::Point(cx, cy));
+      return result.release();)
+}
+
+extern "C" auto
+sfcgal_geometry_rotate_3d(const sfcgal_geometry_t *geom, double angle,
+                          double ax, double ay, double az)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::rotate(*result, angle,
+                                SFCGAL::Kernel::Vector_3(ax, ay, az));
+      return result.release();)
+}
+
+extern "C" auto
+sfcgal_geometry_rotate_3d_around_center(const sfcgal_geometry_t *geom,
+                                        double angle, double ax, double ay,
+                                        double az, double cx, double cy,
+                                        double cz) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::rotate(*result, angle,
+                                SFCGAL::Kernel::Vector_3(ax, ay, az),
+                                SFCGAL::Point(cx, cy, cz));
+      return result.release();)
+}
+
+extern "C" auto
+sfcgal_geometry_rotate_x(const sfcgal_geometry_t *geom, double angle)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::rotateX(*result, angle); return result.release();)
+}
+
+extern "C" auto
+sfcgal_geometry_rotate_y(const sfcgal_geometry_t *geom, double angle)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::rotateY(*result, angle); return result.release();)
+}
+
+extern "C" auto
+sfcgal_geometry_rotate_z(const sfcgal_geometry_t *geom, double angle)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::rotateZ(*result, angle); return result.release();)
 }
