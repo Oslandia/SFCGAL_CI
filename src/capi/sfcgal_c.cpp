@@ -44,6 +44,7 @@
 #include "SFCGAL/algorithm/offset.h"
 #include "SFCGAL/algorithm/partition_2.h"
 #include "SFCGAL/algorithm/plane.h"
+#include "SFCGAL/algorithm/scale.h"
 #include "SFCGAL/algorithm/straightSkeleton.h"
 #include "SFCGAL/algorithm/tesselate.h"
 #include "SFCGAL/algorithm/union.h"
@@ -1534,4 +1535,40 @@ sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
   }
 
   return result.release();
+}
+
+extern "C" auto
+sfcgal_geometry_scale(const sfcgal_geometry_t *geom, double s)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::scale(*result, s); return result.release();)
+}
+
+extern "C" auto
+sfcgal_geometry_scale_3d(const sfcgal_geometry_t *geom, double sx, double sy,
+                         double sz) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::scale(*result, sx, sy, sz); return result.release();)
+}
+
+extern "C" auto
+sfcgal_geometry_scale_3d_around_center(const sfcgal_geometry_t *geom, double sx,
+                                       double sy, double sz, double cx,
+                                       double cy, double cz)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const SFCGAL::Geometry &g =
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom);
+      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      SFCGAL::algorithm::scale(*result, sx, sy, sz, cx, cy, cz);
+      return result.release();)
 }
