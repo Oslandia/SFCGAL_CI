@@ -237,4 +237,96 @@ BOOST_AUTO_TEST_CASE(testForceRHR_3D)
   BOOST_CHECK_EQUAL(expectedGeom, strApi);
   delete[] wkbApi;
 }
+
+BOOST_AUTO_TEST_CASE(testScaleUniformC)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt("POINT(1 2 3)"));
+
+  hasError                  = false;
+  sfcgal_geometry_t *scaled = sfcgal_geometry_scale(g.get(), 2.0);
+  BOOST_CHECK(hasError == false);
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(scaled, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z(2 4 6)");
+
+  sfcgal_geometry_delete(scaled);
+}
+
+BOOST_AUTO_TEST_CASE(testScaleNonUniformC)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt("POINT(1 2 3)"));
+
+  hasError                  = false;
+  sfcgal_geometry_t *scaled = sfcgal_geometry_scale_3d(g.get(), 2.0, 3.0, 4.0);
+  BOOST_CHECK(hasError == false);
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text(scaled, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z(2/1 6/1 12/1)");
+
+  sfcgal_geometry_delete(scaled);
+}
+
+BOOST_AUTO_TEST_CASE(testScaleAroundCenterC)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt("POINT(3 4 5)"));
+
+  hasError = false;
+  sfcgal_geometry_t *scaled =
+      sfcgal_geometry_scale_3d_around_center(g.get(), 2.0, 2.0, 2.0, 1, 1, 1);
+  BOOST_CHECK(hasError == false);
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(scaled, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z(5 7 9)");
+
+  sfcgal_geometry_delete(scaled);
+}
+
+BOOST_AUTO_TEST_CASE(testScaleCubeNonUniformC)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // Create a cube with side length 10
+  std::string cubeWkt = "POLYHEDRALSURFACE Z ("
+                        "((0 0 0, 0 10 0, 10 10 0, 10 0 0, 0 0 0)),"
+                        "((0 0 10, 10 0 10, 10 10 10, 0 10 10, 0 0 10)),"
+                        "((0 0 0, 10 0 0, 10 0 10, 0 0 10, 0 0 0)),"
+                        "((10 0 0, 10 10 0, 10 10 10, 10 0 10, 10 0 0)),"
+                        "((0 10 0, 0 10 10, 10 10 10, 10 10 0, 0 10 0)),"
+                        "((0 0 0, 0 0 10, 0 10 10, 0 10 0, 0 0 0)))";
+
+  std::unique_ptr<Geometry> const g(io::readWkt(cubeWkt));
+
+  hasError                  = false;
+  sfcgal_geometry_t *scaled = sfcgal_geometry_scale_3d(g.get(), 0.5, 1.0, 2.0);
+  BOOST_CHECK(hasError == false);
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(scaled, 0, &wkt, &len);
+
+  // Check a few key points to ensure the scaling was applied correctly
+  std::string scaledWkt(wkt);
+  BOOST_CHECK(scaledWkt.find("0 0 0") !=
+              std::string::npos); // Origin should remain unchanged
+  BOOST_CHECK(scaledWkt.find("5 10 20") !=
+              std::string::npos); // (10,10,10) should become (5,10,20)
+  BOOST_CHECK(scaledWkt.find("5 0 0") !=
+              std::string::npos); // (10,0,0) should become (5,0,0)
+  BOOST_CHECK(scaledWkt.find("0 10 20") !=
+              std::string::npos); // (0,10,10) should become (0,10,20)
+
+  sfcgal_geometry_delete(scaled);
+}
 BOOST_AUTO_TEST_SUITE_END()

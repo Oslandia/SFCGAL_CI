@@ -1181,6 +1181,44 @@ sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
                                    const sfcgal_geometry_t *pointA,
                                    const sfcgal_geometry_t *pointB);
 
+/**
+ * Scale a geometry by a given factor
+ * @param geom The geometry to scale
+ * @param s Scale factor
+ * @return The scaled geometry
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_scale(const sfcgal_geometry_t *geom, double s);
+
+/**
+ * Scale a geometry by different factors for each dimension
+ * @param geom The geometry to scale
+ * @param sx Scale factor for x dimension
+ * @param sy Scale factor for y dimension
+ * @param sz Scale factor for z dimension
+ * @return The scaled geometry
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_scale_3d(const sfcgal_geometry_t *geom, double sx, double sy,
+                         double sz);
+
+/**
+ * Scale a geometry by different factors for each dimension around a center
+ * point
+ * @param geom The geometry to scale
+ * @param sx Scale factor for x dimension
+ * @param sy Scale factor for y dimension
+ * @param sz Scale factor for z dimension
+ * @param cx X-coordinate of the center point
+ * @param cy Y-coordinate of the center point
+ * @param cz Z-coordinate of the center point
+ * @return The scaled geometry
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_scale_3d_around_center(const sfcgal_geometry_t *geom, double sx,
+                                       double sy, double sz, double cx,
+                                       double cy, double cz);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Transformation
