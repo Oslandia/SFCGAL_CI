@@ -18,19 +18,16 @@ namespace algorithm {
 
 /**
  * @brief translate a geometry from a given vector
- * @todo unittest
  */
 SFCGAL_API void
 translate(Geometry &g, const Kernel::Vector_3 &v);
 /**
  * @brief translate a geometry from a given vector
- * @todo unittest
  */
 SFCGAL_API void
 translate(Geometry &g, const Kernel::Vector_2 &v);
 /**
  * @brief translate a geometry from a given vector
- * @todo unittest
  */
 SFCGAL_API void
 translate(Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
@@ -38,7 +35,6 @@ translate(Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
 
 /**
  * @brief translate a geometry from double-coordinates
- * @todo unittest
  */
 SFCGAL_API void
 translate(Geometry &g, const double &dx, const double &dy, const double &dz);
