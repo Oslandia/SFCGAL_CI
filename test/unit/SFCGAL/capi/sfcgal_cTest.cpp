@@ -329,4 +329,98 @@ BOOST_AUTO_TEST_CASE(testScaleCubeNonUniformC)
 
   sfcgal_geometry_delete(scaled);
 }
+
+BOOST_AUTO_TEST_CASE(testRotate2D)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt("POINT(1 0)"));
+
+  hasError                   = false;
+  sfcgal_geometry_t *rotated = sfcgal_geometry_rotate(g.get(), M_PI / 2);
+  BOOST_CHECK(hasError == false);
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT(0 1)");
+
+  sfcgal_geometry_delete(rotated);
+}
+
+BOOST_AUTO_TEST_CASE(testRotate2DAroundPoint)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt("POINT(2 0)"));
+
+  hasError = false;
+  sfcgal_geometry_t *rotated =
+      sfcgal_geometry_rotate_2d(g.get(), M_PI / 2, 1, 0);
+  BOOST_CHECK(hasError == false);
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT(1 1)");
+
+  sfcgal_geometry_delete(rotated);
+}
+
+BOOST_AUTO_TEST_CASE(testRotate3D)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt("POINT(1 0 0)"));
+
+  hasError = false;
+  sfcgal_geometry_t *rotated =
+      sfcgal_geometry_rotate_3d(g.get(), M_PI / 2, 0, 0, 1);
+  BOOST_CHECK(hasError == false);
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z(0 1 0)");
+
+  sfcgal_geometry_delete(rotated);
+}
+
+BOOST_AUTO_TEST_CASE(testRotate3DAroundCenter)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt("POINT(2 0 0)"));
+
+  hasError                   = false;
+  sfcgal_geometry_t *rotated = sfcgal_geometry_rotate_3d_around_center(
+      g.get(), M_PI / 2, 0, 0, 1, 1, 0, 0);
+  BOOST_CHECK(hasError == false);
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z(1 1 0)");
+
+  sfcgal_geometry_delete(rotated);
+}
+
+BOOST_AUTO_TEST_CASE(testRotateX)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt("POINT(0 1 0)"));
+
+  hasError                   = false;
+  sfcgal_geometry_t *rotated = sfcgal_geometry_rotate_x(g.get(), M_PI / 2);
+  BOOST_CHECK(hasError == false);
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z(0 0 1)");
+
+  sfcgal_geometry_delete(rotated);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
