@@ -20,7 +20,7 @@ namespace OBJ {
  * @param[out] out The output stream
  * @throws std::runtime_error If the geometry is invalid or unsupported
  */
-void
+SFCGAL_API void
 save(const Geometry &geom, std::ostream &out);
 
 /**
@@ -32,7 +32,7 @@ save(const Geometry &geom, std::ostream &out);
  * @throws std::runtime_error If the file cannot be opened or the geometry is
  * invalid
  */
-void
+SFCGAL_API void
 save(const Geometry &geom, const std::string &filename);
 
 /**
@@ -43,8 +43,8 @@ save(const Geometry &geom, const std::string &filename);
  * @return The OBJ format string
  * @throws std::runtime_error If the geometry is invalid or unsupported
  */
-std::string
-saveToString(const Geometry &geom);
+SFCGAL_API std::string
+           saveToString(const Geometry &geom);
 
 /**
  * @brief Saves a geometry to an OBJ format buffer (C API).
@@ -56,7 +56,7 @@ saveToString(const Geometry &geom);
  * of bytes written (or required if buffer is null)
  * @throws std::runtime_error If the geometry is invalid or unsupported
  */
-void
+SFCGAL_API void
 saveToBuffer(const Geometry &geom, char *buffer, size_t *size);
 
 } // namespace OBJ

@@ -26,8 +26,9 @@ using namespace SFCGAL;
 
 namespace SFCGAL {
 namespace io {
+
 // print each ring has a different polygon
-inline void
+SFCGAL_API void
 vtk(const Polygon &poly, const std::string &file)
 {
   std::stringstream pointStr;
@@ -64,7 +65,7 @@ vtk(const Polygon &poly, const std::string &file)
 }
 
 template <typename MultiPolygonOrPolyhedraSurface>
-void
+SFCGAL_API void
 vtk(const MultiPolygonOrPolyhedraSurface &multiPoly, const std::string &file)
 {
   std::stringstream pointStr;
@@ -105,13 +106,13 @@ vtk(const MultiPolygonOrPolyhedraSurface &multiPoly, const std::string &file)
       << polyStr.str();
 }
 
-inline void
+SFCGAL_API void
 vtk(const Triangle &tri, const std::string &file)
 {
   vtk(tri.toPolygon(), file);
 }
 
-inline void
+SFCGAL_API void
 vtk(const TriangulatedSurface &s, const std::string &file)
 {
   std::stringstream pointStr;
@@ -148,7 +149,7 @@ vtk(const TriangulatedSurface &s, const std::string &file)
       << polyStr.str();
 }
 
-inline void
+SFCGAL_API void
 vtk(const Geometry &g, const std::string &file)
 {
   switch (g.geometryTypeId()) {
