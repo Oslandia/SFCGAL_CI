@@ -10,15 +10,7 @@ namespace SFCGAL::algorithm {
 void
 scale(Geometry &g, double s)
 {
-  if (g.is3D()) {
-    CGAL::Aff_transformation_3<Kernel> transform(CGAL::SCALING, s);
-    transform::AffineTransform3        scaleTransform(transform);
-    g.accept(scaleTransform);
-  } else {
-    CGAL::Aff_transformation_2<Kernel> transform(CGAL::SCALING, s);
-    transform::AffineTransform2        scaleTransform(transform);
-    g.accept(scaleTransform);
-  }
+  scale(g, s, s, s);
 }
 
 void
