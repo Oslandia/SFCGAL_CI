@@ -1183,6 +1183,32 @@ sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
 
 /*--------------------------------------------------------------------------------------*
  *
+ * Transformation
+ *
+ *--------------------------------------------------------------------------------------*/
+
+/**
+ * Translate a geometry by a 3D vector
+ * @param geom the geometry to translate
+ * @param dx x component of the translation vector
+ * @param dy y component of the translation vector
+ * @param dz z component of the translation vector
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_translate_3d(sfcgal_geometry_t *geom, double dx, double dy,
+                             double dz);
+
+/**
+ * Translate a geometry by a 2D vector
+ * @param geom the geometry to translate
+ * @param dx x component of the translation vector
+ * @param dy y component of the translation vector
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_translate_2d(sfcgal_geometry_t *geom, double dx, double dy);
+
+/*--------------------------------------------------------------------------------------*
+ *
  * Error handling
  *
  *--------------------------------------------------------------------------------------*/

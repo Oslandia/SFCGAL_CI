@@ -46,6 +46,7 @@
 #include "SFCGAL/algorithm/plane.h"
 #include "SFCGAL/algorithm/straightSkeleton.h"
 #include "SFCGAL/algorithm/tesselate.h"
+#include "SFCGAL/algorithm/translate.h"
 #include "SFCGAL/algorithm/union.h"
 #include "SFCGAL/algorithm/visibility.h"
 #include "SFCGAL/algorithm/volume.h"
@@ -1534,4 +1535,44 @@ sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
   }
 
   return result.release();
+}
+
+extern "C" auto
+sfcgal_geometry_translate_2d(sfcgal_geometry_t *geom, double dx, double dy)
+    -> sfcgal_geometry_t *
+{
+  const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  SFCGAL::Geometry *gb = g->clone();
+  try {
+
+    SFCGAL::algorithm::translate(*gb, SFCGAL::Kernel::Vector_2(dx, dy));
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During translate(A, %g, %g):", dx, dy);
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(gb))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  return gb;
+}
+
+extern "C" auto
+sfcgal_geometry_translate_3d(sfcgal_geometry_t *geom, double dx, double dy,
+                             double dz) -> sfcgal_geometry_t *
+{
+  const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  SFCGAL::Geometry *gb = g->clone();
+
+  try {
+    SFCGAL::algorithm::translate(*gb, SFCGAL::Kernel::Vector_3(dx, dy, dz));
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During translate(A, %g, %g, %g):", dx, dy, dz);
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(gb))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  return gb;
 }
