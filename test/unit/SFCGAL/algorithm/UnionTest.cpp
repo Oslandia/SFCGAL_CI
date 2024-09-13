@@ -18,12 +18,16 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
+#include "SFCGAL/algorithm/union.h"
 #include "SFCGAL/Exception.h"
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/Solid.h"
 #include "SFCGAL/algorithm/area.h"
 #include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/algorithm/tesselate.h"
 #include "SFCGAL/algorithm/translate.h"
-#include "SFCGAL/algorithm/union.h"
 #include "SFCGAL/algorithm/volume.h"
 #include "SFCGAL/detail/tools/Registry.h"
 #include "SFCGAL/triangulate/triangulatePolygon.h"
