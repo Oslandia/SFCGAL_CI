@@ -1,0 +1,12 @@
+# vtk DataFile Version 2.0
+SFCGAL Geometry
+ASCII
+DATASET UNSTRUCTURED_GRID
+POINTS 3 float
+0 0 0
+1 1 0
+2 2 0
+CELLS 1 4
+3 0 1 2
+CELL_TYPES 1
+4

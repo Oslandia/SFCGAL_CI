@@ -298,12 +298,27 @@ sfcgal_geometry_as_hexwkb(const sfcgal_geometry_t *pgeom, char **buffer,
       strncpy(*buffer, wkb.c_str(), *len);)
 }
 
-extern "C" void
-sfcgal_geometry_as_vtk(const sfcgal_geometry_t *pgeom, const char *filename)
+extern "C" auto
+sfcgal_geometry_as_vtk_file(const sfcgal_geometry_t *pgeom,
+                            const char              *filename) -> void
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
-      io::OBJ::save(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom),
-                    filename);)
+      SFCGAL::io::VTK::save(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom),
+                            filename);)
+}
+
+extern "C" auto
+sfcgal_geometry_as_vtk(const sfcgal_geometry_t *pgeom, char **buffer,
+                       size_t *len) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      std::string obj = SFCGAL::io::VTK::saveToString(
+          *reinterpret_cast<const SFCGAL::Geometry *>(pgeom));
+      *len = obj.size(); *buffer = (char *)sfcgal_alloc_handler(*len + 1);
+      if (*buffer) {
+        memcpy(*buffer, obj.c_str(), *len);
+        (*buffer)[*len] = '\0';
+      } else { *len = 0; })
 }
 
 extern "C" void
@@ -311,8 +326,8 @@ sfcgal_geometry_as_obj_file(const sfcgal_geometry_t *pgeom,
                             const char              *filename)
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
-      io::OBJ::save(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom),
-                    filename);)
+      SFCGAL::io::OBJ::save(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom),
+                            filename);)
 }
 
 extern "C" void
@@ -320,7 +335,7 @@ sfcgal_geometry_as_obj(const sfcgal_geometry_t *pgeom, char **buffer,
                        size_t *len)
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
-      std::string obj = io::OBJ::saveToString(
+      std::string obj = SFCGAL::io::OBJ::saveToString(
           *reinterpret_cast<const SFCGAL::Geometry *>(pgeom));
       *len = obj.size(); *buffer = (char *)sfcgal_alloc_handler(*len + 1);
       if (*buffer) {
