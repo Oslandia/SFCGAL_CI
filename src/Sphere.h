@@ -1,8 +1,5 @@
-/**
- * @file Sphere.h
- * @author SFCGAL
- * @brief Defines the Sphere class for 3D spheres
- */
+// Copyright (c) 2024-2024, Oslandia.
+// SPDX-License-Identifier: LGPL-2.0-or-later
 
 #ifndef _SFCGAL_SPHERE_H_
 #define _SFCGAL_SPHERE_H_
@@ -15,6 +12,7 @@
 
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/export.h"
+#include "SFCGAL/numeric.h"
 
 namespace SFCGAL {
 
@@ -212,17 +210,6 @@ private:
   std::vector<Kernel::Point_3>
   generateSpherePoints();
 
-  /**
-   * @brief Normalizes a vector
-   * @param v The vector to normalize
-   * @return The normalized vector
-   */
-  static Kernel::Vector_3
-  normalizeVector(const Kernel::Vector_3 &vec)
-  {
-    Kernel::FT length = CGAL::sqrt(CGAL::to_double(vec.squared_length()));
-    return (length > 0) ? vec / length : vec;
-  }
   // Function to get an orthogonal vector in the XY plane
   static Kernel::Vector_3
   get_orthogonal_vector(const Kernel::Vector_3 &vec)

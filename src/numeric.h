@@ -126,6 +126,17 @@ SFCGAL_API CGAL::Gmpz
 SFCGAL_API CGAL::Gmpz
            round(const CGAL::Gmpq &v);
 
+/**
+ * @brief Normalizes a vector
+ * @param v The vector to normalize
+ * @return The normalized vector
+ */
+static Kernel::Vector_3
+normalizeVector(const Kernel::Vector_3 &vec)
+{
+  Kernel::FT length = CGAL::sqrt(CGAL::to_double(vec.squared_length()));
+  return (length > 0) ? vec / length : vec;
+}
 } // namespace SFCGAL
 
 #endif

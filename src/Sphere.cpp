@@ -1,9 +1,3 @@
-/**
- * @file Sphere.cpp
- * @author SFCGAL
- * @brief Implementation of the Sphere class
- */
-
 #include "SFCGAL/Sphere.h"
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Vector_3.h>
@@ -50,14 +44,6 @@ public:
   }
 
 private:
-  // Function to normalize a vector
-  Kernel::Vector_3
-  normalizeVector(const Kernel::Vector_3 &vec)
-  {
-    Kernel::FT length = CGAL::sqrt(CGAL::to_double(vec.squared_length()));
-    return (length > 0) ? vec / length : vec;
-  }
-
   // Function to get an orthogonal vector in the XY plane
   Kernel::Vector_3
   get_orthogonal_vector(const Kernel::Vector_3 &vec)
