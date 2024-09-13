@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 3.6 )
 project( SFCGAL )
 
 set( CMAKE_DEBUG_POSTFIX "d" )
@@ -13,6 +13,10 @@ list(APPEND CMAKE_IGNORE_PREFIX_PATH "/usr/local/include/SFCGAL")
 #
 if(POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW)
+endif()
+
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
 endif()
 
 #----------------------------------------------------------------------------
@@ -84,6 +88,10 @@ include_directories( ${CMAKE_BINARY_DIR}/include )
 
 #-- BOOST --------------------------------------------------
 option( Boost_USE_AUTO_LINK "boost use autolink" OFF )
+set(Boost_USE_DEBUG_RUNTIME OFF)
+set(Boost_USE_STATIC_LIBS OFF)
+option( Boost_USE_DEBUG_RUNTIME "Use Boost debug runtime" OFF )
+
 if( NOT ${Boost_USE_AUTO_LINK} )
 	add_definitions( "-DBOOST_ALL_NO_LIB" )
 endif()
