@@ -52,27 +52,6 @@ PolyhedralSurface::PolyhedralSurface(const PolyhedralSurface &other)
 ///
 ///
 ///
-template <typename Polyhedron>
-PolyhedralSurface::PolyhedralSurface(const Polyhedron &poly)
-{
-  for (typename Polyhedron::Facet_const_iterator fit = poly.facets_begin();
-       fit != poly.facets_end(); ++fit) {
-    auto *face = new LineString();
-    typename Polyhedron::Halfedge_around_facet_const_circulator hit =
-        fit->facet_begin();
-    do {
-      face->addPoint(hit->vertex()->point());
-      ++hit;
-    } while (hit != fit->facet_begin());
-    // close the ring
-    face->addPoint(hit->vertex()->point());
-    _polygons.push_back(new Polygon(face));
-  }
-}
-
-///
-///
-///
 PolyhedralSurface::PolyhedralSurface(const Mesh &sm)
 {
 
@@ -275,4 +254,5 @@ PolyhedralSurface::accept(ConstGeometryVisitor &visitor) const
 template PolyhedralSurface::PolyhedralSurface(const detail::MarkedPolyhedron &);
 template PolyhedralSurface::PolyhedralSurface(
     const CGAL::Polyhedron_3<Kernel> &);
+
 } // namespace SFCGAL
