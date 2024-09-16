@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(test_save_to_buffer)
   std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
 
   size_t size = 1000;
-  char   buffer[size];
+  char   buffer[1000];
   SFCGAL::io::VTK::saveToBuffer(*geom, buffer, &size);
 
   std::string result(buffer, size);
