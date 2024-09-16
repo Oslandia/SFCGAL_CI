@@ -22,7 +22,7 @@ namespace algorithm {
  * @brief Computes a 3D buffer around a Point or LineString.
  * @ingroup public_api
  */
-class Buffer3D {
+class SFCGAL_API Buffer3D {
 public:
   /**
    * @brief Buffer type enumeration
