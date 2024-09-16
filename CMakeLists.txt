@@ -18,6 +18,10 @@ endif()
 #----------------------------------------------------------------------------
 # build options
 #----------------------------------------------------------------------------
+
+# Windows M_PI
+add_compile_definitions(_USE_MATH_DEFINES)
+
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Release' as none was specified.")
