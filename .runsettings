@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <PATH>$(SolutionDir)$(Platform)\$(Configuration);%VCPKG_ROOT%\installed\x64-windows\bin;%VCPKG_ROOT%\installed\x64-windows\debug\bin;%VCPKG_ROOT%\installed\x64-windows\lib;%VCPKG_ROOT%\installed\x64-windows\debug\lib;%PATH%</PATH>
+    </EnvironmentVariables>
+  </RunConfiguration>
+</RunSettings>
