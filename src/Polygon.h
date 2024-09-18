@@ -8,6 +8,7 @@
 #include <boost/assert.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/ptr_container/serialize_ptr_vector.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <vector>
 
@@ -241,6 +242,31 @@ public:
     BOOST_ASSERT(ls != NULL);
     _rings.push_back(ls);
   }
+  /**
+   * Remove all interior rings
+   */
+  inline void
+  removeInteriorRings()
+  {
+    if (_rings.size() > 1) {
+      _rings.erase(_rings.begin() + 1, _rings.end());
+    }
+  }
+
+  /**
+   * Remove the n-th interior ring
+   * @param n index of the interior ring to remove (0-based)
+   * @throws std::out_of_range if n is greater than or equal to the number of
+   * interior rings
+   */
+  inline void
+  removeInteriorRingN(size_t n)
+  {
+    if (n >= numInteriorRings()) {
+      throw std::out_of_range("Interior ring index out of range");
+    }
+    _rings.erase(_rings.begin() + n + 1);
+  }
 
   inline iterator
   begin()
@@ -298,6 +324,34 @@ public:
   {
     ar &boost::serialization::base_object<Geometry>(*this);
     ar &_rings;
+  }
+
+  /**
+   * Returns a const iterator to the first interior ring
+   */
+  inline const_iterator
+  interiorRings_begin() const
+  {
+    return _rings.size() > 1 ? _rings.begin() + 1 : _rings.end();
+  }
+
+  /**
+   * Returns a const iterator to the end of interior rings
+   */
+  inline const_iterator
+  interiorRings_end() const
+  {
+    return _rings.end();
+  }
+
+  /**
+   * Returns a const range of interior rings
+   */
+  inline boost::iterator_range<const_iterator>
+  interiorRings() const
+  {
+    return boost::make_iterator_range(interiorRings_begin(),
+                                      interiorRings_end());
   }
 
 private:

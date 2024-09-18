@@ -175,6 +175,28 @@ public:
     return _shells[n];
   }
 
+  /**
+   * Remove all interior shells
+   */
+  inline void
+  removeInteriorShells()
+  {
+    if (_shells.size() > 1) {
+      _shells.erase(_shells.begin() + 1, _shells.end());
+    }
+  }
+
+  /**
+   * Remove the n-th interior shell
+   */
+  inline void
+  removeInteriorShellN(size_t const &n)
+  {
+    if (n < numInteriorShells()) {
+      _shells.erase(_shells.begin() + n + 1);
+    }
+  }
+
   //-- iterators
 
   inline iterator
