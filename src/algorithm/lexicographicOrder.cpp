@@ -1,310 +1,344 @@
-#include "lexicographicOrder.h"
-#include <SFCGAL/algorithm/isValid.h>
+#include "SFCGAL/algorithm/lexicographicOrder.h"
+#include "SFCGAL/algorithm/orientation.h"
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/Triangle.h"
+
 #include <algorithm>
-#include <tuple>
+#include <limits>
 
 namespace SFCGAL {
 namespace transform {
 
-// Utility function to compare two points considering X, Y, Z, and M values
-bool
-comparePoints(const Point &a, const Point &b)
-{
-  if (a.x() != b.x())
-    return a.x() < b.x();
-  if (a.y() != b.y())
-    return a.y() < b.y();
-  if (a.z() != b.z())
-    return a.z() < b.z();
-  return a.m() < b.m(); // Compare M if all others are equal
-}
+struct LexicographicPointComparator {
+  bool operator()(const Point &p1, const Point &p2) const
+  {
+    if (p1.x() != p2.x())
+      return p1.x() < p2.x();
+    if (p1.y() != p2.y())
+      return p1.y() < p2.y();
 
-// Utility function to find the lowest point of a geometry
-Point
-findLowestPoint(const Geometry &geom)
-{
-  switch (geom.geometryTypeId()) {
-  case TYPE_POINT:
-    return static_cast<const Point &>(geom);
-  case TYPE_LINESTRING: {
-    const LineString &ls = static_cast<const LineString &>(geom);
-    return *std::min_element(ls.begin(), ls.end(), comparePoints);
-  }
-  case TYPE_POLYGON: {
-    const Polygon &poly = static_cast<const Polygon &>(geom);
-    return findLowestPoint(poly.exteriorRing());
-  }
-  case TYPE_TRIANGLE: {
-    const Triangle &tri = static_cast<const Triangle &>(geom);
-    return *std::min_element(&tri.vertex(0), &tri.vertex(3), comparePoints);
-  }
-  default:
-    // For other types, traverse recursively
-    Point lowest = findLowestPoint(geom.geometryN(0));
-    for (size_t i = 1; i < geom.numGeometries(); ++i) {
-      Point current = findLowestPoint(geom.geometryN(i));
-      if (comparePoints(current, lowest))
-        lowest = current;
+    if (p1.is3D() && p2.is3D()) {
+      if (p1.z() != p2.z())
+        return p1.z() < p2.z();
+    } else if (p1.is3D() && !p2.is3D()) {
+      return false;
+    } else if (!p1.is3D() && p2.is3D()) {
+      return true;
     }
-    return lowest;
+
+    if (p1.isMeasured() && p2.isMeasured()) {
+      if (p1.m() != p2.m())
+        return p1.m() < p2.m();
+    } else if (p1.isMeasured() && !p2.isMeasured()) {
+      return false;
+    } else if (!p1.isMeasured() && p2.isMeasured()) {
+      return true;
+    }
+
+    return false;
   }
-}
+};
 
-// Implementation for Point
-void
-lexicographicOrderPoint(Point &, bool reorderRing)
+std::unique_ptr<LineString>
+lexicographicOrderRing(const LineString &ring)
 {
-  // No modification needed
-}
+  if (ring.numPoints() <= 1)
+    return std::make_unique<LineString>(ring);
 
-// Implementation for MultiPoint
-void
-lexicographicOrderMultiPoint(MultiPoint &mp, bool reorderRing)
-{
   std::vector<Point> points;
-  for (size_t i = 0; i < mp.numGeometries(); ++i) {
-    points.push_back(mp.pointN(i));
+  for (size_t i = 0; i < ring.numPoints(); ++i) {
+    points.push_back(ring.pointN(i));
   }
-  if (reorderRing)
-    std::sort(points.begin(), points.end(), comparePoints);
-  mp = MultiPoint();
-  for (const auto &point : points) {
-    mp.addGeometry(point);
+
+  auto minIt = std::min_element(points.begin(), points.end(),
+                                LexicographicPointComparator());
+
+  std::rotate(points.begin(), minIt, points.end());
+
+  if (!(points.front() == points.back())) {
+    points.push_back(points.front());
   }
+
+  LineString tempRing;
+  for (const auto &p : points) {
+    tempRing.addPoint(p);
+  }
+
+  bool isCCW = SFCGAL::algorithm::isCounterClockWiseOriented(tempRing);
+
+  if (isCCW) {
+    std::reverse(points.begin(), points.end() - 1);
+    points.back() = points.front();
+  }
+
+  auto newRing = std::make_unique<LineString>();
+  for (const auto &p : points) {
+    newRing->addPoint(p);
+  }
+
+  return newRing;
 }
 
-// Implementation for LineString
-void
-lexicographicOrderLineString(LineString &ls, bool reorderRing)
+Point
+getRepresentativePoint(const Geometry &g)
 {
-  if (reorderRing) {
-    // To reorder the LineString, find the minimal point and rotate the
-    // LineString accordingly
-    auto minIt = std::min_element(ls.begin(), ls.end(), comparePoints);
-    if (minIt != ls.begin()) {
-      std::reverse(ls.begin(), ls.end());
+  switch (g.geometryTypeId()) {
+  case TYPE_POINT:
+    return g.as<Point>();
+  case TYPE_LINESTRING:
+    return g.as<LineString>().pointN(0);
+  case TYPE_POLYGON:
+    return g.as<Polygon>().exteriorRing().pointN(0);
+  case TYPE_TRIANGLE:
+    return g.as<Triangle>().vertex(0);
+  case TYPE_SOLID:
+    return getRepresentativePoint(g.as<Solid>().exteriorShell());
+  case TYPE_POLYHEDRALSURFACE:
+    if (g.as<PolyhedralSurface>().numPolygons() > 0) {
+      return getRepresentativePoint(g.as<PolyhedralSurface>().polygonN(0));
     }
-  }
-}
-
-// Implementation for MultiLineString
-void
-lexicographicOrderMultiLineString(MultiLineString &mls, bool reorderRing)
-{
-  std::vector<LineString> lines;
-  for (size_t i = 0; i < mls.numGeometries(); ++i) {
-    LineString ls = mls.lineStringN(i);
-    lexicographicOrderLineString(ls, reorderRing);
-    lines.push_back(ls);
-  }
-
-  // Sort the LineStrings in MultiLineString based on the lowest point of each
-  // LineString
-  std::sort(lines.begin(), lines.end(),
-            [](const LineString &a, const LineString &b) {
-              return comparePoints(findLowestPoint(a), findLowestPoint(b));
-            });
-
-  mls = MultiLineString();
-  for (const auto &line : lines) {
-    mls.addGeometry(line);
-  }
-}
-
-// Utility function to reorder a ring
-LineString
-reorderRing(const LineString &ring)
-{
-  if (ring.numPoints() <= 3) {
-    return ring;
-  }
-
-  auto   minIt = std::min_element(ring.begin(), ring.end() - 1, comparePoints);
-  size_t minIndex = std::distance(ring.begin(), minIt);
-
-  std::vector<Point> newRing;
-  newRing.reserve(ring.numPoints());
-
-  newRing.insert(newRing.end(), minIt, ring.end() - 1);
-  newRing.insert(newRing.end(), ring.begin(), minIt);
-
-  newRing.push_back(newRing.front());
-
-  return LineString(newRing);
-}
-
-// Implementation for Polygon
-void
-lexicographicOrderPolygon(Polygon &poly, bool doReorderRing)
-{
-  LineString newExterior = poly.exteriorRing();
-  if (doReorderRing) {
-    newExterior = reorderRing(poly.exteriorRing());
-  }
-
-  std::vector<LineString> interiors;
-  for (size_t i = 0; i < poly.numInteriorRings(); ++i) {
-    if (doReorderRing) {
-      LineString newInterior = reorderRing(poly.interiorRingN(i));
-      interiors.push_back(newInterior);
-    } else {
-      interiors.push_back(poly.interiorRingN(i));
+    return Point();
+  default:
+    if (g.isEmpty()) {
+      return Point();
     }
-  }
-
-  std::sort(interiors.begin(), interiors.end(),
-            [](const LineString &a, const LineString &b) {
-              return comparePoints(
-                  *std::min_element(a.begin(), a.end(), comparePoints),
-                  *std::min_element(b.begin(), b.end(), comparePoints));
-            });
-
-  Polygon newPoly(newExterior);
-  for (const auto &ring : interiors) {
-    newPoly.addInteriorRing(ring);
-  }
-
-  poly = newPoly;
-}
-
-// Implementation for MultiPolygon
-void
-lexicographicOrderMultiPolygon(MultiPolygon &mp, bool reorderRing)
-{
-  std::vector<Polygon> polygons;
-  for (size_t i = 0; i < mp.numGeometries(); ++i) {
-    Polygon poly = mp.polygonN(i);
-    lexicographicOrderPolygon(poly, reorderRing);
-    polygons.push_back(poly);
-  }
-  std::sort(polygons.begin(), polygons.end(),
-            [](const Polygon &a, const Polygon &b) {
-              return comparePoints(findLowestPoint(a), findLowestPoint(b));
-            });
-  mp = MultiPolygon();
-  for (const auto &poly : polygons) {
-    mp.addGeometry(poly);
+    return getRepresentativePoint(g.geometryN(0));
   }
 }
 
-// Implementation for PolyhedralSurface
-void
-lexicographicOrderPolyhedralSurface(PolyhedralSurface &ps, bool reorderRing)
-{
-  std::vector<Polygon> polygons;
-  for (size_t i = 0; i < ps.numPolygons(); ++i) {
-    Polygon poly = ps.polygonN(i);
-    lexicographicOrderPolygon(poly, reorderRing);
-    polygons.push_back(poly);
-  }
-
-  std::sort(polygons.begin(), polygons.end(),
-            [](const Polygon &a, const Polygon &b) {
-              return comparePoints(findLowestPoint(a), findLowestPoint(b));
-            });
-
-  ps = PolyhedralSurface(polygons);
-}
-
-// Implementation for Solid
-void
-lexicographicOrderSolid(Solid &solid, bool reorderRing)
-{
-  lexicographicOrderPolyhedralSurface(solid.exteriorShell(), reorderRing);
-  std::vector<PolyhedralSurface> interiorShells;
-  for (size_t i = 0; i < solid.numInteriorShells(); ++i) {
-    PolyhedralSurface shell = solid.interiorShellN(i);
-    lexicographicOrderPolyhedralSurface(shell, reorderRing);
-    interiorShells.push_back(shell);
-  }
-  std::sort(interiorShells.begin(), interiorShells.end(),
-            [](const PolyhedralSurface &a, const PolyhedralSurface &b) {
-              return comparePoints(findLowestPoint(a), findLowestPoint(b));
-            });
-
-  Solid newSolid(solid.exteriorShell());
-  for (const auto &shell : interiorShells) {
-    newSolid.addInteriorShell(shell);
-  }
-  solid = newSolid;
-}
-
-// Implementation for GeometryCollection
-void
-lexicographicOrderGeometryCollection(GeometryCollection &gc, bool reorderRing)
-{
-  // Appliquer lexicographicOrder à chaque géométrie
-  for (size_t i = 0; i < gc.numGeometries(); ++i) {
-    lexicographicOrder(gc.geometryN(i), reorderRing);
-  }
-
-  // Créer un vecteur de pointeurs vers les géométries
-  std::vector<Geometry *> geom_ptrs;
-  for (size_t i = 0; i < gc.numGeometries(); ++i) {
-    geom_ptrs.push_back(&gc.geometryN(i));
-  }
-
-  // Trier les pointeurs vers les géométries par type WKB, puis par leur contenu
-  std::sort(geom_ptrs.begin(), geom_ptrs.end(),
-            [](const Geometry *a, const Geometry *b) {
-              if (a->geometryTypeId() != b->geometryTypeId()) {
-                return a->geometryTypeId() < b->geometryTypeId();
-              }
-              // Si les types sont les mêmes, comparer le contenu
-              return a->asText() < b->asText();
-            });
-
-  // Reconstruire la GeometryCollection avec les géométries triées
-  GeometryCollection newGc;
-  for (const auto &geom_ptr : geom_ptrs) {
-    newGc.addGeometry(geom_ptr->clone());
-  }
-
-  gc = newGc;
-}
-
-// Main function
-void
-lexicographicOrder(Geometry &geometry, bool reorderRing)
+std::unique_ptr<Geometry>
+lexicographicOrder(const Geometry &geometry)
 {
   switch (geometry.geometryTypeId()) {
   case TYPE_POINT:
-    lexicographicOrderPoint(static_cast<Point &>(geometry), reorderRing);
-    break;
-  case TYPE_MULTIPOINT:
-    lexicographicOrderMultiPoint(static_cast<MultiPoint &>(geometry),
-                                 reorderRing);
-    break;
   case TYPE_LINESTRING:
-    lexicographicOrderLineString(static_cast<LineString &>(geometry),
-                                 reorderRing);
-    break;
-  case TYPE_MULTILINESTRING:
-    lexicographicOrderMultiLineString(static_cast<MultiLineString &>(geometry),
-                                      reorderRing);
-    break;
-  case TYPE_POLYGON:
-    lexicographicOrderPolygon(static_cast<Polygon &>(geometry), reorderRing);
-    break;
-  case TYPE_MULTIPOLYGON:
-    lexicographicOrderMultiPolygon(static_cast<MultiPolygon &>(geometry),
-                                   reorderRing);
-    break;
+    return std::unique_ptr<Geometry>(geometry.clone());
+  case TYPE_MULTIPOINT: {
+    const MultiPoint  &mp = geometry.as<MultiPoint>();
+    std::vector<Point> points;
+    for (size_t i = 0; i < mp.numGeometries(); ++i) {
+      points.push_back(mp.geometryN(i).as<Point>());
+    }
+    std::sort(points.begin(), points.end(), LexicographicPointComparator());
+    auto newMP = std::make_unique<MultiPoint>();
+    for (const auto &p : points) {
+      newMP->addGeometry(new Point(p));
+    }
+    return newMP;
+  }
+
+  case TYPE_MULTILINESTRING: {
+    const MultiLineString &mls = geometry.as<MultiLineString>();
+    std::vector<std::pair<Point, std::unique_ptr<LineString>>> sortedLines;
+    for (size_t i = 0; i < mls.numGeometries(); ++i) {
+      const LineString &line = mls.geometryN(i).as<LineString>();
+      sortedLines.emplace_back(line.pointN(0),
+                               std::make_unique<LineString>(line));
+    }
+    std::sort(sortedLines.begin(), sortedLines.end(),
+              [](const auto &a, const auto &b) {
+                return LexicographicPointComparator()(a.first, b.first);
+              });
+
+    auto newMLS = std::make_unique<MultiLineString>();
+    for (auto &pair : sortedLines) {
+      newMLS->addGeometry(pair.second.release());
+    }
+    return newMLS;
+  }
+  case TYPE_POLYGON: {
+    const Polygon &poly = geometry.as<Polygon>();
+
+    auto orderedExteriorRing = lexicographicOrderRing(poly.exteriorRing());
+
+    std::vector<std::unique_ptr<LineString>> orderedInteriorRings;
+    for (size_t i = 0; i < poly.numInteriorRings(); ++i) {
+      const LineString &interiorRing = poly.interiorRingN(i);
+      auto orderedRing = lexicographicOrderRing(interiorRing);
+      orderedInteriorRings.push_back(std::move(orderedRing));
+    }
+
+    std::sort(orderedInteriorRings.begin(), orderedInteriorRings.end(),
+              [](const std::unique_ptr<LineString> &a, const std::unique_ptr<LineString> &b) {
+                Point repA = getRepresentativePoint(*a);
+                Point repB = getRepresentativePoint(*b);
+                return LexicographicPointComparator()(repA, repB);
+              });
+
+    auto newPoly = std::make_unique<Polygon>();
+
+    newPoly->setExteriorRing(orderedExteriorRing.release());
+
+    for (auto &ring : orderedInteriorRings) {
+      newPoly->addInteriorRing(ring.release());
+    }
+
+    return newPoly;
+  }
+  case TYPE_TRIANGLE: {
+    const Triangle &triangle = geometry.as<Triangle>();
+
+    std::vector<Point> vertices = {triangle.vertex(0), triangle.vertex(1), triangle.vertex(2)};
+
+    auto minIt = std::min_element(vertices.begin(), vertices.end(), LexicographicPointComparator());
+    std::rotate(vertices.begin(), minIt, vertices.end());
+
+    LineString tempRing;
+    tempRing.addPoint(vertices[0]);
+    tempRing.addPoint(vertices[1]);
+    tempRing.addPoint(vertices[2]);
+    tempRing.addPoint(vertices[0]);
+
+    bool isCCW = SFCGAL::algorithm::isCounterClockWiseOriented(tempRing);
+    if (isCCW) {
+      std::reverse(vertices.begin() + 1, vertices.end());
+    }
+
+    auto newTriangle = std::make_unique<Triangle>(vertices[0], vertices[1], vertices[2]);
+
+    return newTriangle;
+  }
+  case TYPE_MULTIPOLYGON: {
+    const MultiPolygon &mp = geometry.as<MultiPolygon>();
+
+    std::vector<std::pair<Point, std::unique_ptr<Polygon>>> sortedPolygons;
+
+    for (size_t i = 0; i < mp.numGeometries(); ++i) {
+      const Polygon &poly = mp.geometryN(i).as<Polygon>();
+
+      Point repPoint = getRepresentativePoint(poly);
+
+      auto orderedPolygon = lexicographicOrder(poly);
+
+      sortedPolygons.emplace_back(repPoint, std::unique_ptr<Polygon>(dynamic_cast<Polygon*>(orderedPolygon.release())));
+    }
+
+    std::sort(sortedPolygons.begin(), sortedPolygons.end(),
+              [](const auto &a, const auto &b) {
+                return LexicographicPointComparator()(a.first, b.first);
+              });
+
+    auto newMP = std::make_unique<MultiPolygon>();
+    for (auto &pair : sortedPolygons) {
+      newMP->addGeometry(pair.second.release());
+    }
+    return newMP;
+  }
   case TYPE_POLYHEDRALSURFACE:
-    lexicographicOrderPolyhedralSurface(
-        static_cast<PolyhedralSurface &>(geometry), reorderRing);
-    break;
-  case TYPE_SOLID:
-    lexicographicOrderSolid(static_cast<Solid &>(geometry), reorderRing);
-    break;
-  case TYPE_GEOMETRYCOLLECTION:
-    lexicographicOrderGeometryCollection(
-        static_cast<GeometryCollection &>(geometry), reorderRing);
-    break;
+  case TYPE_TRIANGULATEDSURFACE: {
+    const PolyhedralSurface &ps = geometry.as<PolyhedralSurface>();
+
+    std::vector<std::pair<Point, std::unique_ptr<Polygon>>> sortedPolygons;
+
+    for (size_t i = 0; i < ps.numPolygons(); ++i) {
+      const Polygon &poly = ps.polygonN(i);
+
+      Point repPoint = getRepresentativePoint(poly);
+
+      auto orderedPolygon = lexicographicOrder(poly);
+
+      sortedPolygons.emplace_back(repPoint, std::unique_ptr<Polygon>(dynamic_cast<Polygon*>(orderedPolygon.release())));
+    }
+
+    std::sort(sortedPolygons.begin(), sortedPolygons.end(),
+              [](const auto &a, const auto &b) {
+                return LexicographicPointComparator()(a.first, b.first);
+              });
+
+    auto newPS = std::make_unique<PolyhedralSurface>();
+    for (auto &pair : sortedPolygons) {
+      newPS->addPolygon(pair.second.release());
+    }
+    return newPS;
+  }
+  case TYPE_SOLID: {
+    const Solid &solid = geometry.as<Solid>();
+
+    auto orderedExteriorShellGeom = lexicographicOrder(solid.exteriorShell());
+    auto orderedExteriorShell = std::unique_ptr<PolyhedralSurface>(dynamic_cast<PolyhedralSurface*>(orderedExteriorShellGeom.release()));
+
+    std::vector<std::unique_ptr<PolyhedralSurface>> orderedInteriorShells;
+    for (size_t i = 0; i < solid.numInteriorShells(); ++i) {
+      auto orderedInteriorShellGeom = lexicographicOrder(solid.interiorShellN(i));
+      auto orderedInteriorShell = std::unique_ptr<PolyhedralSurface>(dynamic_cast<PolyhedralSurface*>(orderedInteriorShellGeom.release()));
+      orderedInteriorShells.push_back(std::move(orderedInteriorShell));
+    }
+
+    // Créer un nouveau Solid avec les coques triées
+    auto newSolid = std::make_unique<Solid>(orderedExteriorShell.release());
+    for (auto &shell : orderedInteriorShells) {
+      newSolid->addInteriorShell(shell.release());
+    }
+    return newSolid;
+  }
+
+  case TYPE_MULTISOLID: {
+    const MultiSolid &ms = geometry.as<MultiSolid>();
+
+    std::vector<std::pair<Point, std::unique_ptr<Solid>>> sortedSolids;
+
+    for (size_t i = 0; i < ms.numGeometries(); ++i) {
+      const Solid &solid = ms.geometryN(i).as<Solid>();
+
+      Point repPoint = getRepresentativePoint(solid);
+
+      auto orderedSolid = lexicographicOrder(solid);
+
+      sortedSolids.emplace_back(repPoint, std::unique_ptr<Solid>(dynamic_cast<Solid*>(orderedSolid.release())));
+    }
+
+    // Trier les solides
+    std::sort(sortedSolids.begin(), sortedSolids.end(),
+              [](const auto &a, const auto &b) {
+                return LexicographicPointComparator()(a.first, b.first);
+              });
+
+    // Créer un nouveau MultiSolid avec les solides triés
+    auto newMS = std::make_unique<MultiSolid>();
+    for (auto &pair : sortedSolids) {
+      newMS->addGeometry(pair.second.release());
+    }
+    return newMS;
+  }
+
+  case TYPE_GEOMETRYCOLLECTION: {
+    const GeometryCollection &gc = geometry.as<GeometryCollection>();
+
+    std::vector<std::unique_ptr<Geometry>> orderedGeometries;
+    for (size_t i = 0; i < gc.numGeometries(); ++i) {
+      auto orderedGeom = lexicographicOrder(gc.geometryN(i));
+      orderedGeometries.push_back(std::move(orderedGeom));
+    }
+
+    std::sort(orderedGeometries.begin(), orderedGeometries.end(),
+              [](const std::unique_ptr<Geometry> &a, const std::unique_ptr<Geometry> &b) {
+                if (a->geometryTypeId() != b->geometryTypeId()) {
+                  return a->geometryTypeId() < b->geometryTypeId();
+                } else {
+                  Point repA = getRepresentativePoint(*a);
+                  Point repB = getRepresentativePoint(*b);
+                  return LexicographicPointComparator()(repA, repB);
+                }
+              });
+
+    auto newGC = std::make_unique<GeometryCollection>();
+    for (auto &geom : orderedGeometries) {
+      newGC->addGeometry(geom.release());
+    }
+    return newGC;
+  }
 
   default:
-    // Unsupported geometry, do nothing
-    break;
+    return std::unique_ptr<Geometry>(geometry.clone());
   }
 }
 

@@ -1,27 +1,15 @@
-#include "SFCGAL/Geometry.h"
-#include "SFCGAL/GeometryCollection.h"
-#include "SFCGAL/LineString.h"
-#include "SFCGAL/MultiLineString.h"
-#include "SFCGAL/MultiPoint.h"
-#include "SFCGAL/MultiPolygon.h"
-#include "SFCGAL/Point.h"
-#include "SFCGAL/Polygon.h"
-#include "SFCGAL/PolyhedralSurface.h"
-#include "SFCGAL/Solid.h"
-#include "SFCGAL/Triangle.h"
-#include "SFCGAL/TriangulatedSurface.h"
+#ifndef _SFCGAL_ALGORITHM_LEXICOGRAPHICORDER_H_
+#define _SFCGAL_ALGORITHM_LEXICOGRAPHICORDER_H_
+
+#include <SFCGAL/Geometry.h>
+#include <memory>
 
 namespace SFCGAL {
 namespace transform {
 
-/**
- * Réorganise une géométrie selon un ordre lexicographique.
- * @param geometry La géométrie à réorganiser.
- * @param invertRings Option pour inverser le sens des anneaux (par défaut:
- * false).
- */
-void
-lexicographicOrder(Geometry &geometry, bool invertRings = false);
+std::unique_ptr<Geometry>lexicographicOrder(const Geometry &geometry);
 
-} // namespace transform
+}
 } // namespace SFCGAL
+
+#endif
