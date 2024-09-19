@@ -266,10 +266,9 @@ BOOST_AUTO_TEST_CASE(testScaleNonUniformC)
   sfcgal_geometry_t *scaled = sfcgal_geometry_scale_3d(g.get(), 2.0, 3.0, 4.0);
   BOOST_CHECK(hasError == false);
 
-  char  *wkt;
-  size_t len;
-  sfcgal_geometry_as_text(scaled, &wkt, &len);
-  BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z(2/1 6/1 12/1)");
+  // FLAKY WKT test
+  std::unique_ptr<Geometry> const g1(io::readWkt("POINT Z(2/1 6/1 12/1)"));
+  BOOST_CHECK(sfcgal_geometry_covers(g1.get(), scaled));
 
   sfcgal_geometry_delete(scaled);
 }
