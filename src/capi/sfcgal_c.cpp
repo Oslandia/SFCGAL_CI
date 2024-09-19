@@ -260,7 +260,7 @@ sfcgal_geometry_as_text(const sfcgal_geometry_t *pgeom, char **buffer,
       std::string wkt =
           reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asText();
       *buffer = (char *)sfcgal_alloc_handler(wkt.size() + 1); *len = wkt.size();
-      strncpy(*buffer, wkt.c_str(), *len);)
+      strncpy(*buffer, wkt.c_str(), *len); (*buffer)[*len]         = '\0';)
 }
 
 extern "C" void
@@ -272,7 +272,7 @@ sfcgal_geometry_as_text_decim(const sfcgal_geometry_t *pgeom, int numDecimals,
           reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asText(
               numDecimals);
       *buffer = (char *)sfcgal_alloc_handler(wkt.size() + 1); *len = wkt.size();
-      strncpy(*buffer, wkt.c_str(), *len);)
+      strncpy(*buffer, wkt.c_str(), *len); (*buffer)[*len]         = '\0';)
 }
 
 extern "C" void
