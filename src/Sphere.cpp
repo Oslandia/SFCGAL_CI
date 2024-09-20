@@ -202,7 +202,8 @@ std::vector<Point_3>
 Sphere::generateSpherePoints()
 {
   std::vector<Point_3> points;
-  points.reserve(m_num_vertical * m_num_horizontal);
+  points.reserve(static_cast<size_t>(m_num_vertical) *
+                 static_cast<size_t>(m_num_horizontal));
 
   Kernel::Vector_3 v1 = normalizeVector(get_orthogonal_vector(m_direction));
   Kernel::Vector_3 v2 = normalizeVector(CGAL::cross_product(m_direction, v1));
