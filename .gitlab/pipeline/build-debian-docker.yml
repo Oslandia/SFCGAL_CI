@@ -21,7 +21,7 @@ build:debian-docker-image:
       --pull
       --cache-from $CI_REGISTRY_IMAGE:debian-latest
       --tag $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA
-      --build-arg CGAL_VERSION=${BUILD_CGAL_VERSION}
+      --build-arg CGAL_VERSION=${DOCKER_CGAL_VERSION}
       -f docker/Dockerfile.debian
       .
     - docker push $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA

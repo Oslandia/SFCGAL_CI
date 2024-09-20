@@ -7,7 +7,9 @@ stages:
   - .post
 
 variables:
-  BUILD_CGAL_VERSION: 6.0-beta1
+  CGAL_LATEST_VERSION: "6.0-beta1"
+  SONAR_CGAL_VERSION: ${CGAL_LATEST_VERSION}
+  DOCKER_CGAL_VERSION: ${CGAL_LATEST_VERSION}
 
 # After ccache ci
 # coverage:
