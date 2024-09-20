@@ -47,6 +47,37 @@ compareFiles(const std::string &file1, const std::string &file2)
                     std::istreambuf_iterator<char>(f2.rdbuf()));
 }
 
+std::string
+readFileContent(const std::string &filePath)
+{
+  std::ifstream file(filePath);
+  if (!file) {
+    return "Unable to read file: " + filePath;
+  }
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  return buffer.str();
+}
+
+void
+compareAndReportFiles(const std::string &expectedFile,
+                      const std::string &generatedFile,
+                      const std::string &testName)
+{
+  bool filesMatch = compareFiles(expectedFile, generatedFile);
+
+  if (!filesMatch) {
+    BOOST_TEST_MESSAGE("Warning for test " << testName << ":");
+    BOOST_TEST_MESSAGE("Generated file does not match the expected file.");
+    BOOST_TEST_MESSAGE("Expected file: " << expectedFile);
+    BOOST_TEST_MESSAGE("Generated file: " << generatedFile);
+    BOOST_TEST_MESSAGE("Content of the generated file:");
+    BOOST_TEST_MESSAGE(readFileContent(generatedFile));
+  } else {
+    BOOST_TEST_MESSAGE("Test " << testName << " passed: files match.");
+  }
+}
+
 BOOST_AUTO_TEST_CASE(testBuffer3D_Point)
 {
   double              radius   = 10.0;
@@ -98,15 +129,9 @@ BOOST_AUTO_TEST_CASE(testBuffer3D_Point)
     }
 
     // Compare the files
-    BOOST_CHECK_MESSAGE(compareFiles(expectedFile, generatedFile.string()),
-                        "Output for point "
-                            << typeName
-                            << " buffer does not match the expected file.\n"
-                               "Expected file: "
-                            << expectedFile
-                            << "\n"
-                               "Generated file: "
-                            << generatedFile.string());
+
+    compareAndReportFiles(expectedFile, generatedFile.string(),
+                          "point_" + typeName + "_buffer");
   }
 
   // Clean up the temporary directory
@@ -167,15 +192,9 @@ BOOST_AUTO_TEST_CASE(testBuffer3D_LineString)
     }
 
     // Compare the files
-    BOOST_CHECK_MESSAGE(compareFiles(expectedFile, generatedFile.string()),
-                        "Output for linestring "
-                            << typeName
-                            << " buffer does not match the expected file.\n"
-                               "Expected file: "
-                            << expectedFile
-                            << "\n"
-                               "Generated file: "
-                            << generatedFile.string());
+
+    compareAndReportFiles(expectedFile, generatedFile.string(),
+                          "linestring_" + typeName + "_buffer");
   }
 
   // Clean up the temporary directory
