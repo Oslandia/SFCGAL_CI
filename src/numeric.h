@@ -131,7 +131,7 @@ SFCGAL_API CGAL::Gmpz
  * @param v The vector to normalize
  * @return The normalized vector
  */
-static Kernel::Vector_3
+inline Kernel::Vector_3
 normalizeVector(const Kernel::Vector_3 &vec)
 {
   Kernel::FT length = CGAL::sqrt(CGAL::to_double(vec.squared_length()));
