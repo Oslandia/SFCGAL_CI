@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(geometryWithNan)
 BOOST_AUTO_TEST_CASE(disconnectedTIN)
 {
   std::unique_ptr<Geometry> const g(
-      io::readWkt("TIN(((0 0,1 0,0 1,0 0)),((2 0,3 0,2 1,2 0)))"));
+      io::readWkt("TIN (((0 0,1 0,0 1,0 0)),((2 0,3 0,2 1,2 0)))"));
   Validity const v = algorithm::isValid(*g);
   BOOST_CHECK(!v);
 }

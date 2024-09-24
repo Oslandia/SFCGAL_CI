@@ -19,12 +19,12 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#include <CGAL/Nef_polyhedron_3.h>
+#include "SFCGAL/algorithm/volume.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/algorithm/isValid.h"
-#include "SFCGAL/algorithm/volume.h"
 #include "SFCGAL/io/wkt.h"
+#include <CGAL/Nef_polyhedron_3.h>
 
 #include <boost/test/unit_test.hpp>
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_VolumeTest)
 BOOST_AUTO_TEST_CASE(cubeVolume)
 {
   const std::unique_ptr<Geometry> s =
-      io::readWkt("SOLID((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
+      io::readWkt("SOLID ((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
                                                      ((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),\
                                                      ((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),\
                                                      ((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),\
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(cubeVolume)
 BOOST_AUTO_TEST_CASE(cubeWithHoleVolume)
 {
   const std::unique_ptr<Geometry> s =
-      io::readWkt("SOLID((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
+      io::readWkt("SOLID ((((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0)),\
                 ((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),\
                 ((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),\
                 ((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),\
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(cubeWithHoleVolume)
 BOOST_AUTO_TEST_CASE(invertedCubeVolume)
 {
   std::unique_ptr<Geometry> const s =
-      io::readWkt("SOLID((((0 0 0,0 1 0,0 1 1,0 0 1,0 0 0)),\
+      io::readWkt("SOLID ((((0 0 0,0 1 0,0 1 1,0 0 1,0 0 0)),\
                                                      ((0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)),\
                                                      ((0 0 0,0 0 1,1 0 1,1 0 0,0 0 0)),\
                                                      ((1 0 0,1 0 1,1 1 1,1 1 0,1 0 0)),\

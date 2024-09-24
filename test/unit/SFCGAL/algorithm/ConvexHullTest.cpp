@@ -65,8 +65,8 @@ BOOST_AUTO_TEST_CASE(testConvexHull2D_ColinearProduceLineString)
   BOOST_CHECK_EQUAL(hull->as<LineString>().numPoints(), 2U);
 
   std::string const hullWKT = hull->asText(1);
-  BOOST_CHECK((hullWKT == "LINESTRING(0.0 0.0,2.0 2.0)") ||
-              (hullWKT == "LINESTRING(2.0 2.0,0.0 0.0)"));
+  BOOST_CHECK((hullWKT == "LINESTRING (0.0 0.0,2.0 2.0)") ||
+              (hullWKT == "LINESTRING (2.0 2.0,0.0 0.0)"));
 }
 
 BOOST_AUTO_TEST_CASE(testConvexHull2D_Triangle)

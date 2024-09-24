@@ -59,13 +59,13 @@ BOOST_AUTO_TEST_CASE(testNormal1)
 BOOST_AUTO_TEST_CASE(testNormal2)
 {
   // a square ccw
-  std::unique_ptr<Geometry> gA(io::readWkt("POLYGON((0 0,1 0,1 1,0 1,0 0))"));
+  std::unique_ptr<Geometry> gA(io::readWkt("POLYGON ((0 0,1 0,1 1,0 1,0 0))"));
   // a square cw oriented
-  std::unique_ptr<Geometry> gB(io::readWkt("POLYGON((0 0,0 1,1 1,1 0,0 0))"));
+  std::unique_ptr<Geometry> gB(io::readWkt("POLYGON ((0 0,0 1,1 1,1 0,0 0))"));
 
   // a pseudo-square ccw oriented, with a concave part
   std::unique_ptr<Geometry> gC(
-      io::readWkt("POLYGON((0 0,0.5 0.5,1 0,1 1,0 1,0 0))"));
+      io::readWkt("POLYGON ((0 0,0.5 0.5,1 0,1 1,0 1,0 0))"));
 
   {
     CGAL::Vector_3<Kernel> const normal =
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(testNormal2)
 BOOST_AUTO_TEST_CASE(testNormal3)
 {
   std::unique_ptr<Geometry> gA(
-      io::readWkt("POLYGON((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0))"));
+      io::readWkt("POLYGON ((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0))"));
   // exact
   {
     CGAL::Vector_3<Kernel> const normal =

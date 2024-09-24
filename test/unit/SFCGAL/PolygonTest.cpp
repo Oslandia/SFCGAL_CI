@@ -154,18 +154,19 @@ BOOST_AUTO_TEST_CASE(testBoundaryEmpty)
 }
 BOOST_AUTO_TEST_CASE(testBoundaryWithoutHoles)
 {
-  std::string const         wkt("POLYGON((0 0,0 1,1 1,0 0))");
+  std::string const         wkt("POLYGON ((0 0,0 1,1 1,0 0))");
   std::unique_ptr<Geometry> boundary(io::readWkt(wkt)->boundary());
   BOOST_CHECK(!boundary->isEmpty());
-  BOOST_CHECK_EQUAL(boundary->asText(0), "LINESTRING(0 0,0 1,1 1,0 0)");
+  BOOST_CHECK_EQUAL(boundary->asText(0), "LINESTRING (0 0,0 1,1 1,0 0)");
 }
 BOOST_AUTO_TEST_CASE(testBoundaryWithHoles)
 {
-  std::string const wkt("POLYGON((0 0,0 5,5 5,0 5,0 0),(1 1,2 1,2 2,1 1))");
+  std::string const wkt("POLYGON ((0 0,0 5,5 5,0 5,0 0),(1 1,2 1,2 2,1 1))");
   std::unique_ptr<Geometry> boundary(io::readWkt(wkt)->boundary());
   BOOST_CHECK(!boundary->isEmpty());
-  BOOST_CHECK_EQUAL(boundary->asText(0),
-                    "MULTILINESTRING((0 0,0 5,5 5,0 5,0 0),(1 1,2 1,2 2,1 1))");
+  BOOST_CHECK_EQUAL(
+      boundary->asText(0),
+      "MULTILINESTRING ((0 0,0 5,5 5,0 5,0 0),(1 1,2 1,2 2,1 1))");
 }
 
 // Envelope             Geometry::envelope() const ;
@@ -186,7 +187,7 @@ BOOST_AUTO_TEST_CASE(asText2d)
   g.exteriorRing().addPoint(Point(0.0, 0.0));
 
   BOOST_CHECK_EQUAL(g.asText(1),
-                    "POLYGON((0.0 0.0,1.0 0.0,1.0 1.0,0.0 1.0,0.0 0.0))");
+                    "POLYGON ((0.0 0.0,1.0 0.0,1.0 1.0,0.0 1.0,0.0 0.0))");
 }
 BOOST_AUTO_TEST_CASE(asText3d)
 {
@@ -197,7 +198,7 @@ BOOST_AUTO_TEST_CASE(asText3d)
   g.exteriorRing().addPoint(Point(0.0, 1.0, 2.0));
   g.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
 
-  BOOST_CHECK_EQUAL(g.asText(1), "POLYGON Z((0.0 0.0 2.0,1.0 0.0 2.0,1.0 1.0 "
+  BOOST_CHECK_EQUAL(g.asText(1), "POLYGON Z ((0.0 0.0 2.0,1.0 0.0 2.0,1.0 1.0 "
                                  "2.0,0.0 1.0 2.0,0.0 0.0 2.0))");
 }
 // virtual std::string  Geometry::geometryType() const = 0 ;

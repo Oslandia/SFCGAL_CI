@@ -461,7 +461,7 @@ WktReader::readInnerGeometryCollection(GeometryCollection &g)
 
   while (!_reader.eof()) {
 
-    // read a full wkt geometry ex : POINT(2.0 6.0)
+    // read a full wkt geometry ex : POINT (2.0 6.0)
     Geometry *gg = readGeometry();
     if (!gg->isEmpty()) {
       g.addGeometry(gg);

@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygon)
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
   std::string const        expectedWkt =
-      "POLYGON((3.0 2.0,1.0 2.0,0.0 4.0,0.0 0.0,3.0 2.0))";
+      "POLYGON ((3.0 2.0,1.0 2.0,0.0 4.0,0.0 0.0,3.0 2.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointOnPolygon)
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
   std::string              expectedWkt =
-      "POLYGON((1.0 2.0,0.0 4.0,0.0 0.0,3.0 2.0,1.0 2.0))";
+      "POLYGON ((1.0 2.0,0.0 4.0,0.0 0.0,3.0 2.0,1.0 2.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnPolygon)
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
   std::string              expectedWkt =
-      "POLYGON((0.0 0.0,3.0 2.0,4.0 0.0,4.0 4.0,1.0 2.0,0.0 2.0,0.0 0.0))";
+      "POLYGON ((0.0 0.0,3.0 2.0,4.0 0.0,4.0 4.0,1.0 2.0,0.0 2.0,0.0 0.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygonHole)
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
   std::string const        expectedWkt =
-      "POLYGON((0.0 1.6,0.2 1.8,0.9 1.8,1.9 1.3,3.0 "
+      "POLYGON ((0.0 1.6,0.2 1.8,0.9 1.8,1.9 1.3,3.0 "
       "2.0,1.0 2.0,0.0 4.0,0.0 1.6))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
@@ -160,10 +160,10 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointOnPolygonHole)
   Point queryPoint(0.0, 2.0);
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
-  // std::string expectedWkt = "POLYGON((1.0 2.0,0.0 4.0,0.0 0.0,1.0 0.7,0.2 "
+  // std::string expectedWkt = "POLYGON ((1.0 2.0,0.0 4.0,0.0 0.0,1.0 0.7,0.2 "
   //                           "1.8,0.9 1.8,2.2 1.5,3.0 2.0,1.0 2.0))";
   std::string expectedWkt =
-      "POLYGON((1/1 2/1,0/1 4/1,0/1 0/1,10808639105689191/10358279142952141 "
+      "POLYGON ((1/1 2/1,0/1 4/1,0/1 0/1,10808639105689191/10358279142952141 "
       "7205759403792794/10358279142952141,3602879701896397/18014398509481984 "
       "7/4,8106479329266893/9007199254740992 "
       "8106479329266893/4503599627370496,24319437987800679/10808639105689190 "
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnPolygonHole)
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
   std::string              expectedWkt =
-      "POLYGON((0.0 0.0,3.0 2.0,4.0 0.0,4.0 4.0,1.0 2.0,0.0 2.0,0.0 1.7,0.2 "
+      "POLYGON ((0.0 0.0,3.0 2.0,4.0 0.0,4.0 4.0,1.0 2.0,0.0 2.0,0.0 1.7,0.2 "
       "1.8,0.9 1.8,0.7 1.2,0.0 1.0,0.0 0.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointOnHolePolygonHole)
   Point queryPoint(0.550, 1.775);
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
-  std::string expectedWkt = "POLYGON((0.7 1.2,0.9 1.8,0.2 1.8,0.7 1.2))";
+  std::string expectedWkt = "POLYGON ((0.7 1.2,0.9 1.8,0.2 1.8,0.7 1.2))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnHolePolygonHole)
   Point queryPoint(0.9, 1.8);
 
   std::unique_ptr<Polygon> result(algorithm::visibility(poly, queryPoint));
-  std::string expectedWkt = "POLYGON((0.7 1.2,0.9 1.8,0.2 1.8,0.7 1.2))";
+  std::string expectedWkt = "POLYGON ((0.7 1.2,0.9 1.8,0.2 1.8,0.7 1.2))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygon)
   std::unique_ptr<Polygon> result(
       algorithm::visibility(poly, startPoint, endPoint));
   std::string const expectedWkt =
-      "POLYGON((4.0 0.0,4.0 4.0,1.0 2.0,0.0 1.3,0.0 0.0,3.0 2.0,4.0 0.0))";
+      "POLYGON ((4.0 0.0,4.0 4.0,1.0 2.0,0.0 1.3,0.0 0.0,3.0 2.0,4.0 0.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
 }
 
@@ -323,7 +323,7 @@ BOOST_AUTO_TEST_CASE(testVisibility_SegmentInPolygonHole)
   std::unique_ptr<Polygon> result(
       algorithm::visibility(poly, startPoint, endPoint));
   std::string const expectedWkt =
-      "POLYGON((19.0 -2.0,12.0 6.0,14.0 14.0,10.4 7.6,11.0 7.0,11.0 6.0,10.0 "
+      "POLYGON ((19.0 -2.0,12.0 6.0,14.0 14.0,10.4 7.6,11.0 7.0,11.0 6.0,10.0 "
       "6.0,9.6 6.0,9.0 5.0,1.0 2.0,4.7 2.3,8.0 4.0,10.0 3.0,9.9 2.8,12.0 "
       "3.0,19.0 -2.0))";
   BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);

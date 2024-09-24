@@ -115,7 +115,8 @@ BOOST_AUTO_TEST_CASE(testExpandToInclude)
 BOOST_AUTO_TEST_CASE(testToRing)
 {
   Envelope const box(0.0, 1.0, 2.0, 3.0);
-  BOOST_CHECK_EQUAL(box.toRing()->asText(0), "LINESTRING(0 2,1 2,1 3,0 3,0 2)");
+  BOOST_CHECK_EQUAL(box.toRing()->asText(0),
+                    "LINESTRING (0 2,1 2,1 3,0 3,0 2)");
 }
 
 // std::unique_ptr< Polygon >    toPolygon() const ;
@@ -123,7 +124,7 @@ BOOST_AUTO_TEST_CASE(testToPolygon)
 {
   Envelope const box(0.0, 1.0, 2.0, 3.0, 4.0, 5.0);
   BOOST_CHECK_EQUAL(box.toSolid()->asText(0),
-                    "SOLID Z((((0 2 4,0 3 4,1 3 4,1 2 4,0 2 4)),((0 2 5,1 2 "
+                    "SOLID Z ((((0 2 4,0 3 4,1 3 4,1 2 4,0 2 4)),((0 2 5,1 2 "
                     "5,1 3 5,0 3 5,0 2 5)),((0 2 4,1 2 4,1 2 5,0 2 5,0 2 "
                     "4)),((1 3 4,0 3 4,0 3 5,1 3 5,1 3 4)),((1 2 4,1 3 4,1 3 "
                     "5,1 2 5,1 2 4)),((0 2 4,0 2 5,0 3 5,0 3 4,0 2 4))))");

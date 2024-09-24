@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(asText2d)
   g.addGeometry(Envelope(0.0, 1.0, 0.0, 1.0).toPolygon().release());
   g.addGeometry(Envelope(2.0, 3.0, 4.0, 5.0).toPolygon().release());
   BOOST_CHECK_EQUAL(g.asText(3),
-                    "MULTIPOLYGON(((0.000 0.000,1.000 0.000,1.000 1.000,0.000 "
+                    "MULTIPOLYGON (((0.000 0.000,1.000 0.000,1.000 1.000,0.000 "
                     "1.000,0.000 0.000)),((2.000 4.000,3.000 4.000,3.000 "
                     "5.000,2.000 5.000,2.000 4.000)))");
 }

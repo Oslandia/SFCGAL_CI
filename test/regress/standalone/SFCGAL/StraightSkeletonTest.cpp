@@ -1,23 +1,23 @@
- /**
- *   SFCGAL
- *
- *   Copyright (C) 2012-2013 Oslandia <infos@oslandia.com>
- *   Copyright (C) 2012-2013 IGN (http://www.ign.fr)
- *
- *   This library is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU Library General Public
- *   License as published by the Free Software Foundation; either
- *   version 2 of the License, or (at your option) any later version.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *   Library General Public License for more details.
+/**
+*   SFCGAL
+*
+*   Copyright (C) 2012-2013 Oslandia <infos@oslandia.com>
+*   Copyright (C) 2012-2013 IGN (http://www.ign.fr)
+*
+*   This library is free software; you can redistribute it and/or
+*   modify it under the terms of the GNU Library General Public
+*   License as published by the Free Software Foundation; either
+*   version 2 of the License, or (at your option) any later version.
+*
+*   This library is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*   Library General Public License for more details.
 
- *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see
- <http://www.gnu.org/licenses/>.
- */
+*   You should have received a copy of the GNU Library General Public
+*   License along with this library; if not, see
+<http://www.gnu.org/licenses/>.
+*/
 #include <fstream>
 
 #include "SFCGAL/GeometryCollection.h"
@@ -60,7 +60,8 @@ runTest(const boost::filesystem::path::string_type &filename)
   BOOST_REQUIRE(ifs.good());
 
   std::string       line;
-  std::string const lbl_base = boost::filesystem::path(filename).filename().string();
+  std::string const lbl_base =
+      boost::filesystem::path(filename).filename().string();
 
   int lineno = 0;
   while (std::getline(ifs, line)) {
@@ -113,13 +114,13 @@ runTest(const boost::filesystem::path::string_type &filename)
 BOOST_AUTO_TEST_CASE(testStraightSkeleton_issue153)
 {
   std::string const wkt =
-      "POLYGON((256 760,518 760,518 630,674 630,674  239,673 239,127 239,127 "
+      "POLYGON ((256 760,518 760,518 630,674 630,674  239,673 239,127 239,127 "
       "240,126 240,126 513,127 513,127 514,126 514,126  630,255 630,256 "
       "630,256 760),(128 629,128 423,270 423,270 422,271  422,271 240,672 "
       "240,672 629,128 629),(258 759,258 631,516 631,516  759,258 759),(128 "
       "421,128 240,269 240,269 421,128 421))";
   std::string const skWkt =
-      "MULTILINESTRING((256.0 760.0,257.0 759.0),(256.0 630.0,256.5 "
+      "MULTILINESTRING ((256.0 760.0,257.0 759.0),(256.0 630.0,256.5 "
       "629.5),(255.0 630.0,255.0 629.5),(126.0 630.0,127.0 629.0),(126.0 "
       "514.0,127.0 515.0),(127.0 514.0,127.5 514.5),(127.0 513.0,127.5 "
       "512.5),(126.0 513.0,127.0 512.0),(126.0 240.0,127.0 241.0),(127.0 "
@@ -171,7 +172,7 @@ BOOST_AUTO_TEST_CASE(testStraightSkeleton_issue133)
       "43.5583450999999968, 4.6499202999999998 43.5215560999999980, "
       "4.6496243000000002 43.5206941000000000))";
   std::string const skWkt =
-      "MULTILINESTRING((4.6 43.5,4.7 43.5),(4.7 43.5,4.7 43.5),(4.7 43.5,4.7 "
+      "MULTILINESTRING ((4.6 43.5,4.7 43.5),(4.7 43.5,4.7 43.5),(4.7 43.5,4.7 "
       "43.5),(4.7 43.5,4.7 43.5),(4.7 43.5,4.7 43.5),(4.7 43.5,4.7 43.5),(4.7 "
       "43.5,4.7 43.5),(4.7 43.5,4.7 43.5),(4.7 43.5,4.7 43.5),(4.7 43.5,4.7 "
       "43.5),(4.7 43.5,4.7 43.5),(4.7 43.6,4.7 43.5),(4.7 43.6,4.7 43.5),(4.7 "

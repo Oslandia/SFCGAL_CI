@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(solidReadTest)
 {
   // the unit cube where half of a cube has been substracted
   std::string const gstr =
-      "SOLID("
+      "SOLID ("
       // exterior shell
       "("
       "((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0))," // front face

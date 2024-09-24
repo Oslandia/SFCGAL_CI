@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(testReadPoints)
   bench().start(boost::format("READ WKT POINTS"));
 
   for (int i = 0; i < N; i++) {
-    io::readWkt("POINT(50000 50000)");
+    io::readWkt("POINT (50000 50000)");
   }
 
   bench().stop();
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(testReadLineString)
   bench().start(boost::format("READ WKT LINESTRING"));
 
   for (int i = 0; i < N; i++) {
-    io::readWkt("LINESTRING(0 0,0 1000,1000 1000)");
+    io::readWkt("LINESTRING (0 0,0 1000,1000 1000)");
   }
 
   bench().stop();
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(testReadPolygon)
   bench().start(boost::format("READ WKT POLYGON"));
 
   for (int i = 0; i < N; i++) {
-    io::readWkt("POLYGON((0 0,0 1000,1000 1000,1000 0,0 0))");
+    io::readWkt("POLYGON ((0 0,0 1000,1000 1000,1000 0,0 0))");
   }
 
   bench().stop();
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(testReadTriangle)
   bench().start(boost::format("READ WKT TRIANGLE"));
 
   for (int i = 0; i < N; i++) {
-    io::readWkt("TRIANGLE((0 0,0 1000,1000 1000,0 0))");
+    io::readWkt("TRIANGLE ((0 0,0 1000,1000 1000,0 0))");
   }
 
   bench().stop();
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(testReadSolid)
 
   for (int i = 0; i < N; i++) {
     io::readWkt(
-        "SOLID((((0.0 0.0 0.0,0.0 1.0 0.0,1.0 1.0 0.0,1.0 0.0 0.0,0.0 0.0 "
+        "SOLID ((((0.0 0.0 0.0,0.0 1.0 0.0,1.0 1.0 0.0,1.0 0.0 0.0,0.0 0.0 "
         "0.0),(0.2 0.2 0.0,0.8 0.2 0.0,0.8 0.8 0.0,0.2 0.8 0.0,0.2 0.2 "
         "0.0)),((0.0 0.0 1.0,1.0 0.0 1.0,1.0 1.0 1.0,0.0 1.0 1.0,0.0 0.0 "
         "1.0),(0.2 0.2 1.0,0.2 0.8 1.0,0.8 0.8 1.0,0.8 0.2 1.0,0.2 0.2 "

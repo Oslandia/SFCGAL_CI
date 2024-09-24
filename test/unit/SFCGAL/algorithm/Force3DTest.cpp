@@ -65,13 +65,13 @@ BOOST_AUTO_TEST_CASE(testPointForceZ)
 {
   Point p(3.0, 4.0);
   algorithm::force3D(p);
-  BOOST_CHECK_EQUAL(p.asText(1), "POINT Z(3.0 4.0 0.0)");
+  BOOST_CHECK_EQUAL(p.asText(1), "POINT Z (3.0 4.0 0.0)");
 }
 BOOST_AUTO_TEST_CASE(testPointForceZWithValue)
 {
   Point p(3.0, 4.0);
   algorithm::force3D(p, -9999.0);
-  BOOST_CHECK_EQUAL(p.asText(1), "POINT Z(3.0 4.0 -9999.0)");
+  BOOST_CHECK_EQUAL(p.asText(1), "POINT Z (3.0 4.0 -9999.0)");
 }
 
 BOOST_AUTO_TEST_CASE(test_MixedLineString2D3D)
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(test_MixedLineString2D3D)
   algorithm::force3D(lineString);
   // should keep 1.0 for the second point
   BOOST_CHECK_EQUAL(lineString.asText(1),
-                    "LINESTRING Z(1.0 1.0 0.0,2.0 2.0 1.0,3.0 3.0 0.0)");
+                    "LINESTRING Z (1.0 1.0 0.0,2.0 2.0 1.0,3.0 3.0 0.0)");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

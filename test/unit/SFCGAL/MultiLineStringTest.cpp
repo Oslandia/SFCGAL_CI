@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(asText2d)
   g.addGeometry(LineString(Point(0.0, 0.0), Point(1.0, 1.0)));
   g.addGeometry(LineString(Point(1.0, 1.0), Point(2.0, 2.0)));
   BOOST_CHECK_EQUAL(g.asText(1),
-                    "MULTILINESTRING((0.0 0.0,1.0 1.0),(1.0 1.0,2.0 2.0))");
+                    "MULTILINESTRING ((0.0 0.0,1.0 1.0),(1.0 1.0,2.0 2.0))");
 }
 
 //-- is< T >

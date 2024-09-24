@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(twoPointsConstructor)
   LineString const g(Point(0.0, 0.0), Point(2.0, 3.0));
   BOOST_CHECK(!g.isEmpty());
   BOOST_CHECK(!g.is3D());
-  BOOST_CHECK_EQUAL(g.asText(1), "LINESTRING(0.0 0.0,2.0 3.0)");
+  BOOST_CHECK_EQUAL(g.asText(1), "LINESTRING (0.0 0.0,2.0 3.0)");
 }
 
 /// LineString( LineString const& other ) ;
@@ -162,13 +162,13 @@ BOOST_AUTO_TEST_CASE(simpleIteratorTest)
 
   LineString::const_iterator       it  = g.begin();
   LineString::const_iterator const end = g.end();
-  BOOST_CHECK_EQUAL(it->asText(3), "POINT(0.000 0.000)");
+  BOOST_CHECK_EQUAL(it->asText(3), "POINT (0.000 0.000)");
   ++it;
   BOOST_CHECK(it != end);
-  BOOST_CHECK_EQUAL(it->asText(3), "POINT(1.000 1.000)");
+  BOOST_CHECK_EQUAL(it->asText(3), "POINT (1.000 1.000)");
   ++it;
   BOOST_CHECK(it != end);
-  BOOST_CHECK_EQUAL(it->asText(3), "POINT(2.000 2.000)");
+  BOOST_CHECK_EQUAL(it->asText(3), "POINT (2.000 2.000)");
   ++it;
   BOOST_CHECK(it == end);
 }
@@ -325,13 +325,13 @@ BOOST_AUTO_TEST_CASE(asTextEmpty)
 BOOST_AUTO_TEST_CASE(asText2d)
 {
   LineString const g(Point(2.0, 3.0), Point(4.0, 5.0));
-  BOOST_CHECK_EQUAL(g.asText(3), "LINESTRING(2.000 3.000,4.000 5.000)");
+  BOOST_CHECK_EQUAL(g.asText(3), "LINESTRING (2.000 3.000,4.000 5.000)");
 }
 BOOST_AUTO_TEST_CASE(asText3d)
 {
   LineString const g(Point(2.0, 3.0, 7.0), Point(4.0, 5.0, 8.0));
   BOOST_CHECK_EQUAL(g.asText(3),
-                    "LINESTRING Z(2.000 3.000 7.000,4.000 5.000 8.000)");
+                    "LINESTRING Z (2.000 3.000 7.000,4.000 5.000 8.000)");
 }
 
 // virtual std::string  Geometry::geometryType() const = 0 ;

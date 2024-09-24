@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(asText2d)
   MultiPoint g;
   g.addGeometry(Point(2.0, 3.0));
   g.addGeometry(Point(3.0, 4.0));
-  BOOST_CHECK_EQUAL(g.asText(3), "MULTIPOINT((2.000 3.000),(3.000 4.000))");
+  BOOST_CHECK_EQUAL(g.asText(3), "MULTIPOINT ((2.000 3.000),(3.000 4.000))");
 }
 
 //-- is< T >

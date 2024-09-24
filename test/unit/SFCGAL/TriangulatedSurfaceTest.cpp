@@ -18,11 +18,11 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
+#include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/Envelope.h"
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Triangle.h"
-#include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/io/wkt.h"
 #include "SFCGAL/triangulate/triangulatePolygon.h"
 
@@ -108,8 +108,9 @@ BOOST_AUTO_TEST_CASE(testBoundary)
   TriangulatedSurface const g(triangles);
   std::unique_ptr<Geometry> boundary(g.boundary());
   // TODO add algorithm::lineMerge and update
-  BOOST_CHECK_EQUAL(boundary->asText(0),
-                    "MULTILINESTRING((0 0,1 0),(1 0,1 1),(1 1,0 1),(0 1,0 0))");
+  BOOST_CHECK_EQUAL(
+      boundary->asText(0),
+      "MULTILINESTRING ((0 0,1 0),(1 0,1 1),(1 1,0 1),(0 1,0 0))");
 }
 BOOST_AUTO_TEST_CASE(testBoundaryClosed)
 {
@@ -195,11 +196,11 @@ BOOST_AUTO_TEST_CASE(polyhedronConversionTest)
 {
   // two unit squares sharing a common edge (1,0)-(1,1)
   std::string const gstr =
-      "POLYHEDRALSURFACE(((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),"
+      "POLYHEDRALSURFACE (((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),"
       "((1 0 0,1 1 0,2 1 0,2 0 0,1 0 0)))";
   // the following surface would generate an exception, since the two polygons
-  // have opposite orientations "POLYHEDRALSURFACE(((0 0 0,0 1 0,1 1 0,1 0 0,0 0
-  // 0)),((2 0 0,2 1 0,1 1 0,1 0 0,2 0 0)))";
+  // have opposite orientations "POLYHEDRALSURFACE (((0 0 0,0 1 0,1 1 0,1 0 0,0
+  // 0 0)),((2 0 0,2 1 0,1 1 0,1 0 0,2 0 0)))";
   std::unique_ptr<Geometry> const g(io::readWkt(gstr));
 
   TriangulatedSurface tri;

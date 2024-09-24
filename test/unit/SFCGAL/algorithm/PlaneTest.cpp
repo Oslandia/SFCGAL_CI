@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_PlaneTest)
 
 BOOST_AUTO_TEST_CASE(testPlane1)
 {
-  std::unique_ptr<Geometry> gA(io::readWkt("POLYGON((0 0,1 0,1 1,0 1,0 0))"));
+  std::unique_ptr<Geometry> gA(io::readWkt("POLYGON ((0 0,1 0,1 1,0 1,0 0))"));
 
   CGAL::Plane_3<Kernel> const plane =
       algorithm::plane3D<Kernel>(gA->as<Polygon>());
@@ -59,18 +59,18 @@ BOOST_AUTO_TEST_CASE(testPlane)
     const bool        _isPlane;
   };
   const TestCase test[] = {
-      {"LINESTRING(1 2 3,4 5 6)", true}, // only two points
-      {"LINESTRING(1 2 3,1 2 3,1 2 3,1 2 3)",
+      {"LINESTRING (1 2 3,4 5 6)", true}, // only two points
+      {"LINESTRING (1 2 3,1 2 3,1 2 3,1 2 3)",
        true}, // all points in the same place
-      {"LINESTRING(1 2 3,2 4 6,3 6 9,4 8 12)", true}, // all points aliged
-      {"LINESTRING(1 2 3,6 5 4,7 8 9)", true},        // triangle must be plane
-      {"LINESTRING(0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)",
+      {"LINESTRING (1 2 3,2 4 6,3 6 9,4 8 12)", true}, // all points aliged
+      {"LINESTRING (1 2 3,6 5 4,7 8 9)", true},        // triangle must be plane
+      {"LINESTRING (0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)",
        true}, // all point in the plane z=0
-      {"LINESTRING(2 1 0,2 0 0,2 1 0,2 1 0,2 0 3)",
+      {"LINESTRING (2 1 0,2 0 0,2 1 0,2 1 0,2 0 3)",
        true}, // all points in the plane x=2
-      {"LINESTRING(2 1 0,2 0 0,2 1 1,2 1 0,1 0 3)",
+      {"LINESTRING (2 1 0,2 0 0,2 1 1,2 1 0,1 0 3)",
        false}, // one point out of plane
-      {"LINESTRING(0 0 0, 1e-5 0 0, 1e-5 1e-5 0, 0 1e-5 1e-5)",
+      {"LINESTRING (0 0 0, 1e-5 0 0, 1e-5 1e-5 0, 0 1e-5 1e-5)",
        false}, // fix #247
   };
   const size_t numTest = sizeof(test) / sizeof(TestCase);
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(testPlane)
 BOOST_AUTO_TEST_CASE(testPlane3DDivideByZeroCrash)
 {
   std::unique_ptr<Geometry> degenerate_polygon =
-      io::readWkt("POLYGON((1 -1 -1,1 0.5 0.5,1 0.5 0.5,1 -1 -1))");
+      io::readWkt("POLYGON ((1 -1 -1,1 0.5 0.5,1 0.5 0.5,1 -1 -1))");
   BOOST_CHECK(degenerate_polygon->geometryTypeId() == TYPE_POLYGON);
 
   // Should return degenerate plane without throwing
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(testPlane3DDivideByZeroCrash)
   }
 
   std::unique_ptr<Geometry> ok_polygon =
-      io::readWkt("POLYGON((1 0.5 0.5,1.5 1.5 0.5,1.5 0.5 0.5,1 0.5 0.5))");
+      io::readWkt("POLYGON ((1 0.5 0.5,1.5 1.5 0.5,1.5 0.5 0.5,1 0.5 0.5))");
   BOOST_CHECK(ok_polygon->geometryTypeId() == TYPE_POLYGON);
 
   BOOST_CHECK(algorithm::hasPlane3D<Kernel>(ok_polygon->as<Polygon>()));

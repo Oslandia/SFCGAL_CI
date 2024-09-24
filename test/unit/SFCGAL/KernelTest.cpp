@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(testSerializeDeserialize)
 }
 
 /**
- * 3 lines intersecting on POINT(1/3 1)
+ * 3 lines intersecting on POINT (1/3 1)
  */
 BOOST_AUTO_TEST_CASE(testIntersectsRobutness)
 {

@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(testExtrudePoint)
   std::unique_ptr<Geometry> ext(algorithm::extrude(g, 0.0, 0.0, 1.0));
   BOOST_CHECK(ext->is<LineString>());
   BOOST_CHECK(ext->as<LineString>().is3D());
-  BOOST_CHECK_EQUAL(ext->asText(1), "LINESTRING Z(0.0 0.0 0.0,0.0 0.0 1.0)");
+  BOOST_CHECK_EQUAL(ext->asText(1), "LINESTRING Z (0.0 0.0 0.0,0.0 0.0 1.0)");
 }
 
 BOOST_AUTO_TEST_CASE(testExtrudeLineString)
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(testExtrudeLineString)
   BOOST_CHECK(ext->is<PolyhedralSurface>());
   BOOST_CHECK(ext->as<PolyhedralSurface>().is3D());
   BOOST_CHECK_EQUAL(ext->asText(1),
-                    "POLYHEDRALSURFACE Z(((0.0 0.0 0.0,1.0 0.0 0.0,1.0 0.0 "
+                    "POLYHEDRALSURFACE Z (((0.0 0.0 0.0,1.0 0.0 0.0,1.0 0.0 "
                     "1.0,0.0 0.0 1.0,0.0 0.0 0.0)))");
 }
 
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(testExtrudeSquare)
 BOOST_AUTO_TEST_CASE(testExtrudePolyhedral)
 {
   std::unique_ptr<Geometry> const g =
-      io::readWkt("POLYHEDRALSURFACE(((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)))");
+      io::readWkt("POLYHEDRALSURFACE (((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)))");
 
   std::unique_ptr<Geometry> ext = algorithm::extrude(*g, 0.0, 0.0, 1.0);
   BOOST_CHECK(ext->is<Solid>());
@@ -151,20 +151,20 @@ BOOST_AUTO_TEST_CASE(testExtrudeSquareWithHole)
   BOOST_CHECK_EQUAL(ext->as<Solid>().exteriorShell().numPolygons(), 10U);
 }
 
-// SELECT ST_AsText(ST_Extrude(ST_Extrude(ST_Extrude('POINT(0 0)', 1, 0, 0), 0,
+// SELECT ST_AsText(ST_Extrude(ST_Extrude(ST_Extrude('POINT (0 0)', 1, 0, 0), 0,
 // 1, 0), 0, 0, 1));
 BOOST_AUTO_TEST_CASE(testChainingExtrude)
 {
   std::unique_ptr<Geometry> g(new Point(0.0, 0.0));
   g = algorithm::extrude(*g, 1.0, 0.0, 0.0);
-  BOOST_CHECK_EQUAL(g->asText(0), "LINESTRING Z(0 0 0,1 0 0)");
+  BOOST_CHECK_EQUAL(g->asText(0), "LINESTRING Z (0 0 0,1 0 0)");
   g = algorithm::extrude(*g, 0.0, 1.0, 0.0);
   BOOST_CHECK_EQUAL(g->asText(0),
-                    "POLYHEDRALSURFACE Z(((0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)))");
+                    "POLYHEDRALSURFACE Z (((0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)))");
   g = algorithm::extrude(*g, 0.0, 0.0, 1.0);
   BOOST_CHECK_EQUAL(
       g->asText(0),
-      "SOLID Z((((0 1 0,1 1 0,1 0 0,0 1 0)),((0 1 1,1 0 1,1 1 1,0 1 1)),((0 1 "
+      "SOLID Z ((((0 1 0,1 1 0,1 0 0,0 1 0)),((0 1 1,1 0 1,1 1 1,0 1 1)),((0 1 "
       "0,1 0 0,0 0 0,0 1 0)),((0 1 1,0 0 1,1 0 1,0 1 1)),((1 0 0,1 1 0,1 1 1,1 "
       "0 1,1 0 0)),((1 1 0,0 1 0,0 1 1,1 1 1,1 1 0)),((0 1 0,0 0 0,0 0 1,0 1 "
       "1,0 1 0)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0))))");

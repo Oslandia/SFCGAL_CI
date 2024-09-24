@@ -68,9 +68,9 @@ BOOST_AUTO_TEST_CASE(testAccessors)
       new Triangle(Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0)));
   BOOST_CHECK_EQUAL(g.numGeometries(), 3U);
 
-  BOOST_CHECK_EQUAL(g.geometryN(0).asText(0), "POINT(2 3)");
-  BOOST_CHECK_EQUAL(g.geometryN(1).asText(0), "LINESTRING(0 0,1 1)");
-  BOOST_CHECK_EQUAL(g.geometryN(2).asText(0), "TRIANGLE((0 0,1 0,1 1,0 0))");
+  BOOST_CHECK_EQUAL(g.geometryN(0).asText(0), "POINT (2 3)");
+  BOOST_CHECK_EQUAL(g.geometryN(1).asText(0), "LINESTRING (0 0,1 1)");
+  BOOST_CHECK_EQUAL(g.geometryN(2).asText(0), "TRIANGLE ((0 0,1 0,1 1,0 0))");
 }
 
 //-- iterators
@@ -87,9 +87,9 @@ BOOST_AUTO_TEST_CASE(testIterators)
 
   GeometryCollection::const_iterator it = g.begin();
 
-  BOOST_CHECK_EQUAL(it->asText(0), "POINT(0 0)");
+  BOOST_CHECK_EQUAL(it->asText(0), "POINT (0 0)");
   ++it;
-  BOOST_CHECK_EQUAL(it->asText(0), "POINT(1 1)");
+  BOOST_CHECK_EQUAL(it->asText(0), "POINT (1 1)");
   ++it;
   BOOST_CHECK(it == g.end());
 }
@@ -111,9 +111,9 @@ BOOST_AUTO_TEST_CASE(asText2d)
   GeometryCollection g;
   g.addGeometry(Point(2.0, 3.0));
   g.addGeometry(Triangle(Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0)));
-  BOOST_CHECK_EQUAL(g.asText(1),
-                    "GEOMETRYCOLLECTION(POINT(2.0 3.0),TRIANGLE((0.0 0.0,1.0 "
-                    "0.0,1.0 1.0,0.0 0.0)))");
+  BOOST_CHECK_EQUAL(
+      g.asText(1), "GEOMETRYCOLLECTION (POINT (2.0 3.0),TRIANGLE ((0.0 0.0,1.0 "
+                   "0.0,1.0 1.0,0.0 0.0)))");
 }
 BOOST_AUTO_TEST_CASE(asText3d)
 {
@@ -121,9 +121,10 @@ BOOST_AUTO_TEST_CASE(asText3d)
   g.addGeometry(Point(2.0, 3.0, 5.0));
   g.addGeometry(Triangle(Point(0.0, 0.0, 6.0), Point(1.0, 0.0, 6.0),
                          Point(1.0, 1.0, 6.0)));
-  BOOST_CHECK_EQUAL(g.asText(1),
-                    "GEOMETRYCOLLECTION Z(POINT Z(2.0 3.0 5.0),TRIANGLE Z((0.0 "
-                    "0.0 6.0,1.0 0.0 6.0,1.0 1.0 6.0,0.0 0.0 6.0)))");
+  BOOST_CHECK_EQUAL(
+      g.asText(1),
+      "GEOMETRYCOLLECTION Z (POINT Z (2.0 3.0 5.0),TRIANGLE Z ((0.0 "
+      "0.0 6.0,1.0 0.0 6.0,1.0 1.0 6.0,0.0 0.0 6.0)))");
 }
 
 // virtual std::string  Geometry::geometryType() const = 0 ;

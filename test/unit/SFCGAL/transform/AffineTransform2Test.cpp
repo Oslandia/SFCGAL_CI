@@ -39,8 +39,8 @@ BOOST_AUTO_TEST_CASE(simpleTranslate)
   transform::AffineTransform2 transform(affine);
   g.accept(transform);
 
-  BOOST_CHECK_EQUAL(g.pointN(0).asText(5), "POINT(1.00000 2.00000)");
-  BOOST_CHECK_EQUAL(g.pointN(1).asText(5), "POINT(2.00000 3.00000)");
+  BOOST_CHECK_EQUAL(g.pointN(0).asText(5), "POINT (1.00000 2.00000)");
+  BOOST_CHECK_EQUAL(g.pointN(1).asText(5), "POINT (2.00000 3.00000)");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

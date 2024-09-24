@@ -89,28 +89,29 @@ BOOST_AUTO_TEST_CASE(binaryTest)
 
 BOOST_AUTO_TEST_CASE(geometryTest)
 {
-  std::unique_ptr<Geometry> g1 = io::readWkt("POINT( 3.4 4.5 5.6 )");
+  std::unique_ptr<Geometry> g1 = io::readWkt("POINT ( 3.4 4.5 5.6 )");
   std::unique_ptr<Geometry> g2 =
-      io::readWkt("LINESTRING( 3.4 4.5 5.6, 5 6 8 )");
+      io::readWkt("LINESTRING ( 3.4 4.5 5.6, 5 6 8 )");
   std::unique_ptr<Geometry> g3 =
-      io::readWkt("TRIANGLE(( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0))");
+      io::readWkt("TRIANGLE (( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0))");
   std::unique_ptr<Geometry> g4 =
-      io::readWkt("POLYGON(( 0 0 0, 1 1 1, 3.4 5.6 6.7,2 3 4, 0 0 0))");
-  std::unique_ptr<Geometry> g5 = io::readWkt(
-      "TIN((( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0)), ((0 0 0,0 1 0,1 1 0,0 0 0)))");
-  std::unique_ptr<Geometry> g6 =
-      io::readWkt("POLYHEDRALSURFACE((( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0)), ((0 "
-                  "0 0,0 1 0,1 1 0,1 0 0,0 0 0)))");
+      io::readWkt("POLYGON (( 0 0 0, 1 1 1, 3.4 5.6 6.7,2 3 4, 0 0 0))");
+  std::unique_ptr<Geometry> g5 =
+      io::readWkt("TIN ((( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0)), ((0 0 0,0 1 0,1 "
+                  "1 0,0 0 0)))");
+  std::unique_ptr<Geometry> g6 = io::readWkt(
+      "POLYHEDRALSURFACE ((( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0)), ((0 "
+      "0 0,0 1 0,1 1 0,1 0 0,0 0 0)))");
   std::unique_ptr<Geometry> g7 =
-      io::readWkt("SOLID(((( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0)), ((0 0 0,0 1 "
+      io::readWkt("SOLID (((( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0)), ((0 0 0,0 1 "
                   "0,1 1 0,1 0 0,0 0 0))))");
-  std::unique_ptr<Geometry> g8 = io::readWkt("MULTIPOINT(( 3.4 4.5 5.6 ))");
+  std::unique_ptr<Geometry> g8 = io::readWkt("MULTIPOINT (( 3.4 4.5 5.6 ))");
   std::unique_ptr<Geometry> g9 =
-      io::readWkt("MULTILINESTRING(( 3.4 4.5 5.6, 5 6 8 ))");
+      io::readWkt("MULTILINESTRING (( 3.4 4.5 5.6, 5 6 8 ))");
   std::unique_ptr<Geometry> g10 =
-      io::readWkt("MULTIPOLYGON((( 0 0 0, 1 1 1, 3.4 5.6 6.7,2 3 4, 0 0 0)))");
+      io::readWkt("MULTIPOLYGON ((( 0 0 0, 1 1 1, 3.4 5.6 6.7,2 3 4, 0 0 0)))");
   std::unique_ptr<Geometry> g11 =
-      io::readWkt("MULTISOLID((((( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0)), ((0 0 "
+      io::readWkt("MULTISOLID ((((( 0 0 0, 3.4 5.6 6.7,2 3 4, 0 0 0)), ((0 0 "
                   "0,0 1 0,1 1 0,1 0 0,0 0 0)))))");
 
   BOOST_CHECK(io::readBinaryGeometry(io::writeBinaryGeometry(*g1))->asText() ==
@@ -147,7 +148,7 @@ BOOST_AUTO_TEST_CASE(caseTest)
 BOOST_AUTO_TEST_CASE(extBinaryTest)
 {
   std::unique_ptr<Geometry> ng1 = io::readWkt(
-      "POLYGON((9.70065196277574 -2.37991360574961,3.74221071600914 "
+      "POLYGON ((9.70065196277574 -2.37991360574961,3.74221071600914 "
       "5.33515858836472,-4.30443822173402 -2.37991360574961,3.74221071600914 "
       "-12.1891073728912,9.70065196277574 -2.37991360574961))");
   SFCGAL::Geometry *mg1 = ng1.release();
@@ -169,11 +170,11 @@ BOOST_AUTO_TEST_CASE(extBinaryTest)
 
 BOOST_AUTO_TEST_CASE(preparedGeometryTest)
 {
-  std::unique_ptr<PreparedGeometry> g1 = io::readEwkt("POINT( 3.4 4.5 5.6 )");
+  std::unique_ptr<PreparedGeometry> g1 = io::readEwkt("POINT ( 3.4 4.5 5.6 )");
   std::unique_ptr<PreparedGeometry> g2 =
-      io::readEwkt("srid=0;POINT( 3.4 4.5 5.6 )");
+      io::readEwkt("srid=0;POINT ( 3.4 4.5 5.6 )");
   std::unique_ptr<PreparedGeometry> g3 =
-      io::readEwkt("srid=4326;POINT( 3.4 4.5 5.6 )");
+      io::readEwkt("srid=4326;POINT ( 3.4 4.5 5.6 )");
 
   BOOST_CHECK(io::readBinaryPrepared(io::writeBinaryPrepared(*g1))->asEWKT() ==
               g1->asEWKT());

@@ -176,7 +176,7 @@ WktWriter::write(const Point &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -209,7 +209,7 @@ WktWriter::write(const LineString &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -245,7 +245,7 @@ WktWriter::write(const Polygon &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -279,7 +279,7 @@ WktWriter::write(const GeometryCollection &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -306,7 +306,7 @@ WktWriter::write(const MultiPoint &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -333,7 +333,7 @@ WktWriter::write(const MultiLineString &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -360,7 +360,7 @@ WktWriter::write(const MultiPolygon &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -387,7 +387,7 @@ WktWriter::write(const MultiSolid &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -414,7 +414,7 @@ WktWriter::write(const Triangle &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -453,7 +453,7 @@ WktWriter::write(const TriangulatedSurface &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -480,7 +480,7 @@ WktWriter::write(const PolyhedralSurface &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 
@@ -516,7 +516,7 @@ WktWriter::write(const Solid &g)
   writeCoordinateType(g);
 
   if (g.isEmpty()) {
-    _s << " EMPTY";
+    _s << "EMPTY";
     return;
   }
 

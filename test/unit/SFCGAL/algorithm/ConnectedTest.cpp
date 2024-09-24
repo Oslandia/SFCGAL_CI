@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_Connected)
 BOOST_AUTO_TEST_CASE(allFine)
 {
   std::unique_ptr<Geometry> geom(
-      io::readWkt("POLYHEDRALSURFACE(((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
+      io::readWkt("POLYHEDRALSURFACE (((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
                                    ((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)),\
                                    ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),\
                                    ((1 1 1, 0 1 1, 0 0 1, 1 0 1, 1 1 1)),\
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(allFine)
 BOOST_AUTO_TEST_CASE(notConnected)
 {
   std::unique_ptr<Geometry> geom(io::readWkt(
-      "POLYHEDRALSURFACE(((0 0 -1, 0 1 -1, 1 1 -1, 1 0 -1, 0 0 -1)),\
+      "POLYHEDRALSURFACE (((0 0 -1, 0 1 -1, 1 1 -1, 1 0 -1, 0 0 -1)),\
                                    ((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)),\
                                    ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),\
                                    ((1 1 1, 0 1 1, 0 0 1, 1 0 1, 1 1 1)),\
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(notConnected)
 BOOST_AUTO_TEST_CASE(notClosed)
 {
   std::unique_ptr<Geometry> geom(
-      io::readWkt("POLYHEDRALSURFACE(((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
+      io::readWkt("POLYHEDRALSURFACE (((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
                                    ((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)),\
                                    ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),\
                                    ((1 1 1, 0 1 1, 0 0 1, 1 0 1, 1 1 1)),\

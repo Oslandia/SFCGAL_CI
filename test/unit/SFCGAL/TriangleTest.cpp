@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(testClone)
 
   std::unique_ptr<Geometry> copy(g.clone());
   BOOST_REQUIRE(copy->is<Triangle>());
-  BOOST_CHECK_EQUAL(copy->asText(0), "TRIANGLE Z((0 0 1,1 0 2,1 1 3,0 0 1))");
+  BOOST_CHECK_EQUAL(copy->asText(0), "TRIANGLE Z ((0 0 1,1 0 2,1 1 3,0 0 1))");
 }
 
 // virtual Geometry*    Geometry::boundary() const ;
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(testBoundary)
   Triangle const g(Kernel::Triangle_2(a, b, c));
 
   std::unique_ptr<Geometry> boundary(g.boundary());
-  BOOST_CHECK_EQUAL(boundary->asText(0), "LINESTRING(0 0,1 0,1 1,0 0)");
+  BOOST_CHECK_EQUAL(boundary->asText(0), "LINESTRING (0 0,1 0,1 1,0 0)");
 }
 
 // Envelope             Geometry::envelope() const ;
@@ -179,7 +179,8 @@ BOOST_AUTO_TEST_CASE(asTextEmpty)
 BOOST_AUTO_TEST_CASE(asText2d)
 {
   Triangle const g(Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0));
-  BOOST_CHECK_EQUAL(g.asText(1), "TRIANGLE((0.0 0.0,1.0 0.0,1.0 1.0,0.0 0.0))");
+  BOOST_CHECK_EQUAL(g.asText(1),
+                    "TRIANGLE ((0.0 0.0,1.0 0.0,1.0 1.0,0.0 0.0))");
 }
 BOOST_AUTO_TEST_CASE(asText3d)
 {
@@ -187,7 +188,7 @@ BOOST_AUTO_TEST_CASE(asText3d)
                    Point(1.0, 1.0, 4.0));
   BOOST_CHECK_EQUAL(
       g.asText(1),
-      "TRIANGLE Z((0.0 0.0 2.0,1.0 0.0 3.0,1.0 1.0 4.0,0.0 0.0 2.0))");
+      "TRIANGLE Z ((0.0 0.0 2.0,1.0 0.0 3.0,1.0 1.0 4.0,0.0 0.0 2.0))");
 }
 
 // virtual std::string  Geometry::geometryType() const = 0 ;

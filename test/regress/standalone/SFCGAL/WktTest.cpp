@@ -48,12 +48,19 @@ BOOST_AUTO_TEST_CASE(testReadWriter)
   std::string filename(SFCGAL_TEST_DIRECTORY);
   filename += "/data/WktTest.txt";
 
+  std::string expectedFilename(SFCGAL_TEST_DIRECTORY);
+  expectedFilename += "/data/WktTestExpected.txt";
+
   std::ifstream ifs(filename.c_str());
+  std::ifstream efs(expectedFilename.c_str());
+
   BOOST_REQUIRE(ifs.good());
+  BOOST_REQUIRE(efs.good());
 
   std::string inputWkt;
+  std::string expectedWkt;
 
-  while (std::getline(ifs, inputWkt)) {
+  while (std::getline(ifs, inputWkt) && std::getline(efs, expectedWkt)) {
     if (inputWkt[0] == '#' || inputWkt.empty()) {
       continue;
     }
@@ -63,7 +70,7 @@ BOOST_AUTO_TEST_CASE(testReadWriter)
      */
     std::unique_ptr<Geometry> g(io::readWkt(inputWkt));
     std::string const         outputWkt = g->asText(1);
-    BOOST_CHECK_EQUAL(inputWkt, outputWkt);
+    BOOST_CHECK_EQUAL(expectedWkt, outputWkt);
   }
 }
 

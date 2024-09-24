@@ -38,45 +38,50 @@ compareFiles(const std::string &file1, const std::string &file2)
 BOOST_AUTO_TEST_CASE(test_all_geometries)
 {
   std::vector<std::string> wkt_examples = {
-      "POINT Z(1 2 3)",
-      "LINESTRING Z(0 0 0, 1 1 1, 2 2 2)",
-      "POLYGON Z((0 0 0, 1 0 0, 1 1 0, 0 1 0, 0 0 0))",
-      "TRIANGLE Z((0 0 0, 1 0 0, 0 1 0, 0 0 0))",
-      "POLYHEDRALSURFACE Z(((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)), ((0 0 0, 0 1 "
+      "POINT Z (1 2 3)",
+      "LINESTRING Z (0 0 0, 1 1 1, 2 2 2)",
+      "POLYGON Z ((0 0 0, 1 0 0, 1 1 0, 0 1 0, 0 0 0))",
+      "TRIANGLE Z ((0 0 0, 1 0 0, 0 1 0, 0 0 0))",
+      "POLYHEDRALSURFACE Z (((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)), ((0 0 0, 0 "
+      "1 "
       "0, 0 1 1, 0 0 1, 0 0 0)))",
-      "SOLID Z((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)), ((1 0 0,1 1 0,1 1 1,1 0 1,1 "
+      "SOLID Z ((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)), ((1 0 0,1 1 0,1 1 1,1 0 "
+      "1,1 "
       "0 0)), ((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0)), ((0 0 1,0 1 1,0 1 0,0 0 0,0 0 "
       "1)), ((1 0 1,1 1 1,0 1 1,0 0 1,1 0 1)), ((1 0 0,1 0 1,0 0 1,0 0 0,1 0 "
       "0))))",
-      "TIN Z(((0 0 0, 0 0 1, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 1 0 0, 0 0 0)))",
-      "MULTIPOINT Z((1 1 1), (2 2 2))",
-      "MULTILINESTRING Z((0 0 0, 1 1 1), (2 2 2, 3 3 3))",
-      "MULTIPOLYGON Z(((0 0 0, 1 0 0, 1 1 0, 0 1 0, 0 0 0)), ((2 2 2, 3 2 2, 3 "
+      "TIN Z (((0 0 0, 0 0 1, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 1 0 0, 0 0 0)))",
+      "MULTIPOINT Z ((1 1 1), (2 2 2))",
+      "MULTILINESTRING Z ((0 0 0, 1 1 1), (2 2 2, 3 3 3))",
+      "MULTIPOLYGON Z (((0 0 0, 1 0 0, 1 1 0, 0 1 0, 0 0 0)), ((2 2 2, 3 2 2, "
+      "3 "
       "3 2, 2 3 2, 2 2 2)))",
-      "MULTISOLID Z(((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((0 0 1,1 0 1,1 1 1,0 "
+      "MULTISOLID Z (((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((0 0 1,1 0 1,1 1 1,0 "
       "1 1,0 0 1)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),((1 1 0,0 1 0,0 1 1,1 1 "
       "1,1 1 0)),((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),((0 0 0,0 0 1,0 1 1,0 1 0,0 "
       "0 0)))),((((2 4 6,2 5 6,3 5 6,3 4 6,2 4 6)),((2 4 7,3 4 7,3 5 7,2 5 7,2 "
       "4 7)),((2 4 6,3 4 6,3 4 7,2 4 7,2 4 6)),((3 5 6,2 5 6,2 5 7,3 5 7,3 5 "
       "6)),((3 4 6,3 5 6,3 5 7,3 4 7,3 4 6)),((2 4 6,2 4 7,2 5 7,2 5 6,2 4 "
       "6)))))",
-      "GEOMETRYCOLLECTION Z(POINT Z(2.0 3.0 5.0),TRIANGLE Z((0.0 0.0 6.0,1.0 "
+      "GEOMETRYCOLLECTION Z (POINT Z (2.0 3.0 5.0),TRIANGLE Z ((0.0 0.0 "
+      "6.0,1.0 "
       "0.0 6.0,1.0 1.0 6.0,0.0 0.0 6.0)))",
-      "POINT(1 2)",
-      "LINESTRING(0 0, 1 1, 2 2)",
-      "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
-      "TRIANGLE((0 0, 1 0, 0 1, 0 0))",
-      "POLYHEDRALSURFACE(((0 0, 0 1, 1 1, 1 0, 0 0)), ((0 0, 0 1, 0 0)))",
-      "TIN(((0 0, 0 1, 1 0, 0 0)), ((0 0, 1 0, 1 1, 0 0)))",
-      "MULTIPOINT((1 1), (2 2))",
-      "MULTILINESTRING((0 0, 1 1), (2 2, 3 3))",
-      "MULTIPOLYGON(((0 0, 1 0, 1 1, 0 1, 0 0)), ((2 2, 3 2, 3 3, 2 3, 2 2)))",
-      "MULTISOLID(((((0 0,0 1,1 1,1 0,0 0)),((0 0,1 0,1 0,0 0,0 0)),((0 0,1 "
+      "POINT (1 2)",
+      "LINESTRING (0 0, 1 1, 2 2)",
+      "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
+      "TRIANGLE ((0 0, 1 0, 0 1, 0 0))",
+      "POLYHEDRALSURFACE (((0 0, 0 1, 1 1, 1 0, 0 0)), ((0 0, 0 1, 0 0)))",
+      "TIN (((0 0, 0 1, 1 0, 0 0)), ((0 0, 1 0, 1 1, 0 0)))",
+      "MULTIPOINT ((1 1), (2 2))",
+      "MULTILINESTRING ((0 0, 1 1), (2 2, 3 3))",
+      "MULTIPOLYGON (((0 0, 1 0, 1 1, 0 1, 0 0)), ((2 2, 3 2, 3 3, 2 3, 2 2)))",
+      "MULTISOLID (((((0 0,0 1,1 1,1 0,0 0)),((0 0,1 0,1 0,0 0,0 0)),((0 0,1 "
       "0,1 0,0 0,0 0)),((1 1,0 1,0 1,1 1,1 1)),((1 0,1 1,1 1,1 0,1 0)),((0 0,0 "
       "0,0 1,0 1,0 0)))),((((2 4,2 5,3 5,3 4,2 4)),((2 4,3 4,3 5,2 5,2 4)),((2 "
       "4,3 4,3 4,2 4,2 4)),((3 5,2 5,2 5,3 5,3 5)),((3 4,3 5,3 5,3 4,3 4)),((2 "
       "4,2 4,2 5,2 5,2 4)))))",
-      "GEOMETRYCOLLECTION(POINT(2.0 3.0),TRIANGLE((0.0 0.0,1.0 0.0,1.0 1.0,0.0 "
+      "GEOMETRYCOLLECTION (POINT (2.0 3.0),TRIANGLE ((0.0 0.0,1.0 0.0,1.0 "
+      "1.0,0.0 "
       "0.0)))"};
 
   // Create a temporary directory for generated files
@@ -125,7 +130,7 @@ BOOST_AUTO_TEST_CASE(test_all_geometries)
 
 BOOST_AUTO_TEST_CASE(test_save_to_string)
 {
-  std::string                       wkt = "POINT(1 2)";
+  std::string                       wkt = "POINT (1 2)";
   std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
 
   std::string result = SFCGAL::io::OBJ::saveToString(*geom);
@@ -136,7 +141,7 @@ BOOST_AUTO_TEST_CASE(test_save_to_string)
 
 BOOST_AUTO_TEST_CASE(test_save_to_buffer)
 {
-  std::string                       wkt = "LINESTRING(0 0, 1 1)";
+  std::string                       wkt = "LINESTRING (0 0, 1 1)";
   std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
 
   size_t size = 100;
@@ -150,7 +155,7 @@ BOOST_AUTO_TEST_CASE(test_save_to_buffer)
 
 BOOST_AUTO_TEST_CASE(test_buffer_size)
 {
-  std::string                       wkt = "POINT(1 2 3)";
+  std::string                       wkt = "POINT (1 2 3)";
   std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
 
   size_t size = 0;
@@ -170,8 +175,8 @@ BOOST_AUTO_TEST_CASE(test_buffer_size)
 
 BOOST_AUTO_TEST_CASE(test_complex_geometry)
 {
-  std::string wkt = "GEOMETRYCOLLECTION(POINT(1 1),LINESTRING(0 0, 1 "
-                    "1),POLYGON((0 0, 1 0, 1 1, 0 1, 0 0)))";
+  std::string wkt = "GEOMETRYCOLLECTION (POINT (1 1),LINESTRING (0 0, 1 "
+                    "1),POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0)))";
   std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
 
   std::string result = SFCGAL::io::OBJ::saveToString(*geom);

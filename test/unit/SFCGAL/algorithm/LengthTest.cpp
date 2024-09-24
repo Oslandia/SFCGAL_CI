@@ -43,25 +43,25 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_LengthTest)
 
 BOOST_AUTO_TEST_CASE(testZeroLength)
 {
-  BOOST_CHECK_EQUAL(algorithm::length(*io::readWkt("POINT(0.0 0.0)")), 0.0);
+  BOOST_CHECK_EQUAL(algorithm::length(*io::readWkt("POINT (0.0 0.0)")), 0.0);
   BOOST_CHECK_EQUAL(algorithm::length(*io::readWkt("LINESTRING EMPTY")), 0.0);
   BOOST_CHECK_EQUAL(
-      algorithm::length(*io::readWkt("POLYGON((0 0,0 1,1 1,1 0,0 0))")), 0.0);
+      algorithm::length(*io::readWkt("POLYGON ((0 0,0 1,1 1,1 0,0 0))")), 0.0);
 }
 
 BOOST_AUTO_TEST_CASE(testZeroLengthVertical)
 {
   BOOST_CHECK_EQUAL(
-      algorithm::length(*io::readWkt("LINESTRING(0.0 0.0 0.0,0.0 0.0 1.0)")),
+      algorithm::length(*io::readWkt("LINESTRING (0.0 0.0 0.0,0.0 0.0 1.0)")),
       0.0);
 }
 
 BOOST_AUTO_TEST_CASE(testLengthLineString)
 {
   BOOST_CHECK_EQUAL(
-      algorithm::length(*io::readWkt("LINESTRING(0.0 0.0,3.0 4.0)")), 5.0);
+      algorithm::length(*io::readWkt("LINESTRING (0.0 0.0,3.0 4.0)")), 5.0);
   BOOST_CHECK_EQUAL(
-      algorithm::length(*io::readWkt("LINESTRING(0.0 0.0,0.0 1.0,1.0 1.0)")),
+      algorithm::length(*io::readWkt("LINESTRING (0.0 0.0,0.0 1.0,1.0 1.0)")),
       2.0);
 }
 
@@ -69,21 +69,22 @@ BOOST_AUTO_TEST_CASE(testLengthLineString)
 
 BOOST_AUTO_TEST_CASE(test3DZeroLength)
 {
-  BOOST_CHECK_EQUAL(algorithm::length3D(*io::readWkt("POINT(0.0 0.0)")), 0.0);
+  BOOST_CHECK_EQUAL(algorithm::length3D(*io::readWkt("POINT (0.0 0.0)")), 0.0);
   BOOST_CHECK_EQUAL(algorithm::length3D(*io::readWkt("LINESTRING EMPTY")), 0.0);
   BOOST_CHECK_EQUAL(
-      algorithm::length3D(*io::readWkt("POLYGON((0 0,0 1,1 1,1 0,0 0))")), 0.0);
+      algorithm::length3D(*io::readWkt("POLYGON ((0 0,0 1,1 1,1 0,0 0))")),
+      0.0);
 }
 BOOST_AUTO_TEST_CASE(test3DLengthVertical)
 {
   BOOST_CHECK_EQUAL(
-      algorithm::length3D(*io::readWkt("LINESTRING(0.0 0.0 0.0,0.0 0.0 1.0)")),
+      algorithm::length3D(*io::readWkt("LINESTRING (0.0 0.0 0.0,0.0 0.0 1.0)")),
       1.0);
 }
 BOOST_AUTO_TEST_CASE(test3DLengthLineString)
 {
   BOOST_CHECK_EQUAL(algorithm::length3D(*io::readWkt(
-                        "LINESTRING(0.0 0.0 0.0,0.0 1.0 0.0,0.0 1.0 1.0)")),
+                        "LINESTRING (0.0 0.0 0.0,0.0 1.0 0.0,0.0 1.0 1.0)")),
                     2.0);
 }
 
@@ -92,9 +93,9 @@ BOOST_AUTO_TEST_CASE(test3DLengthLineString)
 BOOST_AUTO_TEST_CASE(testLength_invalidType)
 {
   std::vector<std::string> wkts;
-  wkts.emplace_back("POINT(3.0 4.0)");
-  wkts.emplace_back("TRIANGLE((0.0 0.0,1.0 0.0,1.0 1.0,0.0 0.0))");
-  wkts.emplace_back("POLYGON((0.0 0.0,1.0 0.0,1.0 1.0,0.0 0.0))");
+  wkts.emplace_back("POINT (3.0 4.0)");
+  wkts.emplace_back("TRIANGLE ((0.0 0.0,1.0 0.0,1.0 1.0,0.0 0.0))");
+  wkts.emplace_back("POLYGON ((0.0 0.0,1.0 0.0,1.0 1.0,0.0 0.0))");
 
   for (auto &wkt : wkts) {
     BOOST_TEST_MESSAGE(wkt);

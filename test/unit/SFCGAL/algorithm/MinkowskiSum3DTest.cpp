@@ -1502,7 +1502,7 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_Cube_Point)
 {
   // Create a cube
   std::string cubeWkt =
-      "SOLID((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)), ((0 0 0, 0 0 1, 0 1 1, 0 "
+      "SOLID ((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)), ((0 0 0, 0 0 1, 0 1 1, 0 "
       "1 0, 0 0 0)), ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)), ((1 1 1, 0 1 1, 0 "
       "0 1, 1 0 1, 1 1 1)), ((1 1 1, 1 0 1, 1 0 0, 1 1 0, 1 1 1)), ((1 1 1, 1 "
       "1 0, 0 1 0, 0 1 1, 1 1 1))))";
@@ -1521,7 +1521,8 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_Cube_Point)
   BOOST_CHECK_EQUAL(result->geometryTypeId(), TYPE_POLYHEDRALSURFACE);
 
   // BOOST_CHECK_EQUAL(result->asText(1), "POLYHEDRALSURFACE
-  // Z(((5.0 6.0 6.0,5.0 6.0 5.0,5.0 5.0 6.0,5.0 6.0 6.0)),((5.0 5.0 6.0,5.0 6.0 5.0,5.0
+  // Z
+  // (((5.0 6.0 6.0,5.0 6.0 5.0,5.0 5.0 6.0,5.0 6.0 6.0)),((5.0 5.0 6.0,5.0 6.0 5.0,5.0
   // 5.0 5.0,5.0 5.0 6.0)),((6.0 5.0 5.0,6.0 5.0 6.0,5.0 5.0 6.0,6.0 5.0 5.0)),((5.0
   // 5.0 5.0,6.0 5.0 5.0,5.0 5.0 6.0,5.0 5.0 5.0)),((5.0 5.0 5.0,5.0 6.0 5.0,6.0 5.0
   // 5.0,5.0 5.0 5.0)),((6.0 5.0 5.0,5.0 6.0 5.0,6.0 6.0 5.0,6.0 5.0 5.0)),((6.0 5.0
@@ -1530,7 +1531,7 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_Cube_Point)
   // 6.0 6.0,6.0 6.0 6.0,6.0 6.0 5.0)),((6.0 5.0 6.0,6.0 5.0 5.0,6.0 6.0 5.0,6.0 5.0
   // 6.0)),((6.0 6.0 6.0,6.0 5.0 6.0,6.0 6.0 5.0,6.0 6.0 6.0)))");
   std::string expectedWkt =
-      "POLYHEDRALSURFACE Z(((5/1 6/1 6/1,5/1 6/1 5/1,5/1 5/1 6/1,5/1 6/1 "
+      "POLYHEDRALSURFACE Z (((5/1 6/1 6/1,5/1 6/1 5/1,5/1 5/1 6/1,5/1 6/1 "
       "6/1)),((5/1 5/1 6/1,5/1 6/1 5/1,5/1 5/1 5/1,5/1 5/1 6/1)),((6/1 5/1 "
       "5/1,6/1 5/1 6/1,5/1 5/1 6/1,6/1 5/1 5/1)),((5/1 5/1 5/1,6/1 5/1 5/1,5/1 "
       "5/1 6/1,5/1 5/1 5/1)),((5/1 5/1 5/1,5/1 6/1 5/1,6/1 5/1 5/1,5/1 5/1 "
@@ -1569,11 +1570,11 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_EmptyGeometries)
 BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_Square_Polyline_2D)
 {
   // Create a square
-  std::string               squareWkt = "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))";
+  std::string               squareWkt = "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))";
   std::unique_ptr<Geometry> square(io::readWkt(squareWkt));
 
   // Create a polyline
-  std::string               polylineWkt = "LINESTRING(0 0, 1 1, 2 0)";
+  std::string               polylineWkt = "LINESTRING (0 0, 1 1, 2 0)";
   std::unique_ptr<Geometry> polyline(io::readWkt(polylineWkt));
 
   // Perform Minkowski sum
@@ -1588,7 +1589,7 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_Square_Polyline_2D)
   BOOST_CHECK_EQUAL(result->geometryTypeId(), TYPE_POLYHEDRALSURFACE);
 
   std::string expectedWkt =
-      "POLYHEDRALSURFACE Z(((3259801534828588929/1630477228166597888 "
+      "POLYHEDRALSURFACE Z (((3259801534828588929/1630477228166597888 "
       "-1152921504606847/1630477228166597888 "
       "0/1,4890278762995186817/1630477228166597888 "
       "-1152921504606847/1630477228166597888 0/1,3/1 0/1 "
@@ -1767,11 +1768,11 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_Square_Polyline_2D)
 BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_WKT_Cube_Point)
 {
   std::string cubeWkt =
-      "SOLID((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)), ((0 0 0, 0 0 1, 0 1 1, 0 "
+      "SOLID ((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)), ((0 0 0, 0 0 1, 0 1 1, 0 "
       "1 0, 0 0 0)), ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)), ((1 1 1, 0 1 1, 0 "
       "0 1, 1 0 1, 1 1 1)), ((1 1 1, 1 0 1, 1 0 0, 1 1 0, 1 1 1)), ((1 1 1, 1 "
       "1 0, 0 1 0, 0 1 1, 1 1 1))))";
-  std::string pointWkt = "POINT(2 2 2)";
+  std::string pointWkt = "POINT (2 2 2)";
 
   std::unique_ptr<Geometry> cube(io::readWkt(cubeWkt));
   std::unique_ptr<Geometry> point(io::readWkt(pointWkt));
@@ -1782,7 +1783,7 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_WKT_Cube_Point)
   BOOST_CHECK_EQUAL(result->geometryTypeId(), TYPE_POLYHEDRALSURFACE);
 
   std::string expectedWkt =
-      "POLYHEDRALSURFACE Z(((2/1 3/1 3/1,2/1 3/1 2/1,2/1 2/1 3/1,2/1 3/1 "
+      "POLYHEDRALSURFACE Z (((2/1 3/1 3/1,2/1 3/1 2/1,2/1 2/1 3/1,2/1 3/1 "
       "3/1)),((2/1 2/1 3/1,2/1 3/1 2/1,2/1 2/1 2/1,2/1 2/1 3/1)),((3/1 2/1 "
       "2/1,3/1 2/1 3/1,2/1 2/1 3/1,3/1 2/1 2/1)),((2/1 2/1 2/1,3/1 2/1 2/1,2/1 "
       "2/1 3/1,2/1 2/1 2/1)),((2/1 2/1 2/1,2/1 3/1 2/1,3/1 2/1 2/1,2/1 2/1 "
@@ -1801,9 +1802,9 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_WKT_Cube_Point)
 BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_WKT_Tetrahedron_Segment)
 {
   std::string tetrahedronWkt =
-      "SOLID((((0 0 0, 1 0 0, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 0 0 1, 0 0 0)), "
+      "SOLID ((((0 0 0, 1 0 0, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 0 0 1, 0 0 0)), "
       "((0 0 0, 0 0 1, 1 0 0, 0 0 0)), ((1 0 0, 0 0 1, 0 1 0, 1 0 0))))";
-  std::string segmentWkt = "LINESTRING(0 0 0, 1 1 1)";
+  std::string segmentWkt = "LINESTRING (0 0 0, 1 1 1)";
 
   std::unique_ptr<Geometry> tetrahedron(io::readWkt(tetrahedronWkt));
   std::unique_ptr<Geometry> segment(io::readWkt(segmentWkt));
@@ -1826,7 +1827,7 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_WKT_Tetrahedron_Segment)
   BOOST_CHECK_EQUAL(result->geometryTypeId(), TYPE_POLYHEDRALSURFACE);
 
   std::string expectedWkt =
-      "POLYHEDRALSURFACE Z(((-1152921504606847/1630477228166597888 "
+      "POLYHEDRALSURFACE Z (((-1152921504606847/1630477228166597888 "
       "1152921504606847/1630477228166597888 "
       "1/1,-1152921504606847/1630477228166597888 "
       "1631630149671204735/1630477228166597888 "

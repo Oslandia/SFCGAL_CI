@@ -48,98 +48,100 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_UnionTest)
 
 BOOST_AUTO_TEST_CASE(Handle1)
 {
-  std::unique_ptr<Geometry> const a = io::readWkt("POINT(0 1)");
-  std::unique_ptr<Geometry> const b = io::readWkt("POINT(0 1)");
+  std::unique_ptr<Geometry> const a = io::readWkt("POINT (0 1)");
+  std::unique_ptr<Geometry> const b = io::readWkt("POINT (0 1)");
   std::unique_ptr<Geometry>       u = algorithm::union_(*a, *b);
   DEBUG_OUT << u->asText() << "\n";
-  BOOST_CHECK(*u == *io::readWkt("POINT(0 1)"));
+  BOOST_CHECK(*u == *io::readWkt("POINT (0 1)"));
 }
 
 BOOST_AUTO_TEST_CASE(Handle2)
 {
-  std::unique_ptr<Geometry> const a = io::readWkt("MULTIPOINT(0 1,0 1,0 1)");
-  std::unique_ptr<Geometry> const b = io::readWkt("POINT(0 1)");
+  std::unique_ptr<Geometry> const a = io::readWkt("MULTIPOINT (0 1,0 1,0 1)");
+  std::unique_ptr<Geometry> const b = io::readWkt("POINT (0 1)");
   std::unique_ptr<Geometry>       u = algorithm::union_(*a, *b);
   DEBUG_OUT << u->asText() << "\n";
-  BOOST_CHECK(*u == *io::readWkt("POINT(0 1)"));
+  BOOST_CHECK(*u == *io::readWkt("POINT (0 1)"));
 }
 
 BOOST_AUTO_TEST_CASE(PointPoint)
 {
   {
-    std::unique_ptr<Geometry> const a = io::readWkt("POINT(0 1)");
-    std::unique_ptr<Geometry> const b = io::readWkt("POINT(0 1)");
+    std::unique_ptr<Geometry> const a = io::readWkt("POINT (0 1)");
+    std::unique_ptr<Geometry> const b = io::readWkt("POINT (0 1)");
     std::unique_ptr<Geometry>       u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("POINT(0 1)"));
+    BOOST_CHECK(*u == *io::readWkt("POINT (0 1)"));
   }
   {
-    std::unique_ptr<Geometry> const a = io::readWkt("POINT(0 0)");
-    std::unique_ptr<Geometry> const b = io::readWkt("POINT(0 1)");
+    std::unique_ptr<Geometry> const a = io::readWkt("POINT (0 0)");
+    std::unique_ptr<Geometry> const b = io::readWkt("POINT (0 1)");
     std::unique_ptr<Geometry>       u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("MULTIPOINT(0 0,0 1)"));
+    BOOST_CHECK(*u == *io::readWkt("MULTIPOINT (0 0,0 1)"));
   }
   {
-    std::unique_ptr<Geometry> const a = io::readWkt("POINT(0 1 1)");
-    std::unique_ptr<Geometry> const b = io::readWkt("POINT(0 1 1)");
+    std::unique_ptr<Geometry> const a = io::readWkt("POINT (0 1 1)");
+    std::unique_ptr<Geometry> const b = io::readWkt("POINT (0 1 1)");
     std::unique_ptr<Geometry>       u = algorithm::union3D(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("POINT(0 1 1)"));
+    BOOST_CHECK(*u == *io::readWkt("POINT (0 1 1)"));
   }
   {
-    std::unique_ptr<Geometry> const a = io::readWkt("POINT(0 0 0)");
-    std::unique_ptr<Geometry> const b = io::readWkt("POINT(0 0 1)");
+    std::unique_ptr<Geometry> const a = io::readWkt("POINT (0 0 0)");
+    std::unique_ptr<Geometry> const b = io::readWkt("POINT (0 0 1)");
     std::unique_ptr<Geometry>       u = algorithm::union3D(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("MULTIPOINT(0 0 0,0 0 1)"));
+    BOOST_CHECK(*u == *io::readWkt("MULTIPOINT (0 0 0,0 0 1)"));
   }
 }
 
 BOOST_AUTO_TEST_CASE(PointLine)
 {
   {
-    std::unique_ptr<Geometry> const a = io::readWkt("POINT(.5 0)");
-    std::unique_ptr<Geometry> const b = io::readWkt("LINESTRING(-1 0,1 0)");
+    std::unique_ptr<Geometry> const a = io::readWkt("POINT (.5 0)");
+    std::unique_ptr<Geometry> const b = io::readWkt("LINESTRING (-1 0,1 0)");
     std::unique_ptr<Geometry>       u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("LINESTRING(-1 0,.5 0,1 0)"));
+    BOOST_CHECK(*u == *io::readWkt("LINESTRING (-1 0,.5 0,1 0)"));
   }
   {
-    std::unique_ptr<Geometry> const a = io::readWkt("POINT(0 0 .5)");
-    std::unique_ptr<Geometry> const b = io::readWkt("LINESTRING(0 0 -1,0 0 1)");
-    std::unique_ptr<Geometry>       u = algorithm::union3D(*a, *b);
+    std::unique_ptr<Geometry> const a = io::readWkt("POINT (0 0 .5)");
+    std::unique_ptr<Geometry> const b =
+        io::readWkt("LINESTRING (0 0 -1,0 0 1)");
+    std::unique_ptr<Geometry> u = algorithm::union3D(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("LINESTRING(0 0 -1,0 0 .5,0 0 1)"));
+    BOOST_CHECK(*u == *io::readWkt("LINESTRING (0 0 -1,0 0 .5,0 0 1)"));
   }
 }
 
 BOOST_AUTO_TEST_CASE(LineLine)
 {
   {
-    std::unique_ptr<Geometry> const a = io::readWkt("LINESTRING(-1 0,1 0)");
-    std::unique_ptr<Geometry> const b = io::readWkt("LINESTRING(-1 1,1 1)");
+    std::unique_ptr<Geometry> const a = io::readWkt("LINESTRING (-1 0,1 0)");
+    std::unique_ptr<Geometry> const b = io::readWkt("LINESTRING (-1 1,1 1)");
     std::unique_ptr<Geometry>       u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("MULTILINESTRING((-1 0,1 0),(-1 1,1 1))"));
+    BOOST_CHECK(*u == *io::readWkt("MULTILINESTRING ((-1 0,1 0),(-1 1,1 1))"));
   }
   {
-    std::unique_ptr<Geometry> const a = io::readWkt("LINESTRING(-1 0,1 0)");
-    std::unique_ptr<Geometry> const b = io::readWkt("LINESTRING(0 -1,0 1)");
+    std::unique_ptr<Geometry> const a = io::readWkt("LINESTRING (-1 0,1 0)");
+    std::unique_ptr<Geometry> const b = io::readWkt("LINESTRING (0 -1,0 1)");
     std::unique_ptr<Geometry>       u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
     BOOST_CHECK(
         *u ==
         *io::readWkt(
-            "MULTILINESTRING((-1 0,0 0),(0 0,1 0),(0 -1,0 0),(0 0,0 1))"));
+            "MULTILINESTRING ((-1 0,0 0),(0 0,1 0),(0 -1,0 0),(0 0,0 1))"));
   }
 }
 
 BOOST_AUTO_TEST_CASE(LineVolume)
 {
-  std::unique_ptr<Geometry> const a = io::readWkt("LINESTRING(-1 -1 -1,2 2 2)");
+  std::unique_ptr<Geometry> const a =
+      io::readWkt("LINESTRING (-1 -1 -1,2 2 2)");
   std::unique_ptr<Geometry> const b =
-      io::readWkt("SOLID((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
+      io::readWkt("SOLID ((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
              ((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)),\
              ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),\
              ((1 1 1, 0 1 1, 0 0 1, 1 0 1, 1 1 1)),\
@@ -156,38 +158,38 @@ BOOST_AUTO_TEST_CASE(PointSurface)
 {
   {
     std::unique_ptr<Geometry> const a =
-        io::readWkt("TRIANGLE((0 0,0 1,1 0,0 0))");
-    std::unique_ptr<Geometry> const b = io::readWkt("POINT(.1 .1)");
+        io::readWkt("TRIANGLE ((0 0,0 1,1 0,0 0))");
+    std::unique_ptr<Geometry> const b = io::readWkt("POINT (.1 .1)");
     std::unique_ptr<Geometry>       u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("TRIANGLE((0 0,0 1,1 0,0 0))"));
+    BOOST_CHECK(*u == *io::readWkt("TRIANGLE ((0 0,0 1,1 0,0 0))"));
   }
   {
     std::unique_ptr<Geometry> const a =
-        io::readWkt("TRIANGLE((0 0 1,0 1 1,1 0 1,0 0 1))");
-    std::unique_ptr<Geometry> const b = io::readWkt("POINT(.1 .1 1)");
+        io::readWkt("TRIANGLE ((0 0 1,0 1 1,1 0 1,0 0 1))");
+    std::unique_ptr<Geometry> const b = io::readWkt("POINT (.1 .1 1)");
     std::unique_ptr<Geometry>       u = algorithm::union3D(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("TRIANGLE((0 0 1,0 1 1,1 0 1,0 0 1))"));
+    BOOST_CHECK(*u == *io::readWkt("TRIANGLE ((0 0 1,0 1 1,1 0 1,0 0 1))"));
   }
 }
 
 BOOST_AUTO_TEST_CASE(PointVolume)
 {
   std::unique_ptr<Geometry> const a =
-      io::readWkt("SOLID((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
+      io::readWkt("SOLID ((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
              ((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)),\
              ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),\
              ((1 1 1, 0 1 1, 0 0 1, 1 0 1, 1 1 1)),\
              ((1 1 1, 1 0 1, 1 0 0, 1 1 0, 1 1 1)),\
              ((1 1 1, 1 1 0, 0 1 0, 0 1 1, 1 1 1))))");
   {
-    std::unique_ptr<Geometry> const b = io::readWkt("POINT(.1 .1 1)");
+    std::unique_ptr<Geometry> const b = io::readWkt("POINT (.1 .1 1)");
     std::unique_ptr<Geometry>       u = algorithm::union3D(*a, *b);
     BOOST_CHECK(u->geometryTypeId() == TYPE_SOLID);
   }
   {
-    std::unique_ptr<Geometry> const b = io::readWkt("POINT(-.1 .1 1)");
+    std::unique_ptr<Geometry> const b = io::readWkt("POINT (-.1 .1 1)");
     std::unique_ptr<Geometry>       u = algorithm::union3D(*a, *b);
     BOOST_CHECK(u->geometryTypeId() == TYPE_GEOMETRYCOLLECTION);
   }
@@ -197,12 +199,12 @@ BOOST_AUTO_TEST_CASE(TriangleTriangle)
 {
   {
     std::unique_ptr<Geometry> const a =
-        io::readWkt("TRIANGLE((0 0,1 0,0 1,0 0))");
+        io::readWkt("TRIANGLE ((0 0,1 0,0 1,0 0))");
     std::unique_ptr<Geometry> const b =
-        io::readWkt("TRIANGLE((0 0,1 0,0 1,0 0))");
+        io::readWkt("TRIANGLE ((0 0,1 0,0 1,0 0))");
     std::unique_ptr<Geometry> u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("TRIANGLE((0 0,0 1,1 0,0 0))"));
+    BOOST_CHECK(*u == *io::readWkt("TRIANGLE ((0 0,0 1,1 0,0 0))"));
   }
 }
 
@@ -210,22 +212,22 @@ BOOST_AUTO_TEST_CASE(PolygonPolygon1)
 {
   {
     std::unique_ptr<Geometry> const a =
-        io::readWkt("POLYGON((-1 -1,1 -1,1 1,-1 1,-1 -1))");
+        io::readWkt("POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1))");
     std::unique_ptr<Geometry> const b =
-        io::readWkt("POLYGON((-1 -1,1 -1,1 1,-1 1,-1 -1),(-0.5 -0.5,-0.5 "
+        io::readWkt("POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1),(-0.5 -0.5,-0.5 "
                     "0.5,0.5 0.5,0.5 -0.5,-0.5 -0.5))");
     std::unique_ptr<Geometry> const u = algorithm::union_(*a, *b);
-    BOOST_CHECK(*u == *io::readWkt("POLYGON((-1 -1,1 -1,1 1,-1 1,-1 -1))"));
+    BOOST_CHECK(*u == *io::readWkt("POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1))"));
   }
 
   {
     std::unique_ptr<Geometry> const a =
-        io::readWkt("POLYGON((0 0,1 0,1 1,0 1,0 0))");
+        io::readWkt("POLYGON ((0 0,1 0,1 1,0 1,0 0))");
     std::unique_ptr<Geometry> const b =
-        io::readWkt("POLYGON((1 0,2 0,2 1,1 1,1 0))");
+        io::readWkt("POLYGON ((1 0,2 0,2 1,1 1,1 0))");
     std::unique_ptr<Geometry> u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
-    BOOST_CHECK(*u == *io::readWkt("POLYGON((0 0,1 0,2 0,2 1,1 1,0 1,0 0))"));
+    BOOST_CHECK(*u == *io::readWkt("POLYGON ((0 0,1 0,2 0,2 1,1 1,0 1,0 0))"));
   }
 }
 
@@ -233,7 +235,7 @@ BOOST_AUTO_TEST_CASE(PolygonPolygon2)
 {
   {
     std::unique_ptr<Geometry> base =
-        io::readWkt("POLYGON((0 0,1 0,1 1,0 1,0 0))");
+        io::readWkt("POLYGON ((0 0,1 0,1 1,0 1,0 0))");
     Polygon a(base->as<Polygon>());
     algorithm::translate(a, .75, 0, 0); // disjoined
     GeometryCollection b;
@@ -258,7 +260,7 @@ BOOST_AUTO_TEST_CASE(PolygonPolygon2)
 BOOST_AUTO_TEST_CASE(PolygonPolygon3)
 {
   std::unique_ptr<Geometry> base =
-      io::readWkt("POLYGON((0 0,1 0,1 1,0 1,0 0))");
+      io::readWkt("POLYGON ((0 0,1 0,1 1,0 1,0 0))");
   GeometryCollection a;
   GeometryCollection b;
 
@@ -288,9 +290,9 @@ BOOST_AUTO_TEST_CASE(GardenFailures1)
   // cgal precondition violation
   {
     std::unique_ptr<Geometry> const a = io::readWkt(
-        "POLYGON((0 0,10 0,10 0,10 10,0 10,0 0),(2 2,2 5,5 5,5 2,2 2))");
+        "POLYGON ((0 0,10 0,10 0,10 10,0 10,0 0),(2 2,2 5,5 5,5 2,2 2))");
     std::unique_ptr<Geometry> const b =
-        io::readWkt("TRIANGLE((-1 -1,1 -1,-1 1,-1 -1))");
+        io::readWkt("TRIANGLE ((-1 -1,1 -1,-1 1,-1 -1))");
     std::unique_ptr<Geometry> u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
     BOOST_CHECK(algorithm::area(*a) + algorithm::area(*b) ==
@@ -303,10 +305,10 @@ BOOST_AUTO_TEST_CASE(GardenFailures2)
   // cgal assertion
   {
     std::unique_ptr<Geometry> const a =
-        io::readWkt("POLYGON((-1 -1,1 -1,1 1,-1 1,-1 -1),(-.5 -.5,-.5 .5,.5 "
+        io::readWkt("POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1),(-.5 -.5,-.5 .5,.5 "
                     ".5,.5 -.5,-.5 -.5))");
     std::unique_ptr<Geometry> const b =
-        io::readWkt("POLYGON((-1 -1,1 -1,1 1,-1 1,-1 -1),(-.5 -.5,-.5 .5,.5 "
+        io::readWkt("POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1),(-.5 -.5,-.5 .5,.5 "
                     ".5,.5 -.5,-.5 -.5))");
     std::unique_ptr<Geometry> u = algorithm::union3D(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
@@ -317,9 +319,9 @@ BOOST_AUTO_TEST_CASE(GardenFailures3)
 {
   // crash (valgrind err) with invalidated iterator after push_back
   {
-    std::unique_ptr<Geometry> const a = io::readWkt("LINESTRING(-1 -1,1 1)");
+    std::unique_ptr<Geometry> const a = io::readWkt("LINESTRING (-1 -1,1 1)");
     std::unique_ptr<Geometry> const b =
-        io::readWkt("MULTILINESTRING((1/1 -1/1 -1/1,1/1 1/1 1/1),(1/1 1/1 "
+        io::readWkt("MULTILINESTRING ((1/1 -1/1 -1/1,1/1 1/1 1/1),(1/1 1/1 "
                     "1/1,1/1 1/1 -1/1))");
     std::unique_ptr<Geometry> u = algorithm::union3D(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
@@ -331,9 +333,9 @@ BOOST_AUTO_TEST_CASE(GardenFailures4)
   // infinite loop
   {
     std::unique_ptr<Geometry> const a =
-        io::readWkt("POLYGON((-1 -1,1 -1,1 1,-1 1,-1 -1))");
+        io::readWkt("POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1))");
     std::unique_ptr<Geometry> const b =
-        io::readWkt("POLYGON((0 0,10 0,10 0,10 10,0 10,0 0))");
+        io::readWkt("POLYGON ((0 0,10 0,10 0,10 10,0 10,0 0))");
     std::unique_ptr<Geometry> u = algorithm::union3D(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
   }
@@ -344,10 +346,10 @@ BOOST_AUTO_TEST_CASE(GardenFailures5)
   // infinite loop
   {
     std::unique_ptr<Geometry> const a =
-        io::readWkt("MULTIPOLYGON(((-3 -1,-1 -1,-1 1,-3 1,-3 -1)),((1 -1,3 "
+        io::readWkt("MULTIPOLYGON (((-3 -1,-1 -1,-1 1,-3 1,-3 -1)),((1 -1,3 "
                     "-1,3 1,1 1,1 -1)))");
     std::unique_ptr<Geometry> const b =
-        io::readWkt("MULTIPOLYGON(((-3 -1,-1 -1,-1 1,-3 1,-3 -1)),((1 -1,3 "
+        io::readWkt("MULTIPOLYGON (((-3 -1,-1 -1,-1 1,-3 1,-3 -1)),((1 -1,3 "
                     "-1,3 1,1 1,1 -1)))");
     std::unique_ptr<Geometry> u = algorithm::union_(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
@@ -359,9 +361,9 @@ BOOST_AUTO_TEST_CASE(GardenFailures6)
   // segfault
   {
     std::unique_ptr<Geometry> const a =
-        io::readWkt("POLYGON((-1 -1,1 -1,1 1,-1 1,-1 -1))");
+        io::readWkt("POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1))");
     std::unique_ptr<Geometry> const b =
-        io::readWkt("POLYGON((-1 -1,1 -1,1 1,-1 1,-1 -1),(-0.5 -0.5,-0.5 "
+        io::readWkt("POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1),(-0.5 -0.5,-0.5 "
                     "0.5,0.5 0.5,0.5 -0.5,-0.5 -0.5))");
     std::unique_ptr<Geometry> u = algorithm::union3D(*a, *b);
     DEBUG_OUT << u->asText() << "\n";
@@ -370,10 +372,10 @@ BOOST_AUTO_TEST_CASE(GardenFailures6)
 
 BOOST_AUTO_TEST_CASE(GardenFailures7)
 {
-  std::unique_ptr<Geometry> const a = io::readWkt("LINESTRING(-1 -1,1 1)");
-  std::unique_ptr<Geometry> const b =
-      io::readWkt("POLYGON((-1 -1,1 -1,1 1,-1 1,-1 -1),(-.5 -.5,-.5 .5,.5 .5,1 "
-                  "-.5,-.5 -.5))");
+  std::unique_ptr<Geometry> const a = io::readWkt("LINESTRING (-1 -1,1 1)");
+  std::unique_ptr<Geometry> const b = io::readWkt(
+      "POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1),(-.5 -.5,-.5 .5,.5 .5,1 "
+      "-.5,-.5 -.5))");
   std::unique_ptr<Geometry> u = algorithm::union3D(*a, *b);
   DEBUG_OUT << u->asText() << "\n";
 }
@@ -381,7 +383,7 @@ BOOST_AUTO_TEST_CASE(GardenFailures7)
 BOOST_AUTO_TEST_CASE(VolumeVolume)
 {
   std::unique_ptr<Geometry> a =
-      io::readWkt("SOLID((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
+      io::readWkt("SOLID ((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),\
              ((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)),\
              ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),\
              ((1 1 1, 0 1 1, 0 0 1, 1 0 1, 1 1 1)),\
