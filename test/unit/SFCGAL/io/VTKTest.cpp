@@ -14,8 +14,8 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_io_VTKWriterTest)
 
 namespace fs = boost::filesystem;
 
-bool
-compareFiles(const std::string &file1, const std::string &file2)
+auto
+compareFiles(const std::string &file1, const std::string &file2) -> bool
 {
   std::ifstream f1(file1, std::ifstream::binary | std::ifstream::ate);
   std::ifstream f2(file2, std::ifstream::binary | std::ifstream::ate);

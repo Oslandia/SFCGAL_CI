@@ -24,8 +24,8 @@ namespace SFCGAL::algorithm {
 using Nef_polyhedron_3 = CGAL::Nef_polyhedron_3<Kernel>;
 using Polyhedron_3     = CGAL::Polyhedron_3<Kernel>;
 
-Kernel::Vector_3
-perpendicular_vector(const Kernel::Vector_3 &v)
+auto
+perpendicular_vector(const Kernel::Vector_3 &v) -> Kernel::Vector_3
 {
   if (v.x() != 0 || v.y() != 0) {
     return Kernel::Vector_3(-v.y(), v.x(), 0);
@@ -35,20 +35,20 @@ perpendicular_vector(const Kernel::Vector_3 &v)
 }
 
 // Helper function to convert SFCGAL::Geometry to Nef_polyhedron_3
-Nef_polyhedron_3
-geometryToNef(const Geometry &g)
+auto
+geometryToNef(const Geometry &g) -> Nef_polyhedron_3
 {
   Nef_polyhedron_3                      result;
   std::function<void(const Geometry &)> process_geometry =
       [&](const Geometry &geom) {
         switch (geom.geometryTypeId()) {
         case TYPE_POINT: {
-          const Point &p = geom.as<Point>();
-          result         = Nef_polyhedron_3(p.toPoint_3());
+          const auto &p = geom.as<Point>();
+          result        = Nef_polyhedron_3(p.toPoint_3());
           break;
         }
         case TYPE_LINESTRING: {
-          const LineString &ls = geom.as<LineString>();
+          const auto &ls = geom.as<LineString>();
           if (ls.numPoints() < 2) {
             result = Nef_polyhedron_3();
           } else {
@@ -84,8 +84,8 @@ geometryToNef(const Geometry &g)
           break;
         }
         case TYPE_TRIANGLE: {
-          const Triangle &tri = geom.as<Triangle>();
-          Polyhedron_3    poly;
+          const auto  &tri = geom.as<Triangle>();
+          Polyhedron_3 poly;
           poly.make_triangle(tri.vertex(0).toPoint_3(),
                              tri.vertex(1).toPoint_3(),
                              tri.vertex(2).toPoint_3());
@@ -93,7 +93,7 @@ geometryToNef(const Geometry &g)
           break;
         }
         case TYPE_POLYGON: {
-          const Polygon               &poly = geom.as<Polygon>();
+          const auto                  &poly = geom.as<Polygon>();
           std::vector<Kernel::Point_3> points;
           for (size_t i = 0; i < poly.exteriorRing().numPoints() - 1; ++i) {
             points.push_back(poly.exteriorRing().pointN(i).toPoint_3());
@@ -105,8 +105,8 @@ geometryToNef(const Geometry &g)
         }
         case TYPE_TRIANGULATEDSURFACE:
         case TYPE_POLYHEDRALSURFACE: {
-          const PolyhedralSurface &ps = geom.as<PolyhedralSurface>();
-          Polyhedron_3             poly;
+          const auto  &ps = geom.as<PolyhedralSurface>();
+          Polyhedron_3 poly;
           for (size_t i = 0; i < ps.numPolygons(); ++i) {
             Nef_polyhedron_3 temp_nef = geometryToNef(ps.polygonN(i));
             if (i == 0) {
@@ -118,7 +118,7 @@ geometryToNef(const Geometry &g)
           break;
         }
         case TYPE_SOLID: {
-          const Solid &solid = geom.as<Solid>();
+          const auto &solid = geom.as<Solid>();
           process_geometry(solid.exteriorShell());
           break;
         }
@@ -127,7 +127,7 @@ geometryToNef(const Geometry &g)
         case TYPE_MULTIPOLYGON:
         case TYPE_MULTISOLID:
         case TYPE_GEOMETRYCOLLECTION: {
-          const GeometryCollection &gc = geom.as<GeometryCollection>();
+          const auto &gc = geom.as<GeometryCollection>();
           for (size_t i = 0; i < gc.numGeometries(); ++i) {
             Nef_polyhedron_3 temp = geometryToNef(gc.geometryN(i));
             if (i == 0) {
@@ -149,8 +149,8 @@ geometryToNef(const Geometry &g)
 }
 
 // Helper function to convert Nef_polyhedron_3 to SFCGAL::Geometry
-std::unique_ptr<Geometry>
-nefToGeometry(const Nef_polyhedron_3 &nef)
+auto
+nefToGeometry(const Nef_polyhedron_3 &nef) -> std::unique_ptr<Geometry>
 {
   if (nef.is_empty()) {
     return std::make_unique<GeometryCollection>();
@@ -166,8 +166,9 @@ nefToGeometry(const Nef_polyhedron_3 &nef)
   return std::make_unique<PolyhedralSurface>(poly);
 }
 
-std::unique_ptr<Geometry>
+auto
 minkowskiSum3D(const Geometry &gA, const Geometry &gB, NoValidityCheck)
+    -> std::unique_ptr<Geometry>
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
@@ -189,8 +190,9 @@ minkowskiSum3D(const Geometry &gA, const Geometry &gB, NoValidityCheck)
   return nefToGeometry(result);
 }
 
-std::unique_ptr<Geometry>
+auto
 minkowskiSum3D(const Geometry &gA, const Geometry &gB)
+    -> std::unique_ptr<Geometry>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gA);
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gB);

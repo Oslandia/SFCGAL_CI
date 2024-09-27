@@ -26,8 +26,8 @@ namespace fs = boost::filesystem;
 
 BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_Buffer3DTest)
 
-bool
-compareFiles(const std::string &file1, const std::string &file2)
+auto
+compareFiles(const std::string &file1, const std::string &file2) -> bool
 {
   std::ifstream f1(file1, std::ifstream::binary | std::ifstream::ate);
   std::ifstream f2(file2, std::ifstream::binary | std::ifstream::ate);
@@ -47,8 +47,8 @@ compareFiles(const std::string &file1, const std::string &file2)
                     std::istreambuf_iterator<char>(f2.rdbuf()));
 }
 
-std::string
-readFileContent(const std::string &filePath)
+auto
+readFileContent(const std::string &filePath) -> std::string
 {
   std::ifstream file(filePath);
   if (!file) {

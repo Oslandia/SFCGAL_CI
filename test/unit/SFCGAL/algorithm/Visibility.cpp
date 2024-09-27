@@ -61,13 +61,13 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygon)
 BOOST_AUTO_TEST_CASE(testVisibility_PointOnPolygon)
 {
   std::vector<Point> points;
-  points.push_back(Point(0.0, 4.0));
-  points.push_back(Point(0.0, 0.0));
-  points.push_back(Point(3.0, 2.0));
-  points.push_back(Point(4.0, 0.0));
-  points.push_back(Point(4.0, 4.0));
-  points.push_back(Point(1.0, 2.0));
-  points.push_back(Point(0.0, 4.0));
+  points.emplace_back(0.0, 4.0);
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(3.0, 2.0);
+  points.emplace_back(4.0, 0.0);
+  points.emplace_back(4.0, 4.0);
+  points.emplace_back(1.0, 2.0);
+  points.emplace_back(0.0, 4.0);
 
   LineString lineString(points);
   Polygon    poly(lineString);
@@ -83,13 +83,13 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointOnPolygon)
 BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnPolygon)
 {
   std::vector<Point> points;
-  points.push_back(Point(0.0, 4.0));
-  points.push_back(Point(0.0, 0.0));
-  points.push_back(Point(3.0, 2.0));
-  points.push_back(Point(4.0, 0.0));
-  points.push_back(Point(4.0, 4.0));
-  points.push_back(Point(1.0, 2.0));
-  points.push_back(Point(0.0, 4.0));
+  points.emplace_back(0.0, 4.0);
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(3.0, 2.0);
+  points.emplace_back(4.0, 0.0);
+  points.emplace_back(4.0, 4.0);
+  points.emplace_back(1.0, 2.0);
+  points.emplace_back(0.0, 4.0);
 
   LineString lineString(points);
   Polygon    poly(lineString);
@@ -137,19 +137,19 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointInPolygonHole)
 BOOST_AUTO_TEST_CASE(testVisibility_PointOnPolygonHole)
 {
   std::vector<Point> points;
-  points.push_back(Point(0.0, 4.0));
-  points.push_back(Point(0.0, 0.0));
-  points.push_back(Point(3.0, 2.0));
-  points.push_back(Point(4.0, 0.0));
-  points.push_back(Point(4.0, 4.0));
-  points.push_back(Point(1.0, 2.0));
-  points.push_back(Point(0.0, 4.0));
+  points.emplace_back(0.0, 4.0);
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(3.0, 2.0);
+  points.emplace_back(4.0, 0.0);
+  points.emplace_back(4.0, 4.0);
+  points.emplace_back(1.0, 2.0);
+  points.emplace_back(0.0, 4.0);
 
   std::vector<Point> points_hole;
-  points_hole.push_back(Point(0.2, 1.75));
-  points_hole.push_back(Point(0.9, 1.8));
-  points_hole.push_back(Point(0.7, 1.2));
-  points_hole.push_back(Point(0.2, 1.75));
+  points_hole.emplace_back(0.2, 1.75);
+  points_hole.emplace_back(0.9, 1.8);
+  points_hole.emplace_back(0.7, 1.2);
+  points_hole.emplace_back(0.2, 1.75);
 
   LineString lineString(points);
   LineString hole(points_hole);
@@ -174,19 +174,19 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointOnPolygonHole)
 BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnPolygonHole)
 {
   std::vector<Point> points;
-  points.push_back(Point(0.0, 4.0));
-  points.push_back(Point(0.0, 0.0));
-  points.push_back(Point(3.0, 2.0));
-  points.push_back(Point(4.0, 0.0));
-  points.push_back(Point(4.0, 4.0));
-  points.push_back(Point(1.0, 2.0));
-  points.push_back(Point(0.0, 4.0));
+  points.emplace_back(0.0, 4.0);
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(3.0, 2.0);
+  points.emplace_back(4.0, 0.0);
+  points.emplace_back(4.0, 4.0);
+  points.emplace_back(1.0, 2.0);
+  points.emplace_back(0.0, 4.0);
 
   std::vector<Point> points_hole;
-  points_hole.push_back(Point(0.2, 1.75));
-  points_hole.push_back(Point(0.9, 1.8));
-  points_hole.push_back(Point(0.7, 1.2));
-  points_hole.push_back(Point(0.2, 1.75));
+  points_hole.emplace_back(0.2, 1.75);
+  points_hole.emplace_back(0.9, 1.8);
+  points_hole.emplace_back(0.7, 1.2);
+  points_hole.emplace_back(0.2, 1.75);
 
   LineString lineString(points);
   LineString hole(points_hole);
@@ -206,19 +206,19 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnPolygonHole)
 BOOST_AUTO_TEST_CASE(testVisibility_PointOnHolePolygonHole)
 {
   std::vector<Point> points;
-  points.push_back(Point(0.0, 4.0));
-  points.push_back(Point(0.0, 0.0));
-  points.push_back(Point(3.0, 2.0));
-  points.push_back(Point(4.0, 0.0));
-  points.push_back(Point(4.0, 4.0));
-  points.push_back(Point(1.0, 2.0));
-  points.push_back(Point(0.0, 4.0));
+  points.emplace_back(0.0, 4.0);
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(3.0, 2.0);
+  points.emplace_back(4.0, 0.0);
+  points.emplace_back(4.0, 4.0);
+  points.emplace_back(1.0, 2.0);
+  points.emplace_back(0.0, 4.0);
 
   std::vector<Point> points_hole;
-  points_hole.push_back(Point(0.2, 1.75));
-  points_hole.push_back(Point(0.9, 1.8));
-  points_hole.push_back(Point(0.7, 1.2));
-  points_hole.push_back(Point(0.2, 1.75));
+  points_hole.emplace_back(0.2, 1.75);
+  points_hole.emplace_back(0.9, 1.8);
+  points_hole.emplace_back(0.7, 1.2);
+  points_hole.emplace_back(0.2, 1.75);
 
   LineString lineString(points);
   LineString hole(points_hole);
@@ -236,19 +236,19 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointOnHolePolygonHole)
 BOOST_AUTO_TEST_CASE(testVisibility_PointVertexOnHolePolygonHole)
 {
   std::vector<Point> points;
-  points.push_back(Point(0.0, 4.0));
-  points.push_back(Point(0.0, 0.0));
-  points.push_back(Point(3.0, 2.0));
-  points.push_back(Point(4.0, 0.0));
-  points.push_back(Point(4.0, 4.0));
-  points.push_back(Point(1.0, 2.0));
-  points.push_back(Point(0.0, 4.0));
+  points.emplace_back(0.0, 4.0);
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(3.0, 2.0);
+  points.emplace_back(4.0, 0.0);
+  points.emplace_back(4.0, 4.0);
+  points.emplace_back(1.0, 2.0);
+  points.emplace_back(0.0, 4.0);
 
   std::vector<Point> points_hole;
-  points_hole.push_back(Point(0.2, 1.75));
-  points_hole.push_back(Point(0.9, 1.8));
-  points_hole.push_back(Point(0.7, 1.2));
-  points_hole.push_back(Point(0.2, 1.75));
+  points_hole.emplace_back(0.2, 1.75);
+  points_hole.emplace_back(0.9, 1.8);
+  points_hole.emplace_back(0.7, 1.2);
+  points_hole.emplace_back(0.2, 1.75);
 
   LineString lineString(points);
   LineString hole(points_hole);

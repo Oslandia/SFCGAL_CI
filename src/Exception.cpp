@@ -3,40 +3,68 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/Exception.h"
+#include <utility>
 
 namespace SFCGAL {
 
-///
-///
-///
-Exception::Exception() throw() : _message("unknown exception") {}
+Exception::Exception() noexcept : _message("unknown exception") {}
 
-///
-///
-///
-Exception::Exception(std::string const &message) throw() : _message(message) {}
+Exception::Exception(std::string const &message) noexcept : _message(message) {}
 
-///
-///
-///
-Exception::~Exception() throw() {}
+Exception::~Exception() noexcept = default;
 
-///
-///
-///
 const char *
-Exception::what() const throw()
+Exception::what() const noexcept
 {
   return _message.c_str();
 }
 
-///
-///
-///
 std::string
-Exception::diagnostic() const throw()
+Exception::diagnostic() const noexcept
 {
   return boost::diagnostic_information(*this);
 }
+
+// Definitions of constructors and destructors for derived classes
+
+GeometryInvalidityException::GeometryInvalidityException(
+    std::string const &message) noexcept
+    : Exception(message)
+{
+}
+
+GeometryInvalidityException::~GeometryInvalidityException() noexcept = default;
+
+NotImplementedException::NotImplementedException(
+    std::string const &message) noexcept
+    : Exception(message)
+{
+}
+
+NotImplementedException::~NotImplementedException() noexcept = default;
+
+InappropriateGeometryException::InappropriateGeometryException(
+    std::string const &message) noexcept
+    : Exception(message)
+{
+}
+
+InappropriateGeometryException::~InappropriateGeometryException() noexcept =
+    default;
+
+NonFiniteValueException::NonFiniteValueException(
+    std::string const &message) noexcept
+    : Exception(message)
+{
+}
+
+NonFiniteValueException::~NonFiniteValueException() noexcept = default;
+
+WktParseException::WktParseException(std::string const &message) noexcept
+    : Exception(message)
+{
+}
+
+WktParseException::~WktParseException() noexcept = default;
 
 } // namespace SFCGAL
