@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_SERIALIZATION_
-#define _SFCGAL_SERIALIZATION_
+#ifndef SFCGAL_SERIALIZATION_
+#define SFCGAL_SERIALIZATION_
 
 #include "SFCGAL/config.h"
 

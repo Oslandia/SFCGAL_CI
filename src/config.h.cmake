@@ -18,8 +18,8 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
-#ifndef _SFCGAL_CONFIG_H_
-#define _SFCGAL_CONFIG_H_
+#ifndef SFCGAL_CONFIG_H_
+#define SFCGAL_CONFIG_H_
 
 #ifndef CGAL_USE_GMPXX
 #define CMAKE_OVERRIDDEN_DEFAULT_ENT_BACKEND 0 // GMP

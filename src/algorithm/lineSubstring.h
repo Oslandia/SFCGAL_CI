@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_ALGORITHM_LINESUBSTRING_H_
-#define _SFCGAL_ALGORITHM_LINESUBSTRING_H_
+#ifndef SFCGAL_ALGORITHM_LINESUBSTRING_H_
+#define SFCGAL_ALGORITHM_LINESUBSTRING_H_
 
 // C++
 #include <memory>
@@ -47,4 +47,4 @@ SFCGAL_API std::unique_ptr<LineString>
 
 } // namespace SFCGAL
 
-#endif // ! _SFCGAL_ALGORITHM_LINESUBSTRING_H_
+#endif // ! SFCGAL_ALGORITHM_LINESUBSTRING_H_

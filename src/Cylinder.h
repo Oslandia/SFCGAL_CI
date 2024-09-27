@@ -1,8 +1,8 @@
 // Copyright (c) 2024-2024, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_CYLINDER_H_
-#define _SFCGAL_CYLINDER_H_
+#ifndef SFCGAL_CYLINDER_H_
+#define SFCGAL_CYLINDER_H_
 
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/export.h"
@@ -194,4 +194,4 @@ private:
 
 } // namespace SFCGAL
 
-#endif // _SFCGAL_CYLINDER_H_
+#endif // SFCGAL_CYLINDER_H_

@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_POLYHEDRALSURFACE_H_
-#define _SFCGAL_POLYHEDRALSURFACE_H_
+#ifndef SFCGAL_POLYHEDRALSURFACE_H_
+#define SFCGAL_POLYHEDRALSURFACE_H_
 
 #include <boost/assert.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>

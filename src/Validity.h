@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_VALIDITY_H_
-#define _SFCGAL_VALIDITY_H_
+#ifndef SFCGAL_VALIDITY_H_
+#define SFCGAL_VALIDITY_H_
 
 namespace SFCGAL {
 

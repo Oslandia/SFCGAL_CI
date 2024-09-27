@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_TOOLS_INPUTSTREAMREADER_H_
-#define _SFCGAL_TOOLS_INPUTSTREAMREADER_H_
+#ifndef SFCGAL_TOOLS_INPUTSTREAMREADER_H_
+#define SFCGAL_TOOLS_INPUTSTREAMREADER_H_
 
 #include "SFCGAL/config.h"
 

@@ -1,8 +1,8 @@
 // Copyright (c) 2024-2024, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_IO_OBJ_H_
-#define _SFCGAL_IO_OBJ_H_
+#ifndef SFCGAL_IO_OBJ_H_
+#define SFCGAL_IO_OBJ_H_
 
 #include <SFCGAL/Geometry.h>
 #include <ostream>

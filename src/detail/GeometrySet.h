@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_DETAIL_GEOMETRY_SET_H_
-#define _SFCGAL_DETAIL_GEOMETRY_SET_H_
+#ifndef SFCGAL_DETAIL_GEOMETRY_SET_H_
+#define SFCGAL_DETAIL_GEOMETRY_SET_H_
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/variant.hpp>
