@@ -1,4 +1,4 @@
-Checks: '-p=build,-*,clang-analyzer-*,cert-*,bugprone-*,modernize-*,performance-*,portability-*,readability-*,-header-filter=.*'
+Checks: '-*,clang-analyzer-*,cert-*,bugprone-*,modernize-*,performance-*,portability-*,readability-*,-header-filter=.*'
 CheckOptions:
     - key: bugprone-argument-comment.StrictMode
       value: 1

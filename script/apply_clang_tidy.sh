@@ -6,9 +6,9 @@
 # You can execute it by defining the variables CLANG_TIDY_BIN, RUN_CLANG_TIDY_BIN, 
 # and APPLY_CLANG_TIDY_BIN when running the script:
 #
-# > env CLANG_TIDY_BIN=/usr/local/bin/clang-tidy15 \
-#       RUN_CLANG_TIDY_BIN=/usr/local/bin/run-clang-tidy15 \
-#       APPLY_CLANG_TIDY_BIN=/usr/local/bin/clang-apply-replacements15 \
+# > env CLANG_TIDY_BIN=/usr/local/bin/clang-tidy18 \
+#       RUN_CLANG_TIDY_BIN=/usr/local/bin/run-clang-tidy18 \
+#       APPLY_CLANG_TIDY_BIN=/usr/local/bin/clang-apply-replacements18 \
 #       ./apply_clang_tidy.sh
 #
 # There isn't a clang-tidy CI in this project as of now.
@@ -25,7 +25,7 @@ run_clang_tidy() {
 
     # Iterate over each check and run clang-tidy with fixes
     while IFS= read -r check; do
-        ${RUN_CLANG_TIDY_BIN} -p build -clang-tidy-binary=${CLANG_TIDY_BIN} -clang-apply-replacements-binary=${APPLY_CLANG_TIDY_BIN} -checks="-=*,$check" -fix
+        ${RUN_CLANG_TIDY_BIN} -p build -clang-tidy-binary=${CLANG_TIDY_BIN} -clang-apply-replacements-binary=${APPLY_CLANG_TIDY_BIN} -header-filter=.* -checks="-*,$check" -fix
 
         # Check if changes were made
         if [ -n "$(git status -s)" ]; then
