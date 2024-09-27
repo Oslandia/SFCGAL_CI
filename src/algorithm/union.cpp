@@ -49,7 +49,7 @@ struct Segment_d : detail::Segment_d<Dim>::Type {
   }
 
   template <class OutputIterator>
-  [[nodiscard]] [[nodiscard]] auto
+  [[nodiscard]] auto
   pieces(OutputIterator out) const -> OutputIterator
   {
     PointVector points(1, this->source());
@@ -80,7 +80,7 @@ struct Segment_d : detail::Segment_d<Dim>::Type {
   pieces() const -> SegmentVector
   {
     SegmentVector result;
-    this->pieces(std::back_inserter(result));
+    (void)this->pieces(std::back_inserter(result));
     return result;
   }
 
@@ -214,7 +214,7 @@ struct Surface_d<3> : Triangle_3 {
       }
 
       for (auto &line : lines) {
-        line.pieces(std::back_inserter(filtered));
+        (void)line.pieces(std::back_inserter(filtered));
       }
     }
 
