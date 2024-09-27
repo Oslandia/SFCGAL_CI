@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(testLessEmpty)
 {
   Coordinate const gA;
   Coordinate const gB;
-  BOOST_CHECK_THROW((gA < gB), Exception);
+  BOOST_CHECK_THROW((void)(gA < gB), Exception);
 }
 BOOST_AUTO_TEST_CASE(testLessXY_XY)
 {
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(testLessXYZ_XYZ)
 }
 BOOST_AUTO_TEST_CASE(testLessXY_XYZ)
 {
-  BOOST_CHECK_THROW((Coordinate(0, 0) < Coordinate(0, 0, 0)), Exception);
+  BOOST_CHECK_THROW((void)(Coordinate(0, 0) < Coordinate(0, 0, 0)), Exception);
 }
 
 BOOST_AUTO_TEST_CASE(testAlmostEqual)
