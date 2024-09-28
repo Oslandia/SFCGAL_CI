@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(testIgnoreEmpty)
     BOOST_TEST_MESSAGE(typeName);
 
     std::unique_ptr<Geometry> g(registry.newGeometryByTypeName(typeName));
-    BOOST_REQUIRE(g.get() != NULL);
+    BOOST_REQUIRE(g.get() != nullptr);
     algorithm::force3D(*g);
     BOOST_CHECK(g->isEmpty());
   }

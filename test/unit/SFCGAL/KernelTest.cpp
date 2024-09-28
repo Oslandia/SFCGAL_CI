@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(testIntersectsRobutness)
       Segment_2(ab.startPoint().toPoint_2(), ab.endPoint().toPoint_2()),
       Segment_2(cd.startPoint().toPoint_2(), cd.endPoint().toPoint_2()));
   const auto *abIcd = CGAL::object_cast<Point_2>(&abIcd_);
-  BOOST_REQUIRE(abIcd != NULL);
+  BOOST_REQUIRE(abIcd != nullptr);
 
   // would break robustness if construction history is lost
   Point const intersectionA(*abIcd);
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(testIntersectsRobutness)
       intersectionA.toPoint_2(),
       Segment_2(ef.startPoint().toPoint_2(), ef.endPoint().toPoint_2()));
   const auto *abIef = CGAL::object_cast<Point_2>(&abIef_);
-  BOOST_REQUIRE(abIef != NULL);
+  BOOST_REQUIRE(abIef != nullptr);
 
   Point const intersectionB(*abIef);
 

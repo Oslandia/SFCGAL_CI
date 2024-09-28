@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(testEmpty2D3D)
     BOOST_TEST_MESSAGE(typeName);
 
     std::unique_ptr<Geometry> const g(registry.newGeometryByTypeName(typeName));
-    BOOST_REQUIRE(g.get() != NULL);
+    BOOST_REQUIRE(g.get() != nullptr);
     BOOST_CHECK_EQUAL(algorithm::area(*g), 0.0);
     BOOST_CHECK_EQUAL(algorithm::area3D(*g), 0.0);
   }
