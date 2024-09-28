@@ -13,14 +13,14 @@ Exception::Exception(std::string message) noexcept : _message(std::move(message)
 
 Exception::~Exception() noexcept = default;
 
-const char *
-Exception::what() const noexcept
+auto
+Exception::what() const noexcept -> const char *
 {
   return _message.c_str();
 }
 
-std::string
-Exception::diagnostic() const noexcept
+auto
+Exception::diagnostic() const noexcept -> std::string
 {
   return boost::diagnostic_information(*this);
 }
