@@ -166,7 +166,7 @@ nefToGeometry(const Nef_polyhedron_3 &nef) -> std::unique_ptr<Geometry>
 }
 
 auto
-minkowskiSum3D(const Geometry &gA, const Geometry &gB, NoValidityCheck)
+minkowskiSum3D(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
   if (gA.isEmpty() || gB.isEmpty()) {
