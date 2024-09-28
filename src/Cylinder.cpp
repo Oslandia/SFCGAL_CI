@@ -7,8 +7,8 @@ namespace SFCGAL {
 Cylinder::Cylinder(const Point_3 &base_center, const Vector_3 &axis,
                    const Kernel::FT &radius, const Kernel::FT &height,
                    int num_radial)
-    : m_base_center(std::move(base_center)), m_axis(std::move(axis)),
-      m_radius(std::move(radius)), m_height(std::move(height)),
+    : m_base_center(base_center), m_axis(axis),
+      m_radius(radius), m_height(height),
       m_num_radial(num_radial)
 {
 }

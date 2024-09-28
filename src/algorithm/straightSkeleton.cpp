@@ -520,7 +520,7 @@ straightSkeletonPartition(const Polygon &g, bool /*autoOrientation*/)
           current = current->next();
         } while (current != start);
 
-        SFCGAL::Polygon poly(SFCGAL::LineString(std::move(points)));
+        SFCGAL::Polygon poly(SFCGAL::LineString(points));
         algorithm::translate(poly, trans);
         return poly;
       };
