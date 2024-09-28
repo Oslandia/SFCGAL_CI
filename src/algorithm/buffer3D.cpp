@@ -86,7 +86,7 @@ Buffer3D::computeRoundBuffer() const -> std::unique_ptr<PolyhedralSurface>
   if (!_inputPoints.empty()) {
     // Create a non-const copy of the points
     std::vector<Point_3> points_copy(_inputPoints.begin(), _inputPoints.end());
-    poly.push_back(point_range(&points_copy.front(), &points_copy.back() + 1));
+    poly.emplace_back(&points_copy.front(), &points_copy.back() + 1);
 
     // Create a Nef_polyhedron from the polyline
     Nef_polyhedron N1(poly.begin(), poly.end(),

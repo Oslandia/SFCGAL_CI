@@ -107,14 +107,13 @@ struct Surface_d<3> : Triangle_3 {
   splitAt(const algorithm::Point_3 &p)
   {
     //@note this is a degenerated segment, but works anyway
-    _split.push_back(Segment_2(_plane.to_2d(p), _plane.to_2d(p)));
+    _split.emplace_back(_plane.to_2d(p), _plane.to_2d(p));
   }
 
   void
   splitAt(const Segment_3 &s)
   {
-    _split.push_back(
-        Segment_2(_plane.to_2d(s.source()), _plane.to_2d(s.target())));
+    _split.emplace_back(_plane.to_2d(s.source()), _plane.to_2d(s.target()));
   }
 
   template <typename Point3Iterator>

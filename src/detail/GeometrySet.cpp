@@ -68,7 +68,7 @@ _decompose_triangle(const Triangle                    &tri,
     outer.reverse_orientation();
   }
 
-  surfaces.push_back(CGAL::Polygon_with_holes_2<Kernel>(outer));
+  surfaces.emplace_back(CGAL::Polygon_with_holes_2<Kernel>(outer));
 }
 void
 _decompose_triangle(const Triangle                    &tri,
@@ -78,7 +78,7 @@ _decompose_triangle(const Triangle                    &tri,
   CGAL::Triangle_3<Kernel> const outtri(tri.vertex(0).toPoint_3(),
                                         tri.vertex(1).toPoint_3(),
                                         tri.vertex(2).toPoint_3());
-  surfaces.push_back(outtri);
+  surfaces.emplace_back(outtri);
 }
 
 void
@@ -87,7 +87,7 @@ _decompose_polygon(const Polygon                     &poly,
                    dim_t<2> /*unused*/)
 {
   BOOST_ASSERT(!poly.isEmpty());
-  surfaces.push_back(poly.toPolygon_with_holes_2());
+  surfaces.emplace_back(poly.toPolygon_with_holes_2());
 }
 void
 _decompose_polygon(const Polygon                     &poly,
@@ -100,7 +100,7 @@ _decompose_polygon(const Polygon                     &poly,
 
   for (size_t i = 0; i < surf.numTriangles(); ++i) {
     const Triangle &tri = surf.triangleN(i);
-    surfaces.push_back(CGAL::Triangle_3<Kernel>(tri.vertex(0).toPoint_3(),
+    surfaces.emplace_back(CGAL::Triangle_3<Kernel>(tri.vertex(0).toPoint_3(),
                                                 tri.vertex(1).toPoint_3(),
                                                 tri.vertex(2).toPoint_3()));
   }
@@ -129,7 +129,7 @@ _decompose_solid(const Solid &solid, GeometrySet<3>::VolumeCollection &volumes,
     p.inside_out();
   }
 
-  volumes.push_back(p);
+  volumes.emplace_back(p);
 }
 
 template <int Dim>
@@ -205,8 +205,7 @@ GeometrySet<2>::addPrimitive(const PrimitiveHandle<2> &p)
     break;
 
   case PrimitiveSurface:
-    _surfaces.push_back(
-        *boost::get<const TypeForDimension<2>::Surface *>(p.handle));
+    _surfaces.emplace_back(*boost::get<const TypeForDimension<2>::Surface *>(p.handle));
     break;
 
   default:
@@ -229,15 +228,14 @@ GeometrySet<3>::addPrimitive(const PrimitiveHandle<3> &p)
     break;
 
   case PrimitiveSurface:
-    _surfaces.push_back(
-        *boost::get<const TypeForDimension<3>::Surface *>(p.handle));
+    _surfaces.emplace_back(*boost::get<const TypeForDimension<3>::Surface *>(p.handle));
     break;
 
   case PrimitiveVolume: {
     const TypeForDimension<3>::Volume &vol =
         *boost::get<const TypeForDimension<3>::Volume *>(p.handle);
     BOOST_ASSERT(!vol.empty());
-    _volumes.push_back(vol);
+    _volumes.emplace_back(vol);
     break;
   }
   }
@@ -276,10 +274,10 @@ GeometrySet<3>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
   } else if (const auto *p = CGAL::object_cast<TSegment>(&o)) {
     _segments.insert(TSegment(*p));
   } else if (const auto *p = CGAL::object_cast<TSurface>(&o)) {
-    _surfaces.push_back(TSurface(*p));
+    _surfaces.emplace_back(TSurface(*p));
   } else if (const auto *p = CGAL::object_cast<TVolume>(&o)) {
     BOOST_ASSERT(!p->empty());
-    _volumes.push_back(TVolume(*p));
+    _volumes.emplace_back(TVolume(*p));
   }
 }
 
@@ -304,7 +302,7 @@ GeometrySet<2>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
       }
 
       CGAL::Polygon_with_holes_2<Kernel> const polyh(poly);
-      _surfaces.push_back(polyh);
+      _surfaces.emplace_back(polyh);
     } else {
       std::copy(pts->begin(), pts->end(),
                 std::inserter(_points, _points.end()));
@@ -317,14 +315,14 @@ GeometrySet<2>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
     poly.push_back(tri->vertex(1));
     poly.push_back(tri->vertex(2));
     CGAL::Polygon_with_holes_2<Kernel> const polyh(poly);
-    _surfaces.push_back(polyh);
+    _surfaces.emplace_back(polyh);
   } else if (const auto *p = CGAL::object_cast<TSegment>(&o)) {
     _segments.insert(TSegment(*p));
   } else if (const auto *p = CGAL::object_cast<TSurface>(&o)) {
     BOOST_ASSERT(!p->is_unbounded());
-    _surfaces.push_back(TSurface(*p));
+    _surfaces.emplace_back(TSurface(*p));
   } else if (const auto *p = CGAL::object_cast<TVolume>(&o)) {
-    _volumes.push_back(TVolume(*p));
+    _volumes.emplace_back(TVolume(*p));
   }
 }
 
@@ -349,14 +347,14 @@ void
 GeometrySet<2>::addPrimitive(const TypeForDimension<2>::Surface &p, int flags)
 {
   BOOST_ASSERT(!p.is_unbounded());
-  _surfaces.push_back(p);
+  _surfaces.emplace_back(p);
   _surfaces.back().setFlags(flags);
 }
 template <>
 void
 GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Surface &p, int flags)
 {
-  _surfaces.push_back(p);
+  _surfaces.emplace_back(p);
   _surfaces.back().setFlags(flags);
 }
 
@@ -373,7 +371,7 @@ GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Volume &p, int flags)
   BOOST_ASSERT(!p.empty());
 
   if (p.is_closed()) {
-    _volumes.push_back(GeometrySet<3>::VolumeCollection::value_type(p, flags));
+    _volumes.emplace_back(p, flags);
   } else {
     // it is an unclosed volume, i.e. a surface
     BOOST_ASSERT(p.is_pure_triangle());
@@ -391,7 +389,7 @@ GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Volume &p, int flags)
       cit++;
       p3 = cit->vertex()->point();
       CGAL::Triangle_3<Kernel> const tri(p1, p2, p3);
-      _surfaces.push_back(tri);
+      _surfaces.emplace_back(tri);
     }
   }
 }

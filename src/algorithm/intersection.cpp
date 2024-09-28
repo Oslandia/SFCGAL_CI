@@ -107,8 +107,7 @@ post_intersection(const GeometrySet<2> &input, GeometrySet<2> &output)
       }
     }
 
-    output.surfaces().push_back(
-        CGAL::Polygon_with_holes_2<Kernel>(outer, rings.begin(), rings.end()));
+    output.surfaces().emplace_back(CGAL::Polygon_with_holes_2<Kernel>(outer, rings.begin(), rings.end()));
   }
 
   output.points()   = input.points();
