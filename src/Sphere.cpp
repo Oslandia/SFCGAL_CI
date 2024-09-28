@@ -51,9 +51,8 @@ private:
   {
     if (vec.x() != 0 || vec.y() != 0) {
       return Kernel::Vector_3(-vec.y(), vec.x(), 0);
-    } else {
-      return Kernel::Vector_3(0, -vec.z(), vec.y());
-    }
+    }       return Kernel::Vector_3(0, -vec.z(), vec.y());
+   
   }
 
   void

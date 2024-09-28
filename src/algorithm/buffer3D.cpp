@@ -99,10 +99,9 @@ Buffer3D::computeRoundBuffer() const -> std::unique_ptr<PolyhedralSurface>
     SFCGAL::detail::MarkedPolyhedron out;
     result.convert_to_polyhedron(out);
     return std::make_unique<PolyhedralSurface>(out);
-  } else {
-    // If _inputPoints is empty, return an empty PolyhedralSurface
+  }     // If _inputPoints is empty, return an empty PolyhedralSurface
     return std::make_unique<PolyhedralSurface>();
-  }
+ 
 }
 
 auto

@@ -29,9 +29,8 @@ perpendicular_vector(const Kernel::Vector_3 &v) -> Kernel::Vector_3
 {
   if (v.x() != 0 || v.y() != 0) {
     return Kernel::Vector_3(-v.y(), v.x(), 0);
-  } else {
-    return Kernel::Vector_3(0, -v.z(), v.y());
-  }
+  }     return Kernel::Vector_3(0, -v.z(), v.y());
+ 
 }
 
 // Helper function to convert SFCGAL::Geometry to Nef_polyhedron_3
