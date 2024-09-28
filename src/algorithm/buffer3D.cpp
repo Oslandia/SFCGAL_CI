@@ -200,7 +200,8 @@ auto
 Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
   std::vector<Kernel::Point_3> line_points;
-  for (const auto &p : _inputPoints) {
+  line_points.reserve(_inputPoints.size());
+for (const auto &p : _inputPoints) {
     line_points.emplace_back(p.x(), p.y(), p.z());
   }
 
