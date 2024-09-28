@@ -256,8 +256,9 @@ for (const auto &p : _inputPoints) {
                     end_ring.back());
 
     rings.push_back(start_ring);
-    if (i == line_points.size() - 2)
+    if (i == line_points.size() - 2) {
       rings.push_back(end_ring);
+}
   }
 
   // Add caps

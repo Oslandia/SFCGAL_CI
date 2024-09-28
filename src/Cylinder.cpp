@@ -72,8 +72,9 @@ auto
 Cylinder::normalize(const Vector_3 &v) -> Cylinder::Vector_3
 {
   double length = std::sqrt(CGAL::to_double(v.squared_length()));
-  if (length < 1e-8)
+  if (length < 1e-8) {
     return v;
+}
   return v / length;
 }
 

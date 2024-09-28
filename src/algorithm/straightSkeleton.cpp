@@ -541,8 +541,9 @@ straightSkeletonPartition(const Polygon &g, bool /*autoOrientation*/)
   for (auto face = skeleton->faces_begin(); face != skeleton->faces_end();
        ++face) {
     // Skip the faces that correspond to holes
-    if (is_hole_face(face))
+    if (is_hole_face(face)) {
       continue;
+}
 
     result->addGeometry(create_polygon_from_face(face));
   }
