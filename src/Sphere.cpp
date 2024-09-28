@@ -140,10 +140,10 @@ private:
   Kernel::Vector_3 direction;
 };
 
-Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
+Sphere::Sphere(Kernel::FT radius, Kernel::Point_3 center,
                int num_vertical, int num_horizontal,
                const Kernel::Vector_3 &direction)
-    : m_radius(radius), m_center(center), m_num_vertical(num_vertical),
+    : m_radius(std::move(radius)), m_center(std::move(center)), m_num_vertical(num_vertical),
       m_num_horizontal(num_horizontal), m_direction(normalizeVector(direction))
 {
 }
