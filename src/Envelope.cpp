@@ -84,7 +84,7 @@ Envelope::operator=(const Envelope &other) -> Envelope &
 ///
 ///
 ///
-Envelope::~Envelope() = default;
+
 
 ///
 ///
