@@ -286,7 +286,7 @@ for (const auto &p : _inputPoints) {
 
 auto
 Buffer3D::extend_point(const Kernel::Point_3  &point,
-                       const Kernel::Vector_3 &direction, double distance) 
+                       const Kernel::Vector_3 &direction, double distance) const 
     -> Kernel::Point_3
 {
   return point + direction * distance;
@@ -295,7 +295,7 @@ Buffer3D::extend_point(const Kernel::Point_3  &point,
 auto
 Buffer3D::create_circle_points(const Kernel::Point_3  &center,
                                const Kernel::Vector_3 &axis, double radius,
-                               int segments) 
+                               int segments) const 
     -> std::vector<Kernel::Point_3>
 {
   std::vector<Kernel::Point_3> points;
@@ -320,7 +320,7 @@ Buffer3D::create_circle_points(const Kernel::Point_3  &center,
 auto
 Buffer3D::compute_bisector_plane(const Kernel::Point_3 &p1,
                                  const Kernel::Point_3 &p2,
-                                 const Kernel::Point_3 &p3) 
+                                 const Kernel::Point_3 &p3) const 
     -> Kernel::Plane_3
 {
   Kernel::Vector_3 v1       = normalizeVector(p2 - p1);
@@ -332,7 +332,7 @@ Buffer3D::compute_bisector_plane(const Kernel::Point_3 &p1,
 auto
 Buffer3D::intersect_segment_plane(const Kernel::Point_3 &p1,
                                   const Kernel::Point_3 &p2,
-                                  const Kernel::Plane_3 &plane) 
+                                  const Kernel::Plane_3 &plane) const 
     -> Kernel::Point_3
 {
   Kernel::Vector_3 v = p2 - p1;
