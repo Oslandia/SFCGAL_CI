@@ -1729,7 +1729,7 @@ sfcgal_geometry_straight_skeleton_partition(const sfcgal_geometry_t *geom,
         *(const SFCGAL::Geometry *)(geom));
   } catch (std::exception &e) {
     SFCGAL_WARNING("During straight_skeleton_partition (A, %g) :",
-                   autoOrientation);
+                   static_cast<int>(autoOrientation));
     SFCGAL_WARNING("  with A: %s",
                    ((const SFCGAL::Geometry *)(geom))->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
