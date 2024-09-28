@@ -16,7 +16,7 @@ template <class HDS>
 class Sphere_builder : public CGAL::Modifier_base<HDS> {
 public:
   Sphere_builder(double radius, int num_vertical, int num_horizontal,
-                 Point_3 center, Kernel::Vector_3 direction)
+                 Point_3 center, const Kernel::Vector_3& direction)
       : radius(radius), num_vertical(num_vertical),
         num_horizontal(num_horizontal), center(std::move(center)),
         direction(normalizeVector(direction))
