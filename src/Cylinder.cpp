@@ -110,7 +110,8 @@ Cylinder::generateSurfaceMesh() -> Cylinder::Surface_mesh
   }
   Vector_3 perpendicular2 = CGAL::cross_product(normalized_axis, perpendicular);
 
-  std::vector<Surface_mesh::Vertex_index> base_vertices, top_vertices;
+  std::vector<Surface_mesh::Vertex_index> base_vertices;
+  std::vector<Surface_mesh::Vertex_index> top_vertices;
 
   // Create vertices for the base and top
   for (int i = 0; i < m_num_radial; ++i) {

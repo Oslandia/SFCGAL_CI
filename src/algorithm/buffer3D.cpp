@@ -226,7 +226,8 @@ for (const auto &p : _inputPoints) {
     std::vector<Kernel::Point_3> end_circle =
         create_circle_points(extended_end, axis, _radius, _segments);
 
-    std::vector<Cylinder::Surface_mesh::Vertex_index> start_ring, end_ring;
+    std::vector<Cylinder::Surface_mesh::Vertex_index> start_ring;
+    std::vector<Cylinder::Surface_mesh::Vertex_index> end_ring;
 
     for (size_t j = 0; j < _segments; ++j) {
       Kernel::Point_3 start_point = start_circle[j];
