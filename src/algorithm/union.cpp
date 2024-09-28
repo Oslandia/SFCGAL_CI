@@ -332,7 +332,7 @@ class Handle {
     }
 
     template <class T>
-    inline auto
+    auto
     as() -> T &
     {
       return boost::get<T &>(*this);
