@@ -76,7 +76,7 @@ main(int argc, char *argv[]) -> int
   po::notify(vm);
 
   if (vm.count("help") != 0U) {
-    std::cout << desc << std::endl;
+    std::cout << desc << '\n';
     return 0;
   }
 
@@ -89,8 +89,8 @@ main(int argc, char *argv[]) -> int
   if (vm.count("filename") != 0U) {
     filename = vm["filename"].as<std::string>();
   } else {
-    std::cerr << "missing input file" << std::endl;
-    std::cout << desc << std::endl;
+    std::cerr << "missing input file" << '\n';
+    std::cout << desc << '\n';
     return 1;
   }
 
@@ -106,7 +106,7 @@ main(int argc, char *argv[]) -> int
   std::ifstream ifs(filename.c_str());
 
   if (!ifs.good()) {
-    std::cerr << "fail to open : " << filename << std::endl;
+    std::cerr << "fail to open : " << filename << '\n';
     return 1;
   }
 
@@ -115,7 +115,7 @@ main(int argc, char *argv[]) -> int
   std::ofstream tri_ofs(tri_filename.c_str());
 
   if (!tri_ofs.good()) {
-    std::cerr << "fail to write : " << tri_filename << std::endl;
+    std::cerr << "fail to write : " << tri_filename << '\n';
     return 1;
   }
 
@@ -124,7 +124,7 @@ main(int argc, char *argv[]) -> int
   std::ofstream ofs_error(error_filename.c_str());
 
   if (!ofs_error.good()) {
-    std::cerr << "fail to write : " << error_filename << std::endl;
+    std::cerr << "fail to write : " << error_filename << '\n';
     return 1;
   }
 
@@ -156,7 +156,7 @@ main(int argc, char *argv[]) -> int
     }
 
     if (verbose) {
-      std::cout << "#" << line << std::endl;
+      std::cout << "#" << line << '\n';
       std::cout.flush();
     }
 
@@ -165,7 +165,7 @@ main(int argc, char *argv[]) -> int
       boost::chrono::duration<double> const elapsed =
           boost::chrono::system_clock::now() - start;
       std::cout << std::left << lineNumber << "(" << elapsed << " s)"
-                << std::endl;
+                << '\n';
     }
 
     std::vector<std::string> tokens;
@@ -210,7 +210,7 @@ main(int argc, char *argv[]) -> int
                   << "area(polygon) != area(tin) ( " << areaPolygons
                   << " !=" << areaTriangles << ")"
                   << "|" << g->asText() << "|" << triangulatedSurface.asText()
-                  << std::endl;
+                  << '\n';
       }
 
       numSuccess++;
@@ -236,7 +236,7 @@ main(int argc, char *argv[]) -> int
 
     // output triangulated surface
     tri_ofs << id << "|" << failed << "|" << triangulatedSurface.asText(5)
-            << std::endl;
+            << '\n';
   } // end for each line
 
   ofs_error.close();
@@ -253,9 +253,9 @@ main(int argc, char *argv[]) -> int
     std::cout << "    " << i << " is inapropriate for triangulation\n";
   }
 
-  std::cout << filename << " complete (" << elapsed << " s)---" << std::endl;
+  std::cout << filename << " complete (" << elapsed << " s)---" << '\n';
   std::cout << numFailed << " failed /" << (numFailed + numSuccess)
-            << std::endl;
+            << '\n';
 
   if (numFailed == 0) {
     // delete empty error file

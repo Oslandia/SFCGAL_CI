@@ -77,7 +77,7 @@ Logger::log(const Level &level, const std::string &message,
     break;
   }
 
-  _out << message << std::endl;
+  _out << message << '\n';
 }
 
 ///

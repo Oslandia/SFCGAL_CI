@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(testFileIntersectionTest)
     }
 
     if (print_line_number) {
-      std::cout << numLine << std::endl;
+      std::cout << numLine << '\n';
     }
 
     if (test_one_line == -1) {

@@ -1078,15 +1078,15 @@ operator<<(std::ostream &ostr, const GeometrySet<2> &g) -> std::ostream &
   std::ostream_iterator<CollectionElement<Point_d<2>::Type>> const out_pt(ostr,
                                                                           ", ");
   std::copy(g.points().begin(), g.points().end(), out_pt);
-  ostr << std::endl << "segments: ";
+  ostr << '\n' << "segments: ";
   std::ostream_iterator<CollectionElement<Segment_d<2>::Type>> const out_seg(
       ostr, ", ");
   std::copy(g.segments().begin(), g.segments().end(), out_seg);
-  ostr << std::endl << "surfaces: ";
+  ostr << '\n' << "surfaces: ";
   std::ostream_iterator<CollectionElement<Surface_d<2>::Type>> const out_surf(
       ostr, ", ");
   std::copy(g.surfaces().begin(), g.surfaces().end(), out_surf);
-  ostr << std::endl;
+  ostr << '\n';
   return ostr;
 }
 
@@ -1097,19 +1097,19 @@ operator<<(std::ostream &ostr, const GeometrySet<3> &g) -> std::ostream &
   std::ostream_iterator<CollectionElement<Point_d<3>::Type>> const out_pt(ostr,
                                                                           ", ");
   std::copy(g.points().begin(), g.points().end(), out_pt);
-  ostr << std::endl << "segments: ";
+  ostr << '\n' << "segments: ";
   std::ostream_iterator<CollectionElement<Segment_d<3>::Type>> const out_seg(
       ostr, ", ");
   std::copy(g.segments().begin(), g.segments().end(), out_seg);
-  ostr << std::endl << "surfaces: ";
+  ostr << '\n' << "surfaces: ";
   std::ostream_iterator<CollectionElement<Surface_d<3>::Type>> const out_surf(
       ostr, ", ");
   std::copy(g.surfaces().begin(), g.surfaces().end(), out_surf);
-  ostr << std::endl << "volumes: ";
+  ostr << '\n' << "volumes: ";
   std::ostream_iterator<CollectionElement<Volume_d<3>::Type>> const out_vol(
       ostr, ", ");
   std::copy(g.volumes().begin(), g.volumes().end(), out_vol);
-  ostr << std::endl;
+  ostr << '\n';
   return ostr;
 }
 
