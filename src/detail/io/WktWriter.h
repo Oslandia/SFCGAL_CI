@@ -90,7 +90,7 @@ protected:
 
 private:
   std::ostream &_s;
-  bool          _exactWrite;
+  bool          _exactWrite = false;
 };
 
 } // namespace io

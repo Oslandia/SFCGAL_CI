@@ -139,7 +139,7 @@ Geometry::geometryN(size_t const &n) -> Geometry &
 ///
 ///
 ///
-Geometry::Geometry() : validityFlag_(false) {}
+Geometry::Geometry()  {}
 
 auto
 Geometry::hasValidityFlag() const -> bool

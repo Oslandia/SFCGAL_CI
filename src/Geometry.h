@@ -328,7 +328,7 @@ public:
   }
 
 protected:
-  bool validityFlag_;
+  bool validityFlag_ = false;
 };
 
 /**

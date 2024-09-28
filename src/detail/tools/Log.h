@@ -126,11 +126,11 @@ private:
   /**
    * current log level
    */
-  Level _logLevel;
+  Level _logLevel = Warning;
   /**
    * display file position?
    */
-  bool _displayFilePosition;
+  bool _displayFilePosition = true;
 
   /**
    * private constructor
