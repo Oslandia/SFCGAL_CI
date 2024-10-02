@@ -42,7 +42,8 @@ test/unit/unit-test-SFCGAL
 *~
 */.DS_Store
 
-build
+build*
 /.vs
 /out/install/x64-Debug/include/SFCGAL
 /CMakeSettings.json
+CGAL*
