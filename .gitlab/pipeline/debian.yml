@@ -12,7 +12,7 @@ debian_testing_gcc:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.6.1", "6.0-beta1"]
+      - CGAL_VERSION: ["5.6.1", "6.0"]
 
 debian_stable_gcc:
   stage: test
@@ -28,7 +28,7 @@ debian_stable_gcc:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.6.1", "6.0-beta1"]
+      - CGAL_VERSION: ["5.6.1", "6.0"]
 
 debian_testing_clang:
   stage: test
@@ -44,7 +44,7 @@ debian_testing_clang:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.6.1", "6.0-beta1"]
+      - CGAL_VERSION: ["5.6.1", "6.0"]
 
 debian_stable_clang:
   stage: test
@@ -60,4 +60,4 @@ debian_stable_clang:
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.6.1", "6.0-beta1"]
+      - CGAL_VERSION: ["5.6.1", "6.0"]
