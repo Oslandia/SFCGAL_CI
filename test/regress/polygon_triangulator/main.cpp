@@ -164,8 +164,7 @@ main(int argc, char *argv[]) -> int
       std::cout.width(12);
       boost::chrono::duration<double> const elapsed =
           boost::chrono::system_clock::now() - start;
-      std::cout << std::left << lineNumber << "(" << elapsed << " s)"
-                << '\n';
+      std::cout << std::left << lineNumber << "(" << elapsed << " s)" << '\n';
     }
 
     std::vector<std::string> tokens;
@@ -254,8 +253,7 @@ main(int argc, char *argv[]) -> int
   }
 
   std::cout << filename << " complete (" << elapsed << " s)---" << '\n';
-  std::cout << numFailed << " failed /" << (numFailed + numSuccess)
-            << '\n';
+  std::cout << numFailed << " failed /" << (numFailed + numSuccess) << '\n';
 
   if (numFailed == 0) {
     // delete empty error file

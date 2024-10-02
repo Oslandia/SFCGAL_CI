@@ -144,8 +144,7 @@ main(int argc, char *argv[]) -> int
       std::cout.width(12);
       boost::chrono::duration<double> const elapsed =
           boost::chrono::system_clock::now() - start;
-      std::cout << std::left << lineNumber << "(" << elapsed << " s)"
-                << '\n';
+      std::cout << std::left << lineNumber << "(" << elapsed << " s)" << '\n';
     }
 
     std::vector<std::string> tokens;
@@ -176,8 +175,7 @@ main(int argc, char *argv[]) -> int
       hull3D = algorithm::convexHull3D(*g);
       failed = false;
     } catch (Exception &e) {
-      std::cerr << "[Exception]" << id << "|" << e.what() << "|" << wkt
-                << '\n';
+      std::cerr << "[Exception]" << id << "|" << e.what() << "|" << wkt << '\n';
     } catch (std::exception &e) {
       std::cerr << "[std::exception]" << id << "|" << e.what() << "|" << wkt
                 << '\n';
@@ -202,8 +200,7 @@ main(int argc, char *argv[]) -> int
   boost::chrono::duration<double> const elapsed =
       boost::chrono::system_clock::now() - start;
   std::cout << filename << " complete (" << elapsed << " s)---" << '\n';
-  std::cout << numFailed << " failed /" << (numFailed + numSuccess)
-            << '\n';
+  std::cout << numFailed << " failed /" << (numFailed + numSuccess) << '\n';
 
   if (numFailed == 0) {
     // delete empty error file

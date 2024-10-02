@@ -383,8 +383,8 @@ public:
   }
 
   void
-  swap(Handle &other)
- noexcept   {
+  swap(Handle &other) noexcept
+  {
     (*_p)->_observers.erase(_p);
     (*other._p)->_observers.erase(other._p);
     std::swap(_p, other._p);

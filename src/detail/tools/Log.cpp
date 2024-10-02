@@ -101,10 +101,7 @@ Logger::setLogLevel(const Level &logLevel)
 ///
 ///
 ///
-Logger::Logger(std::ostream &str)
-    :  _out(str.rdbuf())
-{
-}
+Logger::Logger(std::ostream &str) : _out(str.rdbuf()) {}
 
 ///
 ///

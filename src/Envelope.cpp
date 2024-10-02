@@ -85,7 +85,6 @@ Envelope::operator=(const Envelope &other) -> Envelope &
 ///
 ///
 
-
 ///
 ///
 ///

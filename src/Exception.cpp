@@ -9,7 +9,10 @@ namespace SFCGAL {
 
 Exception::Exception() noexcept : _message("unknown exception") {}
 
-Exception::Exception(std::string const &message) noexcept : _message(std::move(message)) {}
+Exception::Exception(std::string const &message) noexcept
+    : _message(std::move(message))
+{
+}
 
 Exception::~Exception() noexcept = default;
 

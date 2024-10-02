@@ -29,8 +29,8 @@ perpendicular_vector(const Kernel::Vector_3 &v) -> Kernel::Vector_3
 {
   if (v.x() != 0 || v.y() != 0) {
     return Kernel::Vector_3(-v.y(), v.x(), 0);
-  }     return Kernel::Vector_3(0, -v.z(), v.y());
- 
+  }
+  return Kernel::Vector_3(0, -v.z(), v.y());
 }
 
 // Helper function to convert SFCGAL::Geometry to Nef_polyhedron_3
@@ -166,8 +166,8 @@ nefToGeometry(const Nef_polyhedron_3 &nef) -> std::unique_ptr<Geometry>
 }
 
 auto
-minkowskiSum3D(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
-    -> std::unique_ptr<Geometry>
+minkowskiSum3D(const Geometry &gA, const Geometry &gB,
+               NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::unique_ptr<Geometry>(new GeometryCollection());

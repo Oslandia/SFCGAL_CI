@@ -123,8 +123,7 @@ BOOST_AUTO_TEST_CASE(testBuffer3D_Point)
 
     // Check if the expected file exists
     if (!fs::exists(expectedFile)) {
-      std::cout << "Expected file does not exist: " << expectedFile
-                << '\n';
+      std::cout << "Expected file does not exist: " << expectedFile << '\n';
       continue;
     }
 
@@ -186,8 +185,7 @@ BOOST_AUTO_TEST_CASE(testBuffer3D_LineString)
 
     // Check if the expected file exists
     if (!fs::exists(expectedFile)) {
-      std::cout << "Expected file does not exist: " << expectedFile
-                << '\n';
+      std::cout << "Expected file does not exist: " << expectedFile << '\n';
       continue;
     }
 

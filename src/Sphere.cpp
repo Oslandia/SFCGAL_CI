@@ -16,7 +16,7 @@ template <class HDS>
 class Sphere_builder : public CGAL::Modifier_base<HDS> {
 public:
   Sphere_builder(double radius, int num_vertical, int num_horizontal,
-                 Point_3 center, const Kernel::Vector_3& direction)
+                 Point_3 center, const Kernel::Vector_3 &direction)
       : radius(radius), num_vertical(num_vertical),
         num_horizontal(num_horizontal), center(std::move(center)),
         direction(normalizeVector(direction))
@@ -51,8 +51,8 @@ private:
   {
     if (vec.x() != 0 || vec.y() != 0) {
       return Kernel::Vector_3(-vec.y(), vec.x(), 0);
-    }       return Kernel::Vector_3(0, -vec.z(), vec.y());
-   
+    }
+    return Kernel::Vector_3(0, -vec.z(), vec.y());
   }
 
   void
@@ -142,8 +142,9 @@ private:
 Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
                int num_vertical, int num_horizontal,
                const Kernel::Vector_3 &direction)
-    : m_radius(std::move(radius)), m_center(std::move(center)), m_num_vertical(num_vertical),
-      m_num_horizontal(num_horizontal), m_direction(normalizeVector(direction))
+    : m_radius(std::move(radius)), m_center(std::move(center)),
+      m_num_vertical(num_vertical), m_num_horizontal(num_horizontal),
+      m_direction(normalizeVector(direction))
 {
 }
 

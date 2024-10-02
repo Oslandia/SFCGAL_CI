@@ -320,7 +320,8 @@ post_difference(const GeometrySet<2> &input, GeometrySet<2> &output)
       }
     }
 
-    output.surfaces().emplace_back(PolygonWH_2(outer, rings.begin(), rings.end()));
+    output.surfaces().emplace_back(
+        PolygonWH_2(outer, rings.begin(), rings.end()));
   }
 
   output.points()   = input.points();

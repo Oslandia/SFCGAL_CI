@@ -99,9 +99,8 @@ Buffer3D::computeRoundBuffer() const -> std::unique_ptr<PolyhedralSurface>
     SFCGAL::detail::MarkedPolyhedron out;
     result.convert_to_polyhedron(out);
     return std::make_unique<PolyhedralSurface>(out);
-  }     // If _inputPoints is empty, return an empty PolyhedralSurface
-    return std::make_unique<PolyhedralSurface>();
- 
+  } // If _inputPoints is empty, return an empty PolyhedralSurface
+  return std::make_unique<PolyhedralSurface>();
 }
 
 auto
@@ -200,7 +199,7 @@ Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
   std::vector<Kernel::Point_3> line_points;
   line_points.reserve(_inputPoints.size());
-for (const auto &p : _inputPoints) {
+  for (const auto &p : _inputPoints) {
     line_points.emplace_back(p.x(), p.y(), p.z());
   }
 
@@ -258,7 +257,7 @@ for (const auto &p : _inputPoints) {
     rings.push_back(start_ring);
     if (i == line_points.size() - 2) {
       rings.push_back(end_ring);
-}
+    }
   }
 
   // Add caps
@@ -286,7 +285,7 @@ for (const auto &p : _inputPoints) {
 
 auto
 Buffer3D::extend_point(const Kernel::Point_3  &point,
-                       const Kernel::Vector_3 &direction, double distance) const 
+                       const Kernel::Vector_3 &direction, double distance) const
     -> Kernel::Point_3
 {
   return point + direction * distance;
@@ -295,7 +294,7 @@ Buffer3D::extend_point(const Kernel::Point_3  &point,
 auto
 Buffer3D::create_circle_points(const Kernel::Point_3  &center,
                                const Kernel::Vector_3 &axis, double radius,
-                               int segments) const 
+                               int segments) const
     -> std::vector<Kernel::Point_3>
 {
   std::vector<Kernel::Point_3> points;
@@ -320,7 +319,7 @@ Buffer3D::create_circle_points(const Kernel::Point_3  &center,
 auto
 Buffer3D::compute_bisector_plane(const Kernel::Point_3 &p1,
                                  const Kernel::Point_3 &p2,
-                                 const Kernel::Point_3 &p3) const 
+                                 const Kernel::Point_3 &p3) const
     -> Kernel::Plane_3
 {
   Kernel::Vector_3 v1       = normalizeVector(p2 - p1);
@@ -332,7 +331,7 @@ Buffer3D::compute_bisector_plane(const Kernel::Point_3 &p1,
 auto
 Buffer3D::intersect_segment_plane(const Kernel::Point_3 &p1,
                                   const Kernel::Point_3 &p2,
-                                  const Kernel::Plane_3 &plane) const 
+                                  const Kernel::Plane_3 &plane) const
     -> Kernel::Point_3
 {
   Kernel::Vector_3 v = p2 - p1;

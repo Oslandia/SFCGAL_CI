@@ -104,8 +104,7 @@ BOOST_AUTO_TEST_CASE(test_all_geometries)
 
     // Check if the expected file exists
     if (!fs::exists(expectedFile)) {
-      std::cout << "Expected file does not exist: " << expectedFile
-                << '\n';
+      std::cout << "Expected file does not exist: " << expectedFile << '\n';
       continue;
     }
 

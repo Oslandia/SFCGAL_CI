@@ -101,8 +101,8 @@ _decompose_polygon(const Polygon                     &poly,
   for (size_t i = 0; i < surf.numTriangles(); ++i) {
     const Triangle &tri = surf.triangleN(i);
     surfaces.emplace_back(CGAL::Triangle_3<Kernel>(tri.vertex(0).toPoint_3(),
-                                                tri.vertex(1).toPoint_3(),
-                                                tri.vertex(2).toPoint_3()));
+                                                   tri.vertex(1).toPoint_3(),
+                                                   tri.vertex(2).toPoint_3()));
   }
 }
 
@@ -205,7 +205,8 @@ GeometrySet<2>::addPrimitive(const PrimitiveHandle<2> &p)
     break;
 
   case PrimitiveSurface:
-    _surfaces.emplace_back(*boost::get<const TypeForDimension<2>::Surface *>(p.handle));
+    _surfaces.emplace_back(
+        *boost::get<const TypeForDimension<2>::Surface *>(p.handle));
     break;
 
   default:
@@ -228,7 +229,8 @@ GeometrySet<3>::addPrimitive(const PrimitiveHandle<3> &p)
     break;
 
   case PrimitiveSurface:
-    _surfaces.emplace_back(*boost::get<const TypeForDimension<3>::Surface *>(p.handle));
+    _surfaces.emplace_back(
+        *boost::get<const TypeForDimension<3>::Surface *>(p.handle));
     break;
 
   case PrimitiveVolume: {
