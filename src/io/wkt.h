@@ -20,18 +20,18 @@ namespace io {
 /**
  * Read a WKT geometry from an input stream
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           readWkt(std::istream &s);
+SFCGAL_API auto
+           readWkt(std::istream &s) -> std::unique_ptr<Geometry>;
 /**
  * Read a WKT geometry from a string
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           readWkt(const std::string &s);
+SFCGAL_API auto
+           readWkt(const std::string &s) -> std::unique_ptr<Geometry>;
 /**
  * Read a WKT geometry from a char*
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           readWkt(const char *, size_t);
+SFCGAL_API auto
+           readWkt(const char *, size_t) -> std::unique_ptr<Geometry>;
 } // namespace io
 } // namespace SFCGAL
 

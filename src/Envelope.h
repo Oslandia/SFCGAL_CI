@@ -61,10 +61,6 @@ public:
    */
   Envelope &
   operator=(const Envelope &other);
-  /**
-   * destructor
-   */
-  ~Envelope();
 
   /**
    * indicates if the bounding box is empty
