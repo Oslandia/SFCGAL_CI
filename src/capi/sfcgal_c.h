@@ -1068,6 +1068,7 @@ sfcgal_geometry_approximate_medial_axis(const sfcgal_geometry_t *geom);
 /**
  * Returns the straight skeleton partition for the given Polygon
  * @pre isValid(geom) == true
+ * @pre geom must be a Polygon, Triangle or MultiPolygon
  * @post isValid(return) == true
  * @ingroup capi
  */
