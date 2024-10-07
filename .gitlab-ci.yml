@@ -10,6 +10,7 @@ variables:
   CGAL_LATEST_VERSION: "6.0"
   SONAR_CGAL_VERSION: ${CGAL_LATEST_VERSION}
   DOCKER_CGAL_VERSION: ${CGAL_LATEST_VERSION}
+  PYTHON_DOCKER_IMAGE: python:3.12-slim-bookworm
 
 # After ccache ci
 # coverage:
@@ -40,3 +41,49 @@ include:
 
 sast:
   stage: test
+
+
+build:documentation:
+  stage: build
+  image: ${PYTHON_DOCKER_IMAGE}
+  only:
+    refs:
+      - master
+    changes:
+      - "src/*.h"
+      - "src/*.cpp"
+      - "website/docs/*.md"
+      - ".gitlab-ci.yml"
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y doxygen
+    - python -m pip install -U pip
+    - python -m pip install -U -r requirements/website.txt
+  script:
+    - export PYTHONPATH=$(pwd)
+    - cd website && mkdocs build --verbose
+  artifacts:
+    name: documentation
+    expose_as: "built_documentation"
+    paths:
+      - website/site
+    when: always
+
+
+# -- DEPLOYMENT JOBS ------------
+pages:
+  stage: deploy
+  only:
+    refs:
+      - master
+  needs:
+    - job: build:documentation
+      artifacts: true
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - mkdir -p public
+    - cp -rf website/site/* public/
+  artifacts:
+    paths:
+      - public
