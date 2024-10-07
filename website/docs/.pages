@@ -1,0 +1,8 @@
+nav:
+  - Home: index.md
+  - Authors: authors.md
+  - Documentation: 
+      - Overview: documentation.md
+      - Installation: installation.md
+      - Development: development.md
+  - Screencast: screencast.md

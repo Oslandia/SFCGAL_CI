@@ -1,0 +1,73 @@
+site_name: SFCGAL
+repo_name: "SFCGAL"
+repo_url: "https://gitlab.com/sfcgal/SFCGAL/"
+
+extra:
+  current_version: 1.5.2
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.top
+    - navigation.tabs
+    - navigation.hide
+  logo: assets/img/logo.png
+  favicon: assets/img/logo.png
+  palette: 
+     primary: custom
+     accent: custom
+  repo_icon: "gitlab"  # Utilise l'icône GitLab
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - attr_list
+  - admonition
+
+plugins:
+  - mkdocs-video
+  - search
+  - macros
+  - mkdoxy:
+      projects:
+        API:
+          src-dirs: ../src
+          full-doc: True
+          template-dir: templates-custom
+          doxy-cfg:
+            FILE_PATTERNS: "*.cpp *.h"
+            EXAMPLE_PATH: examples
+            FULL_PATH_NAMES: "NO"
+            SHOW_USED_FILES: "NO"
+            RECURSIVE: True
+
+nav : 
+  - Home: index.md
+  - Authors: authors.md
+  - Installation: installation.md
+  - Development: development.md
+  - Screencast: screencast.md
+  - API:
+      - "Links": "API/links.md"
+      - "Classes":
+          - "Class List": "API/annotated.md"
+          - "Class Index": "API/classes.md"
+          - "Class Hierarchy": "API/hierarchy.md"
+          - "Class Members": "API/class_members.md"
+          - "Class Member Functions": "API/class_member_functions.md"
+          - "Class Member Variables": "API/class_member_variables.md"
+          - "Class Member Typedefs": "API/class_member_typedefs.md"
+          - "Class Member Enumerations": "API/class_member_enums.md"
+      - "Namespaces":
+          - "Namespace List": "API/namespaces.md"
+          - "Namespace Members": "API/namespace_members.md"
+          - "Namespace Member Functions": "API/namespace_member_functions.md"
+          - "Namespace Member Variables": "API/namespace_member_variables.md"
+          - "Namespace Member Typedefs": "API/namespace_member_typedefs.md"
+          - "Namespace Member Enumerations": "API/namespace_member_enums.md"
+      - "Functions": "API/functions.md"
+      - "Variables": "API/variables.md"
+      - "Macros": "API/macros.md"
+      - "Files": "API/files.md"
