@@ -8,6 +8,7 @@
 #include <SFCGAL/algorithm/scale.h>
 #include <SFCGAL/algorithm/translate.h>
 #include <SFCGAL/io/OBJ.h>
+#include <SFCGAL/io/STL.h>
 #include <SFCGAL/io/wkb.h>
 #include <boost/test/unit_test.hpp>
 #include <cmath>
@@ -150,6 +151,7 @@ BOOST_AUTO_TEST_CASE(testCigale)
 
   // Save as OBJ file
   io::OBJ::save(*cigale, "/tmp/cigale.obj");
+  io::STL::save(*cigale, "/tmp/cigale.stl");
 
   BOOST_CHECK(!cigale->isEmpty());
 }

@@ -9,6 +9,7 @@
 #include <SFCGAL/algorithm/scale.h>
 #include <SFCGAL/algorithm/translate.h>
 #include <SFCGAL/io/OBJ.h>
+#include <SFCGAL/io/STL.h>
 #include <SFCGAL/io/wkb.h>
 #include <boost/test/unit_test.hpp>
 #include <cmath>
@@ -166,6 +167,7 @@ BOOST_AUTO_TEST_CASE(testElephant)
 
   // Save to OBJ file
   io::OBJ::save(*elephant, "/tmp/elephant.obj");
+  io::STL::save(*elephant, "/tmp/elephant.stl");
 
   // Add a simple test to ensure the geometry is not empty
   BOOST_CHECK(!elephant->isEmpty());
