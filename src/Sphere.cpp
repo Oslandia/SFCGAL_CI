@@ -2,6 +2,7 @@
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Vector_3.h>
 #include <cmath>
+#include <utility>
 
 namespace SFCGAL {
 
@@ -15,15 +16,15 @@ template <class HDS>
 class Sphere_builder : public CGAL::Modifier_base<HDS> {
 public:
   Sphere_builder(double radius, int num_vertical, int num_horizontal,
-                 Point_3 center, Kernel::Vector_3 direction)
+                 Point_3 center, const Kernel::Vector_3 &direction)
       : radius(radius), num_vertical(num_vertical),
-        num_horizontal(num_horizontal), center(center),
+        num_horizontal(num_horizontal), center(std::move(center)),
         direction(normalizeVector(direction))
   {
   }
 
   void
-  operator()(HDS &hds)
+  operator()(HDS &hds) override
   {
     CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
 
@@ -45,14 +46,13 @@ public:
 
 private:
   // Function to get an orthogonal vector in the XY plane
-  Kernel::Vector_3
-  get_orthogonal_vector(const Kernel::Vector_3 &vec)
+  auto
+  get_orthogonal_vector(const Kernel::Vector_3 &vec) -> Kernel::Vector_3
   {
     if (vec.x() != 0 || vec.y() != 0) {
       return Kernel::Vector_3(-vec.y(), vec.x(), 0);
-    } else {
-      return Kernel::Vector_3(0, -vec.z(), vec.y());
     }
+    return Kernel::Vector_3(0, -vec.z(), vec.y());
   }
 
   void
@@ -139,16 +139,17 @@ private:
   Kernel::Vector_3 direction;
 };
 
-Sphere::Sphere(const Kernel::FT &radius, const Point_3 &center,
+Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
                int num_vertical, int num_horizontal,
                const Kernel::Vector_3 &direction)
-    : m_radius(radius), m_center(center), m_num_vertical(num_vertical),
-      m_num_horizontal(num_horizontal), m_direction(normalizeVector(direction))
+    : m_radius(std::move(radius)), m_center(std::move(center)),
+      m_num_vertical(num_vertical), m_num_horizontal(num_horizontal),
+      m_direction(normalizeVector(direction))
 {
 }
 
-Sphere &
-Sphere::operator=(Sphere other)
+auto
+Sphere::operator=(Sphere other) -> Sphere &
 {
   std::swap(m_radius, other.m_radius);
   std::swap(m_center, other.m_center);
@@ -168,8 +169,8 @@ Sphere::invalidateCache()
 }
 
 // Generate the polyhedron representation of the sphere
-Polyhedron_3
-Sphere::generateSpherePolyhedron()
+auto
+Sphere::generateSpherePolyhedron() -> Polyhedron_3
 {
   Polyhedron_3                             P;
   Sphere_builder<Polyhedron_3::HalfedgeDS> builder(
@@ -179,8 +180,8 @@ Sphere::generateSpherePolyhedron()
   return P;
 }
 
-Polyhedron_3
-Sphere::generatePolyhedron()
+auto
+Sphere::generatePolyhedron() -> Polyhedron_3
 {
   if (!m_polyhedron) {
     m_polyhedron = generateSpherePolyhedron();
@@ -188,8 +189,8 @@ Sphere::generatePolyhedron()
   return *m_polyhedron;
 }
 
-std::vector<Point_3>
-Sphere::generatePoints()
+auto
+Sphere::generatePoints() -> std::vector<Point_3>
 {
   if (!m_points) {
     m_points = generateSpherePoints();
@@ -198,8 +199,8 @@ Sphere::generatePoints()
 }
 
 // Generate points on the sphere's surface
-std::vector<Point_3>
-Sphere::generateSpherePoints()
+auto
+Sphere::generateSpherePoints() -> std::vector<Point_3>
 {
   std::vector<Point_3> points;
   points.reserve(static_cast<size_t>(m_num_vertical) *

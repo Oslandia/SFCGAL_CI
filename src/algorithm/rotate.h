@@ -1,8 +1,8 @@
 // Copyright (c) 2024-2024, SFCGAL Contributors and Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_ALGORITHM_ROTATE_H_
-#define _SFCGAL_ALGORITHM_ROTATE_H_
+#ifndef SFCGAL_ALGORITHM_ROTATE_H_
+#define SFCGAL_ALGORITHM_ROTATE_H_
 
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/Kernel.h"
@@ -67,4 +67,4 @@ rotateZ(Geometry &g, const Kernel::FT &angle);
 } // namespace algorithm
 } // namespace SFCGAL
 
-#endif // _SFCGAL_ALGORITHM_ROTATE_H_
+#endif // SFCGAL_ALGORITHM_ROTATE_H_

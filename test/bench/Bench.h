@@ -18,8 +18,8 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
-#ifndef _SFCGAL_BENCH_H_
-#define _SFCGAL_BENCH_H_
+#ifndef SFCGAL_BENCH_H_
+#define SFCGAL_BENCH_H_
 
 #include <iostream>
 #include <stack>

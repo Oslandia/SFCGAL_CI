@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_ENVELOPE_H_
-#define _SFCGAL_ENVELOPE_H_
+#ifndef SFCGAL_ENVELOPE_H_
+#define SFCGAL_ENVELOPE_H_
 
 #include <boost/assert.hpp>
 #include <memory>
@@ -61,10 +61,6 @@ public:
    */
   Envelope &
   operator=(const Envelope &other);
-  /**
-   * destructor
-   */
-  ~Envelope();
 
   /**
    * indicates if the bounding box is empty

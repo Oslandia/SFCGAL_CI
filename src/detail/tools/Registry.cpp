@@ -89,7 +89,7 @@ Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
   SFCGAL_WARNING(boost::format("Registry can't create a new Geometry for the "
                                "type '%s' (returning null pointer)") %
                  geometryTypeName);
-  return NULL;
+  return nullptr;
 }
 
 ///
@@ -107,7 +107,7 @@ Registry::newGeometryByTypeId(int typeId) const -> Geometry *
   SFCGAL_WARNING(boost::format("Registry can't create a new Geometry for the "
                                "type '%d' (returning null pointer)") %
                  typeId);
-  return NULL;
+  return nullptr;
 }
 
 ///

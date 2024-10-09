@@ -154,7 +154,7 @@ lineSubstring(const LineString &ls, double start, double end)
     return std::make_unique<LineString>();
   }
 
-  const unsigned long N = static_cast<unsigned long>(ls.numPoints());
+  const auto N = static_cast<unsigned long>(ls.numPoints());
 
   const bool closed = ls.isClosed();
 

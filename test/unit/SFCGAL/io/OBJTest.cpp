@@ -14,8 +14,8 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_io_OBJWriterTest)
 
 namespace fs = boost::filesystem;
 
-bool
-compareFiles(const std::string &file1, const std::string &file2)
+auto
+compareFiles(const std::string &file1, const std::string &file2) -> bool
 {
   std::ifstream f1(file1, std::ifstream::binary | std::ifstream::ate);
   std::ifstream f2(file2, std::ifstream::binary | std::ifstream::ate);
@@ -104,8 +104,7 @@ BOOST_AUTO_TEST_CASE(test_all_geometries)
 
     // Check if the expected file exists
     if (!fs::exists(expectedFile)) {
-      std::cout << "Expected file does not exist: " << expectedFile
-                << std::endl;
+      std::cout << "Expected file does not exist: " << expectedFile << '\n';
       continue;
     }
 

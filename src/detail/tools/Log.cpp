@@ -77,7 +77,7 @@ Logger::log(const Level &level, const std::string &message,
     break;
   }
 
-  _out << message << std::endl;
+  _out << message << '\n';
 }
 
 ///
@@ -101,10 +101,7 @@ Logger::setLogLevel(const Level &logLevel)
 ///
 ///
 ///
-Logger::Logger(std::ostream &str)
-    : _logLevel(Warning), _displayFilePosition(true), _out(str.rdbuf())
-{
-}
+Logger::Logger(std::ostream &str) : _out(str.rdbuf()) {}
 
 ///
 ///

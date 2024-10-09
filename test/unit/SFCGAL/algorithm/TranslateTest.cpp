@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(testEmpty)
     BOOST_TEST_MESSAGE(typeName);
 
     std::unique_ptr<Geometry> g(registry.newGeometryByTypeName(typeName));
-    BOOST_REQUIRE(g.get() != NULL);
+    BOOST_REQUIRE(g.get() != nullptr);
     algorithm::translate(*g, 1.0, 1.0, 1.0);
     BOOST_CHECK(g->isEmpty());
   }

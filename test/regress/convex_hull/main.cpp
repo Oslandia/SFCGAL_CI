@@ -71,7 +71,7 @@ main(int argc, char *argv[]) -> int
   po::notify(vm);
 
   if (vm.count("help") != 0U) {
-    std::cout << desc << std::endl;
+    std::cout << desc << '\n';
     return 0;
   }
 
@@ -83,8 +83,8 @@ main(int argc, char *argv[]) -> int
   if (vm.count("filename") != 0U) {
     filename = vm["filename"].as<std::string>();
   } else {
-    std::cerr << "missing input file" << std::endl;
-    std::cout << desc << std::endl;
+    std::cerr << "missing input file" << '\n';
+    std::cout << desc << '\n';
     return 1;
   }
 
@@ -94,7 +94,7 @@ main(int argc, char *argv[]) -> int
   std::ifstream ifs(filename.c_str());
 
   if (!ifs.good()) {
-    std::cerr << "fail to open : " << filename << std::endl;
+    std::cerr << "fail to open : " << filename << '\n';
     return 1;
   }
 
@@ -102,7 +102,7 @@ main(int argc, char *argv[]) -> int
   std::ofstream     ofs_result(tri_filename.c_str());
 
   if (!ofs_result.good()) {
-    std::cerr << "fail to write : " << tri_filename << std::endl;
+    std::cerr << "fail to write : " << tri_filename << '\n';
     return 1;
   }
 
@@ -110,7 +110,7 @@ main(int argc, char *argv[]) -> int
   std::ofstream     ofs_error(error_filename.c_str());
 
   if (!ofs_error.good()) {
-    std::cerr << "fail to write : " << error_filename << std::endl;
+    std::cerr << "fail to write : " << error_filename << '\n';
     return 1;
   }
 
@@ -136,7 +136,7 @@ main(int argc, char *argv[]) -> int
     }
 
     if (verbose) {
-      std::cout << "#" << line << std::endl;
+      std::cout << "#" << line << '\n';
       std::cout.flush();
     }
 
@@ -144,8 +144,7 @@ main(int argc, char *argv[]) -> int
       std::cout.width(12);
       boost::chrono::duration<double> const elapsed =
           boost::chrono::system_clock::now() - start;
-      std::cout << std::left << lineNumber << "(" << elapsed << " s)"
-                << std::endl;
+      std::cout << std::left << lineNumber << "(" << elapsed << " s)" << '\n';
     }
 
     std::vector<std::string> tokens;
@@ -176,24 +175,23 @@ main(int argc, char *argv[]) -> int
       hull3D = algorithm::convexHull3D(*g);
       failed = false;
     } catch (Exception &e) {
-      std::cerr << "[Exception]" << id << "|" << e.what() << "|" << wkt
-                << std::endl;
+      std::cerr << "[Exception]" << id << "|" << e.what() << "|" << wkt << '\n';
     } catch (std::exception &e) {
       std::cerr << "[std::exception]" << id << "|" << e.what() << "|" << wkt
-                << std::endl;
+                << '\n';
     } catch (...) {
-      std::cerr << "[...]" << id << "|" << wkt << std::endl;
+      std::cerr << "[...]" << id << "|" << wkt << '\n';
     }
 
     if (failed) {
       numFailed++;
-      ofs_error << line << std::endl;
+      ofs_error << line << '\n';
     } else {
       numSuccess++;
     }
 
     // output triangulated surface
-    ofs_result << id << "|" << failed << "|" << hull->asText(5) << std::endl;
+    ofs_result << id << "|" << failed << "|" << hull->asText(5) << '\n';
   } // end for each line
 
   ofs_error.close();
@@ -201,9 +199,8 @@ main(int argc, char *argv[]) -> int
 
   boost::chrono::duration<double> const elapsed =
       boost::chrono::system_clock::now() - start;
-  std::cout << filename << " complete (" << elapsed << " s)---" << std::endl;
-  std::cout << numFailed << " failed /" << (numFailed + numSuccess)
-            << std::endl;
+  std::cout << filename << " complete (" << elapsed << " s)---" << '\n';
+  std::cout << numFailed << " failed /" << (numFailed + numSuccess) << '\n';
 
   if (numFailed == 0) {
     // delete empty error file

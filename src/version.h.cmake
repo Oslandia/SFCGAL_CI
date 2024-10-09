@@ -15,26 +15,29 @@
  *   Library General Public License for more details.
 
  *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ *   License along with this library; if not, see
+ <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SFCGAL_VERSION_H_
-#define _SFCGAL_VERSION_H_
+#ifndef SFCGAL_VERSION_H_
+#define SFCGAL_VERSION_H_
 
 #include "SFCGAL/export.h"
 
-#define SFCGAL_VERSION_MAJOR @SFCGAL_VERSION_MAJOR@
-#define SFCGAL_VERSION_MINOR @SFCGAL_VERSION_MINOR@
-#define SFCGAL_VERSION_PATCH @SFCGAL_VERSION_PATCH@
+#define SFCGAL_VERSION_MAJOR @SFCGAL_VERSION_MAJOR @
+#define SFCGAL_VERSION_MINOR @SFCGAL_VERSION_MINOR @
+#define SFCGAL_VERSION_PATCH @SFCGAL_VERSION_PATCH @
 
 #define SFCGAL_VERSION "@SFCGAL_VERSION@"
 
-#define SFCGAL_FULL_VERSION "SFCGAL @SFCGAL_VERSION@, CGAL @CGAL_VERSION@, BOOST @Boost_VERSION_STRING@"
+#define SFCGAL_FULL_VERSION                                                    \
+  "SFCGAL @SFCGAL_VERSION@, CGAL @CGAL_VERSION@, BOOST @Boost_VERSION_STRING@"
 
 namespace SFCGAL {
-    SFCGAL_API const char* Version();
-    SFCGAL_API const char* Full_Version();
-}
+SFCGAL_API const char *
+Version();
+SFCGAL_API const char *
+Full_Version();
+} // namespace SFCGAL
 
 #endif
-

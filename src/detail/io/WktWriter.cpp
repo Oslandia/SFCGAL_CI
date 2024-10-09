@@ -43,7 +43,7 @@ writeFT(std::ostream &s, const mpq_class &ft) -> std::ostream &
 ///
 ///
 ///
-WktWriter::WktWriter(std::ostream &s) : _s(s), _exactWrite(false) {}
+WktWriter::WktWriter(std::ostream &s) : _s(s) {}
 
 void
 WktWriter::writeRec(const Geometry &g)

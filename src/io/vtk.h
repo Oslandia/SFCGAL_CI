@@ -1,7 +1,7 @@
 // Copyright (c) 2024-2024, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
-#ifndef _SFCGAL_IO_VTK_H_
-#define _SFCGAL_IO_VTK_H_
+#ifndef SFCGAL_IO_VTK_H_
+#define SFCGAL_IO_VTK_H_
 
 #include <SFCGAL/Geometry.h>
 #include <ostream>
@@ -62,4 +62,4 @@ saveToBuffer(const Geometry &geom, char *buffer, size_t *size);
 } // namespace io
 } // namespace SFCGAL
 
-#endif // _SFCGAL_IO_VTK_H_
+#endif // SFCGAL_IO_VTK_H_

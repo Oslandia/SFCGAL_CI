@@ -17,8 +17,7 @@
 
 namespace PMP = CGAL::Polygon_mesh_processing;
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 Buffer3D::Buffer3D(const Geometry &inputGeometry, double radius, int segments)
     : _radius(radius), _segments(segments)
@@ -26,7 +25,7 @@ Buffer3D::Buffer3D(const Geometry &inputGeometry, double radius, int segments)
   if (inputGeometry.is<Point>()) {
     _inputPoints.push_back(inputGeometry.as<Point>().toPoint_3());
   } else if (inputGeometry.is<LineString>()) {
-    const LineString &ls = inputGeometry.as<LineString>();
+    const auto &ls = inputGeometry.as<LineString>();
     for (size_t i = 0; i < ls.numPoints(); ++i) {
       _inputPoints.push_back(ls.pointN(i).toPoint_3());
     }
@@ -35,8 +34,8 @@ Buffer3D::Buffer3D(const Geometry &inputGeometry, double radius, int segments)
   }
 }
 
-std::unique_ptr<PolyhedralSurface>
-Buffer3D::compute(BufferType type) const
+auto
+Buffer3D::compute(BufferType type) const -> std::unique_ptr<PolyhedralSurface>
 {
   if (_inputPoints.size() == 1) {
     return computePointBuffer();
@@ -54,8 +53,8 @@ Buffer3D::compute(BufferType type) const
   }
 }
 
-std::unique_ptr<PolyhedralSurface>
-Buffer3D::computePointBuffer() const
+auto
+Buffer3D::computePointBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
   Kernel::Point_3 center(_inputPoints[0].x(), _inputPoints[0].y(),
                          _inputPoints[0].z());
@@ -63,8 +62,8 @@ Buffer3D::computePointBuffer() const
   return std::make_unique<PolyhedralSurface>(sphere.generatePolyhedron());
 }
 
-std::unique_ptr<PolyhedralSurface>
-Buffer3D::computeRoundBuffer() const
+auto
+Buffer3D::computeRoundBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
   typedef Kernel::Point_3                           Point_3;
   typedef Point_3                                  *point_iterator;
@@ -87,7 +86,7 @@ Buffer3D::computeRoundBuffer() const
   if (!_inputPoints.empty()) {
     // Create a non-const copy of the points
     std::vector<Point_3> points_copy(_inputPoints.begin(), _inputPoints.end());
-    poly.push_back(point_range(&points_copy.front(), &points_copy.back() + 1));
+    poly.emplace_back(&points_copy.front(), &points_copy.back() + 1);
 
     // Create a Nef_polyhedron from the polyline
     Nef_polyhedron N1(poly.begin(), poly.end(),
@@ -100,14 +99,12 @@ Buffer3D::computeRoundBuffer() const
     SFCGAL::detail::MarkedPolyhedron out;
     result.convert_to_polyhedron(out);
     return std::make_unique<PolyhedralSurface>(out);
-  } else {
-    // If _inputPoints is empty, return an empty PolyhedralSurface
-    return std::make_unique<PolyhedralSurface>();
-  }
+  } // If _inputPoints is empty, return an empty PolyhedralSurface
+  return std::make_unique<PolyhedralSurface>();
 }
 
-std::unique_ptr<PolyhedralSurface>
-Buffer3D::computeCylSphereBuffer() const
+auto
+Buffer3D::computeCylSphereBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
   typedef CGAL::Nef_polyhedron_3<Kernel> Nef_polyhedron;
   Nef_polyhedron                         result;
@@ -197,10 +194,11 @@ Buffer3D::computeCylSphereBuffer() const
   return resultSurface;
 }
 
-std::unique_ptr<PolyhedralSurface>
-Buffer3D::computeFlatBuffer() const
+auto
+Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
   std::vector<Kernel::Point_3> line_points;
+  line_points.reserve(_inputPoints.size());
   for (const auto &p : _inputPoints) {
     line_points.emplace_back(p.x(), p.y(), p.z());
   }
@@ -227,7 +225,8 @@ Buffer3D::computeFlatBuffer() const
     std::vector<Kernel::Point_3> end_circle =
         create_circle_points(extended_end, axis, _radius, _segments);
 
-    std::vector<Cylinder::Surface_mesh::Vertex_index> start_ring, end_ring;
+    std::vector<Cylinder::Surface_mesh::Vertex_index> start_ring;
+    std::vector<Cylinder::Surface_mesh::Vertex_index> end_ring;
 
     for (size_t j = 0; j < _segments; ++j) {
       Kernel::Point_3 start_point = start_circle[j];
@@ -256,8 +255,9 @@ Buffer3D::computeFlatBuffer() const
                     end_ring.back());
 
     rings.push_back(start_ring);
-    if (i == line_points.size() - 2)
+    if (i == line_points.size() - 2) {
       rings.push_back(end_ring);
+    }
   }
 
   // Add caps
@@ -283,17 +283,19 @@ Buffer3D::computeFlatBuffer() const
   return std::make_unique<PolyhedralSurface>(buffer);
 }
 
-Kernel::Point_3
+auto
 Buffer3D::extend_point(const Kernel::Point_3  &point,
                        const Kernel::Vector_3 &direction, double distance) const
+    -> Kernel::Point_3
 {
   return point + direction * distance;
 }
 
-std::vector<Kernel::Point_3>
+auto
 Buffer3D::create_circle_points(const Kernel::Point_3  &center,
                                const Kernel::Vector_3 &axis, double radius,
                                int segments) const
+    -> std::vector<Kernel::Point_3>
 {
   std::vector<Kernel::Point_3> points;
   Kernel::Vector_3             perpendicular =
@@ -314,10 +316,11 @@ Buffer3D::create_circle_points(const Kernel::Point_3  &center,
   return points;
 }
 
-Kernel::Plane_3
+auto
 Buffer3D::compute_bisector_plane(const Kernel::Point_3 &p1,
                                  const Kernel::Point_3 &p2,
                                  const Kernel::Point_3 &p3) const
+    -> Kernel::Plane_3
 {
   Kernel::Vector_3 v1       = normalizeVector(p2 - p1);
   Kernel::Vector_3 v2       = normalizeVector(p3 - p2);
@@ -325,10 +328,11 @@ Buffer3D::compute_bisector_plane(const Kernel::Point_3 &p1,
   return Kernel::Plane_3(p2, bisector);
 }
 
-Kernel::Point_3
+auto
 Buffer3D::intersect_segment_plane(const Kernel::Point_3 &p1,
                                   const Kernel::Point_3 &p2,
                                   const Kernel::Plane_3 &plane) const
+    -> Kernel::Point_3
 {
   Kernel::Vector_3 v = p2 - p1;
   Kernel::FT       t =
@@ -337,5 +341,4 @@ Buffer3D::intersect_segment_plane(const Kernel::Point_3 &p1,
   return p1 + t * v;
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

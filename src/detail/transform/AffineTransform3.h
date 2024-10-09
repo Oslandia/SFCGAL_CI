@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_TRANSFORM_AFFINETRANSFORM3_H_
-#define _SFCGAL_TRANSFORM_AFFINETRANSFORM3_H_
+#ifndef SFCGAL_TRANSFORM_AFFINETRANSFORM3_H_
+#define SFCGAL_TRANSFORM_AFFINETRANSFORM3_H_
 
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/Transform.h"

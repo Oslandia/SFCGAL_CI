@@ -141,7 +141,7 @@ visibility(const Geometry &polygon, const Geometry &point,
     break;
   }
   case 1: {
-    Halfedge_const_handle *he =
+    auto *he =
 #if CGAL_VERSION_MAJOR < 6
         boost::get<Arrangement_2::Halfedge_const_handle>(&obj);
 #else
@@ -155,7 +155,7 @@ visibility(const Geometry &polygon, const Geometry &point,
     break;
   }
   case 2: {
-    Face_const_handle *face =
+    auto *face =
 #if CGAL_VERSION_MAJOR < 6
         boost::get<Arrangement_2::Face_const_handle>(&obj);
 #else

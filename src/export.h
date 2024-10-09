@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_EXPORT_H_
-#define _SFCGAL_EXPORT_H_
+#ifndef SFCGAL_EXPORT_H_
+#define SFCGAL_EXPORT_H_
 
 //----- DLL MANAGEMENT ------------------
 
@@ -38,4 +38,4 @@
 #endif
 #endif
 
-#endif // _SFCGAL_EXPORT_H_
+#endif // SFCGAL_EXPORT_H_

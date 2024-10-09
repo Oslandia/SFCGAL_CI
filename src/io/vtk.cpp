@@ -16,9 +16,7 @@
 #include <sstream>
 #include <vector>
 
-namespace SFCGAL {
-namespace io {
-namespace VTK {
+namespace SFCGAL::io::VTK {
 
 void
 save(const Geometry &geom, std::ostream &out)
@@ -31,14 +29,14 @@ save(const Geometry &geom, std::ostream &out)
       [&](const Geometry &g) {
         switch (g.geometryTypeId()) {
         case TYPE_POINT: {
-          const Point &p = g.as<Point>();
+          const auto &p = g.as<Point>();
           all_points.push_back(p);
           all_cells.push_back({all_points.size() - 1});
           cell_types.push_back(1); // VTK_VERTEX
           break;
         }
         case TYPE_LINESTRING: {
-          const LineString   &ls = g.as<LineString>();
+          const auto         &ls = g.as<LineString>();
           std::vector<size_t> line;
           for (size_t i = 0; i < ls.numPoints(); ++i) {
             all_points.push_back(ls.pointN(i));
@@ -49,7 +47,7 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_TRIANGLE: {
-          const Triangle     &tri = g.as<Triangle>();
+          const auto         &tri = g.as<Triangle>();
           std::vector<size_t> face;
           for (int i = 0; i < 3; ++i) {
             all_points.push_back(tri.vertex(i));
@@ -60,7 +58,7 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_POLYGON: {
-          const Polygon      &poly = g.as<Polygon>();
+          const auto         &poly = g.as<Polygon>();
           std::vector<size_t> face;
           for (size_t i = 0; i < poly.exteriorRing().numPoints() - 1; ++i) {
             all_points.push_back(poly.exteriorRing().pointN(i));
@@ -71,21 +69,21 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_TRIANGULATEDSURFACE: {
-          const TriangulatedSurface &ts = g.as<TriangulatedSurface>();
+          const auto &ts = g.as<TriangulatedSurface>();
           for (size_t i = 0; i < ts.numTriangles(); ++i) {
             process_geometry(ts.triangleN(i));
           }
           break;
         }
         case TYPE_POLYHEDRALSURFACE: {
-          const PolyhedralSurface &ps = g.as<PolyhedralSurface>();
+          const auto &ps = g.as<PolyhedralSurface>();
           for (size_t i = 0; i < ps.numPolygons(); ++i) {
             process_geometry(ps.polygonN(i));
           }
           break;
         }
         case TYPE_SOLID: {
-          const Solid &solid = g.as<Solid>();
+          const auto &solid = g.as<Solid>();
           process_geometry(solid.exteriorShell());
           break;
         }
@@ -94,7 +92,7 @@ save(const Geometry &geom, std::ostream &out)
         case TYPE_MULTIPOLYGON:
         case TYPE_MULTISOLID:
         case TYPE_GEOMETRYCOLLECTION: {
-          const GeometryCollection &gc = g.as<GeometryCollection>();
+          const auto &gc = g.as<GeometryCollection>();
           for (size_t i = 0; i < gc.numGeometries(); ++i) {
             process_geometry(gc.geometryN(i));
           }
@@ -152,8 +150,8 @@ save(const Geometry &geom, const std::string &filename)
   save(geom, out);
 }
 
-std::string
-saveToString(const Geometry &geom)
+auto
+saveToString(const Geometry &geom) -> std::string
 {
   std::ostringstream oss;
   save(geom, oss);
@@ -164,7 +162,7 @@ void
 saveToBuffer(const Geometry &geom, char *buffer, size_t *size)
 {
   std::string result = saveToString(geom);
-  if (buffer && *size >= result.size()) {
+  if ((buffer != nullptr) && *size >= result.size()) {
     std::copy(result.begin(), result.end(), buffer);
     *size = result.size();
   } else {
@@ -172,6 +170,4 @@ saveToBuffer(const Geometry &geom, char *buffer, size_t *size)
   }
 }
 
-} // namespace VTK
-} // namespace io
-} // namespace SFCGAL
+} // namespace SFCGAL::io::VTK

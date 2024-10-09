@@ -49,7 +49,7 @@ struct Segment_d : detail::Segment_d<Dim>::Type {
   }
 
   template <class OutputIterator>
-  [[nodiscard]] [[nodiscard]] auto
+  [[nodiscard]] auto
   pieces(OutputIterator out) const -> OutputIterator
   {
     PointVector points(1, this->source());
@@ -80,7 +80,7 @@ struct Segment_d : detail::Segment_d<Dim>::Type {
   pieces() const -> SegmentVector
   {
     SegmentVector result;
-    this->pieces(std::back_inserter(result));
+    (void)this->pieces(std::back_inserter(result));
     return result;
   }
 
@@ -107,14 +107,13 @@ struct Surface_d<3> : Triangle_3 {
   splitAt(const algorithm::Point_3 &p)
   {
     //@note this is a degenerated segment, but works anyway
-    _split.push_back(Segment_2(_plane.to_2d(p), _plane.to_2d(p)));
+    _split.emplace_back(_plane.to_2d(p), _plane.to_2d(p));
   }
 
   void
   splitAt(const Segment_3 &s)
   {
-    _split.push_back(
-        Segment_2(_plane.to_2d(s.source()), _plane.to_2d(s.target())));
+    _split.emplace_back(_plane.to_2d(s.source()), _plane.to_2d(s.target()));
   }
 
   template <typename Point3Iterator>
@@ -214,7 +213,7 @@ struct Surface_d<3> : Triangle_3 {
       }
 
       for (auto &line : lines) {
-        line.pieces(std::back_inserter(filtered));
+        (void)line.pieces(std::back_inserter(filtered));
       }
     }
 
@@ -333,7 +332,7 @@ class Handle {
     }
 
     template <class T>
-    inline auto
+    auto
     as() -> T &
     {
       return boost::get<T &>(*this);
@@ -384,7 +383,7 @@ public:
   }
 
   void
-  swap(Handle &other)
+  swap(Handle &other) noexcept
   {
     (*_p)->_observers.erase(_p);
     (*other._p)->_observers.erase(other._p);

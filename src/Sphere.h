@@ -1,8 +1,8 @@
 // Copyright (c) 2024-2024, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_SPHERE_H_
-#define _SFCGAL_SPHERE_H_
+#ifndef SFCGAL_SPHERE_H_
+#define SFCGAL_SPHERE_H_
 
 #include <optional>
 #include <vector>
@@ -224,4 +224,4 @@ private:
 
 } // namespace SFCGAL
 
-#endif // _SFCGAL_SPHERE_H_
+#endif // SFCGAL_SPHERE_H_

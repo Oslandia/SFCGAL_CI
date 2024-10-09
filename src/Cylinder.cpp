@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "SFCGAL/Cylinder.h"
 
 namespace SFCGAL {
@@ -10,8 +12,8 @@ Cylinder::Cylinder(const Point_3 &base_center, const Vector_3 &axis,
 {
 }
 
-Cylinder &
-Cylinder::operator=(Cylinder other)
+auto
+Cylinder::operator=(Cylinder other) -> Cylinder &
 {
   std::swap(m_base_center, other.m_base_center);
   std::swap(m_axis, other.m_axis);
@@ -65,17 +67,18 @@ Cylinder::invalidateCache()
   m_surface_mesh.reset();
 }
 
-Cylinder::Vector_3
-Cylinder::normalize(const Vector_3 &v)
+auto
+Cylinder::normalize(const Vector_3 &v) -> Cylinder::Vector_3
 {
   double length = std::sqrt(CGAL::to_double(v.squared_length()));
-  if (length < 1e-8)
+  if (length < 1e-8) {
     return v;
+  }
   return v / length;
 }
 
-Cylinder::Polyhedron_3
-Cylinder::generatePolyhedron()
+auto
+Cylinder::generatePolyhedron() -> Cylinder::Polyhedron_3
 {
   if (m_polyhedron) {
     return *m_polyhedron;
@@ -88,8 +91,8 @@ Cylinder::generatePolyhedron()
   return poly;
 }
 
-Cylinder::Surface_mesh
-Cylinder::generateSurfaceMesh()
+auto
+Cylinder::generateSurfaceMesh() -> Cylinder::Surface_mesh
 {
   if (m_surface_mesh) {
     return *m_surface_mesh;
@@ -106,7 +109,8 @@ Cylinder::generateSurfaceMesh()
   }
   Vector_3 perpendicular2 = CGAL::cross_product(normalized_axis, perpendicular);
 
-  std::vector<Surface_mesh::Vertex_index> base_vertices, top_vertices;
+  std::vector<Surface_mesh::Vertex_index> base_vertices;
+  std::vector<Surface_mesh::Vertex_index> top_vertices;
 
   // Create vertices for the base and top
   for (int i = 0; i < m_num_radial; ++i) {

@@ -21,7 +21,7 @@ namespace SFCGAL::triangulate {
 struct VertexInfo2 {
   VertexInfo2() = default;
 
-  const CGAL::Point_3<Kernel> *original{NULL};
+  const CGAL::Point_3<Kernel> *original{nullptr};
 };
 
 using triangulation_vertex_base =

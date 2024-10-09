@@ -1,8 +1,8 @@
 // Copyright (c) 2023-2023, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_IO_WKBWRITER_H_
-#define _SFCGAL_IO_WKBWRITER_H_
+#ifndef SFCGAL_IO_WKBWRITER_H_
+#define SFCGAL_IO_WKBWRITER_H_
 
 #include <boost/endian/conversion.hpp>
 #include <cstddef>

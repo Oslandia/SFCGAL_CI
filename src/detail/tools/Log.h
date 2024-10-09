@@ -2,8 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#ifndef _SFCGAL_LOG_H_
-#define _SFCGAL_LOG_H_
+#ifndef SFCGAL_LOG_H_
+#define SFCGAL_LOG_H_
 
 #include "SFCGAL/config.h"
 
@@ -126,11 +126,11 @@ private:
   /**
    * current log level
    */
-  Level _logLevel;
+  Level _logLevel = Warning;
   /**
    * display file position?
    */
-  bool _displayFilePosition;
+  bool _displayFilePosition = true;
 
   /**
    * private constructor
