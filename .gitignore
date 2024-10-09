@@ -47,3 +47,7 @@ build*
 /out/install/x64-Debug/include/SFCGAL
 /CMakeSettings.json
 CGAL*
+
+.venv
+# Ignore website local build
+website/site
