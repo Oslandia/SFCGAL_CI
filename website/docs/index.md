@@ -1,11 +1,11 @@
 # SFCGAL
 
-![]( assets/img/logo.svg)
+![](assets/img/logo.svg)
 
 ## Downloads
 
-[Download this project as a .zip file](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ current_version }}/SFCGAL-v{{ current_version }}.zip){ .md-button .md-button--primary }
-[Download this project as a tar.gz file](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ current_version }}/SFCGAL-v{{ current_version }}.tar.gz){ .md-button .md-button--primary }
+[Download this project as a .zip file](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.zip){ .md-button .md-button--primary }
+[Download this project as a tar.gz file](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.tar.gz){ .md-button .md-button--primary }
 
 ## About
 

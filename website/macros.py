@@ -30,3 +30,22 @@ def define_env(env):
                 return content
         except FileNotFoundError:
             return f"File not found: {filename}"
+        
+    @env.macro
+    def get_project_version() -> str:
+        """Retrieve the project version from sonar-project.properties.
+
+        Returns:
+            str: The project version if found, or an error message if the file 
+                 cannot be read or the version is not specified.
+        """
+        properties_file = "../sonar-project.properties"
+        try:
+            with open(properties_file, "r", encoding="utf-8") as file:
+                for line in file:
+                    if line.startswith("sonar.projectVersion="):
+                        # Extract and return the version number
+                        return line.split("=", 1)[1].strip()
+            return "Version not found in the properties file."
+        except FileNotFoundError:
+            return f"File not found: {properties_file}"

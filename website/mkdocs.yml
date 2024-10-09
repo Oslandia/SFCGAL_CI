@@ -2,9 +2,6 @@ site_name: SFCGAL
 repo_name: "SFCGAL"
 repo_url: "https://gitlab.com/sfcgal/SFCGAL/"
 
-extra:
-  current_version: 1.5.2
-
 theme:
   name: material
   features:
