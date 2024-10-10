@@ -20,6 +20,7 @@
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/PreparedGeometry.h"
+#include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
 
@@ -235,6 +236,9 @@ private:
     case TYPE_NURBSCURVE:
       return readInnerNURBSCurve().clone();
 
+    case TYPE_SOLID:
+      return {readInnerSolid().clone()};
+
     default:
       std::ostringstream oss;
       oss << "WkbReader: type '" << geometryType << "' is not supported";
@@ -302,6 +306,12 @@ private:
    */
   auto
   readInnerPolyhedralSurface() -> PolyhedralSurface;
+
+  /**
+   * Read Solid content from wkb
+   */
+  auto
+  readInnerSolid() -> Solid;
 
   /**
    * Read NURBSCurve content from wkb

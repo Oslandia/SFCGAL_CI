@@ -97,9 +97,8 @@ enum GeometryType {
   // TYPE_SPIRALCURVE = 23,
 
   //-- not official codes
-  TYPE_SOLID      = 101,
-  TYPE_MULTISOLID = 102,
-  // AffinePlacement 102 1102
+  TYPE_SOLID      = 25,
+  TYPE_MULTISOLID = 26
 };
 
 /**

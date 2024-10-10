@@ -222,6 +222,29 @@ WkbReader::readInnerPolyhedralSurface() -> PolyhedralSurface
   return result;
 }
 
+/**
+ * Read Solid content from wkb
+ */
+auto
+WkbReader::readInnerSolid() -> Solid
+{
+  std::vector<PolyhedralSurface> geoms;
+  try {
+    const uint32_t numGeoms{read<uint32_t>()};
+    for (uint32_t i = 0; i < numGeoms; ++i) {
+      readWkb();
+      if (_geometry != nullptr) {
+        geoms.push_back(_geometry->as<SFCGAL::PolyhedralSurface>());
+      }
+    }
+  } catch (std::exception &e) {
+    std::cerr << e.what();
+    return {};
+  }
+  SFCGAL::Solid const result{geoms};
+  return result;
+}
+
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 auto
 WkbReader::readInnerNURBSCurve() -> NURBSCurve
