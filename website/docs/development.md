@@ -1,10 +1,10 @@
 # Development
 
-The project uses git and [GitHub](https://www.github.com) to manage the source code, bug reports, and issues.
+The project uses git and [Gitlab](https://www.gitlab.com) to manage the source code, bug reports, and issues.
 
-You are free to fork the project and are welcome to propose evolutions. The preferred way of submitting patches is through GitHub’s pull request mechanism.
+You are free to fork the project and are welcome to propose evolutions. The preferred way of submitting patches is through Gitlab's merge request mechanism.
 
-Bugs can be reported via the [Issues](https://github.com/Oslandia/SFCGAL/issues) section of the GitHub project.
+Bugs can be reported via the [Issues](https://gitlab.com/sfcgal/SFCGAL/issues) section of the Gitlab project.
 
 ## Branches
 
@@ -68,7 +68,7 @@ To release a new SFCGAL version:
 
 - Update the file NEWS in the master branch.
 - Change the version number in the root CMakeLists.txt in the master branch.
-- Release from GitHub (GitHub will create the tag for you).
+- Release from Gitlab (Gitlab will create the tag for you).
 - Update links to the new version in the gh-pages branch.
 
 ## Bindings
