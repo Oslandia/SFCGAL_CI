@@ -39,6 +39,7 @@ push:debian-docker-latest:
   only:
     refs:
       - master
+  needs: ['build:debian-docker-image']
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
