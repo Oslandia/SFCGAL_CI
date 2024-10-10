@@ -96,10 +96,9 @@ enum GeometryType {
   // TYPE_CLOTHOID = 22,
   // TYPE_SPIRALCURVE = 23,
 
+  TYPE_SOLID = 25,
   //-- not official codes
-  TYPE_SOLID      = 101,
-  TYPE_MULTISOLID = 102,
-  // AffinePlacement 102 1102
+  TYPE_MULTISOLID = 26
 };
 
 /**

@@ -145,4 +145,18 @@ BOOST_AUTO_TEST_CASE(PostgisEWkb)
     }
   }
 }
+
+BOOST_AUTO_TEST_CASE(SolidWKB)
+{
+  std::string cube{"SOLID((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((1 0 0,1 1 0,1 1 "
+                   "1,1 0 1,1 0 0)),((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0)),((0 0 "
+                   "1,0 1 1,0 1 0,0 0 0,0 0 1)),((1 0 1,1 1 1,0 1 1,0 0 1,1 0 "
+                   "1)),((1 0 0,1 0 1,0 0 1,0 0 0,1 0 0))))"};
+
+  std::unique_ptr<Geometry> g(io::readWkt(cube));
+  auto                      wkbBinary = g->asWkb();
+  std::unique_ptr<Geometry> g2(io::readWkb(wkbBinary));
+  BOOST_CHECK_EQUAL(g->asText(0), g2->asText(0));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
