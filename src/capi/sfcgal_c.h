@@ -500,6 +500,13 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_multi_polygon_create();
 
 /**
+ * Creates an empty MultiSolid
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_multi_solid_create();
+
+/**
  * Creates an empty PolyhedralSurface
  * @ingroup capi
  */
