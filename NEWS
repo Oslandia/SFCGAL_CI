@@ -17,6 +17,7 @@
 		- !349: Fix build for clang18, missing includes (Loïc Bartoletti)
 		- !346: Add missing SFCGAL_API for VTK and OBJ headers (exportDll) (Loïc Bartoletti)
 	## Improvements (Improve/Update)
+		- !374: Add the MultiSolid class to the C API
 		- !366: Add missing pre-condition in C API (Raphaël Delhome)
 		- !364: Fix warnings and apply clang-tidy fix (Loïc Bartoletti)
 		- !358: Improve Buffer3D tests resilience for cross-platform compatibility (Loïc Bartoletti)
