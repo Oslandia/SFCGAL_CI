@@ -81,8 +81,8 @@ enum GeometryType {
   TYPE_TRIANGLE            = 17,
 
   //-- not official codes
-  TYPE_SOLID      = 101,
-  TYPE_MULTISOLID = 102
+  TYPE_SOLID      = 25,
+  TYPE_MULTISOLID = 26
 };
 
 /**

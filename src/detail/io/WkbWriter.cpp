@@ -12,9 +12,11 @@
 #include "SFCGAL/MultiLineString.h"
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
 
@@ -69,6 +71,14 @@ WkbWriter::writeRec(const Geometry &g, boost::endian::order wkbOrder)
 
   case TYPE_POLYHEDRALSURFACE:
     writeInner<PolyhedralSurface, Polygon>(g.as<PolyhedralSurface>(), wkbOrder);
+    return;
+
+  case TYPE_SOLID:
+    writeInner<Solid, PolyhedralSurface>(g.as<Solid>(), wkbOrder);
+    return;
+
+  case TYPE_MULTISOLID:
+    writeInner<MultiSolid, Solid>(g.as<MultiSolid>(), wkbOrder);
     return;
 
   default:
@@ -278,11 +288,19 @@ WkbWriter::writeInner(const M &g, boost::endian::order wkbOrder)
   // WkbType
   writeGeometryType(g, wkbOrder);
 
-  // Number of Geometries
-  toByte(static_cast<uint32_t>(g.numGeometries()), wkbOrder);
+  // Number of Geometries/Shells
+  if constexpr (std::is_same<M, Solid>::value) {
+    toByte(static_cast<uint32_t>(g.numShells()), wkbOrder);
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
-    writeInner(g.geometryN(i).template as<G>(), wkbOrder);
+    for (size_t i = 0; i < g.numShells(); i++) {
+      writeRec(g.shellN(i).template as<G>(), wkbOrder);
+    }
+  } else {
+    toByte(static_cast<uint32_t>(g.numGeometries()), wkbOrder);
+
+    for (size_t i = 0; i < g.numGeometries(); i++) {
+      writeRec(g.geometryN(i).template as<G>(), wkbOrder);
+    }
   }
 }
 

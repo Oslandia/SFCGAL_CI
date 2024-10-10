@@ -14,10 +14,12 @@
 #include "SFCGAL/MultiLineString.h"
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/PreparedGeometry.h"
+#include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
 
@@ -227,6 +229,13 @@ private:
       return std::unique_ptr<SFCGAL::Geometry>(
           readInnerPolyhedralSurface().clone());
 
+    case TYPE_SOLID:
+      return std::unique_ptr<SFCGAL::Geometry>(readInnerSolid().clone());
+
+    case TYPE_MULTISOLID:
+      return std::unique_ptr<SFCGAL::Geometry>(
+          readInnerMultiGeometries<MultiSolid, Solid>().clone());
+
     default:
       std::ostringstream oss;
       oss << "WkbWriter: type '" << geometryType << "' is not supported";
@@ -294,6 +303,12 @@ private:
    */
   auto
   readInnerPolyhedralSurface() -> PolyhedralSurface;
+
+  /**
+   * Read Solid content from wkb
+   */
+  auto
+  readInnerSolid() -> Solid;
 
   /**
    * actually reading 3D ?
