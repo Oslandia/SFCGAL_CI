@@ -8,6 +8,7 @@
 #include "SFCGAL/MultiLineString.h"
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -619,6 +620,13 @@ sfcgal_multi_polygon_create() -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiPolygon());)
+}
+
+extern "C" auto
+sfcgal_multi_solid_create() -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiSolid());)
 }
 
 /**
