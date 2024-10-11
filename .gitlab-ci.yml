@@ -76,6 +76,11 @@ pages:
   only:
     refs:
       - master
+    changes:
+      - "src/*.h"
+      - "src/*.cpp"
+      - "website/docs/*.md"
+      - ".gitlab-ci.yml"
   needs:
     - job: build:documentation
       artifacts: true
