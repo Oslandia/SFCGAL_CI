@@ -45,6 +45,8 @@ Supported operations include:
 
 SFCGAL is distributed under the terms of the [GNU Lesser General Public License 2+](http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html).
 
-⚠ **Note** that the main dependency for SFCGAL is the CGAL library, and SFCGAL uses CGAL modules which are licenced as GPLv3+. Whenever you compile and distribute SCFGAL with the GPL-licenced CGAL, the full packaged result is automatically considered as GPL version 3 or later, due to GPL "viral" property.
+!!! warning Licence
 
-If you link and distribute SFCGAL with another software package, be assured to fully understand the implications and check any legal and technical requirements implied by the licence.
+    **Note** that the main dependency for SFCGAL is the CGAL library, and SFCGAL uses CGAL modules which are licenced as GPLv3+. Whenever you compile and distribute SCFGAL with the GPL-licenced CGAL, the full packaged result is automatically considered as GPL version 3 or later, due to GPL "viral" property.
+
+    If you link and distribute SFCGAL with another software package, be assured to fully understand the implications and check any legal and technical requirements implied by the licence.
