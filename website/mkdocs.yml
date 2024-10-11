@@ -2,13 +2,14 @@ site_name: SFCGAL
 repo_name: "SFCGAL"
 repo_url: "https://gitlab.com/sfcgal/SFCGAL/"
 
-theme:
+theme:  
   name: material
   features:
     - navigation.instant
     - navigation.top
     - navigation.tabs
     - navigation.hide
+    - content.code.copy
   logo: assets/img/logo.png
   favicon: assets/img/logo.png
   palette: 
