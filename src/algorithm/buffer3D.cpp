@@ -108,7 +108,6 @@ Buffer3D::computeCylSphereBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
   typedef CGAL::Nef_polyhedron_3<Kernel> Nef_polyhedron;
   Nef_polyhedron                         result;
-  bool                                   is_first = true;
 
   // Add a sphere at the first point of the line
   if (!_inputPoints.empty()) {
@@ -128,8 +127,7 @@ Buffer3D::computeCylSphereBuffer() const -> std::unique_ptr<PolyhedralSurface>
         start_sphere.generatePolyhedron();
     Nef_polyhedron start_sphere_nef(start_sphere_poly);
 
-    result   = start_sphere_nef;
-    is_first = false;
+    result = start_sphere_nef;
   }
 
   // Create a cylinder and spheres for each segment of the line
