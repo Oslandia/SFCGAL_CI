@@ -71,7 +71,7 @@ build:documentation:
 
 
 # -- DEPLOYMENT JOBS ------------
-pages:
+deploy:pages:
   stage: deploy
   only:
     refs:
