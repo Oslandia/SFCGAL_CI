@@ -25,8 +25,7 @@ def define_env(env):
         """
         try:
             with open(filename, "r", encoding="utf-8") as file:
-                content = file.read().replace("website/docs/", "")
-                content = content.replace("[AUTHORS](AUTHORS)", "[AUTHORS](./authors.md)")
+                content = file.read()
                 return content
         except FileNotFoundError:
             return f"File not found: {filename}"
