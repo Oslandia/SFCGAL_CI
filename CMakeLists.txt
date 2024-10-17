@@ -266,3 +266,23 @@ install( PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/sfcgal-config DESTINATION bin )
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sfcgal.pc.in ${CMAKE_CURRENT_BINARY_DIR}/sfcgal.pc @ONLY)
 install( FILES ${CMAKE_CURRENT_BINARY_DIR}/sfcgal.pc DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+# cmake config
+include(GNUInstallDirs)
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/SFCGAL
+    CACHE PATH "Location of header files" )
+set(SYSCONFIG_INSTALL_DIR ${CMAKE_INSTALL_SYSCONFDIR}/SFCGAL
+    CACHE PATH "Location of configuration files" )
+include(CMakePackageConfigHelpers)
+configure_package_config_file(cmake/SFCGALConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/SFCGALConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SFCGAL
+  PATH_VARS INCLUDE_INSTALL_DIR SYSCONFIG_INSTALL_DIR)
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/SFCGALConfigVersion.cmake
+  VERSION ${SFCGAL_VERSION}
+  COMPATIBILITY SameMajorVersion )
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/SFCGALConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/cmake/SFCGALConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SFCGAL )
+

@@ -43,6 +43,8 @@ else()
     )
 endif()
 
+add_library(SFCGAL::SFCGAL ALIAS SFCGAL)
+
 add_dependencies( SFCGAL copy )
 
 # set VERSION and SOVERSION
@@ -52,7 +54,7 @@ set_target_properties( SFCGAL PROPERTIES VERSION ${SFCGAL_VERSION}
 target_link_libraries( SFCGAL CGAL::CGAL CGAL::CGAL_Core)
 
 if( CGAL_USE_GMPXX )
-target_link_libraries( SFCGAL gmpxx )
+  target_link_libraries( SFCGAL gmpxx )
 endif()
 
 target_link_libraries( SFCGAL ${Boost_LIBRARIES} )
@@ -76,10 +78,17 @@ endif()
 install(
 	TARGETS
 	SFCGAL
+	EXPORT SFCGALTargets
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	BUNDLE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(EXPORT SFCGALTargets
+  FILE SFCGALTargets.cmake
+  NAMESPACE SFCGAL::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SFCGAL
 )
 
 # SFCGAL-osg
