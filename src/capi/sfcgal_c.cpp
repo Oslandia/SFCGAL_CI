@@ -40,6 +40,7 @@
 #include "SFCGAL/algorithm/extrude.h"
 #include "SFCGAL/algorithm/intersection.h"
 #include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/algorithm/isSimple.h"
 #include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/algorithm/lineSubstring.h"
 #include "SFCGAL/algorithm/minkowskiSum.h"
@@ -224,6 +225,39 @@ sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
     }
   }
   return static_cast<int>(is_valid);
+}
+
+extern "C" auto
+sfcgal_geometry_is_simple(const sfcgal_geometry_t *geom) -> int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return (int)bool(SFCGAL::algorithm::isSimple(
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom)));)
+}
+
+extern "C" auto
+sfcgal_geometry_is_simple_detail(const sfcgal_geometry_t *geom,
+                                 char **complexity_reason) -> int
+{
+  // set to null for now
+  if (complexity_reason != nullptr) {
+    *complexity_reason = nullptr;
+  }
+
+  const auto *g         = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  bool        is_simple = false;
+  try {
+    SFCGAL::Simplicity const simplicity = SFCGAL::algorithm::isSimple(*g);
+    is_simple                           = simplicity;
+    if (!is_simple && (complexity_reason != nullptr)) {
+      *complexity_reason = strdup(simplicity.reason().c_str());
+    }
+  } catch (SFCGAL::Exception &e) {
+    if (complexity_reason != nullptr) {
+      *complexity_reason = strdup(e.what());
+    }
+  }
+  return static_cast<int>(is_simple);
 }
 
 extern "C" auto
