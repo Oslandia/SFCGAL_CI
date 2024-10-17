@@ -1226,7 +1226,7 @@ typedef enum {
  * @return A new geometry representing the 3D buffer
  * @pre isValid(geom) == true
  * @pre radius > 0
- * @pre segments > 2
+ * @pre segments > 3
  * @post isValid(return) == true
  * @ingroup capi
  */
