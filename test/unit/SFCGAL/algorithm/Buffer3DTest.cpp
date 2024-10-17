@@ -101,13 +101,13 @@ BOOST_AUTO_TEST_CASE(testBuffer3D_Point)
     std::string typeName;
     switch (bufferType) {
     case algorithm::Buffer3D::ROUND:
-      typeName = "round";
+      typeName = "ROUND";
       break;
     case algorithm::Buffer3D::CYLSPHERE:
-      typeName = "cylsphere";
+      typeName = "CYLSPHERE";
       break;
     case algorithm::Buffer3D::FLAT:
-      typeName = "flat";
+      typeName = "FLAT";
       break;
     }
 
@@ -163,13 +163,13 @@ BOOST_AUTO_TEST_CASE(testBuffer3D_LineString)
     std::string typeName;
     switch (bufferType) {
     case algorithm::Buffer3D::ROUND:
-      typeName = "round";
+      typeName = "ROUND";
       break;
     case algorithm::Buffer3D::CYLSPHERE:
-      typeName = "cylsphere";
+      typeName = "CYLSPHERE";
       break;
     case algorithm::Buffer3D::FLAT:
-      typeName = "flat";
+      typeName = "FLAT";
       break;
     }
 
