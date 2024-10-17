@@ -103,6 +103,26 @@ sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
                                 sfcgal_geometry_t      **invalidity_location);
 
 /**
+ * Tests if the given geometry is simple or not
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_geometry_is_simple(const sfcgal_geometry_t *);
+
+/**
+ * Tests if the given geometry is simple or not
+ * And return details in case of complexity
+ * @param geom the input geometry
+ * @param complexity_reason input/output parameter. If non null, a
+ * null-terminated string could be allocated and contain reason of the
+ * complexity
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_geometry_is_complexity_detail(const sfcgal_geometry_t *geom,
+                                     char **complexity_reason);
+
+/**
  * Tests if the given geometry is 3D or not
  * @ingroup capi
  */
