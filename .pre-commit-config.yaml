@@ -26,8 +26,10 @@ repos:
     rev: v16.0.2
     hooks:
       - id: clang-format
-        #        args: [--style=file:/home/bde/prog/sfcgal/SFCGAL/.clang-format]
-        files: \.(c|h|cpp|hpp)$
+        args:
+          - --style=file:./.clang-format
+          - --files=src/.*\.(c|h|cpp|hpp)$
+          - --Werror
 
   # - repo: https://github.com/pocc/pre-commit-hooks
   #   rev: v1.3.5
