@@ -260,6 +260,10 @@ if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
 else()
   set( SFCGAL_LIB_NAME "SFCGAL" )
 endif()
+
+if ( UNIX )
+  include(GNUInstallDirs)
+endif()
 #set( SFCGAL_LIB_NAME ${${CMAKE_BUILD_TYPE}
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sfcgal-config.in ${CMAKE_CURRENT_BINARY_DIR}/sfcgal-config @ONLY)
 install( PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/sfcgal-config DESTINATION bin )
