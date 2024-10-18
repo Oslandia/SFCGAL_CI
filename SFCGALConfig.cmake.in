@@ -1,0 +1,32 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+set_and_check(SFCGAL_INCLUDE_DIR "@PACKAGE_SFCGAL_INCLUDE_DIR@")
+set_and_check(SFCGAL_LIBRARY_DIR "@PACKAGE_SFCGAL_LIBRARY_DIR@")
+
+if(NOT TARGET SFCGAL::SFCGAL)
+    add_library(SFCGAL::SFCGAL SHARED IMPORTED)
+
+    if(WIN32)
+        set(SFCGAL_LIBRARY_NAME "SFCGAL.dll")
+    elseif(APPLE)
+        set(SFCGAL_LIBRARY_NAME "libSFCGAL.dylib")
+    else()
+        set(SFCGAL_LIBRARY_NAME "libSFCGAL.so")
+    endif()
+    
+    set_target_properties(SFCGAL::SFCGAL PROPERTIES
+        IMPORTED_LOCATION "${SFCGAL_LIBRARY_DIR}/${SFCGAL_LIBRARY_NAME}"
+        INTERFACE_INCLUDE_DIRECTORIES "${SFCGAL_INCLUDE_DIR}"
+    )
+
+    if(WIN32)
+        set_property(TARGET SFCGAL::SFCGAL APPEND PROPERTY
+            IMPORTED_IMPLIB "${SFCGAL_LIBRARY_DIR}/SFCGAL.lib"
+        )
+    endif()
+
+endif()
+
+check_required_components(SFCGAL)
