@@ -53,7 +53,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-          sudo ./ci/debian/before_install.sh 6.0
+          sudo ./ci/debian/before_install.sh 6.0.1
 
     - name: Build
       run: |
