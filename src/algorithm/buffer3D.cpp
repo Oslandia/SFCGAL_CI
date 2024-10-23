@@ -226,7 +226,7 @@ Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
     std::vector<Cylinder::Surface_mesh::Vertex_index> start_ring;
     std::vector<Cylinder::Surface_mesh::Vertex_index> end_ring;
 
-    for (size_t j = 0; j < _segments; ++j) {
+    for (int j = 0; j < _segments; ++j) {
       Kernel::Point_3 start_point = start_circle[j];
       Kernel::Point_3 end_point   = end_circle[j];
 
@@ -271,7 +271,7 @@ Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
   Cylinder::Surface_mesh::Vertex_index end_center_index =
       buffer.add_vertex(end_center);
 
-  for (size_t i = 0; i < _segments; ++i) {
+  for (int i = 0; i < _segments; ++i) {
     buffer.add_face(start_center_index, rings.front()[(i + 1) % _segments],
                     rings.front()[i]);
     buffer.add_face(end_center_index, rings.back()[i],
