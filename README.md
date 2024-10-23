@@ -19,12 +19,12 @@ Please refer to the <a href="http://sfcgal.gitlab.io/SFCGAL">project page</a> fo
 
 ## Build/Install
 
-See the [INSTALL](https://sfcgal.gitlab.io/SFCGAL/installation.html) page.
+See the [INSTALL](https://sfcgal.gitlab.io/SFCGAL/installation/) page.
 
 ## Reference Docs
 
-* [C API](https://sfcgal.gitlab.io/SFCGAL/doxygen/group__capi.html)
-* [C++ API](https://sfcgal.gitlab.io/SFCGAL/doxygen/group__public__api.html)
+* [C API](https://sfcgal.gitlab.io/SFCGAL/API/sfcgal__c_8h/)
+* [C++ API](https://sfcgal.gitlab.io/SFCGAL/API/links/)
 
 ## Client Applications
 
@@ -53,14 +53,13 @@ for Python.
 
 ### Using other languages
 
-SFCGAL has bindings in many languages, see the [bindings
-page](https://sfcgal.gitlab.io/SFCGAL/dev.html).
+SFCGAL has bindings in many languages, see the [bindings page](https://sfcgal.gitlab.io/SFCGAL/development/#bindings).
 
 
 ## Documentation
 
 API documentation can be generated using Doxygen. Documentation is not included
-in the default build. To build the documentation see the [dev](https://sfcgal.gitlab.io/SFCGAL/dev.html) page.
+in the default build. To build the documentation see the [Development](https://sfcgal.gitlab.io/SFCGAL/development/) page.
 
 
 ## Style
@@ -78,7 +77,7 @@ To commit without the *git hooks*, add the `--no-verify` option to the `git comm
 
 ## Testing
 
-See documentation in [dev](https://sfcgal.gitlab.io/SFCGAL/dev.html) page.
+See documentation in [Development](https://sfcgal.gitlab.io/SFCGAL/development/) page.
 
 ## Licence
 
