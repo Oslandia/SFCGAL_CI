@@ -129,7 +129,7 @@ public:
     return _shells[n + 1];
   }
   /**
-   * add a polygon to the PolyhedralSurface
+   * adds an interior shell to the Solid
    */
   inline void
   addInteriorShell(const PolyhedralSurface &shell)
@@ -137,7 +137,7 @@ public:
     _shells.push_back(shell.clone());
   }
   /**
-   * add a polygon to the PolyhedralSurface
+   * adds an interior shell to the Solid
    */
   inline void
   addInteriorShell(PolyhedralSurface *shell)
