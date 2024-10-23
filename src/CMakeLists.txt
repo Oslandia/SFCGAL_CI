@@ -4,6 +4,8 @@ file( GLOB_RECURSE SFCGAL_HEADERS "*.h" )
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC )
     list(REMOVE_ITEM SFCGAL_SOURCES ${CMAKE_SOURCE_DIR}/src/algorithm/alphaShapes.cpp)
     list(REMOVE_ITEM SFCGAL_HEADERS ${CMAKE_SOURCE_DIR}/src/algorithm/alphaShapes.h)
+    list(REMOVE_ITEM SFCGAL_SOURCES ${CMAKE_SOURCE_DIR}/src/algorithm/alphaShapes3D.cpp)
+    list(REMOVE_ITEM SFCGAL_HEADERS ${CMAKE_SOURCE_DIR}/src/algorithm/alphaShapes3D.h)
 endif()
 
 file( GLOB_RECURSE SFCGAL_HEADERS_COPIED RELATIVE ${CMAKE_SOURCE_DIR}/src "*.h" )

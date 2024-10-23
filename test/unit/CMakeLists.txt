@@ -10,6 +10,7 @@ file( GLOB_RECURSE SFCGAL_UNIT_TEST_SOURCES *.cpp )
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC )
     list(REMOVE_ITEM SFCGAL_UNIT_TEST_SOURCES ${CMAKE_SOURCE_DIR}/test/unit/SFCGAL/algorithm/AlphaShapesTest.cpp)
+    list(REMOVE_ITEM SFCGAL_UNIT_TEST_SOURCES ${CMAKE_SOURCE_DIR}/test/unit/SFCGAL/algorithm/AlphaShapes3DTest.cpp)
 endif()
 
 add_executable( unit-test-SFCGAL ${SFCGAL_UNIT_TEST_SOURCES} )
@@ -24,4 +25,3 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug" )
 else()
     add_test( unit-test ${CMAKE_CURRENT_BINARY_DIR}/unit-test-SFCGAL --auto_start_dbg=y --log_level=all)
 endif()
-
