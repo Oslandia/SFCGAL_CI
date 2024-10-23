@@ -1,4 +1,4 @@
-opensuse_gcc: 
+opensuse_gcc:
   stage: test
   image: opensuse/tumbleweed
 
