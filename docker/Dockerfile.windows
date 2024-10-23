@@ -10,7 +10,7 @@ RUN cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
     -DSFCGAL_BUILD_TESTS=OFF \
     -DCMAKE_TOOLCHAIN_FILE="\"$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake\""; \
-    cmake --build build --config Release
+    cmake --build build --config Release -j $env:NUMBER_OF_PROCESSORS
 
 # Restore the default Windows shell for correct batch processing.
 SHELL ["cmd", "/S", "/C"]
