@@ -751,6 +751,15 @@ sfcgal_solid_add_interior_shell(sfcgal_geometry_t *geom,
           down_cast<SFCGAL::PolyhedralSurface>(shell));)
 }
 
+extern "C" void
+sfcgal_solid_set_exterior_shell(sfcgal_geometry_t *geom,
+                                sfcgal_geometry_t *shell)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      down_cast<SFCGAL::Solid>(geom)->setExteriorShell(
+          down_cast<SFCGAL::PolyhedralSurface>(shell));)
+}
+
 extern "C" auto
 sfcgal_prepared_geometry_create() -> sfcgal_prepared_geometry_t *
 {

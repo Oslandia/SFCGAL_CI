@@ -632,6 +632,18 @@ sfcgal_solid_add_interior_shell(sfcgal_geometry_t *solid,
                                 sfcgal_geometry_t *shell);
 
 /**
+ * Set the exterior shell of a given Solid
+ * @pre solid must be a Solid
+ * @pre shell must be a PolyhedralSurface
+ * @post the ownership of the shell is taken. The caller is not responsible
+ * anymore of its deallocation
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_solid_set_exterior_shell(sfcgal_geometry_t *solid,
+                                sfcgal_geometry_t *shell);
+
+/**
  * Gets the validity flag of the geometry.
  */
 SFCGAL_API int

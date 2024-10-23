@@ -34,6 +34,7 @@
 #include "SFCGAL/io/wkt.h"
 
 #include <boost/test/unit_test.hpp>
+#include <memory>
 
 using namespace boost::unit_test;
 using namespace SFCGAL;
@@ -445,6 +446,33 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionC)
   // check
   BOOST_CHECK_EQUAL(expectedWKT, strApi);
   delete[] wkbApi;
+}
+
+BOOST_AUTO_TEST_CASE(testSolidSetExteriorShell)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Solid> const solid = std::make_unique<Solid>();
+  BOOST_CHECK(solid->isEmpty());
+
+  std::string const polyhedral1Str =
+    "POLYHEDRALSURFACE ("
+    "((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)),"
+    "((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),"
+    "((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),"
+    "((1 1 0, 1 1 1, 1 0 1, 1 0 0, 1 1 0)),"
+    "((0 1 0, 0 1 1, 1 1 1, 1 1 0, 0 1 0)),"
+    "((0 0 1, 1 0 1, 1 1 1, 0 1 1, 0 0 1))"
+    ")";
+
+  std::unique_ptr<Geometry> shell1(io::readWkt(polyhedral1Str));
+  BOOST_CHECK(!shell1->isEmpty());
+
+  sfcgal_solid_set_exterior_shell(solid.get(), shell1.get());
+
+  // check
+  BOOST_CHECK(!solid->isEmpty());
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_solid_shell_n(solid.get(), 0), shell1.get()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

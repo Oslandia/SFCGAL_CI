@@ -147,6 +147,24 @@ public:
   }
 
   /**
+   * Sets the Solid exterior shell
+   */
+  inline void
+  setExteriorShell(const PolyhedralSurface &shell)
+  {
+    _shells.replace(0, shell.clone());
+  }
+
+  /**
+   * Sets the Solid exterior shell
+   */
+  inline void
+  setExteriorShell(PolyhedralSurface *shell)
+  {
+    _shells.replace(0, shell);
+  }
+
+  /**
    * Returns the number of shells
    */
   inline size_t

@@ -23,8 +23,10 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/io/wkt.h"
+#include "SFCGAL/algorithm/covers.h"
 
 #include <boost/test/unit_test.hpp>
+#include <memory>
 using namespace boost::unit_test;
 
 using namespace SFCGAL;
@@ -104,6 +106,34 @@ BOOST_AUTO_TEST_CASE(solidReadTest)
 
   std::unique_ptr<Geometry> g(io::readWkt(gstr));
   BOOST_CHECK_EQUAL(g->as<Solid>().numShells(), 2U);
+}
+
+BOOST_AUTO_TEST_CASE(solidSetExteriorRingTest)
+{
+  std::unique_ptr<Solid> emptySolid = std::make_unique<Solid>();
+  BOOST_CHECK(emptySolid->isEmpty());
+
+  std::string const polyhedral1Str =
+    "POLYHEDRALSURFACE ("
+    "((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)),"
+    "((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),"
+    "((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),"
+    "((1 1 0, 1 1 1, 1 0 1, 1 0 0, 1 1 0)),"
+    "((0 1 0, 0 1 1, 1 1 1, 1 1 0, 0 1 0)),"
+    "((0 0 1, 1 0 1, 1 1 1, 0 1 1, 0 0 1))"
+    ")";
+
+  std::unique_ptr<Solid> solid = std::make_unique<Solid>();
+  BOOST_CHECK(solid->isEmpty());
+
+  std::unique_ptr<Geometry> shell1(io::readWkt(polyhedral1Str));
+  BOOST_CHECK(!shell1->isEmpty());
+  BOOST_CHECK(solid->isEmpty());
+
+  solid->setExteriorShell(shell1);
+  BOOST_CHECK_EQUAL(solid->numShells(), 1);
+  BOOST_CHECK(!solid->isEmpty());
+  BOOST_CHECK(algorithm::covers3D(solid->exteriorShell(), *shell1));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
