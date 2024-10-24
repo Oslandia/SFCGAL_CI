@@ -18,6 +18,9 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
+
+#include "../../../test_config.h"
+
 #include "SFCGAL/capi/sfcgal_c.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -474,5 +477,37 @@ BOOST_AUTO_TEST_CASE(testSolidSetExteriorShell)
   BOOST_CHECK(!solid->isEmpty());
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_solid_shell_n(solid.get(), 0), shell1.get()));
 }
+
+#if !_MSC_VER
+BOOST_AUTO_TEST_CASE(testAlphaWrapping3DTest)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::string inputData(SFCGAL_TEST_DIRECTORY);
+  inputData += "/data/bunny1000Wkt.txt";
+  std::ifstream bunnyFSInput(inputData.c_str());
+  BOOST_REQUIRE(bunnyFSInput.good());
+  std::ostringstream inputWkt;
+  inputWkt << bunnyFSInput.rdbuf();
+
+  std::unique_ptr<Geometry> const geomInput(io::readWkt(inputWkt.str()));
+  BOOST_REQUIRE(geomInput->is3D());
+
+  sfcgal_geometry_t *geomAlphaWrapping = sfcgal_geometry_alpha_wrapping_3d(geomInput.get(), 20, 0);
+
+  std::string resultData(SFCGAL_TEST_DIRECTORY);
+  resultData += "/data/bunny1000AlphaWrapping20Wkt.txt";
+  std::ifstream bunnyFSResult(resultData.c_str());
+  BOOST_REQUIRE(bunnyFSResult.good());
+  std::ostringstream resultWkt;
+  resultWkt << bunnyFSResult.rdbuf();
+
+  std::unique_ptr<Geometry> alphaWrappingExpectedGeom(io::readWkt(resultWkt.str()));
+  BOOST_REQUIRE(alphaWrappingExpectedGeom->is3D());
+
+  BOOST_CHECK(sfcgal_geometry_covers_3d(geomAlphaWrapping, alphaWrappingExpectedGeom.get()));
+  sfcgal_geometry_delete(geomAlphaWrapping);
+}
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

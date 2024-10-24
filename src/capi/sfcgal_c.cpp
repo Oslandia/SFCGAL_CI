@@ -29,6 +29,7 @@
 
 #if !_MSC_VER
 #include "SFCGAL/algorithm/alphaShapes.h"
+#include "SFCGAL/algorithm/alphaWrapping3D.h"
 #endif
 #include "SFCGAL/algorithm/area.h"
 #include "SFCGAL/algorithm/buffer3D.h"
@@ -1406,6 +1407,31 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During optimal_alpha_shapes(A, %g %g):",
                    static_cast<int>(allow_holes), nb_components);
+    SFCGAL_WARNING("  with A: %s",
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  return result.release();
+}
+#endif
+
+#if !_MSC_VER
+extern "C" auto
+sfcgal_geometry_alpha_wrapping_3d(const sfcgal_geometry_t *geom,
+                                  size_t relativeAlpha, size_t relativeOffset)
+    -> sfcgal_geometry_t *
+{
+  const auto *inputGeom = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result = SFCGAL::algorithm::alphaWrapping3D(
+        inputGeom->as<const SFCGAL::Geometry>(), relativeAlpha, relativeOffset);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During wrapping_3d(A, %g %g):", relativeAlpha,
+                   relativeOffset);
     SFCGAL_WARNING("  with A: %s",
                    ((const SFCGAL::Geometry *)(geom))->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
