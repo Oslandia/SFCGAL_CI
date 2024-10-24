@@ -31,8 +31,6 @@ makeValidOrientation(CGAL::Polygon_2<Kernel> &polygon)
 void
 makeValidOrientation(CGAL::Polygon_with_holes_2<Kernel> &polygon)
 {
-  using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
-
   if (polygon.outer_boundary().orientation() != CGAL::COUNTERCLOCKWISE) {
     polygon.outer_boundary().reverse_orientation();
   }
