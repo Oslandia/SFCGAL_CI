@@ -36,8 +36,11 @@
 #include <boost/test/unit_test.hpp>
 #include <memory>
 
-using namespace boost::unit_test;
 using namespace SFCGAL;
+
+#include "../../../test_config.h"
+// always after CGAL
+using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(SFCGAL_sfcgal_cTest)
 
@@ -537,6 +540,40 @@ BOOST_AUTO_TEST_CASE(testSolidSetExteriorShell)
   // check
   BOOST_CHECK(!solid->isEmpty());
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_solid_shell_n(solid.get(), 0), shell1.get()));
+}
+
+BOOST_AUTO_TEST_CASE(testAlphaWrapping3DTest)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::string inputData(SFCGAL_TEST_DIRECTORY);
+  inputData += "/data/bunny1000Wkt.txt";
+  std::ifstream bunnyFSInput(inputData.c_str());
+  BOOST_REQUIRE(bunnyFSInput.good());
+  std::ostringstream inputWkt;
+  inputWkt << bunnyFSInput.rdbuf();
+
+  std::unique_ptr<Geometry> const geomInput(io::readWkt(inputWkt.str()));
+  BOOST_REQUIRE(geomInput->is3D());
+
+  sfcgal_geometry_t *geomAlphaWrapping = sfcgal_geometry_alpha_wrapping_3d(geomInput.get(), 20, 0);
+
+  std::string resultData(SFCGAL_TEST_DIRECTORY);
+#if CGAL_VERSION_MAJOR < 6
+  resultData += "/data/bunny1000AlphaWrapping20Wkt_cgal5.txt";
+#else
+  resultData += "/data/bunny1000AlphaWrapping20Wkt_cgal6.txt";
+#endif
+  std::ifstream bunnyFSResult(resultData.c_str());
+  BOOST_REQUIRE(bunnyFSResult.good());
+  std::ostringstream resultWkt;
+  resultWkt << bunnyFSResult.rdbuf();
+
+  std::unique_ptr<Geometry> alphaWrappingExpectedGeom(io::readWkt(resultWkt.str()));
+  BOOST_REQUIRE(alphaWrappingExpectedGeom->is3D());
+
+  BOOST_CHECK(sfcgal_geometry_covers_3d(geomAlphaWrapping, alphaWrappingExpectedGeom.get()));
+  sfcgal_geometry_delete(geomAlphaWrapping);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -24,4 +24,3 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug" )
 else()
     add_test( unit-test ${CMAKE_CURRENT_BINARY_DIR}/unit-test-SFCGAL --auto_start_dbg=y --log_level=all)
 endif()
-
