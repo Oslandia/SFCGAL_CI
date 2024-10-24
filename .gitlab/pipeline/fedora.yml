@@ -8,7 +8,7 @@ fedora40_clang:
     - ./ci/fedora/before_install.sh $CGAL_VERSION
     - cd $CI_PROJECT_DIR
     - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-$CGAL_VERSION
-    - make -j$(nproc)
+    - make
     - ctest -VV
   parallel:
     matrix:
@@ -24,7 +24,7 @@ fedora40_gcc:
     - ./ci/fedora/before_install.sh $CGAL_VERSION
     - cd $CI_PROJECT_DIR
     - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-$CGAL_VERSION
-    - make -j$(nproc)
+    - make
     - ctest -VV
   parallel:
     matrix:
