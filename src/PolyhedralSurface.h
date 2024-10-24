@@ -17,10 +17,13 @@
 #include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/triangulate/triangulatePolygon.h"
 
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>
 
-using Mesh = CGAL::Surface_mesh<SFCGAL::Kernel::Point_3>;
+using InexactKernel = CGAL::Exact_predicates_inexact_constructions_kernel;
+using Mesh          = CGAL::Surface_mesh<SFCGAL::Kernel::Point_3>;
+using InexactMesh   = CGAL::Surface_mesh<InexactKernel::Point_3>;
 
 namespace SFCGAL {
 
@@ -74,6 +77,8 @@ public:
    * Constructor from a CGAL::Surface_mesh
    */
   PolyhedralSurface(const Mesh &sm);
+
+  PolyhedralSurface(const InexactMesh &inexactMesh);
   /**
    * Copy constructor
    */

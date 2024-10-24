@@ -5,6 +5,8 @@
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/GeometryVisitor.h"
 
+#include <CGAL/Cartesian_converter.h>
+
 using namespace SFCGAL::detail;
 
 namespace SFCGAL {
@@ -61,6 +63,24 @@ PolyhedralSurface::PolyhedralSurface(const Mesh &sm)
     for (vertex_descriptor const vd :
          vertices_around_face(sm.halfedge(face), sm)) {
       new_face->addPoint(Point(sm.point(vd)));
+    }
+
+    new_face->addPoint(new_face->startPoint().clone());
+    _polygons.push_back(new Polygon(new_face));
+  }
+}
+
+PolyhedralSurface::PolyhedralSurface(const InexactMesh &inexactMesh)
+{
+  using inexact_to_exact  = CGAL::Cartesian_converter<InexactKernel, Kernel>;
+  using vertex_descriptor = Mesh::Vertex_index;
+
+  inexact_to_exact toExact;
+  for (auto face : inexactMesh.faces()) {
+    auto *new_face = new LineString();
+    for (vertex_descriptor const vd :
+         vertices_around_face(inexactMesh.halfedge(face), inexactMesh)) {
+      new_face->addPoint(Point(toExact(inexactMesh.point(vd))));
     }
 
     new_face->addPoint(new_face->startPoint().clone());
