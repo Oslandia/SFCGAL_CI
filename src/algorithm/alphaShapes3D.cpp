@@ -3,12 +3,14 @@
 
 #include "SFCGAL/algorithm/alphaShapes3D.h"
 #include "SFCGAL/detail/GetPointsVisitor.h"
-#include "SFCGAL/detail/transform/ForceOrderPoints.h"
 
 #include <CGAL/Alpha_shape_3.h>
 #include <CGAL/Alpha_shape_cell_base_3.h>
 #include <CGAL/Alpha_shape_vertex_base_3.h>
 #include <CGAL/Delaunay_triangulation_3.h>
+#include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
+#include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
+#include <CGAL/Polygon_mesh_processing/repair_polygon_soup.h>
 
 namespace SFCGAL::algorithm {
 
@@ -64,44 +66,47 @@ auto
 alphaShape3D_to_polyhedralSurface(const Alpha_shape_3 &alphaShape)
     -> std::unique_ptr<PolyhedralSurface>
 {
-  auto resultSurface = std::make_unique<PolyhedralSurface>();
 
   // Iterate through all facets of the alpha shape
+  std::vector<Point_3>                    points;
+  std::vector<std::array<std::size_t, 3>> polygons;
   for (auto facetIterator = alphaShape.alpha_shape_facets_begin();
        facetIterator != alphaShape.alpha_shape_facets_end(); ++facetIterator) {
 
     if (alphaShape.classify(*facetIterator) == Alpha_shape_3::REGULAR) {
       // Get facet vertices
-      auto cell = facetIterator->first;
-      int  idx  = facetIterator->second;
+      auto cell     = facetIterator->first;
+      int  facetIdx = facetIterator->second;
 
-      const Point_3 pt1 = cell->vertex((idx + 1) & 3)->point();
-      const Point_3 pt2 = cell->vertex((idx + 2) & 3)->point();
-      const Point_3 pt3 = cell->vertex((idx + 3) & 3)->point();
+      const size_t currentIdx = points.size();
+      polygons.push_back({currentIdx, currentIdx + 1, currentIdx + 2});
+      points.push_back(cell->vertex((facetIdx + 1) & 3)->point());
+      points.push_back(cell->vertex((facetIdx + 2) & 3)->point());
+      points.push_back(cell->vertex((facetIdx + 3) & 3)->point());
 
-      // Create triangle polygon
-      auto poly = std::make_unique<Polygon>();
-      auto ring = std::make_unique<LineString>();
+      // // Create triangle polygon
+      // auto poly = std::make_unique<Polygon>();
+      // auto ring = std::make_unique<LineString>();
 
-      // create a closed ring
-      ring->addPoint(Point(pt1));
-      ring->addPoint(Point(pt2));
-      ring->addPoint(Point(pt3));
-      ring->addPoint(Point(pt1));
+      // // create a closed ring
+      // ring->addPoint(Point(pt1));
+      // ring->addPoint(Point(pt2));
+      // ring->addPoint(Point(pt3));
+      // ring->addPoint(Point(pt1));
 
-      poly->setExteriorRing(ring.release());
+      // poly->setExteriorRing(ring.release());
 
-      // SFCGAL::transform::ForceOrderPoints force(false);
-      // poly->accept(force);
-
-      resultSurface->addPolygon(poly.release());
+      // resultSurface->addPolygon(poly.release());
     }
   }
 
-  // SFCGAL::transform::ForceOrderPoints force(true);
-  // resultSurface->accept(force);
+  CGAL::Polygon_mesh_processing::repair_polygon_soup(points, polygons);
+  CGAL::Polygon_mesh_processing::orient_polygon_soup(points, polygons);
+  CGAL::Surface_mesh<Point_3> surfaceMesh;
+  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, polygons,
+                                                              surfaceMesh);
 
-  return resultSurface;
+  return std::make_unique<PolyhedralSurface>(PolyhedralSurface(surfaceMesh));
 }
 
 auto

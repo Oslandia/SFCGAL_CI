@@ -59,8 +59,11 @@ BOOST_AUTO_TEST_CASE(testAlphaShapes3D_MultiPoint)
   inputWkt << bunnyFS.rdbuf();
 
   std::unique_ptr<Geometry> geomInput(io::readWkt(inputWkt.str()));
+  BOOST_REQUIRE(geomInput->is3D());
 
   std::unique_ptr<Geometry> alphaShapesGeneral(algorithm::alphaShapes3D(geomInput->as<const SFCGAL::Geometry>()));
+
+  // std::cout << alphaShapesGeneral->asText(17);
 
   // check
   try {
