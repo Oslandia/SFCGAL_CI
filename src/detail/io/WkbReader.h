@@ -229,7 +229,7 @@ private:
 
     default:
       std::ostringstream oss;
-      oss << "WkbWriter: type '" << geometryType << "' is not supported";
+      oss << "WkbReader: type '" << geometryType << "' is not supported";
       std::cerr << oss.str() << std::endl;
 
       return {};
