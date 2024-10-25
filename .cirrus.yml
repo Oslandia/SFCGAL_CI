@@ -10,7 +10,7 @@ task:
     - pkg install -y cgal gmp mpfr boost-libs cmake ninja
 
   build_script:
-    - export CGAL_VERSION=6.0.1
+    - export CGAL_VERSION=6.0
     - fetch "https://github.com/CGAL/cgal/releases/download/v${CGAL_VERSION}/CGAL-${CGAL_VERSION}.tar.xz" -o CGAL-${CGAL_VERSION}.tar.xz
     - tar xJf CGAL-${CGAL_VERSION}.tar.xz
     - cmake -GNinja -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCGAL_DIR=CGAL-${CGAL_VERSION}
