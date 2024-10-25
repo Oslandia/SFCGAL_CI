@@ -157,6 +157,8 @@ public:
 
   /**
    * Sets the Solid exterior shell
+   * The ownership of the shell is taken. The caller is not responsible
+   * anymore of its deallocation.
    */
   inline void
   setExteriorShell(PolyhedralSurface *shell)
