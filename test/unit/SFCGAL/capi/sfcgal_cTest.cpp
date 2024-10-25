@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_CASE(testSolidSetExteriorShell)
   std::unique_ptr<Geometry> shell1(io::readWkt(polyhedral1Str));
   BOOST_CHECK(!shell1->isEmpty());
 
-  sfcgal_solid_set_exterior_shell(solid.get(), shell1.get());
+  sfcgal_solid_set_exterior_shell(solid.get(), sfcgal_geometry_clone(shell1.get()));
 
   // check
   BOOST_CHECK(!solid->isEmpty());

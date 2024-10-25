@@ -21,6 +21,7 @@
 #include "SFCGAL/Kernel.h"
 
 #include "SFCGAL/Solid.h"
+#include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/io/wkt.h"
 #include "SFCGAL/algorithm/covers.h"
@@ -130,7 +131,7 @@ BOOST_AUTO_TEST_CASE(solidSetExteriorRingTest)
   BOOST_CHECK(!shell1->isEmpty());
   BOOST_CHECK(solid->isEmpty());
 
-  solid->setExteriorShell(shell1);
+  solid->setExteriorShell(dynamic_cast<PolyhedralSurface *>(shell1.get())->clone());
   BOOST_CHECK_EQUAL(solid->numShells(), 1);
   BOOST_CHECK(!solid->isEmpty());
   BOOST_CHECK(algorithm::covers3D(solid->exteriorShell(), *shell1));
