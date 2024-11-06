@@ -89,7 +89,7 @@ include_directories( ${CMAKE_BINARY_DIR}/include )
 #-- BOOST --------------------------------------------------
 option( Boost_USE_AUTO_LINK "boost use autolink" OFF )
 set(Boost_USE_DEBUG_RUNTIME OFF)
-set(Boost_USE_STATIC_LIBS OFF)
+# set(Boost_USE_STATIC_LIBS OFF)
 option( Boost_USE_DEBUG_RUNTIME "Use Boost debug runtime" OFF )
 
 if( NOT ${Boost_USE_AUTO_LINK} )
