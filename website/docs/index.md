@@ -1,11 +1,13 @@
 # SFCGAL
 
-![](assets/img/logo.svg)
+![logo SFCGAL](assets/img/logo.svg)
 
 ## Downloads
 
+<!-- markdownlint-disable MD034 -->
 [Download this project as a .zip file](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.zip){ .md-button .md-button--primary }
 [Download this project as a tar.gz file](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.tar.gz){ .md-button .md-button--primary }
+<!-- markdownlint-enable MD034 -->
 
 ## About
 

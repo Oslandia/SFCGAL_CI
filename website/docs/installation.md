@@ -6,7 +6,9 @@ SFCGAL source code is available on the corresponding [GitLab repository](https:/
 
 The `master` branch is the development branch and has a tag for each released version.
 
+<!-- markdownlint-disable MD034 -->
 Source code of the {{ get_project_version() }} release can be found with the tag v{{ get_project_version() }}. You can directly download a [zip](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.zip) or [tarball](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.tar.gz).
+<!-- markdownlint-enable MD034 -->
 
 ## Supported platforms
 

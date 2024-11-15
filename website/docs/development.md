@@ -48,9 +48,7 @@ SFCGAL comes with different layers of tests. The SFCGAL_BUILD_TESTS CMake option
 
 [Valgrind](https://valgrind.org/) can automatically detect many memory management and threading bugs, and profile programs in detail. Since SFCGAL uses a CGAL Kernel that depends on floating-point rounding modes that are not supported by the current version of Valgrind, a patched version is necessary:
 
-```
-
-Copier le code
+```sh title "Install Valgrind"
 git clone https://github.com/trast/valgrind.git
 cd valgrind/
 git clone https://github.com/trast/valgrind-VEX.git VEX
