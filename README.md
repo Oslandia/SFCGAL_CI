@@ -12,10 +12,10 @@ Please refer to the <a href="http://sfcgal.gitlab.io/SFCGAL">project page</a> fo
 
 ## Community Resources
 
-* Website: https://sfcgal.org
-* **git** repository: https://gitlab.com/sfcgal/SFCGAL
+* Website: <https://sfcgal.org>
+* **git** repository: <https://gitlab.com/sfcgal/SFCGAL>
 * **#sfcgal** chat channel (all bridged):
-  * IRC: irc://irc.libera.chat/#sfcgal (https://kiwiirc.com/nextclient/irc.libera.chat/#sfcgal)
+  * IRC: irc://irc.libera.chat/#sfcgal (<https://kiwiirc.com/nextclient/irc.libera.chat/#sfcgal>)
 
 ## Build/Install
 
@@ -55,12 +55,10 @@ for Python.
 
 SFCGAL has bindings in many languages, see the [bindings page](https://sfcgal.gitlab.io/SFCGAL/development/#bindings).
 
-
 ## Documentation
 
 API documentation can be generated using Doxygen. Documentation is not included
 in the default build. To build the documentation see the [Development](https://sfcgal.gitlab.io/SFCGAL/development/) page.
-
 
 ## Style
 
@@ -73,7 +71,6 @@ pre-commit install
 ```
 
 To commit without the *git hooks*, add the `--no-verify` option to the `git commit` command.
-
 
 ## Testing
 
