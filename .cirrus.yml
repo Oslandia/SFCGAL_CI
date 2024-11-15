@@ -41,6 +41,4 @@ task:
     - ctest -VV --test-dir build
   matrix:
     macos_instance:
-      image: ghcr.io/cirruslabs/macos-ventura-base:latest
-    macos_instance:
-      image: ghcr.io/cirruslabs/macos-ventura-base:latest
+      image: ghcr.io/cirruslabs/macos-runner:sonoma
