@@ -30,6 +30,26 @@ repos:
         args: ["--style=file", "-i"]  # Use the .clang-format file for configuration and apply all fixes
         files: ^src/.*\.(c|h|cpp|hpp)$
 
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.42.0
+    hooks:
+      - id: markdownlint
+        args:
+          [
+            "--config",
+            ".markdownlint.json",
+            "--ignore-path",
+            ".markdownlintignore",
+            "--fix",
+          ]
+        language: node
+        pass_filenames: true
+        files: ^website/.*
+        types:
+          - file
+          - markdown
+          - non-executable
+
   # - repo: https://github.com/pocc/pre-commit-hooks
   #   rev: v1.3.5
   #   hooks:
