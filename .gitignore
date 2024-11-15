@@ -48,6 +48,12 @@ build*
 /CMakeSettings.json
 CGAL*
 
+# -- Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 .venv
-# Ignore website local build
+# mkdocs
+.cache
 website/site
