@@ -5,16 +5,23 @@ repo_url: "https://gitlab.com/sfcgal/SFCGAL/"
 theme:
   name: material
   features:
-    - navigation.instant
-    - navigation.top
-    - navigation.tabs
     - navigation.hide
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+    - toc.integrate 
   logo: assets/img/logo.png
   favicon: assets/img/logo.png
-  palette: 
+  palette:
      primary: custom
      accent: custom
-  repo_icon: "gitlab"  # Utilise l'icône GitLab
+  icon:
+    repo: fontawesome/brands/gitlab
 
 extra_css:
   - stylesheets/extra.css
@@ -22,6 +29,9 @@ extra_css:
 markdown_extensions:
   - attr_list
   - admonition
+  # Permalinks - https://squidfunk.github.io/mkdocs-material/extensions/permalinks/
+  - toc:
+      permalink: "#"
 
 plugins:
   - macros:
@@ -40,7 +50,7 @@ plugins:
             RECURSIVE: True
   - search
 
-nav : 
+nav :
   - Home: index.md
   - Authors: authors.md
   - Sponsors: sponsors.md
