@@ -24,8 +24,6 @@ markdown_extensions:
   - admonition
 
 plugins:
-  - mkdocs-video
-  - search
   - macros:
             module_name: macros
   - mkdoxy:
@@ -40,6 +38,7 @@ plugins:
             FULL_PATH_NAMES: "NO"
             SHOW_USED_FILES: "NO"
             RECURSIVE: True
+  - search
 
 nav : 
   - Home: index.md
@@ -47,7 +46,7 @@ nav :
   - Sponsors: sponsors.md
   - Installation: installation.md
   - Development: development.md
-  - Screencast: screencast.md
+  # - Screencast: screencast.md
   - API:
       - "Links": "API/links.md"
       - "Classes":
