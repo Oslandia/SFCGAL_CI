@@ -1,6 +1,6 @@
 # Authors
 
-Development of SFCGAL is led by [Oslandia](http://www.oslandia.com).
+Development of SFCGAL is led by [Oslandia](https://oslandia.com).
 
 ## Initial Authors
 
