@@ -2,12 +2,12 @@
 
 ## Source code
 
-SFCGAL source code is available on the corresponding [GitLab repository](https://gitlab.com/SFCGAL/SFCGAL).
+SFCGAL source code is available on the corresponding [GitLab repository](https://gitlab.com/sfcgal/SFCGAL).
 
 The `master` branch is the development branch and has a tag for each released version.
 
 <!-- markdownlint-disable MD034 -->
-Source code of the {{ get_project_version() }} release can be found with the tag v{{ get_project_version() }}. You can directly download a [zip](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.zip) or [tarball](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.tar.gz).
+Source code of the {{ get_project_version() }} release can be found with the tag v{{ get_project_version() }}. You can directly download a [zip](https://gitlab.com/sfcgal/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.zip) or [tarball](https://gitlab.com/sfcgal/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.tar.gz).
 <!-- markdownlint-enable MD034 -->
 
 ## Supported platforms
@@ -22,16 +22,16 @@ SFCGAL has been successfully compiled and tested on the following platforms:
 ## Requirements
 
 - A C++ compiler, see above for supported platforms
-- [CMake](http://www.cmake.org) version ≥ 2.8.6
-- [CGAL](http://www.cgal.org) version ≥ 5.6
-- [Boost](http://www.boost.org) version ≥ 1.74
-- [MPFR](http://mpfr.org) version ≥ 2.2.1
-- [GMP](http://gmplib.org) version ≥ 4.2
+- [CMake](https://cmake.org) version ≥ 2.8.6
+- [CGAL](https://www.cgal.org) version ≥ 5.6
+- [Boost](https://www.boost.org) version ≥ 1.74
+- [MPFR](https://www.mpfr.org) version ≥ 2.2.1
+- [GMP](https://gmplib.org) version ≥ 4.2
 
 **Optional dependencies for viewer and 3D format export:**
 
-- [OpenSceneGraph](http://www.openscenegraph.org) version ≥ 3.1
-- [Qt5](http://qt-project.org)
+- [OpenSceneGraph](https://openscenegraph.github.io/openscenegraph.io/) version ≥ 3.1
+- [Qt5](https://contribute.qt-project.org/)
 
 ## Compilation
 
