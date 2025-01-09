@@ -1,10 +1,10 @@
 # Development
 
-The project uses git and [Gitlab](https://www.gitlab.com) to manage the source code, bug reports, and issues.
+The project uses git and [Gitlab](https://about.gitlab.com) to manage the source code, bug reports, and issues.
 
 You are free to fork the project and are welcome to propose evolutions. The preferred way of submitting patches is through Gitlab's merge request mechanism.
 
-Bugs can be reported via the [Issues](https://gitlab.com/sfcgal/SFCGAL/issues) section of the Gitlab project.
+Bugs can be reported via the [Issues](https://gitlab.com/sfcgal/SFCGAL/-/issues) section of the Gitlab project.
 
 ## Branches
 
@@ -16,7 +16,7 @@ When different major versions are to be maintained, the most recent major versio
 
 In conformance with the git way of development, each new feature is developed on its own temporary branch.
 
-Version numbers follow the [Semantic Versioning 2.0.0](http://semver.org) policy and are tagged as **x.y.z**, where:
+Version numbers follow the [Semantic Versioning 2.0.0](https://semver.org) policy and are tagged as **x.y.z**, where:
 
 - **x** is the major version number. It changes in case of API breaks or major redesign.
 - **y** is the minor version number. It changes when new functionalities are added without a major API break.
