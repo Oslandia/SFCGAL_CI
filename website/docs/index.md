@@ -5,13 +5,13 @@
 ## Downloads
 
 <!-- markdownlint-disable MD034 -->
-[Download this project as a .zip file](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.zip){ .md-button .md-button--primary }
-[Download this project as a tar.gz file](https://gitlab.com/SFCGAL/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.tar.gz){ .md-button .md-button--primary }
+[Download this project as a .zip file](https://gitlab.com/sfcgal/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.zip){ .md-button .md-button--primary }
+[Download this project as a tar.gz file](https://gitlab.com/sfcgal/SFCGAL/-/archive/v{{ get_project_version() }}/SFCGAL-v{{ get_project_version() }}.tar.gz){ .md-button .md-button--primary }
 <!-- markdownlint-enable MD034 -->
 
 ## About
 
-SFCGAL is a C++ wrapper library around [CGAL](http://www.cgal.org) with the aim of supporting ISO 19107:2013 and [OGC Simple Features Access 1.2](http://www.opengeospatial.org/standards/sfa) for 3D operations.
+SFCGAL is a C++ wrapper library around [CGAL](http://www.cgal.org) with the aim of supporting ISO 19107:2013 and [OGC Simple Features Access 1.2](https://www.ogc.org/publications/standard/sfa/) for 3D operations.
 
 SFCGAL provides standard compliant geometry types and operations. PostGIS uses the C API, to expose some SFCGAL's functions in spatial databases (cf. [PostGIS manual](https://postgis.net/docs/reference_sfcgal.html)).
 
