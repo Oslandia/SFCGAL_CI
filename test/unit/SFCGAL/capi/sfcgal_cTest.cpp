@@ -402,6 +402,52 @@ BOOST_AUTO_TEST_CASE(testRotate3D)
   sfcgal_geometry_delete(rotated);
 }
 
+BOOST_AUTO_TEST_CASE(testEnvelope2D)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt(
+      "MULTIPOLYGON (((0 0, 20 0, 20 10, 0 10, 0 0)), ((25 5, 30 5, 30 15, 25 15, 25 5)))"));
+
+  hasError = false;
+  sfcgal_geometry_t *result = sfcgal_geometry_envelope(g.get());
+  BOOST_CHECK(hasError == false);
+
+  char *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POLYGON ((0 0,30 0,30 15,0 15,0 0))");
+
+  sfcgal_free_buffer(wkt);
+  sfcgal_geometry_delete(result);
+}
+
+BOOST_AUTO_TEST_CASE(testEnvelope3D)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(
+      io::readWkt("MULTILINESTRING Z ((0 0 0, 20 0 5, 20 10 10), (25 5 -5, 30 15 20, 25 15 25))"));
+
+  hasError = false;
+  sfcgal_geometry_t *result = sfcgal_geometry_envelope(g.get());
+  BOOST_CHECK(hasError == false);
+
+  std::string expected = "POLYHEDRALSURFACE Z (((0 0 -5,0 15 -5,30 15 -5,30 0 -5,0 0 -5)),"
+                         "((0 0 25,30 0 25,30 15 25,0 15 25,0 0 25)),"
+                         "((0 0 -5,30 0 -5,30 0 25,0 0 25,0 0 -5)),"
+                         "((30 15 -5,0 15 -5,0 15 25,30 15 25,30 15 -5)),"
+                         "((30 0 -5,30 15 -5,30 15 25,30 0 25,30 0 -5)),"
+                         "((0 0 -5,0 0 25,0 15 25,0 15 -5,0 0 -5)))";
+  char *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), expected);
+
+  sfcgal_free_buffer(wkt);
+  sfcgal_geometry_delete(result);
+}
+
 BOOST_AUTO_TEST_CASE(testRotate3DAroundCenter)
 {
   sfcgal_set_error_handlers(printf, on_error);
