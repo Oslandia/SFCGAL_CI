@@ -52,15 +52,9 @@ To run a specific test use the option `-t` with the test name retrieve above. Fo
 
 ## Valgrind
 
-[Valgrind](https://valgrind.org/) can automatically detect many memory management and threading bugs, and profile programs in detail. Since SFCGAL uses a CGAL Kernel that depends on floating-point rounding modes that are not supported by the current version of Valgrind, a patched version is necessary:
+[Valgrind](https://valgrind.org/) can automatically detect many memory management and threading bugs, and profile programs in detail. Since SFCGAL uses a CGAL Kernel that depends on floating-point rounding modes that are not supported by the current version of Valgrind, a special option is needed (not for production!) at `cmake` time: `-DSFCGAL_VALGRIND=ON`. This enable a specific define for CGAL: `CGAL_DISABLE_ROUNDING_MATH_CHECK` (see <https://github.com/CGAL/cgal/issues/3180#issuecomment-947376584>).
 
-```sh title "Install Valgrind"
-git clone https://github.com/trast/valgrind.git
-cd valgrind/
-git clone https://github.com/trast/valgrind-VEX.git VEX
-./autogen.sh
-./configure && make -j 8 && sudo make install
-```
+Then you can run the tests with, for example, this command: `valgrind --leak-check=yes -- test/unit/unit-test-SFCGALd -t 'SFCGAL_sfcgal_cTest*'`
 
 ## Documentation
 

@@ -40,6 +40,7 @@ option( SFCGAL_BUILD_BENCH "Build benchmarks" OFF )
 option( SFCGAL_BUILD_DOC "Build documentation" OFF )
 
 option( SFCGAL_WITH_OSG "Compile with OpenSceneGraph support" OFF )
+option( SFCGAL_VALGRIND "Compile with Valgrind support" OFF )
 
 # Configure CCache if available
 if(NOT MSVC)
@@ -70,6 +71,11 @@ endif ()
 #-----------------------------------------------------------
 # dependencies
 #-----------------------------------------------------------
+
+if( SFCGAL_VALGRIND )
+  # valgrind tends to alter how CGAL works. To avoid the '-frounding-math' warning we need to activate this define:
+  add_definitions( "-DCGAL_DISABLE_ROUNDING_MATH_CHECK" )
+endif()
 
 #-- find CGAL  ---------------------------------------------
 if( CGAL_USE_GMPXX )

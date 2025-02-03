@@ -69,6 +69,7 @@ Default building options should work out-of-the-box. You may want to fine-tune t
 | `SFCGAL_WARNING_AS_ERROR` | OFF       | Turn to `ON` to convert build warnings into errors                                                         |
 | `SFCGAL_BUILD_WITH_GPROF` | OFF       | Turn to `ON` to build with GNU gprof                                                                       |
 | `SFCGAL_USE_STATIC_LIBS`  | OFF       | Turn to `ON` to compile as a static library                                                                |
+| `SFCGAL_VALGRIND`         | OFF       | Turn to `ON` to compile with Valgrin support (Debug only)                                                  |
 
 ## Installation with PostGIS
 
