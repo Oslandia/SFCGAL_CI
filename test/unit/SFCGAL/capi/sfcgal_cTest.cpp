@@ -239,6 +239,7 @@ BOOST_AUTO_TEST_CASE(testForceRHR_3D)
   // check
   BOOST_CHECK_EQUAL(expectedGeom, strApi);
   delete[] wkbApi;
+  sfcgal_geometry_delete(rhr);
 }
 
 BOOST_AUTO_TEST_CASE(testScaleUniformC)
