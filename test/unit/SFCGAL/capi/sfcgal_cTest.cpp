@@ -110,6 +110,8 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPolygon)
   sfcgal_geometry_t *sk = sfcgal_geometry_straight_skeleton(g.get());
   BOOST_CHECK(hasError == false);
   BOOST_CHECK_EQUAL(5, sfcgal_geometry_collection_num_geometries(sk));
+
+  sfcgal_geometry_delete(sk);
 }
 
 BOOST_AUTO_TEST_CASE(testStraightSkeletonMultiPolygon)
