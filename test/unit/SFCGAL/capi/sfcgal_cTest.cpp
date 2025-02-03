@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(testAsWkb)
 
   // check
   BOOST_CHECK_EQUAL(strGeom, strApi);
-  delete[] wkbApi;
+  sfcgal_free_buffer(wkbApi);
 }
 
 BOOST_AUTO_TEST_CASE(testStraightSkeletonPolygon)
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(testForceRHR)
 
   // check
   BOOST_CHECK_EQUAL(strGeom, strApi);
-  delete[] wkbApi;
+  sfcgal_free_buffer(wkbApi);
   sfcgal_geometry_delete(rhr);
 }
 
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(testForceLHR)
 
   // check
   BOOST_CHECK_EQUAL(expectedGeom, strApi);
-  delete[] wkbApi;
+  sfcgal_free_buffer(wkbApi);
   sfcgal_geometry_delete(lhr);
 }
 
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE(testForceRHR_3D)
 
   // check
   BOOST_CHECK_EQUAL(expectedGeom, strApi);
-  delete[] wkbApi;
+  sfcgal_free_buffer(wkbApi);
   sfcgal_geometry_delete(rhr);
 }
 
@@ -264,6 +264,7 @@ BOOST_AUTO_TEST_CASE(testScaleUniformC)
   sfcgal_geometry_as_text_decim(scaled, 0, &wkt, &len);
   BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z (2 4 6)");
 
+  sfcgal_free_buffer(wkt);
   sfcgal_geometry_delete(scaled);
 }
 
@@ -300,6 +301,7 @@ BOOST_AUTO_TEST_CASE(testScaleAroundCenterC)
   sfcgal_geometry_as_text_decim(scaled, 0, &wkt, &len);
   BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z (5 7 9)");
 
+  sfcgal_free_buffer(wkt);
   sfcgal_geometry_delete(scaled);
 }
 
@@ -337,6 +339,7 @@ BOOST_AUTO_TEST_CASE(testScaleCubeNonUniformC)
   BOOST_CHECK(scaledWkt.find("0 10 20") !=
               std::string::npos); // (0,10,10) should become (0,10,20)
 
+  sfcgal_free_buffer(wkt);
   sfcgal_geometry_delete(scaled);
 }
 
@@ -355,6 +358,7 @@ BOOST_AUTO_TEST_CASE(testRotate2D)
   sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
   BOOST_CHECK_EQUAL(std::string(wkt), "POINT (0 1)");
 
+  sfcgal_free_buffer(wkt);
   sfcgal_geometry_delete(rotated);
 }
 
@@ -374,6 +378,7 @@ BOOST_AUTO_TEST_CASE(testRotate2DAroundPoint)
   sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
   BOOST_CHECK_EQUAL(std::string(wkt), "POINT (1 1)");
 
+  sfcgal_free_buffer(wkt);
   sfcgal_geometry_delete(rotated);
 }
 
@@ -393,6 +398,7 @@ BOOST_AUTO_TEST_CASE(testRotate3D)
   sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
   BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z (0 1 0)");
 
+  sfcgal_free_buffer(wkt);
   sfcgal_geometry_delete(rotated);
 }
 
@@ -412,6 +418,7 @@ BOOST_AUTO_TEST_CASE(testRotate3DAroundCenter)
   sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
   BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z (1 1 0)");
 
+  sfcgal_free_buffer(wkt);
   sfcgal_geometry_delete(rotated);
 }
 
@@ -430,6 +437,7 @@ BOOST_AUTO_TEST_CASE(testRotateX)
   sfcgal_geometry_as_text_decim(rotated, 0, &wkt, &len);
   BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z (0 0 1)");
 
+  sfcgal_free_buffer(wkt);
   sfcgal_geometry_delete(rotated);
 }
 
@@ -454,7 +462,7 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionC)
 
   // check
   BOOST_CHECK_EQUAL(expectedWKT, strApi);
-  delete[] wkbApi;
+  sfcgal_free_buffer(wkbApi);
   sfcgal_geometry_delete(result);
 }
 
