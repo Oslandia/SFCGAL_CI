@@ -36,13 +36,19 @@ Environment variables and build options are listed in the installation [section]
 
 ## Tests
 
-SFCGAL comes with different layers of tests. The SFCGAL_BUILD_TESTS CMake option allows you to build these tests.
+SFCGAL comes with different layers of tests. The `SFCGAL_BUILD_TESTS` CMake option allows you to build these tests.
 
-- **Unit tests**: Test each feature independently with hand-crafted datasets that must cover every possible case. Run it with unit-test-SFCGAL.
-- **Regression tests**: Consist of function calls with real or near-real datasets. Run it with standalone-regress-test-SFCGAL.
-- **Garden test**: Inspired by the eponymous PostGIS test, it ensures that all combinations of parameters are acceptable for each function (i.e., no crashes occur). Run it with garden-test-SFCGAL.
-- **Style test**: Ensures the code is properly formatted before committing. Run the script test-style-SFCGAL.sh.
-- **Benchmark tests**: Measure the processing speed of SFCGAL algorithms. Compilation is available through the SFCGAL_BUILD_BENCH CMake option.
+Note: Tests should run from within the build directory. If you have built in `Debug`, you must add `d` at the end of the binary name.
+
+- **Unit tests**: Test each feature independently with hand-crafted datasets that must cover every possible case. Run it with `test/unit/unit-test-SFCGAL`.
+- **Regression tests**: Consist of function calls with real or near-real datasets. Run it with `test/regress/standalone/standalone-regress-test-SFCGAL`.
+- **Garden test**: Inspired by the eponymous PostGIS test, it ensures that all combinations of parameters are acceptable for each function (i.e., no crashes occur). Run it with `garden-test-SFCGAL`.
+- **Style test**: Ensures the code is properly formatted before committing. Run the script `test-style-SFCGAL.sh`.
+- **Benchmark tests**: Measure the processing speed of SFCGAL algorithms. Compilation is available through the `SFCGAL_BUILD_BENCH` CMake option.
+
+To list all known test run add the option `--list_content` to test binary. For example, `test/unit/unit-test-SFCGALd --list_content`.
+
+To run a specific test use the option `-t` with the test name retrieve above. For example, `test/unit/unit-test-SFCGALd -t 'SFCGAL_sfcgal_cTest/testEnvelope*'`.
 
 ## Valgrind
 
