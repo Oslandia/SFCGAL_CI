@@ -1435,7 +1435,8 @@ typedef void *(*sfcgal_alloc_handler_t)(size_t);
 typedef void (*sfcgal_free_handler_t)(void *);
 
 /**
- * Sets the error handlers. These callbacks are called on warning or error
+ * Sets the allocation handlers. These functions are called on memory allocation
+ * and deallocation.
  * @param malloc_handler is the function to call for memory allocation. The
  * default behaviour is to call malloc()
  * @param free_handler is the function to call for memory deallocation. The
