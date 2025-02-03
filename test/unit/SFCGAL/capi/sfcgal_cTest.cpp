@@ -192,6 +192,7 @@ BOOST_AUTO_TEST_CASE(testForceRHR)
   // check
   BOOST_CHECK_EQUAL(strGeom, strApi);
   delete[] wkbApi;
+  sfcgal_geometry_delete(rhr);
 }
 
 BOOST_AUTO_TEST_CASE(testForceLHR)
