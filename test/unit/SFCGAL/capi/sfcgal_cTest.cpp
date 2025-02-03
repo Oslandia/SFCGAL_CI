@@ -176,6 +176,8 @@ BOOST_AUTO_TEST_CASE(testLineSubstring)
   BOOST_CHECK(hasError == false);
 
   BOOST_CHECK(sfcgal_geometry_covers_3d(ls, g2.get()));
+
+  sfcgal_geometry_delete(ls);
 }
 
 BOOST_AUTO_TEST_CASE(testForceRHR)
