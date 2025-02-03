@@ -455,6 +455,7 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionC)
   // check
   BOOST_CHECK_EQUAL(expectedWKT, strApi);
   delete[] wkbApi;
+  sfcgal_geometry_delete(result);
 }
 
 BOOST_AUTO_TEST_CASE(testSolidSetExteriorShell)
