@@ -141,6 +141,14 @@ sfcgal_set_alloc_handlers(sfcgal_alloc_handler_t alloc_handler,
 }
 
 extern "C" void
+sfcgal_free_buffer(void *buffer)
+{
+  if (buffer != nullptr) {
+    sfcgal_free_handler(buffer);
+  }
+}
+
+extern "C" void
 sfcgal_init()
 {
   // Empty for now

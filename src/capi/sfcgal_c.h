@@ -1437,6 +1437,14 @@ SFCGAL_API void
 sfcgal_set_alloc_handlers(sfcgal_alloc_handler_t malloc_handler,
                           sfcgal_free_handler_t  free_handler);
 
+/**
+ * Delete a buffer previously allocated and returned by SFCAL.
+ * @param buffer a buffer previously allocated and returned by SFCAL
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_free_buffer(void *buffer);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Init
