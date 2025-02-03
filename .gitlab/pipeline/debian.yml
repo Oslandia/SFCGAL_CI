@@ -36,7 +36,7 @@ debian_testing_clang:
 
   script:
     - apt-get update -qq
-    - apt-get install --yes sudo wget clang libstdc++-11-dev
+    - apt-get install --yes sudo wget clang
     - ./ci/debian/before_install.sh $CGAL_VERSION
     - cd $CI_PROJECT_DIR
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
