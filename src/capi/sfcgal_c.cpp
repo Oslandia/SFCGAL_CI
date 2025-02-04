@@ -1987,3 +1987,32 @@ sfcgal_geometry_centroid_3d(const sfcgal_geometry_t *geom)
   std::unique_ptr<SFCGAL::Geometry> out(result->clone());
   return out.release();
 }
+
+extern "C" auto
+sfcgal_geometry_is_equals(const sfcgal_geometry_t *ga,
+                          const sfcgal_geometry_t *gb) -> int
+{
+  return sfcgal_geometry_is_almost_equals(ga, gb, 0.0);
+}
+
+extern "C" auto
+sfcgal_geometry_is_almost_equals(const sfcgal_geometry_t *ga,
+                                 const sfcgal_geometry_t *gb, double tolerance)
+    -> int
+{
+  const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(ga);
+  const auto *g2 = reinterpret_cast<const SFCGAL::Geometry *>(gb);
+
+  bool result;
+  try {
+    result = g1->almostEqual(*g2, tolerance);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During is_almost_equals(A, B, %g):", tolerance);
+    SFCGAL_WARNING("  with A: %s", g1->asText().c_str());
+    SFCGAL_WARNING("  with B: %s", g2->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    result = false;
+  }
+
+  return static_cast<int>(result);
+}

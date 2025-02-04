@@ -1261,6 +1261,32 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_centroid_3d(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns true if geom1 is equals to geom2.
+ *
+ * For each point of geom1 there is a point in geom2.
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_geometry_is_equals(const sfcgal_geometry_t *geom1,
+                          const sfcgal_geometry_t *geom2);
+
+/**
+ * Returns true if geom1 is almost equals to geom2.
+ *
+ * For each point of geom1 there is a point in geom2 within tolerance distance.
+ * @param tolerance 0 by default
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_geometry_is_almost_equals(const sfcgal_geometry_t *geom1,
+                                 const sfcgal_geometry_t *geom2,
+                                 double                   tolerance = 0.0);
+
+/**
  * Returns the y monotone partition of a geometry (polygon without hole)
  * @pre isValid(geom) == true
  * @post isValid(return) == true
