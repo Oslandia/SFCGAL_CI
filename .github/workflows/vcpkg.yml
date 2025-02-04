@@ -1,33 +1,48 @@
-name: Build with vcpkg on Windows
+name: Build with vcpkg
 
 on: [push, pull_request]
 
 jobs:
-  msvc:
-    name: MSVC
-    runs-on: windows-latest
+  job:
+    name: ${{ matrix.os }}-${{ github.workflow }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: windows-latest
+            triplet: x64-windows
+          - os: ubuntu-latest
+            triplet: x64-linux
+          - os: macos-latest
+            triplet: x64-osx
+
     env:
-      VCPKG_VERSION: a42af01b72c28a8e1d7b48107b33e4f286a55ef6
-      vcpkg_packages: cgal boost-program-options boost-timer boost-test
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install Ninja (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Ninja (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install ninja autoconf automake libtool
 
       - name: Restore from cache and run vcpkg
-        uses: lukka/run-vcpkg@v7
+        uses: lukka/run-vcpkg@v11
+        id: runvcpkg
+
+      - name: Run CMake+vcpkg+NinjaMulti-Config (Release configuration)
+        uses: lukka/run-cmake@v10
+        id: runcmake
         with:
-          vcpkgArguments: ${{env.vcpkg_packages}}
-          vcpkgDirectory: '${{ github.workspace }}\vcpkg'
-          appendedCacheKey: x64-windows
-          vcpkgGitCommitId: ${{ env.VCPKG_VERSION }}
-          vcpkgTriplet: x64-windows
-
-      - name: Configure project with vcpkg/cmake
-        run: |
-            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSFCGAL_BUILD_TESTS=ON -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake"
-    
-      - name: Build SFCGAL
-        run: cmake --build build --config Release
-
-      # - name: Test SFCGAL
-      #   run: ctest -VV --output-on-failure --test-dir build
-
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          configurePreset: 'ninja-multi-vcpkg'
+          buildPreset: 'ninja-multi-vcpkg'
+          buildPresetAdditionalArgs: '[`--config Release`]'

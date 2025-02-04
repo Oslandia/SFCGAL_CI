@@ -1,0 +1,8 @@
+{
+  "name": "main",
+  "version-string": "latest",
+  "dependencies": [
+    "cgal"
+  ],
+  "builtin-baseline": "cbf6fe29bd66f7e9c4474d7086b39c3012cce225"
+}
