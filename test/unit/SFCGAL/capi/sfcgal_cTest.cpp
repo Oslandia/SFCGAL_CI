@@ -53,6 +53,89 @@ on_error(const char * /*msg*/, ...) -> int
   return 0;
 }
 
+BOOST_AUTO_TEST_CASE(testIs3D)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // retrieve wkb from geometry via C++ api
+  std::unique_ptr<Geometry> const g(io::readWkt("POLYGON ((0 0, 20 0, 20 10, 0 10, 0 0))"));
+  // check
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_is_3d(g.get()));
+
+  std::unique_ptr<Geometry> const g2(
+      io::readWkt("POLYGON Z ((0 0 0, 20 0 0, 20 10 0, 0 10 0, 0 0 0))"));
+  // check
+  BOOST_CHECK_EQUAL(true, sfcgal_geometry_is_3d(g2.get()));
+}
+
+BOOST_AUTO_TEST_CASE(testIsValid)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // ========== 2D
+  // retrieve wkb from geometry via C++ api
+  std::unique_ptr<Geometry> const g(io::readWkt("POLYGON((0 0,10 0,10 0,10 10,0 10,0 0))"));
+  char *reason;
+  sfcgal_geometry_t *location;
+  int result = sfcgal_geometry_is_valid_detail(g.get(), &reason, &location);
+  // check
+  BOOST_CHECK_EQUAL(true, result);
+  BOOST_CHECK_EQUAL(nullptr, reason);
+  BOOST_CHECK_EQUAL(nullptr, location);
+
+  std::unique_ptr<Geometry> const g2(io::readWkt("POLYGON((1 2,1 2,1 2,1 2))"));
+  result = sfcgal_geometry_is_valid_detail(g2.get(), &reason, &location);
+  // check
+  BOOST_CHECK_EQUAL(false, result);
+  BOOST_CHECK_EQUAL("ring 0 degenerated to a point", reason);
+  BOOST_CHECK_EQUAL(nullptr, location);
+
+  sfcgal_free_buffer(reason);
+  if (location)
+    sfcgal_geometry_delete(location);
+
+  // ========== 3D
+  std::unique_ptr<Geometry> const g3(
+      io::readWkt("TRIANGLE((1.0 -1.0 -1.0,1.0 1.0 -1.0,1.0 -1.0 1.0,1.0 -1.0 -1.0))"));
+  result = sfcgal_geometry_is_valid_detail(g3.get(), &reason, &location);
+  // check
+  BOOST_CHECK_EQUAL(true, result);
+  BOOST_CHECK_EQUAL(nullptr, reason);
+  BOOST_CHECK_EQUAL(nullptr, location);
+
+  std::unique_ptr<Geometry> const g4(
+      io::readWkt("TRIANGLE((1.0 -1.0 -1.0,1.0 1.0 -1.0,1.0 -1.0 -1.0,1.0 -1.0 -1.0))"));
+  result = sfcgal_geometry_is_valid_detail(g4.get(), &reason, &location);
+  // check
+  BOOST_CHECK_EQUAL(false, result);
+  BOOST_CHECK_EQUAL("ring 0 self intersects", reason);
+  BOOST_CHECK_EQUAL(nullptr, location);
+
+  sfcgal_free_buffer(reason);
+  if (location)
+    sfcgal_geometry_delete(location);
+}
+
+BOOST_AUTO_TEST_CASE(testIsMeasured)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // retrieve wkb from geometry via C++ api
+  std::unique_ptr<Geometry> const g(io::readWkt("POLYGON ((0 0, 20 0, 20 10, 0 10, 0 0))"));
+  // check
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_is_measured(g.get()));
+
+  std::unique_ptr<Geometry> const g2(
+      io::readWkt("POLYGON Z ((0 0 0, 20 0 0, 20 10 0, 0 10 0, 0 0 0))"));
+  // check
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_is_measured(g2.get()));
+
+  std::unique_ptr<Geometry> const g3(
+      io::readWkt("POLYGON M ((0 0 1, 20 0 2, 20 10 3, 0 10 4, 0 0 1))"));
+  // check
+  BOOST_CHECK_EQUAL(true, sfcgal_geometry_is_measured(g3.get()));
+}
+
 /// Coordinate() ;
 BOOST_AUTO_TEST_CASE(testErrorOnBadGeometryType)
 {

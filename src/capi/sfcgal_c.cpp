@@ -172,6 +172,8 @@ sfcgal_full_version() -> const char *
 extern "C" void
 sfcgal_set_geometry_validation(int /*enabled*/)
 {
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      BOOST_THROW_EXCEPTION(SFCGAL::Exception("Not implemented")););
 }
 
 extern "C" auto
