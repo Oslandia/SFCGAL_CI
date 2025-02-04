@@ -198,6 +198,17 @@ sfcgal_geometry_is_valid(const sfcgal_geometry_t *geom) -> int
           *reinterpret_cast<const SFCGAL::Geometry *>(geom)));)
 }
 
+// deprecated!
+extern "C" auto
+sfcgal_geometry_is_complexity_detail(const sfcgal_geometry_t *geom,
+                                     char                   **invalidity_reason,
+                                     sfcgal_geometry_t **invalidity_location)
+    -> int
+{
+  return sfcgal_geometry_is_valid_detail(geom, invalidity_reason,
+                                         invalidity_location);
+}
+
 extern "C" auto
 sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
                                 char                   **invalidity_reason,
