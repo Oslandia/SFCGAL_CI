@@ -420,6 +420,16 @@ BOOST_AUTO_TEST_CASE(testEnvelope2D)
 
   sfcgal_free_buffer(wkt);
   sfcgal_geometry_delete(result);
+
+  hasError = false;
+  result = sfcgal_geometry_envelope_3d(g.get());
+  BOOST_CHECK(hasError == false);
+
+  sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POLYGON ((0 0,30 0,30 15,0 15,0 0))");
+
+  sfcgal_free_buffer(wkt);
+  sfcgal_geometry_delete(result);
 }
 
 BOOST_AUTO_TEST_CASE(testEnvelope3D)
@@ -433,14 +443,25 @@ BOOST_AUTO_TEST_CASE(testEnvelope3D)
   sfcgal_geometry_t *result = sfcgal_geometry_envelope(g.get());
   BOOST_CHECK(hasError == false);
 
-  std::string expected = "POLYHEDRALSURFACE Z (((0 0 -5,0 15 -5,30 15 -5,30 0 -5,0 0 -5)),"
-                         "((0 0 25,30 0 25,30 15 25,0 15 25,0 0 25)),"
-                         "((0 0 -5,30 0 -5,30 0 25,0 0 25,0 0 -5)),"
-                         "((30 15 -5,0 15 -5,0 15 25,30 15 25,30 15 -5)),"
-                         "((30 0 -5,30 15 -5,30 15 25,30 0 25,30 0 -5)),"
-                         "((0 0 -5,0 0 25,0 15 25,0 15 -5,0 0 -5)))";
+  std::string expected = "POLYGON ((0 0,30 0,30 15,0 15,0 0))";
   char *wkt;
   size_t len;
+  sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), expected);
+
+  sfcgal_free_buffer(wkt);
+  sfcgal_geometry_delete(result);
+
+  hasError = false;
+  result = sfcgal_geometry_envelope_3d(g.get());
+  BOOST_CHECK(hasError == false);
+
+  expected = "POLYHEDRALSURFACE Z (((0 0 -5,0 15 -5,30 15 -5,30 0 -5,0 0 -5)),"
+             "((0 0 25,30 0 25,30 15 25,0 15 25,0 0 25)),"
+             "((0 0 -5,30 0 -5,30 0 25,0 0 25,0 0 -5)),"
+             "((30 15 -5,0 15 -5,0 15 25,30 15 25,30 15 -5)),"
+             "((30 0 -5,30 15 -5,30 15 25,30 0 25,30 0 -5)),"
+             "((0 0 -5,0 0 25,0 15 25,0 15 -5,0 0 -5)))";
   sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
   BOOST_CHECK_EQUAL(std::string(wkt), expected);
 

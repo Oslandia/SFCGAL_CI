@@ -1206,6 +1206,15 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_envelope(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns the 3d envelope of geom
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_envelope_3d(const sfcgal_geometry_t *geom);
+
+/**
  * Returns the 2D length of geom
  * @pre isValid(geom) == true
  * @post isValid(return) == true
