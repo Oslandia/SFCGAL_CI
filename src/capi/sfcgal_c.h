@@ -103,7 +103,7 @@ sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
                                 sfcgal_geometry_t      **invalidity_location);
 
 /**
- * @deprecated Same as sfcgal_geometry_is_valid_detail
+ * @deprecated Use sfcgal_geometry_is_valid_detail instead.
  * @ingroup capi
  */
 [[__deprecated__(

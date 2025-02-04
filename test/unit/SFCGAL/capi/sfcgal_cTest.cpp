@@ -136,6 +136,32 @@ BOOST_AUTO_TEST_CASE(testIsMeasured)
   BOOST_CHECK_EQUAL(true, sfcgal_geometry_is_measured(g3.get()));
 }
 
+BOOST_AUTO_TEST_CASE(testIsSimple)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // retrieve wkb from geometry via C++ api
+  std::unique_ptr<Geometry> const g(io::readWkt("LINESTRING (0.0 0.0, 2.0 0.0, 1.0 1.0)"));
+  // check
+  BOOST_CHECK_EQUAL(true, sfcgal_geometry_is_simple(g.get()));
+
+  std::unique_ptr<Geometry> const g2(
+      io::readWkt("POLYGON Z ((0.0 0.0 0.0, 1.0 0.0 0.0, 1.0 1.0 0.0, "
+                  "0.0 1.0 0.0, 0.0 0.0 0.0))"));
+  // check
+  BOOST_CHECK_EQUAL(true, sfcgal_geometry_is_simple(g2.get()));
+
+  std::unique_ptr<Geometry> const g3(
+      io::readWkt("POLYGON Z ((0.0 0.0 1.0, 1.0 0.0 0.0, 1.0 1.0 0.0, "
+                  "0.0 1.0 0.0, 0.0 0.0 1.0))"));
+  char *reason;
+  // check
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_is_simple_detail(g3.get(), &reason));
+  BOOST_CHECK_EQUAL("Points don't lie in the same plane.", reason);
+
+  sfcgal_free_buffer(reason);
+}
+
 /// Coordinate() ;
 BOOST_AUTO_TEST_CASE(testErrorOnBadGeometryType)
 {
