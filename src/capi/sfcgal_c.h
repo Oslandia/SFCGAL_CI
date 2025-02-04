@@ -1206,6 +1206,24 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_envelope(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns the 2D length of geom
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API double
+sfcgal_geometry_length(const sfcgal_geometry_t *geom);
+
+/**
+ * Returns the 3D length of geom
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API double
+sfcgal_geometry_length_3d(const sfcgal_geometry_t *geom);
+
+/**
  * Returns the y monotone partition of a geometry (polygon without hole)
  * @pre isValid(geom) == true
  * @post isValid(return) == true
