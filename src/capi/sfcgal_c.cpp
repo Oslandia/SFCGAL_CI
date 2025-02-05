@@ -33,6 +33,7 @@
 #include "SFCGAL/algorithm/alphaWrapping3D.h"
 #include "SFCGAL/algorithm/area.h"
 #include "SFCGAL/algorithm/buffer3D.h"
+#include "SFCGAL/algorithm/centroid.h"
 #include "SFCGAL/algorithm/convexHull.h"
 #include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/difference.h"
@@ -1947,4 +1948,43 @@ sfcgal_geometry_length_3d(const sfcgal_geometry_t *geom) -> double
   }
 
   return result;
+}
+
+extern "C" auto
+sfcgal_geometry_centroid(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Point> result;
+
+  try {
+    result = SFCGAL::algorithm::centroid(*geometry);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During centroid(A):");
+    SFCGAL_WARNING("  with A: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  std::unique_ptr<SFCGAL::Geometry> out(result->clone());
+  return out.release();
+}
+
+extern "C" auto
+sfcgal_geometry_centroid_3d(const sfcgal_geometry_t *geom)
+    -> sfcgal_geometry_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Point> result;
+
+  try {
+    result = SFCGAL::algorithm::centroid3D(*geometry);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During centroid3D(A):");
+    SFCGAL_WARNING("  with A: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  std::unique_ptr<SFCGAL::Geometry> out(result->clone());
+  return out.release();
 }

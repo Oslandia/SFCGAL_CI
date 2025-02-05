@@ -652,6 +652,46 @@ BOOST_AUTO_TEST_CASE(testLength3D)
   BOOST_CHECK_EQUAL(21.2106, std::round(result * 10000.0) / 10000.0);
 }
 
+BOOST_AUTO_TEST_CASE(testCentroid)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt(
+      "MULTIPOLYGON (((0 0, 20 0, 20 10, 0 10, 0 0)), ((25 5, 30 5, 30 15, 25 15, 25 5)))"));
+
+  hasError = false;
+  sfcgal_geometry_t *result = sfcgal_geometry_centroid(g.get());
+  BOOST_CHECK(hasError == false);
+
+  char *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT (14 6)");
+
+  sfcgal_free_buffer(wkt);
+  sfcgal_geometry_delete(result);
+}
+
+BOOST_AUTO_TEST_CASE(testCentroid3D)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt(
+      "MULTIPOLYGON Z (((0 0 0, 20 0 0, 20 10 5, 0 10 5, 0 0 0)), ((25 5 0, 30 5 0, 30 15 -5, 25 15 -5, 25 5 0)))"));
+
+  hasError = false;
+  sfcgal_geometry_t *result = sfcgal_geometry_centroid(g.get());
+  BOOST_CHECK(hasError == false);
+
+  char *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt), "POINT Z (14 6 2)");
+
+  sfcgal_free_buffer(wkt);
+  sfcgal_geometry_delete(result);
+}
+
 BOOST_AUTO_TEST_CASE(testRotate3DAroundCenter)
 {
   sfcgal_set_error_handlers(printf, on_error);

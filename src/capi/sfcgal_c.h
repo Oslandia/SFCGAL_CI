@@ -1243,6 +1243,24 @@ SFCGAL_API double
 sfcgal_geometry_length_3d(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns a Point representing the geometry centroid
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_centroid(const sfcgal_geometry_t *geom);
+
+/**
+ * Returns a Point representing the geometry centroid
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_centroid_3d(const sfcgal_geometry_t *geom);
+
+/**
  * Returns the y monotone partition of a geometry (polygon without hole)
  * @pre isValid(geom) == true
  * @post isValid(return) == true
