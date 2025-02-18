@@ -137,6 +137,16 @@ Geometry::geometryN(size_t const &n) -> Geometry &
   return *this;
 }
 
+void
+Geometry::setGeometryN(const Geometry &, size_t const &)
+{
+}
+
+void
+Geometry::setGeometryN(Geometry *, size_t const &)
+{
+}
+
 ///
 ///
 ///
