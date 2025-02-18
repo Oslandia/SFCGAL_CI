@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryVisitor.h"
 
 #include <CGAL/Cartesian_converter.h>
@@ -203,6 +204,48 @@ PolyhedralSurface::geometryN(size_t const &n) -> Polygon &
   }
 
   return _polygons[n];
+}
+
+void
+PolyhedralSurface::setGeometryN(Polygon *polygon, size_t const &n)
+{
+  BOOST_ASSERT(polygon != NULL);
+
+  if (n >= numGeometries()) {
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("Cannot set geometry at position %s. "
+                                 "PolyhedralSurface has only %d geometries.") %
+                   n % numGeometries())
+                      .str()));
+  }
+
+  _polygons.replace(n, polygon);
+}
+
+void
+PolyhedralSurface::setGeometryN(const Polygon &polygon, size_t const &n)
+{
+  setGeometryN(polygon.clone(), n);
+}
+
+void
+PolyhedralSurface::setGeometryN(Geometry *geometry, size_t const &n)
+{
+  if (geometry->geometryTypeId() != TYPE_POLYGON) {
+    std::ostringstream oss;
+    oss << "try to set a '" << geometry->geometryType()
+        << "' in a PolyhedralSurface\n";
+    delete geometry; // we are responsible for the resource here
+    BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
+  }
+
+  setGeometryN(dynamic_cast<Polygon *>(geometry), n);
+}
+
+void
+PolyhedralSurface::setGeometryN(const Geometry &geometry, size_t const &n)
+{
+  setGeometryN(geometry.clone(), n);
 }
 
 void

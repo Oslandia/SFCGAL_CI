@@ -122,6 +122,36 @@ GeometryCollection::geometryN(size_t const &n) -> Geometry &
 }
 
 void
+GeometryCollection::setGeometryN(Geometry *geometry, size_t const &n)
+{
+  BOOST_ASSERT(geometry != NULL);
+
+  if (n >= numGeometries()) {
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("Cannot set geometry at position %s. "
+                                 "GeometryCollection has only %d geometries.") %
+                   n % numGeometries())
+                      .str()));
+  }
+
+  if (!isAllowed(*geometry)) {
+    std::ostringstream oss;
+    oss << "try to add a '" << geometry->geometryType() << "' in a '"
+        << geometryType() << "'\n";
+    delete geometry; // we are responsible for the resource here
+    BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
+  }
+
+  _geometries.replace(n, geometry);
+}
+
+void
+GeometryCollection::setGeometryN(const Geometry &geometry, size_t const &n)
+{
+  setGeometryN(geometry.clone(), n);
+}
+
+void
 GeometryCollection::addGeometry(Geometry *geometry)
 {
   BOOST_ASSERT(geometry != NULL);

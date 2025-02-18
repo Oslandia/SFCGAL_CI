@@ -139,6 +139,36 @@ public:
   Triangle &
   geometryN(size_t const &n) override;
 
+  /**
+   * Sets the n-th Geometry, starting at zero
+   * It needs to be a triangle.
+   */
+  void
+  setGeometryN(const Geometry &geometry, size_t const &n) override;
+
+  /**
+   * Sets the n-th Geometry, starting at zero
+   * It needs to be a triangle.
+   * The ownership of the polygon is taken. The caller is not responsible
+   * anymore of its deallocation.
+   */
+  void
+  setGeometryN(Geometry *geometry, size_t const &n) override;
+
+  /**
+   * Sets the n-th Triangle, starting at zero
+   */
+  void
+  setGeometryN(const Triangle &triangle, size_t const &n);
+
+  /**
+   * Sets the n-th Triangle, starting at zero
+   * The ownership of the polygon is taken. The caller is not responsible
+   * anymore of its deallocation.
+   */
+  void
+  setGeometryN(Triangle *triangle, size_t const &n);
+
   //-- optimization
 
   void

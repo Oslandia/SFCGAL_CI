@@ -77,6 +77,13 @@ public:
   Geometry &
   geometryN(size_t const &n) override;
 
+  //-- SFCGAL::Geometry
+  virtual void
+  setGeometryN(const Geometry &geometry, size_t const &n) override;
+  //-- SFCGAL::Geometry
+  virtual void
+  setGeometryN(Geometry *geometry, size_t const &n) override;
+
   /**
    * [SFA/OGC]add a geometry to the collection (takes ownership)
    */

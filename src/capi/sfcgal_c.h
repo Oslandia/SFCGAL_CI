@@ -223,6 +223,17 @@ sfcgal_geometry_get_geometry_n(const sfcgal_geometry_t *geometryCollection,
                                size_t                   n);
 
 /**
+ * Sets the n-th geometry of the given geometry collection
+ * @pre geometryCollection must be a GeometryCollection, a PolyhedralSurface or
+ * a TriangulatedSurface. Otherwise, nothing happens. The ownership of the
+ * geometry is taken. The caller is not responsible anymore of its deallocation.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_geometry_set_geometry_n(sfcgal_geometry_t *geometryCollection,
+                               sfcgal_geometry_t *geometry, size_t n);
+
+/**
  * Returns a WKT representation of the given geometry using CGAL exact integer
  * fractions as coordinate values
  * @post buffer is returned allocated and must be freed by the caller

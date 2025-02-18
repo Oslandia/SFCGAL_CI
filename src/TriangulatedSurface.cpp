@@ -129,6 +129,48 @@ TriangulatedSurface::geometryN(size_t const &n) -> Triangle &
 }
 
 void
+TriangulatedSurface::setGeometryN(Triangle *triangle, size_t const &n)
+{
+  BOOST_ASSERT(triangle != NULL);
+
+  if (n >= numGeometries()) {
+    BOOST_THROW_EXCEPTION(Exception(
+        (boost::format("Cannot set geometry at position %s. "
+                       "TriangulatedSurface has only %d geometries.") %
+         n % numGeometries())
+            .str()));
+  }
+
+  _triangles.replace(n, triangle);
+}
+
+void
+TriangulatedSurface::setGeometryN(const Triangle &triangle, size_t const &n)
+{
+  setGeometryN(triangle.clone(), n);
+}
+
+void
+TriangulatedSurface::setGeometryN(Geometry *geometry, size_t const &n)
+{
+  if (geometry->geometryTypeId() != TYPE_TRIANGLE) {
+    std::ostringstream oss;
+    oss << "try to set a '" << geometry->geometryType()
+        << "' in a TriangulatedSurface\n";
+    delete geometry; // we are responsible for the resource here
+    BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
+  }
+
+  setGeometryN(dynamic_cast<Triangle *>(geometry), n);
+}
+
+void
+TriangulatedSurface::setGeometryN(const Geometry &geometry, size_t const &n)
+{
+  setGeometryN(geometry.clone(), n);
+}
+
+void
 TriangulatedSurface::reserve(const size_t &n)
 {
   _triangles.reserve(n);

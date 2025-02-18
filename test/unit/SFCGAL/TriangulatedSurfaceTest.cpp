@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(polyhedronConversionTest)
   BOOST_CHECK_EQUAL(poly->size_of_vertices(), 6U);
 }
 
-BOOST_AUTO_TEST_CASE(geometryNTest)
+BOOST_AUTO_TEST_CASE(setGeometryNTest)
 {
   std::unique_ptr<Geometry> emptyGeom(io::readWkt("TIN EMPTY"));
   BOOST_CHECK(emptyGeom->is<TriangulatedSurface>());
@@ -238,7 +238,28 @@ BOOST_AUTO_TEST_CASE(geometryNTest)
   BOOST_CHECK_EQUAL(geom->geometryN(1).asText(0), "TRIANGLE Z ((2 0 2,3 2 3,1 2 4,2 0 2))");
   BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0), "TRIANGLE Z ((1 2 4,3 2 3,2 4 6,1 2 4))");
   BOOST_CHECK_THROW(geom->geometryN(3), Exception);
-}
 
+  // set new Polygon at index 1 from a Geometry object
+  std::string const newTriangleStr = "TRIANGLE Z ((0 0 0, 2 0 4, 1 2 2, 0 0 0))";
+  std::unique_ptr<Geometry> newGeom(io::readWkt(newTriangleStr));
+  geom->setGeometryN(newGeom->clone(), 1);
+
+  BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
+  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0), "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
+  BOOST_CHECK_EQUAL(geom->geometryN(1).asText(), newGeom->asText());
+  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0), "TRIANGLE Z ((1 2 4,3 2 3,2 4 6,1 2 4))");
+
+  // set New Triangle at index 2 from a Triangle
+  std::string const newTriangleStr2 = "TRIANGLE Z ((0 0 0, 0 15 0, 15 15 15, 0 0 0))";
+  std::unique_ptr<Geometry> newGeom2(io::readWkt(newTriangleStr2));
+  Triangle *newTriangle2 = dynamic_cast<Triangle *>(newGeom2.get());
+  BOOST_CHECK(newTriangle2);
+  geom->setGeometryN(newTriangle2->clone(), 2);
+
+  BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
+  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0), "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
+  BOOST_CHECK_EQUAL(geom->geometryN(1).asText(), newGeom->asText());
+  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(), newGeom2->asText());
+}
 
 BOOST_AUTO_TEST_SUITE_END()

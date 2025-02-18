@@ -11,6 +11,7 @@
 #include <boost/serialization/base_object.hpp>
 #include <vector>
 
+#include "SFCGAL/Geometry.h"
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
@@ -178,6 +179,36 @@ public:
   //-- SFCGAL::Geometry
   Polygon &
   geometryN(size_t const &n) override;
+
+  /**
+   * Sets the n-th Geometry, starting at zero
+   * It needs to be a polygon.
+   */
+  void
+  setGeometryN(const Geometry &geometry, size_t const &n) override;
+
+  /**
+   * Sets the n-th Geometry, starting at zero
+   * It needs to be a polygon.
+   * The ownership of the polygon is taken. The caller is not responsible
+   * anymore of its deallocation.
+   */
+  void
+  setGeometryN(Geometry *geometry, size_t const &n) override;
+
+  /**
+   * Sets the n-th Polygon, starting at zero
+   */
+  void
+  setGeometryN(const Polygon &polygon, size_t const &n);
+
+  /**
+   * Sets the n-th Polygon, starting at zero
+   * The ownership of the polygon is taken. The caller is not responsible
+   * anymore of its deallocation.
+   */
+  void
+  setGeometryN(Polygon *polygon, size_t const &n);
 
   /**
    * Convert to CGAL::Polyhedron_3

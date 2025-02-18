@@ -74,6 +74,18 @@ BOOST_AUTO_TEST_CASE(testAccessors)
   BOOST_CHECK_EQUAL(g.geometryN(1).asText(0), "LINESTRING (0 0,1 1)");
   BOOST_CHECK_EQUAL(g.geometryN(2).asText(0), "TRIANGLE ((0 0,1 0,1 1,0 0))");
   BOOST_CHECK_THROW(g.geometryN(3), Exception);
+
+  g.setGeometryN(Point(0.0, 0.0), 1);
+  BOOST_CHECK_EQUAL(g.numGeometries(), 3U);
+  BOOST_CHECK_EQUAL(g.geometryN(0).asText(0), "POINT (2 3)");
+  BOOST_CHECK_EQUAL(g.geometryN(1).asText(0), "POINT (0 0)");
+  BOOST_CHECK_EQUAL(g.geometryN(2).asText(0), "TRIANGLE ((0 0,1 0,1 1,0 0))");
+
+  g.setGeometryN(new Triangle(Point(3.0, 0.0), Point(4.0, 0.0), Point(4.0, 1.0)), 2);
+  BOOST_CHECK_EQUAL(g.numGeometries(), 3U);
+  BOOST_CHECK_EQUAL(g.geometryN(0).asText(0), "POINT (2 3)");
+  BOOST_CHECK_EQUAL(g.geometryN(1).asText(0), "POINT (0 0)");
+  BOOST_CHECK_EQUAL(g.geometryN(2).asText(0), "TRIANGLE ((3 0,4 0,4 1,3 0))");
 }
 
 //-- iterators

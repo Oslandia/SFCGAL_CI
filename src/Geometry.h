@@ -270,6 +270,24 @@ public:
   geometryN(size_t const &n);
 
   /**
+   * @brief [OGC/SFA]Sets the n-th geometry, starting at zero
+   * @warning Does nothing for Point, LineString, Polygon, Triangle
+   * TriangulatedSurface
+   */
+  virtual void
+  setGeometryN(const Geometry &geometry, size_t const &n);
+
+  /**
+   * @brief [OGC/SFA]Sets the n-th geometry, starting at zero
+   * The ownership of the geometry is taken. The caller is not responsible
+   * anymore of its deallocation.
+   * @warning *this for GeometryCollection, PolyhedralSurface,
+   * TriangulatedSurface
+   */
+  virtual void
+  setGeometryN(Geometry *geometry, size_t const &n);
+
+  /**
    * @brief Tests if geometry is of "Derived" type given as template parameter
    * @warning not optimized (slow with dynamic_cast)
    */
