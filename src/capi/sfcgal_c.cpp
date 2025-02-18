@@ -29,8 +29,8 @@
 
 #if !_MSC_VER
 #include "SFCGAL/algorithm/alphaShapes.h"
-#include "SFCGAL/algorithm/alphaWrapping3D.h"
 #endif
+#include "SFCGAL/algorithm/alphaWrapping3D.h"
 #include "SFCGAL/algorithm/area.h"
 #include "SFCGAL/algorithm/buffer3D.h"
 #include "SFCGAL/algorithm/convexHull.h"
