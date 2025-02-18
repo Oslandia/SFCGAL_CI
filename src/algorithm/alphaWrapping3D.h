@@ -18,8 +18,8 @@
  <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SFCGAL_ALGORITHM_ALPHASHAPES3D_H_
-#define _SFCGAL_ALGORITHM_ALPHASHAPES3D_H_
+#ifndef _SFCGAL_ALGORITHM_ALPHAWRAPPING3D_H_
+#define _SFCGAL_ALGORITHM_ALPHAWRAPPING3D_H_
 
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/PolyhedralSurface.h"
