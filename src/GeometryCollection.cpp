@@ -152,6 +152,35 @@ GeometryCollection::geometryN(size_t const &n) -> Geometry &
 ///
 ///
 void
+GeometryCollection::setGeometryN(Geometry *geometry, size_t const &n)
+{
+  BOOST_ASSERT(geometry != NULL);
+  BOOST_ASSERT(n < _geometries.size());
+
+  if (!isAllowed(*geometry)) {
+    std::ostringstream oss;
+    oss << "try to add a '" << geometry->geometryType() << "' in a '"
+        << geometryType() << "'\n";
+    delete geometry; // we are responsible for the resource here
+    BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
+  }
+
+  _geometries.replace(n, geometry);
+}
+
+///
+///
+///
+void
+GeometryCollection::setGeometryN(const Geometry &geometry, size_t const &n)
+{
+  setGeometryN(geometry.clone(), n);
+}
+
+///
+///
+///
+void
 GeometryCollection::addGeometry(Geometry *geometry)
 {
   BOOST_ASSERT(geometry != NULL);

@@ -285,6 +285,8 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   hasError = false;
   BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 2), geomCollection2.get()));
   BOOST_CHECK(hasError == false);
+  sfcgal_geometry_set_geometry_n(geomCollection.get(), point->clone(), 1);
+  BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 1), point.get()));
 
   // PolyhedralSurface - should succeed
   hasError = false;
@@ -297,6 +299,9 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   hasError = false;
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(polySurface.get(), 2), polySurface2.get()));
   BOOST_CHECK(hasError == false);
+  std::unique_ptr<Geometry> const simplePolygon(io::readWkt("POLYGON Z ((0 0 0, 2 0 1, 2 2 2, 0 2 1, 0 0 0))"));
+  sfcgal_geometry_set_geometry_n(polySurface.get(), simplePolygon->clone(), 1);
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(polySurface.get(), 1), simplePolygon.get()));
 
   // TIN - should succeed
   hasError = false;
@@ -309,17 +314,24 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   hasError = false;
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 2), tin2.get()));
   BOOST_CHECK(hasError == false);
+  std::unique_ptr<Geometry> const simpleTriangle(io::readWkt("TRIANGLE Z ((0 0 0, 2 0 1, 2 2 2, 0 0 0))"));
+  sfcgal_geometry_set_geometry_n(tin.get(), simpleTriangle->clone(), 1);
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 1), simpleTriangle.get()));
 
   // Line - should return itself
   hasError = false;
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(line.get()), 1);
   BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(line.get(), 0), line.get());
+  sfcgal_geometry_set_geometry_n(line.get(), simpleTriangle->clone(), 1);
+  BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(line.get(), 1), line.get());
   BOOST_CHECK(hasError == false);
 
   // Point - should return itself
   hasError = false;
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(point.get()), 1);
   BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(point.get(), 5), point.get());
+  sfcgal_geometry_set_geometry_n(point.get(), simpleTriangle->clone(), 1);
+  BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(point.get(), 1), point.get());
   BOOST_CHECK(hasError == false);
 }
 
