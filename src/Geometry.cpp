@@ -139,6 +139,26 @@ Geometry::geometryN(size_t const &n) -> Geometry &
 ///
 ///
 ///
+void
+Geometry::setGeometryN(const Geometry &geometry, size_t const &n)
+{
+  (void)geometry;
+  (void)n;
+}
+
+///
+///
+///
+void
+Geometry::setGeometryN(Geometry *geometry, size_t const &n)
+{
+  (void)geometry;
+  (void)n;
+}
+
+///
+///
+///
 Geometry::Geometry() = default;
 
 auto
