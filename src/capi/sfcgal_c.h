@@ -581,7 +581,7 @@ sfcgal_polyhedral_surface_create();
  * @pre polyhedral must be a PolyhedralSurface
  * @ingroup capi
  */
-SFCGAL_API size_t
+[[deprecated("Use sfcgal_geometry_num_geometries instead.")]] SFCGAL_API size_t
 sfcgal_polyhedral_surface_num_polygons(const sfcgal_geometry_t *polyhedral);
 
 /**
