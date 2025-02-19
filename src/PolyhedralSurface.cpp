@@ -240,6 +240,7 @@ PolyhedralSurface::numGeometries() const -> size_t
 auto
 PolyhedralSurface::geometryN(size_t const &n) const -> const Polygon &
 {
+  BOOST_ASSERT(n < numGeometries());
   return _polygons[n];
 }
 
@@ -249,6 +250,7 @@ PolyhedralSurface::geometryN(size_t const &n) const -> const Polygon &
 auto
 PolyhedralSurface::geometryN(size_t const &n) -> Polygon &
 {
+  BOOST_ASSERT(n < numGeometries());
   return _polygons[n];
 }
 
