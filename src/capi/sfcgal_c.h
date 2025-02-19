@@ -664,8 +664,10 @@ sfcgal_triangulated_surface_num_triangles(const sfcgal_geometry_t *tin);
  * @pre i >= 0 and i < sfcgal_triangulated_surface_num_triangles( tin )
  * @post the returned Triangle is not writable and must not be deallocated by
  * the caller
+ * @deprecated Use sfcgal_geometry_get_geometry_n
  * @ingroup capi
  */
+SFCGAL_DEPRECATED("Use sfcgal_geometry_get_geometry_n instead.")
 SFCGAL_API const sfcgal_geometry_t *
 sfcgal_triangulated_surface_triangle_n(const sfcgal_geometry_t *tin, size_t i);
 
