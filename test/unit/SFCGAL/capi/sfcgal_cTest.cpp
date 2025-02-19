@@ -367,7 +367,7 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPolygon)
   hasError              = false;
   sfcgal_geometry_t *sk = sfcgal_geometry_straight_skeleton(g.get());
   BOOST_CHECK(hasError == false);
-  BOOST_CHECK_EQUAL(5, sfcgal_geometry_collection_num_geometries(sk));
+  BOOST_CHECK_EQUAL(5, sfcgal_geometry_num_geometries(sk));
 
   sfcgal_geometry_delete(sk);
 }
@@ -383,7 +383,7 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonMultiPolygon)
   hasError              = false;
   sfcgal_geometry_t *sk = sfcgal_geometry_straight_skeleton(g.get());
   BOOST_CHECK(hasError == false);
-  BOOST_CHECK_EQUAL(8, sfcgal_geometry_collection_num_geometries(sk));
+  BOOST_CHECK_EQUAL(8, sfcgal_geometry_num_geometries(sk));
 
   sfcgal_geometry_delete(sk);
 }
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE(testApproximateMedialAxis)
   hasError              = false;
   sfcgal_geometry_t *sk = sfcgal_geometry_approximate_medial_axis(g.get());
   BOOST_CHECK(hasError == false);
-  BOOST_CHECK_EQUAL(11, sfcgal_geometry_collection_num_geometries(sk));
+  BOOST_CHECK_EQUAL(11, sfcgal_geometry_num_geometries(sk));
   BOOST_CHECK_EQUAL(71.56, std::round(sfcgal_geometry_length(sk) * 100.0) / 100.0);
 
   sfcgal_geometry_delete(sk);

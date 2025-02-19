@@ -542,8 +542,10 @@ sfcgal_geometry_collection_create();
 /**
  * Returns the number of geometries of a given GeometryCollection
  * @pre collection is a GeometryCollection
+ * @deprecated Use sfcgal_geometry_num_geometries instead
  * @ingroup capi
  */
+SFCGAL_DEPRECATED("Use sfcgal_geometry_num_geometries instead.")
 SFCGAL_API size_t
 sfcgal_geometry_collection_num_geometries(const sfcgal_geometry_t *collection);
 
