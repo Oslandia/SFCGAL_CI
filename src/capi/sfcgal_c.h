@@ -515,7 +515,7 @@ sfcgal_geometry_collection_create();
  * @pre collection is a GeometryCollection
  * @ingroup capi
  */
-SFCGAL_API size_t
+[[deprecated("Use sfcgal_geometry_num_geometries instead.")]] SFCGAL_API size_t
 sfcgal_geometry_collection_num_geometries(const sfcgal_geometry_t *collection);
 
 /**
