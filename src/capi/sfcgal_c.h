@@ -591,11 +591,13 @@ sfcgal_polyhedral_surface_num_polygons(const sfcgal_geometry_t *polyhedral);
  * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_polygons(polyhedral)
  * @post the returned Polygon is not writable and must not be deallocated by the
  * caller
+ * @deprecated Use sfcgal_geometry_get_geometry_n instead
  * @ingroup capi
  */
-SFCGAL_API const sfcgal_geometry_t *
-sfcgal_polyhedral_surface_polygon_n(const sfcgal_geometry_t *polyhedral,
-                                    size_t                   i);
+[[deprecated("Use sfcgal_geometry_get_geometry_n instead.")]] SFCGAL_API const
+    sfcgal_geometry_t *
+    sfcgal_polyhedral_surface_polygon_n(const sfcgal_geometry_t *polyhedral,
+                                        size_t                   i);
 
 /**
  * Adds a Polygon to a given PolyhedralSurface
