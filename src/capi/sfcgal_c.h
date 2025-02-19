@@ -621,7 +621,7 @@ sfcgal_triangulated_surface_create();
  * @pre tin must be a TriangulatedSurface
  * @ingroup capi
  */
-SFCGAL_API size_t
+[[deprecated("Use sfcgal_geometry_num_geometries instead.")]] SFCGAL_API size_t
 sfcgal_triangulated_surface_num_triangles(const sfcgal_geometry_t *tin);
 
 /**
