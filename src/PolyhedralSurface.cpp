@@ -180,12 +180,28 @@ PolyhedralSurface::numGeometries() const -> size_t
 auto
 PolyhedralSurface::geometryN(size_t const &n) const -> const Polygon &
 {
+  if (n >= numGeometries()) {
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("Cannot access geometry at position %s. "
+                                 "PolyhedralSurface has only %d geometries.") %
+                   n % numGeometries())
+                      .str()));
+  }
+
   return _polygons[n];
 }
 
 auto
 PolyhedralSurface::geometryN(size_t const &n) -> Polygon &
 {
+  if (n >= numGeometries()) {
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("Cannot access geometry at position %s. "
+                                 "PolyhedralSurface has only %d geometries.") %
+                   n % numGeometries())
+                      .str()));
+  }
+
   return _polygons[n];
 }
 
