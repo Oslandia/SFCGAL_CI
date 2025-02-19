@@ -632,8 +632,10 @@ sfcgal_triangulated_surface_num_triangles(const sfcgal_geometry_t *tin);
  * the caller
  * @ingroup capi
  */
-SFCGAL_API const sfcgal_geometry_t *
-sfcgal_triangulated_surface_triangle_n(const sfcgal_geometry_t *tin, size_t i);
+[[deprecated("Use sfcgal_geometry_geometry_n instead.")]] SFCGAL_API const
+    sfcgal_geometry_t *
+    sfcgal_triangulated_surface_triangle_n(const sfcgal_geometry_t *tin,
+                                           size_t                   i);
 
 /**
  * Adds a Triangle to a given TriangulatedSurface
