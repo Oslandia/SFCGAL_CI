@@ -225,6 +225,85 @@ BOOST_AUTO_TEST_CASE(testErrorOnBadGeometryType)
   BOOST_CHECK(hasError == true);
 }
 
+BOOST_AUTO_TEST_CASE(testGeometryN)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const line(io::readWkt("LINESTRING (0 0, 0 1)"));
+  std::unique_ptr<Geometry> const point(io::readWkt("POINT (0 2)"));
+
+  std::string geomCollectionStr = "GEOMETRYCOLLECTION ("
+                                  "POINT (1 1),"
+                                  "LINESTRING (0 0, 2 2, 3 3),"
+                                  "POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0)),"
+                                  "MULTIPOINT ((2 2), (3 3), (4 4))"
+                                  ")";
+  std::unique_ptr<Geometry> const geomCollection(io::readWkt(geomCollectionStr));
+  std::unique_ptr<Geometry> const geomCollection0(io::readWkt("POINT (1 1)"));
+  std::unique_ptr<Geometry> const geomCollection2(io::readWkt("POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0))"));
+
+  std::string polySurfaceStr = "POLYHEDRALSURFACE Z ("
+                               "((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0)),"
+                               "((2 0 0, 4 0 0, 4 2 1, 2 2 1, 2 0 0)),"
+                               "((0 2 1, 2 2 1, 1 3 2, 0 2 1))"
+                               ")";
+  std::unique_ptr<Geometry> const polySurface(io::readWkt(polySurfaceStr));
+  std::unique_ptr<Geometry> const polySurface0(io::readWkt("POLYGON Z ((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0))"));
+  std::unique_ptr<Geometry> const polySurface2(io::readWkt("POLYGON Z ((0 2 1, 2 2 1, 1 3 2, 0 2 1))"));
+
+  std::string tinStr = "TIN Z ("
+                       "((0 0 0, 1 0 0, 0.5 1 1, 0 0 0)),"
+                       "((1 0 0, 1.5 1 1, 0.5 1 1, 1 0 0)),"
+                       "((0.5 1 1, 1.5 1 1, 1 2 2, 0.5 1 1))"
+                       ")";
+  std::unique_ptr<Geometry> const tin(io::readWkt(tinStr));
+  std::unique_ptr<Geometry> const tin0(io::readWkt("TRIANGLE Z ((0 0 0, 1 0 0, 0.5 1 1, 0 0 0))"));
+  std::unique_ptr<Geometry> const tin2(io::readWkt("TRIANGLE Z ((0.5 1 1, 1.5 1 1, 1 2 2, 0.5 1 1))"));
+
+  // GeometryCollection - should succeed
+  hasError = false;
+  BOOST_CHECK(!geomCollection->isEmpty());
+  BOOST_CHECK(!geomCollection0->isEmpty());
+  BOOST_CHECK(!geomCollection2->isEmpty());
+  BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 0), geomCollection0.get()));
+  BOOST_CHECK(hasError == false);
+  hasError = false;
+  BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 2), geomCollection2.get()));
+  BOOST_CHECK(hasError == false);
+
+  // PolyhedralSurface - should succeed
+  hasError = false;
+  BOOST_CHECK(!polySurface->isEmpty());
+  BOOST_CHECK(!polySurface0->isEmpty());
+  BOOST_CHECK(!polySurface2->isEmpty());
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(polySurface.get(), 0), polySurface0.get()));
+  BOOST_CHECK(hasError == false);
+  hasError = false;
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(polySurface.get(), 2), polySurface2.get()));
+  BOOST_CHECK(hasError == false);
+
+  // TIN - should succeed
+  hasError = false;
+  BOOST_CHECK(!tin->isEmpty());
+  BOOST_CHECK(!tin0->isEmpty());
+  BOOST_CHECK(!tin2->isEmpty());
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 0), tin0.get()));
+  BOOST_CHECK(hasError == false);
+  hasError = false;
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 2), tin2.get()));
+  BOOST_CHECK(hasError == false);
+
+  // Line - should return itself
+  hasError = false;
+  BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(line.get(), 0), line.get());
+  BOOST_CHECK(hasError == false);
+
+  // Point - should return itself
+  hasError = false;
+  BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(point.get(), 5), point.get());
+  BOOST_CHECK(hasError == false);
+}
+
 BOOST_AUTO_TEST_CASE(testAsWkb)
 {
   sfcgal_set_error_handlers(printf, on_error);
