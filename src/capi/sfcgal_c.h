@@ -201,6 +201,18 @@ SFCGAL_API void
 sfcgal_geometry_delete(sfcgal_geometry_t *);
 
 /**
+ * Returns the n-th geometry of the given geometry collection
+ * @pre geometry must be a GeometryCollection, a PolyhedralSurface or a
+ * TriangulatedSurface. Otherwise, the geometry is returned.
+ * @post the returned Geometry is not writable and must not be deallocated by
+ * the caller
+ * @ingroup capi
+ */
+SFCGAL_API const sfcgal_geometry_t *
+sfcgal_geometry_get_geometry_n(const sfcgal_geometry_t *geometryCollection,
+                               size_t                   n);
+
+/**
  * Returns a WKT representation of the given geometry using CGAL exact integer
  * fractions as coordinate values
  * @post buffer is returned allocated and must be freed by the caller
