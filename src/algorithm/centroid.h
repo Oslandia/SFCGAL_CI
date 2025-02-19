@@ -52,59 +52,82 @@ SFCGAL_API std::unique_ptr<Point>
            centroid(const Geometry &g);
 
 /**
+ * @brief Returns the 3D centroid for a Geometry
+ *
+ * The result is the weighted centroid of a geometry. The implementation follows
+ * PostGIS one (https://postgis.net/docs/ST_Centroid.html). The weigth is
+ * computed in the 3D space.
+ *
+ * @ingroup public_api
+ * @pre g is a valid geometry
+ */
+SFCGAL_API std::unique_ptr<Point>
+           centroid3D(const Geometry &g);
+
+/**
  * Returns the weighted centroid for a Geometry
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const Geometry &g);
+weightedCentroid(const Geometry &g, bool enable3DComputation = false);
 
 /**
  * Returns the weighted centroid for a Triangle
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const Triangle &g);
+weightedCentroid(const Triangle &g, bool enable3DComputation = false);
 
 /**
  * Returns the weighted centroid for a Triangle
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const Point &a, const Point &b, const Point &c);
+weightedCentroid(const Point &a, const Point &b, const Point &c,
+                 bool enable3DComputation = false);
 
 /**
  * Returns the weighted centroid for a LineString
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const LineString &g);
+weightedCentroid(const LineString &g, bool enable3DComputation = false);
 
 /**
  * Returns the weighted centroid for a Polygon
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const Polygon &g);
+weightedCentroid(const Polygon &g, bool enable3DComputation = false);
 
 /**
  * Returns the weighted centroid for a GeometryCollection
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const GeometryCollection &g);
+weightedCentroid(const GeometryCollection &g, bool enable3DComputation = false);
 
 /**
  * Returns the weighted centroid for a TriangulatedSurface
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const TriangulatedSurface &g);
+weightedCentroid(const TriangulatedSurface &g,
+                 bool                       enable3DComputation = false);
 
 /**
- * Returns the centroid for a TriangulatedSurface
+ * Returns the weighted centroid for a PolyhedralSurface
  * @ingroup detail
  */
-// SFCGAL_API WeightedCentroid weightedCentroid(const PolyhedralSurface &g);
+SFCGAL_API WeightedCentroid
+weightedCentroid(const PolyhedralSurface &g, bool enable3DComputation = false);
+
+/**
+ * Returns the weighted centroid for a Solid
+ * @ingroup detail
+ */
+SFCGAL_API WeightedCentroid
+weightedCentroid(const Solid &g, bool enable3DComputation = false);
 
 } // namespace algorithm
 } // namespace SFCGAL

@@ -192,10 +192,24 @@ Geometry::almostEqual(const Geometry &other, const double tolerance) const
   return true;
 }
 
+///
+///
+///
 auto
 Geometry::centroid() const -> Point
 {
   std::unique_ptr<Point> out = algorithm::centroid(*this);
+
+  return *(out.get());
+}
+
+///
+///
+///
+auto
+Geometry::centroid3D() const -> Point
+{
+  std::unique_ptr<Point> out = algorithm::centroid3D(*this);
 
   return *(out.get());
 }
