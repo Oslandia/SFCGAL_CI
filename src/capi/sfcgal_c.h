@@ -651,8 +651,10 @@ sfcgal_triangulated_surface_create();
 /**
  * Returns the number of triangles of a given TriangulatedSurface
  * @pre tin must be a TriangulatedSurface
+ * @deprecated Use sfcgal_geometry_num_geometries instead
  * @ingroup capi
  */
+SFCGAL_DEPRECATED("Use sfcgal_geometry_num_geometries instead.")
 SFCGAL_API size_t
 sfcgal_triangulated_surface_num_triangles(const sfcgal_geometry_t *tin);
 
