@@ -126,7 +126,7 @@ public:
   toTriangulatedSurface() const;
 
   /**
-   * [SFA/OGC]Returns the number of points
+   * [SFA/OGC]Returns the number of polygons
    * @deprecated see numGeometries
    */
   inline size_t
@@ -135,7 +135,7 @@ public:
     return _polygons.size();
   }
   /**
-   * [SFA/OGC]Returns the n-th point
+   * [SFA/OGC]Returns the n-th polygon
    * @deprecated see geometryN()
    */
   inline const Polygon &
@@ -145,7 +145,7 @@ public:
     return _polygons[n];
   }
   /**
-   * [SFA/OGC]Returns the n-th point
+   * [SFA/OGC]Returns the n-th polygon
    * @deprecated see geometryN()
    */
   inline Polygon &
