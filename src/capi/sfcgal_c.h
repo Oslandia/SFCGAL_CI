@@ -201,6 +201,16 @@ SFCGAL_API void
 sfcgal_geometry_delete(sfcgal_geometry_t *);
 
 /**
+ * Returns the number of geometries of the given geometry collection
+ * @pre geometry must be a GeometryCollection, a PolyhedralSurface or a
+ * TriangulatedSurface. Otherwise, 1 is returned.  For empty geometries 0 is
+ * returned.
+ * @ingroup capi
+ */
+SFCGAL_API size_t
+sfcgal_geometry_num_geometries(const sfcgal_geometry_t *geometryCollection);
+
+/**
  * Returns the n-th geometry of the given geometry collection
  * @pre geometry must be a GeometryCollection, a PolyhedralSurface or a
  * TriangulatedSurface. Otherwise, the geometry is returned.

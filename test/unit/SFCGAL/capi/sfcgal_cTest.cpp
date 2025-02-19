@@ -53,6 +53,20 @@ on_error(const char * /*msg*/, ...) -> int
   return 0;
 }
 
+BOOST_AUTO_TEST_CASE(testEmpty)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const g(io::readWkt("POLYGON EMPTY"));
+  BOOST_CHECK(sfcgal_geometry_is_empty(g.get()));
+  BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(g.get()), 0);
+
+  std::unique_ptr<Geometry> const g2(
+      io::readWkt("POLYGON Z ((0 0 0, 20 0 0, 20 10 0, 0 10 0, 0 0 0))"));
+  BOOST_CHECK(!sfcgal_geometry_is_empty(g2.get()));
+  BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(g2.get()), 1);
+}
+
 BOOST_AUTO_TEST_CASE(testIs3D)
 {
   sfcgal_set_error_handlers(printf, on_error);
@@ -265,6 +279,7 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   BOOST_CHECK(!geomCollection->isEmpty());
   BOOST_CHECK(!geomCollection0->isEmpty());
   BOOST_CHECK(!geomCollection2->isEmpty());
+  BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(geomCollection.get()), 4);
   BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 0), geomCollection0.get()));
   BOOST_CHECK(hasError == false);
   hasError = false;
@@ -276,6 +291,7 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   BOOST_CHECK(!polySurface->isEmpty());
   BOOST_CHECK(!polySurface0->isEmpty());
   BOOST_CHECK(!polySurface2->isEmpty());
+  BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(polySurface.get()), 3);
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(polySurface.get(), 0), polySurface0.get()));
   BOOST_CHECK(hasError == false);
   hasError = false;
@@ -287,6 +303,7 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   BOOST_CHECK(!tin->isEmpty());
   BOOST_CHECK(!tin0->isEmpty());
   BOOST_CHECK(!tin2->isEmpty());
+  BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(tin.get()), 3);
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 0), tin0.get()));
   BOOST_CHECK(hasError == false);
   hasError = false;
@@ -295,11 +312,13 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
 
   // Line - should return itself
   hasError = false;
+  BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(line.get()), 1);
   BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(line.get(), 0), line.get());
   BOOST_CHECK(hasError == false);
 
   // Point - should return itself
   hasError = false;
+  BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(point.get()), 1);
   BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(point.get(), 5), point.get());
   BOOST_CHECK(hasError == false);
 }

@@ -427,6 +427,15 @@ sfcgal_geometry_delete(sfcgal_geometry_t *geom)
 }
 
 extern "C" auto
+sfcgal_geometry_num_geometries(const sfcgal_geometry_t *geometryCollection)
+    -> size_t
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return down_const_cast<SFCGAL::Geometry>(geometryCollection)
+          ->numGeometries();)
+}
+
+extern "C" auto
 sfcgal_geometry_get_geometry_n(const sfcgal_geometry_t *geometryCollection,
                                size_t n) -> const sfcgal_geometry_t *
 {
