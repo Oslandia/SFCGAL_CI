@@ -608,8 +608,10 @@ sfcgal_polyhedral_surface_create();
 /**
  * Returns the number of polygons of a given PolyhedralSurface
  * @pre polyhedral must be a PolyhedralSurface
+ * @deprecated Use sfcgal_geometry_num_geometries instead
  * @ingroup capi
  */
+SFCGAL_DEPRECATED("Use sfcgal_geometry_num_geometries instead.")
 SFCGAL_API size_t
 sfcgal_polyhedral_surface_num_polygons(const sfcgal_geometry_t *polyhedral);
 
