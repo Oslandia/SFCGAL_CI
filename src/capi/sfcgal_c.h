@@ -525,11 +525,13 @@ sfcgal_geometry_collection_num_geometries(const sfcgal_geometry_t *collection);
  * @pre i >= 0 and i < sfcgal_geometry_collection_num_geometries
  * @post the returned Geometry is not writable and must not be deallocated by
  * the caller
+ * @deprecated Use sfcgal_geometry_get_geometry_n
  * @ingroup capi
  */
-SFCGAL_API const sfcgal_geometry_t *
-sfcgal_geometry_collection_geometry_n(const sfcgal_geometry_t *collection,
-                                      size_t                   i);
+[[deprecated("Use sfcgal_geometry_get_geometry_n instead.")]] SFCGAL_API const
+    sfcgal_geometry_t *
+    sfcgal_geometry_collection_geometry_n(const sfcgal_geometry_t *collection,
+                                          size_t                   i);
 
 /**
  * Adds a Geometry to a given GeometryCollection
