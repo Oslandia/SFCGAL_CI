@@ -38,55 +38,9 @@ include:
   - local: /.gitlab/pipeline/test-code.yml
   - local: /.gitlab/pipeline/build-debian-docker.yml
   - local: /.gitlab/pipeline/build-windows.yml
+  - local: /.gitlab/pipeline/documentation.yml
 
 semgrep-sast:
   stage: lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-
-build:documentation:
-  stage: build
-  image: ${PYTHON_DOCKER_IMAGE}
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        - "src/*.h"
-        - "src/*.cpp"
-        - "website/docs/*.md"
-        - ".gitlab-ci.yml"
-  before_script:
-    - apt-get update -qq
-    - apt-get install -y doxygen
-    - python -m pip install -U pip
-    - python -m pip install -U -r requirements/website.txt
-  script:
-    - export PYTHONPATH=$(pwd)
-    - cd website && mkdocs build --verbose
-  artifacts:
-    name: documentation
-    expose_as: "built_documentation"
-    paths:
-      - website/site
-    when: always
-
-# -- DEPLOYMENT JOBS ------------
-deploy:pages:
-  stage: deploy
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        - "src/*.h"
-        - "src/*.cpp"
-        - "website/docs/*.md"
-        - ".gitlab-ci.yml"
-  needs:
-    - job: build:documentation
-      artifacts: true
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - mkdir -p public
-    - cp -rf website/site/* public/
-  artifacts:
-    paths:
-      - public
