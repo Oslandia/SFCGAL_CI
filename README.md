@@ -1,6 +1,6 @@
 # SFCGAL
 
-[![GitLab pipeline status](https://gitlab.com/Oslandia/SFCGAL/badges/master/pipeline.svg)](https://gitlab.com/Oslandia/SFCGAL/-/commits/master)
+[![GitLab pipeline status](https://gitlab.com/sfcgal/SFCGAL/badges/master/pipeline.svg)](https://gitlab.com/sfcgal/SFCGAL/-/commits/master)
 [![GitHub pipeline status](https://github.com/Oslandia/SFCGAL_CI/actions/workflows/msys.yml/badge.svg)](https://github.com/Oslandia/SFCGAL_CI/actions?query=branch%3Amaster)
 [![Cirrus pipeline status](https://api.cirrus-ci.com/github/Oslandia/SFCGAL_CI.svg)](http://cirrus-ci.com/github/Oslandia/SFCGAL_CI)
 
