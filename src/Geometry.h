@@ -327,6 +327,12 @@ public:
   {
   }
 
+  /**
+   * @brief Computes centroid of this geometry
+   */
+  Point
+  centroid() const;
+
 protected:
   bool validityFlag_ = false;
 };
