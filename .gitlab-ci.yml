@@ -12,36 +12,280 @@ variables:
   DOCKER_CGAL_VERSION: ${CGAL_LATEST_VERSION}
   PYTHON_DOCKER_IMAGE: python:3.12-slim-bookworm
 
-# After ccache ci
-# coverage:
-#   image: debian:testing
-
-#   script:
-#     - apt-get update -qq
-#     - apt-get install --yes sudo wget build-essential gcovr
-#     - ./ci/debian/before_install.sh 5.6
-#     - cd $CI_PROJECT_DIR
-#     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_COVERAGE=ON -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
-#     - make
-#     - make sfcgal_coverage
-#   coverage: '/^\s*lines:\s*\d+.\d+\%/'
-#   artifacts:
-#     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
-#     expire_in: 2 days
-#     reports:
-#       cobertura: sfcgal_coverage.xml
 
 include:
   - template: Security/SAST.gitlab-ci.yml
-  #  - local: /.gitlab/pipeline/sonar.yml
-  - local: /.gitlab/pipeline/lint-code.yml
-  - local: /.gitlab/pipeline/test-code.yml
-  - local: /.gitlab/pipeline/build-windows.yml
-  - local: /.gitlab/pipeline/build-debian-docker.yml
+
+#######################
+# clang-format linter #
+#######################
+# Check if the C++ code is consistent in code formatting (correct amount of tabs/spaces,
+# correct indentation etc.)
+clang-format:
+  stage: lint
+  image:
+    name: kszonek/clang-format-16
+    entrypoint: [""]
+  script:
+    # We need to use simple BusyBox `find` syntax here.
+    - >
+      clang-format --dry-run --Werror
+      $(find src/ -iname '*.cpp' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.h')
+  # script:
+  #   - run-clang-format.py -r src --style=file
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
+      changes:
+        - "src/**/*.{c,h,cpp,hpp}"
+        - ".clang-format"
+        - ".clang-format-ignore"
+
+opensuse_gcc:
+  stage: test
+  image: opensuse/tumbleweed
+
+  script:
+    - ./ci/opensuse/before_install.sh
+    - cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -GNinja
+    - cmake --build build -j$(nproc)
+    - ctest --test-dir build --output-on-failure
+
+fedora40_clang:
+  stage: test
+  image: fedora:40
+
+  script:
+    - yum update -qy
+    - yum install -y sudo wget clang
+    - ./ci/fedora/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-$CGAL_VERSION
+    - make -j$(nproc)
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.6.2", "6.0.1"]
+
+fedora40_gcc:
+  stage: test
+  image: fedora:40
+
+  script:
+    - yum update -qy
+    - yum install -y sudo wget gcc-c++
+    - ./ci/fedora/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-$CGAL_VERSION
+    - make -j$(nproc)
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.6.2", "6.0.1"]
+
+debian_testing_gcc:
+  stage: test
+  image: debian:testing
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget build-essential
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    - make -j$(nproc)
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.6.2", "6.0.1"]
+
+debian_stable_gcc:
+  stage: test
+  image: debian:stable
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget build-essential
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    - make -j$(nproc)
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.6.2", "6.0.1"]
+
+debian_testing_clang:
+  stage: test
+  image: debian:testing
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget clang
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+    - make -j$(nproc)
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.6.2", "6.0.1"]
+
+debian_stable_clang:
+  stage: test
+  image: debian:stable
+
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget clang
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+    - make -j$(nproc)
+    - ctest -VV
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.6.2", "6.0.1"]
+
+build:windows:
+  stage: build
+  tags:
+    - saas-windows-medium-amd64
+  rules:
+    # on default branch
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: always
+    # on a tag
+    - if: $CI_COMMIT_TAG
+      when: always
+    # on a MR if previous jobs are successful
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+      allow_failure: true
+  before_script:
+    - Start-Service -Name "docker"
+    - docker login -u $env:CI_REGISTRY_USER -p $env:CI_REGISTRY_PASSWORD $env:CI_REGISTRY
+  script:
+    - (docker pull $env:CI_REGISTRY_IMAGE':'windows-latest) -or ($true)
+    - docker build
+      --pull
+      --cache-from $env:CI_REGISTRY_IMAGE':'windows-latest
+      --tag $env:CI_REGISTRY_IMAGE':'windows-$env:CI_COMMIT_SHA
+      -f docker\Dockerfile.windows
+      .
+    - docker push $env:CI_REGISTRY_IMAGE':'windows-$env:CI_COMMIT_SHA
+  after_script:
+    - docker logout $env:CI_REGISTRY
+
+
+push:windows-latest:
+  stage: deploy
+  tags:
+    - saas-windows-medium-amd64
+  only:
+    refs:
+      - master
+  needs: ['build:windows']
+  before_script:
+    - Start-Service -Name "docker"
+    - docker login -u $env:CI_REGISTRY_USER -p $env:CI_REGISTRY_PASSWORD $env:CI_REGISTRY
+  script:
+    - docker pull $env:CI_REGISTRY_IMAGE':'windows-$env:CI_COMMIT_SHA
+    - docker tag $env:CI_REGISTRY_IMAGE':'windows-$env:CI_COMMIT_SHA $env:CI_REGISTRY_IMAGE':'windows-latest
+    - docker push $env:CI_REGISTRY_IMAGE':'windows-latest
+  after_script:
+    - docker logout $env:CI_REGISTRY
+
+
+push:windows-tag:
+  stage: deploy
+  tags:
+    - saas-windows-medium-amd64
+  only:
+    refs:
+      - tags
+  before_script:
+    - Start-Service -Name "docker"
+    - docker login -u $env:CI_REGISTRY_USER -p $env:CI_REGISTRY_PASSWORD $env:CI_REGISTRY
+  script:
+    - docker pull $env:CI_REGISTRY_IMAGE':'windows-$env:CI_COMMIT_SHA
+    - docker tag $env:CI_REGISTRY_IMAGE':'windows-$env:CI_COMMIT_SHA $env:CI_REGISTRY_IMAGE':'windows-$env:CI_COMMIT_REF_NAME
+    - docker push $env:CI_REGISTRY_IMAGE':'windows-$env:CI_COMMIT_REF_NAME
+  after_script:
+    - docker logout $env:CI_REGISTRY
 
 sast:
   stage: test
 
+build:debian-docker-image:
+  stage: build
+  image: docker:latest
+  services:
+    - name: docker:dind
+  rules:
+    # on default branch
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: always
+    # on a tag
+    - if: $CI_COMMIT_TAG
+      when: always
+    # on a MR if previous jobs are successful
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:debian-latest || true
+    - docker build
+      --pull
+      --cache-from $CI_REGISTRY_IMAGE:debian-latest
+      --tag $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA
+      --build-arg CGAL_VERSION=${DOCKER_CGAL_VERSION}
+      -f docker/Dockerfile.debian
+      .
+    - docker push $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA
+  after_script:
+    - docker logout $CI_REGISTRY
+
+
+push:debian-docker-latest:
+  stage: deploy
+  image: docker:latest
+  services:
+    - name: docker:dind
+  variables:
+    GIT_STRATEGY: none
+  only:
+    refs:
+      - master
+  needs: ['build:debian-docker-image']
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:debian-latest
+    - docker push $CI_REGISTRY_IMAGE:debian-latest
+  after_script:
+    - docker logout $CI_REGISTRY
+
+
+push:debian-docker-tag:
+  stage: deploy
+  image: docker:latest
+  services:
+    - name: docker:dind
+  variables:
+    GIT_STRATEGY: none
+  only:
+    refs:
+      - tags
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY_IMAGE:debian-$CI_COMMIT_REF_NAME
+  after_script:
+    - docker logout $CI_REGISTRY
 
 build:documentation:
   stage: build
