@@ -1,8 +1,8 @@
 stages:
   - .pre
   - lint
-  - build
   - test
+  - build
   - deploy
   - .post
 
@@ -36,24 +36,24 @@ include:
   #  - local: /.gitlab/pipeline/sonar.yml
   - local: /.gitlab/pipeline/lint-code.yml
   - local: /.gitlab/pipeline/test-code.yml
-  - local: /.gitlab/pipeline/build-windows.yml
   - local: /.gitlab/pipeline/build-debian-docker.yml
+  - local: /.gitlab/pipeline/build-windows.yml
 
-sast:
-  stage: test
-
+semgrep-sast:
+  stage: lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 build:documentation:
   stage: build
   image: ${PYTHON_DOCKER_IMAGE}
-  only:
-    refs:
-      - master
-    changes:
-      - "src/*.h"
-      - "src/*.cpp"
-      - "website/docs/*.md"
-      - ".gitlab-ci.yml"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - "src/*.h"
+        - "src/*.cpp"
+        - "website/docs/*.md"
+        - ".gitlab-ci.yml"
   before_script:
     - apt-get update -qq
     - apt-get install -y doxygen
@@ -69,18 +69,16 @@ build:documentation:
       - website/site
     when: always
 
-
 # -- DEPLOYMENT JOBS ------------
 deploy:pages:
   stage: deploy
-  only:
-    refs:
-      - master
-    changes:
-      - "src/*.h"
-      - "src/*.cpp"
-      - "website/docs/*.md"
-      - ".gitlab-ci.yml"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - "src/*.h"
+        - "src/*.cpp"
+        - "website/docs/*.md"
+        - ".gitlab-ci.yml"
   needs:
     - job: build:documentation
       artifacts: true

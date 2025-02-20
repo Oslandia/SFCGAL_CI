@@ -1,6 +1,15 @@
-fedora40_clang:
+.fedora_test_base:
   stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
   image: fedora:40
+  parallel:
+    matrix:
+      - CGAL_VERSION: ["5.6.2", "6.0.1"]
+
+fedora40_clang:
+  extends: .fedora_test_base
 
   script:
     - yum update -qy
@@ -10,13 +19,9 @@ fedora40_clang:
     - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-$CGAL_VERSION
     - make -j$(nproc)
     - ctest -VV
-  parallel:
-    matrix:
-      - CGAL_VERSION: ["5.6.2", "6.0.1"]
 
 fedora40_gcc:
-  stage: test
-  image: fedora:40
+  extends: .fedora_test_base
 
   script:
     - yum update -qy
@@ -26,6 +31,3 @@ fedora40_gcc:
     - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCGAL_DIR=$CI_PROJECT_DIR/CGAL-$CGAL_VERSION
     - make -j$(nproc)
     - ctest -VV
-  parallel:
-    matrix:
-      - CGAL_VERSION: ["5.6.2", "6.0.1"]

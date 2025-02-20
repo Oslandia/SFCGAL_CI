@@ -16,7 +16,7 @@ clang-format:
   # script:
   #   - run-clang-format.py -r src --style=file
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")
       changes:
         - "src/**/*.{c,h,cpp,hpp}"
         - ".clang-format"
