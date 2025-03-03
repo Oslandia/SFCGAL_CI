@@ -63,7 +63,7 @@ sonar-build-test:
       when: always
 
 sonar-check:
-  stage: .post
+  stage: test
   cache:
     policy: pull
     key: "${CI_COMMIT_SHORT_SHA}"

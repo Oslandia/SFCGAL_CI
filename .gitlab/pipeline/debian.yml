@@ -1,60 +1,40 @@
 .debian_test_base:
-  stage: test
+  stage: build
+  variables:
+    OS_VERSION: "--"
+    PACKAGE: "--"
+    C_COMPILER: "--"
+    CXX_COMPILER: "--"
+  image: debian:${OS_VERSION}
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # on default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget ${PACKAGE}
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/${C_COMPILER} -DCMAKE_CXX_COMPILER=/usr/bin/${CXX_COMPILER} -DCGAL_DIR=${CI_PROJECT_DIR}/CGAL-${CGAL_VERSION}
+    - make -j$(nproc)
+    - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: ["5.6.2", "6.0.1"]
+      - CGAL_VERSION: ["5.6.2", $CGAL_LATEST_VERSION]
+        OS_VERSION: ["stable", "testing"]
 
-debian_testing_gcc:
+debian_clang:
   extends: .debian_test_base
-  image: debian:testing
+  variables:
+    PACKAGE: "clang"
+    C_COMPILER: "clang"
+    CXX_COMPILER: "clang++"
 
-  script:
-    - apt-get update -qq
-    - apt-get install --yes sudo wget build-essential
-    - ./ci/debian/before_install.sh $CGAL_VERSION
-    - cd $CI_PROJECT_DIR
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
-    - make -j$(nproc)
-    - ctest -VV
-
-debian_stable_gcc:
+debian_gcc:
   extends: .debian_test_base
-  image: debian:stable
-
-  script:
-    - apt-get update -qq
-    - apt-get install --yes sudo wget build-essential
-    - ./ci/debian/before_install.sh $CGAL_VERSION
-    - cd $CI_PROJECT_DIR
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
-    - make -j$(nproc)
-    - ctest -VV
-
-debian_testing_clang:
-  extends: .debian_test_base
-  image: debian:testing
-
-  script:
-    - apt-get update -qq
-    - apt-get install --yes sudo wget clang
-    - ./ci/debian/before_install.sh $CGAL_VERSION
-    - cd $CI_PROJECT_DIR
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
-    - make -j$(nproc)
-    - ctest -VV
-
-debian_stable_clang:
-  extends: .debian_test_base
-  image: debian:stable
-
-  script:
-    - apt-get update -qq
-    - apt-get install --yes sudo wget clang
-    - ./ci/debian/before_install.sh $CGAL_VERSION
-    - cd $CI_PROJECT_DIR
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
-    - make -j$(nproc)
-    - ctest -VV
+  variables:
+    PACKAGE: "build-essential"
+    C_COMPILER: "gcc"
+    CXX_COMPILER: "g++"

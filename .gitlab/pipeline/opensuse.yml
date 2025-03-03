@@ -1,12 +1,15 @@
 opensuse_gcc:
-  stage: test
+  stage: build
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # on default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
   image: opensuse/tumbleweed
 
   script:
-    - ./ci/opensuse/before_install.sh
+    - ./ci/opensuse/before_install.sh $CGAL_LATEST_VERSION
     - cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -GNinja
     - cmake --build build -j$(nproc)
     - ctest --test-dir build --output-on-failure
