@@ -28,7 +28,6 @@ build:windows-docker-image:
   after_script:
     - docker logout $env:CI_REGISTRY
 
-
 push:windows-docker-latest:
   stage: deploy
   tags:
@@ -37,10 +36,7 @@ push:windows-docker-latest:
     # on default branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: always
-    # on a MR if previous jobs are successful
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
-  needs: ['build:windows-docker-image']
+  needs: ["build:windows-docker-image"]
   before_script:
     - Start-Service -Name "docker"
     - docker login -u $env:CI_REGISTRY_USER -p $env:CI_REGISTRY_PASSWORD $env:CI_REGISTRY
@@ -51,7 +47,6 @@ push:windows-docker-latest:
   after_script:
     - docker logout $env:CI_REGISTRY
 
-
 push:windows-docker-tag:
   stage: deploy
   tags:
@@ -59,9 +54,7 @@ push:windows-docker-tag:
   rules:
     # on a tag
     - if: $CI_COMMIT_TAG
-    # on a MR if previous jobs are successful
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
+      when: always
   before_script:
     - Start-Service -Name "docker"
     - docker login -u $env:CI_REGISTRY_USER -p $env:CI_REGISTRY_PASSWORD $env:CI_REGISTRY
