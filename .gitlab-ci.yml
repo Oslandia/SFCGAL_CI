@@ -12,6 +12,10 @@ variables:
   DOCKER_CGAL_VERSION: ${CGAL_LATEST_VERSION}
   PYTHON_DOCKER_IMAGE: python:3.12-slim-bookworm
 
+default:
+  tags:
+    - saas-linux-medium-amd64 # best free runner for linux
+
 # After ccache ci
 # coverage:
 #   image: debian:testing
