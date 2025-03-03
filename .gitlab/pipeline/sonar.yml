@@ -2,11 +2,11 @@
 image: debian:stable
 
 variables:
-  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
+  GIT_DEPTH: "0" # Tells git to fetch all the branches of the project, required by the analysis task
   SONAR_SCANNER_VERSION: 6.1.0.4477-linux-x64
 
-get-sonar-binaries:
+sonar-get-binaries:
   stage: .pre
   cache:
     policy: push
@@ -24,13 +24,15 @@ get-sonar-binaries:
     # Download build-wrapper
     - curl -sSLo ./build-wrapper-linux-x86.zip "${SONAR_HOST_URL}/static/cpp/build-wrapper-linux-x86.zip"
     - unzip -oj build-wrapper-linux-x86.zip -d ./build-wrapper
-  only:
-    - merge_requests
-    - master
-    - develop
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    # on default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
 
-build:
-  stage: build
+sonar-build-test:
+  stage: test
   cache:
     policy: pull-push
     key: "${CI_COMMIT_SHORT_SHA}"
@@ -48,15 +50,19 @@ build:
     - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     # run the build inside the build wrapper
     - build-wrapper/build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --config Release
+    - cd build
+    - ctest -VV
   artifacts:
     paths:
       - build/
-  only:
-    - merge_requests
-    - master
-    - develop
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    # on default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
 
-sonarcloud-check:
+sonar-check:
   stage: .post
   cache:
     policy: pull
@@ -66,9 +72,14 @@ sonarcloud-check:
       - sonar-scanner/
       - bw-output/
       - build/
+  needs: ["sonar-build-test"]
   script:
     - sonar-scanner/bin/sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}" -Dsonar.token="${SONAR_TOKEN}" -Dsonar.cfamily.build-wrapper-output=bw-output
-  only:
-    - merge_requests
-    - master
-    - develop
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+      allow_failure: true
+    # on default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
+      allow_failure: true
