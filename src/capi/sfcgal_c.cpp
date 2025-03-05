@@ -125,6 +125,22 @@ down_const_cast(const sfcgal_geometry_t *p) -> const T *
   return q;
 }
 
+static sfcgal_alloc_handler_t sfcgal_alloc_handler = malloc;
+static sfcgal_free_handler_t  sfcgal_free_handler  = free;
+
+inline auto
+alloc_and_copy(const std::string str, char **buffer, size_t *len) -> void
+{
+  *len    = str.size();
+  *buffer = (char *)sfcgal_alloc_handler(*len + 1);
+  if (*buffer) {
+    memset(*buffer, 0, *len + 1);
+    memcpy(*buffer, str.data(), *len);
+  } else {
+    *len = 0;
+  }
+}
+
 extern "C" void
 sfcgal_set_error_handlers(sfcgal_error_handler_t warning_handler,
                           sfcgal_error_handler_t error_handler)
@@ -132,9 +148,6 @@ sfcgal_set_error_handlers(sfcgal_error_handler_t warning_handler,
   __sfcgal_warning_handler = warning_handler;
   __sfcgal_error_handler   = error_handler;
 }
-
-static sfcgal_alloc_handler_t sfcgal_alloc_handler = malloc;
-static sfcgal_free_handler_t  sfcgal_free_handler  = free;
 
 extern "C" void
 sfcgal_set_alloc_handlers(sfcgal_alloc_handler_t alloc_handler,
@@ -318,8 +331,7 @@ sfcgal_geometry_as_text(const sfcgal_geometry_t *pgeom, char **buffer,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       std::string wkt =
           reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asText();
-      *buffer = (char *)sfcgal_alloc_handler(wkt.size() + 1); *len = wkt.size();
-      strncpy(*buffer, wkt.c_str(), *len); (*buffer)[*len]         = '\0';)
+      alloc_and_copy(wkt, buffer, len);)
 }
 
 extern "C" void
@@ -330,8 +342,7 @@ sfcgal_geometry_as_text_decim(const sfcgal_geometry_t *pgeom, int numDecimals,
       std::string wkt =
           reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asText(
               numDecimals);
-      *buffer = (char *)sfcgal_alloc_handler(wkt.size() + 1); *len = wkt.size();
-      strncpy(*buffer, wkt.c_str(), *len); (*buffer)[*len]         = '\0';)
+      alloc_and_copy(wkt, buffer, len);)
 }
 
 extern "C" void
@@ -342,8 +353,7 @@ sfcgal_geometry_as_wkb(const sfcgal_geometry_t *pgeom, char **buffer,
       std::string wkb =
           reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb(
               boost::endian::order::native, false);
-      *buffer = (char *)sfcgal_alloc_handler(wkb.size() + 1); *len = wkb.size();
-      memcpy(*buffer, wkb.data(), *len);)
+      alloc_and_copy(wkb, buffer, len);)
 }
 
 extern "C" void
@@ -354,8 +364,7 @@ sfcgal_geometry_as_hexwkb(const sfcgal_geometry_t *pgeom, char **buffer,
       std::string wkb =
           reinterpret_cast<const SFCGAL::Geometry *>(pgeom)->asWkb(
               boost::endian::order::native, true);
-      *buffer = (char *)sfcgal_alloc_handler(wkb.size() + 1); *len = wkb.size();
-      strncpy(*buffer, wkb.c_str(), *len);)
+      alloc_and_copy(wkb, buffer, len);)
 }
 
 extern "C" auto
@@ -374,11 +383,7 @@ sfcgal_geometry_as_vtk(const sfcgal_geometry_t *pgeom, char **buffer,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       std::string obj = SFCGAL::io::VTK::saveToString(
           *reinterpret_cast<const SFCGAL::Geometry *>(pgeom));
-      *len = obj.size(); *buffer = (char *)sfcgal_alloc_handler(*len + 1);
-      if (*buffer) {
-        memcpy(*buffer, obj.c_str(), *len);
-        (*buffer)[*len] = '\0';
-      } else { *len = 0; })
+      alloc_and_copy(obj, buffer, len);)
 }
 
 extern "C" void
@@ -397,11 +402,7 @@ sfcgal_geometry_as_obj(const sfcgal_geometry_t *pgeom, char **buffer,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       std::string obj = SFCGAL::io::OBJ::saveToString(
           *reinterpret_cast<const SFCGAL::Geometry *>(pgeom));
-      *len = obj.size(); *buffer = (char *)sfcgal_alloc_handler(*len + 1);
-      if (*buffer) {
-        memcpy(*buffer, obj.c_str(), *len);
-        (*buffer)[*len] = '\0';
-      } else { *len = 0; })
+      alloc_and_copy(obj, buffer, len);)
 }
 
 /**
@@ -881,8 +882,7 @@ sfcgal_prepared_geometry_as_ewkt(const sfcgal_prepared_geometry_t *pgeom,
       std::string ewkt =
           reinterpret_cast<const SFCGAL::PreparedGeometry *>(pgeom)->asEWKT(
               num_decimals);
-      *buffer = (char *)sfcgal_alloc_handler(ewkt.size() + 1);
-      *len    = ewkt.size(); strncpy(*buffer, ewkt.c_str(), *len);)
+      alloc_and_copy(ewkt, buffer, len);)
 }
 
 extern "C" auto
@@ -910,8 +910,7 @@ sfcgal_io_write_binary_prepared(const sfcgal_prepared_geometry_t *geom,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       const auto *g = reinterpret_cast<const SFCGAL::PreparedGeometry *>(geom);
       std::string str = SFCGAL::io::writeBinaryPrepared(*g);
-      *buffer = (char *)sfcgal_alloc_handler(str.size() + 1); *len = str.size();
-      memcpy(*buffer, str.c_str(), *len);)
+      alloc_and_copy(str, buffer, len);)
 }
 
 extern "C" auto
