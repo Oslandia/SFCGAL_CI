@@ -44,6 +44,9 @@ BOOST_AUTO_TEST_CASE(addLineString)
   MultiLineString g;
   g.addGeometry(new LineString());
   BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
+
+  g.addGeometry(LineString(Point(0.0, 0.0), Point(1.0, 1.0)));
+  BOOST_CHECK_EQUAL(g.numGeometries(), 2U);
 }
 //-- addForbidenGeometry
 BOOST_AUTO_TEST_CASE(addLineStringThrow)

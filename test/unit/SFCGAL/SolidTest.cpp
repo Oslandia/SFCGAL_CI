@@ -107,6 +107,7 @@ BOOST_AUTO_TEST_CASE(solidReadTest)
 
   std::unique_ptr<Geometry> g(io::readWkt(gstr));
   BOOST_CHECK_EQUAL(g->as<Solid>().numShells(), 2U);
+  BOOST_CHECK_EQUAL(g->as<Solid>().numGeometries(), 1U);
 }
 
 BOOST_AUTO_TEST_CASE(solidSetExteriorRingTest)
@@ -130,9 +131,11 @@ BOOST_AUTO_TEST_CASE(solidSetExteriorRingTest)
   std::unique_ptr<Geometry> shell1(io::readWkt(polyhedral1Str));
   BOOST_CHECK(!shell1->isEmpty());
   BOOST_CHECK(solid->isEmpty());
+  BOOST_CHECK_EQUAL(solid->numGeometries(), 0U);
 
   solid->setExteriorShell(dynamic_cast<PolyhedralSurface *>(shell1.get())->clone());
-  BOOST_CHECK_EQUAL(solid->numShells(), 1);
+  BOOST_CHECK_EQUAL(solid->numShells(), 1U);
+  BOOST_CHECK_EQUAL(solid->numGeometries(), 1U);
   BOOST_CHECK(!solid->isEmpty());
   BOOST_CHECK(algorithm::covers3D(solid->exteriorShell(), *shell1));
 }

@@ -39,6 +39,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructor)
   BOOST_CHECK(g.isEmpty());
   BOOST_CHECK(!g.is3D());
   BOOST_CHECK(!g.isMeasured());
+  BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
 
   // no more access to double
   BOOST_CHECK_THROW(g.x(), Exception);
@@ -263,6 +264,19 @@ BOOST_AUTO_TEST_CASE(asPoint)
 {
   std::unique_ptr<Geometry> g(new Point());
   BOOST_CHECK(g->as<Point>().isEmpty());
+}
+
+// virtual size_t              numGeometries() const ;
+BOOST_AUTO_TEST_CASE(testAccessors)
+{
+  Point const g;
+  BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
+
+  Point const g2D(2.0, 3.0);
+  BOOST_CHECK_EQUAL(g2D.numGeometries(), 1U);
+
+  Point const g3D(2.0, 3.0, 4.0);
+  BOOST_CHECK_EQUAL(g3D.numGeometries(), 1U);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

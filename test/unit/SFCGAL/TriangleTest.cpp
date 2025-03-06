@@ -36,6 +36,7 @@ BOOST_AUTO_TEST_CASE(testDefaultConstructor)
 {
   Triangle const g;
   BOOST_CHECK(g.isEmpty());
+  BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
 }
 // Triangle( const Kernel::Triangle_2 & triangle ) ;
 BOOST_AUTO_TEST_CASE(testConstructorTriangle_2)
@@ -47,6 +48,7 @@ BOOST_AUTO_TEST_CASE(testConstructorTriangle_2)
   Triangle g(Kernel::Triangle_2(a, b, c));
   BOOST_CHECK(!g.isEmpty());
   BOOST_CHECK(!g.is3D());
+  BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
 
   BOOST_CHECK_EQUAL(g.vertex(0).toPoint_2(), a);
   BOOST_CHECK_EQUAL(g.vertex(1).toPoint_2(), b);

@@ -112,7 +112,7 @@ Geometry::round(const long &scale)
 auto
 Geometry::numGeometries() const -> size_t
 {
-  return 1;
+  return isEmpty() ? 0 : 1;
 }
 
 ///

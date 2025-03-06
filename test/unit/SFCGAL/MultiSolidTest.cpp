@@ -52,6 +52,8 @@ BOOST_AUTO_TEST_CASE(addSolid)
   MultiSolid g;
   g.addGeometry(new Solid());
   BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
+  g.addGeometry(new Solid());
+  BOOST_CHECK_EQUAL(g.numGeometries(), 2U);
 }
 //-- addForbidenGeometry
 BOOST_AUTO_TEST_CASE(addLineStringThrow)

@@ -39,6 +39,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructor)
   TriangulatedSurface const g;
   BOOST_CHECK(g.isEmpty());
   BOOST_CHECK_EQUAL(g.numTriangles(), 0U);
+  BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
 }
 // TriangulatedSurface( const std::vector< Triangle > & triangle ) ;
 BOOST_AUTO_TEST_CASE(constructorWithTriangles)
@@ -50,6 +51,7 @@ BOOST_AUTO_TEST_CASE(constructorWithTriangles)
   TriangulatedSurface const g(triangles);
   BOOST_CHECK(!g.isEmpty());
   BOOST_CHECK_EQUAL(g.numTriangles(), 2U);
+  BOOST_CHECK_EQUAL(g.numGeometries(), 2U);
 }
 
 // TriangulatedSurface( TriangulatedSurface const& other ) ;
@@ -96,6 +98,7 @@ BOOST_AUTO_TEST_CASE(testClone)
   std::unique_ptr<Geometry> copy(g.clone());
   BOOST_REQUIRE(copy->is<TriangulatedSurface>());
   BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numTriangles(), 2U);
+  BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numGeometries(), 2U);
 }
 
 // virtual Geometry*    Geometry::boundary() const ;

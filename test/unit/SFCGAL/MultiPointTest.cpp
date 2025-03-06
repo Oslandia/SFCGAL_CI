@@ -50,6 +50,8 @@ BOOST_AUTO_TEST_CASE(addPoint)
   MultiPoint g;
   g.addGeometry(new Point(2.0, 3.0));
   BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
+  g.addGeometry(new Point(4.0, 5.0));
+  BOOST_CHECK_EQUAL(g.numGeometries(), 2U);
 }
 //-- addForbidenGeometry
 BOOST_AUTO_TEST_CASE(addLineStringThrow)

@@ -59,6 +59,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructor)
 BOOST_AUTO_TEST_CASE(testAccessors)
 {
   GeometryCollection g;
+  BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
 
   g.addGeometry(new Point(2.0, 3.0));
   BOOST_CHECK_EQUAL(g.numGeometries(), 1U);

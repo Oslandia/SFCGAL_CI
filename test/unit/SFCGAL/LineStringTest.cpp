@@ -79,6 +79,26 @@ BOOST_AUTO_TEST_CASE(testClear)
   BOOST_CHECK(g.isEmpty());
 }
 
+BOOST_AUTO_TEST_CASE(testAccessors)
+{
+  LineString g;
+  BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
+
+  g.addPoint(Point(0.0, 0.0));
+  BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
+
+  g.addPoint(Point(1.0, 0.0));
+  BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
+
+  g.addPoint(Point(1.0, 1.0));
+  BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
+
+  g.addPoint(new Point(2.0, 1.0));
+  BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
+
+  BOOST_CHECK_EQUAL(g.geometryN(0).asText(0), "LINESTRING (0 0,1 0,1 1,2 1)");
+}
+
 /// void reverse() ;
 BOOST_AUTO_TEST_CASE(testReverse_empty)
 {
