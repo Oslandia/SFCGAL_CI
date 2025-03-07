@@ -1,7 +1,8 @@
 build:windows:
   stage: build
   tags:
-    - saas-windows-medium-amd64
+    - osgeo4w
+    - win10-vs2017
   rules:
     # on default branch
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
@@ -32,7 +33,8 @@ build:windows:
 push:windows-latest:
   stage: deploy
   tags:
-    - saas-windows-medium-amd64
+    - osgeo4w
+    - win10-vs2017
   only:
     refs:
       - master
@@ -51,7 +53,8 @@ push:windows-latest:
 push:windows-tag:
   stage: deploy
   tags:
-    - saas-windows-medium-amd64
+    - osgeo4w
+    - win10-vs2017
   only:
     refs:
       - tags
