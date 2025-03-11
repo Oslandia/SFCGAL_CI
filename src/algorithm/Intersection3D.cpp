@@ -206,8 +206,8 @@ _intersection_solid_solid(const MarkedPolyhedron &pa,
   }
 }
 
-//
-// must be called with pa's dimension larger than pb's
+///
+/// must be called with pa's dimension larger than pb's
 void
 intersection(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb,
              GeometrySet<3> &output, dim_t<3> /*unused*/)

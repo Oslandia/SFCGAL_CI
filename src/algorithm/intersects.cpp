@@ -27,8 +27,8 @@
 using namespace SFCGAL::detail;
 
 namespace SFCGAL::algorithm {
-//
-// Type of pa must be of larger dimension than type of pb
+///
+/// Type of pa must be of larger dimension than type of pb
 auto
 _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
 {
@@ -222,8 +222,8 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   return false;
 }
 
-//
-// intersects of a volume with any other type
+///
+/// intersects of a volume with any other type
 struct intersects_volume_x : public boost::static_visitor<bool> {
   const MarkedPolyhedron *polyhedron;
 
@@ -269,8 +269,8 @@ struct intersects_volume_x : public boost::static_visitor<bool> {
   }
 };
 
-//
-// Type of pa must be of larger dimension than type of pb
+///
+/// Type of pa must be of larger dimension than type of pb
 auto
 _intersects(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb) -> bool
 {

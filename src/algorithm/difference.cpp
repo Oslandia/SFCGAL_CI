@@ -230,8 +230,7 @@ difference(const Primitive &primitive, PrimitiveHandleConstIterator begin,
   return primitives;
 }
 
-// just performs the type switch for the primitive to substract from
-//
+/// just performs the type switch for the primitive to substract from
 void
 appendDifference(const PrimitiveHandle<2>                              &pa,
                  CollisionMapper<2>::PrimitiveHandleSet::const_iterator begin,

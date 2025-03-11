@@ -18,6 +18,7 @@ namespace triangulate {
  */
 SFCGAL_API void
 triangulate2DZ(const Geometry &g, ConstraintDelaunayTriangulation &triangulate);
+
 /**
  * @brief Constraint 2DZ Delaunay Triangulation (keep Z if defined, project
  * points in OXY plane)

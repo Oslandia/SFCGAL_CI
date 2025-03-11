@@ -17,10 +17,12 @@
 #include <CGAL/Bbox_3.h>
 #include <CGAL/Box_intersection_d/Box_with_handle_d.h>
 
-// comparison operator on segments, for use in a std::set
+/// comparison operator on 2D segments, for use in a std::set
 bool
 operator<(const CGAL::Segment_2<SFCGAL::Kernel> &sega,
           const CGAL::Segment_2<SFCGAL::Kernel> &segb);
+
+/// comparison operator on 3D segments, for use in a std::set
 bool
 operator<(const CGAL::Segment_3<SFCGAL::Kernel> &sega,
           const CGAL::Segment_3<SFCGAL::Kernel> &segb);

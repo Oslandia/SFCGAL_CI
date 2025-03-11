@@ -14,14 +14,16 @@
 
 namespace SFCGAL {
 namespace detail {
+
+/*
 ///
 /// Type traits for CGAL types.
 ///
 /// CGAL types cannot be directly parametrized by their dimension.
 /// For instance, there are both a Triangle_2<K> and a Triangle_3<K> type
-///
-/// TypeForKernel<K, 2>::Point is equivalent to CGAL::Point_2<K> for instance
-/// TypeForDimension<2>::Bbox is equivalent to CGAL::Bbox_2
+TypeForKernel<K, 2>::Point is equivalent to CGAL::Point_2<K> for instance
+TypeForDimension<2>::Bbox is equivalent to CGAL::Bbox_2
+*/
 
 struct SFCGAL_API NoVolume {};
 
@@ -52,7 +54,7 @@ struct Halfedge_with_mark : public CGAL::HalfedgeDS_halfedge_base<Refs> {
   }
 };
 
-// An items type using my halfedge.
+/// An items type using my halfedge.
 struct SFCGAL_API Items_with_mark_on_hedge : public CGAL::Polyhedron_items_3 {
   template <class Refs, class Traits>
   struct Halfedge_wrapper {
