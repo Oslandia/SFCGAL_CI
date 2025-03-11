@@ -11,6 +11,7 @@
 #include <memory>
 
 using namespace SFCGAL::detail::io;
+using namespace SFCGAL::tools;
 
 namespace SFCGAL::io {
 

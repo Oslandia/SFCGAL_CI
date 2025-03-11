@@ -10,6 +10,7 @@
 #include "SFCGAL/detail/tools/CharArrayBuffer.h"
 
 using namespace SFCGAL::detail::io;
+using namespace SFCGAL::tools;
 
 namespace SFCGAL::io {
 

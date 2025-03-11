@@ -2,11 +2,10 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <iostream>
-
 #include "SFCGAL/detail/tools/CharArrayBuffer.h"
 
-#include <cstring>
+namespace SFCGAL {
+namespace tools {
 
 CharArrayBuffer::CharArrayBuffer(const char *begin, const char *end)
     : begin_(begin), end_(end), current_(begin_)
@@ -86,3 +85,6 @@ CharArrayBuffer::showmanyc() -> std::streamsize
 {
   return end_ - current_;
 }
+
+} // namespace tools
+} // namespace SFCGAL

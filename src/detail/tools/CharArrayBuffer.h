@@ -9,6 +9,8 @@
 
 #include <streambuf>
 
+namespace SFCGAL {
+namespace tools {
 ///
 /// Streambuf on a char*
 ///
@@ -46,5 +48,8 @@ private:
   const char *const end_;
   const char       *current_;
 };
+
+} // namespace tools
+} // namespace SFCGAL
 
 #endif
