@@ -5,6 +5,7 @@
 #ifndef SFCGAL_PREPARED_GEOMETRY_H_
 #define SFCGAL_PREPARED_GEOMETRY_H_
 
+#include "SFCGAL/Geometry.h"
 #include "SFCGAL/config.h"
 
 #include "SFCGAL/Envelope.h"
@@ -19,8 +20,6 @@
 namespace SFCGAL {
 
 class Geometry;
-
-typedef uint32_t srid_t;
 
 /**
  * A PreparedGeometry is a shell around a SFCGAL::Geometry.

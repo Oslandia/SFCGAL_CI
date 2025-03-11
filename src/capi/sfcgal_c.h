@@ -23,6 +23,12 @@ extern "C" {
  *--------------------------------------------------------------------------------------*/
 
 /**
+ * SRID type
+ * @ingroup capi
+ */
+typedef uint32_t srid_t;
+
+/**
  * sfcgal_geometry_t is an opaque pointer type that is used to represent a
  * pointer to SFCGAL::Geometry
  * @ingroup capi
@@ -691,8 +697,6 @@ sfcgal_geometry_force_valid(sfcgal_geometry_t *geom, int valid);
  * @ingroup capi
  */
 typedef void sfcgal_prepared_geometry_t;
-
-typedef uint32_t srid_t;
 
 /**
  * Creates an empty PreparedGeometry

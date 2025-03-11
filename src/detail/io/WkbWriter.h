@@ -13,8 +13,6 @@
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/config.h"
 
-using srid_t = uint32_t;
-
 namespace SFCGAL::detail::io {
 
 /**

@@ -20,6 +20,11 @@ namespace CGAL {
 class Object;
 }
 
+/**
+ * SRID type
+ */
+typedef uint32_t srid_t;
+
 namespace SFCGAL {
 class Geometry;
 class Point;
