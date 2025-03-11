@@ -2,7 +2,7 @@ site_name: SFCGAL
 repo_name: "SFCGAL"
 repo_url: "https://gitlab.com/sfcgal/SFCGAL/"
 
-theme:  
+theme:
   name: material
   features:
     - navigation.hide
@@ -14,13 +14,13 @@ theme:
     - navigation.top
     - navigation.tracking
     - toc.follow
-    - toc.integrate 
+    - toc.integrate
     - content.code.copy
   logo: assets/img/logo.png
   favicon: assets/img/logo.png
   palette:
-     primary: custom
-     accent: custom
+    primary: custom
+    accent: custom
   icon:
     repo: fontawesome/brands/gitlab
 
@@ -37,7 +37,7 @@ markdown_extensions:
 
 plugins:
   - macros:
-            module_name: macros
+      module_name: macros
   - mkdoxy:
       projects:
         API:
@@ -46,13 +46,19 @@ plugins:
           template-dir: templates-custom
           doxy-cfg:
             FILE_PATTERNS: "*.cpp *.h"
-            EXAMPLE_PATH: examples
+            EXAMPLE_PATH: ../examples
             FULL_PATH_NAMES: "NO"
             SHOW_USED_FILES: "NO"
+            EXTRACT_PRIVATE: "NO"
             RECURSIVE: True
+            PREDEFINED: DOXYGEN_SHOULD_SKIP_THIS
+            ENABLE_PREPROCESSING: True
+            BUILTIN_STL_SUPPORT: True
+            MULTILINE_CPP_IS_BRIEF: False
+            SORT_GROUP_NAMES: True
   - search
 
-nav :
+nav:
   - Home: index.md
   - Authors: authors.md
   - Sponsors: sponsors.md
@@ -60,6 +66,7 @@ nav :
   - Development: development.md
   # - Screencast: screencast.md
   - API:
+      - "Modules": "API/modules.md"
       - "Links": "API/links.md"
       - "Classes":
           - "Class List": "API/annotated.md"
