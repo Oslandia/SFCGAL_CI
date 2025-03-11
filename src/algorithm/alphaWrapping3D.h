@@ -29,7 +29,6 @@ namespace SFCGAL::algorithm {
 /**
  * Computes the 3D alpha wrapping of a geometry
  * https://doc.cgal.org/latest/Alpha_wrap_3/index.html
- * @ingroup public_api
  * @since 2.1
  * @param geom input geometry
  * @param relativeAlpha This parameter is used to determine which features will

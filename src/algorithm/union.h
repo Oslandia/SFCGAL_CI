@@ -24,7 +24,6 @@ struct NoValidityCheck;
 /**
  * Union on 2D geometries.
  * @pre ga and gb are valid geometries
- * @ingroup public_api
  */
 SFCGAL_API std::unique_ptr<Geometry>
            union_(const Geometry &ga, const Geometry &gb);
@@ -32,7 +31,6 @@ SFCGAL_API std::unique_ptr<Geometry>
 /**
  * Union on 2D geometries. No validity check variant
  * @pre ga and gb are valid geometries
- * @ingroup detail
  * @warning No actual validity check is done.
  */
 SFCGAL_API std::unique_ptr<Geometry>
@@ -41,7 +39,6 @@ SFCGAL_API std::unique_ptr<Geometry>
 /**
  * Union on 3D geometries. Assume z = 0 if needed
  * @pre ga and gb are valid geometries
- * @ingroup public_api
  */
 SFCGAL_API std::unique_ptr<Geometry>
            union3D(const Geometry &ga, const Geometry &gb);
@@ -49,7 +46,6 @@ SFCGAL_API std::unique_ptr<Geometry>
 /**
  * Union on 3D geometries. Assume z = 0 if needed
  * @pre ga and gb are valid geometries
- * @ingroup detail
  * @warning@ No actual validity check is done
  */
 SFCGAL_API std::unique_ptr<Geometry>

@@ -17,7 +17,6 @@ namespace algorithm {
  * returns a MultiPolygon
  *
  * @warning Ownership is taken from the parameter
- * @ingroup
  */
 SFCGAL_API std::unique_ptr<Geometry>
            collectionToMulti(std::unique_ptr<Geometry> coll);

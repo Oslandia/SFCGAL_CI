@@ -18,8 +18,6 @@ namespace triangulate {
  * @param g input geometry
  * @param triangulatedSurface resulting TriangulatedSurface
  * @param usePolygonPlanes use polygon plane or Triangulate in OXY plane
- * @todo unittest
- * @ingroup detail
  */
 SFCGAL_API void
 triangulatePolygon3D(const Geometry      &g,
@@ -60,7 +58,6 @@ opentriangulatePolygon3D(const GeometryCollection &g,
 /**
  * @brief Triangulate 3D polygons in a PolyhedralSurface.
  *
- * @todo unittest
  * @ingroup detail
  */
 SFCGAL_API void

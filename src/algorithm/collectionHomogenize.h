@@ -20,7 +20,6 @@ namespace algorithm {
  * homogeneous will be returned as the appropriate multi-type.
  *
  * @warning Ownership is taken from the parameter
- * @ingroup detail
  */
 SFCGAL_API std::unique_ptr<Geometry>
            collectionHomogenize(std::unique_ptr<Geometry> coll);

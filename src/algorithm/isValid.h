@@ -30,7 +30,6 @@ namespace algorithm {
 
 /**
  * @brief Check validity of a geometry
- * @ingroup public_api
  */
 SFCGAL_API const Validity
 isValid(const Geometry &g, const double &toleranceAbs = 1e-9);
@@ -38,14 +37,12 @@ isValid(const Geometry &g, const double &toleranceAbs = 1e-9);
 /**
  * Sets the geometry flag on a geometry and propagate to every internal
  * geometries
- * @ingroup public_api
  */
 SFCGAL_API void
 propagateValidityFlag(Geometry &g, bool valid);
 
 /**
  * Tag used for variants of algorithm that do not do validity check
- * @ingroup public_api
  */
 struct NoValidityCheck {};
 

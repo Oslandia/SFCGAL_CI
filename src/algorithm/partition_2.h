@@ -14,7 +14,6 @@ namespace algorithm {
 /**
  * Partition algorithm available
  *
- * @ingroup public_api
  * @since 1.4.2
  */
 enum PartitionAlgorithm {
@@ -35,7 +34,6 @@ enum PartitionAlgorithm {
 /**
  * Compute the partition of a 2D polygon
  * https://doc.cgal.org/latest/Partition_2/index.html#Chapter_2D_Polygon_Partitioning
- * @ingroup public_api
  * @since 1.4.2
  */
 SFCGAL_API auto

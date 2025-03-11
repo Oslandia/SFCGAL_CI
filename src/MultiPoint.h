@@ -17,7 +17,6 @@ namespace SFCGAL {
 
 /**
  * A MultiPoint in SFA.
- * @ingroup public_api
  */
 class SFCGAL_API MultiPoint : public GeometryCollection {
 public:

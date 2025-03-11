@@ -23,7 +23,6 @@ struct NoValidityCheck;
  *
  * @todo missing cases (union)
  * @pre gA and gB are valid geometries
- * @ingroup public_api
  */
 SFCGAL_API std::unique_ptr<Geometry>
            minkowskiSum(const Geometry &gA, const Polygon &gB);
@@ -37,7 +36,6 @@ SFCGAL_API std::unique_ptr<Geometry>
  *
  * @todo missing cases (union)
  * @pre gA and gB are valid geometries
- * @ingroup detail
  * @warning@ No actual validity check is done.
  */
 SFCGAL_API std::unique_ptr<Geometry>

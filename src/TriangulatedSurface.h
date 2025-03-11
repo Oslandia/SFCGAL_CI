@@ -23,7 +23,6 @@ namespace SFCGAL {
 
 /**
  * A TriangulatedSurface in SFA modeled as a Triangle soup
- * @ingroup public_api
  * @todo do better than a "triangle soup" or add topological view?
  */
 class SFCGAL_API TriangulatedSurface : public Surface {

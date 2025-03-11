@@ -17,7 +17,7 @@ namespace algorithm {
 /**
  * Pseudo cover test on 2D geometries. Collect points of gb and tests if no
  * points of gb is outside ga
- * @ingroup@ detail
+ * @ingroup detail
  */
 SFCGAL_API bool
 coversPoints(const Geometry &ga, const Geometry &gb);
@@ -25,7 +25,7 @@ coversPoints(const Geometry &ga, const Geometry &gb);
 /**
  * Pseudo cover test on 3D geometries. Collect points of gb and tests if no
  * points of gb is outside ga
- * @ingroup@ detail
+ * @ingroup detail
  */
 SFCGAL_API bool
 coversPoints3D(const Geometry &ga, const Geometry &gb);

@@ -70,7 +70,7 @@
  * Exceptions to this rule are stated in the reference manual (@link SFCGAL::algorithm::minkowskiSum example @endlink).
  *
  * @section geo_validity_policy Geometry validation policy
- * 
+ *
  * Every processing algorithm takes <b>valid</b> geometries as input parameters (no self intersection, etc.). Validity of geometries is tested with the algorithm::isValid() function and corresponds to validity preconditions asked for by OGC standards.
  *
  * Geometries can also be marked as permanently valid by using a geometry flag. See Geometry::hasValidityFlag() and Geometry::forceValidityFlag()
@@ -85,13 +85,6 @@
  *
  * Some other elements of the documentation are tagged as @link detail 'details' @endlink which means they are for internal use only and are subject
  * to changes within future releases.
- *
- * @defgroup public_api Public C++ API
- * @defgroup capi Public C API
- *
- * @defgroup detail Implementation details
- * 
- * @defgroup incomplete Incomplete or buggy functions
  *
  *
  */

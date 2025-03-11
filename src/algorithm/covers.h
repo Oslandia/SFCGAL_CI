@@ -24,7 +24,6 @@ namespace algorithm {
 /**
  * Cover test on 2D geometries. Checks if gA covers gB. Force projection to z=0
  * if needed
- * @ingroup@ detail
  */
 SFCGAL_API bool
 covers(const Geometry &ga, const Geometry &gb);
@@ -36,14 +35,14 @@ SFCGAL_API bool
 covers3D(const Geometry &ga, const Geometry &gb);
 
 /**
- * @ingroup@ detail
+ * @ingroup detail
  */
 template <int Dim>
 bool
 covers(const detail::GeometrySet<Dim> &a, const detail::GeometrySet<Dim> &b);
 
 /**
- * @ingroup@ detail
+ * @ingroup detail
  */
 template <int Dim>
 bool

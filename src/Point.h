@@ -16,7 +16,6 @@ namespace SFCGAL {
 
 /**
  * A point in SFA.
- * @ingroup public_api
  * The x(),y(),z() interface is based on CGAL kernel requirements, taken
  * from examples/Kernel_23/MyPointC2.h
  * @todo strong typing on coordinate dimension?

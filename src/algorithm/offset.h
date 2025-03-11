@@ -23,7 +23,6 @@ struct NoValidityCheck;
  *
  * @warning test in order to compare with minkowski sum
  * @pre g is a valid Geometry
- * @ingroup public_api
  */
 SFCGAL_API std::unique_ptr<MultiPolygon>
            offset(const Geometry &g, const double &r);
@@ -33,7 +32,6 @@ SFCGAL_API std::unique_ptr<MultiPolygon>
  *
  * @warning test in order to compare with minkowski sum
  * @pre g is a valid Geometry
- * @ingroup detail
  * @warning No actual validity check is done.
  */
 SFCGAL_API std::unique_ptr<MultiPolygon>

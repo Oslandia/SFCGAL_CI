@@ -12,12 +12,11 @@
 
 namespace SFCGAL {
 namespace algorithm {
-/*
+/**
  * Given a geometry collection
  * returns a MultiPolygon from triangles, polygons, polyhedral and polygons
  *
  * @warning Ownership is taken from the parameter
- * @ingroup detail
  */
 SFCGAL_API std::unique_ptr<Geometry>
            collectionExtractPolygons(std::unique_ptr<Geometry> coll);

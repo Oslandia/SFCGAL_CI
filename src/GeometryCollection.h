@@ -17,7 +17,6 @@ namespace SFCGAL {
 
 /**
  * A GeometryCollection in SFA.
- * @ingroup public_api
  */
 class SFCGAL_API GeometryCollection : public Geometry {
 public:

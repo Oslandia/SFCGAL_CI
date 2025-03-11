@@ -14,7 +14,6 @@ namespace SFCGAL {
 namespace algorithm {
 /**
  * Returns an aggregate of ga and gb
- * @ingroup detail
  */
 SFCGAL_API std::unique_ptr<Geometry>
            collect(const Geometry &ga, const Geometry &gb);

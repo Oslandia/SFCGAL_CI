@@ -19,8 +19,7 @@ SFCGAL_ASSERT_GEOMETRY_SIMPLICITY(const Geometry &g);
 namespace algorithm {
 
 /**
- * @brief Check simplicity of a geometry
- * @ingroup public_api
+ * Check simplicity of a geometry
  */
 SFCGAL_API const Simplicity
 isSimple(const Geometry &g, const double &toleranceAbs = 1e-9);

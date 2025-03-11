@@ -25,7 +25,6 @@ struct NoValidityCheck;
 /**
  * @brief build an approximate medial axis for a Polygon
  * @param g input geometry
- * @ingroup public_api
  * @pre g is a valid geometry
  * @throws NotImplementedException If g is a Polygon with point touching rings.
  */
@@ -40,7 +39,6 @@ SFCGAL_API std::unique_ptr<MultiLineString>
  * @param outputM whether to output the distance to border as M
  * @param toleranceAbs Distance tolerance between returned points. A line must
  * have a maximum distance of toleranceAbs.
- * @ingroup public_api
  * @pre g is a valid geometry
  * @throws NotImplementedException If g is a Polygon with point touching rings.
  */
@@ -56,7 +54,6 @@ SFCGAL_API std::unique_ptr<MultiLineString>
  * @param outputM whether to output the distance to border as M
  * @param toleranceAbs Distance tolerance between returned points. A line must
  * have a maximum distance of toleranceAbs.
- * @ingroup public_api
  * @pre g is a valid geometry
  * @warning No actual validity check is done
  * @throws NotImplementedException If g is a Polygon with point touching rings.
@@ -106,7 +103,6 @@ extrudeStraightSkeleton(const Geometry &g, double building_height,
 
 /**
  * @brief Build a 2D straight skeleton partition for a Geometry
- * @ingroup public_api
  * @param[in] g The input geometry
  * @param[in] autoOrientation Check and fix polygon orientation
  * @return A unique pointer to a MultiPolygon representing the partitioned

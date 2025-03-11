@@ -27,7 +27,6 @@ struct NoValidityCheck;
 /**
  * Robust intersection test on 2D geometries. Force projection to z=0 if needed
  * @pre ga and gb are valid geometries
- * @ingroup public_api
  */
 SFCGAL_API bool
 intersects(const Geometry &ga, const Geometry &gb);
@@ -35,7 +34,6 @@ intersects(const Geometry &ga, const Geometry &gb);
 /**
  * Robust intersection test on 3D geometries. Assume z = 0 if needed
  * @pre ga and gb are valid geometries
- * @ingroup public_api
  */
 SFCGAL_API bool
 intersects3D(const Geometry &ga, const Geometry &gb);

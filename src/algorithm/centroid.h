@@ -43,7 +43,6 @@ public:
  * PostGIS one (https://postgis.net/docs/ST_Centroid.html). The weigth is
  * computed in the XY space.
  *
- * @ingroup public_api
  * @warning Z component is ignored, geometries must be valid when projected in
  * the XY plane. Vertical geometries will generate an error.
  * @pre g is a valid geometry in 2D
@@ -58,7 +57,6 @@ SFCGAL_API std::unique_ptr<Point>
  * PostGIS one (https://postgis.net/docs/ST_Centroid.html). The weigth is
  * computed in the 3D space.
  *
- * @ingroup public_api
  * @pre g is a valid geometry
  */
 SFCGAL_API std::unique_ptr<Point>

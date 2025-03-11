@@ -18,7 +18,6 @@ struct NoValidityCheck;
  * @brief 3D Minkowski sum (p+q)
  *
  * @pre gA and gB are valid 3D geometries
- * @ingroup public_api
  */
 SFCGAL_API std::unique_ptr<Geometry>
            minkowskiSum3D(const Geometry &gA, const Geometry &gB);
@@ -27,7 +26,6 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @brief 3D Minkowski sum (p+q)
  *
  * @pre gA and gB are valid 3D geometries
- * @ingroup detail
  * @warning No actual validity check is done.
  */
 SFCGAL_API std::unique_ptr<Geometry>

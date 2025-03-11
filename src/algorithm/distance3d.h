@@ -17,7 +17,6 @@ struct NoValidityCheck;
  * dispatch distance between two Geometries
  * @todo complete with solid
  * Compute distance between two 3D Geometries
- * @ingroup public_api
  * @pre gA is a valid geometry
  * @pre gB is a valid geometry
  */
@@ -26,7 +25,6 @@ distance3D(const Geometry &gA, const Geometry &gB);
 
 /**
  * Compute distance between two 3D Geometries
- * @ingroup detail
  * @pre gA is a valid geometry
  * @pre gB is a valid geometry
  * @warning No actual validity check is done

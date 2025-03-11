@@ -15,7 +15,6 @@ struct NoValidityCheck;
 
 /**
  * Compute the distance between two Geometries
- * @ingroup public_api
  * @pre gA is a valid geometry
  * @pre gB is a valid geometry
  */
@@ -24,7 +23,6 @@ distance(const Geometry &gA, const Geometry &gB);
 
 /**
  * Compute the distance between two Geometries
- * @ingroup detail
  * @pre gA is a valid geometry
  * @pre gB is a valid geometry
  * @warning No actual validity check is done

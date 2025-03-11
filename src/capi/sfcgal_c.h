@@ -16,12 +16,6 @@ extern "C" {
 
 // TODO : return of errors ! => error handler
 
-/**
- *
- * Minimal C API for SFCGAL
- *
- */
-
 /*--------------------------------------------------------------------------------------*
  *
  * Support for SFCGAL::Geometry class hierarchy
@@ -989,7 +983,7 @@ sfcgal_geometry_extrude(const sfcgal_geometry_t *geom, double ex, double ey,
  * Convert a PolyhedralSurface to a Solid
  * @pre isValid(geom) == true
  * @post isValid(return) == true
- * @ingroup detail
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_make_solid(const sfcgal_geometry_t *geom);
@@ -1341,7 +1335,7 @@ sfcgal_geometry_visibility_point(const sfcgal_geometry_t *polygon,
  * @param polygon input geometry
  * @param pointA input geometry
  * @param pointB input geometry
- * @ingroup public_api
+ * @ingroup capi
  * @pre polygon is a valid geometry
  * @pre pointA and pointB must be vertices of poly, adjacents and respect the
  * direction

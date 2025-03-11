@@ -31,7 +31,6 @@ namespace algorithm {
 /**
  * Compute the 2D alpha shapes for a geometry
  * https://doc.cgal.org/latest/Alpha_shapes_2/index.html#Chapter_2D_Alpha_Shapes
- * @ingroup public_api
  * @since 1.4.1
  */
 SFCGAL_API auto
@@ -41,7 +40,6 @@ alphaShapes(const Geometry &g, double alpha = 1, bool allow_holes = false)
 /**
  * Compute the optimal 2D alpha shapes for a geometry
  * https://doc.cgal.org/latest/Alpha_shapes_2/index.html#Chapter_2D_Alpha_Shapes
- * @ingroup public_api
  * @since 1.4.1
  */
 SFCGAL_API auto

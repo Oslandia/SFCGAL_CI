@@ -14,7 +14,6 @@ namespace OBJ {
 
 /**
  * @brief Saves a geometry to an OBJ format stream.
- * @ingroup io
  *
  * @param[in] geom The geometry to save
  * @param[out] out The output stream
@@ -25,7 +24,6 @@ save(const Geometry &geom, std::ostream &out);
 
 /**
  * @brief Saves a geometry to an OBJ file.
- * @ingroup io
  *
  * @param[in] geom The geometry to save
  * @param[in] filename The name of the file to save to
@@ -37,7 +35,6 @@ save(const Geometry &geom, const std::string &filename);
 
 /**
  * @brief Saves a geometry to an OBJ format string.
- * @ingroup io
  *
  * @param[in] geom The geometry to save
  * @return The OBJ format string
@@ -48,7 +45,6 @@ SFCGAL_API std::string
 
 /**
  * @brief Saves a geometry to an OBJ format buffer (C API).
- * @ingroup io
  *
  * @param[in] geom The geometry to save
  * @param[out] buffer The buffer to write to

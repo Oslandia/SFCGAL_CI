@@ -20,7 +20,6 @@ namespace SFCGAL {
 /**
  * A Solid modeled with an exteriorShell and interiorShells materialized by
  * PolyhedralSurface.
- * @ingroup public_api
  * @note A shell is supposed to be closed.
  * @warning GM_Solid, from ISO 19107 is defined in CityGML, but not in SFA.
  * Without Solid concept,

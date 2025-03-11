@@ -34,7 +34,6 @@ struct NoValidityCheck;
  *   since there is no common expectation of the
  *   values of the measures on the returned Geometry,
  *   all measures from the result are removed.
- * @ingroup public_api
  */
 SFCGAL_API std::unique_ptr<Geometry>
 extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
@@ -59,7 +58,6 @@ extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
  *   since there is no common expectation of the
  *   values of the measures on the returned Geometry,
  *   all measures from the result are removed.
- * @ingroup detail
  * @warning No actual validity check is conducted.
  */
 SFCGAL_API std::unique_ptr<Geometry>
