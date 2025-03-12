@@ -54,7 +54,7 @@ difference(const Point_2 &primitive, const PrimitiveHandle<2> &pb,
     break;
 
   case PrimitiveSurface:
-    difference(primitive, *pb.as<PolygonWH_2>(), out);
+    difference(primitive, *pb.as<Polygon_with_holes_2>(), out);
     break;
   }
 
@@ -76,7 +76,7 @@ difference(const Segment_2 &primitive, const PrimitiveHandle<2> &pb,
     break;
 
   case PrimitiveSurface:
-    difference(primitive, *pb.as<PolygonWH_2>(), out);
+    difference(primitive, *pb.as<Polygon_with_holes_2>(), out);
     break;
   }
 
@@ -85,7 +85,7 @@ difference(const Segment_2 &primitive, const PrimitiveHandle<2> &pb,
 
 template <typename OutputIteratorType>
 auto
-difference(const PolygonWH_2 &primitive, const PrimitiveHandle<2> &pb,
+difference(const Polygon_with_holes_2 &primitive, const PrimitiveHandle<2> &pb,
            OutputIteratorType out) -> OutputIteratorType
 {
   switch (pb.handle.which()) {
@@ -98,7 +98,7 @@ difference(const PolygonWH_2 &primitive, const PrimitiveHandle<2> &pb,
     break;
 
   case PrimitiveSurface:
-    difference(primitive, *pb.as<PolygonWH_2>(), out);
+    difference(primitive, *pb.as<Polygon_with_holes_2>(), out);
     break;
   }
 
@@ -251,8 +251,8 @@ appendDifference(const PrimitiveHandle<2>                              &pa,
   }
 
   case PrimitiveSurface: {
-    std::vector<PolygonWH_2> res =
-        difference(*pa.as<PolygonWH_2>(), begin, end);
+    std::vector<Polygon_with_holes_2> res =
+        difference(*pa.as<Polygon_with_holes_2>(), begin, end);
     output.addSurfaces(res.begin(), res.end());
     return;
   }
@@ -302,8 +302,8 @@ post_difference(const GeometrySet<2> &input, GeometrySet<2> &output)
   //
   // reverse orientation of polygons if needed
   for (const auto &it : input.surfaces()) {
-    const PolygonWH_2 &p     = it.primitive();
-    Polygon_2          outer = p.outer_boundary();
+    const Polygon_with_holes_2 &p     = it.primitive();
+    Polygon_2                   outer = p.outer_boundary();
 
     if (outer.orientation() == CGAL::CLOCKWISE) {
       outer.reverse_orientation();
@@ -320,7 +320,7 @@ post_difference(const GeometrySet<2> &input, GeometrySet<2> &output)
     }
 
     output.surfaces().emplace_back(
-        PolygonWH_2(outer, rings.begin(), rings.end()));
+        Polygon_with_holes_2(outer, rings.begin(), rings.end()));
   }
 
   output.points()   = input.points();

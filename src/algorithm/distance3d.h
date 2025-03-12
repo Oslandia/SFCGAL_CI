@@ -5,9 +5,9 @@
 #ifndef SFCGAL_ALGORITHM_DISTANCE3D_H_
 #define SFCGAL_ALGORITHM_DISTANCE3D_H_
 
-#include "SFCGAL/config.h"
-
 #include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 namespace algorithm {

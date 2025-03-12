@@ -24,10 +24,6 @@
 #include <CGAL/minkowski_sum_2.h>
 #include <CGAL/offset_polygon_2.h>
 
-using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
-using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
-using Polygon_set_2        = CGAL::Polygon_set_2<SFCGAL::Kernel>;
-
 using Gps_traits_2   = CGAL::Gps_circle_segment_traits_2<SFCGAL::Kernel>;
 using Offset_curve_2 = Gps_traits_2::Curve_2;
 using Offset_x_monotone_curve_2   = Gps_traits_2::X_monotone_curve_2;

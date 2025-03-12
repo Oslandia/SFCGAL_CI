@@ -26,8 +26,6 @@ bool
 hasPlane3D(const Polygon &polygon, CGAL::Point_3<Kernel> &a,
            CGAL::Point_3<Kernel> &b, CGAL::Point_3<Kernel> &c)
 {
-  typedef CGAL::Point_3<Kernel> Point_3;
-
   const LineString &exteriorRing = polygon.exteriorRing();
 
   /*

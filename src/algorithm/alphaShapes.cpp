@@ -32,8 +32,6 @@ using Vb              = CGAL::Alpha_shape_vertex_base_2<Kernel>;
 using Fb              = CGAL::Alpha_shape_face_base_2<Kernel>;
 using Tds             = CGAL::Triangulation_data_structure_2<Vb, Fb>;
 using Triangulation_2 = CGAL::Delaunay_triangulation_2<Kernel, Tds>;
-using Point_2         = CGAL::Point_2<Kernel>;
-using Segment_2       = CGAL::Segment_2<Kernel>;
 using Alpha_shape_2   = CGAL::Alpha_shape_2<Triangulation_2>;
 
 using Alpha_shape_edges_iterator = Alpha_shape_2::Alpha_shape_edges_iterator;

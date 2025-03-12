@@ -16,9 +16,6 @@
 
 namespace SFCGAL::algorithm {
 
-using Point_2               = Kernel::Point_2;
-using Polygon_2             = CGAL::Polygon_2<Kernel>;
-using Segment_2             = Kernel::Segment_2;
 using Traits_2              = CGAL::Arr_segment_traits_2<Kernel>;
 using Arrangement_2         = CGAL::Arrangement_2<Traits_2>;
 using Face_handle           = Arrangement_2::Face_handle;
@@ -26,7 +23,6 @@ using Face_const_handle     = Arrangement_2::Face_const_handle;
 using Halfedge_const_handle = Arrangement_2::Halfedge_const_handle;
 using TEV =
     CGAL::Triangular_expansion_visibility_2<Arrangement_2, CGAL::Tag_true>;
-using PolygonWithHoles = CGAL::Polygon_with_holes_2<Kernel>;
 
 static auto
 query_visibility(Face_handle fh, Halfedge_const_handle he)

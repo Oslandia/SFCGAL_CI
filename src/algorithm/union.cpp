@@ -94,7 +94,7 @@ struct Surface_d {};
 
 template <>
 struct Surface_d<3> : Triangle_3 {
-  using PointVector   = std::vector<algorithm::Point_2>;
+  using PointVector   = std::vector<SFCGAL::Point_2>;
   using SegmentVector = std::vector<Segment_2>;
   using SurfaceVector = std::vector<PointVector>;
 
@@ -104,7 +104,7 @@ struct Surface_d<3> : Triangle_3 {
   }
 
   void
-  splitAt(const algorithm::Point_3 &p)
+  splitAt(const SFCGAL::Point_3 &p)
   {
     //@note this is a degenerated segment, but works anyway
     _split.emplace_back(_plane.to_2d(p), _plane.to_2d(p));
@@ -137,12 +137,12 @@ struct Surface_d<3> : Triangle_3 {
   void
   splitAt(const Triangle_3 &t)
   {
-    const algorithm::Point_3 v[3] = {t.vertex(0), t.vertex(1), t.vertex(2)};
+    const SFCGAL::Point_3 v[3] = {t.vertex(0), t.vertex(1), t.vertex(2)};
     this->splitAt(v, v + 3);
   }
 
   void
-  splitAt(const std::vector<algorithm::Point_3> &p)
+  splitAt(const std::vector<SFCGAL::Point_3> &p)
   { // polygon with unclosed ring
     this->splitAt(p.begin(), p.end());
   }
@@ -166,7 +166,7 @@ struct Surface_d<3> : Triangle_3 {
   }
 
   void
-  remove(const std::vector<algorithm::Point_3> &p)
+  remove(const std::vector<SFCGAL::Point_3> &p)
   {
     this->remove(p.begin(), p.end());
   }
@@ -174,7 +174,7 @@ struct Surface_d<3> : Triangle_3 {
   void
   remove(const Triangle_3 &t)
   {
-    const algorithm::Point_3 v[3] = {t.vertex(0), t.vertex(1), t.vertex(2)};
+    const SFCGAL::Point_3 v[3] = {t.vertex(0), t.vertex(1), t.vertex(2)};
     this->remove(v, v + 3);
   }
 
@@ -266,18 +266,18 @@ struct Surface_d<3> : Triangle_3 {
   }
 
 private:
-  algorithm::Plane_3 _plane;
-  SegmentVector      _split;
-  SurfaceVector      _remove;
+  SFCGAL::Plane_3 _plane;
+  SegmentVector   _split;
+  SurfaceVector   _remove;
 };
 
 template <>
-struct Surface_d<2> : PolygonWH_2 {
+struct Surface_d<2> : Polygon_with_holes_2 {
   using PointVector   = std::vector<Point_2>;
   using SegmentVector = std::vector<Segment_2>;
   using SurfaceVector = std::vector<PointVector>;
 
-  Surface_d(const PolygonWH_2 &s) : PolygonWH_2(s) {}
+  Surface_d(const Polygon_with_holes_2 &s) : Polygon_with_holes_2(s) {}
 
   void
   splitAt(const Segment_2 &s)
@@ -292,9 +292,9 @@ struct Surface_d<2> : PolygonWH_2 {
   }
 
   [[nodiscard]] auto
-  pieces() const -> std::vector<PolygonWH_2>
+  pieces() const -> std::vector<Polygon_with_holes_2>
   {
-    std::vector<PolygonWH_2> res;
+    std::vector<Polygon_with_holes_2> res;
     fix_cgal_valid_polygon(*this, std::back_inserter(res));
     return res;
   }
@@ -769,7 +769,7 @@ union_segment_volume(Handle<3> a, Handle<3> b)
 void
 union_surface_surface(Handle<2> a, Handle<2> b)
 {
-  PolygonWH_2 res;
+  Polygon_with_holes_2 res;
 
   if (CGAL::join(fix_sfs_valid_polygon(a.asSurface()),
                  fix_sfs_valid_polygon(b.asSurface()), res)) {

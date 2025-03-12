@@ -28,13 +28,6 @@
 
 using namespace SFCGAL;
 
-using Vector_2  = Kernel::Vector_2;
-using Vector_3  = Kernel::Vector_3;
-using Point_2   = Kernel::Point_2;
-using Point_3   = Kernel::Point_3;
-using Segment_2 = Kernel::Segment_2;
-using Segment_3 = Kernel::Segment_3;
-
 // always after CGAL
 using namespace boost::unit_test;
 

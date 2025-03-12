@@ -68,7 +68,7 @@ Cylinder::invalidateCache()
 }
 
 auto
-Cylinder::normalize(const Vector_3 &v) -> Cylinder::Vector_3
+Cylinder::normalize(const Vector_3 &v) -> Vector_3
 {
   double length = std::sqrt(CGAL::to_double(v.squared_length()));
   if (length < 1e-8) {
@@ -78,27 +78,27 @@ Cylinder::normalize(const Vector_3 &v) -> Cylinder::Vector_3
 }
 
 auto
-Cylinder::generatePolyhedron() -> Cylinder::Polyhedron_3
+Cylinder::generatePolyhedron() -> Polyhedron_3
 {
   if (m_polyhedron) {
     return *m_polyhedron;
   }
 
-  Polyhedron_3 poly;
-  Surface_mesh sm = generateSurfaceMesh();
+  Polyhedron_3   poly;
+  Surface_mesh_3 sm = generateSurfaceMesh();
   CGAL::copy_face_graph(sm, poly);
   m_polyhedron = poly;
   return poly;
 }
 
 auto
-Cylinder::generateSurfaceMesh() -> Cylinder::Surface_mesh
+Cylinder::generateSurfaceMesh() -> Surface_mesh_3
 {
   if (m_surface_mesh) {
     return *m_surface_mesh;
   }
 
-  Surface_mesh mesh;
+  Surface_mesh_3 mesh;
 
   Vector_3 normalized_axis = normalize(m_axis);
   Vector_3 perpendicular =
@@ -109,8 +109,8 @@ Cylinder::generateSurfaceMesh() -> Cylinder::Surface_mesh
   }
   Vector_3 perpendicular2 = CGAL::cross_product(normalized_axis, perpendicular);
 
-  std::vector<Surface_mesh::Vertex_index> base_vertices;
-  std::vector<Surface_mesh::Vertex_index> top_vertices;
+  std::vector<Surface_mesh_3::Vertex_index> base_vertices;
+  std::vector<Surface_mesh_3::Vertex_index> top_vertices;
 
   // Create vertices for the base and top
   for (int i = 0; i < m_num_radial; ++i) {
@@ -130,8 +130,8 @@ Cylinder::generateSurfaceMesh() -> Cylinder::Surface_mesh
   }
 
   // Add base and top faces
-  Surface_mesh::Vertex_index base_center = mesh.add_vertex(m_base_center);
-  Surface_mesh::Vertex_index top_center =
+  Surface_mesh_3::Vertex_index base_center = mesh.add_vertex(m_base_center);
+  Surface_mesh_3::Vertex_index top_center =
       mesh.add_vertex(m_base_center + m_height * normalized_axis);
 
   for (int i = 0; i < m_num_radial; ++i) {

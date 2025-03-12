@@ -23,10 +23,6 @@ using namespace SFCGAL::detail;
 
 namespace SFCGAL {
 
-using Point_2    = CGAL::Point_2<Kernel>;
-using Segment_2  = CGAL::Segment_2<Kernel>;
-using Triangle_2 = CGAL::Triangle_2<Kernel>;
-
 namespace algorithm {
 // see Intersection3D.cpp
 void

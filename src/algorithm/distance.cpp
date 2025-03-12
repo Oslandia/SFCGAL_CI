@@ -24,13 +24,6 @@
 #include "SFCGAL/detail/GetPointsVisitor.h"
 #include "SFCGAL/detail/transform/AffineTransform3.h"
 
-using Point_2   = SFCGAL::Kernel::Point_2;
-using Vector_2  = SFCGAL::Kernel::Vector_2;
-using Segment_2 = SFCGAL::Kernel::Segment_2;
-
-using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
-using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
-
 namespace SFCGAL::algorithm {
 
 ///
@@ -439,8 +432,6 @@ boundingCircle(const Geometry &geom) -> const Circle
   if (v.points.empty()) {
     return Circle();
   }
-
-  using Vector_2 = CGAL::Vector_2<Kernel>;
 
   const auto end = v.points.end();
 

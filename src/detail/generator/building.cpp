@@ -18,11 +18,7 @@
 
 namespace SFCGAL::generator {
 
-using Point_2              = Kernel::Point_2;
-using Point_3              = Kernel::Point_3;
-using Polygon_2            = CGAL::Polygon_2<Kernel>;
-using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
-using Straight_skeleton_2  = CGAL::Straight_skeleton_2<Kernel>;
+using Straight_skeleton_2 = CGAL::Straight_skeleton_2<Kernel>;
 
 /**
  * @brief Basic building generator relying on a straight skeleton

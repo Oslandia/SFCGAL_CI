@@ -24,16 +24,10 @@
 #include "SFCGAL/detail/transform/AffineTransform3.h"
 #include "SFCGAL/triangulate/triangulatePolygon.h"
 
-using Kernel             = CGAL::Exact_predicates_exact_constructions_kernel;
+namespace SFCGAL {
 using squared_distance_t = Kernel::FT;
 
-using Point_3    = Kernel::Point_3;
-using Vector_3   = Kernel::Vector_3;
-using Segment_3  = Kernel::Segment_3;
-using Triangle_3 = Kernel::Triangle_3;
-using Plane_3    = Kernel::Plane_3;
-
-namespace SFCGAL::algorithm {
+namespace algorithm {
 
 ///
 ///
@@ -543,8 +537,6 @@ boundingSphere(const Geometry &geom) -> const Sphere
     return Sphere();
   }
 
-  using Vector_3 = CGAL::Vector_3<Kernel>;
-
   const auto end = v.points.end();
 
   // centroid
@@ -866,4 +858,5 @@ distanceTriangleTriangle3D(const Triangle &gA, const Triangle &gB) -> double
   return CGAL::sqrt(CGAL::to_double(dMin));
 }
 
-} // namespace SFCGAL::algorithm
+} // namespace algorithm
+} // namespace SFCGAL

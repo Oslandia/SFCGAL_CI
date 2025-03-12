@@ -6,9 +6,6 @@
 
 namespace SFCGAL {
 
-using Point_3      = Kernel::Point_3;
-using Polyhedron_3 = CGAL::Polyhedron_3<Kernel>;
-
 /**
  * @brief Helper class for building the sphere polyhedron
  */

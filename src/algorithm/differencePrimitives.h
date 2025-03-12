@@ -22,19 +22,7 @@ namespace SFCGAL {
 
 namespace algorithm {
 
-typedef CGAL::Vector_2<Kernel>             Vector_2;
-typedef CGAL::Point_2<Kernel>              Point_2;
-typedef CGAL::Segment_2<Kernel>            Segment_2;
-typedef CGAL::Triangle_2<Kernel>           Triangle_2;
-typedef CGAL::Polygon_2<Kernel>            Polygon_2;
-typedef CGAL::Polygon_with_holes_2<Kernel> PolygonWH_2;
-typedef detail::NoVolume                   NoVolume;
-
-typedef CGAL::Vector_3<Kernel>   Vector_3;
-typedef CGAL::Point_3<Kernel>    Point_3;
-typedef CGAL::Segment_3<Kernel>  Segment_3;
-typedef CGAL::Triangle_3<Kernel> Triangle_3;
-typedef CGAL::Plane_3<Kernel>    Plane_3;
+typedef detail::NoVolume         NoVolume;
 typedef detail::MarkedPolyhedron MarkedPolyhedron;
 
 CGAL::Object
@@ -42,7 +30,7 @@ intersection(const CGAL::Triangle_3<Kernel> &a,
              const CGAL::Triangle_3<Kernel> &b);
 
 inline bool
-do_intersect(const Point_2 &point, const PolygonWH_2 &polygon)
+do_intersect(const Point_2 &point, const Polygon_with_holes_2 &polygon)
 {
   // point intersects if it's inside the ext ring and outside all holes
 
@@ -52,7 +40,7 @@ do_intersect(const Point_2 &point, const PolygonWH_2 &polygon)
     return false;
   }
 
-  for (PolygonWH_2::Hole_const_iterator hit = polygon.holes_begin();
+  for (Polygon_with_holes_2::Hole_const_iterator hit = polygon.holes_begin();
        hit != polygon.holes_end(); ++hit) {
     if (CGAL::bounded_side_2(hit->vertices_begin(), hit->vertices_end(), point,
                              Kernel()) != CGAL::ON_UNBOUNDED_SIDE) {
@@ -87,7 +75,8 @@ difference(const Point_2 &a, const Segment_2 &b, PointOutputIteratorType out)
 
 template <typename PointOutputIteratorType>
 PointOutputIteratorType
-difference(const Point_2 &a, const PolygonWH_2 &b, PointOutputIteratorType out)
+difference(const Point_2 &a, const Polygon_with_holes_2 &b,
+           PointOutputIteratorType out)
 {
   if (!do_intersect(a, b)) {
     *out++ = a;
@@ -114,7 +103,8 @@ difference(const Segment_2 &, const NoVolume &, SegmentOutputIteratorType out)
 
 template <typename SurfaceOutputIteratorType>
 SurfaceOutputIteratorType
-difference(const PolygonWH_2 &, const NoVolume &, SurfaceOutputIteratorType out)
+difference(const Polygon_with_holes_2 &, const NoVolume &,
+           SurfaceOutputIteratorType out)
 {
   BOOST_ASSERT(false);
   return out;
@@ -218,7 +208,7 @@ private:
 
 template <typename SegmentOutputIteratorType>
 SegmentOutputIteratorType
-difference(const Segment_2 &segment, const PolygonWH_2 &polygon,
+difference(const Segment_2 &segment, const Polygon_with_holes_2 &polygon,
            SegmentOutputIteratorType out)
 {
   // we could triangulate the polygon and substract each triangle
@@ -309,7 +299,8 @@ isHoleOf(const Polygon_2 &hole, const Polygon_2 &poly)
 
 template <typename PolygonOutputIteratorType>
 PolygonOutputIteratorType
-fix_cgal_valid_polygon(const PolygonWH_2 &p, PolygonOutputIteratorType out)
+fix_cgal_valid_polygon(const Polygon_with_holes_2 &p,
+                       PolygonOutputIteratorType   out)
 {
   const Polygon_2 &outer = p.outer_boundary();
 
@@ -411,8 +402,8 @@ fix_cgal_valid_polygon(const PolygonWH_2 &p, PolygonOutputIteratorType out)
     }
 
     for (unsigned i = 0; i < boundaries.size(); i++) {
-      *out++ = PolygonWH_2(boundaries[i], sortedHoles[i].begin(),
-                           sortedHoles[i].end());
+      *out++ = Polygon_with_holes_2(boundaries[i], sortedHoles[i].begin(),
+                                    sortedHoles[i].end());
     }
 
     // std::cerr << "extracted " << boundaries.size() << " boundaries,
@@ -424,8 +415,8 @@ fix_cgal_valid_polygon(const PolygonWH_2 &p, PolygonOutputIteratorType out)
   return out;
 }
 
-inline PolygonWH_2
-fix_sfs_valid_polygon(const PolygonWH_2 &p)
+inline Polygon_with_holes_2
+fix_sfs_valid_polygon(const Polygon_with_holes_2 &p)
 {
   CGAL::Gps_segment_traits_2<Kernel> traits;
 
@@ -476,7 +467,7 @@ fix_sfs_valid_polygon(const PolygonWH_2 &p)
     }
   }
 
-  return PolygonWH_2(out[0], out.begin() + 1, out.end());
+  return Polygon_with_holes_2(out[0], out.begin() + 1, out.end());
 }
 
 template <typename OutputIteratorType>
@@ -493,17 +484,17 @@ difference(const Triangle_3 &p, const Triangle_3 &q, OutputIteratorType out)
     // difference between polygons
     // triangulate the result
 
-    PolygonWH_2 pProj, qProj;
+    Polygon_with_holes_2 pProj, qProj;
 
     for (unsigned i = 0; i < 3; i++) {
       pProj.outer_boundary().push_back(plane.to_2d(p.vertex(i)));
       qProj.outer_boundary().push_back(plane.to_2d(q.vertex(i)));
     }
 
-    std::vector<PolygonWH_2> res;
+    std::vector<Polygon_with_holes_2> res;
     difference(pProj, qProj, std::back_inserter(res));
 
-    for (std::vector<PolygonWH_2>::const_iterator i = res.begin();
+    for (std::vector<Polygon_with_holes_2>::const_iterator i = res.begin();
          i != res.end(); ++i) {
       const Polygon       poly(*i);
       TriangulatedSurface ts;
@@ -612,10 +603,10 @@ difference(const Segment_3 &segment, const MarkedPolyhedron &polyhedron,
            SegmentOutputIteratorType out)
 {
   // this is a bit of a pain
-  // the algo should follow the same lines as the Segment_2 - PolygonWH_2
-  // namely, remove the pieces of the segment were it touches facets,
-  // then compute the intersections with facets to cut the segments and
-  // create segments for output were the middle point is inside
+  // the algo should follow the same lines as the Segment_2 -
+  // Polygon_with_holes_2 namely, remove the pieces of the segment were it
+  // touches facets, then compute the intersections with facets to cut the
+  // segments and create segments for output were the middle point is inside
   //
   // to speed thing up we put facets in AABB-Tree
 
@@ -811,12 +802,12 @@ difference(const Triangle_3 &triangle, const MarkedPolyhedron &polyhedron,
 
 template <typename PolygonOutputIteratorType>
 PolygonOutputIteratorType
-difference(const PolygonWH_2 &a, const PolygonWH_2 &b,
+difference(const Polygon_with_holes_2 &a, const Polygon_with_holes_2 &b,
            PolygonOutputIteratorType out)
 {
   CGAL::Gps_segment_traits_2<Kernel> traits;
 
-  std::vector<PolygonWH_2> temp;
+  std::vector<Polygon_with_holes_2> temp;
   CGAL::difference(are_holes_and_boundary_pairwise_disjoint(a, traits)
                        ? a
                        : fix_sfs_valid_polygon(a),
@@ -828,7 +819,7 @@ difference(const PolygonWH_2 &a, const PolygonWH_2 &b,
   // polygon outer rings from difference can self intersect at points
   // therefore we need to split the generated polygons so that they are valid
   // for SFS
-  for (std::vector<PolygonWH_2>::const_iterator poly = temp.begin();
+  for (std::vector<Polygon_with_holes_2>::const_iterator poly = temp.begin();
        poly != temp.end(); ++poly) {
     out = fix_cgal_valid_polygon(*poly, out);
   }

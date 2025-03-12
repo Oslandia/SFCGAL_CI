@@ -22,11 +22,6 @@ namespace SFCGAL {
  */
 class SFCGAL_API Cylinder {
 public:
-  using Point_3      = Kernel::Point_3;
-  using Vector_3     = Kernel::Vector_3;
-  using Polyhedron_3 = CGAL::Polyhedron_3<Kernel>;
-  using Surface_mesh = CGAL::Surface_mesh<Point_3>;
-
   /**
    * @brief Constructs a Cylinder object
    * @param base_center The center point of the base of the cylinder
@@ -152,7 +147,7 @@ public:
    * @brief Generates a surface mesh representation of the cylinder
    * @return A CGAL::Surface_mesh object representing the cylinder
    */
-  Surface_mesh
+  Surface_mesh_3
   generateSurfaceMesh();
 
   double
@@ -169,13 +164,13 @@ public:
   }
 
 private:
-  Point_3                     m_base_center;
-  Vector_3                    m_axis;
-  Kernel::FT                  m_radius;
-  Kernel::FT                  m_height;
-  int                         m_num_radial;
-  std::optional<Polyhedron_3> m_polyhedron;
-  std::optional<Surface_mesh> m_surface_mesh;
+  Point_3                       m_base_center;
+  Vector_3                      m_axis;
+  Kernel::FT                    m_radius;
+  Kernel::FT                    m_height;
+  int                           m_num_radial;
+  std::optional<Polyhedron_3>   m_polyhedron;
+  std::optional<Surface_mesh_3> m_surface_mesh;
 
   /**
    * @brief Invalidates the cached polyhedron and surface mesh

@@ -65,7 +65,6 @@ Buffer3D::computePointBuffer() const -> std::unique_ptr<PolyhedralSurface>
 auto
 Buffer3D::computeRoundBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
-  typedef Kernel::Point_3                           Point_3;
   typedef Point_3                                  *point_iterator;
   typedef std::pair<point_iterator, point_iterator> point_range;
   typedef std::list<point_range>                    polyline;
@@ -201,8 +200,8 @@ Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
     line_points.emplace_back(p.x(), p.y(), p.z());
   }
 
-  Cylinder::Surface_mesh                                         buffer;
-  std::vector<std::vector<Cylinder::Surface_mesh::Vertex_index>> rings;
+  Surface_mesh_3                                         buffer;
+  std::vector<std::vector<Surface_mesh_3::Vertex_index>> rings;
 
   std::vector<Kernel::Plane_3> bisector_planes;
   for (size_t i = 1; i < line_points.size() - 1; ++i) {
@@ -223,8 +222,8 @@ Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
     std::vector<Kernel::Point_3> end_circle =
         create_circle_points(extended_end, axis, _radius, _segments);
 
-    std::vector<Cylinder::Surface_mesh::Vertex_index> start_ring;
-    std::vector<Cylinder::Surface_mesh::Vertex_index> end_ring;
+    std::vector<Surface_mesh_3::Vertex_index> start_ring;
+    std::vector<Surface_mesh_3::Vertex_index> end_ring;
 
     for (int j = 0; j < _segments; ++j) {
       Kernel::Point_3 start_point = start_circle[j];
@@ -239,8 +238,8 @@ Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
             intersect_segment_plane(start_point, end_point, bisector_planes[i]);
       }
 
-      Cylinder::Surface_mesh::Vertex_index v1 = buffer.add_vertex(start_point);
-      Cylinder::Surface_mesh::Vertex_index v2 = buffer.add_vertex(end_point);
+      Surface_mesh_3::Vertex_index v1 = buffer.add_vertex(start_point);
+      Surface_mesh_3::Vertex_index v2 = buffer.add_vertex(end_point);
       start_ring.push_back(v1);
       end_ring.push_back(v2);
 
@@ -266,10 +265,9 @@ Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
       line_points.back(),
       normalizeVector(line_points.back() - line_points[line_points.size() - 2]),
       _radius);
-  Cylinder::Surface_mesh::Vertex_index start_center_index =
+  Surface_mesh_3::Vertex_index start_center_index =
       buffer.add_vertex(start_center);
-  Cylinder::Surface_mesh::Vertex_index end_center_index =
-      buffer.add_vertex(end_center);
+  Surface_mesh_3::Vertex_index end_center_index = buffer.add_vertex(end_center);
 
   for (int i = 0; i < _segments; ++i) {
     buffer.add_face(start_center_index, rings.front()[(i + 1) % _segments],

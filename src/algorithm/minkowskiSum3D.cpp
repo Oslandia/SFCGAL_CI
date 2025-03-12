@@ -22,7 +22,6 @@
 namespace SFCGAL::algorithm {
 
 using Nef_polyhedron_3 = CGAL::Nef_polyhedron_3<Kernel>;
-using Polyhedron_3     = CGAL::Polyhedron_3<Kernel>;
 
 auto
 perpendicular_vector(const Kernel::Vector_3 &v) -> Kernel::Vector_3

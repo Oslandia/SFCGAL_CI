@@ -43,9 +43,6 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_NormalTest)
 
 BOOST_AUTO_TEST_CASE(testNormal1)
 {
-  typedef CGAL::Vector_3<Kernel> Vector_3;
-  typedef CGAL::Point_3<Kernel>  Point_3;
-
   Point_3 const a(0.0, 0.0, 0.0);
   Point_3 const b(1.0, 0.0, 0.0);
   Point_3 const c(1.0, 1.0, 0.0);

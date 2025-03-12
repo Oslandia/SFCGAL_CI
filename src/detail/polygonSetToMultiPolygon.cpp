@@ -17,8 +17,6 @@ auto
 polygonSetToMultiPolygon(const CGAL::Polygon_set_2<Kernel> &polygonSet)
     -> std::unique_ptr<MultiPolygon>
 {
-  using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<Kernel>;
-
   std::list<Polygon_with_holes_2> res;
   polygonSet.polygons_with_holes(std::back_inserter(res));
 

@@ -5,7 +5,6 @@
 #include <cmath>
 
 using namespace SFCGAL;
-using Point_3 = Kernel::Point_3;
 
 BOOST_AUTO_TEST_SUITE(SphereTests)
 
@@ -90,7 +89,7 @@ BOOST_AUTO_TEST_CASE(testWKT)
     auto polyhedron = sphere.generatePolyhedron();
     PolyhedralSurface surface(polyhedron);
     std::string wkt = surface.asText(1);
-    
+
     BOOST_TEST_MESSAGE("Sphere WKT: " << wkt);
     BOOST_CHECK(wkt.find("POLYHEDRALSURFACE Z") == 0);
 }

@@ -23,10 +23,6 @@
 
 #include <CGAL/Aff_transformation_2.h>
 
-using Polygon_2            = CGAL::Polygon_2<SFCGAL::Kernel>;
-using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<SFCGAL::Kernel>;
-using Polygon_set_2        = CGAL::Polygon_set_2<SFCGAL::Kernel>;
-
 namespace SFCGAL::algorithm {
 
 //-- private interface

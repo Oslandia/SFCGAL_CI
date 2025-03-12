@@ -5,8 +5,6 @@
 #include <cmath>
 
 using namespace SFCGAL;
-using Point_3  = Kernel::Point_3;
-using Vector_3 = Kernel::Vector_3;
 
 BOOST_AUTO_TEST_SUITE(CylinderTests)
 

@@ -29,16 +29,6 @@
 
 namespace SFCGAL::algorithm {
 
-using Point_2    = CGAL::Point_2<SFCGAL::Kernel>;
-using Triangle_2 = CGAL::Triangle_2<SFCGAL::Kernel>;
-using Polygon_2  = CGAL::Polygon_2<SFCGAL::Kernel>;
-using Vector_2   = CGAL::Vector_2<SFCGAL::Kernel>;
-
-using Point_3    = CGAL::Point_3<SFCGAL::Kernel>;
-using Triangle_3 = CGAL::Triangle_3<SFCGAL::Kernel>;
-using Plane_3    = CGAL::Plane_3<SFCGAL::Kernel>;
-using Vector_3   = CGAL::Vector_3<SFCGAL::Kernel>;
-
 ///
 ///
 ///
