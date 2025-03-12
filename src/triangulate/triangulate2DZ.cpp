@@ -16,6 +16,12 @@ namespace SFCGAL::triangulate {
 
 using Vertex_handle = ConstraintDelaunayTriangulation::Vertex_handle;
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 ///
 ///
 ///
@@ -74,6 +80,14 @@ triangulate2DZ(const Triangle                  &g,
     last = vertex;
   }
 }
+
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
+
 ///
 ///
 ///

@@ -27,6 +27,13 @@
 using namespace SFCGAL::detail;
 
 namespace SFCGAL::algorithm {
+
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 ///
 /// Type of pa must be of larger dimension than type of pb
 auto
@@ -335,6 +342,13 @@ dispatch_intersects_sym(const PrimitiveHandle<Dim> &pa,
   return _intersects(pb, pa);
 }
 
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
+
 template <int Dim>
 auto
 intersects(const PrimitiveHandle<Dim> &pa, const PrimitiveHandle<Dim> &pb)
@@ -379,13 +393,17 @@ intersects(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
   return false;
 }
 
+/// @private
 template bool
 intersects<2>(const GeometrySet<2> &a, const GeometrySet<2> &b);
+/// @private
 template bool
 intersects<3>(const GeometrySet<3> &a, const GeometrySet<3> &b);
 
+/// @private
 template bool
 intersects<2>(const PrimitiveHandle<2> &a, const PrimitiveHandle<2> &b);
+/// @private
 template bool
 intersects<3>(const PrimitiveHandle<3> &a, const PrimitiveHandle<3> &b);
 
@@ -433,6 +451,7 @@ intersects3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
   return intersects(gsa, gsb);
 }
 
+/// @private
 template <int Dim>
 auto
 selfIntersectsImpl(const LineString &line) -> bool
@@ -525,6 +544,7 @@ selfIntersects3D(const LineString &l) -> bool
   return selfIntersectsImpl<3>(l);
 }
 
+/// @private
 template <int Dim>
 auto
 selfIntersectsImpl(const PolyhedralSurface &s, const SurfaceGraph &graph)
@@ -579,6 +599,7 @@ selfIntersects3D(const PolyhedralSurface &s, const SurfaceGraph &g) -> bool
   return selfIntersectsImpl<3>(s, g);
 }
 
+/// @private
 template <int Dim>
 auto
 selfIntersectsImpl(const TriangulatedSurface &tin, const SurfaceGraph &graph)

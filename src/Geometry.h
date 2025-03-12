@@ -26,6 +26,9 @@ class Object;
 typedef uint32_t srid_t;
 
 namespace SFCGAL {
+
+/// @{
+/// @privatesection
 class Geometry;
 class Point;
 class LineString;
@@ -48,13 +51,11 @@ class Envelope;
 
 class GeometryVisitor;
 class ConstGeometryVisitor;
-} // namespace SFCGAL
-
-namespace SFCGAL {
 
 const uint32_t wkbSRID = 0x20000000;
 const uint32_t wkbM    = 0x40000000;
 const uint32_t wkbZ    = 0x80000000;
+/// @} end of private section
 
 /**
  * [OGC/SFA]8.2.3 "A common list of codes for geometric types"

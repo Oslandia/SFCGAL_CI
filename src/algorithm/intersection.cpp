@@ -24,6 +24,13 @@ using namespace SFCGAL::detail;
 namespace SFCGAL {
 
 namespace algorithm {
+
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 // see Intersection3D.cpp
 void
 intersection(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb,
@@ -118,6 +125,12 @@ post_intersection(const GeometrySet<3> &input, GeometrySet<3> &output)
   // nothing special to do
   output = input;
 }
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 template <int Dim>
 void
@@ -141,9 +154,11 @@ intersection(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
   output.merge(temp2);
 }
 
+/// @private
 template void
 intersection<2>(const GeometrySet<2> &a, const GeometrySet<2> &b,
                 GeometrySet<2> &);
+/// @private
 template void
 intersection<3>(const GeometrySet<3> &a, const GeometrySet<3> &b,
                 GeometrySet<3> &);

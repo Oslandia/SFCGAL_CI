@@ -22,6 +22,11 @@ namespace SFCGAL {
 
 namespace algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
 typedef detail::NoVolume         NoVolume;
 typedef detail::MarkedPolyhedron MarkedPolyhedron;
 
@@ -826,6 +831,8 @@ difference(const Polygon_with_holes_2 &a, const Polygon_with_holes_2 &b,
 
   return out;
 }
+
+/// @} end of private section
 
 } // namespace algorithm
 } // namespace SFCGAL

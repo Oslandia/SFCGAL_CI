@@ -33,6 +33,12 @@
 
 namespace SFCGAL::algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 using Straight_skeleton_2 = CGAL::Straight_skeleton_2<Kernel>;
 using Arrangement_2 = CGAL::Arrangement_2<CGAL::Arr_segment_traits_2<Kernel>>;
 
@@ -269,6 +275,13 @@ extractPolygons(const Geometry &g, std::vector<Polygon> &vect)
 }
 
 } // namespace
+
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 ///
 ///

@@ -6,7 +6,9 @@
 
 namespace SFCGAL {
 
-const char _sfcgal_version[]      = SFCGAL_VERSION;
+/// @private
+const char _sfcgal_version[] = SFCGAL_VERSION;
+/// @private
 const char _sfcgal_full_version[] = SFCGAL_FULL_VERSION;
 
 auto

@@ -25,7 +25,11 @@
 
 namespace SFCGAL::algorithm {
 
-//-- private interface
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
 
 /**
  * dispatch gA+gB sum
@@ -250,6 +254,13 @@ minkowskiSumCollection(const Geometry &gA, const Polygon_2 &gB,
   }
 }
 
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
+
 auto
 minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
@@ -263,8 +274,6 @@ minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck /*unused*/)
   return std::unique_ptr<Geometry>(
       detail::polygonSetToMultiPolygon(polygonSet).release());
 }
-
-//-- public interface implementation
 
 ///
 ///

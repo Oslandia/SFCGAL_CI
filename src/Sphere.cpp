@@ -6,6 +6,12 @@
 
 namespace SFCGAL {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 /**
  * @brief Helper class for building the sphere polyhedron
  */
@@ -135,6 +141,13 @@ private:
   Point_3          center;
   Kernel::Vector_3 direction;
 };
+
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
                int num_vertical, int num_horizontal,

@@ -30,7 +30,11 @@
 
 namespace SFCGAL::algorithm {
 
-//-- private interface
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
 
 auto
 extrude(const Point &g, const Kernel::Vector_3 &v) -> LineString *;
@@ -308,7 +312,12 @@ extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
   return result.release();
 }
 
-//-- public interface
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 ///
 ///

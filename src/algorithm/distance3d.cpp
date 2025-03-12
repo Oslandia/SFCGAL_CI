@@ -24,6 +24,11 @@
 #include "SFCGAL/detail/transform/AffineTransform3.h"
 #include "SFCGAL/triangulate/triangulatePolygon.h"
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
 namespace SFCGAL {
 using squared_distance_t = Kernel::FT;
 
@@ -860,3 +865,4 @@ distanceTriangleTriangle3D(const Triangle &gA, const Triangle &gB) -> double
 
 } // namespace algorithm
 } // namespace SFCGAL
+/// @} end of private section

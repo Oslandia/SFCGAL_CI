@@ -77,6 +77,13 @@
 // SFCGAL::PreparedGeometry has no vtable and can thus be manipuled through
 // reinterpret_cast without problem
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 static sfcgal_error_handler_t __sfcgal_warning_handler = printf;
 static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
 
@@ -228,6 +235,13 @@ alloc_and_copy(const std::string str, char **buffer, size_t *len) -> void
     *len = 0;
   }
 }
+
+/// @} end of private section
+#endif
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 extern "C" void
 sfcgal_set_error_handlers(sfcgal_error_handler_t warning_handler,
@@ -1035,6 +1049,9 @@ sfcgal_io_read_ewkt(const char *str, size_t len) -> sfcgal_prepared_geometry_t *
   return pg;
 }
 
+/// @{
+/// @privatesection
+
 SFCGAL_GEOMETRY_FUNCTION_BINARY_PREDICATE(covers, SFCGAL::algorithm::covers)
 SFCGAL_GEOMETRY_FUNCTION_BINARY_PREDICATE(covers_3d,
                                           SFCGAL::algorithm::covers3D)
@@ -1073,6 +1090,8 @@ SFCGAL_GEOMETRY_FUNCTION_UNARY_CONSTRUCTION(tesselate,
 
 SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(area, SFCGAL::algorithm::area)
 SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(area_3d, SFCGAL::algorithm::area3D)
+
+/// @} end of private section
 
 extern "C" auto
 sfcgal_geometry_volume(const sfcgal_geometry_t *ga) -> double

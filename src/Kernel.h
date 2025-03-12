@@ -19,8 +19,11 @@ namespace SFCGAL {
 
 using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
 
+/// @{
+/// @privatesection
 /**
  * Quotient type
+ * @private
  */
 typedef CGAL::Gmpq QT;
 
@@ -39,6 +42,8 @@ using Segment_3      = CGAL::Segment_3<Kernel>;
 using Vector_3       = CGAL::Vector_3<SFCGAL::Kernel>;
 using Polyhedron_3   = CGAL::Polyhedron_3<Kernel>;
 using Surface_mesh_3 = CGAL::Surface_mesh<Point_3>;
+
+/// @} end of private section
 
 } // namespace SFCGAL
 

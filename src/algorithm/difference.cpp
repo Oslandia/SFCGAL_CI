@@ -23,6 +23,12 @@ using namespace SFCGAL::detail;
 
 namespace SFCGAL::algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 template <int Dim>
 struct CollisionMapper {
   using PrimitiveHandleSet = std::vector<PrimitiveHandle<Dim> *>;
@@ -392,6 +398,13 @@ difference<2>(const GeometrySet<2> &a, const GeometrySet<2> &b,
 template void
 difference<3>(const GeometrySet<3> &a, const GeometrySet<3> &b,
               GeometrySet<3> &);
+
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 auto
 difference(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)

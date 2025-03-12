@@ -16,6 +16,12 @@
 
 namespace SFCGAL::algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 using Traits_2              = CGAL::Arr_segment_traits_2<Kernel>;
 using Arrangement_2         = CGAL::Arrangement_2<Traits_2>;
 using Face_handle           = Arrangement_2::Face_handle;
@@ -57,6 +63,13 @@ query_visibility(Face_handle fh, Halfedge_const_handle he)
 
   return result;
 }
+
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 ///
 ///

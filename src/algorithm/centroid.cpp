@@ -29,6 +29,12 @@
 
 namespace SFCGAL::algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 ///
 ///
 ///
@@ -57,6 +63,13 @@ std::function<WeightedCentroid(const T &, bool)> weightedCentroidLambda =
 
   return {totalArea, totalWeightedCentroid, totalM};
 };
+
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 ///
 ///

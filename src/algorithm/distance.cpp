@@ -547,8 +547,6 @@ distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
   return dMin;
 }
 
-//--- private
-
 ///
 ///
 ///

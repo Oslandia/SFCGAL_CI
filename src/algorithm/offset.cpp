@@ -24,6 +24,12 @@
 #include <CGAL/minkowski_sum_2.h>
 #include <CGAL/offset_polygon_2.h>
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 using Gps_traits_2   = CGAL::Gps_circle_segment_traits_2<SFCGAL::Kernel>;
 using Offset_curve_2 = Gps_traits_2::Curve_2;
 using Offset_x_monotone_curve_2   = Gps_traits_2::X_monotone_curve_2;
@@ -37,8 +43,6 @@ using Offset_polygon_set_2        = CGAL::General_polygon_set_2<Gps_traits_2>;
   if (!std::isfinite(r))                                                       \
     BOOST_THROW_EXCEPTION(NonFiniteValueException("radius is non finite"));
 namespace SFCGAL::algorithm {
-
-//-- private interface
 
 /**
  * @brief dispatch a geometry
@@ -340,7 +344,12 @@ offset(const Geometry &g, const double &radius,
   }
 }
 
-//-- public interface
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 ///
 ///

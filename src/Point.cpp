@@ -217,6 +217,8 @@ Point::almostEqual(const Point &other, const double tolerance) const -> bool
   return _coordinate.almostEqual(other._coordinate, tolerance);
 }
 
+/// @{
+/// @privatesection
 ///
 /// Private structures used to implement partial function specialization
 template <int D>
@@ -236,6 +238,8 @@ struct do_toPoint_d<3> {
     return p->toPoint_3();
   }
 };
+
+/// @} end of private section
 
 template <int Dim>
 auto

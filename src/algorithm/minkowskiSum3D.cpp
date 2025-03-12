@@ -21,6 +21,12 @@
 
 namespace SFCGAL::algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 using Nef_polyhedron_3 = CGAL::Nef_polyhedron_3<Kernel>;
 
 auto
@@ -163,6 +169,13 @@ nefToGeometry(const Nef_polyhedron_3 &nef) -> std::unique_ptr<Geometry>
 
   return std::make_unique<PolyhedralSurface>(poly);
 }
+
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 auto
 minkowskiSum3D(const Geometry &gA, const Geometry &gB,

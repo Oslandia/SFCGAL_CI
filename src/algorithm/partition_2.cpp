@@ -21,6 +21,11 @@
 
 namespace SFCGAL::algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
 using Traits     = CGAL::Partition_traits_2<Kernel>;
 using TPoint_2   = Traits::Point_2;
 using TPolygon_2 = Traits::Polygon_2;
@@ -78,6 +83,13 @@ polygons_to_geometry(const std::list<TPolygon_2> &polys)
   }
   return std::unique_ptr<Geometry>(geoms);
 }
+
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 auto
 partition_2(const Geometry &g, PartitionAlgorithm alg)

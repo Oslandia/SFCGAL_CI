@@ -23,6 +23,10 @@
 #include <CGAL/mpz_class.h>
 #endif
 
+/*
+ * @todo SHOULD BE IN io FOLDER OR ADD MISSING detail NAMESPACE
+ */
+
 namespace SFCGAL {
 
 namespace io {

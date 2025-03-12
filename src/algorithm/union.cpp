@@ -17,6 +17,12 @@
 
 namespace SFCGAL::algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 struct EmptyPrimitive {};
 
 enum PrimitiveType {
@@ -1037,6 +1043,13 @@ union_(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
   return result;
 }
 
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
+
 auto
 union3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
@@ -1064,6 +1077,7 @@ union3D(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
   return result;
 }
 
+/// @private
 void
 handleLeakTest()
 {

@@ -26,6 +26,12 @@ namespace SFCGAL {
 
 namespace algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+
 auto
 isSimple(const LineString &linestring) -> const Simplicity
 {
@@ -194,6 +200,13 @@ isSimple(const GeometryCollection &collection, const double &toleranceAbs)
 
   return Simplicity::simple();
 }
+
+/// @} end of private section
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 auto
 isSimple(const Geometry &g, const double &toleranceAbs) -> const Simplicity
