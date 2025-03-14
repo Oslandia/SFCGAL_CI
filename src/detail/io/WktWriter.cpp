@@ -40,9 +40,6 @@ writeFT(std::ostream &s, const mpq_class &ft) -> std::ostream &
 #endif
 } // namespace impl
 
-///
-///
-///
 WktWriter::WktWriter(std::ostream &s) : _s(s) {}
 
 void
@@ -103,9 +100,6 @@ WktWriter::writeRec(const Geometry &g)
   BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
 }
 
-///
-///
-///
 void
 WktWriter::write(const Geometry &g, bool exact)
 {
@@ -113,9 +107,6 @@ WktWriter::write(const Geometry &g, bool exact)
   writeRec(g);
 }
 
-///
-///
-///
 void
 WktWriter::writeCoordinateType(const Geometry &g)
 {
@@ -137,9 +128,6 @@ fixZeroNeg(double val, int precision) -> double
   return val;
 }
 
-///
-///
-///
 void
 WktWriter::writeCoordinate(const Point &g)
 {
@@ -166,9 +154,6 @@ WktWriter::writeCoordinate(const Point &g)
   }
 }
 
-///
-///
-///
 void
 WktWriter::write(const Point &g)
 {
@@ -183,9 +168,6 @@ WktWriter::write(const Point &g)
   writeInner(g);
 }
 
-///
-///
-///
 void
 WktWriter::writeInner(const Point &g)
 {
@@ -199,9 +181,6 @@ WktWriter::writeInner(const Point &g)
   _s << ")";
 }
 
-///
-///
-///
 void
 WktWriter::write(const LineString &g)
 {
@@ -216,9 +195,6 @@ WktWriter::write(const LineString &g)
   writeInner(g);
 }
 
-///
-///
-///
 void
 WktWriter::writeInner(const LineString &g)
 {
@@ -235,9 +211,6 @@ WktWriter::writeInner(const LineString &g)
   _s << ")";
 }
 
-///
-///
-///
 void
 WktWriter::write(const Polygon &g)
 {
@@ -252,9 +225,6 @@ WktWriter::write(const Polygon &g)
   writeInner(g);
 }
 
-///
-///
-///
 void
 WktWriter::writeInner(const Polygon &g)
 {
@@ -269,9 +239,6 @@ WktWriter::writeInner(const Polygon &g)
   _s << ")";
 }
 
-///
-///
-///
 void
 WktWriter::write(const GeometryCollection &g)
 {
@@ -296,9 +263,6 @@ WktWriter::write(const GeometryCollection &g)
   _s << ")";
 }
 
-///
-///
-///
 void
 WktWriter::write(const MultiPoint &g)
 {
@@ -323,9 +287,6 @@ WktWriter::write(const MultiPoint &g)
   _s << ")";
 }
 
-///
-///
-///
 void
 WktWriter::write(const MultiLineString &g)
 {
@@ -350,9 +311,6 @@ WktWriter::write(const MultiLineString &g)
   _s << ")";
 }
 
-///
-///
-///
 void
 WktWriter::write(const MultiPolygon &g)
 {
@@ -377,9 +335,6 @@ WktWriter::write(const MultiPolygon &g)
   _s << ")";
 }
 
-///
-///
-///
 void
 WktWriter::write(const MultiSolid &g)
 {
@@ -404,9 +359,6 @@ WktWriter::write(const MultiSolid &g)
   _s << ")";
 }
 
-///
-///
-///
 void
 WktWriter::write(const Triangle &g)
 {
@@ -421,9 +373,6 @@ WktWriter::write(const Triangle &g)
   writeInner(g);
 }
 
-///
-///
-///
 void
 WktWriter::writeInner(const Triangle &g)
 {
@@ -443,9 +392,6 @@ WktWriter::writeInner(const Triangle &g)
   _s << ")";
 }
 
-///
-///
-///
 void
 WktWriter::write(const TriangulatedSurface &g)
 {
@@ -470,9 +416,6 @@ WktWriter::write(const TriangulatedSurface &g)
   _s << ")"; // end TIN
 }
 
-///
-///
-///
 void
 WktWriter::write(const PolyhedralSurface &g)
 {
@@ -487,9 +430,6 @@ WktWriter::write(const PolyhedralSurface &g)
   writeInner(g);
 }
 
-///
-///
-///
 void
 WktWriter::writeInner(const PolyhedralSurface &g)
 {
@@ -506,9 +446,6 @@ WktWriter::writeInner(const PolyhedralSurface &g)
   _s << ")"; // end POLYHEDRALSURFACE
 }
 
-///
-///
-///
 void
 WktWriter::write(const Solid &g)
 {
@@ -523,9 +460,6 @@ WktWriter::write(const Solid &g)
   writeInner(g);
 }
 
-///
-///
-///
 void
 WktWriter::writeInner(const Solid &g)
 {

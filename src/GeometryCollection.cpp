@@ -11,14 +11,8 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 GeometryCollection::GeometryCollection() = default;
 
-///
-///
-///
 GeometryCollection::GeometryCollection(GeometryCollection const &other)
     : Geometry(other)
 {
@@ -27,9 +21,6 @@ GeometryCollection::GeometryCollection(GeometryCollection const &other)
   }
 }
 
-///
-///
-///
 auto
 GeometryCollection::operator=(GeometryCollection other) -> GeometryCollection &
 {
@@ -37,41 +28,26 @@ GeometryCollection::operator=(GeometryCollection other) -> GeometryCollection &
   return *this;
 }
 
-///
-///
-///
 GeometryCollection::~GeometryCollection() = default;
 
-///
-///
-///
 auto
 GeometryCollection::clone() const -> GeometryCollection *
 {
   return new GeometryCollection(*this);
 }
 
-///
-///
-///
 auto
 GeometryCollection::geometryType() const -> std::string
 {
   return "GeometryCollection";
 }
 
-///
-///
-///
 auto
 GeometryCollection::geometryTypeId() const -> GeometryType
 {
   return TYPE_GEOMETRYCOLLECTION;
 }
 
-///
-///
-///
 auto
 GeometryCollection::dimension() const -> int
 {
@@ -84,9 +60,6 @@ GeometryCollection::dimension() const -> int
   return maxDimension;
 }
 
-///
-///
-///
 auto
 GeometryCollection::coordinateDimension() const -> int
 {
@@ -96,45 +69,30 @@ GeometryCollection::coordinateDimension() const -> int
   return _geometries.front().coordinateDimension();
 }
 
-///
-///
-///
 auto
 GeometryCollection::isEmpty() const -> bool
 {
   return _geometries.empty();
 }
 
-///
-///
-///
 auto
 GeometryCollection::is3D() const -> bool
 {
   return !isEmpty() && _geometries.front().is3D();
 }
 
-///
-///
-///
 auto
 GeometryCollection::isMeasured() const -> bool
 {
   return !isEmpty() && _geometries.front().isMeasured();
 }
 
-///
-///
-///
 auto
 GeometryCollection::numGeometries() const -> size_t
 {
   return _geometries.size();
 }
 
-///
-///
-///
 auto
 GeometryCollection::geometryN(size_t const &n) const -> const Geometry &
 {
@@ -149,9 +107,6 @@ GeometryCollection::geometryN(size_t const &n) const -> const Geometry &
   return _geometries[n];
 }
 
-///
-///
-///
 auto
 GeometryCollection::geometryN(size_t const &n) -> Geometry &
 {
@@ -166,9 +121,6 @@ GeometryCollection::geometryN(size_t const &n) -> Geometry &
   return _geometries[n];
 }
 
-///
-///
-///
 void
 GeometryCollection::addGeometry(Geometry *geometry)
 {
@@ -185,18 +137,12 @@ GeometryCollection::addGeometry(Geometry *geometry)
   _geometries.push_back(geometry);
 }
 
-///
-///
-///
 void
 GeometryCollection::addGeometry(Geometry const &geometry)
 {
   addGeometry(geometry.clone());
 }
 
-///
-///
-///
 auto
 GeometryCollection::isAllowed(Geometry const & /*unused*/) -> bool
 {
@@ -204,18 +150,12 @@ GeometryCollection::isAllowed(Geometry const & /*unused*/) -> bool
   return true;
 }
 
-///
-///
-///
 void
 GeometryCollection::accept(GeometryVisitor &visitor)
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 void
 GeometryCollection::accept(ConstGeometryVisitor &visitor) const
 {

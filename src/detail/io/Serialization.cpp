@@ -55,9 +55,6 @@ BinaryUnserializer::BinaryUnserializer(std::istream &ostr)
   register_type<MultiSolid>();
 }
 
-///
-///
-///
 auto
 writeBinaryGeometry(const Geometry &g) -> std::string
 {
@@ -69,9 +66,6 @@ writeBinaryGeometry(const Geometry &g) -> std::string
   return ostr.str();
 }
 
-///
-///
-///
 auto
 writeBinaryPrepared(const PreparedGeometry &g) -> std::string
 {
@@ -82,9 +76,6 @@ writeBinaryPrepared(const PreparedGeometry &g) -> std::string
   return ostr.str();
 }
 
-///
-///
-///
 auto
 readBinaryGeometry(const std::string &str) -> std::unique_ptr<Geometry>
 {
@@ -95,9 +86,6 @@ readBinaryGeometry(const std::string &str) -> std::unique_ptr<Geometry>
   return std::unique_ptr<Geometry>(g);
 }
 
-///
-///
-///
 auto
 readBinaryPrepared(const std::string &str) -> std::unique_ptr<PreparedGeometry>
 {

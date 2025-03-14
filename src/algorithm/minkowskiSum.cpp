@@ -67,9 +67,6 @@ minkowskiSumCollection(const Geometry &gA, const Polygon_2 &gB,
 
 //-- private interface implementation
 
-///
-///
-///
 void
 minkowskiSum(const Geometry &gA, const Polygon_2 &gB,
              CGAL::Polygon_set_2<Kernel> &polygonSet)
@@ -138,9 +135,6 @@ minkowskiSum(const Point &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
   }
 }
 
-///
-///
-///
 void
 minkowskiSum(const LineString &gA, const Polygon_2 &gB,
              Polygon_set_2 &polygonSet)
@@ -177,9 +171,6 @@ minkowskiSum(const LineString &gA, const Polygon_2 &gB,
   }
 }
 
-///
-///
-///
 void
 minkowskiSum(const Polygon &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
 {
@@ -232,9 +223,6 @@ minkowskiSum(const Polygon &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
   }
 }
 
-///
-///
-///
 void
 minkowskiSum(const Solid &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
 {
@@ -242,9 +230,6 @@ minkowskiSum(const Solid &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
   minkowskiSumCollection(gA.exteriorShell(), gB, polygonSet);
 }
 
-///
-///
-///
 void
 minkowskiSumCollection(const Geometry &gA, const Polygon_2 &gB,
                        Polygon_set_2 &polygonSet)
@@ -275,9 +260,6 @@ minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck /*unused*/)
       detail::polygonSetToMultiPolygon(polygonSet).release());
 }
 
-///
-///
-///
 auto
 minkowskiSum(const Geometry &gA, const Polygon &gB) -> std::unique_ptr<Geometry>
 {

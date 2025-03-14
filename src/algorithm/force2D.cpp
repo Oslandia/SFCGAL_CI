@@ -7,9 +7,6 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 void
 force2D(Geometry &g)
 {

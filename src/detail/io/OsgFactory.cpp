@@ -186,9 +186,6 @@ OsgFactory::addToGeometry(osg::Geometry *geometry, const GeometryCollection &g)
     addToGeometry(geometry, g.geometryN(i));
   }
 }
-///
-///
-///
 osg::Geometry *
 OsgFactory::createGeometry(const Geometry &g)
 {
@@ -204,9 +201,6 @@ OsgFactory::createGeometry(const Geometry &g)
   return geometry.release();
 }
 
-///
-///
-///
 osg::Vec3
 OsgFactory::createVec3(const Point &g) const
 {
@@ -214,18 +208,12 @@ OsgFactory::createVec3(const Point &g) const
                    CGAL::to_double(g.z()));
 }
 
-///
-///
-///
 size_t
 OsgFactory::createVertex(osg::Vec3Array *vertices, const Point &g)
 {
   return createVertex(vertices, createVec3(g));
 }
 
-///
-///
-///
 size_t
 OsgFactory::createVertex(osg::Vec3Array *vertices, const osg::Vec3 &g)
 {

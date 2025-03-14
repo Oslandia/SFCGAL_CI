@@ -23,14 +23,8 @@
 
 namespace SFCGAL::detail::io {
 
-///
-///
-///
 WktReader::WktReader(std::istream &s) : _reader(s) {}
 
-///
-///
-///
 auto
 WktReader::readSRID() -> srid_t
 {
@@ -47,8 +41,6 @@ WktReader::readSRID() -> srid_t
   return srid;
 }
 
-///
-///
 auto
 WktReader::readGeometry() -> Geometry *
 {
@@ -133,9 +125,6 @@ WktReader::readGeometry() -> Geometry *
   BOOST_THROW_EXCEPTION(WktParseException("unexpected geometry"));
 }
 
-///
-///
-///
 auto
 WktReader::readGeometryType() -> GeometryType
 {
@@ -184,9 +173,6 @@ WktReader::readGeometryType() -> GeometryType
   BOOST_THROW_EXCEPTION(WktParseException(oss.str()));
 }
 
-///
-///
-///
 void
 WktReader::readInnerPoint(Point &g)
 {
@@ -205,9 +191,6 @@ WktReader::readInnerPoint(Point &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerLineString(LineString &g)
 {
@@ -246,9 +229,6 @@ WktReader::readInnerLineString(LineString &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerPolygon(Polygon &g)
 {
@@ -280,9 +260,6 @@ WktReader::readInnerPolygon(Polygon &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerTriangle(Triangle &g)
 {
@@ -332,9 +309,6 @@ WktReader::readInnerTriangle(Triangle &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerMultiPoint(MultiPoint &g)
 {
@@ -379,9 +353,6 @@ WktReader::readInnerMultiPoint(MultiPoint &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerMultiLineString(MultiLineString &g)
 {
@@ -412,9 +383,6 @@ WktReader::readInnerMultiLineString(MultiLineString &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerMultiPolygon(MultiPolygon &g)
 {
@@ -445,9 +413,6 @@ WktReader::readInnerMultiPolygon(MultiPolygon &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerGeometryCollection(GeometryCollection &g)
 {
@@ -478,9 +443,6 @@ WktReader::readInnerGeometryCollection(GeometryCollection &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
 {
@@ -507,9 +469,6 @@ WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerPolyhedralSurface(PolyhedralSurface &g)
 {
@@ -537,9 +496,6 @@ WktReader::readInnerPolyhedralSurface(PolyhedralSurface &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerSolid(Solid &g)
 {
@@ -573,9 +529,6 @@ WktReader::readInnerSolid(Solid &g)
   }
 }
 
-///
-///
-///
 void
 WktReader::readInnerMultiSolid(MultiSolid &g)
 {
@@ -606,9 +559,6 @@ WktReader::readInnerMultiSolid(MultiSolid &g)
   }
 }
 
-///
-///
-///
 auto
 WktReader::readPointCoordinate(Point &p) -> bool
 {
@@ -664,9 +614,6 @@ WktReader::readPointCoordinate(Point &p) -> bool
   return true;
 }
 
-///
-///
-///
 auto
 WktReader::parseErrorMessage() -> std::string
 {

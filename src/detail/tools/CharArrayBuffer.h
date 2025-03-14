@@ -11,11 +11,8 @@
 
 namespace SFCGAL {
 namespace tools {
-///
 /// Streambuf on a char*
-///
 /// http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
-///
 class SFCGAL_API CharArrayBuffer : public std::streambuf {
 public:
   CharArrayBuffer(const char *begin, const char *end);

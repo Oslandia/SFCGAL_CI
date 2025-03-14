@@ -25,18 +25,12 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const Point & /*g*/)
 {
   _boundary.reset();
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const LineString &g)
 {
@@ -55,9 +49,6 @@ BoundaryVisitor::visit(const LineString &g)
   }
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const Polygon &g)
 {
@@ -79,9 +70,6 @@ BoundaryVisitor::visit(const Polygon &g)
   }
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const Triangle &g)
 {
@@ -99,9 +87,6 @@ BoundaryVisitor::visit(const Triangle &g)
   _boundary = std::move(boundary);
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const Solid &g)
 {
@@ -111,18 +96,12 @@ BoundaryVisitor::visit(const Solid &g)
                     .str()));
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const MultiPoint & /*g*/)
 {
   _boundary.reset();
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const MultiLineString &g)
 {
@@ -144,9 +123,6 @@ BoundaryVisitor::visit(const MultiLineString &g)
   getBoundaryFromLineStrings(graph);
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const MultiPolygon &g)
 {
@@ -160,9 +136,6 @@ BoundaryVisitor::visit(const MultiPolygon &g)
   getBoundaryFromPolygons(graph);
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const MultiSolid &g)
 {
@@ -172,9 +145,6 @@ BoundaryVisitor::visit(const MultiSolid &g)
                     .str()));
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const GeometryCollection &g)
 {
@@ -184,9 +154,6 @@ BoundaryVisitor::visit(const GeometryCollection &g)
                     .str()));
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const PolyhedralSurface &g)
 {
@@ -197,9 +164,6 @@ BoundaryVisitor::visit(const PolyhedralSurface &g)
   getBoundaryFromPolygons(graph);
 }
 
-///
-///
-///
 void
 BoundaryVisitor::visit(const TriangulatedSurface &g)
 {
@@ -210,9 +174,6 @@ BoundaryVisitor::visit(const TriangulatedSurface &g)
   getBoundaryFromPolygons(graph);
 }
 
-///
-///
-///
 auto
 BoundaryVisitor::releaseBoundary() -> Geometry *
 {
@@ -222,9 +183,6 @@ BoundaryVisitor::releaseBoundary() -> Geometry *
   return new GeometryCollection();
 }
 
-///
-///
-///
 void
 BoundaryVisitor::getBoundaryFromLineStrings(const graph::GeometryGraph &graph)
 {
@@ -259,9 +217,6 @@ BoundaryVisitor::getBoundaryFromLineStrings(const graph::GeometryGraph &graph)
   }
 }
 
-///
-///
-///
 void
 BoundaryVisitor::getBoundaryFromPolygons(const graph::GeometryGraph &g)
 {

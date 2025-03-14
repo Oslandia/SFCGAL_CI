@@ -71,9 +71,6 @@ query_visibility(Face_handle fh, Halfedge_const_handle he)
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
-///
-///
-///
 auto
 visibility(const Geometry &polygon, const Geometry &point)
     -> std::unique_ptr<Polygon>
@@ -183,9 +180,6 @@ visibility(const Geometry &polygon, const Geometry &point,
 
   return query_visibility(fh, fh->outer_ccb());
 }
-///
-///
-///
 auto
 visibility(const Geometry &polygon, const Geometry &pointA,
            const Geometry &pointB) -> std::unique_ptr<Polygon>

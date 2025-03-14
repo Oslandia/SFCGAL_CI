@@ -12,9 +12,6 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 Envelope::Envelope()
 {
   for (auto &_bound : _bounds) {
@@ -22,9 +19,6 @@ Envelope::Envelope()
   }
 }
 
-///
-///
-///
 Envelope::Envelope(const double &xmin, const double &xmax, const double &ymin,
                    const double &ymax)
 {
@@ -33,9 +27,6 @@ Envelope::Envelope(const double &xmin, const double &xmax, const double &ymin,
   _bounds[2] = detail::Interval();
 }
 
-///
-///
-///
 Envelope::Envelope(const double &xmin, const double &xmax, const double &ymin,
                    const double &ymax, const double &zmin, const double &zmax)
 {
@@ -44,23 +35,14 @@ Envelope::Envelope(const double &xmin, const double &xmax, const double &ymin,
   _bounds[2] = detail::Interval(zmin, zmax);
 }
 
-///
-///
-///
 Envelope::Envelope(const Coordinate &p) { expandToInclude(p); }
 
-///
-///
-///
 Envelope::Envelope(const Coordinate &p1, const Coordinate &p2)
 {
   expandToInclude(p1);
   expandToInclude(p2);
 }
 
-///
-///
-///
 Envelope::Envelope(const Envelope &other)
 {
   for (size_t i = 0; i < 3; i++) {
@@ -68,9 +50,6 @@ Envelope::Envelope(const Envelope &other)
   }
 }
 
-///
-///
-///
 auto
 Envelope::operator=(const Envelope &other) -> Envelope &
 {
@@ -81,31 +60,18 @@ Envelope::operator=(const Envelope &other) -> Envelope &
   return *this;
 }
 
-///
-///
-///
-
-///
-///
-///
 auto
 Envelope::isEmpty() const -> bool
 {
   return _bounds[0].isEmpty() || _bounds[1].isEmpty();
 }
 
-///
-///
-///
 auto
 Envelope::is3D() const -> bool
 {
   return !isEmpty() && !_bounds[2].isEmpty();
 }
 
-///
-///
-///
 void
 Envelope::expandToInclude(const Coordinate &coordinate)
 {
@@ -119,9 +85,6 @@ Envelope::expandToInclude(const Coordinate &coordinate)
   }
 }
 
-///
-///
-///
 auto
 Envelope::contains(const Envelope &a, const Envelope &b) -> bool
 {
@@ -135,9 +98,6 @@ Envelope::contains(const Envelope &a, const Envelope &b) -> bool
          b.yMax() <= a.yMax();
 }
 
-///
-///
-///
 auto
 Envelope::overlaps(const Envelope &a, const Envelope &b) -> bool
 {
@@ -152,9 +112,6 @@ Envelope::overlaps(const Envelope &a, const Envelope &b) -> bool
   return CGAL::do_overlap(abox, bbox);
 }
 
-///
-///
-///
 auto
 Envelope::toRing() const -> std::unique_ptr<LineString>
 {
@@ -173,18 +130,12 @@ Envelope::toRing() const -> std::unique_ptr<LineString>
   return ring;
 }
 
-///
-///
-///
 auto
 Envelope::toPolygon() const -> std::unique_ptr<Polygon>
 {
   return std::make_unique<Polygon>(toRing().release());
 }
 
-///
-///
-///
 auto
 Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
 {
@@ -279,18 +230,12 @@ Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
   return shell;
 }
 
-///
-///
-///
 auto
 Envelope::toSolid() const -> std::unique_ptr<Solid>
 {
   return std::make_unique<Solid>(toShell().release());
 }
 
-///
-///
-///
 auto
 Envelope::print(std::ostream &ostr) const -> std::ostream &
 {

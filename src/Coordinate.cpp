@@ -10,31 +10,19 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 Coordinate::Coordinate() : _storage(Coordinate::Empty()) {}
 
-///
-///
-///
 Coordinate::Coordinate(const Kernel::FT &x, const Kernel::FT &y)
     : _storage(Kernel::Point_2(x, y))
 {
 }
 
-///
-///
-///
 Coordinate::Coordinate(const Kernel::FT &x, const Kernel::FT &y,
                        const Kernel::FT &z)
     : _storage(Kernel::Point_3(x, y, z))
 {
 }
 
-///
-///
-///
 Coordinate::Coordinate(const double &x, const double &y)
 {
   if (!std::isfinite(x) || !std::isfinite(y)) {
@@ -45,9 +33,6 @@ Coordinate::Coordinate(const double &x, const double &y)
   _storage = Kernel::Point_2(x, y);
 }
 
-///
-///
-///
 Coordinate::Coordinate(const double &x, const double &y, const double &z)
 {
   if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z)) {
@@ -58,30 +43,15 @@ Coordinate::Coordinate(const double &x, const double &y, const double &z)
   _storage = Kernel::Point_3(x, y, z);
 }
 
-///
-///
-///
 Coordinate::Coordinate(const Kernel::Point_2 &other) : _storage(other) {}
 
-///
-///
-///
 Coordinate::Coordinate(const Kernel::Point_3 &other) : _storage(other) {}
 
-///
-///
-///
 Coordinate::Coordinate(const Coordinate &other) = default;
 
-///
-///
-///
 auto
 Coordinate::operator=(const Coordinate &other) -> Coordinate & = default;
 
-///
-///
-///
 Coordinate::~Coordinate() = default;
 
 class CoordinateDimensionVisitor : public boost::static_visitor<int> {
@@ -103,9 +73,6 @@ public:
   }
 };
 
-///
-///
-///
 auto
 Coordinate::coordinateDimension() const -> int
 {
@@ -113,18 +80,12 @@ Coordinate::coordinateDimension() const -> int
   return boost::apply_visitor(visitor, _storage);
 }
 
-///
-///
-///
 auto
 Coordinate::isEmpty() const -> bool
 {
   return _storage.which() == 0;
 }
 
-///
-///
-///
 auto
 Coordinate::is3D() const -> bool
 {
@@ -152,9 +113,6 @@ public:
   }
 };
 
-///
-///
-///
 auto
 Coordinate::x() const -> Kernel::FT
 {
@@ -183,9 +141,6 @@ public:
   }
 };
 
-///
-///
-///
 auto
 Coordinate::y() const -> Kernel::FT
 {
@@ -214,9 +169,6 @@ public:
   }
 };
 
-///
-///
-///
 auto
 Coordinate::z() const -> Kernel::FT
 {
@@ -293,9 +245,6 @@ public:
   }
 };
 
-///
-///
-///
 auto
 Coordinate::toPoint_2() const -> Kernel::Point_2
 {
@@ -322,9 +271,6 @@ public:
   }
 };
 
-///
-///
-///
 auto
 Coordinate::toPoint_3() const -> Kernel::Point_3
 {
@@ -332,9 +278,6 @@ Coordinate::toPoint_3() const -> Kernel::Point_3
   return boost::apply_visitor(visitor, _storage);
 }
 
-///
-///
-///
 auto
 Coordinate::operator<(const Coordinate &other) const -> bool
 {
@@ -381,9 +324,6 @@ Coordinate::operator<(const Coordinate &other) const -> bool
   return false;
 }
 
-///
-///
-///
 auto
 Coordinate::operator==(const Coordinate &other) const -> bool
 {
@@ -397,9 +337,6 @@ Coordinate::operator==(const Coordinate &other) const -> bool
   return x() == other.x() && y() == other.y();
 }
 
-///
-///
-///
 auto
 Coordinate::operator!=(const Coordinate &other) const -> bool
 {

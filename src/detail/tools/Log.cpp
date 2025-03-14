@@ -8,14 +8,8 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 Logger::~Logger() = default;
 
-///
-///
-///
 auto
 Logger::get() -> Logger *
 {
@@ -23,9 +17,6 @@ Logger::get() -> Logger *
   return &log;
 }
 
-///
-///
-///
 void
 Logger::log(const Level &level, const boost::format &message,
             const std::string &filename, const int &lineNumber)
@@ -33,9 +24,6 @@ Logger::log(const Level &level, const boost::format &message,
   log(level, message.str(), filename, lineNumber);
 }
 
-///
-///
-///
 void
 Logger::log(const Level &level, const std::string &message,
             const std::string &filename, const int &lineNumber)
@@ -80,32 +68,20 @@ Logger::log(const Level &level, const std::string &message,
   _out << message << '\n';
 }
 
-///
-///
-///
 auto
 Logger::logLevel() const -> const Logger::Level &
 {
   return _logLevel;
 }
 
-///
-///
-///
 void
 Logger::setLogLevel(const Level &logLevel)
 {
   _logLevel = logLevel;
 }
 
-///
-///
-///
 Logger::Logger(std::ostream &str) : _out(str.rdbuf()) {}
 
-///
-///
-///
 auto
 logger() -> Logger &
 {

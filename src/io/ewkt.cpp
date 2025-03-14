@@ -15,9 +15,6 @@ using namespace SFCGAL::tools;
 
 namespace SFCGAL::io {
 
-///
-///
-///
 auto
 readEwkt(std::istream &s) -> std::unique_ptr<PreparedGeometry>
 {
@@ -29,9 +26,6 @@ readEwkt(std::istream &s) -> std::unique_ptr<PreparedGeometry>
   return uptr;
 }
 
-///
-///
-///
 auto
 readEwkt(const std::string &s) -> std::unique_ptr<PreparedGeometry>
 {
@@ -42,9 +36,6 @@ readEwkt(const std::string &s) -> std::unique_ptr<PreparedGeometry>
   return std::make_unique<PreparedGeometry>(std::move(g), srid);
 }
 
-///
-///
-///
 auto
 readEwkt(const char *str, size_t len) -> std::unique_ptr<PreparedGeometry>
 {

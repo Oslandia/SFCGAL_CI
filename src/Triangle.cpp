@@ -9,9 +9,6 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 Triangle::Triangle()
 {
   _vertices[0] = Point();
@@ -19,9 +16,6 @@ Triangle::Triangle()
   _vertices[2] = Point();
 }
 
-///
-///
-///
 Triangle::Triangle(const Kernel::Triangle_2 &triangle)
 {
   for (int i = 0; i < 3; i++) {
@@ -29,9 +23,6 @@ Triangle::Triangle(const Kernel::Triangle_2 &triangle)
   }
 }
 
-///
-///
-///
 Triangle::Triangle(const Kernel::Triangle_3 &triangle)
 {
   for (int i = 0; i < 3; i++) {
@@ -39,9 +30,6 @@ Triangle::Triangle(const Kernel::Triangle_3 &triangle)
   }
 }
 
-///
-///
-///
 Triangle::Triangle(const Point &p, const Point &q, const Point &r)
 {
   _vertices[0] = p;
@@ -49,9 +37,6 @@ Triangle::Triangle(const Point &p, const Point &q, const Point &r)
   _vertices[2] = r;
 }
 
-///
-///
-///
 Triangle::Triangle(const Triangle &other) : Surface(other)
 {
   _vertices[0] = other._vertices[0];
@@ -59,9 +44,6 @@ Triangle::Triangle(const Triangle &other) : Surface(other)
   _vertices[2] = other._vertices[2];
 }
 
-///
-///
-///
 auto
 Triangle::operator=(const Triangle &other) -> Triangle &
 {
@@ -71,77 +53,50 @@ Triangle::operator=(const Triangle &other) -> Triangle &
   return *this;
 }
 
-///
-///
-///
 Triangle::~Triangle() = default;
 
-///
-///
-///
 auto
 Triangle::clone() const -> Triangle *
 {
   return new Triangle(*this);
 }
 
-///
-///
-///
 auto
 Triangle::geometryType() const -> std::string
 {
   return "Triangle";
 }
 
-///
-///
-///
 auto
 Triangle::geometryTypeId() const -> GeometryType
 {
   return TYPE_TRIANGLE;
 }
 
-///
-///
-///
 auto
 Triangle::coordinateDimension() const -> int
 {
   return _vertices[0].coordinateDimension();
 }
 
-///
-///
-///
 auto
 Triangle::isEmpty() const -> bool
 {
   return _vertices[0].isEmpty();
 }
 
-///
-///
-///
 auto
 Triangle::is3D() const -> bool
 {
   return _vertices[0].is3D();
 }
 
-///
-///
-///
 auto
 Triangle::isMeasured() const -> bool
 {
   return _vertices[0].isMeasured();
 }
 
-///
-///
-///
 void
 Triangle::reverse()
 {
@@ -149,9 +104,6 @@ Triangle::reverse()
   std::swap(_vertices[1], _vertices[2]);
 }
 
-///
-///
-///
 auto
 Triangle::toPolygon() const -> Polygon
 {
@@ -168,18 +120,12 @@ Triangle::toPolygon() const -> Polygon
   return Polygon(LineString(points));
 }
 
-///
-///
-///
 void
 Triangle::accept(GeometryVisitor &visitor)
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 void
 Triangle::accept(ConstGeometryVisitor &visitor) const
 {

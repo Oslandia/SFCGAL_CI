@@ -11,14 +11,8 @@
 
 namespace SFCGAL::triangulate {
 
-///
-///
-///
 ConstraintDelaunayTriangulation::ConstraintDelaunayTriangulation() = default;
 
-///
-///
-///
 auto
 ConstraintDelaunayTriangulation::addVertex(const Coordinate &position)
     -> ConstraintDelaunayTriangulation::Vertex_handle
@@ -36,9 +30,6 @@ ConstraintDelaunayTriangulation::addVertex(const Coordinate &position)
   return vertex;
 }
 
-///
-///
-///
 void
 ConstraintDelaunayTriangulation::addConstraint(Vertex_handle source,
                                                Vertex_handle target)
@@ -50,36 +41,24 @@ ConstraintDelaunayTriangulation::addConstraint(Vertex_handle source,
   _cdt.insert_constraint(source, target);
 }
 
-///
-///
-///
 void
 ConstraintDelaunayTriangulation::clear()
 {
   _cdt.clear();
 }
 
-///
-///
-///
 auto
 ConstraintDelaunayTriangulation::numVertices() const -> size_t
 {
   return _cdt.number_of_vertices();
 }
 
-///
-///
-///
 auto
 ConstraintDelaunayTriangulation::numTriangles() const -> size_t
 {
   return _cdt.number_of_faces();
 }
 
-///
-///
-///
 void
 ConstraintDelaunayTriangulation::setProjectionPlane(
     const Kernel::Plane_3 &projectionPlane)
@@ -88,9 +67,6 @@ ConstraintDelaunayTriangulation::setProjectionPlane(
   _projectionPlane = projectionPlane;
 }
 
-///
-///
-///
 auto
 ConstraintDelaunayTriangulation::projectionPlane() const -> Kernel::Plane_3
 {
@@ -101,18 +77,13 @@ ConstraintDelaunayTriangulation::projectionPlane() const -> Kernel::Plane_3
                          Kernel::RT(0));
 }
 
-///
 /// adapted from CGAL example
-///
 void
 ConstraintDelaunayTriangulation::markDomains()
 {
   detail::markDomains(_cdt);
 }
 
-///
-///
-///
 void
 ConstraintDelaunayTriangulation::getTriangles(
     TriangulatedSurface &triangulatedSurface, bool filterExteriorParts) const
@@ -139,9 +110,6 @@ ConstraintDelaunayTriangulation::getTriangles(
   }
 }
 
-///
-///
-///
 auto
 ConstraintDelaunayTriangulation::getTriangulatedSurface() const
     -> std::unique_ptr<TriangulatedSurface>

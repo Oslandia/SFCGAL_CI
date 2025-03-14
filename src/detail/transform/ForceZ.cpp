@@ -9,14 +9,8 @@
 
 namespace SFCGAL::transform {
 
-///
-///
-///
 ForceZ::ForceZ(Kernel::FT defaultZ) : _defaultZ(std::move(defaultZ)) {}
 
-///
-///
-///
 void
 ForceZ::transform(Point &p)
 {

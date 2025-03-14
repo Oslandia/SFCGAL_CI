@@ -11,9 +11,6 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 auto
 tesselate(const Geometry &g, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>

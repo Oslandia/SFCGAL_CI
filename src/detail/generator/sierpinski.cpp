@@ -33,9 +33,6 @@ _sierpinski(const std::vector<Kernel::Triangle_2> &triangles)
   return result;
 }
 
-///
-///
-///
 auto
 sierpinski(const unsigned int &order) -> std::unique_ptr<MultiPolygon>
 {

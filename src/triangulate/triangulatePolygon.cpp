@@ -21,9 +21,6 @@ namespace SFCGAL::triangulate {
 
 using Vertex_handle = ConstraintDelaunayTriangulation::Vertex_handle;
 
-///
-///
-///
 void
 triangulatePolygon3D(const Geometry      &g,
                      TriangulatedSurface &triangulatedSurface)
@@ -69,9 +66,6 @@ triangulatePolygon3D(const Geometry      &g,
   }
 }
 
-///
-///
-///
 void
 triangulatePolygon3D(const Triangle      &triangle,
                      TriangulatedSurface &triangulatedSurface)
@@ -86,9 +80,6 @@ triangulatePolygon3D(const Triangle      &triangle,
   triangulatedSurface.addTriangle(triangle);
 }
 
-///
-///
-///
 void
 triangulatePolygon3D(const TriangulatedSurface &g,
                      TriangulatedSurface       &triangulatedSurface)
@@ -96,9 +87,6 @@ triangulatePolygon3D(const TriangulatedSurface &g,
   triangulatedSurface.addTriangles(g);
 }
 
-///
-///
-///
 void
 triangulatePolygon3D(const GeometryCollection &g,
                      TriangulatedSurface      &triangulatedSurface)
@@ -108,9 +96,6 @@ triangulatePolygon3D(const GeometryCollection &g,
   }
 }
 
-///
-///
-///
 void
 triangulatePolygon3D(const Polygon       &polygon,
                      TriangulatedSurface &triangulatedSurface)
@@ -177,9 +162,6 @@ triangulatePolygon3D(const Polygon       &polygon,
   cdt.getTriangles(triangulatedSurface, true);
 }
 
-///
-///
-///
 void
 triangulatePolygon3D(const PolyhedralSurface &g,
                      TriangulatedSurface     &triangulatedSurface)
@@ -189,9 +171,6 @@ triangulatePolygon3D(const PolyhedralSurface &g,
   }
 }
 
-///
-///
-///
 void
 triangulatePolygon3D(const Solid &g, TriangulatedSurface &triangulatedSurface)
 {

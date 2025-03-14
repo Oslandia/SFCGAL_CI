@@ -6,18 +6,12 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 auto
 floor(const CGAL::Gmpq &v) -> CGAL::Gmpz
 {
   return v.numerator() / v.denominator();
 }
 
-///
-///
-///
 auto
 ceil(const CGAL::Gmpq &v) -> CGAL::Gmpz
 {
@@ -26,9 +20,6 @@ ceil(const CGAL::Gmpq &v) -> CGAL::Gmpz
   return result;
 }
 
-///
-///
-///
 auto
 round(const CGAL::Gmpq &v) -> CGAL::Gmpz
 {
@@ -43,18 +34,12 @@ round(const CGAL::Gmpq &v) -> CGAL::Gmpz
 }
 
 #ifdef CGAL_USE_GMPXX
-///
-///
-///
 auto
 floor(const mpq_class &v) -> mpz_class
 {
   return v.get_num() / v.get_den();
 }
 
-///
-///
-///
 auto
 ceil(const mpq_class &v) -> mpz_class
 {
@@ -64,9 +49,6 @@ ceil(const mpq_class &v) -> mpz_class
   return result;
 }
 
-///
-///
-///
 auto
 round(const mpq_class &v) -> mpz_class
 {

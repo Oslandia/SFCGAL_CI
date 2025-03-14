@@ -7,9 +7,6 @@
 
 namespace SFCGAL::transform {
 
-///
-///
-///
 void
 Force2D::transform(Point &p)
 {

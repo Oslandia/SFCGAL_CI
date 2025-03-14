@@ -22,14 +22,8 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 Bench::~Bench() {}
 
-///
-///
-///
 void
 Bench::start(const std::string &description)
 {
@@ -37,18 +31,12 @@ Bench::start(const std::string &description)
   _timers.top().second.start();
 }
 
-///
-///
-///
 void
 Bench::start(const boost::basic_format<char> &description)
 {
   start(description.str());
 }
 
-///
-///
-///
 void
 Bench::stop()
 {
@@ -59,9 +47,6 @@ Bench::stop()
   _timers.pop();
 }
 
-///
-///
-///
 Bench &
 Bench::instance()
 {
@@ -69,18 +54,12 @@ Bench::instance()
   return bench;
 }
 
-///
-///
-///
 std::ostream &
 Bench::s()
 {
   return *_s;
 }
 
-///
-///
-///
 Bench::Bench() : _s(&std::cout) {}
 
 } // namespace SFCGAL

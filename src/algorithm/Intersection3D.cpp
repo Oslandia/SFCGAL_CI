@@ -219,7 +219,6 @@ _intersection_solid_solid(const MarkedPolyhedron &pa,
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
-///
 /// must be called with pa's dimension larger than pb's
 void
 intersection(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb,

@@ -32,9 +32,7 @@ using triangulation_data_structure =
 using Triangulation =
     CGAL::Delaunay_triangulation_2<Kernel, triangulation_data_structure>;
 
-///
 /// input polyhedron must have its planes computed
-///
 void
 triangulate(const MarkedPolyhedron &polyhedron, GeometrySet<3> &geometry)
 {
@@ -93,9 +91,6 @@ triangulate(const MarkedPolyhedron &polyhedron, GeometrySet<3> &geometry)
   }
 }
 
-///
-///
-///
 void
 triangulate(const CGAL::Polygon_with_holes_2<Kernel> &polygon,
             GeometrySet<2>                           &output)

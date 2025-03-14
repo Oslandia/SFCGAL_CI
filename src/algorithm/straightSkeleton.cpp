@@ -283,9 +283,6 @@ extractPolygons(const Geometry &g, std::vector<Polygon> &vect)
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
-///
-///
-///
 auto
 straightSkeleton(const Geometry &g, bool          autoOrientation,
                  NoValidityCheck /*unused*/, bool innerOnly,
@@ -322,9 +319,6 @@ straightSkeleton(const Geometry &g, bool autoOrientation, bool innerOnly,
   propagateValidityFlag(*result, true);
   return result;
 }
-///
-///
-///
 auto
 straightSkeleton(const Polygon &g, bool /*autoOrientation*/, bool innerOnly,
                  bool outputDistanceInM, const double &toleranceAbs)
@@ -354,9 +348,6 @@ straightSkeleton(const Polygon &g, bool /*autoOrientation*/, bool innerOnly,
   return result;
 }
 
-///
-///
-///
 auto
 straightSkeleton(const MultiPolygon &g, bool /*autoOrientation*/,
                  bool innerOnly, bool outputDistanceInM,

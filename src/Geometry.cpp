@@ -23,9 +23,6 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 auto
 Geometry::asText(const int &numDecimals) const -> std::string
 {
@@ -55,9 +52,6 @@ Geometry::asWkb(boost::endian::order wkbOrder, bool asHex) const -> std::string
   writer.write(*this, wkbOrder);
   return oss.str();
 }
-///
-///
-///
 auto
 Geometry::envelope() const -> Envelope
 {
@@ -67,9 +61,6 @@ Geometry::envelope() const -> Envelope
   return box;
 }
 
-///
-///
-///
 auto
 Geometry::boundary() const -> std::unique_ptr<Geometry>
 {
@@ -78,27 +69,18 @@ Geometry::boundary() const -> std::unique_ptr<Geometry>
   return std::unique_ptr<Geometry>(visitor.releaseBoundary());
 }
 
-///
-///
-///
 auto
 Geometry::distance(const Geometry &other) const -> double
 {
   return algorithm::distance(*this, other);
 }
 
-///
-///
-///
 auto
 Geometry::distance3D(const Geometry &other) const -> double
 {
   return algorithm::distance3D(*this, other);
 }
 
-///
-///
-///
 void
 Geometry::round(const long &scale)
 {
@@ -106,18 +88,12 @@ Geometry::round(const long &scale)
   accept(roundTransform);
 }
 
-///
-///
-///
 auto
 Geometry::numGeometries() const -> size_t
 {
   return isEmpty() ? 0 : 1;
 }
 
-///
-///
-///
 auto
 Geometry::geometryN(size_t const &n) const -> const Geometry &
 {
@@ -126,9 +102,6 @@ Geometry::geometryN(size_t const &n) const -> const Geometry &
   return *this;
 }
 
-///
-///
-///
 auto
 Geometry::geometryN(size_t const &n) -> Geometry &
 {
@@ -137,9 +110,6 @@ Geometry::geometryN(size_t const &n) -> Geometry &
   return *this;
 }
 
-///
-///
-///
 Geometry::Geometry() = default;
 
 auto
@@ -192,9 +162,6 @@ Geometry::almostEqual(const Geometry &other, const double tolerance) const
   return true;
 }
 
-///
-///
-///
 auto
 Geometry::centroid() const -> Point
 {
@@ -203,9 +170,6 @@ Geometry::centroid() const -> Point
   return *(out.get());
 }
 
-///
-///
-///
 auto
 Geometry::centroid3D() const -> Point
 {
@@ -214,7 +178,6 @@ Geometry::centroid3D() const -> Point
   return *(out.get());
 }
 
-///
 /// Function used to compare geometries
 /// FIXME
 /// Since we do not have (yet) a real "equals" operator, we only compare points

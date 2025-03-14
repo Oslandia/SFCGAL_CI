@@ -10,14 +10,8 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 TriangulatedSurface::TriangulatedSurface() = default;
 
-///
-///
-///
 TriangulatedSurface::TriangulatedSurface(const std::vector<Triangle> &triangles)
 
 {
@@ -26,16 +20,10 @@ TriangulatedSurface::TriangulatedSurface(const std::vector<Triangle> &triangles)
   }
 }
 
-///
-///
-///
 TriangulatedSurface::TriangulatedSurface(const TriangulatedSurface &other)
 
     = default;
 
-///
-///
-///
 auto
 TriangulatedSurface::operator=(TriangulatedSurface other)
     -> TriangulatedSurface &
@@ -44,41 +32,26 @@ TriangulatedSurface::operator=(TriangulatedSurface other)
   return *this;
 }
 
-///
-///
-///
 TriangulatedSurface::~TriangulatedSurface() = default;
 
-///
-///
-///
 auto
 TriangulatedSurface::clone() const -> TriangulatedSurface *
 {
   return new TriangulatedSurface(*this);
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::geometryType() const -> std::string
 {
   return "TriangulatedSurface";
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::geometryTypeId() const -> GeometryType
 {
   return TYPE_TRIANGULATEDSURFACE;
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::dimension() const -> int
 {
@@ -86,9 +59,6 @@ TriangulatedSurface::dimension() const -> int
   return 2;
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::coordinateDimension() const -> int
 {
@@ -98,36 +68,24 @@ TriangulatedSurface::coordinateDimension() const -> int
   return _triangles[0].coordinateDimension();
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::isEmpty() const -> bool
 {
   return _triangles.empty();
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::is3D() const -> bool
 {
   return !_triangles.empty() && _triangles.front().is3D();
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::isMeasured() const -> bool
 {
   return !_triangles.empty() && _triangles.front().isMeasured();
 }
 
-///
-///
-///
 void
 TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
 {
@@ -136,18 +94,12 @@ TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
   }
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::numGeometries() const -> size_t
 {
   return _triangles.size();
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::geometryN(size_t const &n) const -> const Triangle &
 {
@@ -162,9 +114,6 @@ TriangulatedSurface::geometryN(size_t const &n) const -> const Triangle &
   return _triangles[n];
 }
 
-///
-///
-///
 auto
 TriangulatedSurface::geometryN(size_t const &n) -> Triangle &
 {
@@ -179,27 +128,18 @@ TriangulatedSurface::geometryN(size_t const &n) -> Triangle &
   return _triangles[n];
 }
 
-///
-///
-///
 void
 TriangulatedSurface::reserve(const size_t &n)
 {
   _triangles.reserve(n);
 }
 
-///
-///
-///
 void
 TriangulatedSurface::accept(GeometryVisitor &visitor)
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 void
 TriangulatedSurface::accept(ConstGeometryVisitor &visitor) const
 {

@@ -74,9 +74,6 @@ auto
 extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
     -> GeometryCollection *;
 
-///
-///
-///
 auto
 extrude(const Point &g, const Kernel::Vector_3 &v) -> LineString *
 {
@@ -90,9 +87,6 @@ extrude(const Point &g, const Kernel::Vector_3 &v) -> LineString *
   return new LineString(Point(a), Point(b));
 }
 
-///
-///
-///
 auto
 extrude(const LineString &g, const Kernel::Vector_3 &v) -> PolyhedralSurface *
 {
@@ -120,9 +114,6 @@ extrude(const LineString &g, const Kernel::Vector_3 &v) -> PolyhedralSurface *
   return polyhedralSurface.release();
 }
 
-///
-///
-///
 auto
 extrude(const Polygon &g, const Kernel::Vector_3 &v, bool addTop) -> Solid *
 {
@@ -166,18 +157,12 @@ extrude(const Polygon &g, const Kernel::Vector_3 &v, bool addTop) -> Solid *
   return new Solid(polyhedralSurface);
 }
 
-///
-///
-///
 auto
 extrude(const Triangle &g, const Kernel::Vector_3 &v) -> Solid *
 {
   return extrude(g.toPolygon(), v);
 }
 
-///
-///
-///
 auto
 extrude(const MultiPoint &g, const Kernel::Vector_3 &v) -> MultiLineString *
 {
@@ -194,9 +179,6 @@ extrude(const MultiPoint &g, const Kernel::Vector_3 &v) -> MultiLineString *
   return result.release();
 }
 
-///
-///
-///
 auto
 extrude(const MultiLineString &g, const Kernel::Vector_3 &v)
     -> PolyhedralSurface *
@@ -218,9 +200,6 @@ extrude(const MultiLineString &g, const Kernel::Vector_3 &v)
   return result.release();
 }
 
-///
-///
-///
 auto
 extrude(const MultiPolygon &g, const Kernel::Vector_3 &v) -> MultiSolid *
 {
@@ -237,9 +216,6 @@ extrude(const MultiPolygon &g, const Kernel::Vector_3 &v) -> MultiSolid *
   return result.release();
 }
 
-///
-///
-///
 auto
 extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v) -> Solid *
 {
@@ -277,9 +253,6 @@ extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v) -> Solid *
   return result.release();
 }
 
-///
-///
-///
 auto
 extrude(const PolyhedralSurface &g, const Kernel::Vector_3 &v) -> Solid *
 {
@@ -292,9 +265,6 @@ extrude(const PolyhedralSurface &g, const Kernel::Vector_3 &v) -> Solid *
   return extrude(triangulatedSurface, v);
 }
 
-///
-///
-///
 auto
 extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
     -> GeometryCollection *
@@ -319,9 +289,6 @@ extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
-///
-///
-///
 auto
 extrude(const Geometry &g, const Kernel::Vector_3 &v)
     -> std::unique_ptr<Geometry>
@@ -368,9 +335,6 @@ extrude(const Geometry &g, const Kernel::Vector_3 &v)
           .str()));
 }
 
-///
-///
-///
 auto
 extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
         const Kernel::FT &dz, NoValidityCheck /*unused*/)

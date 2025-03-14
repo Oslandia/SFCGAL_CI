@@ -19,18 +19,12 @@
 
 namespace SFCGAL::detail {
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const Point &g)
 {
   points.push_back(&g);
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const LineString &g)
 {
@@ -39,9 +33,6 @@ GetPointsVisitor::visit(const LineString &g)
   }
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const Polygon &g)
 {
@@ -50,9 +41,6 @@ GetPointsVisitor::visit(const Polygon &g)
   }
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const Triangle &g)
 {
@@ -61,9 +49,6 @@ GetPointsVisitor::visit(const Triangle &g)
   visit(g.vertex(2));
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const Solid &g)
 {
@@ -72,9 +57,6 @@ GetPointsVisitor::visit(const Solid &g)
   }
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const MultiPoint &g)
 {
@@ -83,9 +65,6 @@ GetPointsVisitor::visit(const MultiPoint &g)
   }
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const MultiLineString &g)
 {
@@ -94,9 +73,6 @@ GetPointsVisitor::visit(const MultiLineString &g)
   }
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const MultiPolygon &g)
 {
@@ -105,9 +81,6 @@ GetPointsVisitor::visit(const MultiPolygon &g)
   }
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const MultiSolid &g)
 {
@@ -116,9 +89,6 @@ GetPointsVisitor::visit(const MultiSolid &g)
   }
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const GeometryCollection &g)
 {
@@ -127,9 +97,6 @@ GetPointsVisitor::visit(const GeometryCollection &g)
   }
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const PolyhedralSurface &g)
 {
@@ -138,9 +105,6 @@ GetPointsVisitor::visit(const PolyhedralSurface &g)
   }
 }
 
-///
-///
-///
 void
 GetPointsVisitor::visit(const TriangulatedSurface &g)
 {

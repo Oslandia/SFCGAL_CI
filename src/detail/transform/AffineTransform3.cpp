@@ -24,17 +24,11 @@
 
 namespace SFCGAL::transform {
 
-///
-///
-///
 AffineTransform3::AffineTransform3(CGAL::Aff_transformation_3<Kernel> transform)
     : _transform(std::move(transform))
 {
 }
 
-///
-///
-///
 void
 AffineTransform3::transform(Point &p)
 {
@@ -47,9 +41,6 @@ AffineTransform3::transform(Point &p)
   }
 }
 
-///
-///
-///
 void
 AffineTransform3::transform(LineString &ls)
 {
@@ -58,9 +49,6 @@ AffineTransform3::transform(LineString &ls)
   }
 }
 
-///
-///
-///
 void
 AffineTransform3::transform(Triangle &tri)
 {
@@ -69,9 +57,6 @@ AffineTransform3::transform(Triangle &tri)
   transform(tri.vertex(2));
 }
 
-///
-///
-///
 void
 AffineTransform3::transform(Polygon &poly)
 {
@@ -82,9 +67,6 @@ AffineTransform3::transform(Polygon &poly)
   }
 }
 
-///
-///
-///
 void
 AffineTransform3::transform(PolyhedralSurface &surf)
 {
@@ -93,9 +75,6 @@ AffineTransform3::transform(PolyhedralSurface &surf)
   }
 }
 
-///
-///
-///
 void
 AffineTransform3::transform(TriangulatedSurface &surf)
 {
@@ -104,9 +83,6 @@ AffineTransform3::transform(TriangulatedSurface &surf)
   }
 }
 
-///
-///
-///
 void
 AffineTransform3::transform(Solid &solid)
 {

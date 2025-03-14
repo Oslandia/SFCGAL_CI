@@ -8,18 +8,12 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 auto
 operator<<(std::ostream &ostr, const Envelope &env) -> std::ostream &
 {
   return env.print(ostr);
 }
 
-///
-///
-///
 auto
 operator<<(std::ostream &ostr, const Geometry &g) -> std::ostream &
 {

@@ -11,14 +11,8 @@ using namespace SFCGAL::detail;
 
 namespace SFCGAL {
 
-///
-///
-///
 PolyhedralSurface::PolyhedralSurface() = default;
 
-///
-///
-///
 PolyhedralSurface::PolyhedralSurface(const std::vector<Polygon> &polygons)
 
 {
@@ -44,16 +38,10 @@ PolyhedralSurface::PolyhedralSurface(const std::unique_ptr<Geometry> &geometry)
   }
 }
 
-///
-///
-///
 PolyhedralSurface::PolyhedralSurface(const PolyhedralSurface &other)
 
     = default;
 
-///
-///
-///
 PolyhedralSurface::PolyhedralSurface(const Mesh &sm)
 {
 
@@ -88,9 +76,6 @@ PolyhedralSurface::PolyhedralSurface(const InexactMesh &inexactMesh)
   }
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::operator=(PolyhedralSurface other) -> PolyhedralSurface &
 {
@@ -98,50 +83,32 @@ PolyhedralSurface::operator=(PolyhedralSurface other) -> PolyhedralSurface &
   return *this;
 }
 
-///
-///
-///
 PolyhedralSurface::~PolyhedralSurface() = default;
 
-///
-///
-///
 auto
 PolyhedralSurface::clone() const -> PolyhedralSurface *
 {
   return new PolyhedralSurface(*this);
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::geometryType() const -> std::string
 {
   return "PolyhedralSurface";
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::geometryTypeId() const -> GeometryType
 {
   return TYPE_POLYHEDRALSURFACE;
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::dimension() const -> int
 {
   return 2;
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::coordinateDimension() const -> int
 {
@@ -151,18 +118,12 @@ PolyhedralSurface::coordinateDimension() const -> int
   return _polygons.front().coordinateDimension();
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::isEmpty() const -> bool
 {
   return _polygons.empty();
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::is3D() const -> bool
 {
@@ -172,9 +133,6 @@ PolyhedralSurface::is3D() const -> bool
   return _polygons.front().is3D();
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::isMeasured() const -> bool
 {
@@ -184,9 +142,6 @@ PolyhedralSurface::isMeasured() const -> bool
   return _polygons.front().isMeasured();
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::toTriangulatedSurface() const -> TriangulatedSurface
 {
@@ -195,18 +150,12 @@ PolyhedralSurface::toTriangulatedSurface() const -> TriangulatedSurface
   return result;
 }
 
-///
-///
-///
 void
 PolyhedralSurface::addPolygon(const Polygon &polygon)
 {
   addPolygon(polygon.clone());
 }
 
-///
-///
-///
 void
 PolyhedralSurface::addPolygon(Polygon *polygon)
 {
@@ -214,9 +163,6 @@ PolyhedralSurface::addPolygon(Polygon *polygon)
   _polygons.push_back(polygon);
 }
 
-///
-///
-///
 void
 PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
 {
@@ -225,45 +171,30 @@ PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
   }
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::numGeometries() const -> size_t
 {
   return _polygons.size();
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::geometryN(size_t const &n) const -> const Polygon &
 {
   return _polygons[n];
 }
 
-///
-///
-///
 auto
 PolyhedralSurface::geometryN(size_t const &n) -> Polygon &
 {
   return _polygons[n];
 }
 
-///
-///
-///
 void
 PolyhedralSurface::accept(GeometryVisitor &visitor)
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 void
 PolyhedralSurface::accept(ConstGeometryVisitor &visitor) const
 {

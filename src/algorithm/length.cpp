@@ -11,9 +11,6 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 auto
 length(const LineString &g) -> double
 {
@@ -28,9 +25,6 @@ length(const LineString &g) -> double
   return result;
 }
 
-///
-///
-///
 auto
 length(const GeometryCollection &g) -> double
 {
@@ -43,9 +37,6 @@ length(const GeometryCollection &g) -> double
   return result;
 }
 
-///
-///
-///
 auto
 length(const Geometry &g) -> double
 {
@@ -82,9 +73,6 @@ length(const Geometry &g) -> double
 
 //------ 3D
 
-///
-///
-///
 auto
 length3D(const LineString &g) -> double
 {
@@ -99,9 +87,6 @@ length3D(const LineString &g) -> double
   return result;
 }
 
-///
-///
-///
 auto
 length3D(const GeometryCollection &g) -> double
 {
@@ -114,9 +99,6 @@ length3D(const GeometryCollection &g) -> double
   return result;
 }
 
-///
-///
-///
 auto
 length3D(const Geometry &g) -> double
 {

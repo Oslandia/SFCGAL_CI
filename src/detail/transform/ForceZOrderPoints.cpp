@@ -12,17 +12,11 @@
 
 namespace SFCGAL::transform {
 
-///
-///
-///
 ForceZOrderPoints::ForceZOrderPoints(Kernel::FT defaultZ)
     : _defaultZ(std::move(defaultZ))
 {
 }
 
-///
-///
-///
 void
 ForceZOrderPoints::transform(Point &p)
 {
@@ -31,9 +25,6 @@ ForceZOrderPoints::transform(Point &p)
   }
 }
 
-///
-///
-///
 void
 ForceZOrderPoints::visit(Triangle &t)
 {

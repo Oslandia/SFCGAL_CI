@@ -14,9 +14,6 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 void
 makeValidOrientation(CGAL::Polygon_2<Kernel> &polygon)
 {
@@ -25,9 +22,6 @@ makeValidOrientation(CGAL::Polygon_2<Kernel> &polygon)
   }
 }
 
-///
-///
-///
 void
 makeValidOrientation(CGAL::Polygon_with_holes_2<Kernel> &polygon)
 {
@@ -42,9 +36,6 @@ makeValidOrientation(CGAL::Polygon_with_holes_2<Kernel> &polygon)
   }
 }
 
-///
-///
-///
 void
 makeValidOrientation(Polygon &polygon)
 {
@@ -63,9 +54,6 @@ makeValidOrientation(Polygon &polygon)
   }
 }
 
-///
-///
-///
 auto
 hasConsistentOrientation3D(const TriangulatedSurface &g) -> bool
 {
@@ -81,9 +69,6 @@ hasConsistentOrientation3D(const TriangulatedSurface &g) -> bool
   return graph::algorithm::isHalfEdge(graph);
 }
 
-///
-///
-///
 auto
 hasConsistentOrientation3D(const PolyhedralSurface &g) -> bool
 {
@@ -99,9 +84,6 @@ hasConsistentOrientation3D(const PolyhedralSurface &g) -> bool
   return graph::algorithm::isHalfEdge(graph);
 }
 
-///
-///
-///
 void
 makeConsistentOrientation3D(TriangulatedSurface &g)
 {
@@ -110,9 +92,6 @@ makeConsistentOrientation3D(TriangulatedSurface &g)
   g = builder.buildTriangulatedSurface();
 }
 
-///
-///
-///
 auto
 isCounterClockWiseOriented(const LineString &ls) -> bool
 {
@@ -129,9 +108,6 @@ isCounterClockWiseOriented(const LineString &ls) -> bool
   return z > 0;
 }
 
-///
-///
-///
 auto
 isCounterClockWiseOriented(const Triangle &tri) -> bool
 {
@@ -144,9 +120,6 @@ isCounterClockWiseOriented(const Triangle &tri) -> bool
          0;
 }
 
-///
-///
-///
 auto
 isCounterClockWiseOriented(const Polygon &poly) -> bool
 {

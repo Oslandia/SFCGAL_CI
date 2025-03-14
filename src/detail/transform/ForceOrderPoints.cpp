@@ -10,22 +10,13 @@
 
 namespace SFCGAL::transform {
 
-///
-///
-///
 ForceOrderPoints::ForceOrderPoints(bool orientCCW) : _orientCCW(orientCCW) {}
 
-///
-///
-///
 void
 ForceOrderPoints::transform(Point & /*p*/)
 {
 }
 
-///
-///
-///
 void
 ForceOrderPoints::visit(Triangle &t)
 {

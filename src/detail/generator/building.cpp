@@ -53,9 +53,6 @@ _buildingWall(const Polygon_2 &ring, const Kernel::FT &wallHeight,
   }
 }
 
-///
-///
-///
 auto
 building(const Polygon &g, const Kernel::FT &wallHeight,
          const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>
@@ -132,9 +129,6 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
   return std::unique_ptr<Geometry>(new Solid(shell.release()));
 }
 
-///
-///
-///
 auto
 building(const MultiPolygon &g, const Kernel::FT &wallHeight,
          const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>
@@ -149,9 +143,6 @@ building(const MultiPolygon &g, const Kernel::FT &wallHeight,
   return std::unique_ptr<Geometry>(multiSolid.release());
 }
 
-///
-///
-///
 auto
 building(const Geometry &g, const Kernel::FT &wallHeight,
          const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>

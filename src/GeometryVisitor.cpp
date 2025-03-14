@@ -19,14 +19,8 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 GeometryVisitor::~GeometryVisitor() = default;
 
-///
-///
-///
 void
 GeometryVisitor::visit(Geometry &g)
 {
@@ -96,14 +90,8 @@ GeometryVisitor::visit(Geometry &g)
 
 //---------------- ConstGeometryVisitor
 
-///
-///
-///
 ConstGeometryVisitor::~ConstGeometryVisitor() = default;
 
-///
-///
-///
 void
 ConstGeometryVisitor::visit(const Geometry &g)
 {

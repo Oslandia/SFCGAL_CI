@@ -19,23 +19,14 @@
 
 namespace SFCGAL::detail {
 
-///
-///
-///
 EnvelopeVisitor::EnvelopeVisitor(Envelope &envelope_) : envelope(envelope_) {}
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const Point &g)
 {
   envelope.expandToInclude(g.coordinate());
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const LineString &g)
 {
@@ -44,9 +35,6 @@ EnvelopeVisitor::visit(const LineString &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const Polygon &g)
 {
@@ -55,9 +43,6 @@ EnvelopeVisitor::visit(const Polygon &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const Triangle &g)
 {
@@ -66,9 +51,6 @@ EnvelopeVisitor::visit(const Triangle &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const Solid &g)
 {
@@ -77,9 +59,6 @@ EnvelopeVisitor::visit(const Solid &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const MultiPoint &g)
 {
@@ -88,9 +67,6 @@ EnvelopeVisitor::visit(const MultiPoint &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const MultiLineString &g)
 {
@@ -99,9 +75,6 @@ EnvelopeVisitor::visit(const MultiLineString &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const MultiPolygon &g)
 {
@@ -110,9 +83,6 @@ EnvelopeVisitor::visit(const MultiPolygon &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const MultiSolid &g)
 {
@@ -121,9 +91,6 @@ EnvelopeVisitor::visit(const MultiSolid &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const GeometryCollection &g)
 {
@@ -132,9 +99,6 @@ EnvelopeVisitor::visit(const GeometryCollection &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const PolyhedralSurface &g)
 {
@@ -143,9 +107,6 @@ EnvelopeVisitor::visit(const PolyhedralSurface &g)
   }
 }
 
-///
-///
-///
 void
 EnvelopeVisitor::visit(const TriangulatedSurface &g)
 {

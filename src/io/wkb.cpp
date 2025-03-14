@@ -14,9 +14,6 @@ using namespace SFCGAL::tools;
 
 namespace SFCGAL::io {
 
-///
-///
-///
 auto
 readWkb(std::istream &stream, bool asHexString) -> std::unique_ptr<Geometry>
 {
@@ -25,9 +22,6 @@ readWkb(std::istream &stream, bool asHexString) -> std::unique_ptr<Geometry>
   return wkbReader.geometry();
 }
 
-///
-///
-///
 auto
 readWkb(const std::string &s, bool asHexString) -> std::unique_ptr<Geometry>
 {
@@ -37,9 +31,6 @@ readWkb(const std::string &s, bool asHexString) -> std::unique_ptr<Geometry>
   return wkbReader.geometry();
 }
 
-///
-///
-///
 auto
 readWkb(const char *str, size_t len, bool asHexString)
     -> std::unique_ptr<Geometry>

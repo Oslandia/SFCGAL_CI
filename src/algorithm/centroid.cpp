@@ -35,9 +35,6 @@ namespace SFCGAL::algorithm {
 /// @{
 /// @privatesection
 
-///
-///
-///
 template <typename T>
 std::function<WeightedCentroid(const T &, bool)> weightedCentroidLambda =
     [](const T &g, bool enable3DComputation) -> WeightedCentroid {
@@ -71,9 +68,6 @@ std::function<WeightedCentroid(const T &, bool)> weightedCentroidLambda =
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
-///
-///
-///
 auto
 centroid(const Geometry &g) -> std::unique_ptr<Point>
 {
@@ -96,9 +90,6 @@ centroid(const Geometry &g) -> std::unique_ptr<Point>
   return std::make_unique<Point>(out);
 }
 
-///
-///
-///
 auto
 centroid3D(const Geometry &g) -> std::unique_ptr<Point>
 {
@@ -120,9 +111,6 @@ centroid3D(const Geometry &g) -> std::unique_ptr<Point>
 
   return std::make_unique<Point>(out);
 }
-///
-///
-///
 auto
 weightedCentroid(const Geometry &g, bool enable3DComputation)
     -> WeightedCentroid
@@ -174,9 +162,6 @@ weightedCentroid(const Geometry &g, bool enable3DComputation)
                     .str()));
 }
 
-///
-///
-///
 auto
 weightedCentroid(const Triangle &g, bool enable3DComputation)
     -> WeightedCentroid
@@ -185,9 +170,6 @@ weightedCentroid(const Triangle &g, bool enable3DComputation)
                           enable3DComputation);
 }
 
-///
-///
-///
 auto
 weightedCentroid(const Point &a, const Point &b, const Point &c,
                  bool enable3DComputation) -> WeightedCentroid
@@ -218,9 +200,6 @@ weightedCentroid(const Point &a, const Point &b, const Point &c,
   return {area, out, m};
 }
 
-///
-///
-///
 auto
 weightedCentroid(const LineString &g, bool enable3DComputation)
     -> WeightedCentroid
@@ -273,9 +252,6 @@ weightedCentroid(const LineString &g, bool enable3DComputation)
   return {totalArea, totalWeightedCentroid, totalM};
 }
 
-///
-///
-///
 auto
 weightedCentroid(const Polygon &g, bool enable3DComputation) -> WeightedCentroid
 {
@@ -314,9 +290,6 @@ weightedCentroid(const Polygon &g, bool enable3DComputation) -> WeightedCentroid
   return {totalArea, totalWeightedCentroid, totalM};
 }
 
-///
-///
-///
 auto
 weightedCentroid(const GeometryCollection &g, bool enable3DComputation)
     -> WeightedCentroid
@@ -324,9 +297,6 @@ weightedCentroid(const GeometryCollection &g, bool enable3DComputation)
   return weightedCentroidLambda<GeometryCollection>(g, enable3DComputation);
 }
 
-///
-///
-///
 auto
 weightedCentroid(const TriangulatedSurface &g, bool enable3DComputation)
     -> WeightedCentroid
@@ -334,9 +304,6 @@ weightedCentroid(const TriangulatedSurface &g, bool enable3DComputation)
   return weightedCentroidLambda<TriangulatedSurface>(g, enable3DComputation);
 }
 
-///
-///
-///
 auto
 weightedCentroid(const PolyhedralSurface &g, bool enable3DComputation)
     -> WeightedCentroid
@@ -344,9 +311,6 @@ weightedCentroid(const PolyhedralSurface &g, bool enable3DComputation)
   return weightedCentroidLambda<PolyhedralSurface>(g, enable3DComputation);
 }
 
-///
-///
-///
 auto
 weightedCentroid(const Solid &g, bool enable3DComputation) -> WeightedCentroid
 {

@@ -233,9 +233,6 @@ offset(const LineString &lineString, const double &radius,
   }
 }
 
-///
-///
-///
 void
 offset(const Polygon &g, const double &radius, Offset_polygon_set_2 &polygonSet)
 {
@@ -290,9 +287,6 @@ offset(const Polygon &g, const double &radius, Offset_polygon_set_2 &polygonSet)
   }
 }
 
-///
-///
-///
 void
 offsetCollection(const Geometry &g, const double &radius,
                  Offset_polygon_set_2 &polygonSet)
@@ -304,9 +298,6 @@ offsetCollection(const Geometry &g, const double &radius,
   }
 }
 
-///
-///
-///
 void
 offset(const Geometry &g, const double &radius,
        Offset_polygon_set_2 &polygonSet)
@@ -351,9 +342,6 @@ offset(const Geometry &g, const double &radius,
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
-///
-///
-///
 auto
 offset(const Geometry &g, const double &r, NoValidityCheck /*unused*/)
     -> std::unique_ptr<MultiPolygon>

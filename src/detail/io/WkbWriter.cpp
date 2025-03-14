@@ -23,9 +23,6 @@
 
 namespace SFCGAL::detail::io {
 
-///
-///
-///
 void
 WkbWriter::writeRec(const Geometry &g, boost::endian::order wkbOrder)
 {
@@ -90,18 +87,12 @@ WkbWriter::write(const Geometry &g, const srid_t &srid,
   write(g, wkbOrder);
 }
 
-///
-///
-///
 void
 WkbWriter::write(const Geometry &g, boost::endian::order wkbOrder)
 {
   writeRec(g, wkbOrder);
 }
 
-///
-///
-///
 void
 WkbWriter::writeCoordinate(const Point &g, boost::endian::order wkbOrder)
 {
@@ -157,9 +148,6 @@ WkbWriter::writeGeometryType(const Geometry &g, boost::endian::order wkbOrder)
   }
 }
 
-///
-///
-///
 void
 WkbWriter::writeInner(const Point &g, boost::endian::order wkbOrder)
 {
@@ -183,9 +171,6 @@ WkbWriter::writeInner(const Point &g, boost::endian::order wkbOrder)
   }
 }
 
-///
-///
-///
 void
 WkbWriter::writeInner(const LineString &g, boost::endian::order wkbOrder)
 {
@@ -207,9 +192,6 @@ WkbWriter::writeInnerRing(const LineString &g, boost::endian::order wkbOrder)
   }
 }
 
-///
-///
-///
 void
 WkbWriter::writeInner(const Polygon &g, boost::endian::order wkbOrder)
 {
@@ -227,9 +209,6 @@ WkbWriter::writeInner(const Polygon &g, boost::endian::order wkbOrder)
   }
 }
 
-///
-///
-///
 void
 WkbWriter::writeInner(const Triangle &g, boost::endian::order wkbOrder)
 {

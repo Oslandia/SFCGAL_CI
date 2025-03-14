@@ -34,9 +34,6 @@ using squared_distance_t = Kernel::FT;
 
 namespace algorithm {
 
-///
-///
-///
 auto
 distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
     -> double
@@ -89,9 +86,6 @@ distance3D(const Geometry &gA, const Geometry &gB) -> double
 
   return distance3D(gA, gB, NoValidityCheck());
 }
-///
-///
-///
 auto
 distancePointGeometry3D(const Point &gA, const Geometry &gB) -> double
 {
@@ -130,9 +124,6 @@ distancePointGeometry3D(const Point &gA, const Geometry &gB) -> double
                     .str()));
 }
 
-///
-///
-///
 auto
 distancePointPoint3D(const Point &gA, const Point &gB) -> double
 {
@@ -144,9 +135,6 @@ distancePointPoint3D(const Point &gA, const Point &gB) -> double
       CGAL::to_double(CGAL::squared_distance(gA.toPoint_3(), gB.toPoint_3())));
 }
 
-///
-///
-///
 auto
 distancePointLineString3D(const Point &gA, const LineString &gB) -> double
 {
@@ -164,9 +152,6 @@ distancePointLineString3D(const Point &gA, const LineString &gB) -> double
   return dMin;
 }
 
-///
-///
-///
 auto
 distancePointTriangle3D(const Point &gA, const Triangle &gB) -> double
 {
@@ -177,9 +162,6 @@ distancePointTriangle3D(const Point &gA, const Triangle &gB) -> double
   return distancePointTriangle3D(gA, gB.vertex(0), gB.vertex(1), gB.vertex(2));
 }
 
-///
-///
-///
 auto
 distancePointPolygon3D(const Point &gA, const Polygon &gB) -> double
 {
@@ -192,9 +174,6 @@ distancePointPolygon3D(const Point &gA, const Polygon &gB) -> double
   return distanceGeometryCollectionToGeometry3D(triangulateSurfaceB, gA);
 }
 
-///
-///
-///
 auto
 distancePointSolid3D(const Point &gA, const Solid &gB) -> double
 {
@@ -216,9 +195,6 @@ distancePointSolid3D(const Point &gA, const Solid &gB) -> double
   return dMin;
 }
 
-///
-///
-///
 auto
 distanceLineStringGeometry3D(const LineString &gA, const Geometry &gB) -> double
 {
@@ -257,9 +233,6 @@ distanceLineStringGeometry3D(const LineString &gA, const Geometry &gB) -> double
                     .str()));
 }
 
-///
-///
-///
 auto
 distanceLineStringLineString3D(const LineString &gA, const LineString &gB)
     -> double
@@ -284,9 +257,6 @@ distanceLineStringLineString3D(const LineString &gA, const LineString &gB)
   return dMin;
 }
 
-///
-///
-///
 auto
 distanceLineStringTriangle3D(const LineString &gA, const Triangle &gB) -> double
 {
@@ -308,9 +278,6 @@ distanceLineStringTriangle3D(const LineString &gA, const Triangle &gB) -> double
   return dMin;
 }
 
-///
-///
-///
 auto
 distanceLineStringPolygon3D(const LineString &gA, const Polygon &gB) -> double
 {
@@ -323,9 +290,6 @@ distanceLineStringPolygon3D(const LineString &gA, const Polygon &gB) -> double
   return distanceGeometryCollectionToGeometry3D(triangulateSurfaceB, gA);
 }
 
-///
-///
-///
 auto
 distanceLineStringSolid3D(const LineString &gA, const Solid &gB) -> double
 {
@@ -346,9 +310,6 @@ distanceLineStringSolid3D(const LineString &gA, const Solid &gB) -> double
   return dMin;
 }
 
-///
-///
-///
 auto
 distanceTriangleGeometry3D(const Triangle &gA, const Geometry &gB) -> double
 {
@@ -387,9 +348,6 @@ distanceTriangleGeometry3D(const Triangle &gA, const Geometry &gB) -> double
                     .str()));
 }
 
-///
-///
-///
 auto
 distanceTriangleSolid3D(const Triangle &gA, const Solid &gB) -> double
 {
@@ -410,9 +368,6 @@ distanceTriangleSolid3D(const Triangle &gA, const Solid &gB) -> double
   return dMin;
 }
 
-///
-///
-///
 auto
 distancePolygonGeometry3D(const Polygon &gA, const Geometry &gB) -> double
 {
@@ -428,9 +383,6 @@ distancePolygonGeometry3D(const Polygon &gA, const Geometry &gB) -> double
   return distanceGeometryCollectionToGeometry3D(triangulateSurfaceA, gB);
 }
 
-///
-///
-///
 auto
 distanceSolidGeometry3D(const Solid &gA, const Geometry &gB) -> double
 {
@@ -469,9 +421,6 @@ distanceSolidGeometry3D(const Solid &gA, const Geometry &gB) -> double
                     .str()));
 }
 
-///
-///
-///
 auto
 distanceSolidSolid3D(const Solid &gA, const Solid &gB) -> double
 {
@@ -573,9 +522,6 @@ boundingSphere(const Geometry &geom) -> const Sphere
   return Sphere(std::sqrt(CGAL::to_double(maxDistanceSq)), c);
 }
 
-///
-///
-///
 auto
 distanceGeometryCollectionToGeometry3D(const Geometry &gA, const Geometry &gB)
     -> double
@@ -660,9 +606,6 @@ distanceGeometryCollectionToGeometry3D(const Geometry &gA, const Geometry &gB)
   return dMin;
 }
 
-///
-///
-///
 auto
 distancePointSegment3D(const Point &p, const Point &a, const Point &b) -> double
 {
@@ -711,9 +654,6 @@ squaredDistancePointTriangle3D(const Point_3 &p, const Triangle_3 &abc)
 #endif
 }
 
-///
-///
-///
 auto
 distancePointTriangle3D(const Point &p_, const Point &a_, const Point &b_,
                         const Point &c_) -> double
@@ -731,9 +671,6 @@ distancePointTriangle3D(const Point &p_, const Point &a_, const Point &b_,
   return CGAL::sqrt(CGAL::to_double(dMin));
 }
 
-///
-///
-///
 auto
 distanceSegmentSegment3D(const Point &a, const Point &b, const Point &c,
                          const Point &d) -> double
@@ -780,9 +717,6 @@ squaredDistanceSegmentTriangle3D(const Segment_3 &sAB, const Triangle_3 &tABC)
   return dMin;
 }
 
-///
-///
-///
 auto
 distanceSegmentTriangle3D(const Point &sA_, const Point &sB_, const Point &tA_,
                           const Point &tB_, const Point &tC_) -> double
@@ -845,9 +779,6 @@ squaredDistanceTriangleTriangle3D(const Triangle_3 &triangleA,
   return dMin;
 }
 
-///
-///
-///
 auto
 distanceTriangleTriangle3D(const Triangle &gA, const Triangle &gB) -> double
 {

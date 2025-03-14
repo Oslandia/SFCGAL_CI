@@ -7,28 +7,16 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 Surface::~Surface() = default;
 
-///
-///
-///
 auto
 Surface::dimension() const -> int
 {
   return 2;
 }
 
-///
-///
-///
 Surface::Surface() = default;
 
-///
-///
-///
 Surface::Surface(Surface const &other) = default;
 
 /**

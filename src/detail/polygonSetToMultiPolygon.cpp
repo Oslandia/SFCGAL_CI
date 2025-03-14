@@ -10,9 +10,6 @@
 
 namespace SFCGAL::detail {
 
-///
-///
-///
 auto
 polygonSetToMultiPolygon(const CGAL::Polygon_set_2<Kernel> &polygonSet)
     -> std::unique_ptr<MultiPolygon>

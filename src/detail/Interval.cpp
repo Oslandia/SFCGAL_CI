@@ -9,53 +9,28 @@
 
 namespace SFCGAL::detail {
 
-///
-///
-///
 Interval::Interval() : _lower(NaN()), _upper(NaN()) {}
 
-///
-///
-///
 Interval::Interval(const double &value) : _lower(value), _upper(value) {}
 
-///
-///
-///
 Interval::Interval(const double &v1, const double &v2)
     : _lower(std::min(v1, v2)), _upper(std::max(v1, v2))
 {
 }
 
-///
-///
-///
 Interval::Interval(const Interval &other)
 
     = default;
 
-///
-///
-///
 auto
 Interval::operator=(const Interval &other) -> Interval & = default;
 
-///
-///
-///
-
-///
-///
-///
 auto
 Interval::isEmpty() const -> bool
 {
   return std::isnan(_lower) || std::isnan(_upper);
 }
 
-///
-///
-///
 void
 Interval::expandBy(const double &d)
 {
@@ -67,9 +42,6 @@ Interval::expandBy(const double &d)
   _upper = _upper + d;
 }
 
-///
-///
-///
 void
 Interval::expandToInclude(const Interval &other)
 {
@@ -86,9 +58,6 @@ Interval::expandToInclude(const Interval &other)
   }
 }
 
-///
-///
-///
 void
 Interval::expandToInclude(const double &value)
 {
@@ -105,9 +74,6 @@ Interval::expandToInclude(const double &value)
   }
 }
 
-///
-///
-///
 auto
 Interval::intersects(const Interval &other) const -> bool
 {
@@ -119,9 +85,6 @@ Interval::intersects(const Interval &other) const -> bool
   return _lower <= other._upper && _upper >= other._lower;
 }
 
-///
-///
-///
 auto
 Interval::operator==(const Interval &other) const -> bool
 {
@@ -132,9 +95,6 @@ Interval::operator==(const Interval &other) const -> bool
   return _lower == other._lower && _upper == other._upper;
 }
 
-///
-///
-///
 auto
 Interval::operator!=(const Interval &other) const -> bool
 {

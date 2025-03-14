@@ -7,19 +7,10 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 MultiSolid::MultiSolid() = default;
 
-///
-///
-///
 MultiSolid::MultiSolid(MultiSolid const &other) = default;
 
-///
-///
-///
 auto
 MultiSolid::operator=(MultiSolid other) -> MultiSolid &
 {
@@ -27,59 +18,38 @@ MultiSolid::operator=(MultiSolid other) -> MultiSolid &
   return *this;
 }
 
-///
-///
-///
 MultiSolid::~MultiSolid() = default;
 
-///
-///
-///
 auto
 MultiSolid::clone() const -> MultiSolid *
 {
   return new MultiSolid(*this);
 }
 
-///
-///
-///
 auto
 MultiSolid::geometryType() const -> std::string
 {
   return "MultiSolid";
 }
 
-///
-///
-///
 auto
 MultiSolid::geometryTypeId() const -> GeometryType
 {
   return TYPE_MULTISOLID;
 }
 
-///
-///
-///
 auto
 MultiSolid::isAllowed(Geometry const &g) -> bool
 {
   return g.geometryTypeId() == TYPE_SOLID;
 }
 
-///
-///
-///
 void
 MultiSolid::accept(GeometryVisitor &visitor)
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 void
 MultiSolid::accept(ConstGeometryVisitor &visitor) const
 {

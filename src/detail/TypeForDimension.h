@@ -16,9 +16,7 @@ namespace SFCGAL {
 namespace detail {
 
 /*
-///
 /// Type traits for CGAL types.
-///
 /// CGAL types cannot be directly parametrized by their dimension.
 /// For instance, there are both a Triangle_2<K> and a Triangle_3<K> type
 TypeForKernel<K, 2>::Point is equivalent to CGAL::Point_2<K> for instance
@@ -27,7 +25,6 @@ TypeForDimension<2>::Bbox is equivalent to CGAL::Bbox_2
 
 struct SFCGAL_API NoVolume {};
 
-///
 /// Generic traits, default dimension is 2
 template <int Dim>
 struct TypeForDimension {
@@ -39,7 +36,6 @@ struct TypeForDimension {
   typedef NoVolume                           Volume;
 };
 
-///
 /// Extended polyhedron_3 type with a boolean marker on halfedges
 /// This is used internally for polyhedra boolean operations
 template <class Refs>
@@ -64,7 +60,6 @@ struct SFCGAL_API Items_with_mark_on_hedge : public CGAL::Polyhedron_items_3 {
 
 typedef CGAL::Polyhedron_3<Kernel, Items_with_mark_on_hedge> MarkedPolyhedron;
 
-///
 /// Specialization for dimension = 3
 template <>
 struct TypeForDimension<3> {
@@ -76,39 +71,33 @@ struct TypeForDimension<3> {
   typedef MarkedPolyhedron   Volume;
 };
 
-///
 /// Another way of looking at TypeForDimension<Dim>::Point
 template <int Dim>
 struct Point_d {
   typedef typename TypeForDimension<Dim>::Point Type;
 };
-///
 /// Another way of looking at TypeForDimension<Dim>::Segment
 template <int Dim>
 struct Segment_d {
   typedef typename TypeForDimension<Dim>::Segment Type;
 };
-///
 /// Another way of looking at TypeForDimension<Dim>::Surface
 template <int Dim>
 struct Surface_d {
   typedef typename TypeForDimension<Dim>::Surface Type;
 };
-///
 /// Another way of looking at TypeForDimension<Dim>::Volume
 template <int Dim>
 struct Volume_d {
   typedef typename TypeForDimension<Dim>::Volume Type;
 };
 
-///
 /// Create a distinct type for each dimension
 template <int N>
 struct dim_t {
   enum { v = N };
 };
 
-///
 /// Get a primitive dimension (0: point, 1: line, 2: surface, 3: volume) from a
 /// type
 template <class T>
@@ -141,7 +130,6 @@ struct PrimitiveDimension<TypeForDimension<3>::Volume> {
   static const int value = 3;
 };
 
-///
 /// Tests if a primitive type has a larger dimension than another one
 template <class X, class Y>
 struct IsPrimitiveLarger {

@@ -22,9 +22,6 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 void
 translate(Geometry &g, const Kernel::Vector_3 &v)
 {
@@ -33,9 +30,6 @@ translate(Geometry &g, const Kernel::Vector_3 &v)
   g.accept(visitor);
 }
 
-///
-///
-///
 void
 translate(Geometry &g, const Kernel::Vector_2 &v)
 {
@@ -44,9 +38,6 @@ translate(Geometry &g, const Kernel::Vector_2 &v)
   g.accept(visitor);
 }
 
-///
-///
-///
 void
 translate(Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
           const Kernel::FT &dz)
@@ -54,9 +45,6 @@ translate(Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
   translate(g, Kernel::Vector_3(dx, dy, dz));
 }
 
-///
-///
-///
 void
 translate(Geometry &g, const double &dx, const double &dy, const double &dz)
 {

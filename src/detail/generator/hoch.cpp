@@ -33,9 +33,6 @@ _hoch(const std::vector<Kernel::Vector_2> &points)
   return result;
 }
 
-///
-///
-///
 auto
 hoch(const unsigned int &order) -> std::unique_ptr<Polygon>
 {

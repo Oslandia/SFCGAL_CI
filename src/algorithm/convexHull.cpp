@@ -25,9 +25,6 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 auto
 convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
 {
@@ -89,9 +86,6 @@ convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
       Exception("unexpected CGAL output type in CGAL::convex_hull_2"));
 }
 
-///
-///
-///
 auto
 convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
 {

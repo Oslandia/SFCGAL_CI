@@ -11,76 +11,43 @@ using namespace SFCGAL::detail;
 
 namespace SFCGAL {
 
-///
-///
-///
 Point::Point() : _m(NaN()) {}
 
-///
-///
-///
 Point::Point(const Coordinate &coordinate) : _coordinate(coordinate), _m(NaN())
 {
 }
 
-///
-///
-///
 Point::Point(const Kernel::FT &x, const Kernel::FT &y)
     : _coordinate(x, y), _m(NaN())
 {
 }
 
-///
-///
-///
 Point::Point(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z,
              const double &m)
     : _coordinate(x, y, z), _m(m)
 {
 }
 
-///
-///
-///
 Point::Point(const double &x, const double &y) : _coordinate(x, y), _m(NaN()) {}
 
-///
-///
-///
 Point::Point(const double &x, const double &y, const double &z)
     : _coordinate(x, y, z), _m(NaN())
 {
 }
 
-///
-///
-///
 Point::Point(const double &x, const double &y, const double &z, const double &m)
     : _coordinate(x, y, z), _m(m)
 {
 }
 
-///
-///
-///
 Point::Point(const Kernel::Point_2 &other) : _coordinate(other), _m(NaN()) {}
 
-///
-///
-///
 Point::Point(const Kernel::Point_3 &other) : _coordinate(other), _m(NaN()) {}
 
-///
-///
-///
 Point::Point(const Point &other)
 
     = default;
 
-///
-///
-///
 auto
 Point::operator=(const Point &other) -> Point &
 {
@@ -89,122 +56,80 @@ Point::operator=(const Point &other) -> Point &
   return *this;
 }
 
-///
-///
-///
 Point::~Point() = default;
 
-///
-///
-///
 auto
 Point::clone() const -> Point *
 {
   return new Point(*this);
 }
 
-///
-///
-///
 auto
 Point::geometryType() const -> std::string
 {
   return "Point";
 }
 
-///
-///
-///
 auto
 Point::geometryTypeId() const -> GeometryType
 {
   return TYPE_POINT;
 }
 
-///
-///
-///
 auto
 Point::dimension() const -> int
 {
   return 0;
 }
 
-///
-///
-///
 auto
 Point::coordinateDimension() const -> int
 {
   return _coordinate.coordinateDimension() + (isMeasured() ? 1 : 0);
 }
 
-///
-///
-///
 auto
 Point::isEmpty() const -> bool
 {
   return _coordinate.isEmpty();
 }
 
-///
-///
-///
 auto
 Point::is3D() const -> bool
 {
   return _coordinate.is3D();
 }
 
-///
-///
-///
 auto
 Point::isMeasured() const -> bool
 {
   return !std::isnan(_m);
 }
 
-///
-///
-///
 void
 Point::accept(GeometryVisitor &visitor)
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 void
 Point::accept(ConstGeometryVisitor &visitor) const
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 auto
 Point::operator<(const Point &other) const -> bool
 {
   return _coordinate < other._coordinate;
 }
 
-///
-///
-///
 auto
 Point::operator==(const Point &other) const -> bool
 {
   return _coordinate == other._coordinate;
 }
 
-///
-///
-///
 auto
 Point::operator!=(const Point &other) const -> bool
 {
@@ -219,7 +144,6 @@ Point::almostEqual(const Point &other, const double tolerance) const -> bool
 
 /// @{
 /// @privatesection
-///
 /// Private structures used to implement partial function specialization
 template <int D>
 struct do_toPoint_d {

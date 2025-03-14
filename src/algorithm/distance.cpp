@@ -26,9 +26,6 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 auto
 distance(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
     -> double
@@ -74,9 +71,6 @@ distance(const Geometry &gA, const Geometry &gB) -> double
   return distance(gA, gB, NoValidityCheck());
 }
 
-///
-///
-///
 auto
 distancePointGeometry(const Point &gA, const Geometry &gB) -> double
 {
@@ -114,9 +108,6 @@ distancePointGeometry(const Point &gA, const Geometry &gB) -> double
   return 0;
 }
 
-///
-///
-///
 auto
 distancePointPoint(const Point &gA, const Point &gB) -> double
 {
@@ -128,9 +119,6 @@ distancePointPoint(const Point &gA, const Point &gB) -> double
       CGAL::to_double(CGAL::squared_distance(gA.toPoint_2(), gB.toPoint_2())));
 }
 
-///
-///
-///
 auto
 distancePointLineString(const Point &gA, const LineString &gB) -> double
 {
@@ -153,9 +141,6 @@ distancePointLineString(const Point &gA, const LineString &gB) -> double
   return dMin;
 }
 
-///
-///
-///
 auto
 distancePointPolygon(const Point &gA, const Polygon &gB) -> double
 {
@@ -181,18 +166,12 @@ distancePointPolygon(const Point &gA, const Polygon &gB) -> double
   return dMin;
 }
 
-///
-///
-///
 auto
 distancePointTriangle(const Point &gA, const Triangle &gB) -> double
 {
   return distancePointPolygon(gA, gB.toPolygon());
 }
 
-///
-///
-///
 auto
 distanceLineStringGeometry(const LineString &gA, const Geometry &gB) -> double
 {
@@ -234,9 +213,6 @@ distanceLineStringGeometry(const LineString &gA, const Geometry &gB) -> double
   return 0;
 }
 
-///
-///
-///
 auto
 distanceLineStringLineString(const LineString &gA, const LineString &gB)
     -> double
@@ -261,9 +237,6 @@ distanceLineStringLineString(const LineString &gA, const LineString &gB)
   return dMin;
 }
 
-///
-///
-///
 auto
 distanceLineStringPolygon(const LineString &gA, const Polygon &gB) -> double
 {
@@ -288,18 +261,12 @@ distanceLineStringPolygon(const LineString &gA, const Polygon &gB) -> double
   return dMin;
 }
 
-///
-///
-///
 auto
 distanceLineStringTriangle(const LineString &gA, const Triangle &gB) -> double
 {
   return distanceLineStringPolygon(gA, gB.toPolygon());
 }
 
-///
-///
-///
 auto
 distancePolygonGeometry(const Polygon &gA, const Geometry &gB) -> double
 {
@@ -341,9 +308,6 @@ distancePolygonGeometry(const Polygon &gA, const Geometry &gB) -> double
   return 0;
 }
 
-///
-///
-///
 auto
 distancePolygonPolygon(const Polygon &gA, const Polygon &gB) -> double
 {
@@ -370,18 +334,12 @@ distancePolygonPolygon(const Polygon &gA, const Polygon &gB) -> double
   return dMin;
 }
 
-///
-///
-///
 auto
 distancePolygonTriangle(const Polygon &gA, const Triangle &gB) -> double
 {
   return distancePolygonPolygon(gA, gB.toPolygon());
 }
 
-///
-///
-///
 auto
 distanceTriangleGeometry(const Triangle &gA, const Geometry &gB) -> double
 {
@@ -464,9 +422,6 @@ boundingCircle(const Geometry &geom) -> const Circle
   return Circle(std::sqrt(CGAL::to_double(maxDistanceSq)), c);
 }
 
-///
-///
-///
 auto
 distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
     -> double
@@ -547,9 +502,6 @@ distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
   return dMin;
 }
 
-///
-///
-///
 auto
 distancePointSegment(const Point &p, const Point &a, const Point &b) -> double
 {
@@ -562,9 +514,6 @@ distancePointSegment(const Point &p, const Point &a, const Point &b) -> double
       p.toPoint_2(), Segment_2(a.toPoint_2(), b.toPoint_2()))));
 }
 
-///
-///
-///
 auto
 distanceSegmentSegment(const Point &a, const Point &b, const Point &c,
                        const Point &d) -> double

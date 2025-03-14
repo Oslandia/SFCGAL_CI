@@ -7,17 +7,11 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 ConsistentOrientationBuilder::ConsistentOrientationBuilder()
     : _graph(), _graphBuilder(_graph)
 {
 }
 
-///
-///
-///
 void
 ConsistentOrientationBuilder::addTriangle(const Triangle &triangle)
 {
@@ -25,9 +19,6 @@ ConsistentOrientationBuilder::addTriangle(const Triangle &triangle)
       _graphBuilder.addTriangle(triangle, graph::Edge(_triangles.size())));
 }
 
-///
-///
-///
 void
 ConsistentOrientationBuilder::addTriangulatedSurface(
     const TriangulatedSurface &triangulatedSurface)
@@ -37,9 +28,6 @@ ConsistentOrientationBuilder::addTriangulatedSurface(
   }
 }
 
-///
-///
-///
 auto
 ConsistentOrientationBuilder::buildTriangulatedSurface() -> TriangulatedSurface
 {
@@ -53,9 +41,6 @@ ConsistentOrientationBuilder::buildTriangulatedSurface() -> TriangulatedSurface
   return triangulatedSurface;
 }
 
-///
-///
-///
 auto
 ConsistentOrientationBuilder::triangleN(const size_t &n) const -> Triangle
 {
@@ -68,9 +53,6 @@ ConsistentOrientationBuilder::triangleN(const size_t &n) const -> Triangle
                   Point(_graph[_graph.source(ca)].coordinate));
 }
 
-///
-///
-///
 void
 ConsistentOrientationBuilder::_makeOrientationConsistent()
 {
@@ -134,9 +116,6 @@ ConsistentOrientationBuilder::_makeOrientationConsistent()
   }
 }
 
-///
-///
-///
 void
 ConsistentOrientationBuilder::_computeNeighbors()
 {
@@ -168,9 +147,6 @@ ConsistentOrientationBuilder::_computeNeighbors()
   }
 }
 
-///
-///
-///
 auto
 ConsistentOrientationBuilder::_findNextTriangle() -> int
 {

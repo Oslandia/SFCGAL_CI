@@ -10,14 +10,8 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 Polygon::Polygon() { _rings.push_back(new LineString()); }
 
-///
-///
-///
 Polygon::Polygon(const std::vector<LineString> &rings)
 {
   if (rings.empty()) {
@@ -29,22 +23,13 @@ Polygon::Polygon(const std::vector<LineString> &rings)
   }
 }
 
-///
-///
-///
 Polygon::Polygon(const LineString &exteriorRing)
 {
   _rings.push_back(exteriorRing.clone());
 }
 
-///
-///
-///
 Polygon::Polygon(LineString *exteriorRing) { _rings.push_back(exteriorRing); }
 
-///
-///
-///
 Polygon::Polygon(const Triangle &triangle)
 {
   _rings.push_back(new LineString());
@@ -56,9 +41,6 @@ Polygon::Polygon(const Triangle &triangle)
   }
 }
 
-///
-///
-///
 Polygon::Polygon(const Polygon &other) : Surface(other)
 {
   for (size_t i = 0; i < other.numRings(); i++) {
@@ -66,9 +48,6 @@ Polygon::Polygon(const Polygon &other) : Surface(other)
   }
 }
 
-///
-///
-///
 Polygon::Polygon(const CGAL::Polygon_2<Kernel> &other)
 {
   _rings.push_back(new LineString());
@@ -79,9 +58,6 @@ Polygon::Polygon(const CGAL::Polygon_2<Kernel> &other)
   }
 }
 
-///
-///
-///
 Polygon::Polygon(const CGAL::Polygon_with_holes_2<Kernel> &poly)
 {
   _rings.push_back(new LineString());
@@ -106,9 +82,6 @@ Polygon::Polygon(const CGAL::Polygon_with_holes_2<Kernel> &poly)
   }
 }
 
-///
-///
-///
 auto
 Polygon::operator=(Polygon other) -> Polygon &
 {
@@ -116,77 +89,50 @@ Polygon::operator=(Polygon other) -> Polygon &
   return *this;
 }
 
-///
-///
-///
 Polygon::~Polygon() = default;
 
-///
-///
-///
 auto
 Polygon::coordinateDimension() const -> int
 {
   return _rings[0].coordinateDimension();
 }
 
-///
-///
-///
 auto
 Polygon::geometryType() const -> std::string
 {
   return "Polygon";
 }
 
-///
-///
-///
 auto
 Polygon::geometryTypeId() const -> GeometryType
 {
   return TYPE_POLYGON;
 }
 
-///
-///
-///
 auto
 Polygon::clone() const -> Polygon *
 {
   return new Polygon(*this);
 }
 
-///
-///
-///
 auto
 Polygon::isEmpty() const -> bool
 {
   return exteriorRing().isEmpty();
 }
 
-///
-///
-///
 auto
 Polygon::is3D() const -> bool
 {
   return exteriorRing().is3D();
 }
 
-///
-///
-///
 auto
 Polygon::isMeasured() const -> bool
 {
   return exteriorRing().isMeasured();
 }
 
-///
-///
-///
 void
 Polygon::reverse()
 {
@@ -195,45 +141,30 @@ Polygon::reverse()
   }
 }
 
-///
-///
-///
 void
 Polygon::accept(GeometryVisitor &visitor)
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 void
 Polygon::accept(ConstGeometryVisitor &visitor) const
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 auto
 Polygon::isCounterClockWiseOriented() const -> bool
 {
   return algorithm::isCounterClockWiseOriented(*this);
 }
 
-///
-///
-///
 auto
 Polygon::toPolygon_2(bool fixOrientation) const -> CGAL::Polygon_2<Kernel>
 {
   return exteriorRing().toPolygon_2(fixOrientation);
 }
 
-///
-///
-///
 auto
 Polygon::toPolygon_with_holes_2(bool fixOrientation) const
     -> CGAL::Polygon_with_holes_2<Kernel>

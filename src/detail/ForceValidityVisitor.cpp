@@ -19,18 +19,12 @@
 
 namespace SFCGAL::detail {
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(Point &g)
 {
   g.forceValidityFlag(valid_);
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(LineString &g)
 {
@@ -40,9 +34,6 @@ ForceValidityVisitor::visit(LineString &g)
   }
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(Polygon &g)
 {
@@ -52,9 +43,6 @@ ForceValidityVisitor::visit(Polygon &g)
   }
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(Triangle &g)
 {
@@ -64,9 +52,6 @@ ForceValidityVisitor::visit(Triangle &g)
   visit(g.vertex(2));
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(Solid &g)
 {
@@ -76,9 +61,6 @@ ForceValidityVisitor::visit(Solid &g)
   }
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(MultiPoint &g)
 {
@@ -88,9 +70,6 @@ ForceValidityVisitor::visit(MultiPoint &g)
   }
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(MultiLineString &g)
 {
@@ -100,9 +79,6 @@ ForceValidityVisitor::visit(MultiLineString &g)
   }
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(MultiPolygon &g)
 {
@@ -112,9 +88,6 @@ ForceValidityVisitor::visit(MultiPolygon &g)
   }
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(MultiSolid &g)
 {
@@ -124,9 +97,6 @@ ForceValidityVisitor::visit(MultiSolid &g)
   }
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(GeometryCollection &g)
 {
@@ -136,9 +106,6 @@ ForceValidityVisitor::visit(GeometryCollection &g)
   }
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(PolyhedralSurface &g)
 {
@@ -148,9 +115,6 @@ ForceValidityVisitor::visit(PolyhedralSurface &g)
   }
 }
 
-///
-///
-///
 void
 ForceValidityVisitor::visit(TriangulatedSurface &g)
 {

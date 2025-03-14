@@ -31,7 +31,6 @@ namespace SFCGAL {
 class Geometry;
 namespace detail {
 
-///
 /// Primitive type enumeration. Note that the value is the dimension !
 enum PrimitiveType {
   PrimitivePoint   = 0,
@@ -40,7 +39,6 @@ enum PrimitiveType {
   PrimitiveVolume  = 3
 };
 
-///
 /// Primitive handle. Holds a pointer to a primitive, through the 'handle'
 /// member
 template <int Dim>
@@ -67,7 +65,6 @@ struct PrimitiveHandle {
   }
 };
 
-///
 /// PrimitiveBox. Type used for CGAL::Box_intersection_d
 template <int Dim>
 struct PrimitiveBox {
@@ -76,21 +73,18 @@ struct PrimitiveBox {
       Type;
 };
 
-///
 /// BoxCollection for use with CGAL::Box_intersection_d
 template <int Dim>
 struct BoxCollection {
   typedef std::vector<typename PrimitiveBox<Dim>::Type> Type;
 };
 
-///
 /// HandleCollection. Used to store PrimitiveHandle
 template <int Dim>
 struct HandleCollection {
   typedef std::list<PrimitiveHandle<Dim>> Type;
 };
 
-///
 /// Flags available for each type of Geometry type.
 /// Primitives can be 'flagged' in order to speed up recomposition
 enum ElementFlag {
@@ -98,7 +92,6 @@ enum ElementFlag {
   FLAG_IS_PLANAR = 1
 };
 
-///
 /// CollectionElement, a Primitive with flags
 /// Primitive : Point_d, Segment_d, Surface_d, Volume_d
 template <class Primitive>
@@ -154,7 +147,6 @@ operator<<(std::ostream &ostr, const CollectionElement<Primitive> &p)
   return ostr;
 }
 
-///
 /// A GeometrySet represents a set of CGAL primitives.
 /// Primitive are either of dimension 0 (points),
 /// dimension 1 (segments), dimension 2 (surfaces, a.k.a. polygon or triangles)
@@ -398,11 +390,9 @@ private:
   VolumeCollection  _volumes;
 };
 
-///
 /// Display operator
 SFCGAL_API std::ostream            &
 operator<<(std::ostream &, const GeometrySet<2> &g);
-///
 /// Display operator
 SFCGAL_API std::ostream            &
 operator<<(std::ostream &, const GeometrySet<3> &g);

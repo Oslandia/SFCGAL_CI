@@ -19,23 +19,14 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 Transform::~Transform() = default;
 
-///
-///
-///
 void
 Transform::visit(Point &g)
 {
   transform(g);
 }
 
-///
-///
-///
 void
 Transform::visit(LineString &g)
 {
@@ -44,9 +35,6 @@ Transform::visit(LineString &g)
   }
 }
 
-///
-///
-///
 void
 Transform::visit(Polygon &g)
 {
@@ -55,9 +43,6 @@ Transform::visit(Polygon &g)
   }
 }
 
-///
-///
-///
 void
 Transform::visit(Triangle &g)
 {
@@ -66,9 +51,6 @@ Transform::visit(Triangle &g)
   visit(g.vertex(2));
 }
 
-///
-///
-///
 void
 Transform::visit(Solid &g)
 {
@@ -77,9 +59,6 @@ Transform::visit(Solid &g)
   }
 }
 
-///
-///
-///
 void
 Transform::visit(MultiPoint &g)
 {
@@ -88,9 +67,6 @@ Transform::visit(MultiPoint &g)
   }
 }
 
-///
-///
-///
 void
 Transform::visit(MultiLineString &g)
 {
@@ -99,9 +75,6 @@ Transform::visit(MultiLineString &g)
   }
 }
 
-///
-///
-///
 void
 Transform::visit(MultiPolygon &g)
 {
@@ -110,9 +83,6 @@ Transform::visit(MultiPolygon &g)
   }
 }
 
-///
-///
-///
 void
 Transform::visit(MultiSolid &g)
 {
@@ -121,9 +91,6 @@ Transform::visit(MultiSolid &g)
   }
 }
 
-///
-///
-///
 void
 Transform::visit(GeometryCollection &g)
 {
@@ -132,9 +99,6 @@ Transform::visit(GeometryCollection &g)
   }
 }
 
-///
-///
-///
 void
 Transform::visit(PolyhedralSurface &g)
 {
@@ -143,9 +107,6 @@ Transform::visit(PolyhedralSurface &g)
   }
 }
 
-///
-///
-///
 void
 Transform::visit(TriangulatedSurface &g)
 {

@@ -14,9 +14,6 @@ using namespace SFCGAL::tools;
 
 namespace SFCGAL::io {
 
-///
-///
-///
 auto
 readWkt(std::istream &s) -> std::unique_ptr<Geometry>
 {
@@ -24,9 +21,6 @@ readWkt(std::istream &s) -> std::unique_ptr<Geometry>
   return std::unique_ptr<Geometry>(wktReader.readGeometry());
 }
 
-///
-///
-///
 auto
 readWkt(const std::string &s) -> std::unique_ptr<Geometry>
 {
@@ -42,9 +36,6 @@ readWkt(const std::string &s) -> std::unique_ptr<Geometry>
   return geom;
 }
 
-///
-///
-///
 auto
 readWkt(const char *str, size_t len) -> std::unique_ptr<Geometry>
 {

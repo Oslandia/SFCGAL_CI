@@ -8,14 +8,8 @@
 
 namespace SFCGAL::transform {
 
-///
-///
-///
 RoundTransform::RoundTransform(const long &scale) : _scale(scale) {}
 
-///
-///
-///
 void
 RoundTransform::transform(Point &p)
 {

@@ -10,9 +10,6 @@
 
 namespace SFCGAL::transform {
 
-///
-///
-///
 AffineTransform2::AffineTransform2(CGAL::Aff_transformation_2<Kernel> transform)
     : _transform(std::move(transform))
 {

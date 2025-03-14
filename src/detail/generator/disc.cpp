@@ -18,9 +18,6 @@
 
 namespace SFCGAL::generator {
 
-///
-///
-///
 auto
 disc(const Point &center, const double &radius,
      const unsigned int &nQuadrantSegments) -> std::unique_ptr<Polygon>

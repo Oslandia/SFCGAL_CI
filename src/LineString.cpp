@@ -7,14 +7,8 @@
 
 namespace SFCGAL {
 
-///
-///
-///
 LineString::LineString() = default;
 
-///
-///
-///
 LineString::LineString(const std::vector<Point> &points)
 {
   for (const auto &point : points) {
@@ -22,9 +16,6 @@ LineString::LineString(const std::vector<Point> &points)
   }
 }
 
-///
-///
-///
 LineString::LineString(const Point &startPoint, const Point &endPoint)
 
 {
@@ -32,9 +23,6 @@ LineString::LineString(const Point &startPoint, const Point &endPoint)
   _points.push_back(endPoint.clone());
 }
 
-///
-///
-///
 LineString::LineString(const LineString &other) : Geometry(other)
 {
   for (size_t i = 0; i < other.numPoints(); i++) {
@@ -42,9 +30,6 @@ LineString::LineString(const LineString &other) : Geometry(other)
   }
 }
 
-///
-///
-///
 auto
 LineString::operator=(LineString other) -> LineString &
 {
@@ -52,103 +37,68 @@ LineString::operator=(LineString other) -> LineString &
   return *this;
 }
 
-///
-///
-///
 LineString::~LineString() = default;
 
-///
-///
-///
 auto
 LineString::clone() const -> LineString *
 {
   return new LineString(*this);
 }
 
-///
-///
-///
 auto
 LineString::geometryTypeId() const -> GeometryType
 {
   return TYPE_LINESTRING;
 }
 
-///
-///
-///
 auto
 LineString::geometryType() const -> std::string
 {
   return "LineString";
 }
 
-///
-///
-///
 auto
 LineString::dimension() const -> int
 {
   return 1;
 }
 
-///
-///
 auto
 LineString::coordinateDimension() const -> int
 {
   return isEmpty() ? 0 : _points[0].coordinateDimension();
 }
 
-///
-///
-///
 auto
 LineString::isEmpty() const -> bool
 {
   return _points.empty();
 }
 
-///
-///
-///
 auto
 LineString::is3D() const -> bool
 {
   return !isEmpty() && startPoint().is3D();
 }
 
-///
-///
-///
 auto
 LineString::isMeasured() const -> bool
 {
   return !isEmpty() && startPoint().isMeasured();
 }
 
-///
-///
-///
 void
 LineString::clear()
 {
   _points.clear();
 }
 
-///
-///
-///
 void
 LineString::reverse()
 {
   std::reverse(_points.begin(), _points.end());
 }
 
-///
-///
-///
 auto
 LineString::numSegments() const -> size_t
 {
@@ -158,45 +108,30 @@ LineString::numSegments() const -> size_t
   return _points.size() - 1;
 }
 
-///
-///
-///
 auto
 LineString::isClosed() const -> bool
 {
   return (!isEmpty()) && (startPoint() == endPoint());
 }
 
-///
-///
-///
 void
 LineString::reserve(const size_t &n)
 {
   _points.reserve(n);
 }
 
-///
-///
-///
 void
 LineString::accept(GeometryVisitor &visitor)
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 void
 LineString::accept(ConstGeometryVisitor &visitor) const
 {
   return visitor.visit(*this);
 }
 
-///
-///
-///
 auto
 LineString::toPolygon_2(bool fixOrientation) const -> CGAL::Polygon_2<Kernel>
 {

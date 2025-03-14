@@ -7,9 +7,6 @@
 
 namespace SFCGAL::algorithm {
 
-///
-///
-///
 void
 force3D(Geometry &g, const Kernel::FT &defaultZ)
 {

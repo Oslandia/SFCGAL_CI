@@ -25,9 +25,6 @@ namespace SFCGAL::tools {
 
 Registry *Registry::_instance = nullptr;
 
-///
-///
-///
 Registry::~Registry()
 {
   for (auto &_prototype : _prototypes) {
@@ -35,9 +32,6 @@ Registry::~Registry()
   }
 }
 
-///
-///
-///
 void
 Registry::addPrototype(const Geometry &g)
 {
@@ -57,9 +51,6 @@ Registry::addPrototype(const Geometry &g)
   _prototypes.push_back(g.clone());
 }
 
-///
-///
-///
 auto
 Registry::getGeometryTypes() const -> std::vector<std::string>
 {
@@ -73,9 +64,6 @@ Registry::getGeometryTypes() const -> std::vector<std::string>
   return names;
 }
 
-///
-///
-///
 auto
 Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
     -> Geometry *
@@ -92,9 +80,6 @@ Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
   return nullptr;
 }
 
-///
-///
-///
 auto
 Registry::newGeometryByTypeId(int typeId) const -> Geometry *
 {
@@ -110,9 +95,6 @@ Registry::newGeometryByTypeId(int typeId) const -> Geometry *
   return nullptr;
 }
 
-///
-///
-///
 auto
 Registry::instance() -> Registry &
 {
@@ -123,9 +105,6 @@ Registry::instance() -> Registry &
   return *_instance;
 }
 
-///
-///
-///
 Registry::Registry()
 {
   addPrototype(Point());
