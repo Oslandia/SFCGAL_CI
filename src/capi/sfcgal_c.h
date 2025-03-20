@@ -14,6 +14,17 @@
 extern "C" {
 #endif
 
+#if defined(__cplusplus) && __cplusplus >= 201402L
+#define DEPRECATED(msg) [[deprecated(msg)]]
+#elif defined(__GNUC__) || defined(__clang__)
+#define DEPRECATED(msg) __attribute__((deprecated(msg)))
+#elif defined(_MSC_VER)
+#define DEPRECATED(msg) __declspec(deprecated(msg))
+#else
+#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+#define DEPRECATED(msg)
+#endif
+
 // TODO : return of errors ! => error handler
 
 /**
@@ -106,8 +117,8 @@ sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
  * @deprecated Use sfcgal_geometry_is_valid_detail instead.
  * @ingroup capi
  */
-[[__deprecated__(
-    "Use sfcgal_geometry_is_simple_detail instead.")]] SFCGAL_API int
+DEPRECATED("Use sfcgal_geometry_is_valid_detail instead")
+SFCGAL_API int
 sfcgal_geometry_is_complexity_detail(const sfcgal_geometry_t *geom,
                                      char                   **invalidity_reason,
                                      sfcgal_geometry_t **invalidity_location);
