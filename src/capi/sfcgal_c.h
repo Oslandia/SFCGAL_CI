@@ -1276,7 +1276,7 @@ sfcgal_geometry_is_equals(const sfcgal_geometry_t *geom1,
  * Returns true if geom1 is almost equals to geom2.
  *
  * For each point of geom1 there is a point in geom2 within tolerance distance.
- * @param tolerance 0 by default
+ * @param tolerance
  * @pre isValid(geom) == true
  * @post isValid(return) == true
  * @ingroup capi
@@ -1284,7 +1284,7 @@ sfcgal_geometry_is_equals(const sfcgal_geometry_t *geom1,
 SFCGAL_API int
 sfcgal_geometry_is_almost_equals(const sfcgal_geometry_t *geom1,
                                  const sfcgal_geometry_t *geom2,
-                                 double                   tolerance = 0.0);
+                                 double                   tolerance);
 
 /**
  * Returns the y monotone partition of a geometry (polygon without hole)
