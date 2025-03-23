@@ -1,4 +1,5 @@
 #-- standalone test
+add_subdirectory( capi )
 add_subdirectory( standalone )
 
 #-- test that needs parameters

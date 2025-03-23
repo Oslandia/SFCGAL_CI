@@ -1,0 +1,18 @@
+#-- capi test
+
+if( SFCGAL_USE_STATIC_LIBS )
+  add_definitions( "-DSFCGAL_USE_STATIC_LIBS" )
+endif()
+
+file( GLOB_RECURSE SFCGAL_REGRESS_POLYGON_TRIANGULATOR_TEST_SOURCES *.c )
+
+set( REGRESS_NAME test-regress-capi )
+add_executable( ${REGRESS_NAME} ${SFCGAL_REGRESS_POLYGON_TRIANGULATOR_TEST_SOURCES} )
+
+find_package(Boost REQUIRED COMPONENTS program_options filesystem serialization)
+
+target_link_libraries( ${REGRESS_NAME}	SFCGAL)
+
+
+set_target_properties( ${REGRESS_NAME} PROPERTIES DEBUG_POSTFIX "d" )
+install( TARGETS ${REGRESS_NAME} DESTINATION bin )
