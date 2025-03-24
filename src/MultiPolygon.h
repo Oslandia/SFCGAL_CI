@@ -42,14 +42,14 @@ public:
 
   //-- SFCGAL::Geometry
   virtual MultiPolygon *
-  clone() const;
+  clone() const override;
 
   //-- SFCGAL::Geometry
   virtual std::string
-  geometryType() const;
+  geometryType() const override;
   //-- SFCGAL::Geometry
   virtual GeometryType
-  geometryTypeId() const;
+  geometryTypeId() const override;
 
   /**
    * returns the n-th Geometry as a Polygon
@@ -72,10 +72,10 @@ public:
 
   //-- SFCGAL::Geometry
   virtual void
-  accept(GeometryVisitor &visitor);
+  accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
   virtual void
-  accept(ConstGeometryVisitor &visitor) const;
+  accept(ConstGeometryVisitor &visitor) const override;
 
   /**
    * Serializer
@@ -90,7 +90,7 @@ public:
 protected:
   //-- SFCGAL::GeometryCollection
   virtual bool
-  isAllowed(Geometry const &g);
+  isAllowed(Geometry const &g) override;
 };
 
 } // namespace SFCGAL
