@@ -21,7 +21,7 @@ public:
 
   //-- SFCGAL::Geometry
   virtual int
-  dimension() const;
+  dimension() const override;
 
   /**
    * [OGC/SFS]"The area of this Surface, as measured in the spatial reference
