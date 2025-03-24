@@ -2,6 +2,8 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
+#include <boost/format.hpp>
+
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/GeometryVisitor.h"
 
@@ -136,6 +138,14 @@ GeometryCollection::numGeometries() const -> size_t
 auto
 GeometryCollection::geometryN(size_t const &n) const -> const Geometry &
 {
+  if (n >= numGeometries()) {
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("Cannot access geometry at position %s. "
+                                 "GeometryCollection has only %d geometries.") %
+                   n % numGeometries())
+                      .str()));
+  }
+
   return _geometries[n];
 }
 
@@ -145,6 +155,14 @@ GeometryCollection::geometryN(size_t const &n) const -> const Geometry &
 auto
 GeometryCollection::geometryN(size_t const &n) -> Geometry &
 {
+  if (n >= numGeometries()) {
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("Cannot access geometry at position %s. "
+                                 "GeometryCollection has only %d geometries.") %
+                   n % numGeometries())
+                      .str()));
+  }
+
   return _geometries[n];
 }
 

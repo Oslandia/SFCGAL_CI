@@ -60,6 +60,7 @@ BOOST_AUTO_TEST_CASE(testAccessors)
 {
   GeometryCollection g;
   BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
+  BOOST_CHECK_THROW(g.geometryN(0), Exception);
 
   g.addGeometry(new Point(2.0, 3.0));
   BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
@@ -72,6 +73,7 @@ BOOST_AUTO_TEST_CASE(testAccessors)
   BOOST_CHECK_EQUAL(g.geometryN(0).asText(0), "POINT (2 3)");
   BOOST_CHECK_EQUAL(g.geometryN(1).asText(0), "LINESTRING (0 0,1 1)");
   BOOST_CHECK_EQUAL(g.geometryN(2).asText(0), "TRIANGLE ((0 0,1 0,1 1,0 0))");
+  BOOST_CHECK_THROW(g.geometryN(3), Exception);
 }
 
 //-- iterators
