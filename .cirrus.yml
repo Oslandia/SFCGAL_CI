@@ -23,12 +23,9 @@ task:
     - name: 15.0-CURRENT
       freebsd_instance:
         image_family: freebsd-15-0-snap
-    - name: 14.1-RELEASE
+    - name: 14.2-RELEASE
       freebsd_instance:
-        image_family: freebsd-14-1
-    - name: 13.3-RELEASE
-      freebsd_instance:
-        image_family: freebsd-13-3
+        image_family: freebsd-14-2
 
 task:
   name: macOS
