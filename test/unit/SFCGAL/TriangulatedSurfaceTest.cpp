@@ -216,4 +216,29 @@ BOOST_AUTO_TEST_CASE(polyhedronConversionTest)
   BOOST_CHECK_EQUAL(poly->size_of_vertices(), 6U);
 }
 
+BOOST_AUTO_TEST_CASE(geometryNTest)
+{
+  std::unique_ptr<Geometry> emptyGeom(io::readWkt("TIN EMPTY"));
+  BOOST_CHECK(emptyGeom->is<TriangulatedSurface>());
+  BOOST_CHECK(emptyGeom->isEmpty());
+  BOOST_CHECK_EQUAL(emptyGeom->numGeometries(), 0);
+  BOOST_CHECK_THROW(emptyGeom->geometryN(0), Exception);
+
+  std::string const triangulatedSurfaceStr =
+    "TIN Z ("
+    "((0 0 0, 2 0 2, 1 2 4, 0 0 0)),"
+    "((2 0 2, 3 2 3, 1 2 4, 2 0 2)),"
+    "((1 2 4, 3 2 3, 2 4 6, 1 2 4))"
+    ")";
+
+  std::unique_ptr<Geometry> geom(io::readWkt(triangulatedSurfaceStr));
+  BOOST_CHECK(!geom->isEmpty());
+  BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
+  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0), "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
+  BOOST_CHECK_EQUAL(geom->geometryN(1).asText(0), "TRIANGLE Z ((2 0 2,3 2 3,1 2 4,2 0 2))");
+  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0), "TRIANGLE Z ((1 2 4,3 2 3,2 4 6,1 2 4))");
+  BOOST_CHECK_THROW(geom->geometryN(3), Exception);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()

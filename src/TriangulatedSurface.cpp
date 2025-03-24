@@ -2,8 +2,11 @@
 // Copyright (c) 2012-2022, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include "SFCGAL/TriangulatedSurface.h"
+#include <boost/format.hpp>
+
+#include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryVisitor.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
 namespace SFCGAL {
 
@@ -148,7 +151,14 @@ TriangulatedSurface::numGeometries() const -> size_t
 auto
 TriangulatedSurface::geometryN(size_t const &n) const -> const Triangle &
 {
-  BOOST_ASSERT(n < numGeometries());
+  if (n >= numGeometries()) {
+    BOOST_THROW_EXCEPTION(Exception(
+        (boost::format("Cannot access geometry at position %s. "
+                       "TriangulatedSurface has only %d geometries.") %
+         n % numGeometries())
+            .str()));
+  }
+
   return _triangles[n];
 }
 
@@ -158,7 +168,14 @@ TriangulatedSurface::geometryN(size_t const &n) const -> const Triangle &
 auto
 TriangulatedSurface::geometryN(size_t const &n) -> Triangle &
 {
-  BOOST_ASSERT(n < numGeometries());
+  if (n >= numGeometries()) {
+    BOOST_THROW_EXCEPTION(Exception(
+        (boost::format("Cannot access geometry at position %s. "
+                       "TriangulatedSurface has only %d geometries.") %
+         n % numGeometries())
+            .str()));
+  }
+
   return _triangles[n];
 }
 
