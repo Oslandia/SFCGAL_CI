@@ -27,9 +27,15 @@ sonar-get-binaries:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: always
+      changes:
+        - "**/*.{c,h,cpp,hpp}"
+        - "**/CMakeLists.txt"
     # on default branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: always
+      changes:
+        - "**/*.{c,h,cpp,hpp}"
+        - "**/CMakeLists.txt"
 
 sonar-build-test:
   stage: test
@@ -41,6 +47,7 @@ sonar-build-test:
       - sonar-scanner/
       - bw-output/
       - build/ # the build has to be made available to the sonar-scanner for the analysis
+  needs: ["sonar-get-binaries"]
   before_script:
     - apt-get update -qq
     - apt-get install --yes sudo wget build-essential
