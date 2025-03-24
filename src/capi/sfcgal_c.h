@@ -1668,6 +1668,15 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_translate_2d(const sfcgal_geometry_t *geom, double dx,
                              double dy);
 
+/**
+ * Simplify a geometry
+ * @param geom the geometry to simplify
+ * @param threshold threshold parameter
+ * @param preserveTopology preserve the topology
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_simplify(sfcgal_geometry_t *geom, double threshold,
+                         bool preserveTopology);
 /*--------------------------------------------------------------------------------------*
  *
  * Error handling

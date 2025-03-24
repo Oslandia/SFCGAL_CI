@@ -55,6 +55,7 @@
 #include "SFCGAL/algorithm/plane.h"
 #include "SFCGAL/algorithm/rotate.h"
 #include "SFCGAL/algorithm/scale.h"
+#include "SFCGAL/algorithm/simplification.h"
 #include "SFCGAL/algorithm/straightSkeleton.h"
 #include "SFCGAL/algorithm/tesselate.h"
 #include "SFCGAL/algorithm/translate.h"
@@ -2155,4 +2156,25 @@ sfcgal_geometry_is_almost_equals(const sfcgal_geometry_t *ga,
   }
 
   return static_cast<int>(result);
+}
+
+extern "C" auto
+sfcgal_geometry_simplify(sfcgal_geometry_t *geom, double threshold,
+                         bool preserveTopology) -> sfcgal_geometry_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result =
+        SFCGAL::algorithm::simplify(*geometry, threshold, preserveTopology);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During simplify(A, %g, %d):", threshold, preserveTopology);
+    SFCGAL_WARNING("  with A: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  std::unique_ptr<SFCGAL::Geometry> out(result->clone());
+  return out.release();
 }
