@@ -14,6 +14,35 @@
 extern "C" {
 #endif
 
+#if defined(__has_c_attribute)
+  #if __has_c_attribute(deprecated)
+    #define SFCGAL_DEPRECATED(msg) [[deprecated(msg)]]
+  #elif defined(__clang__) || defined(__GNUC__)
+    #define SFCGAL_DEPRECATED(msg) __attribute__((deprecated(msg)))
+  #elif defined(_MSC_VER)
+    #define SFCGAL_DEPRECATED(msg) __declspec(deprecated(msg))
+  #else
+    #define SFCGAL_DEPRECATED(msg)
+  #endif
+#elif defined(__has_cpp_attribute)
+  #if __has_cpp_attribute(deprecated)
+    #define SFCGAL_DEPRECATED(msg) [[deprecated(msg)]]
+  #elif defined(__clang__) || defined(__GNUC__)
+    #define SFCGAL_DEPRECATED(msg) __attribute__((deprecated(msg)))
+  #elif defined(_MSC_VER)
+    #define SFCGAL_DEPRECATED(msg) __declspec(deprecated(msg))
+  #else
+    #define SFCGAL_DEPRECATED(msg)
+  #endif
+#elif defined(__clang__) || defined(__GNUC__)
+  #define SFCGAL_DEPRECATED(msg) __attribute__((deprecated(msg)))
+#elif defined(_MSC_VER)
+  #define SFCGAL_DEPRECATED(msg) __declspec(deprecated(msg))
+#else
+  #pragma message("WARNING: deprecated if not supported by this compiler")
+  #define SFCGAL_DEPRECATED(msg)
+#endif
+
 // TODO : return of errors ! => error handler
 
 /*--------------------------------------------------------------------------------------*
@@ -106,8 +135,8 @@ sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
  * @deprecated Use sfcgal_geometry_is_valid_detail instead.
  * @ingroup capi
  */
-[[__deprecated__(
-    "Use sfcgal_geometry_is_simple_detail instead.")]] SFCGAL_API int
+SFCGAL_DEPRECATED("Use sfcgal_geometry_is_valid_detail instead")
+SFCGAL_API int
 sfcgal_geometry_is_complexity_detail(const sfcgal_geometry_t *geom,
                                      char                   **invalidity_reason,
                                      sfcgal_geometry_t **invalidity_location);
