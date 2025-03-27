@@ -55,6 +55,18 @@ public:
   Point(const double &x, const double &y, const double &z, const double &m);
 
   /**
+   * Generic XYZM constructor determined by CoordinateType
+   */
+  Point(const double &x, const double &y, const double &z, const double &m,
+        CoordinateType dim);
+
+  /**
+   * Generic XYZM constructor determined by CoordinateType
+   */
+  Point(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z,
+        const double &m, CoordinateType dim);
+
+  /**
    * Constructor from CGAL::Point_2<K>
    */
   Point(const Kernel::Point_2 &other);
