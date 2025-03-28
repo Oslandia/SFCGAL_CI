@@ -159,14 +159,14 @@ logger();
   } while (0)
 
 #ifndef NDEBUG
-#define LOG_DEBUG(msg)                                                         \
-  do {                                                                         \
-    SFCGAL_LOG("DEBUG", msg);                                                  \
-  } while (0)
+  #define LOG_DEBUG(msg)                                                       \
+    do {                                                                       \
+      SFCGAL_LOG("DEBUG", msg);                                                \
+    } while (0)
 #else
-#define LOG_DEBUG(msg)                                                         \
-  do {                                                                         \
-  } while (0)
+  #define LOG_DEBUG(msg)                                                       \
+    do {                                                                       \
+    } while (0)
 #endif
 #define LOG_NOTICE(msg)                                                        \
   do {                                                                         \

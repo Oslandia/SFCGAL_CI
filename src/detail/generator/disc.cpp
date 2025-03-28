@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #ifdef _MSC_VER
-#define _USE_MATH_DEFINES
+  #define _USE_MATH_DEFINES
 #endif
 
 #include "SFCGAL/detail/generator/disc.h"

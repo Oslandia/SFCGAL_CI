@@ -19,8 +19,8 @@
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/split_member.hpp>
 #ifdef CGAL_USE_GMPXX
-#include <CGAL/mpq_class.h>
-#include <CGAL/mpz_class.h>
+  #include <CGAL/mpq_class.h>
+  #include <CGAL/mpz_class.h>
 #endif
 
 /*

@@ -8,8 +8,8 @@
 #include "SFCGAL/config.h"
 
 #ifndef SFCGAL_WITH_OSG
-#error                                                                         \
-    "SFCGAL is not build with OpenSceneGraph support (see SFCGAL_BUILD_OSG in cmake)"
+  #error                                                                       \
+      "SFCGAL is not build with OpenSceneGraph support (see SFCGAL_BUILD_OSG in cmake)"
 #endif
 
 #include <string>

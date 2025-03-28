@@ -28,7 +28,7 @@
 #include "SFCGAL/io/wkt.h"
 
 #if !_MSC_VER
-#include "SFCGAL/algorithm/alphaShapes.h"
+  #include "SFCGAL/algorithm/alphaShapes.h"
 #endif
 #include "SFCGAL/algorithm/alphaWrapping3D.h"
 #include "SFCGAL/algorithm/area.h"
@@ -87,111 +87,111 @@
 static sfcgal_error_handler_t __sfcgal_warning_handler = printf;
 static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
 
-#define SFCGAL_WARNING __sfcgal_warning_handler
-#define SFCGAL_ERROR __sfcgal_error_handler
+  #define SFCGAL_WARNING __sfcgal_warning_handler
+  #define SFCGAL_ERROR __sfcgal_error_handler
 
-#define SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(call)                           \
-  try {                                                                        \
-    call                                                                       \
-  } catch (std::exception & e) {                                               \
-    SFCGAL_ERROR("%s", e.what());                                              \
-    return 0;                                                                  \
-  }
-
-#define SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(call)                    \
-  try {                                                                        \
-    call                                                                       \
-  } catch (std::exception & e) {                                               \
-    SFCGAL_ERROR("%s", e.what());                                              \
-  }
-
-// Functions that take two geometries and return a scalar
-//
-// name: C function name
-// ret_type: C function return type
-// sfcgal_function: C++ SFCGAL method to call
-// cpp_type: C++ return type (might be different than ret_type)
-// fail_value: returned value on failure
-#define SFCGAL_GEOMETRY_FUNCTION_BINARY_SCALAR(name, sfcgal_function,          \
-                                               ret_type, cpp_type, fail_value) \
-  extern "C" ret_type sfcgal_geometry_##name(const sfcgal_geometry_t *ga,      \
-                                             const sfcgal_geometry_t *gb)      \
-  {                                                                            \
-    cpp_type r;                                                                \
+  #define SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(call)                         \
     try {                                                                      \
-      r = sfcgal_function(*(const SFCGAL::Geometry *)(ga),                     \
-                          *(const SFCGAL::Geometry *)(gb));                    \
+      call                                                                     \
     } catch (std::exception & e) {                                             \
-      SFCGAL_WARNING("During " #name "(A,B) :");                               \
-      SFCGAL_WARNING("  with A: %s",                                           \
-                     ((const SFCGAL::Geometry *)(ga))->asText().c_str());      \
-      SFCGAL_WARNING("   and B: %s",                                           \
-                     ((const SFCGAL::Geometry *)(gb))->asText().c_str());      \
-      SFCGAL_ERROR("%s", e.what());                                            \
-      return fail_value;                                                       \
-    }                                                                          \
-    return r;                                                                  \
-  }
-
-#define SFCGAL_GEOMETRY_FUNCTION_BINARY_PREDICATE(name, sfcgal_function)       \
-  SFCGAL_GEOMETRY_FUNCTION_BINARY_SCALAR(name, sfcgal_function, int, bool, -1)
-
-#define SFCGAL_GEOMETRY_FUNCTION_BINARY_MEASURE(name, sfcgal_function)         \
-  SFCGAL_GEOMETRY_FUNCTION_BINARY_SCALAR(name, sfcgal_function, double,        \
-                                         double, -1.0)
-
-#define SFCGAL_GEOMETRY_FUNCTION_BINARY_CONSTRUCTION(name, sfcgal_function)    \
-  extern "C" sfcgal_geometry_t *sfcgal_geometry_##name(                        \
-      const sfcgal_geometry_t *ga, const sfcgal_geometry_t *gb)                \
-  {                                                                            \
-    std::unique_ptr<SFCGAL::Geometry> result;                                  \
-    try {                                                                      \
-      result = sfcgal_function(*(const SFCGAL::Geometry *)(ga),                \
-                               *(const SFCGAL::Geometry *)(gb));               \
-    } catch (std::exception & e) {                                             \
-      SFCGAL_WARNING("During " #name "(A,B) :");                               \
-      SFCGAL_WARNING("  with A: %s",                                           \
-                     ((const SFCGAL::Geometry *)(ga))->asText().c_str());      \
-      SFCGAL_WARNING("   and B: %s",                                           \
-                     ((const SFCGAL::Geometry *)(gb))->asText().c_str());      \
       SFCGAL_ERROR("%s", e.what());                                            \
       return 0;                                                                \
-    }                                                                          \
-    return result.release();                                                   \
-  }
+    }
 
-#define SFCGAL_GEOMETRY_FUNCTION_UNARY_CONSTRUCTION(name, sfcgal_function)     \
-  extern "C" sfcgal_geometry_t *sfcgal_geometry_##name(                        \
-      const sfcgal_geometry_t *ga)                                             \
-  {                                                                            \
-    std::unique_ptr<SFCGAL::Geometry> result;                                  \
+  #define SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(call)                  \
     try {                                                                      \
-      result = sfcgal_function(*(const SFCGAL::Geometry *)(ga));               \
+      call                                                                     \
     } catch (std::exception & e) {                                             \
-      SFCGAL_WARNING("During " #name "(A) :");                                 \
-      SFCGAL_WARNING("  with A: %s",                                           \
-                     ((const SFCGAL::Geometry *)(ga))->asText().c_str());      \
       SFCGAL_ERROR("%s", e.what());                                            \
-      return 0;                                                                \
-    }                                                                          \
-    return result.release();                                                   \
-  }
+    }
 
-#define SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(name, sfcgal_function)          \
-  extern "C" double sfcgal_geometry_##name(const sfcgal_geometry_t *ga)        \
-  {                                                                            \
-    double r;                                                                  \
-    try {                                                                      \
-      r = sfcgal_function(*(const SFCGAL::Geometry *)(ga));                    \
-    } catch (std::exception & e) {                                             \
-      SFCGAL_WARNING("During " #name "(A) :");                                 \
-      SFCGAL_WARNING("  with A: %s",                                           \
-                     ((const SFCGAL::Geometry *)(ga))->asText().c_str());      \
-      SFCGAL_ERROR("%s", e.what());                                            \
-      return -1.0;                                                             \
-    }                                                                          \
-    return r;                                                                  \
-  }
+  // Functions that take two geometries and return a scalar
+  //
+  // name: C function name
+  // ret_type: C function return type
+  // sfcgal_function: C++ SFCGAL method to call
+  // cpp_type: C++ return type (might be different than ret_type)
+  // fail_value: returned value on failure
+  #define SFCGAL_GEOMETRY_FUNCTION_BINARY_SCALAR(                              \
+      name, sfcgal_function, ret_type, cpp_type, fail_value)                   \
+    extern "C" ret_type sfcgal_geometry_##name(const sfcgal_geometry_t *ga,    \
+                                               const sfcgal_geometry_t *gb)    \
+    {                                                                          \
+      cpp_type r;                                                              \
+      try {                                                                    \
+        r = sfcgal_function(*(const SFCGAL::Geometry *)(ga),                   \
+                            *(const SFCGAL::Geometry *)(gb));                  \
+      } catch (std::exception & e) {                                           \
+        SFCGAL_WARNING("During " #name "(A,B) :");                             \
+        SFCGAL_WARNING("  with A: %s",                                         \
+                       ((const SFCGAL::Geometry *)(ga))->asText().c_str());    \
+        SFCGAL_WARNING("   and B: %s",                                         \
+                       ((const SFCGAL::Geometry *)(gb))->asText().c_str());    \
+        SFCGAL_ERROR("%s", e.what());                                          \
+        return fail_value;                                                     \
+      }                                                                        \
+      return r;                                                                \
+    }
+
+  #define SFCGAL_GEOMETRY_FUNCTION_BINARY_PREDICATE(name, sfcgal_function)     \
+    SFCGAL_GEOMETRY_FUNCTION_BINARY_SCALAR(name, sfcgal_function, int, bool, -1)
+
+  #define SFCGAL_GEOMETRY_FUNCTION_BINARY_MEASURE(name, sfcgal_function)       \
+    SFCGAL_GEOMETRY_FUNCTION_BINARY_SCALAR(name, sfcgal_function, double,      \
+                                           double, -1.0)
+
+  #define SFCGAL_GEOMETRY_FUNCTION_BINARY_CONSTRUCTION(name, sfcgal_function)  \
+    extern "C" sfcgal_geometry_t *sfcgal_geometry_##name(                      \
+        const sfcgal_geometry_t *ga, const sfcgal_geometry_t *gb)              \
+    {                                                                          \
+      std::unique_ptr<SFCGAL::Geometry> result;                                \
+      try {                                                                    \
+        result = sfcgal_function(*(const SFCGAL::Geometry *)(ga),              \
+                                 *(const SFCGAL::Geometry *)(gb));             \
+      } catch (std::exception & e) {                                           \
+        SFCGAL_WARNING("During " #name "(A,B) :");                             \
+        SFCGAL_WARNING("  with A: %s",                                         \
+                       ((const SFCGAL::Geometry *)(ga))->asText().c_str());    \
+        SFCGAL_WARNING("   and B: %s",                                         \
+                       ((const SFCGAL::Geometry *)(gb))->asText().c_str());    \
+        SFCGAL_ERROR("%s", e.what());                                          \
+        return 0;                                                              \
+      }                                                                        \
+      return result.release();                                                 \
+    }
+
+  #define SFCGAL_GEOMETRY_FUNCTION_UNARY_CONSTRUCTION(name, sfcgal_function)   \
+    extern "C" sfcgal_geometry_t *sfcgal_geometry_##name(                      \
+        const sfcgal_geometry_t *ga)                                           \
+    {                                                                          \
+      std::unique_ptr<SFCGAL::Geometry> result;                                \
+      try {                                                                    \
+        result = sfcgal_function(*(const SFCGAL::Geometry *)(ga));             \
+      } catch (std::exception & e) {                                           \
+        SFCGAL_WARNING("During " #name "(A) :");                               \
+        SFCGAL_WARNING("  with A: %s",                                         \
+                       ((const SFCGAL::Geometry *)(ga))->asText().c_str());    \
+        SFCGAL_ERROR("%s", e.what());                                          \
+        return 0;                                                              \
+      }                                                                        \
+      return result.release();                                                 \
+    }
+
+  #define SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(name, sfcgal_function)        \
+    extern "C" double sfcgal_geometry_##name(const sfcgal_geometry_t *ga)      \
+    {                                                                          \
+      double r;                                                                \
+      try {                                                                    \
+        r = sfcgal_function(*(const SFCGAL::Geometry *)(ga));                  \
+      } catch (std::exception & e) {                                           \
+        SFCGAL_WARNING("During " #name "(A) :");                               \
+        SFCGAL_WARNING("  with A: %s",                                         \
+                       ((const SFCGAL::Geometry *)(ga))->asText().c_str());    \
+        SFCGAL_ERROR("%s", e.what());                                          \
+        return -1.0;                                                           \
+      }                                                                        \
+      return r;                                                                \
+    }
 
 template <class T>
 inline auto

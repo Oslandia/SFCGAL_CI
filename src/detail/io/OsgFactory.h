@@ -8,8 +8,8 @@
 #include "SFCGAL/config.h"
 
 #ifndef SFCGAL_WITH_OSG
-#error                                                                         \
-    "SFCGAL is not built with OpenSceneGraph support, this header can't be included"
+  #error                                                                       \
+      "SFCGAL is not built with OpenSceneGraph support, this header can't be included"
 #endif
 
 #include <osg/Geometry>

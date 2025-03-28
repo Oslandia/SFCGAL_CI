@@ -5,14 +5,14 @@
 #include "SFCGAL/config.h"
 #ifdef SFCGAL_WITH_OSG
 
-#include "SFCGAL/detail/io/OsgFactory.h"
-#include "SFCGAL/io/osg.h"
+  #include "SFCGAL/detail/io/OsgFactory.h"
+  #include "SFCGAL/io/osg.h"
 
-#include <osg/Geode>
-#include <osg/Geometry>
-#include <osg/Group>
+  #include <osg/Geode>
+  #include <osg/Geometry>
+  #include <osg/Group>
 
-#include <osgDB/WriteFile>
+  #include <osgDB/WriteFile>
 
 namespace SFCGAL {
 namespace io {

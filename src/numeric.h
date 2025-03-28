@@ -15,11 +15,11 @@
 namespace SFCGAL {
 
 #if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wfloat-equal"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wfloat-equal"
 #elif defined(__GCC__)
-#pragma gcc diagnostic push
-#pragma gcc diagnostic ignored "-Wfloat-equal"
+  #pragma gcc diagnostic push
+  #pragma gcc diagnostic ignored "-Wfloat-equal"
 #endif
 inline auto
 almostEqual(const double a, const double b, const double epsilon) -> bool
@@ -65,9 +65,9 @@ almostEqual(const Kernel::FT &a, const Kernel::FT &b, const Kernel::FT &epsilon)
 }
 
 #if defined(__clang__)
-#pragma clang diagnostic pop
+  #pragma clang diagnostic pop
 #elif defined(__GCC__)
-#pragma gcc diagnostic pop
+  #pragma gcc diagnostic pop
 #endif
 
 /**
