@@ -1,5 +1,5 @@
 build:windows-docker-image:
-  stage: build
+  stage: docker
   tags:
     - saas-windows-medium-amd64
   rules:
@@ -29,7 +29,7 @@ build:windows-docker-image:
     - docker logout $env:CI_REGISTRY
 
 push:windows-docker-latest:
-  stage: deploy
+  stage: docker
   tags:
     - saas-windows-medium-amd64
   rules:
@@ -48,7 +48,7 @@ push:windows-docker-latest:
     - docker logout $env:CI_REGISTRY
 
 push:windows-docker-tag:
-  stage: deploy
+  stage: docker
   tags:
     - saas-windows-medium-amd64
   rules:
