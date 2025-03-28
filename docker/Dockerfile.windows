@@ -4,7 +4,9 @@ FROM sfcgal/sfcgal-build-deps:windows-latest
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 WORKDIR "c:\SFCGAL"
-COPY . ./
+COPY src ./src
+COPY test ./test
+COPY CMakeLists.txt sfcgal.pc.in sfcgal-config.in ./
 
 RUN cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
