@@ -1,7 +1,7 @@
 stages:
-  - .pre
   - lint
-  - test
+  - test # for sast tests
+  - sonar-build-test
   - build
   - doc
   - docker
