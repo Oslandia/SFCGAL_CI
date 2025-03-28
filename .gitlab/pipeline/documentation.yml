@@ -4,15 +4,9 @@ build:documentation:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
-        - "**/*.{c,h,cpp,hpp}"
-        - "website/**/*"
-        - ".gitlab-ci.yml"
-    # on a MR if previous jobs are successful
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
-      changes:
-        - "**/*.{c,h,cpp,hpp}"
-        - "website/**/*"
+        - "src/*.h"
+        - "src/*.cpp"
+        - "website/docs/*.md"
         - ".gitlab-ci.yml"
   before_script:
     - apt-get update -qq
@@ -32,6 +26,13 @@ build:documentation:
 # -- DEPLOYMENT JOBS ------------
 deploy:pages:
   stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - "src/*.h"
+        - "src/*.cpp"
+        - "website/docs/*.md"
+        - ".gitlab-ci.yml"
   needs:
     - job: build:documentation
       artifacts: true
