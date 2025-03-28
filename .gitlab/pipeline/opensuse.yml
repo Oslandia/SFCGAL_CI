@@ -1,5 +1,5 @@
 opensuse_gcc:
-  stage: build
+  stage: plateform-build-test
   rules:
     # on default branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
