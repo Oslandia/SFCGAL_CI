@@ -1,5 +1,5 @@
-build:documentation:
-  stage: build
+doc:build:
+  stage: doc
   image: ${PYTHON_DOCKER_IMAGE}
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -30,10 +30,23 @@ build:documentation:
     when: always
 
 # -- DEPLOYMENT JOBS ------------
-deploy:pages:
-  stage: deploy
+doc:deploy:
+  stage: doc
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - "**/*.{c,h,cpp,hpp}"
+        - "website/**/*"
+        - ".gitlab-ci.yml"
+    # on a MR if previous jobs are successful
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+      changes:
+        - "**/*.{c,h,cpp,hpp}"
+        - "website/**/*"
+        - ".gitlab-ci.yml"
   needs:
-    - job: build:documentation
+    - job: doc:build
       artifacts: true
   variables:
     GIT_STRATEGY: none
