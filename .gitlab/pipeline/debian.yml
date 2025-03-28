@@ -1,5 +1,5 @@
 .debian_test_base:
-  stage: build
+  stage: plateform-build-test
   variables:
     OS_VERSION: "--"
     PACKAGE: "--"
