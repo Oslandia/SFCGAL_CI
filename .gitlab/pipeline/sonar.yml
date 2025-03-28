@@ -6,8 +6,8 @@ variables:
   GIT_DEPTH: "0" # Tells git to fetch all the branches of the project, required by the analysis task
   SONAR_SCANNER_VERSION: 6.1.0.4477-linux-x64
 
-sonar-get-binaries:
-  stage: .pre
+sonar:get-binaries:
+  stage: sonar-build-test
   cache:
     policy: push
     key: "${CI_COMMIT_SHORT_SHA}"
@@ -31,8 +31,8 @@ sonar-get-binaries:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: always
 
-sonar-build-test:
-  stage: test
+sonar:build-test:
+  stage: sonar-build-test
   cache:
     policy: pull-push
     key: "${CI_COMMIT_SHORT_SHA}"
@@ -41,7 +41,7 @@ sonar-build-test:
       - sonar-scanner/
       - bw-output/
       - build/ # the build has to be made available to the sonar-scanner for the analysis
-  needs: ["sonar-get-binaries"]
+  needs: ["sonar:get-binaries"]
   before_script:
     - apt-get update -qq
     - apt-get install --yes sudo wget build-essential
@@ -63,8 +63,8 @@ sonar-build-test:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: always
 
-sonar-check:
-  stage: test
+sonar:check:
+  stage: sonar-build-test
   cache:
     policy: pull
     key: "${CI_COMMIT_SHORT_SHA}"
@@ -73,7 +73,7 @@ sonar-check:
       - sonar-scanner/
       - bw-output/
       - build/
-  needs: ["sonar-build-test"]
+  needs: ["sonar:build-test"]
   script:
     - sonar-scanner/bin/sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}" -Dsonar.token="${SONAR_TOKEN}" -Dsonar.cfamily.build-wrapper-output=bw-output
   rules:
