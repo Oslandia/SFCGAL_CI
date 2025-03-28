@@ -58,6 +58,7 @@ plugins:
             SORT_GROUP_NAMES: True
   - search
 
+# blah laba
 nav:
   - Home: index.md
   - Authors: authors.md
