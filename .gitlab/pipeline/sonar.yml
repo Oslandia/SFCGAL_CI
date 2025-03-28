@@ -41,6 +41,7 @@ sonar-build-test:
       - sonar-scanner/
       - bw-output/
       - build/ # the build has to be made available to the sonar-scanner for the analysis
+  needs: ["sonar-get-binaries"]
   before_script:
     - apt-get update -qq
     - apt-get install --yes sudo wget build-essential
