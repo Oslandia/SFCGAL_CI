@@ -192,6 +192,26 @@ public:
   virtual auto
   dropM() -> bool = 0;
 
+  /**
+   * @brief Determines the coordinate dimension of a geometry
+   *
+   * @return CoordinateType The coordinate dimension (XY, XYZ, XYM, XYZM)
+   */
+  auto
+  getCoordinateType() const -> CoordinateType
+  {
+    bool hasZ = is3D();
+    bool hasM = isMeasured();
+
+    if (hasZ) {
+      return hasM ? CoordinateType::COORDINATE_XYZM
+                  : CoordinateType::COORDINATE_XYZ;
+    } else {
+      return hasM ? CoordinateType::COORDINATE_XYM
+                  : CoordinateType::COORDINATE_XY;
+    }
+  }
+
   // virtual bool         isSimple() const = 0 ;
 
   /**
