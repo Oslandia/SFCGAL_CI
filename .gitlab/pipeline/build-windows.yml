@@ -13,6 +13,7 @@ build:windows-docker-image:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
       allow_failure: true
+  needs: []
   before_script:
     - Start-Service -Name "docker"
     - docker login -u $env:CI_REGISTRY_USER -p $env:CI_REGISTRY_PASSWORD $env:CI_REGISTRY
