@@ -14,6 +14,7 @@ doc:build:
         - "**/*.{c,h,cpp,hpp}"
         - "website/**/*"
         - ".gitlab-ci.yml"
+  needs: []
   before_script:
     - apt-get update -qq
     - apt-get install -y doxygen
