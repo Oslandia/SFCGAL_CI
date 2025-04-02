@@ -78,29 +78,29 @@ public:
   ~Point();
 
   //-- SFCGAL::Geometry
-  virtual Point *
+  Point *
   clone() const override;
 
   //-- SFCGAL::Geometry
-  virtual std::string
+  std::string
   geometryType() const override;
   //-- SFCGAL::Geometry
-  virtual GeometryType
+  GeometryType
   geometryTypeId() const override;
   //-- SFCGAL::Geometry
-  virtual int
+  int
   dimension() const override;
   //-- SFCGAL::Geometry
-  virtual int
+  int
   coordinateDimension() const override;
   //-- SFCGAL::Geometry
-  virtual bool
+  bool
   isEmpty() const override;
   //-- SFCGAL::Geometry
-  virtual bool
+  bool
   is3D() const override;
   //-- SFCGAL::Geometry
-  virtual bool
+  bool
   isMeasured() const override;
   //--- accessors
 
@@ -172,10 +172,10 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
-  virtual void
+  void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
-  virtual void
+  void
   accept(ConstGeometryVisitor &visitor) const override;
 
   /**
