@@ -131,7 +131,7 @@ GeometryCollection::addGeometry(Geometry *geometry)
     oss << "try to add a '" << geometry->geometryType() << "' in a '"
         << geometryType() << "'\n";
     delete geometry; // we are responsible for the resource here
-    BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
+    BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
   _geometries.push_back(geometry);
