@@ -26,8 +26,8 @@ public:
   /*
    * [SFCGAL::Transform]
    */
-  virtual void
-  transform(Point &p);
+  void
+  transform(Point &p) override;
 
 private:
   Kernel::FT _defaultZ;
