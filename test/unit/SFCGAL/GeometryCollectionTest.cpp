@@ -34,6 +34,7 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/io/wkt.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;
@@ -172,23 +173,73 @@ BOOST_AUTO_TEST_CASE(testIsGeometryCollection)
   BOOST_CHECK(MultiSolid().is<GeometryCollection>());
 }
 
-BOOST_AUTO_TEST_CASE(testDropZ)
+BOOST_AUTO_TEST_CASE(testDropZM)
 {
   GeometryCollection geomEmpty;
   BOOST_CHECK(geomEmpty.isEmpty());
   BOOST_CHECK(!geomEmpty.dropZ());
+  BOOST_CHECK(!geomEmpty.dropM());
 
-  GeometryCollection geom;
-  geom.addGeometry(Point(2.0, 3.0, 5.0));
-  geom.addGeometry(Triangle(Point(0.0, 0.0, 6.0), Point(1.0, 0.0, 6.0),
-                            Point(1.0, 1.0, 6.0)));
-  BOOST_CHECK(geom.is3D());
-  BOOST_CHECK(geom.dropZ());
+  GeometryCollection geom2D;
+  geom2D.addGeometry(Point(2.0, 3.0));
+  geom2D.addGeometry(Triangle(Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0)));
+  BOOST_CHECK(!geom2D.is3D());
+  BOOST_CHECK(!geom2D.isMeasured());
+  BOOST_CHECK(!geom2D.dropZ());
+  BOOST_CHECK(!geom2D.dropM());
+
+  GeometryCollection geom3D;
+  geom3D.addGeometry(Point(2.0, 3.0, 5.0));
+  geom3D.addGeometry(Triangle(Point(0.0, 0.0, 6.0), Point(1.0, 0.0, 6.0), Point(1.0, 1.0, 6.0)));
+  BOOST_CHECK(geom3D.is3D());
+  BOOST_CHECK(!geom3D.isMeasured());
+  BOOST_CHECK(!geom3D.dropM());
+  BOOST_CHECK(geom3D.dropZ());
   BOOST_CHECK_EQUAL(
-      geom.asText(1),
+      geom3D.asText(1),
       "GEOMETRYCOLLECTION (POINT (2.0 3.0),TRIANGLE ((0.0 "
       "0.0,1.0 0.0,1.0 1.0,0.0 0.0)))");
-  BOOST_CHECK(!geom.dropZ());
+  BOOST_CHECK(!geom3D.dropZ());
+  BOOST_CHECK(!geom3D.dropM());
+
+  GeometryCollection geomM;
+  geomM.addGeometry(io::readWkt("POINT M (2 3 4)").release());
+  geomM.addGeometry(io::readWkt("TRIANGLE M ((0 0 1, 5 5 5, 0 5 2, 0 0 1))").release());
+  BOOST_REQUIRE(geomM.is<GeometryCollection>());
+  BOOST_CHECK(!geomM.is3D());
+  BOOST_CHECK(geomM.isMeasured());
+  BOOST_CHECK(!geomM.dropZ());
+  BOOST_CHECK(geomM.dropM());
+  BOOST_CHECK_EQUAL(
+                    geomM.asText(1),
+                    "GEOMETRYCOLLECTION (POINT (2.0 3.0),"
+                    "TRIANGLE ((0.0 0.0,5.0 5.0,0.0 5.0,0.0 0.0)))");
+  BOOST_CHECK(!geomM.dropZ());
+  BOOST_CHECK(!geomM.dropM());
+  BOOST_CHECK(!geomM.is3D());
+  BOOST_CHECK(!geomM.isMeasured());
+
+  GeometryCollection geomZM;
+  geomZM.addGeometry(Point(2.0, 3.0, 5.0, 4.0));
+  geomZM.addGeometry(Triangle(Point(0.0, 0.0, 6.0, 2.0), Point(1.0, 0.0, 6.0, 2.0), Point(1.0, 1.0, 6.0, 2.0)));
+  BOOST_CHECK(geomZM.is3D());
+  BOOST_CHECK(geomZM.isMeasured());
+  BOOST_CHECK(geomZM.dropM());
+  BOOST_CHECK(geomZM.is3D());
+  BOOST_CHECK(!geomZM.isMeasured());
+  BOOST_CHECK_EQUAL(
+                    geomZM.asText(0),
+                    "GEOMETRYCOLLECTION Z (POINT Z (2 3 5),"
+                    "TRIANGLE Z ((0 0 6,1 0 6,1 1 6,0 0 6)))");
+  BOOST_CHECK(geomZM.dropZ());
+  BOOST_CHECK(!geomZM.is3D());
+  BOOST_CHECK(!geomZM.isMeasured());
+  BOOST_CHECK_EQUAL(
+                    geomZM.asText(0),
+                    "GEOMETRYCOLLECTION (POINT (2 3),"
+                    "TRIANGLE ((0 0,1 0,1 1,0 0)))");
+  BOOST_CHECK(!geomZM.dropZ());
+  BOOST_CHECK(!geomZM.dropM());
 }
 
 // template < typename Derived > inline const Derived &  Geometry::as() const

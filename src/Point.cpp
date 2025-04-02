@@ -112,6 +112,17 @@ Point::dropZ() -> bool
   return _coordinate.dropZ();
 }
 
+auto
+Point::dropM() -> bool
+{
+  if (!isMeasured()) {
+    return false;
+  }
+
+  setM(std::numeric_limits<double>::quiet_NaN());
+  return true;
+}
+
 void
 Point::accept(GeometryVisitor &visitor)
 {

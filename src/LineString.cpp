@@ -101,6 +101,20 @@ LineString::dropZ() -> bool
   return true;
 }
 
+auto
+LineString::dropM() -> bool
+{
+  if (!isMeasured()) {
+    return false;
+  }
+
+  for (auto &_point : _points) {
+    _point.dropM();
+  }
+
+  return true;
+}
+
 void
 LineString::clear()
 {

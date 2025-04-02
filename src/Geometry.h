@@ -184,6 +184,14 @@ public:
   virtual auto
   dropZ() -> bool = 0;
 
+  /**
+   * @brief Drops the m coordinate of the geometry
+   * @return TRUE if a M value was present and has been removed
+   * @pre suppose no mix of M/!M points
+   */
+  virtual auto
+  dropM() -> bool = 0;
+
   // virtual bool         isSimple() const = 0 ;
 
   /**

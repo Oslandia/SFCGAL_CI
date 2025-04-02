@@ -111,6 +111,20 @@ Triangle::dropZ() -> bool
   return true;
 }
 
+auto
+Triangle::dropM() -> bool
+{
+  if (!isMeasured()) {
+    return false;
+  }
+
+  for (auto &_vertex : _vertices) {
+    _vertex.dropM();
+  }
+
+  return true;
+}
+
 void
 Triangle::reverse()
 {

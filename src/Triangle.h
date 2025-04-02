@@ -85,6 +85,9 @@ public:
   auto
   dropZ() -> bool override;
 
+  auto
+  dropM() -> bool override;
+
   /**
    * reverse Triangle orientation
    */

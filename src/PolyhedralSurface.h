@@ -122,6 +122,9 @@ public:
   auto
   dropZ() -> bool override;
 
+  auto
+  dropM() -> bool override;
+
   /**
    * Convert PolyhedralSurface to TriangulatedSurface
    */

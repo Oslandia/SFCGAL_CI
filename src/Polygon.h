@@ -98,6 +98,9 @@ public:
   auto
   dropZ() -> bool override;
 
+  auto
+  dropM() -> bool override;
+
   /**
    * Check whether the 2D polygon is pointing up
    */

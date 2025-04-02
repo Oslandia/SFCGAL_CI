@@ -27,6 +27,7 @@
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/io/wkt.h"
 
 using namespace SFCGAL;
 using namespace boost::unit_test;
@@ -406,15 +407,56 @@ BOOST_AUTO_TEST_CASE(isLineString)
   BOOST_CHECK(g.is<LineString>());
 }
 
-BOOST_AUTO_TEST_CASE(testDropZ)
+BOOST_AUTO_TEST_CASE(testDropZM)
 {
+  LineString lineEmpty;
+  BOOST_CHECK(lineEmpty.isEmpty());
+  BOOST_CHECK(!lineEmpty.is3D());
+  BOOST_CHECK(!lineEmpty.isMeasured());
+  BOOST_CHECK(!lineEmpty.dropZ());
+  BOOST_CHECK(!lineEmpty.dropM());
+
   LineString line2D(Point(0.0, 0.0), Point(1.0, 1.0));
+  BOOST_CHECK(!line2D.is3D());
+  BOOST_CHECK(!line2D.isMeasured());
+  BOOST_CHECK(!line2D.dropM());
   BOOST_CHECK(!line2D.dropZ());
 
   LineString line3D(Point(0.0, 0.0, 2.0), Point(1.0, 1.0, 5.0));
+  BOOST_CHECK(line3D.is3D());
+  BOOST_CHECK(!line3D.isMeasured());
   BOOST_CHECK(line3D.dropZ());
   BOOST_CHECK_EQUAL(line3D.asText(1), "LINESTRING (0.0 0.0,1.0 1.0)");
+  BOOST_CHECK(!line3D.is3D());
   BOOST_CHECK(!line3D.dropZ());
+
+  std::unique_ptr<Geometry> lineM(io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
+  BOOST_CHECK(!lineM->is3D());
+  BOOST_CHECK(lineM->isMeasured());
+  BOOST_CHECK(!lineM->dropZ());
+  BOOST_CHECK(lineM->dropM());
+  BOOST_CHECK_EQUAL(lineM->asText(0), "LINESTRING (0 0,1 1,2 2)");
+  BOOST_CHECK(!lineM->is3D());
+  BOOST_CHECK(!lineM->isMeasured());
+  BOOST_CHECK(!lineM->dropZ());
+  BOOST_CHECK(!lineM->dropM());
+
+  LineString lineZM(Point(0.0, 0.0, 2.0, 4.0), Point(1.0, 1.0, 5.0, 4.0));
+  BOOST_CHECK(lineZM.is3D());
+  BOOST_CHECK(lineZM.isMeasured());
+
+  BOOST_CHECK(lineZM.dropM());
+  BOOST_CHECK(lineZM.is3D());
+  BOOST_CHECK(!lineZM.isMeasured());
+  BOOST_CHECK_EQUAL(lineZM.asText(0), "LINESTRING Z (0 0 2,1 1 5)");
+  BOOST_CHECK(!lineZM.dropM());
+
+  BOOST_CHECK(lineZM.dropZ());
+  BOOST_CHECK(!lineZM.is3D());
+  BOOST_CHECK(!lineZM.isMeasured());
+  BOOST_CHECK_EQUAL(lineZM.asText(0), "LINESTRING (0 0,1 1)");
+  BOOST_CHECK(!lineZM.dropZ());
+  BOOST_CHECK(!lineZM.dropM());
 }
 
 // template < typename Derived > inline const Derived &  Geometry::as() const

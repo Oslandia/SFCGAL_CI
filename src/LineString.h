@@ -83,6 +83,9 @@ public:
   auto
   dropZ() -> bool override;
 
+  auto
+  dropM() -> bool override;
+
   /**
    * remove all points from the LineString
    */

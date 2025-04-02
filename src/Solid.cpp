@@ -108,6 +108,20 @@ Solid::dropZ() -> bool
   return true;
 }
 
+auto
+Solid::dropM() -> bool
+{
+  if (!isMeasured()) {
+    return false;
+  }
+
+  for (auto &_shell : _shells) {
+    _shell.dropM();
+  }
+
+  return true;
+}
+
 void
 Solid::accept(GeometryVisitor &visitor)
 {

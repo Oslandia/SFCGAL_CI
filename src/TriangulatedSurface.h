@@ -81,6 +81,9 @@ public:
   auto
   dropZ() -> bool override;
 
+  auto
+  dropM() -> bool override;
+
   /**
    * [SFA/OGC]Returns the number of points
    * @deprecated see numGeometries()

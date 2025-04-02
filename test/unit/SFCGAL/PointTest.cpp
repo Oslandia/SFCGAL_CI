@@ -19,12 +19,14 @@
  *   License along with this library; if not, see
  <http://www.gnu.org/licenses/>.
  */
+#include "SFCGAL/Geometry.h"
 #include "SFCGAL/Kernel.h"
 
 #include "SFCGAL/Envelope.h"
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/Point.h"
+#include "SFCGAL/io/wkt.h"
 
 #include <boost/test/unit_test.hpp>
 using namespace boost::unit_test;
@@ -250,20 +252,62 @@ BOOST_AUTO_TEST_CASE(testIsMeasured)
   BOOST_CHECK(Point(2.0, 3.0, 4.0, 5.0).isMeasured());
 }
 
-BOOST_AUTO_TEST_CASE(testDropZ)
+BOOST_AUTO_TEST_CASE(testDropZM)
 {
   Point ptEmpty;
+  BOOST_CHECK(ptEmpty.isEmpty());
+  BOOST_CHECK(!ptEmpty.is3D());
+  BOOST_CHECK(!ptEmpty.isMeasured());
   BOOST_CHECK(!ptEmpty.dropZ());
+  BOOST_CHECK(!ptEmpty.dropM());
 
   Point pt2D(2.0, 3.0);
+  BOOST_CHECK(!pt2D.is3D());
+  BOOST_CHECK(!pt2D.isMeasured());
   BOOST_CHECK(!pt2D.dropZ());
+  BOOST_CHECK(!ptEmpty.dropM());
 
   Point pt3D(2.0, 3.0, 4.0);
+  BOOST_CHECK(pt3D.is3D());
+  BOOST_CHECK(!pt3D.isMeasured());
   BOOST_CHECK(pt3D.dropZ());
+  BOOST_CHECK(!pt3D.dropM());
   BOOST_CHECK_EQUAL(pt3D.x(), 2.0);
   BOOST_CHECK_EQUAL(pt3D.y(), 3.0);
   BOOST_CHECK_EQUAL(pt3D.z(), 0.0);
+  BOOST_CHECK(!pt3D.is3D());
+  BOOST_CHECK(!pt3D.isMeasured());
   BOOST_CHECK(!pt3D.dropZ());
+
+  std::unique_ptr<Geometry> ptM(io::readWkt("POINT M (2 3 4)"));
+  BOOST_REQUIRE(ptM->is<Point>());
+  BOOST_CHECK(!ptM->is3D());
+  BOOST_CHECK(ptM->isMeasured());
+  BOOST_CHECK(!ptM->dropZ());
+  BOOST_CHECK(ptM->dropM());
+  BOOST_CHECK(!ptM->isMeasured());
+  BOOST_CHECK_EQUAL(ptM->as<Point>().x(), 2.0);
+  BOOST_CHECK_EQUAL(ptM->as<Point>().y(), 3.0);
+  BOOST_CHECK_EQUAL(ptM->as<Point>().z(), 0.0);
+  BOOST_CHECK(!ptM->dropM());
+
+  Point ptZM(2.0, 3.0, 4.0, 5.0);
+  BOOST_CHECK(ptZM.is3D());
+  BOOST_CHECK(ptZM.isMeasured());
+  BOOST_CHECK(ptZM.dropM());
+  BOOST_CHECK_EQUAL(ptZM.x(), 2.0);
+  BOOST_CHECK_EQUAL(ptZM.y(), 3.0);
+  BOOST_CHECK_EQUAL(ptZM.z(), 4.0);
+  BOOST_CHECK(ptZM.is3D());
+  BOOST_CHECK(!ptZM.isMeasured());
+  BOOST_CHECK(!ptZM.dropM());
+  BOOST_CHECK(ptZM.dropZ());
+  BOOST_CHECK_EQUAL(ptZM.x(), 2.0);
+  BOOST_CHECK_EQUAL(ptZM.y(), 3.0);
+  BOOST_CHECK_EQUAL(ptZM.z(), 0.0);
+  BOOST_CHECK(!ptZM.dropZ());
+  BOOST_CHECK(!ptZM.is3D());
+  BOOST_CHECK(!ptZM.isMeasured());
 }
 
 // TODO

@@ -147,6 +147,20 @@ Polygon::dropZ() -> bool
   return true;
 }
 
+auto
+Polygon::dropM() -> bool
+{
+  if (!isMeasured()) {
+    return false;
+  }
+
+  for (auto &_ring : _rings) {
+    _ring.dropM();
+  }
+
+  return true;
+}
+
 void
 Polygon::reverse()
 {

@@ -24,6 +24,7 @@
 
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/io/wkt.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;
@@ -76,18 +77,65 @@ BOOST_AUTO_TEST_CASE(asText2d)
   BOOST_CHECK_EQUAL(g.asText(3), "MULTIPOINT ((2.000 3.000),(3.000 4.000))");
 }
 
-BOOST_AUTO_TEST_CASE(dropZ)
+BOOST_AUTO_TEST_CASE(dropZM)
 {
-  MultiPoint multiPoint;
-  BOOST_CHECK(!multiPoint.dropZ());
+  MultiPoint multiPointEmpty;
+  BOOST_CHECK(multiPointEmpty.isEmpty());
+  BOOST_CHECK(!multiPointEmpty.is3D());
+  BOOST_CHECK(!multiPointEmpty.isMeasured());
+  BOOST_CHECK(!multiPointEmpty.dropZ());
+  BOOST_CHECK(!multiPointEmpty.dropM());
 
-  multiPoint.addGeometry(new Point(2.0, 3.0, 5.0));
-  multiPoint.addGeometry(new Point(4.0, 5.0, 7.0));
-  BOOST_CHECK(multiPoint.is3D());
-  BOOST_CHECK(multiPoint.dropZ());
-  BOOST_CHECK_EQUAL(multiPoint.asText(1), "MULTIPOINT ((2.0 3.0),(4.0 5.0))");
-  BOOST_CHECK(!multiPoint.is3D());
-  BOOST_CHECK(!multiPoint.dropZ());
+  MultiPoint multiPoint2D;
+  multiPoint2D.addGeometry(new Point(2.0, 3.0));
+  multiPoint2D.addGeometry(new Point(4.0, 5.0));
+  BOOST_CHECK(!multiPoint2D.is3D());
+  BOOST_CHECK(!multiPoint2D.isMeasured());
+  BOOST_CHECK(!multiPoint2D.dropM());
+  BOOST_CHECK(!multiPoint2D.dropZ());
+
+  MultiPoint multiPoint3D;
+  multiPoint3D.addGeometry(new Point(2.0, 3.0, 5.0));
+  multiPoint3D.addGeometry(new Point(4.0, 5.0, 7.0));
+  BOOST_CHECK(multiPoint3D.is3D());
+  BOOST_CHECK(!multiPoint3D.isMeasured());
+  BOOST_CHECK(!multiPoint3D.dropM());
+  BOOST_CHECK(multiPoint3D.dropZ());
+  BOOST_CHECK_EQUAL(multiPoint3D.asText(1), "MULTIPOINT ((2.0 3.0),(4.0 5.0))");
+  BOOST_CHECK(!multiPoint3D.is3D());
+  BOOST_CHECK(!multiPoint3D.isMeasured());
+  BOOST_CHECK(!multiPoint3D.dropM());
+  BOOST_CHECK(!multiPoint3D.dropZ());
+
+  MultiPoint multiPointM;
+  multiPointM.addGeometry(io::readWkt("POINT M (2 3 4)").release());
+  multiPointM.addGeometry(io::readWkt("POINT M (4 5 7)").release());
+  BOOST_CHECK(!multiPointM.is3D());
+  BOOST_CHECK(multiPointM.isMeasured());
+  BOOST_CHECK(!multiPointM.dropZ());
+  BOOST_CHECK(multiPointM.dropM());
+  BOOST_CHECK_EQUAL(multiPointM.asText(0), "MULTIPOINT ((2 3),(4 5))");
+  BOOST_CHECK(!multiPointM.is3D());
+  BOOST_CHECK(!multiPointM.isMeasured());
+  BOOST_CHECK(!multiPointM.dropM());
+  BOOST_CHECK(!multiPointM.dropZ());
+
+  MultiPoint multiPointZM;
+  multiPointZM.addGeometry(new Point(2.0, 3.0, 5.0, 6.0));
+  multiPointZM.addGeometry(new Point(4.0, 5.0, 7.0, 8.0));
+  BOOST_CHECK(multiPointZM.is3D());
+  BOOST_CHECK(multiPointZM.isMeasured());
+  BOOST_CHECK(multiPointZM.dropM());
+  BOOST_CHECK(multiPointZM.is3D());
+  BOOST_CHECK(!multiPointZM.isMeasured());
+  BOOST_CHECK_EQUAL(multiPointZM.asText(0), "MULTIPOINT Z ((2 3 5),(4 5 7))");
+  BOOST_CHECK(!multiPointZM.dropM());
+  BOOST_CHECK(multiPointZM.dropZ());
+  BOOST_CHECK_EQUAL(multiPointZM.asText(0), "MULTIPOINT ((2 3),(4 5))");
+  BOOST_CHECK(!multiPointZM.is3D());
+  BOOST_CHECK(!multiPointZM.isMeasured());
+  BOOST_CHECK(!multiPointZM.dropM());
+  BOOST_CHECK(!multiPointZM.dropZ());
 }
 
 //-- is< T >

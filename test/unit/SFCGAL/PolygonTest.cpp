@@ -225,26 +225,74 @@ BOOST_AUTO_TEST_CASE(testDimension)
 // virtual bool         Geometry::isMeasured() const = 0 ;
 // virtual bool         Geometry::isSimple() const = 0 ;
 
-BOOST_AUTO_TEST_CASE(testDropZ)
+BOOST_AUTO_TEST_CASE(testDropZM)
 {
   Polygon emptyPolygon;
   BOOST_CHECK(!emptyPolygon.is3D());
+  BOOST_CHECK(!emptyPolygon.isMeasured());
   BOOST_CHECK(!emptyPolygon.dropZ());
+  BOOST_CHECK(!emptyPolygon.dropM());
 
-  Polygon polygon;
-  polygon.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
-  polygon.exteriorRing().addPoint(Point(1.0, 0.0, 2.0));
-  polygon.exteriorRing().addPoint(Point(1.0, 1.0, 2.0));
-  polygon.exteriorRing().addPoint(Point(0.0, 1.0, 2.0));
-  polygon.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
-  BOOST_CHECK(polygon.is3D());
-  BOOST_CHECK(polygon.dropZ());
+  Polygon polygon2D;
+  polygon2D.exteriorRing().addPoint(Point(0.0, 0.0));
+  polygon2D.exteriorRing().addPoint(Point(1.0, 0.0));
+  polygon2D.exteriorRing().addPoint(Point(1.0, 1.0));
+  BOOST_CHECK(!polygon2D.is3D());
+  BOOST_CHECK(!polygon2D.isMeasured());
+  BOOST_CHECK(!polygon2D.dropZ());
+  BOOST_CHECK(!polygon2D.dropM());
 
-  BOOST_CHECK_EQUAL(polygon.asText(1),
+  Polygon polygon3D;
+  polygon3D.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
+  polygon3D.exteriorRing().addPoint(Point(1.0, 0.0, 2.0));
+  polygon3D.exteriorRing().addPoint(Point(1.0, 1.0, 2.0));
+  polygon3D.exteriorRing().addPoint(Point(0.0, 1.0, 2.0));
+  polygon3D.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
+  BOOST_CHECK(polygon3D.is3D());
+  BOOST_CHECK(!polygon3D.isMeasured());
+  BOOST_CHECK(!polygon3D.dropM());
+  BOOST_CHECK(polygon3D.dropZ());
+
+  BOOST_CHECK_EQUAL(polygon3D.asText(1),
                     "POLYGON ((0.0 0.0,1.0 0.0,1.0 1.0,0.0 1.0,0.0 0.0))");
 
-  BOOST_CHECK(!polygon.is3D());
-  BOOST_CHECK(!polygon.dropZ());
+  BOOST_CHECK(!polygon3D.is3D());
+  BOOST_CHECK(!polygon3D.dropZ());
+  BOOST_CHECK(!polygon3D.isMeasured());
+  BOOST_CHECK(!polygon3D.dropM());
+
+  std::unique_ptr<Geometry> polygonM(io::readWkt("POLYGON M ((0 0 4, 0 3 5, 3 3 6, 3 0 7, 0 0 4))").release());
+  BOOST_CHECK(!polygonM->is3D());
+  BOOST_CHECK(polygonM->isMeasured());
+  BOOST_CHECK(!polygonM->dropZ());
+  BOOST_CHECK(polygonM->dropM());
+  BOOST_CHECK_EQUAL(polygonM->asText(0), "POLYGON ((0 0,0 3,3 3,3 0,0 0))");
+  BOOST_CHECK(!polygonM->is3D());
+  BOOST_CHECK(!polygonM->isMeasured());
+  BOOST_CHECK(!polygonM->dropZ());
+  BOOST_CHECK(!polygonM->dropM());
+
+  Polygon polygonZM;
+  polygonZM.exteriorRing().addPoint(Point(0.0, 0.0, 2.0, 1.0));
+  polygonZM.exteriorRing().addPoint(Point(1.0, 0.0, 2.0, 1.0));
+  polygonZM.exteriorRing().addPoint(Point(1.0, 1.0, 2.0, 1.0));
+  polygonZM.exteriorRing().addPoint(Point(0.0, 1.0, 2.0, 1.0));
+  polygonZM.exteriorRing().addPoint(Point(0.0, 0.0, 2.0, 1.0));
+  BOOST_CHECK(polygonZM.is3D());
+  BOOST_CHECK(polygonZM.isMeasured());
+
+  BOOST_CHECK(polygonZM.dropM());
+  BOOST_CHECK(polygonZM.is3D());
+  BOOST_CHECK(!polygonZM.isMeasured());
+  BOOST_CHECK_EQUAL(polygonZM.asText(0), "POLYGON Z ((0 0 2,1 0 2,1 1 2,0 1 2,0 0 2))");
+  BOOST_CHECK(!polygonZM.dropM());
+
+  BOOST_CHECK(polygonZM.dropZ());
+  BOOST_CHECK(!polygonZM.is3D());
+  BOOST_CHECK(!polygonZM.isMeasured());
+  BOOST_CHECK_EQUAL(polygonZM.asText(0), "POLYGON ((0 0,1 0,1 1,0 1,0 0))");
+  BOOST_CHECK(!polygonZM.dropZ());
+  BOOST_CHECK(!polygonZM.dropM());
 }
 
 // template < typename Derived > inline bool Geometry::is() const

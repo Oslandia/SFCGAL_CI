@@ -10,6 +10,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <memory>
+#include <string>
 using namespace boost::unit_test;
 
 using namespace SFCGAL;
@@ -64,27 +65,64 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
   BOOST_CHECK_THROW(geom->geometryN(3), Exception);
 }
 
-BOOST_AUTO_TEST_CASE(dropZTest)
+BOOST_AUTO_TEST_CASE(dropZMTest)
 {
   std::unique_ptr<Geometry> emptyGeom(io::readWkt("POLYHEDRALSURFACE EMPTY"));
   BOOST_CHECK(!emptyGeom->is3D());
+  BOOST_CHECK(!emptyGeom->isMeasured());
   BOOST_CHECK(!emptyGeom->dropZ());
+  BOOST_CHECK(!emptyGeom->dropM());
 
-  std::string const polyhedralStr =
+  std::string const polyhedral3DStr =
     "POLYHEDRALSURFACE Z ("
     "((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0)),"
     "((0 0 0, 10 0 0, 5 0 5, 0 0 0)),"
     "((0 0 0, 0 10 0, 5 5 5, 0 0 0))"
     ")";
 
-  std::unique_ptr<Geometry> geom(io::readWkt(polyhedralStr));
-  BOOST_CHECK(geom->is3D());
-  BOOST_CHECK(geom->dropZ());
-  BOOST_CHECK_EQUAL(geom->asText(0),
+  std::unique_ptr<Geometry> geom3D(io::readWkt(polyhedral3DStr));
+  BOOST_CHECK(geom3D->is3D());
+  BOOST_CHECK(!geom3D->isMeasured());
+  BOOST_CHECK(!geom3D->dropM());
+  BOOST_CHECK(geom3D->dropZ());
+  BOOST_CHECK_EQUAL(geom3D->asText(0),
                     "POLYHEDRALSURFACE (((0 0,10 0,10 10,0 10,0 0)),"
                     "((0 0,10 0,5 0,0 0)),((0 0,0 10,5 5,0 0)))");
-  BOOST_CHECK(!geom->is3D());
-  BOOST_CHECK(!geom->dropZ());
+  BOOST_CHECK(!geom3D->is3D());
+  BOOST_CHECK(!geom3D->dropZ());
+  BOOST_CHECK(!geom3D->isMeasured());
+  BOOST_CHECK(!geom3D->dropM());
+
+  std::string const polyhedralMStr = "POLYHEDRALSURFACE M (((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)))";
+  std::unique_ptr<Geometry> geomM(io::readWkt(polyhedralMStr));
+  BOOST_CHECK(!geomM->is3D());
+  BOOST_CHECK(geomM->isMeasured());
+  BOOST_CHECK(!geomM->dropZ());
+  BOOST_CHECK(geomM->dropM());
+  BOOST_CHECK_EQUAL(geomM->asText(0),
+                    "POLYHEDRALSURFACE (((0 0,0 1,1 1,1 0,0 0)))");
+  BOOST_CHECK(!geomM->is3D());
+  BOOST_CHECK(!geomM->isMeasured());
+  BOOST_CHECK(!geomM->dropZ());
+  BOOST_CHECK(!geomM->dropM());
+
+  std::string const polyhedralZMStr = "POLYHEDRALSURFACE ZM (((0 0 0 1,0 1 0 2,1 1 0 3,1 0 0 4,0 0 0 1)))";
+  std::unique_ptr<Geometry> geomZM(io::readWkt(polyhedralZMStr));
+  BOOST_CHECK(geomZM->is3D());
+  BOOST_CHECK(geomZM->isMeasured());
+  BOOST_CHECK(geomZM->dropM());
+  BOOST_CHECK(geomZM->is3D());
+  BOOST_CHECK(!geomZM->isMeasured());
+  BOOST_CHECK_EQUAL(geomZM->asText(0),
+                    "POLYHEDRALSURFACE Z (((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)))");
+  BOOST_CHECK(!geomZM->dropM());
+  BOOST_CHECK(geomZM->dropZ());
+  BOOST_CHECK_EQUAL(geomZM->asText(0),
+                    "POLYHEDRALSURFACE (((0 0,0 1,1 1,1 0,0 0)))");
+  BOOST_CHECK(!geomZM->isMeasured());
+  BOOST_CHECK(!geomZM->is3D());
+  BOOST_CHECK(!geomZM->dropZ());
+  BOOST_CHECK(!geomZM->dropM());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

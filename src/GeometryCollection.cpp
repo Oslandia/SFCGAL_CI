@@ -102,6 +102,20 @@ GeometryCollection::dropZ() -> bool
 }
 
 auto
+GeometryCollection::dropM() -> bool
+{
+  if (!isMeasured()) {
+    return false;
+  }
+
+  for (auto &_geometry : _geometries) {
+    _geometry.dropM();
+  }
+
+  return true;
+}
+
+auto
 GeometryCollection::numGeometries() const -> size_t
 {
   return _geometries.size();

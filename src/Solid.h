@@ -89,6 +89,9 @@ public:
   auto
   dropZ() -> bool override;
 
+  auto
+  dropM() -> bool override;
+
   /**
    * Returns the exterior shell
    */

@@ -24,6 +24,7 @@
 
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/io/wkt.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;
@@ -84,6 +85,67 @@ BOOST_AUTO_TEST_CASE(isMultiLineString)
 {
   MultiLineString const g;
   BOOST_CHECK(g.is<MultiLineString>());
+}
+
+BOOST_AUTO_TEST_CASE(dropZM)
+{
+  MultiLineString multiLineStringEmpty;
+  BOOST_CHECK(multiLineStringEmpty.isEmpty());
+  BOOST_CHECK(!multiLineStringEmpty.is3D());
+  BOOST_CHECK(!multiLineStringEmpty.isMeasured());
+  BOOST_CHECK(!multiLineStringEmpty.dropZ());
+  BOOST_CHECK(!multiLineStringEmpty.dropM());
+
+  MultiLineString multiLineString2D;
+  multiLineString2D.addGeometry(new LineString(Point(2.0, 3.0), Point(4.0, 5.0)));
+  multiLineString2D.addGeometry(new LineString(Point(6.0, 7.0), Point(9.0, 10.0)));
+  BOOST_CHECK(!multiLineString2D.is3D());
+  BOOST_CHECK(!multiLineString2D.isMeasured());
+  BOOST_CHECK(!multiLineString2D.dropM());
+  BOOST_CHECK(!multiLineString2D.dropZ());
+
+  MultiLineString multiLineString3D;
+  multiLineString3D.addGeometry(new LineString(Point(2.0, 3.0, 5.0), Point(4.0, 5.0, 5.0)));
+  multiLineString3D.addGeometry(new LineString(Point(6.0, 7.0, 5.0), Point(9.0, 10.0, 5.0)));
+  BOOST_CHECK(multiLineString3D.is3D());
+  BOOST_CHECK(!multiLineString3D.isMeasured());
+  BOOST_CHECK(!multiLineString3D.dropM());
+  BOOST_CHECK(multiLineString3D.dropZ());
+  BOOST_CHECK_EQUAL(multiLineString3D.asText(0), "MULTILINESTRING ((2 3,4 5),(6 7,9 10))");
+  BOOST_CHECK(!multiLineString3D.is3D());
+  BOOST_CHECK(!multiLineString3D.isMeasured());
+  BOOST_CHECK(!multiLineString3D.dropM());
+  BOOST_CHECK(!multiLineString3D.dropZ());
+
+  MultiLineString multiLineStringM;
+  multiLineStringM.addGeometry(io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
+  multiLineStringM.addGeometry(io::readWkt("LINESTRING M (3 2 4, 4 2 5)").release());
+  BOOST_CHECK(!multiLineStringM.is3D());
+  BOOST_CHECK(multiLineStringM.isMeasured());
+  BOOST_CHECK(!multiLineStringM.dropZ());
+  BOOST_CHECK(multiLineStringM.dropM());
+  BOOST_CHECK_EQUAL(multiLineStringM.asText(0), "MULTILINESTRING ((0 0,1 1,2 2),(3 2,4 2))");
+  BOOST_CHECK(!multiLineStringM.is3D());
+  BOOST_CHECK(!multiLineStringM.isMeasured());
+  BOOST_CHECK(!multiLineStringM.dropM());
+  BOOST_CHECK(!multiLineStringM.dropZ());
+
+  MultiLineString multiLineStringZM;
+  multiLineStringZM.addGeometry(new LineString(Point(2.0, 3.0, 5.0, 2.0), Point(4.0, 5.0, 5.0, 2.0)));
+  multiLineStringZM.addGeometry(new LineString(Point(6.0, 7.0, 5.0, 1.0), Point(9.0, 10.0, 5.0, 1.0)));
+  BOOST_CHECK(multiLineStringZM.is3D());
+  BOOST_CHECK(multiLineStringZM.isMeasured());
+  BOOST_CHECK(multiLineStringZM.dropM());
+  BOOST_CHECK(multiLineStringZM.is3D());
+  BOOST_CHECK(!multiLineStringZM.isMeasured());
+  BOOST_CHECK_EQUAL(multiLineStringZM.asText(0), "MULTILINESTRING Z ((2 3 5,4 5 5),(6 7 5,9 10 5))");
+  BOOST_CHECK(!multiLineStringZM.dropM());
+  BOOST_CHECK(multiLineStringZM.dropZ());
+  BOOST_CHECK_EQUAL(multiLineStringZM.asText(0), "MULTILINESTRING ((2 3,4 5),(6 7,9 10))");
+  BOOST_CHECK(!multiLineStringZM.is3D());
+  BOOST_CHECK(!multiLineStringZM.isMeasured());
+  BOOST_CHECK(!multiLineStringZM.dropM());
+  BOOST_CHECK(!multiLineStringZM.dropZ());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

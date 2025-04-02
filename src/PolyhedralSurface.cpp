@@ -158,6 +158,20 @@ PolyhedralSurface::dropZ() -> bool
 }
 
 auto
+PolyhedralSurface::dropM() -> bool
+{
+  if (!isMeasured()) {
+    return false;
+  }
+
+  for (auto &_polygon : _polygons) {
+    _polygon.dropM();
+  }
+
+  return true;
+}
+
+auto
 PolyhedralSurface::toTriangulatedSurface() const -> TriangulatedSurface
 {
   TriangulatedSurface result;

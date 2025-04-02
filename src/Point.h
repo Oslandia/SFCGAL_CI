@@ -105,6 +105,10 @@ public:
 
   auto
   dropZ() -> bool override;
+
+  auto
+  dropM() -> bool override;
+
   //--- accessors
 
   /**

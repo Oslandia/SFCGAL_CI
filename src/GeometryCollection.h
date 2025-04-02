@@ -70,6 +70,9 @@ public:
   auto
   dropZ() -> bool override;
 
+  auto
+  dropM() -> bool override;
+
   //-- SFCGAL::Geometry
   size_t
   numGeometries() const override;

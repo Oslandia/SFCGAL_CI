@@ -100,6 +100,20 @@ TriangulatedSurface::dropZ() -> bool
   return true;
 }
 
+auto
+TriangulatedSurface::dropM() -> bool
+{
+  if (!isMeasured()) {
+    return false;
+  }
+
+  for (auto &_triangle : _triangles) {
+    _triangle.dropM();
+  }
+
+  return true;
+}
+
 void
 TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
 {
