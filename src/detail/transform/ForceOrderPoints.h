@@ -29,13 +29,13 @@ public:
   /*
    * [SFCGAL::Transform]
    */
-  virtual void
-  transform(Point &p);
+  void
+  transform(Point &p) override;
 
-  virtual void
-  visit(Triangle &);
-  virtual void
-  visit(Polygon &);
+  void
+  visit(Triangle &) override;
+  void
+  visit(Polygon &) override;
 
 private:
   bool _orientCCW;
