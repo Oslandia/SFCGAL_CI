@@ -150,6 +150,37 @@ BOOST_AUTO_TEST_CASE(testIsMeasured)
   BOOST_CHECK_EQUAL(true, sfcgal_geometry_is_measured(g3.get()));
 }
 
+BOOST_AUTO_TEST_CASE(testDropZ)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // retrieve wkb from geometry via C++ api
+  std::unique_ptr<Geometry> polygon2D(io::readWkt("POLYGON ((0 0, 20 0, 20 10, 0 10, 0 0))"));
+  // check
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_is_3d(polygon2D.get()));
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_drop_z(polygon2D.get()));
+
+  std::unique_ptr<Geometry> polygon3D(
+      io::readWkt("POLYGON Z ((0 0 2, 20 0 2, 20 10 3, 0 10 2, 0 0 4))"));
+  // check
+  BOOST_CHECK_EQUAL(true, sfcgal_geometry_is_3d(polygon3D.get()));
+  BOOST_CHECK_EQUAL(true, sfcgal_geometry_drop_z(polygon3D.get()));
+  char  *wkbApi;
+  size_t wkbLen;
+  sfcgal_geometry_as_text_decim(polygon3D.get(), 0, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+  sfcgal_free_buffer(wkbApi);
+  BOOST_CHECK_EQUAL(strApi, "POLYGON ((0 0,20 0,20 10,0 10,0 0))");
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_is_3d(polygon3D.get()));
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_drop_z(polygon3D.get()));
+
+  std::unique_ptr<Geometry> polygonM(
+      io::readWkt("POLYGON M ((0 0 1, 20 0 2, 20 10 3, 0 10 4, 0 0 1))"));
+  // check
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_is_3d(polygonM.get()));
+  BOOST_CHECK_EQUAL(false, sfcgal_geometry_drop_z(polygonM.get()));
+}
+
 BOOST_AUTO_TEST_CASE(testIsSimple)
 {
   sfcgal_set_error_handlers(printf, on_error);
