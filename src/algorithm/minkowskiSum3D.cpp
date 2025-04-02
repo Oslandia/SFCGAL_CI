@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/algorithm/minkowskiSum3D.h"
+#include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/Point.h"
@@ -18,6 +19,7 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/convex_hull_3.h>
 #include <CGAL/minkowski_sum_3.h>
+#include <boost/throw_exception.hpp>
 
 namespace SFCGAL::algorithm {
 
@@ -143,8 +145,8 @@ geometryToNef(const Geometry &g) -> Nef_polyhedron_3
           break;
         }
         default:
-          throw std::runtime_error("Unsupported geometry type: " +
-                                   geom.geometryType());
+          BOOST_THROW_EXCEPTION(GeometryInvalidityException(
+              "Unsupported geometry type: " + geom.geometryType()));
         }
       };
 
