@@ -20,7 +20,7 @@ public:
   virtual ~Surface();
 
   //-- SFCGAL::Geometry
-  virtual int
+  int
   dimension() const override;
 
   /**
