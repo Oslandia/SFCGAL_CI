@@ -28,8 +28,8 @@ public:
   /*
    * [SFCGAL::Transform]
    */
-  virtual void
-  transform(Point &p);
+  void
+  transform(Point &p) override;
 
 private:
   CGAL::Aff_transformation_2<Kernel> _transform;
