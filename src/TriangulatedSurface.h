@@ -53,29 +53,29 @@ public:
   ~TriangulatedSurface();
 
   //-- SFCGAL::Geometry
-  virtual TriangulatedSurface *
+  TriangulatedSurface *
   clone() const override;
 
   //-- SFCGAL::Geometry
-  virtual std::string
+  std::string
   geometryType() const override;
   //-- SFCGAL::Geometry
-  virtual GeometryType
+  GeometryType
   geometryTypeId() const override;
   //-- SFCGAL::Geometry
-  virtual int
+  int
   dimension() const override;
   //-- SFCGAL::Geometry
-  virtual int
+  int
   coordinateDimension() const override;
   //-- SFCGAL::Geometry
-  virtual bool
+  bool
   isEmpty() const override;
   //-- SFCGAL::Geometry
-  virtual bool
+  bool
   is3D() const override;
   //-- SFCGAL::Geometry
-  virtual bool
+  bool
   isMeasured() const override;
 
   /**
@@ -130,13 +130,13 @@ public:
   addTriangles(const TriangulatedSurface &other);
 
   //-- SFCGAL::Geometry
-  virtual size_t
+  size_t
   numGeometries() const override;
   //-- SFCGAL::Geometry
-  virtual const Triangle &
+  const Triangle &
   geometryN(size_t const &n) const override;
   //-- SFCGAL::Geometry
-  virtual Triangle &
+  Triangle &
   geometryN(size_t const &n) override;
 
   //-- optimization
@@ -171,10 +171,10 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
-  virtual void
+  void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
-  virtual void
+  void
   accept(ConstGeometryVisitor &visitor) const override;
 
   //-- helpers
