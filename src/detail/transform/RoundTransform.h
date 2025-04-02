@@ -26,8 +26,8 @@ public:
   /*
    * [SFCGAL::Transform]
    */
-  virtual void
-  transform(Point &p);
+  void
+  transform(Point &p) override;
 
 private:
   long _scale;
