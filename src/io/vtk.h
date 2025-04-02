@@ -16,7 +16,7 @@ namespace VTK {
  *
  * @param[in] geom The geometry to save
  * @param[out] out The output stream
- * @throws std::runtime_error If the geometry is invalid or unsupported
+ * @throws SFCGAL::Exception If the geometry is invalid or unsupported
  */
 SFCGAL_API void
 save(const Geometry &geom, std::ostream &out);
@@ -26,7 +26,7 @@ save(const Geometry &geom, std::ostream &out);
  *
  * @param[in] geom The geometry to save
  * @param[in] filename The name of the file to save to
- * @throws std::runtime_error If the file cannot be opened or the geometry is
+ * @throws SFCGAL::Exception If the file cannot be opened or the geometry is
  * invalid
  */
 SFCGAL_API void
@@ -37,7 +37,7 @@ save(const Geometry &geom, const std::string &filename);
  *
  * @param[in] geom The geometry to save
  * @return The legacy VTK format string
- * @throws std::runtime_error If the geometry is invalid or unsupported
+ * @throws SFCGAL::Exception If the geometry is invalid or unsupported
  */
 SFCGAL_API std::string
            saveToString(const Geometry &geom);
@@ -49,7 +49,7 @@ SFCGAL_API std::string
  * @param[out] buffer The buffer to write to
  * @param[in,out] size On input, the size of the buffer. On output, the number
  * of bytes written (or required if buffer is null)
- * @throws std::runtime_error If the geometry is invalid or unsupported
+ * @throws SFCGAL::Exception If the geometry is invalid or unsupported
  */
 SFCGAL_API void
 saveToBuffer(const Geometry &geom, char *buffer, size_t *size);

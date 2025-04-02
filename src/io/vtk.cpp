@@ -1,4 +1,5 @@
 #include "SFCGAL/io/vtk.h"
+#include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -11,6 +12,7 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
+#include <boost/throw_exception.hpp>
 #include <fstream>
 #include <functional>
 #include <sstream>
@@ -99,8 +101,8 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         default:
-          throw std::runtime_error("Unsupported geometry type: " +
-                                   g.geometryType());
+          BOOST_THROW_EXCEPTION(InappropriateGeometryException(
+              "Unsupported geometry type: " + g.geometryType()));
         }
       };
 
@@ -144,8 +146,8 @@ save(const Geometry &geom, const std::string &filename)
 {
   std::ofstream out(filename);
   if (!out) {
-    throw std::runtime_error("Unable to open file " + filename +
-                             " for writing.");
+    BOOST_THROW_EXCEPTION(
+        Exception("Unable to open file " + filename + " for writing."));
   }
   save(geom, out);
 }
