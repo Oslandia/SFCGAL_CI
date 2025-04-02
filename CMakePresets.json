@@ -50,6 +50,36 @@
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
         }
       }
+    },
+    {
+      "name": "unix-clang",
+      "displayName": "UNIX Clang",
+      "description": "Default build options for UNIX Clang",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-Winconsistent-missing-override -Winconsistent-missing-destructor-override -Wswitch-enum",
+        "SFCGAL_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "unix-gcc",
+      "displayName": "UNIX GCC",
+      "description": "Default build options for UNIX GCC",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-Wsuggest-override -Wswitch-enum",
+        "SFCGAL_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "unix-gcc-ninja",
+      "displayName": "UNIX GCC with Ninja Generator",
+      "description": "Default build options for UNIX GCC",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-Wsuggest-override -Wswitch-enum",
+        "SFCGAL_BUILD_TESTS": "ON"
+      }
     }
   ],
   "buildPresets": [
