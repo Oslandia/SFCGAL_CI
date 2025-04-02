@@ -199,6 +199,28 @@ BOOST_AUTO_TEST_CASE(testAlmostEqual)
                    .almostEqual(Coordinate(0.0, 0.0, 0.000003), 0.000001));
 }
 
+BOOST_AUTO_TEST_CASE(testDropZ)
+{
+  Coordinate coord3D(1.0, 2.0, 3.0);
+  BOOST_CHECK(!coord3D.isEmpty());
+  BOOST_CHECK(coord3D.is3D());
+  BOOST_CHECK(coord3D.dropZ());
+  BOOST_CHECK(!coord3D.is3D());
+  BOOST_CHECK_EQUAL(coord3D.x(), 1.0);
+  BOOST_CHECK_EQUAL(coord3D.y(), 2.0);
+
+  Coordinate coord2D(1.0, 4.0);
+  BOOST_CHECK(!coord2D.isEmpty());
+  BOOST_CHECK(!coord2D.is3D());
+  BOOST_CHECK(!coord2D.dropZ());
+  BOOST_CHECK_EQUAL(coord2D.x(), 1.0);
+  BOOST_CHECK_EQUAL(coord2D.y(), 4.0);
+
+  Coordinate coordEmpty;
+  BOOST_CHECK(coordEmpty.isEmpty());
+  BOOST_CHECK(!coordEmpty.dropZ());
+}
+
 /// bool operator == ( const Coordinate & other ) const ;
 /// bool operator != ( const Coordinate & other ) const ;
 /// inline Kernel::Vector_2 toVector_2() const

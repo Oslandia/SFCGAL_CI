@@ -181,6 +181,13 @@ public:
   Kernel::Point_3
   toPoint_3() const;
 
+  /**
+   * @brief Drops the z coordinate
+   * @return TRUE if a Z value was present and has been removed
+   */
+  auto
+  dropZ() -> bool;
+
   // class for Empty coordinate
   class Empty {};
 

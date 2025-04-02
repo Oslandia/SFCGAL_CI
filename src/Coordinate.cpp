@@ -367,4 +367,15 @@ Coordinate::almostEqual(const Coordinate &other, const double tolerance) const
   return result;
 }
 
+auto
+Coordinate::dropZ() -> bool
+{
+  if (!is3D()) {
+    return false;
+  }
+
+  _storage = Kernel::Point_2(x(), y());
+  return true;
+}
+
 } // namespace SFCGAL
