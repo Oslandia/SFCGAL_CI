@@ -8,6 +8,7 @@
 #include "SFCGAL/config.h"
 #include <boost/exception/all.hpp>
 #include <boost/format.hpp>
+#include <boost/throw_exception.hpp>
 #include <string>
 
 namespace SFCGAL {

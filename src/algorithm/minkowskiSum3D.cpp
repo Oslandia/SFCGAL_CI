@@ -19,7 +19,6 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/convex_hull_3.h>
 #include <CGAL/minkowski_sum_3.h>
-#include <boost/throw_exception.hpp>
 
 namespace SFCGAL::algorithm {
 

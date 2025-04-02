@@ -11,7 +11,6 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
-#include <boost/throw_exception.hpp>
 #include <fstream>
 #include <functional>
 #include <sstream>
