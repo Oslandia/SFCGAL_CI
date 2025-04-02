@@ -5,6 +5,7 @@
     PACKAGE: "--"
     C_COMPILER: "--"
     CXX_COMPILER: "--"
+    CMAKE_PRESET: "--"
   image: fedora:${OS_VERSION}
   rules:
     # on default branch
@@ -17,7 +18,7 @@
     - yum install -y sudo wget ${PACKAGE}
     - ./ci/fedora/before_install.sh $CGAL_VERSION
     - cd $CI_PROJECT_DIR
-    - cmake -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/${C_COMPILER} -DCMAKE_CXX_COMPILER=/usr/bin/${CXX_COMPILER} -DCGAL_DIR=${CI_PROJECT_DIR}/CGAL-${CGAL_VERSION}
+    - cmake --preset=${CMAKE_PRESET} -DCMAKE_C_COMPILER=/usr/bin/${C_COMPILER} -DCMAKE_CXX_COMPILER=/usr/bin/${CXX_COMPILER} -DCGAL_DIR=${CI_PROJECT_DIR}/CGAL-${CGAL_VERSION}
     - make -j$(nproc)
     - ctest -VV
   parallel:
@@ -31,6 +32,7 @@ fedora_clang:
     PACKAGE: "clang"
     C_COMPILER: "clang"
     CXX_COMPILER: "clang++"
+    CMAKE_PRESET: "unix-clang"
 
 fedora_gcc:
   extends: .fedora_test_base
@@ -38,3 +40,4 @@ fedora_gcc:
     PACKAGE: "gcc-c++"
     C_COMPILER: "gcc"
     CXX_COMPILER: "g++"
+    CMAKE_PRESET: "unix-gcc"

@@ -48,7 +48,7 @@ sonar:build-test:
     - ./ci/debian/before_install.sh $SONAR_CGAL_VERSION
   script:
     # prepare the build tree
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . --preset=unix-gcc -B build -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
     # run the build inside the build wrapper
     - build-wrapper/build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --config Release
     - cd build

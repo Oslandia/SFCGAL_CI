@@ -10,6 +10,6 @@ opensuse_gcc:
 
   script:
     - ./ci/opensuse/before_install.sh $CGAL_LATEST_VERSION
-    - cmake -S . -B build -DSFCGAL_BUILD_TESTS=ON -GNinja
+    - cmake --preset=unix-gcc-ninja -S . -B build
     - cmake --build build -j$(nproc)
     - ctest --test-dir build --output-on-failure
