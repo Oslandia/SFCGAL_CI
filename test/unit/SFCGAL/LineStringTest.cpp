@@ -20,6 +20,7 @@
  */
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
+#include <boost/test/tools/old/interface.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "SFCGAL/Envelope.h"
@@ -404,6 +405,18 @@ BOOST_AUTO_TEST_CASE(isLineString)
   LineString const g;
   BOOST_CHECK(g.is<LineString>());
 }
+
+BOOST_AUTO_TEST_CASE(testDropZ)
+{
+  LineString line2D(Point(0.0, 0.0), Point(1.0, 1.0));
+  BOOST_CHECK(!line2D.dropZ());
+
+  LineString line3D(Point(0.0, 0.0, 2.0), Point(1.0, 1.0, 5.0));
+  BOOST_CHECK(line3D.dropZ());
+  BOOST_CHECK_EQUAL(line3D.asText(1), "LINESTRING (0.0 0.0,1.0 1.0)");
+  BOOST_CHECK(!line3D.dropZ());
+}
+
 // template < typename Derived > inline const Derived &  Geometry::as() const
 // template < typename Derived > inline Derived &        Geometry::as()
 

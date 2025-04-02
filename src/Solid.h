@@ -86,6 +86,9 @@ public:
   bool
   isMeasured() const override;
 
+  auto
+  dropZ() -> bool override;
+
   /**
    * Returns the exterior shell
    */

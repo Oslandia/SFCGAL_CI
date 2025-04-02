@@ -64,4 +64,27 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
   BOOST_CHECK_THROW(geom->geometryN(3), Exception);
 }
 
+BOOST_AUTO_TEST_CASE(dropZTest)
+{
+  std::unique_ptr<Geometry> emptyGeom(io::readWkt("POLYHEDRALSURFACE EMPTY"));
+  BOOST_CHECK(!emptyGeom->is3D());
+  BOOST_CHECK(!emptyGeom->dropZ());
+
+  std::string const polyhedralStr =
+    "POLYHEDRALSURFACE Z ("
+    "((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0)),"
+    "((0 0 0, 10 0 0, 5 0 5, 0 0 0)),"
+    "((0 0 0, 0 10 0, 5 5 5, 0 0 0))"
+    ")";
+
+  std::unique_ptr<Geometry> geom(io::readWkt(polyhedralStr));
+  BOOST_CHECK(geom->is3D());
+  BOOST_CHECK(geom->dropZ());
+  BOOST_CHECK_EQUAL(geom->asText(0),
+                    "POLYHEDRALSURFACE (((0 0,10 0,10 10,0 10,0 0)),"
+                    "((0 0,10 0,5 0,0 0)),((0 0,0 10,5 5,0 0)))");
+  BOOST_CHECK(!geom->is3D());
+  BOOST_CHECK(!geom->dropZ());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

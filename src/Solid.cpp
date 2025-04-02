@@ -94,6 +94,20 @@ Solid::isMeasured() const -> bool
   return exteriorShell().isMeasured();
 }
 
+auto
+Solid::dropZ() -> bool
+{
+  if (!is3D()) {
+    return false;
+  }
+
+  for (auto &_shell : _shells) {
+    _shell.dropZ();
+  }
+
+  return true;
+}
+
 void
 Solid::accept(GeometryVisitor &visitor)
 {

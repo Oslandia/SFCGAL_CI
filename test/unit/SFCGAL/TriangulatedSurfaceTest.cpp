@@ -262,4 +262,27 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
   BOOST_CHECK_EQUAL(geom->geometryN(2).asText(), newGeom2->asText());
 }
 
+BOOST_AUTO_TEST_CASE(dropZTest)
+{
+  TriangulatedSurface surfaceEmpty;
+  BOOST_CHECK(surfaceEmpty.isEmpty());
+  BOOST_CHECK(!surfaceEmpty.dropZ());
+
+  std::string const triangulatedSurfaceStr =
+    "TIN Z ("
+    "((0 0 0, 2 0 2, 1 2 4, 0 0 0)),"
+    "((2 0 2, 3 2 3, 1 2 4, 2 0 2)),"
+    "((1 2 4, 3 2 3, 2 4 6, 1 2 4))"
+    ")";
+
+  std::unique_ptr<Geometry> geom(io::readWkt(triangulatedSurfaceStr));
+  BOOST_CHECK(!geom->isEmpty());
+  BOOST_CHECK(geom->is3D());
+  BOOST_CHECK(geom->dropZ());
+  BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
+  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0), "TRIANGLE ((0 0,2 0,1 2,0 0))");
+  BOOST_CHECK_EQUAL(geom->geometryN(1).asText(0), "TRIANGLE ((2 0,3 2,1 2,2 0))");
+  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0), "TRIANGLE ((1 2,3 2,2 4,1 2))");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

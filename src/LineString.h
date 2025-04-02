@@ -80,6 +80,9 @@ public:
   bool
   isMeasured() const override;
 
+  auto
+  dropZ() -> bool override;
+
   /**
    * remove all points from the LineString
    */

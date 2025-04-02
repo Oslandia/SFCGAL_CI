@@ -82,6 +82,9 @@ public:
   bool
   isMeasured() const override;
 
+  auto
+  dropZ() -> bool override;
+
   /**
    * reverse Triangle orientation
    */

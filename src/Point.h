@@ -102,6 +102,9 @@ public:
   //-- SFCGAL::Geometry
   bool
   isMeasured() const override;
+
+  auto
+  dropZ() -> bool override;
   //--- accessors
 
   /**

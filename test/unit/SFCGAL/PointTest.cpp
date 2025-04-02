@@ -1,3 +1,4 @@
+
 /**
  *   SFCGAL
  *
@@ -247,6 +248,22 @@ BOOST_AUTO_TEST_CASE(testIsMeasured)
   BOOST_CHECK(!Point(2.0, 3.0).isMeasured());
   BOOST_CHECK(!Point(2.0, 3.0, 4.0).isMeasured());
   BOOST_CHECK(Point(2.0, 3.0, 4.0, 5.0).isMeasured());
+}
+
+BOOST_AUTO_TEST_CASE(testDropZ)
+{
+  Point ptEmpty;
+  BOOST_CHECK(!ptEmpty.dropZ());
+
+  Point pt2D(2.0, 3.0);
+  BOOST_CHECK(!pt2D.dropZ());
+
+  Point pt3D(2.0, 3.0, 4.0);
+  BOOST_CHECK(pt3D.dropZ());
+  BOOST_CHECK_EQUAL(pt3D.x(), 2.0);
+  BOOST_CHECK_EQUAL(pt3D.y(), 3.0);
+  BOOST_CHECK_EQUAL(pt3D.z(), 0.0);
+  BOOST_CHECK(!pt3D.dropZ());
 }
 
 // TODO

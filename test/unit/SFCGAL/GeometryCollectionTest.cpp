@@ -172,6 +172,25 @@ BOOST_AUTO_TEST_CASE(testIsGeometryCollection)
   BOOST_CHECK(MultiSolid().is<GeometryCollection>());
 }
 
+BOOST_AUTO_TEST_CASE(testDropZ)
+{
+  GeometryCollection geomEmpty;
+  BOOST_CHECK(geomEmpty.isEmpty());
+  BOOST_CHECK(!geomEmpty.dropZ());
+
+  GeometryCollection geom;
+  geom.addGeometry(Point(2.0, 3.0, 5.0));
+  geom.addGeometry(Triangle(Point(0.0, 0.0, 6.0), Point(1.0, 0.0, 6.0),
+                            Point(1.0, 1.0, 6.0)));
+  BOOST_CHECK(geom.is3D());
+  BOOST_CHECK(geom.dropZ());
+  BOOST_CHECK_EQUAL(
+      geom.asText(1),
+      "GEOMETRYCOLLECTION (POINT (2.0 3.0),TRIANGLE ((0.0 "
+      "0.0,1.0 0.0,1.0 1.0,0.0 0.0)))");
+  BOOST_CHECK(!geom.dropZ());
+}
+
 // template < typename Derived > inline const Derived &  Geometry::as() const
 // template < typename Derived > inline Derived &        Geometry::as()
 

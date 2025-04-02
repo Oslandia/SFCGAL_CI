@@ -86,6 +86,20 @@ TriangulatedSurface::isMeasured() const -> bool
   return !_triangles.empty() && _triangles.front().isMeasured();
 }
 
+auto
+TriangulatedSurface::dropZ() -> bool
+{
+  if (!is3D()) {
+    return false;
+  }
+
+  for (auto &_triangle : _triangles) {
+    _triangle.dropZ();
+  }
+
+  return true;
+}
+
 void
 TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
 {

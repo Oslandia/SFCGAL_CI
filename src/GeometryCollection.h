@@ -67,6 +67,9 @@ public:
   bool
   isMeasured() const override;
 
+  auto
+  dropZ() -> bool override;
+
   //-- SFCGAL::Geometry
   size_t
   numGeometries() const override;

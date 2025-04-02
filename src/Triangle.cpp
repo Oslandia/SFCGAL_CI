@@ -97,6 +97,20 @@ Triangle::isMeasured() const -> bool
   return _vertices[0].isMeasured();
 }
 
+auto
+Triangle::dropZ() -> bool
+{
+  if (!is3D()) {
+    return false;
+  }
+
+  for (auto &_vertex : _vertices) {
+    _vertex.dropZ();
+  }
+
+  return true;
+}
+
 void
 Triangle::reverse()
 {

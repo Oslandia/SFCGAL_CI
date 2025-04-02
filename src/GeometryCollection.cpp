@@ -88,6 +88,20 @@ GeometryCollection::isMeasured() const -> bool
 }
 
 auto
+GeometryCollection::dropZ() -> bool
+{
+  if (!is3D()) {
+    return false;
+  }
+
+  for (auto &_geometry : _geometries) {
+    _geometry.dropZ();
+  }
+
+  return true;
+}
+
+auto
 GeometryCollection::numGeometries() const -> size_t
 {
   return _geometries.size();

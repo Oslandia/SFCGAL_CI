@@ -80,6 +80,40 @@ BOOST_AUTO_TEST_CASE(asText2d)
                     "5.000,2.000 5.000,2.000 4.000)))");
 }
 
+BOOST_AUTO_TEST_CASE(dropZ)
+{
+  MultiPolygon emptyMultiPolygon;
+  BOOST_CHECK(!emptyMultiPolygon.is3D());
+  BOOST_CHECK(!emptyMultiPolygon.dropZ());
+
+  MultiPolygon multiPolygon;
+  Polygon poly1;
+  poly1.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
+  poly1.exteriorRing().addPoint(Point(1.0, 0.0, 2.0));
+  poly1.exteriorRing().addPoint(Point(1.0, 1.0, 2.0));
+  poly1.exteriorRing().addPoint(Point(0.0, 1.0, 2.0));
+  poly1.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
+
+  Polygon poly2;
+  poly2.exteriorRing().addPoint(Point(3.0, 5.0, 3.0));
+  poly2.exteriorRing().addPoint(Point(4.0, 5.0, 3.0));
+  poly2.exteriorRing().addPoint(Point(4.0, 6.0, 3.0));
+  poly2.exteriorRing().addPoint(Point(3.0, 6.0, 3.0));
+  poly2.exteriorRing().addPoint(Point(3.0, 5.0, 3.0));
+
+  multiPolygon.addGeometry(poly1);
+  multiPolygon.addGeometry(poly2);
+  BOOST_CHECK(multiPolygon.is3D());
+  BOOST_CHECK(multiPolygon.dropZ());
+
+  BOOST_CHECK_EQUAL(multiPolygon.asText(1),
+                    "MULTIPOLYGON (((0.0 0.0,1.0 0.0,1.0 1.0,0.0 1.0,0.0 0.0)),"
+                    "((3.0 5.0,4.0 5.0,4.0 6.0,3.0 6.0,3.0 5.0)))");
+
+  BOOST_CHECK(!multiPolygon.is3D());
+  BOOST_CHECK(!multiPolygon.dropZ());
+}
+
 //-- is< T >
 
 BOOST_AUTO_TEST_CASE(isGeometryCollection)

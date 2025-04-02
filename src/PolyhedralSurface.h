@@ -119,6 +119,9 @@ public:
   bool
   isMeasured() const override;
 
+  auto
+  dropZ() -> bool override;
+
   /**
    * Convert PolyhedralSurface to TriangulatedSurface
    */

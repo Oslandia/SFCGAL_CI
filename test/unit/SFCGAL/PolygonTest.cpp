@@ -225,6 +225,28 @@ BOOST_AUTO_TEST_CASE(testDimension)
 // virtual bool         Geometry::isMeasured() const = 0 ;
 // virtual bool         Geometry::isSimple() const = 0 ;
 
+BOOST_AUTO_TEST_CASE(testDropZ)
+{
+  Polygon emptyPolygon;
+  BOOST_CHECK(!emptyPolygon.is3D());
+  BOOST_CHECK(!emptyPolygon.dropZ());
+
+  Polygon polygon;
+  polygon.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
+  polygon.exteriorRing().addPoint(Point(1.0, 0.0, 2.0));
+  polygon.exteriorRing().addPoint(Point(1.0, 1.0, 2.0));
+  polygon.exteriorRing().addPoint(Point(0.0, 1.0, 2.0));
+  polygon.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
+  BOOST_CHECK(polygon.is3D());
+  BOOST_CHECK(polygon.dropZ());
+
+  BOOST_CHECK_EQUAL(polygon.asText(1),
+                    "POLYGON ((0.0 0.0,1.0 0.0,1.0 1.0,0.0 1.0,0.0 0.0))");
+
+  BOOST_CHECK(!polygon.is3D());
+  BOOST_CHECK(!polygon.dropZ());
+}
+
 // template < typename Derived > inline bool Geometry::is() const
 BOOST_AUTO_TEST_CASE(isPolygon)
 {

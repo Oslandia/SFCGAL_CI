@@ -176,6 +176,14 @@ public:
   virtual bool
   isMeasured() const = 0;
 
+  /**
+   * @brief Drops the z coordinate of the geometry
+   * @return TRUE if a Z value was present and has been removed
+   * @pre suppose no mix of 2D/3D coordinates
+   */
+  virtual auto
+  dropZ() -> bool = 0;
+
   // virtual bool         isSimple() const = 0 ;
 
   /**

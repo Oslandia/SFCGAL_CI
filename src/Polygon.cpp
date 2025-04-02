@@ -133,6 +133,20 @@ Polygon::isMeasured() const -> bool
   return exteriorRing().isMeasured();
 }
 
+auto
+Polygon::dropZ() -> bool
+{
+  if (!is3D()) {
+    return false;
+  }
+
+  for (auto &_ring : _rings) {
+    _ring.dropZ();
+  }
+
+  return true;
+}
+
 void
 Polygon::reverse()
 {

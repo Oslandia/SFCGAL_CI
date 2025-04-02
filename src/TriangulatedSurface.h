@@ -78,6 +78,9 @@ public:
   bool
   isMeasured() const override;
 
+  auto
+  dropZ() -> bool override;
+
   /**
    * [SFA/OGC]Returns the number of points
    * @deprecated see numGeometries()

@@ -95,6 +95,9 @@ public:
   bool
   isMeasured() const override;
 
+  auto
+  dropZ() -> bool override;
+
   /**
    * Check whether the 2D polygon is pointing up
    */

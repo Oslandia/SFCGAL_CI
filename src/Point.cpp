@@ -106,6 +106,12 @@ Point::isMeasured() const -> bool
   return !std::isnan(_m);
 }
 
+auto
+Point::dropZ() -> bool
+{
+  return _coordinate.dropZ();
+}
+
 void
 Point::accept(GeometryVisitor &visitor)
 {

@@ -87,6 +87,20 @@ LineString::isMeasured() const -> bool
   return !isEmpty() && startPoint().isMeasured();
 }
 
+auto
+LineString::dropZ() -> bool
+{
+  if (!is3D()) {
+    return false;
+  }
+
+  for (auto &_point : _points) {
+    _point.dropZ();
+  }
+
+  return true;
+}
+
 void
 LineString::clear()
 {

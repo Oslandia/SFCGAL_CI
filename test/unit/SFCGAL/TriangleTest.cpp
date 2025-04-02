@@ -218,6 +218,21 @@ BOOST_AUTO_TEST_CASE(testIsEmpty)
 // virtual bool         Geometry::isMeasured() const = 0 ;
 // virtual bool         Geometry::isSimple() const = 0 ;
 
+BOOST_AUTO_TEST_CASE(testDropZ)
+{
+  Triangle triangleEmpty;
+  BOOST_CHECK(!triangleEmpty.dropZ());
+
+  Triangle triangle2D(Point(2.0, 3.0), Point(4.0, 5.0), Point(7.0, -1.0));
+  BOOST_CHECK(!triangle2D.dropZ());
+
+  Triangle triangle3D(Point(2.0, 3.0, 1.0), Point(4.0, 5.0, 1.0), Point(7.0, -1.0, 1.0));
+  BOOST_CHECK(triangle3D.dropZ());
+  BOOST_CHECK_EQUAL(triangle3D.asText(1), "TRIANGLE ((2.0 3.0,4.0 5.0,7.0 -1.0,2.0 3.0))");
+  BOOST_CHECK(!triangle3D.dropZ());
+  BOOST_CHECK(!triangle3D.is3D());
+}
+
 // template < typename Derived > inline bool Geometry::is() const
 BOOST_AUTO_TEST_CASE(isTriangle)
 {

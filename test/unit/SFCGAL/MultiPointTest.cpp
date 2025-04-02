@@ -76,6 +76,20 @@ BOOST_AUTO_TEST_CASE(asText2d)
   BOOST_CHECK_EQUAL(g.asText(3), "MULTIPOINT ((2.000 3.000),(3.000 4.000))");
 }
 
+BOOST_AUTO_TEST_CASE(dropZ)
+{
+  MultiPoint multiPoint;
+  BOOST_CHECK(!multiPoint.dropZ());
+
+  multiPoint.addGeometry(new Point(2.0, 3.0, 5.0));
+  multiPoint.addGeometry(new Point(4.0, 5.0, 7.0));
+  BOOST_CHECK(multiPoint.is3D());
+  BOOST_CHECK(multiPoint.dropZ());
+  BOOST_CHECK_EQUAL(multiPoint.asText(1), "MULTIPOINT ((2.0 3.0),(4.0 5.0))");
+  BOOST_CHECK(!multiPoint.is3D());
+  BOOST_CHECK(!multiPoint.dropZ());
+}
+
 //-- is< T >
 
 BOOST_AUTO_TEST_CASE(isGeometryCollection)

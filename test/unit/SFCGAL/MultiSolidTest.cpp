@@ -99,4 +99,25 @@ BOOST_AUTO_TEST_CASE(isMultiSolid)
   BOOST_CHECK(g.is<MultiSolid>());
 }
 
+BOOST_AUTO_TEST_CASE(dropZ)
+{
+  MultiSolid geom;
+  BOOST_CHECK(geom.isEmpty());
+  BOOST_CHECK(!geom.dropZ());
+
+  geom.addGeometry(Envelope(0.0, 1.0, 0.0, 1.0, 0.0, 1.0).toSolid().release());
+  geom.addGeometry(Envelope(2.0, 3.0, 4.0, 5.0, 6.0, 7.0).toSolid().release());
+  BOOST_CHECK(geom.dropZ());
+  BOOST_CHECK_EQUAL(
+      geom.asText(0),
+      "MULTISOLID (((((0 0,0 1,1 1,1 0,0 0)),((0 0,1 0,1 1,0 "
+      "1,0 0)),((0 0,1 0,1 0,0 0,0 0)),((1 1,0 1,0 1,1 1,"
+      "1 1)),((1 0,1 1,1 1,1 0,1 0)),((0 0,0 0,0 1,0 1,0 "
+      "0)))),((((2 4,2 5,3 5,3 4,2 4)),((2 4,3 4,3 5,2 5,2 "
+      "4)),((2 4,3 4,3 4,2 4,2 4)),((3 5,2 5,2 5,3 5,3 5))"
+      ",((3 4,3 5,3 5,3 4,3 4)),((2 4,2 4,2 5,2 5,2 4)))))");
+
+  BOOST_CHECK(!geom.dropZ());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
