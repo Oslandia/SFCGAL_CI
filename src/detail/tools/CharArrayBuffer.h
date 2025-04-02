@@ -20,13 +20,13 @@ public:
 
 private:
   int_type
-  underflow();
+  underflow() override;
   int_type
-  uflow();
+  uflow() override;
   int_type
-  pbackfail(int_type ch);
+  pbackfail(int_type ch) override;
   std::streamsize
-  showmanyc();
+  showmanyc() override;
 
   // copy ctor and assignment not implemented;
   // copying not allowed
@@ -35,10 +35,10 @@ private:
   operator=(const CharArrayBuffer &);
 
   std::streampos
-  seekpos(std::streampos pos, std::ios_base::openmode);
+  seekpos(std::streampos pos, std::ios_base::openmode) override;
   std::streampos
   seekoff(std::streamoff off, std::ios_base::seekdir way,
-          std::ios_base::openmode);
+          std::ios_base::openmode) override;
 
 private:
   const char *const begin_;
