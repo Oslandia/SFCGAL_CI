@@ -93,29 +93,29 @@ public:
   ~PolyhedralSurface();
 
   //-- SFCGAL::Geometry
-  virtual PolyhedralSurface *
+  PolyhedralSurface *
   clone() const override;
 
   //-- SFCGAL::Geometry
-  virtual std::string
+  std::string
   geometryType() const override;
   //-- SFCGAL::Geometry
-  virtual GeometryType
+  GeometryType
   geometryTypeId() const override;
   //-- SFCGAL::Geometry
-  virtual int
+  int
   dimension() const override;
   //-- SFCGAL::Geometry
-  virtual int
+  int
   coordinateDimension() const override;
   //-- SFCGAL::Geometry
-  virtual bool
+  bool
   isEmpty() const override;
   //-- SFCGAL::Geometry
-  virtual bool
+  bool
   is3D() const override;
   //-- SFCGAL::Geometry
-  virtual bool
+  bool
   isMeasured() const override;
 
   /**
@@ -170,13 +170,13 @@ public:
   addPolygons(const PolyhedralSurface &polyhedralSurface);
 
   //-- SFCGAL::Geometry
-  virtual size_t
+  size_t
   numGeometries() const override;
   //-- SFCGAL::Geometry
-  virtual const Polygon &
+  const Polygon &
   geometryN(size_t const &n) const override;
   //-- SFCGAL::Geometry
-  virtual Polygon &
+  Polygon &
   geometryN(size_t const &n) override;
 
   /**
@@ -218,10 +218,10 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
-  virtual void
+  void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
-  virtual void
+  void
   accept(ConstGeometryVisitor &visitor) const override;
 
   /**
