@@ -42,40 +42,40 @@ public:
   virtual ~GeometryCollection();
 
   //-- SFCGAL::Geometry
-  virtual GeometryCollection *
-  clone() const;
+  GeometryCollection *
+  clone() const override;
 
   //-- SFCGAL::Geometry
-  virtual std::string
-  geometryType() const;
+  std::string
+  geometryType() const override;
   //-- SFCGAL::Geometry
-  virtual GeometryType
-  geometryTypeId() const;
+  GeometryType
+  geometryTypeId() const override;
   //-- SFCGAL::Geometry
-  virtual int
-  dimension() const;
+  int
+  dimension() const override;
   //-- SFCGAL::Geometry
-  virtual int
-  coordinateDimension() const;
+  int
+  coordinateDimension() const override;
   //-- SFCGAL::Geometry
-  virtual bool
-  isEmpty() const;
+  bool
+  isEmpty() const override;
   //-- SFCGAL::Geometry
-  virtual bool
-  is3D() const;
+  bool
+  is3D() const override;
   //-- SFCGAL::Geometry
-  virtual bool
-  isMeasured() const;
+  bool
+  isMeasured() const override;
 
   //-- SFCGAL::Geometry
-  virtual size_t
-  numGeometries() const;
+  size_t
+  numGeometries() const override;
   //-- SFCGAL::Geometry
-  virtual const Geometry &
-  geometryN(size_t const &n) const;
+  const Geometry &
+  geometryN(size_t const &n) const override;
   //-- SFCGAL::Geometry
-  virtual Geometry &
-  geometryN(size_t const &n);
+  Geometry &
+  geometryN(size_t const &n) override;
 
   /**
    * [SFA/OGC]add a geometry to the collection (takes ownership)
@@ -115,11 +115,11 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
-  virtual void
-  accept(GeometryVisitor &visitor);
+  void
+  accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
-  virtual void
-  accept(ConstGeometryVisitor &visitor) const;
+  void
+  accept(ConstGeometryVisitor &visitor) const override;
 
   /**
    * Serializer
