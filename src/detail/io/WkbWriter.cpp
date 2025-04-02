@@ -7,6 +7,7 @@
 
 #include "SFCGAL/detail/io/WkbWriter.h"
 
+#include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -71,7 +72,7 @@ WkbWriter::writeRec(const Geometry &g, boost::endian::order wkbOrder)
   default:
     std::ostringstream oss;
     oss << "WkbWriter: type '" << g.geometryType() << "' is not supported";
-    BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
+    BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 }
 
