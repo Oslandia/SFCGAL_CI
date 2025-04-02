@@ -18,30 +18,30 @@ namespace detail {
  */
 class SFCGAL_API GetPointsVisitor : public ConstGeometryVisitor {
 public:
-  virtual void
-  visit(const Point &g);
-  virtual void
-  visit(const LineString &g);
-  virtual void
-  visit(const Polygon &g);
-  virtual void
-  visit(const Triangle &g);
-  virtual void
-  visit(const Solid &g);
-  virtual void
-  visit(const MultiPoint &g);
-  virtual void
-  visit(const MultiLineString &g);
-  virtual void
-  visit(const MultiPolygon &g);
-  virtual void
-  visit(const MultiSolid &g);
-  virtual void
-  visit(const GeometryCollection &g);
-  virtual void
-  visit(const PolyhedralSurface &g);
-  virtual void
-  visit(const TriangulatedSurface &g);
+  void
+  visit(const Point &g) override;
+  void
+  visit(const LineString &g) override;
+  void
+  visit(const Polygon &g) override;
+  void
+  visit(const Triangle &g) override;
+  void
+  visit(const Solid &g) override;
+  void
+  visit(const MultiPoint &g) override;
+  void
+  visit(const MultiLineString &g) override;
+  void
+  visit(const MultiPolygon &g) override;
+  void
+  visit(const MultiSolid &g) override;
+  void
+  visit(const GeometryCollection &g) override;
+  void
+  visit(const PolyhedralSurface &g) override;
+  void
+  visit(const TriangulatedSurface &g) override;
 
 public:
   typedef std::vector<const Point *>::const_iterator const_iterator;
