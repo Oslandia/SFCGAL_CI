@@ -4,6 +4,7 @@
 
 #include "SFCGAL/detail/io/WktWriter.h"
 
+#include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -97,7 +98,7 @@ WktWriter::writeRec(const Geometry &g)
 
   std::ostringstream oss;
   oss << "WktWriter : '" << g.geometryType() << "' is not supported";
-  BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
+  BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
 }
 
 void
