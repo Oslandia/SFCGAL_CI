@@ -22,30 +22,30 @@ public:
   virtual void
   transform(Point &p) = 0;
 
-  virtual void
-  visit(Point &g);
-  virtual void
-  visit(LineString &g);
-  virtual void
-  visit(Polygon &g);
-  virtual void
-  visit(Triangle &g);
-  virtual void
-  visit(Solid &g);
-  virtual void
-  visit(MultiPoint &g);
-  virtual void
-  visit(MultiLineString &g);
-  virtual void
-  visit(MultiPolygon &g);
-  virtual void
-  visit(MultiSolid &g);
-  virtual void
-  visit(GeometryCollection &g);
-  virtual void
-  visit(PolyhedralSurface &g);
-  virtual void
-  visit(TriangulatedSurface &g);
+  void
+  visit(Point &g) override;
+  void
+  visit(LineString &g) override;
+  void
+  visit(Polygon &g) override;
+  void
+  visit(Triangle &g) override;
+  void
+  visit(Solid &g) override;
+  void
+  visit(MultiPoint &g) override;
+  void
+  visit(MultiLineString &g) override;
+  void
+  visit(MultiPolygon &g) override;
+  void
+  visit(MultiSolid &g) override;
+  void
+  visit(GeometryCollection &g) override;
+  void
+  visit(PolyhedralSurface &g) override;
+  void
+  visit(TriangulatedSurface &g) override;
 };
 
 } // namespace SFCGAL
