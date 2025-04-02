@@ -39,14 +39,14 @@ public:
   virtual ~MultiLineString();
 
   //-- SFCGAL::Geometry
-  virtual MultiLineString *
+  MultiLineString *
   clone() const override;
 
   //-- SFCGAL::Geometry
-  virtual std::string
+  std::string
   geometryType() const override;
   //-- SFCGAL::Geometry
-  virtual GeometryType
+  GeometryType
   geometryTypeId() const override;
 
   /**
@@ -69,10 +69,10 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
-  virtual void
+  void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
-  virtual void
+  void
   accept(ConstGeometryVisitor &visitor) const override;
 
   /**
@@ -87,7 +87,7 @@ public:
 
 protected:
   //-- SFCGAL::GeometryCollection
-  virtual bool
+  bool
   isAllowed(Geometry const &g) override;
 };
 
