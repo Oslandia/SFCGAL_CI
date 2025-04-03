@@ -1468,6 +1468,7 @@ typedef enum {
  * @pre radius > 0
  * @pre segments > 3
  * @post isValid(return) == true
+ * @post The returned geometry must be deallocated by the caller
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
