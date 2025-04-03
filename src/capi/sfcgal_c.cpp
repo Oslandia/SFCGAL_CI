@@ -307,6 +307,16 @@ sfcgal_geometry_type_id(const sfcgal_geometry_t *geom) -> sfcgal_geometry_type_t
 }
 
 extern "C" auto
+sfcgal_geometry_type(const sfcgal_geometry_t *geom, char **type,
+                     size_t *typeLen) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      std::string wkt =
+          reinterpret_cast<const SFCGAL::Geometry *>(geom)->geometryType();
+      alloc_and_copy(wkt, type, typeLen);)
+}
+
+extern "C" auto
 sfcgal_geometry_dimension(const sfcgal_geometry_t *geom) -> int
 {
 
