@@ -421,6 +421,13 @@ sfcgal_geometry_drop_z(sfcgal_geometry_t *geom) -> int
 }
 
 extern "C" auto
+sfcgal_geometry_drop_m(sfcgal_geometry_t *geom) -> int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return (int)reinterpret_cast<SFCGAL::Geometry *>(geom)->dropM();)
+}
+
+extern "C" auto
 sfcgal_geometry_clone(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(

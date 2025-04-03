@@ -191,6 +191,14 @@ SFCGAL_API int
 sfcgal_geometry_drop_z(sfcgal_geometry_t *);
 
 /**
+ * Drops the m coordinate of the geometry
+ * @post returns 1 if a M value was present and has been removed. 0 otherwise.
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_geometry_drop_m(sfcgal_geometry_t *);
+
+/**
  * Returns a deep clone of the given geometry
  * @post returns a pointer to an allocated geometry that must be deallocated by
  * @ref sfcgal_geometry_delete
