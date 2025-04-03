@@ -109,6 +109,14 @@ SFCGAL_API sfcgal_geometry_type_t
 sfcgal_geometry_type_id(const sfcgal_geometry_t *);
 
 /**
+ * Returns the type of a given geometry as a string
+ * @post type is returned allocated and must be freed by the caller
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_geometry_type(const sfcgal_geometry_t *, char **type, size_t *typeLen);
+
+/**
  * Returns the dimension of a given geometry ( 0 : punctual, 1 : curve, ...)
  * @ingroup capi
  */

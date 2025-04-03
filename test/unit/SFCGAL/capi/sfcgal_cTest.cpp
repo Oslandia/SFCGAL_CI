@@ -259,6 +259,50 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK_EQUAL(false, sfcgal_geometry_drop_m(polygonZM.get()));
 }
 
+BOOST_AUTO_TEST_CASE(testType)
+{
+  // PolyhedralSurface
+  std::string const polySurfaceStr = "POLYHEDRALSURFACE Z ("
+                                     "((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0)),"
+                                     "((2 0 0, 4 0 0, 4 2 1, 2 2 1, 2 0 0)),"
+                                     "((0 2 1, 2 2 1, 1 3 2, 0 2 1))"
+                                     ")";
+  std::unique_ptr<Geometry> const polySurface(io::readWkt(polySurfaceStr));
+  char *polyType;
+  size_t polyLen;
+  sfcgal_geometry_type(polySurface.get(), &polyType, &polyLen);
+  std::string strPolyType(polyType, polyLen);
+  sfcgal_free_buffer(polyType);
+  BOOST_CHECK_EQUAL(strPolyType, "PolyhedralSurface");
+
+  // LineString
+  std::unique_ptr<Geometry> const lineGeom(io::readWkt("LINESTRING (0.0 0.0, 2.0 0.0, 1.0 1.0)"));
+  char *lineType;
+  size_t lineLen;
+  sfcgal_geometry_type(lineGeom.get(), &lineType, &lineLen);
+  std::string strLineType(lineType, lineLen);
+  sfcgal_free_buffer(lineType);
+  BOOST_CHECK_EQUAL(strLineType, "LineString");
+
+  // Point
+  std::unique_ptr<Geometry> const pointGeom(io::readWkt("POINT Z (0.0 0.0 3.0)"));
+  char *pointType;
+  size_t pointLen;
+  sfcgal_geometry_type(pointGeom.get(), &pointType, &pointLen);
+  std::string strPointType(pointType, pointLen);
+  sfcgal_free_buffer( pointType);
+  BOOST_CHECK_EQUAL(strPointType, "Point");
+
+  // Polygon
+  std::unique_ptr<Geometry> const polygonGeom(io::readWkt("POLYGON ((0 0, 0 3, 3 3, 3 0, 0 0))"));
+  char *polygonType;
+  size_t polygonLen;
+  sfcgal_geometry_type(polygonGeom.get(), &polygonType, &polygonLen);
+  std::string strPolygonType(polygonType, polygonLen);
+  sfcgal_free_buffer( polygonType);
+  BOOST_CHECK_EQUAL(strPolygonType, "Polygon");
+}
+
 BOOST_AUTO_TEST_CASE(testIsSimple)
 {
   sfcgal_set_error_handlers(printf, on_error);
