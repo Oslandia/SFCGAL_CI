@@ -951,6 +951,101 @@ BOOST_AUTO_TEST_CASE(testLength3D)
   BOOST_CHECK_EQUAL(21.2106, std::round(result * 10000.0) / 10000.0);
 }
 
+BOOST_AUTO_TEST_CASE(testBoundary)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // 2D Polygon
+  std::unique_ptr<Geometry> const polygon2D(io::readWkt("POLYGON ((0 0,30 0,30 15,0 15,0 0))"));
+  hasError = false;
+  sfcgal_geometry_t *polygon2DBoundary = sfcgal_geometry_boundary(polygon2D.get());
+  BOOST_CHECK(hasError == false);
+
+  std::string expectedPolygon2DBoundary = "LINESTRING (0 0,30 0,30 15,0 15,0 0)";
+  char *wktPolygon2DBoundary;
+  size_t lenPolygon2DBoundary;
+  sfcgal_geometry_as_text_decim(polygon2DBoundary, 0, &wktPolygon2DBoundary, &lenPolygon2DBoundary);
+  BOOST_CHECK_EQUAL(std::string(wktPolygon2DBoundary), expectedPolygon2DBoundary);
+
+  sfcgal_free_buffer(wktPolygon2DBoundary);
+  sfcgal_geometry_delete(polygon2DBoundary);
+
+  // 2D MultiPolygon
+  std::unique_ptr<Geometry> const multiPolygon2D(io::readWkt("MULTIPOLYGON (((0 0, 20 0, 20 10, 0 10, 0 0)), ((25 5, 30 5, 30 15, 25 15, 25 5)))"));
+  hasError = false;
+  sfcgal_geometry_t *multiPolygon2DBoundary = sfcgal_geometry_boundary(multiPolygon2D.get());
+  BOOST_CHECK(hasError == false);
+
+  std::string expectedMultiPolygon2DBoundary = "MULTILINESTRING ((0 0,20 0),(20 0,20 10),(20 10,0 10),(0 10,0 0),(25 5,30 5),(30 5,30 15),(30 15,25 15),(25 15,25 5))";
+  char *wktMultiPolygon2DBoundary;
+  size_t lenMultiPolygon2DBoundary;
+  sfcgal_geometry_as_text_decim(multiPolygon2DBoundary, 0, &wktMultiPolygon2DBoundary, &lenMultiPolygon2DBoundary);
+  BOOST_CHECK_EQUAL(std::string(wktMultiPolygon2DBoundary), expectedMultiPolygon2DBoundary);
+
+  sfcgal_free_buffer(wktMultiPolygon2DBoundary);
+  sfcgal_geometry_delete(multiPolygon2DBoundary);
+
+  // 3D Polygon
+  std::unique_ptr<Geometry> const polygon3D(io::readWkt("POLYGON Z ((0 0,0 10,10 10,10 0,0 0),(1 1 1,1 2 1,2 2 1,2 1 1,1 1 1))"));
+  hasError = false;
+  sfcgal_geometry_t *polygon3DBoundary = sfcgal_geometry_boundary(polygon3D.get());
+  BOOST_CHECK(hasError == false);
+
+  std::string expectedPolygon3DBoundary = "MULTILINESTRING ((0 0,0 10,10 10,10 0,0 0),(1 1 1,1 2 1,2 2 1,2 1 1,1 1 1))";
+  char *wktPolygon3DBoundary;
+  size_t lenPolygon3DBoundary;
+  sfcgal_geometry_as_text_decim(polygon3DBoundary, 0, &wktPolygon3DBoundary, &lenPolygon3DBoundary);
+  BOOST_CHECK_EQUAL(std::string(wktPolygon3DBoundary), expectedPolygon3DBoundary);
+
+  sfcgal_free_buffer(wktPolygon3DBoundary);
+  sfcgal_geometry_delete(polygon3DBoundary);
+
+  // 2D LineString
+  std::unique_ptr<Geometry> const line2D(io::readWkt("LINESTRING (0 0, 0 3, 4 3)"));
+  hasError = false;
+  sfcgal_geometry_t *line2DBoundary = sfcgal_geometry_boundary(line2D.get());
+  BOOST_CHECK(hasError == false);
+
+  std::string expectedLine2DBoundary = "MULTIPOINT ((0 0),(4 3))";
+  char *wktLine2DBoundary;
+  size_t lenLine2DBoundary;
+  sfcgal_geometry_as_text_decim(line2DBoundary, 0, &wktLine2DBoundary, &lenLine2DBoundary);
+  BOOST_CHECK_EQUAL(std::string(wktLine2DBoundary), expectedLine2DBoundary);
+
+  sfcgal_free_buffer(wktLine2DBoundary);
+  sfcgal_geometry_delete(line2DBoundary);
+
+  // 2D MultiLineString
+  std::unique_ptr<Geometry> const multiLine3D(io::readWkt("MULTILINESTRING Z ((0 0 1, 1 1 2, 2 2 3), (3 3 4, 4 4 5, 5 5 6))"));
+  hasError = false;
+  sfcgal_geometry_t *multiLine3DBoundary = sfcgal_geometry_boundary(multiLine3D.get());
+  BOOST_CHECK(hasError == false);
+
+  std::string expectedMultiLine3DBoundary = "MULTIPOINT Z ((0 0 1),(2 2 3),(3 3 4),(5 5 6))";
+  char *wktMultiLine3DBoundary;
+  size_t lenMultiLine3DBoundary;
+  sfcgal_geometry_as_text_decim(multiLine3DBoundary, 0, &wktMultiLine3DBoundary, &lenMultiLine3DBoundary);
+  BOOST_CHECK_EQUAL(std::string(wktMultiLine3DBoundary), expectedMultiLine3DBoundary);
+
+  sfcgal_free_buffer(wktMultiLine3DBoundary);
+  sfcgal_geometry_delete(multiLine3DBoundary);
+
+  // 3D LineString
+  std::unique_ptr<Geometry> const line3D(io::readWkt("LINESTRING Z (0 0 0, 0 3 10, 4 3 20)"));
+  hasError = false;
+  sfcgal_geometry_t *line3DBoundary = sfcgal_geometry_boundary(line3D.get());
+  BOOST_CHECK(hasError == false);
+
+  std::string expectedLine3DBoundary = "MULTIPOINT Z ((0 0 0),(4 3 20))";
+  char *wktLine3DBoundary;
+  size_t lenLine3DBoundary;
+  sfcgal_geometry_as_text_decim(line3DBoundary, 0, &wktLine3DBoundary, &lenLine3DBoundary);
+  BOOST_CHECK_EQUAL(std::string(wktLine3DBoundary), expectedLine3DBoundary);
+
+  sfcgal_free_buffer(wktLine3DBoundary);
+  sfcgal_geometry_delete(line3DBoundary);
+}
+
 BOOST_AUTO_TEST_CASE(testCentroid)
 {
   sfcgal_set_error_handlers(printf, on_error);

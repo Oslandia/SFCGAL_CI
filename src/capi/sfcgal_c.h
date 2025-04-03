@@ -1346,6 +1346,15 @@ SFCGAL_API double
 sfcgal_geometry_length_3d(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns the boundary of geom
+ * @pre isValid(geom) == true
+ * @post the caller is responsible for the boundary deallocation.
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_boundary(const sfcgal_geometry_t *geom);
+
+/**
  * Returns a Point representing the geometry centroid
  * @pre isValid(geom) == true
  * @post isValid(return) == true

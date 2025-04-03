@@ -2032,6 +2032,15 @@ sfcgal_geometry_length_3d(const sfcgal_geometry_t *geom) -> double
   return result;
 }
 
+SFCGAL_API auto
+sfcgal_geometry_boundary(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return reinterpret_cast<const SFCGAL::Geometry *>(geom)
+          ->boundary()
+          .release();)
+}
+
 extern "C" auto
 sfcgal_geometry_centroid(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
 {
