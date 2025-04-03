@@ -82,6 +82,40 @@ BOOST_AUTO_TEST_CASE(testIs3D)
   BOOST_CHECK_EQUAL(true, sfcgal_geometry_is_3d(g2.get()));
 }
 
+BOOST_AUTO_TEST_CASE(testDimension)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // ========== Empty Polygon
+  std::unique_ptr<Geometry> const emptyPolygon(io::readWkt("POLYGON EMPTY"));
+  BOOST_CHECK(sfcgal_geometry_is_empty(emptyPolygon.get()));
+  BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(emptyPolygon.get()), 2);
+
+  // ========== Point
+  std::unique_ptr<Geometry> const pointGeom(io::readWkt("POINTZ (4 4 9)"));
+  BOOST_CHECK(!sfcgal_geometry_is_empty(pointGeom.get()));
+  BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(pointGeom.get()), 0);
+
+  // ========== Line
+  std::unique_ptr<Geometry> const lineGeom(io::readWkt("LINESTRING Z (-117 33 2, -116 34 4)"));
+  BOOST_CHECK(!sfcgal_geometry_is_empty(lineGeom.get()));
+  BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(lineGeom.get()), 1);
+
+  // ========== Polygon
+  std::unique_ptr<Geometry> const polygonGeom2D(io::readWkt("POLYGON ((0 0, 0 3, 3 3, 3 0, 0 0))"));
+  BOOST_CHECK(!sfcgal_geometry_is_empty(polygonGeom2D.get()));
+  BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(polygonGeom2D.get()), 2);
+
+  std::unique_ptr<Geometry> const polygonGeom3D(io::readWkt("POLYGON Z ((0 0 1, 0 3 2, 3 3 3, 3 0 4, 0 0 1))"));
+  BOOST_CHECK(!sfcgal_geometry_is_empty(polygonGeom3D.get()));
+  BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(polygonGeom3D.get()), 2);
+
+  // ========== PolyhedralSurface
+  std::unique_ptr<Geometry> const polyhedralSurface(io::readWkt("POLYHEDRALSURFACE Z (((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)))"));
+  BOOST_CHECK(!sfcgal_geometry_is_empty(polyhedralSurface.get()));
+  BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(polyhedralSurface.get()), 2);
+}
+
 BOOST_AUTO_TEST_CASE(testIsValid)
 {
   sfcgal_set_error_handlers(printf, on_error);

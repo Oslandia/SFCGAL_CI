@@ -109,6 +109,13 @@ SFCGAL_API sfcgal_geometry_type_t
 sfcgal_geometry_type_id(const sfcgal_geometry_t *);
 
 /**
+ * Returns the dimension of a given geometry ( 0 : punctual, 1 : curve, ...)
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_geometry_dimension(const sfcgal_geometry_t *);
+
+/**
  * Tests if the given geometry is valid or not
  * @ingroup capi
  */

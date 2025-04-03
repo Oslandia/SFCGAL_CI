@@ -307,6 +307,18 @@ sfcgal_geometry_type_id(const sfcgal_geometry_t *geom) -> sfcgal_geometry_type_t
 }
 
 extern "C" auto
+sfcgal_geometry_dimension(const sfcgal_geometry_t *geom) -> int
+{
+
+  try {
+    return reinterpret_cast<const SFCGAL::Geometry *>(geom)->dimension();
+  } catch (std::exception &e) {
+    SFCGAL_ERROR("%s", e.what());
+    return 0; // to avoid warning
+  }
+}
+
+extern "C" auto
 sfcgal_geometry_is_valid(const sfcgal_geometry_t *geom) -> int
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
