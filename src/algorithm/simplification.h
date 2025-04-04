@@ -11,7 +11,7 @@ namespace algorithm {
 
 /**
  * @brief Simplifies a geometry using the CGAL algorithm
- * 
+ *
  * @param geometry The geometry to simplify
  * @param threshold The distance threshold for simplification
  * @param preserveTopology Whether to preserve topology during simplification
