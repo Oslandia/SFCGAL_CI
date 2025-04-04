@@ -1,3 +1,6 @@
+// Copyright (c) 2025-2025, SFCGAL Team.
+// SPDX-License-Identifier: LGPL-2.0-or-later
+
 #pragma once
 
 #include <SFCGAL/GeometryCollection.h>
