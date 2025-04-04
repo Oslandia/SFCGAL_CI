@@ -1,4 +1,6 @@
-// simplification.h
+// Copyright (c) 2025-2025, SFCGAL Team.
+// SPDX-License-Identifier: LGPL-2.0-or-later
+
 #ifndef SFCGAL_ALGORITHM_SIMPLIFICATION_H
 #define SFCGAL_ALGORITHM_SIMPLIFICATION_H
 
