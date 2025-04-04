@@ -1727,8 +1727,8 @@ sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
 
 extern "C" auto
 
-sfcgal_geometry_translate_2d(sfcgal_geometry_t *geom, double dx, double dy)
-    -> sfcgal_geometry_t *
+sfcgal_geometry_translate_2d(const sfcgal_geometry_t *geom, double dx,
+                             double dy) -> sfcgal_geometry_t *
 {
   const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   SFCGAL::Geometry *gb = g->clone();
@@ -1747,8 +1747,8 @@ sfcgal_geometry_translate_2d(sfcgal_geometry_t *geom, double dx, double dy)
 }
 
 extern "C" auto
-sfcgal_geometry_translate_3d(sfcgal_geometry_t *geom, double dx, double dy,
-                             double dz) -> sfcgal_geometry_t *
+sfcgal_geometry_translate_3d(const sfcgal_geometry_t *geom, double dx,
+                             double dy, double dz) -> sfcgal_geometry_t *
 {
   const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(geom);
   SFCGAL::Geometry *gb = g->clone();

@@ -1607,8 +1607,8 @@ sfcgal_geometry_scale_3d_around_center(const sfcgal_geometry_t *geom, double sx,
  * @param dz z component of the translation vector
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_geometry_translate_3d(sfcgal_geometry_t *geom, double dx, double dy,
-                             double dz);
+sfcgal_geometry_translate_3d(const sfcgal_geometry_t *geom, double dx,
+                             double dy, double dz);
 
 /**
  * Translate a geometry by a 2D vector
@@ -1617,7 +1617,8 @@ sfcgal_geometry_translate_3d(sfcgal_geometry_t *geom, double dx, double dy,
  * @param dy y component of the translation vector
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_geometry_translate_2d(sfcgal_geometry_t *geom, double dx, double dy);
+sfcgal_geometry_translate_2d(const sfcgal_geometry_t *geom, double dx,
+                             double dy);
 
 /*--------------------------------------------------------------------------------------*
  *
