@@ -74,6 +74,13 @@ BOOST_AUTO_TEST_CASE(testPointForceZWithValue)
   BOOST_CHECK_EQUAL(p.asText(1), "POINT Z (3.0 4.0 -9999.0)");
 }
 
+BOOST_AUTO_TEST_CASE(testPointForceZFromM)
+{
+  std::unique_ptr<Geometry> ptM(io::readWkt("POINT M (2 3 4)"));
+  algorithm::force3D(*ptM);
+  BOOST_CHECK_EQUAL(ptM->asText(1), "POINT ZM (2.0 3.0 0.0 4.0)");
+}
+
 BOOST_AUTO_TEST_CASE(test_MixedLineString2D3D)
 {
   LineString lineString;
