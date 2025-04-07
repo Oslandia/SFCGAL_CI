@@ -259,6 +259,58 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK_EQUAL(false, sfcgal_geometry_drop_m(polygonZM.get()));
 }
 
+BOOST_AUTO_TEST_CASE(testSwapXY)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // retrieve wkb from geometry via C++ api
+  std::unique_ptr<Geometry> polygon2D(io::readWkt("POLYGON ((0 0, 20 0, 20 10, 0 10, 0 0))"));
+  // check
+  sfcgal_geometry_swap_xy(polygon2D.get());
+  char  *wkbApi2D;
+  size_t wkb2DLen;
+  sfcgal_geometry_as_text_decim(polygon2D.get(), 0, &wkbApi2D, &wkb2DLen);
+  std::string strApi2D(wkbApi2D, wkb2DLen);
+  sfcgal_free_buffer(wkbApi2D);
+  BOOST_CHECK_EQUAL(strApi2D, "POLYGON ((0 0,0 20,10 20,10 0,0 0))");
+
+  // 3D
+  std::unique_ptr<Geometry> polygon3D(
+      io::readWkt("POLYGON Z ((0 0 2, 20 0 2, 20 10 3, 0 10 2, 0 0 4))"));
+  // check
+  sfcgal_geometry_swap_xy(polygon3D.get());
+  char  *wkbApi3D;
+  size_t wkb3DLen;
+  sfcgal_geometry_as_text_decim(polygon3D.get(), 0, &wkbApi3D, &wkb3DLen);
+  std::string strApi3D(wkbApi3D, wkb3DLen);
+  sfcgal_free_buffer(wkbApi3D);
+  BOOST_CHECK_EQUAL(strApi3D, "POLYGON Z ((0 0 2,0 20 2,10 20 3,10 0 2,0 0 4))");
+
+  // M
+  std::unique_ptr<Geometry> polygonM(
+      io::readWkt("POLYGON M ((0 0 1, 20 0 2, 20 10 3, 0 10 4, 0 0 1))"));
+  // check
+  sfcgal_geometry_swap_xy(polygonM.get());
+  char  *wkbApiM;
+  size_t wkbMLen;
+  sfcgal_geometry_as_text_decim(polygonM.get(), 0, &wkbApiM, &wkbMLen);
+  std::string strApiM(wkbApiM, wkbMLen);
+  sfcgal_free_buffer(wkbApiM);
+  BOOST_CHECK_EQUAL(strApiM, "POLYGON M ((0 0 1,0 20 2,10 20 3,10 0 4,0 0 1))");
+
+  // ZM
+  std::unique_ptr<Geometry> polygonZM(
+      io::readWkt("POLYGON ZM ((0 0 1 2, 20 0 2 2, 20 10 3 2, 0 10 4 2, 0 0 1 2))"));
+  // check
+  sfcgal_geometry_swap_xy(polygonZM.get());
+  char  *wkbApiZM;
+  size_t wkbZMLen;
+  sfcgal_geometry_as_text_decim(polygonZM.get(), 0, &wkbApiZM, &wkbZMLen);
+  std::string strApiZM(wkbApiZM, wkbZMLen);
+  sfcgal_free_buffer(wkbApiZM);
+  BOOST_CHECK_EQUAL(strApiZM, "POLYGON ZM ((0 0 1 2,0 20 2 2,10 20 3 2,10 0 4 2,0 0 1 2))");
+}
+
 BOOST_AUTO_TEST_CASE(testType)
 {
   // PolyhedralSurface

@@ -26,6 +26,7 @@
 #include "SFCGAL/io/vtk.h"
 #include "SFCGAL/io/wkb.h"
 #include "SFCGAL/io/wkt.h"
+#include "sfcgal_c.h"
 
 #if !_MSC_VER
   #include "SFCGAL/algorithm/alphaShapes.h"
@@ -447,6 +448,13 @@ sfcgal_geometry_drop_m(sfcgal_geometry_t *geom) -> int
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return (int)reinterpret_cast<SFCGAL::Geometry *>(geom)->dropM();)
+}
+
+extern "C" auto
+sfcgal_geometry_swap_xy(sfcgal_geometry_t *geom) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      return reinterpret_cast<SFCGAL::Geometry *>(geom)->swapXY();)
 }
 
 extern "C" auto

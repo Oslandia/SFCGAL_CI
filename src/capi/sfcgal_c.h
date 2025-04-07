@@ -214,6 +214,13 @@ SFCGAL_API int
 sfcgal_geometry_drop_m(sfcgal_geometry_t *);
 
 /**
+ * Swaps the x and y coordinates of the geometry
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_geometry_swap_xy(sfcgal_geometry_t *);
+
+/**
  * Returns a deep clone of the given geometry
  * @post returns a pointer to an allocated geometry that must be deallocated by
  * @ref sfcgal_geometry_delete
