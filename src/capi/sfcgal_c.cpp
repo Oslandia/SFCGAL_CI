@@ -41,6 +41,7 @@
 #include "SFCGAL/algorithm/distance.h"
 #include "SFCGAL/algorithm/distance3d.h"
 #include "SFCGAL/algorithm/extrude.h"
+#include "SFCGAL/algorithm/force3D.h"
 #include "SFCGAL/algorithm/intersection.h"
 #include "SFCGAL/algorithm/intersects.h"
 #include "SFCGAL/algorithm/isSimple.h"
@@ -448,6 +449,25 @@ sfcgal_geometry_drop_m(sfcgal_geometry_t *geom) -> int
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return (int)reinterpret_cast<SFCGAL::Geometry *>(geom)->dropM();)
+}
+
+extern "C" auto
+sfcgal_geometry_force_z(sfcgal_geometry_t *geom, double defaultZ) -> int
+{
+  auto *sfcgalGeom = reinterpret_cast<SFCGAL::Geometry *>(geom);
+  // If the geometry is already 3D or empty, don't do anything
+  if (sfcgalGeom->isEmpty() || sfcgalGeom->is3D()) {
+    return 0;
+  }
+
+  try {
+    SFCGAL::algorithm::force3D(*sfcgalGeom, defaultZ);
+  } catch (std::exception &e) {
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return 1;
 }
 
 extern "C" auto
