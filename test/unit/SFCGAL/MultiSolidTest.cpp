@@ -120,4 +120,28 @@ BOOST_AUTO_TEST_CASE(dropZ)
   BOOST_CHECK(!geom.dropZ());
 }
 
+BOOST_AUTO_TEST_CASE(swapXY)
+{
+  MultiSolid geom;
+
+  geom.addGeometry(Envelope(0.0, 1.0, 0.0, 1.0, 0.0, 1.0).toSolid().release());
+  geom.addGeometry(Envelope(2.0, 3.0, 4.0, 5.0, 6.0, 7.0).toSolid().release());
+  geom.swapXY();
+  BOOST_CHECK_EQUAL(
+                    geom.asText(0),
+                    "MULTISOLID Z ("
+                    "((((0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)),"
+                    "((0 0 1,0 1 1,1 1 1,1 0 1,0 0 1)),"
+                    "((0 0 0,0 1 0,0 1 1,0 0 1,0 0 0)),"
+                    "((1 1 0,1 0 0,1 0 1,1 1 1,1 1 0)),"
+                    "((0 1 0,1 1 0,1 1 1,0 1 1,0 1 0)),"
+                    "((0 0 0,0 0 1,1 0 1,1 0 0,0 0 0)))),"
+                    "((((4 2 6,5 2 6,5 3 6,4 3 6,4 2 6)),"
+                    "((4 2 7,4 3 7,5 3 7,5 2 7,4 2 7)),"
+                    "((4 2 6,4 3 6,4 3 7,4 2 7,4 2 6)),"
+                    "((5 3 6,5 2 6,5 2 7,5 3 7,5 3 6)),"
+                    "((4 3 6,5 3 6,5 3 7,4 3 7,4 3 6)),"
+                    "((4 2 6,4 2 7,5 2 7,5 2 6,4 2 6)))))");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

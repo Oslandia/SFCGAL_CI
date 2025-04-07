@@ -172,6 +172,14 @@ PolyhedralSurface::dropM() -> bool
 }
 
 auto
+PolyhedralSurface::swapXY() -> void
+{
+  for (auto &_polygon : _polygons) {
+    _polygon.swapXY();
+  }
+}
+
+auto
 PolyhedralSurface::toTriangulatedSurface() const -> TriangulatedSurface
 {
   TriangulatedSurface result;

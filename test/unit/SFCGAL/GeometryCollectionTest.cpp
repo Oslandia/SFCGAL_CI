@@ -242,6 +242,51 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(!geomZM.dropM());
 }
 
+BOOST_AUTO_TEST_CASE(testSwapXY)
+{
+  GeometryCollection geomEmpty;
+  BOOST_CHECK(geomEmpty.isEmpty());
+  geomEmpty.swapXY();
+  BOOST_CHECK(geomEmpty.isEmpty());
+
+  GeometryCollection geom2D;
+  geom2D.addGeometry(Point(2.0, 3.0));
+  geom2D.addGeometry(Triangle(Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0)));
+  geom2D.swapXY();
+  BOOST_CHECK_EQUAL(geom2D.asText(1),
+                    "GEOMETRYCOLLECTION "
+                    "(POINT (3.0 2.0),"
+                    "TRIANGLE ((0.0 0.0,0.0 1.0,1.0 1.0,0.0 0.0)))");
+
+  GeometryCollection geom3D;
+  geom3D.addGeometry(Point(2.0, 3.0, 5.0));
+  geom3D.addGeometry(Triangle(Point(0.0, 0.0, 6.0), Point(1.0, 0.0, 6.0), Point(1.0, 1.0, 6.0)));
+  geom3D.swapXY();
+  BOOST_CHECK_EQUAL(geom3D.asText(1),
+                    "GEOMETRYCOLLECTION Z "
+                    "(POINT Z (3.0 2.0 5.0),"
+                    "TRIANGLE Z ((0.0 0.0 6.0,0.0 1.0 6.0,1.0 1.0 6.0,0.0 0.0 6.0)))");
+
+  GeometryCollection geomM;
+  geomM.addGeometry(io::readWkt("POINT M (2 3 4)").release());
+  geomM.addGeometry(io::readWkt("TRIANGLE M ((0 0 1, 5 5 5, 0 5 2, 0 0 1))").release());
+  BOOST_REQUIRE(geomM.is<GeometryCollection>());
+  geomM.swapXY();
+  BOOST_CHECK_EQUAL(geomM.asText(1),
+                    "GEOMETRYCOLLECTION M "
+                    "(POINT M (3.0 2.0 4.0),"
+                    "TRIANGLE M ((0.0 0.0 1.0,5.0 5.0 5.0,5.0 0.0 2.0,0.0 0.0 1.0)))");
+
+  GeometryCollection geomZM;
+  geomZM.addGeometry(Point(2.0, 3.0, 5.0, 4.0));
+  geomZM.addGeometry(Triangle(Point(0.0, 0.0, 6.0, 2.0), Point(1.0, 0.0, 6.0, 2.0), Point(1.0, 1.0, 6.0, 2.0)));
+  geomZM.swapXY();
+  BOOST_CHECK_EQUAL(geomZM.asText(0),
+                    "GEOMETRYCOLLECTION ZM "
+                    "(POINT ZM (3 2 5 4),"
+                    "TRIANGLE ZM ((0 0 6 2,0 1 6 2,1 1 6 2,0 0 6 2)))");
+}
+
 // template < typename Derived > inline const Derived &  Geometry::as() const
 // template < typename Derived > inline Derived &        Geometry::as()
 

@@ -176,4 +176,36 @@ BOOST_AUTO_TEST_CASE(solidDropZTest)
   BOOST_CHECK(!solid->dropZ());
 }
 
+BOOST_AUTO_TEST_CASE(solidSwapXYTest)
+{
+  std::unique_ptr<Solid> emptySolid = std::make_unique<Solid>();
+  BOOST_CHECK(emptySolid->isEmpty());
+  BOOST_CHECK(!emptySolid->dropZ());
+
+  std::string const polyhedral1Str =
+    "POLYHEDRALSURFACE ("
+    "((0 0 0, 0 0 1, 0 1 1, 0 1 0, 0 0 0)),"
+    "((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),"
+    "((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),"
+    "((1 1 0, 1 1 1, 1 0 1, 1 0 0, 1 1 0)),"
+    "((0 1 0, 0 1 1, 1 1 1, 1 1 0, 0 1 0)),"
+    "((0 0 1, 1 0 1, 1 1 1, 0 1 1, 0 0 1))"
+    ")";
+  std::unique_ptr<Geometry> shell1(io::readWkt(polyhedral1Str));
+
+  std::unique_ptr<Solid> solid = std::make_unique<Solid>();
+  solid->setExteriorShell(dynamic_cast<PolyhedralSurface *>(shell1.get())->clone());
+  solid->swapXY();
+
+  BOOST_CHECK_EQUAL(
+           solid->asText(1),
+                    "SOLID Z (("
+                    "((0.0 0.0 0.0,0.0 0.0 1.0,1.0 0.0 1.0,1.0 0.0 0.0,0.0 0.0 0.0)),"
+                    "((0.0 0.0 0.0,1.0 0.0 0.0,1.0 1.0 0.0,0.0 1.0 0.0,0.0 0.0 0.0)),"
+                    "((0.0 0.0 0.0,0.0 1.0 0.0,0.0 1.0 1.0,0.0 0.0 1.0,0.0 0.0 0.0)),"
+                    "((1.0 1.0 0.0,1.0 1.0 1.0,0.0 1.0 1.0,0.0 1.0 0.0,1.0 1.0 0.0)),"
+                    "((1.0 0.0 0.0,1.0 0.0 1.0,1.0 1.0 1.0,1.0 1.0 0.0,1.0 0.0 0.0)),"
+                    "((0.0 0.0 1.0,0.0 1.0 1.0,1.0 1.0 1.0,1.0 0.0 1.0,0.0 0.0 1.0))))");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

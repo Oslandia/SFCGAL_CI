@@ -171,6 +171,78 @@ BOOST_AUTO_TEST_CASE(dropZM)
   BOOST_CHECK(!multiPolygonZM.dropZ());
 }
 
+BOOST_AUTO_TEST_CASE(swapXY)
+{
+  MultiPolygon emptyMultiPolygon;
+  BOOST_CHECK(emptyMultiPolygon.isEmpty());
+  emptyMultiPolygon.swapXY();
+  BOOST_CHECK(emptyMultiPolygon.isEmpty());
+
+
+  MultiPolygon multiPolygon2D;
+  Polygon poly12D;
+  poly12D.exteriorRing().addPoint(Point(0.0, 0.0));
+  poly12D.exteriorRing().addPoint(Point(1.0, 0.0));
+  poly12D.exteriorRing().addPoint(Point(1.0, 1.0));
+  poly12D.exteriorRing().addPoint(Point(0.0, 1.0));
+  poly12D.exteriorRing().addPoint(Point(0.0, 0.0));
+
+  Polygon poly22D;
+  poly22D.exteriorRing().addPoint(Point(3.0, 5.0));
+  poly22D.exteriorRing().addPoint(Point(4.0, 5.0));
+  poly22D.exteriorRing().addPoint(Point(4.0, 6.0));
+  poly22D.exteriorRing().addPoint(Point(3.0, 6.0));
+  poly22D.exteriorRing().addPoint(Point(3.0, 5.0));
+
+  multiPolygon2D.addGeometry(poly12D);
+  multiPolygon2D.addGeometry(poly22D);
+  multiPolygon2D.swapXY();
+  BOOST_CHECK_EQUAL(multiPolygon2D.asText(0),
+                    "MULTIPOLYGON (((0 0,0 1,1 1,1 0,0 0)),((5 3,5 4,6 4,6 3,5 3)))");
+
+  MultiPolygon multiPolygon3D;
+  Polygon poly13D;
+  poly13D.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
+  poly13D.exteriorRing().addPoint(Point(1.0, 0.0, 2.0));
+  poly13D.exteriorRing().addPoint(Point(1.0, 1.0, 2.0));
+  poly13D.exteriorRing().addPoint(Point(0.0, 1.0, 2.0));
+  poly13D.exteriorRing().addPoint(Point(0.0, 0.0, 2.0));
+
+  Polygon poly23D;
+  poly23D.exteriorRing().addPoint(Point(3.0, 5.0, 3.0));
+  poly23D.exteriorRing().addPoint(Point(4.0, 5.0, 3.0));
+  poly23D.exteriorRing().addPoint(Point(4.0, 6.0, 3.0));
+  poly23D.exteriorRing().addPoint(Point(3.0, 6.0, 3.0));
+  poly23D.exteriorRing().addPoint(Point(3.0, 5.0, 3.0));
+
+  multiPolygon3D.addGeometry(poly13D);
+  multiPolygon3D.addGeometry(poly23D);
+  multiPolygon2D.swapXY();
+  BOOST_CHECK_EQUAL(multiPolygon3D.asText(1),
+                    "MULTIPOLYGON Z "
+                    "(((0.0 0.0 2.0,1.0 0.0 2.0,1.0 1.0 2.0,0.0 1.0 2.0,0.0 0.0 2.0)),"
+                    "((3.0 5.0 3.0,4.0 5.0 3.0,4.0 6.0 3.0,3.0 6.0 3.0,3.0 5.0 3.0)))");
+
+
+  MultiPolygon multiPolygonM;
+  multiPolygonM.addGeometry(io::readWkt("POLYGON M ((0 0 1, 0 3 2, 3 3 3, 3 0 4, 0 0 1))").release());
+  multiPolygonM.addGeometry(io::readWkt("POLYGON M ((4 5 1, 1 4 2, 4 0 4, 4 5 1))").release());
+  multiPolygonM.swapXY();
+  BOOST_CHECK_EQUAL(multiPolygonM.asText(0),
+                    "MULTIPOLYGON M "
+                    "(((0 0 1,3 0 2,3 3 3,0 3 4,0 0 1)),"
+                    "((5 4 1,4 1 2,0 4 4,5 4 1)))");
+
+  MultiPolygon multiPolygonZM;
+  multiPolygonZM.addGeometry(io::readWkt("POLYGON ZM ((0 0 1 4, 0 3 2 5, 3 3 3 6, 3 0 4 7, 0 0 1 4))").release());
+  multiPolygonZM.addGeometry(io::readWkt("POLYGON ZM ((2 4 1 5, 7 7 7 6, 4 2 5 7, 2 4 1 5))").release());
+  multiPolygonZM.swapXY();
+  BOOST_CHECK_EQUAL(multiPolygonZM.asText(0),
+                    "MULTIPOLYGON ZM "
+                    "(((0 0 1 4,3 0 2 5,3 3 3 6,0 3 4 7,0 0 1 4)),"
+                    "((4 2 1 5,7 7 7 6,2 4 5 7,4 2 1 5)))");
+}
+
 //-- is< T >
 
 BOOST_AUTO_TEST_CASE(isGeometryCollection)

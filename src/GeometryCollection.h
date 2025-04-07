@@ -73,6 +73,9 @@ public:
   auto
   dropM() -> bool override;
 
+  auto
+  swapXY() -> void override;
+
   //-- SFCGAL::Geometry
   size_t
   numGeometries() const override;

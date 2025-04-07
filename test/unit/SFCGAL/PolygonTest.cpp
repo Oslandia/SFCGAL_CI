@@ -295,6 +295,46 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(!polygonZM.dropM());
 }
 
+BOOST_AUTO_TEST_CASE(testSwapXY)
+{
+  Polygon emptyPolygon;
+  BOOST_CHECK(emptyPolygon.isEmpty());
+  emptyPolygon.swapXY();
+  BOOST_CHECK(emptyPolygon.isEmpty());
+
+  Polygon polygon2D;
+  polygon2D.exteriorRing().addPoint(Point(3.0, 0.0));
+  polygon2D.exteriorRing().addPoint(Point(1.0, 0.0));
+  polygon2D.exteriorRing().addPoint(Point(1.0, 5.0));
+  polygon2D.swapXY();
+  BOOST_CHECK_EQUAL(polygon2D.asText(0), "POLYGON ((0 3,0 1,5 1))");
+
+  Polygon polygon3D;
+  polygon3D.exteriorRing().addPoint(Point(3.0, 0.0, 2.0));
+  polygon3D.exteriorRing().addPoint(Point(1.0, 0.0, 2.0));
+  polygon3D.exteriorRing().addPoint(Point(1.0, 1.0, 2.0));
+  polygon3D.exteriorRing().addPoint(Point(0.0, 1.0, 2.0));
+  polygon3D.exteriorRing().addPoint(Point(7.0, 2.0, 2.0));
+  polygon3D.swapXY();
+  BOOST_CHECK_EQUAL(polygon3D.asText(1),
+                    "POLYGON Z ((0.0 3.0 2.0,0.0 1.0 2.0,1.0 1.0 2.0,1.0 0.0 2.0,2.0 7.0 2.0))");
+
+  std::unique_ptr<Geometry> polygonM(io::readWkt("POLYGON M ((0 0 4, 0 3 5, 3 3 6, 3 0 7, 0 0 4))").release());
+  polygonM->swapXY();
+  BOOST_CHECK_EQUAL(polygonM->asText(0),
+                    "POLYGON M ((0 0 4,3 0 5,3 3 6,0 3 7,0 0 4))");
+
+  Polygon polygonZM;
+  polygonZM.exteriorRing().addPoint(Point(0.0, 0.0, 2.0, 1.0));
+  polygonZM.exteriorRing().addPoint(Point(1.0, 0.0, 2.0, 1.0));
+  polygonZM.exteriorRing().addPoint(Point(1.0, 1.0, 2.0, 1.0));
+  polygonZM.exteriorRing().addPoint(Point(0.0, 1.0, 2.0, 1.0));
+  polygonZM.exteriorRing().addPoint(Point(0.0, 0.0, 2.0, 1.0));
+  polygonZM.swapXY();
+  BOOST_CHECK_EQUAL(polygonZM.asText(0),
+                    "POLYGON ZM ((0 0 2 1,0 1 2 1,1 1 2 1,1 0 2 1,0 0 2 1))");
+}
+
 // template < typename Derived > inline bool Geometry::is() const
 BOOST_AUTO_TEST_CASE(isPolygon)
 {

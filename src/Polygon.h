@@ -101,6 +101,9 @@ public:
   auto
   dropM() -> bool override;
 
+  auto
+  swapXY() -> void override;
+
   /**
    * Check whether the 2D polygon is pointing up
    */

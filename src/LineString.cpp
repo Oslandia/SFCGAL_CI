@@ -115,6 +115,14 @@ LineString::dropM() -> bool
   return true;
 }
 
+auto
+LineString::swapXY() -> void
+{
+  for (auto &_point : _points) {
+    _point.swapXY();
+  }
+}
+
 void
 LineString::clear()
 {

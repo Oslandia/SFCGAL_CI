@@ -125,6 +125,14 @@ Triangle::dropM() -> bool
   return true;
 }
 
+auto
+Triangle::swapXY() -> void
+{
+  for (auto &_vertex : _vertices) {
+    _vertex.swapXY();
+  }
+}
+
 void
 Triangle::reverse()
 {

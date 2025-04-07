@@ -138,6 +138,37 @@ BOOST_AUTO_TEST_CASE(dropZM)
   BOOST_CHECK(!multiPointZM.dropZ());
 }
 
+BOOST_AUTO_TEST_CASE(swapXY)
+{
+  MultiPoint multiPointEmpty;
+  BOOST_CHECK(multiPointEmpty.isEmpty());
+  multiPointEmpty.swapXY();
+  BOOST_CHECK(multiPointEmpty.isEmpty());
+
+  MultiPoint multiPoint2D;
+  multiPoint2D.addGeometry(new Point(2.0, 3.0));
+  multiPoint2D.addGeometry(new Point(4.0, 5.0));
+  multiPoint2D.swapXY();
+  BOOST_CHECK_EQUAL(multiPoint2D.asText(0), "MULTIPOINT ((3 2),(5 4))");
+
+  MultiPoint multiPoint3D;
+  multiPoint3D.addGeometry(new Point(9.0, 3.0, 5.0));
+  multiPoint3D.addGeometry(new Point(12.0, 5.0, 7.0));
+  multiPoint3D.swapXY();
+  BOOST_CHECK_EQUAL(multiPoint3D.asText(0), "MULTIPOINT Z ((3 9 5),(5 12 7))");
+
+  MultiPoint multiPointM;
+  multiPointM.addGeometry(io::readWkt("POINT M (20 7 4)").release());
+  multiPointM.addGeometry(io::readWkt("POINT M (14 9 7)").release());
+  multiPointM.swapXY();
+  BOOST_CHECK_EQUAL(multiPointM.asText(0), "MULTIPOINT M ((7 20 4),(9 14 7))");
+
+  MultiPoint multiPointZM;
+  multiPointZM.addGeometry(new Point(-2.0, -3.0, 5.0, 6.0));
+  multiPointZM.addGeometry(new Point(42.0, -5.0, 7.0, 8.0));
+  multiPointZM.swapXY();
+  BOOST_CHECK_EQUAL(multiPointZM.asText(0), "MULTIPOINT ZM ((-3 -2 5 6),(-5 42 7 8))");
+}
 //-- is< T >
 
 BOOST_AUTO_TEST_CASE(isGeometryCollection)

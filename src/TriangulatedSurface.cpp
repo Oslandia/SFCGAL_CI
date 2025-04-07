@@ -114,6 +114,14 @@ TriangulatedSurface::dropM() -> bool
   return true;
 }
 
+auto
+TriangulatedSurface::swapXY() -> void
+{
+  for (auto &_triangle : _triangles) {
+    _triangle.swapXY();
+  }
+}
+
 void
 TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
 {

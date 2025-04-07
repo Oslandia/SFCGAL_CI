@@ -459,6 +459,31 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(!lineZM.dropM());
 }
 
+BOOST_AUTO_TEST_CASE(testSwapXY)
+{
+  LineString lineEmpty;
+  BOOST_CHECK(lineEmpty.isEmpty());
+  lineEmpty.swapXY();
+  BOOST_CHECK(lineEmpty.isEmpty());
+
+  LineString line2D(Point(3.0, 0.0), Point(1.0, 4.0));
+  line2D.swapXY();
+  BOOST_CHECK_EQUAL(line2D.asText(0), "LINESTRING (0 3,4 1)");
+
+  LineString line3D(Point(-2.0, 0.0, 2.0), Point(5.0, 1.0, 5.0));
+  line3D.swapXY();
+  BOOST_CHECK_EQUAL(line3D.asText(0), "LINESTRING Z (0 -2 2,1 5 5)");
+
+  std::unique_ptr<Geometry> lineM(io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
+  lineM->swapXY();
+  BOOST_CHECK_EQUAL(lineM->asText(0), "LINESTRING M (0 0 4,1 1 5,2 2 6)");
+
+
+  LineString lineZM(Point(3.0, 0.0, 2.0, 4.0), Point(1.0, 23.0, 5.0, 4.0));
+  lineZM.swapXY();
+  BOOST_CHECK_EQUAL(lineZM.asText(0), "LINESTRING ZM (0 3 2 4,23 1 5 4)");
+}
+
 // template < typename Derived > inline const Derived &  Geometry::as() const
 // template < typename Derived > inline Derived &        Geometry::as()
 

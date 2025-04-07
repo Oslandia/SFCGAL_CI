@@ -84,6 +84,9 @@ public:
   auto
   dropM() -> bool override;
 
+  auto
+  swapXY() -> void override;
+
   /**
    * [SFA/OGC]Returns the number of points
    * @deprecated see numGeometries()

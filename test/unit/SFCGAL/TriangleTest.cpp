@@ -266,6 +266,33 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(!triangleZM.is3D());
 }
 
+BOOST_AUTO_TEST_CASE(testSwapXY)
+{
+  Triangle triangleEmpty;
+  BOOST_CHECK(triangleEmpty.isEmpty());
+  triangleEmpty.swapXY();
+  BOOST_CHECK(triangleEmpty.isEmpty());
+
+  Triangle triangle2D(Point(2.0, 3.0), Point(4.0, 5.0), Point(7.0, -1.0));
+  triangle2D.swapXY();
+  BOOST_CHECK_EQUAL(triangle2D.asText(0), "TRIANGLE ((3 2,5 4,-1 7,3 2))");
+
+  Triangle triangle3D(Point(2.0, 3.0, 1.0), Point(4.0, 5.0, 1.0), Point(7.0, -1.0, 1.0));
+  triangle3D.swapXY();
+  BOOST_CHECK_EQUAL(triangle3D.asText(0), "TRIANGLE Z ((3 2 1,5 4 1,-1 7 1,3 2 1))");
+
+  std::unique_ptr<Geometry> pt1M(io::readWkt("POINT M (2 3 4)"));
+  std::unique_ptr<Geometry> pt2M(io::readWkt("POINT M (4 5 4)"));
+  std::unique_ptr<Geometry> pt3M(io::readWkt("POINT M (7 -1 4)"));
+  Triangle triangleM(pt1M->as<Point>(), pt2M->as<Point>(), pt3M->as<Point>());
+  triangleM.swapXY();
+  BOOST_CHECK_EQUAL(triangleM.asText(0), "TRIANGLE M ((3 2 4,5 4 4,-1 7 4,3 2 4))");
+
+  Triangle triangleZM(Point(2.0, 3.0, 1.0, 2.0), Point(4.0, 5.0, 1.0, 5.0), Point(7.0, -1.0, 1.0, 7.0));
+  triangleZM.swapXY();
+  BOOST_CHECK_EQUAL(triangleZM.asText(0), "TRIANGLE ZM ((3 2 1 2,5 4 1 5,-1 7 1 7,3 2 1 2))");
+}
+
 // template < typename Derived > inline bool Geometry::is() const
 BOOST_AUTO_TEST_CASE(isTriangle)
 {

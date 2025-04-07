@@ -122,6 +122,14 @@ Solid::dropM() -> bool
   return true;
 }
 
+auto
+Solid::swapXY() -> void
+{
+  for (auto &_shell : _shells) {
+    _shell.swapXY();
+  }
+}
+
 void
 Solid::accept(GeometryVisitor &visitor)
 {

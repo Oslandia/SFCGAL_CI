@@ -88,6 +88,9 @@ public:
   auto
   dropM() -> bool override;
 
+  auto
+  swapXY() -> void override;
+
   /**
    * reverse Triangle orientation
    */

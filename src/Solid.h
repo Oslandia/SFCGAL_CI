@@ -92,6 +92,9 @@ public:
   auto
   dropM() -> bool override;
 
+  auto
+  swapXY() -> void override;
+
   /**
    * Returns the exterior shell
    */

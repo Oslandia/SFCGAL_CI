@@ -116,6 +116,14 @@ GeometryCollection::dropM() -> bool
 }
 
 auto
+GeometryCollection::swapXY() -> void
+{
+  for (auto &_geometry : _geometries) {
+    _geometry.swapXY();
+  }
+}
+
+auto
 GeometryCollection::numGeometries() const -> size_t
 {
   return _geometries.size();

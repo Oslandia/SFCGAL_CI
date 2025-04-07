@@ -125,4 +125,38 @@ BOOST_AUTO_TEST_CASE(dropZMTest)
   BOOST_CHECK(!geomZM->dropM());
 }
 
+BOOST_AUTO_TEST_CASE(swapXYTest)
+{
+  std::unique_ptr<Geometry> emptyGeom(io::readWkt("POLYHEDRALSURFACE EMPTY"));
+  BOOST_CHECK(emptyGeom->isEmpty());
+  emptyGeom->swapXY();
+  BOOST_CHECK(emptyGeom->isEmpty());
+
+  std::string const polyhedral3DStr =
+    "POLYHEDRALSURFACE Z ("
+    "((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0)),"
+    "((0 0 0, 10 0 0, 5 0 5, 0 0 0)),"
+    "((0 0 0, 0 10 0, 5 5 5, 0 0 0))"
+    ")";
+  std::unique_ptr<Geometry> geom3D(io::readWkt(polyhedral3DStr));
+  geom3D->swapXY();
+  BOOST_CHECK_EQUAL(geom3D->asText(0),
+                    "POLYHEDRALSURFACE Z "
+                    "(((0 0 0,0 10 0,10 10 0,10 0 0,0 0 0)),"
+                    "((0 0 0,0 10 0,0 5 5,0 0 0)),"
+                    "((0 0 0,10 0 0,5 5 5,0 0 0)))");
+
+  std::string const polyhedralMStr = "POLYHEDRALSURFACE M (((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)))";
+  std::unique_ptr<Geometry> geomM(io::readWkt(polyhedralMStr));
+  geomM->swapXY();
+  BOOST_CHECK_EQUAL(geomM->asText(0),
+                    "POLYHEDRALSURFACE M (((0 0 0,1 0 0,1 1 0,0 1 0,0 0 0)))");
+
+  std::string const polyhedralZMStr = "POLYHEDRALSURFACE ZM (((0 0 0 1,0 1 0 2,1 1 0 3,1 0 0 4,0 0 0 1)))";
+  std::unique_ptr<Geometry> geomZM(io::readWkt(polyhedralZMStr));
+  geomZM->swapXY();
+  BOOST_CHECK_EQUAL(geomZM->asText(0),
+                    "POLYHEDRALSURFACE ZM (((0 0 0 1,1 0 0 2,1 1 0 3,0 1 0 4,0 0 0 1)))");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

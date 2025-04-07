@@ -161,6 +161,14 @@ Polygon::dropM() -> bool
   return true;
 }
 
+auto
+Polygon::swapXY() -> void
+{
+  for (auto &_ring : _rings) {
+    _ring.swapXY();
+  }
+}
+
 void
 Polygon::reverse()
 {

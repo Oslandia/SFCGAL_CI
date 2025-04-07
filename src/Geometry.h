@@ -192,6 +192,12 @@ public:
   virtual auto
   dropM() -> bool = 0;
 
+  /**
+   * @brief Swaps the x and y coordinates of the geometry
+   */
+  virtual auto
+  swapXY() -> void = 0;
+
   // virtual bool         isSimple() const = 0 ;
 
   /**

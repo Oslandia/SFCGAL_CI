@@ -109,6 +109,9 @@ public:
   auto
   dropM() -> bool override;
 
+  auto
+  swapXY() -> void override;
+
   //--- accessors
 
   /**

@@ -86,6 +86,9 @@ public:
   auto
   dropM() -> bool override;
 
+  auto
+  swapXY() -> void override;
+
   /**
    * remove all points from the LineString
    */

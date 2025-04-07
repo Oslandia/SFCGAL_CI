@@ -310,6 +310,34 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(!ptZM.isMeasured());
 }
 
+BOOST_AUTO_TEST_CASE(testSwapXY)
+{
+  Point ptEmpty;
+  BOOST_CHECK(ptEmpty.isEmpty());
+  ptEmpty.swapXY();
+  BOOST_CHECK(ptEmpty.isEmpty());
+
+  Point pt2D(2.0, 3.0);
+  pt2D.swapXY();
+  BOOST_CHECK_EQUAL(pt2D.x(), 3.0);
+  BOOST_CHECK_EQUAL(pt2D.y(), 2.0);
+
+  Point pt3D(5.0, 3.0, 4.0);
+  pt3D.swapXY();
+  BOOST_CHECK_EQUAL(pt3D.x(), 3.0);
+  BOOST_CHECK_EQUAL(pt3D.y(), 5.0);
+
+  std::unique_ptr<Geometry> ptM(io::readWkt("POINT M (9 2 4)"));
+  ptM->swapXY();
+  BOOST_CHECK_EQUAL(ptM->as<Point>().x(), 2.0);
+  BOOST_CHECK_EQUAL(ptM->as<Point>().y(), 9.0);
+
+  Point ptZM(-2.0, -3.0, 4.0, 5.0);
+  ptZM.swapXY();
+  BOOST_CHECK_EQUAL(ptZM.x(), -3.0);
+  BOOST_CHECK_EQUAL(ptZM.y(), -2.0);
+}
+
 // TODO
 // virtual bool         Geometry::isSimple() const = 0 ;
 

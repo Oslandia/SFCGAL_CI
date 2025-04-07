@@ -123,6 +123,12 @@ Point::dropM() -> bool
   return true;
 }
 
+auto
+Point::swapXY() -> void
+{
+  _coordinate.swapXY();
+}
+
 void
 Point::accept(GeometryVisitor &visitor)
 {

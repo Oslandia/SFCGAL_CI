@@ -125,6 +125,9 @@ public:
   auto
   dropM() -> bool override;
 
+  auto
+  swapXY() -> void override;
+
   /**
    * Convert PolyhedralSurface to TriangulatedSurface
    */

@@ -148,4 +148,36 @@ BOOST_AUTO_TEST_CASE(dropZM)
   BOOST_CHECK(!multiLineStringZM.dropZ());
 }
 
+BOOST_AUTO_TEST_CASE(swapXY)
+{
+  MultiLineString multiLineStringEmpty;
+  BOOST_CHECK(multiLineStringEmpty.isEmpty());
+  multiLineStringEmpty.swapXY();
+  BOOST_CHECK(multiLineStringEmpty.isEmpty());
+
+  MultiLineString multiLineString2D;
+  multiLineString2D.addGeometry(new LineString(Point(2.0, 3.0), Point(4.0, 5.0)));
+  multiLineString2D.addGeometry(new LineString(Point(6.0, 7.0), Point(9.0, 10.0)));
+  multiLineString2D.swapXY();
+  BOOST_CHECK_EQUAL(multiLineString2D.asText(0), "MULTILINESTRING ((3 2,5 4),(7 6,10 9))");
+
+  MultiLineString multiLineString3D;
+  multiLineString3D.addGeometry(new LineString(Point(2.0, 3.0, 5.0), Point(4.0, 5.0, 5.0)));
+  multiLineString3D.addGeometry(new LineString(Point(6.0, 7.0, 5.0), Point(9.0, 10.0, 5.0)));
+  multiLineString3D.swapXY();
+  BOOST_CHECK_EQUAL(multiLineString3D.asText(0), "MULTILINESTRING Z ((3 2 5,5 4 5),(7 6 5,10 9 5))");
+
+  MultiLineString multiLineStringM;
+  multiLineStringM.addGeometry(io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
+  multiLineStringM.addGeometry(io::readWkt("LINESTRING M (3 2 4, 4 2 5)").release());
+  multiLineStringM.swapXY();
+  BOOST_CHECK_EQUAL(multiLineStringM.asText(0), "MULTILINESTRING M ((0 0 4,1 1 5,2 2 6),(2 3 4,2 4 5))");
+
+  MultiLineString multiLineStringZM;
+  multiLineStringZM.addGeometry(new LineString(Point(2.0, 3.0, 5.0, 2.0), Point(4.0, 5.0, 5.0, 2.0)));
+  multiLineStringZM.addGeometry(new LineString(Point(6.0, 7.0, 5.0, 1.0), Point(9.0, 10.0, 5.0, 1.0)));
+  multiLineStringZM.swapXY();
+  BOOST_CHECK_EQUAL(multiLineStringZM.asText(0), "MULTILINESTRING ZM ((3 2 5 2,5 4 5 2),(7 6 5 1,10 9 5 1))");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
