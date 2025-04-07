@@ -221,6 +221,31 @@ BOOST_AUTO_TEST_CASE(testDropZ)
   BOOST_CHECK(!coordEmpty.dropZ());
 }
 
+BOOST_AUTO_TEST_CASE(testSwapXY)
+{
+  Coordinate coord3D(1.0, 2.0, 3.0);
+  BOOST_CHECK(!coord3D.isEmpty());
+  BOOST_CHECK(coord3D.is3D());
+  coord3D.swapXY();
+  BOOST_CHECK(coord3D.is3D());
+  BOOST_CHECK_EQUAL(coord3D.x(), 2.0);
+  BOOST_CHECK_EQUAL(coord3D.y(), 1.0);
+  BOOST_CHECK_EQUAL(coord3D.z(), 3.0);
+
+  Coordinate coord2D(1.0, 4.0);
+  BOOST_CHECK(!coord2D.isEmpty());
+  BOOST_CHECK(!coord2D.is3D());
+  coord2D.swapXY();
+  BOOST_CHECK(!coord2D.is3D());
+  BOOST_CHECK_EQUAL(coord2D.x(), 4.0);
+  BOOST_CHECK_EQUAL(coord2D.y(), 1.0);
+
+  Coordinate coordEmpty;
+  BOOST_CHECK(coordEmpty.isEmpty());
+  coordEmpty.swapXY();
+  BOOST_CHECK(coordEmpty.isEmpty());
+}
+
 /// bool operator == ( const Coordinate & other ) const ;
 /// bool operator != ( const Coordinate & other ) const ;
 /// inline Kernel::Vector_2 toVector_2() const

@@ -378,4 +378,14 @@ Coordinate::dropZ() -> bool
   return true;
 }
 
+auto
+Coordinate::swapXY() -> void
+{
+  if (_storage.which() == 1) {
+    _storage = Kernel::Point_2(y(), x());
+  } else if (_storage.which() == 2) {
+    _storage = Kernel::Point_3(y(), x(), z());
+  }
+}
+
 } // namespace SFCGAL

@@ -188,6 +188,12 @@ public:
   auto
   dropZ() -> bool;
 
+  /**
+   * @brief Swaps the x and y coordinates
+   */
+  auto
+  swapXY() -> void;
+
   // class for Empty coordinate
   class Empty {};
 
