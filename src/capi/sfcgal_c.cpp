@@ -42,6 +42,7 @@
 #include "SFCGAL/algorithm/distance3d.h"
 #include "SFCGAL/algorithm/extrude.h"
 #include "SFCGAL/algorithm/force3D.h"
+#include "SFCGAL/algorithm/forceMeasured.h"
 #include "SFCGAL/algorithm/intersection.h"
 #include "SFCGAL/algorithm/intersects.h"
 #include "SFCGAL/algorithm/isSimple.h"
@@ -462,6 +463,25 @@ sfcgal_geometry_force_z(sfcgal_geometry_t *geom, double defaultZ) -> int
 
   try {
     SFCGAL::algorithm::force3D(*sfcgalGeom, defaultZ);
+  } catch (std::exception &e) {
+    SFCGAL_ERROR("%s", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+extern "C" auto
+sfcgal_geometry_force_m(sfcgal_geometry_t *geom, double defaultM) -> int
+{
+  auto *sfcgalGeom = reinterpret_cast<SFCGAL::Geometry *>(geom);
+  // If the geometry is already measured or empty, don't do anything
+  if (sfcgalGeom->isEmpty() || sfcgalGeom->isMeasured()) {
+    return 0;
+  }
+
+  try {
+    SFCGAL::algorithm::forceMeasured(*sfcgalGeom, defaultM);
   } catch (std::exception &e) {
     SFCGAL_ERROR("%s", e.what());
     return 0;

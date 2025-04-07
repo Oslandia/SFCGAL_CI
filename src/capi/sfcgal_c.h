@@ -226,6 +226,18 @@ SFCGAL_API int
 sfcgal_geometry_force_z(sfcgal_geometry_t *geom, double defaultZ);
 
 /**
+ * Adds a m-dimension to the geometry, initialized to a preset value.
+ * Existing M values remains unchanged.
+ * This has no effect on empty geometries.
+ * @param geom the input geometry
+ * @param defaultM m-value to use
+ * @post returns 1 if a M value was added. 0 otherwise.
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_geometry_force_m(sfcgal_geometry_t *geom, double defaultM);
+
+/**
  * Swaps the x and y coordinates of the geometry
  * @ingroup capi
  */
