@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(solidReadTest)
 
   std::unique_ptr<Geometry> g(io::readWkt(gstr));
   BOOST_CHECK_EQUAL(g->as<Solid>().numShells(), 2U);
-  BOOST_CHECK_EQUAL(g->as<Solid>().numGeometries(), 1U);
+  BOOST_CHECK_EQUAL(g->as<Solid>().numGeometries(), 2U);
 }
 
 BOOST_AUTO_TEST_CASE(solidSetExteriorRingTest)

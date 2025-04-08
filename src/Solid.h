@@ -174,6 +174,13 @@ public:
     _shells.replace(0, shell);
   }
 
+  //-- SFCGAL::Geometry
+  size_t
+  numGeometries() const override
+  {
+    return numShells();
+  }
+
   /**
    * Returns the number of shells
    */
