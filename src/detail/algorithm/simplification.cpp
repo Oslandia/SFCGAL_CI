@@ -129,7 +129,7 @@ struct Segment {
     double dy   = y2 - y1;
     double len2 = dx * dx + dy * dy;
 
-    if (len2 < 1e-8) {
+    if (len2 < EPSILON) {
       // Segment is degenerate, return distance to p1
       double distX = x - x1;
       double distY = y - y1;
@@ -165,7 +165,7 @@ struct Segment {
     double dy   = y2 - y1;
     double len2 = dx * dx + dy * dy;
 
-    if (len2 < 1e-8) {
+    if (len2 < EPSILON) {
       return 0.0; // Degenerate segment, use first point
     }
 
