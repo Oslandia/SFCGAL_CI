@@ -544,8 +544,8 @@ simplifyMultiLineString(const MultiLineString &multiLine, double threshold,
  * @brief Simplifies a Polygon
  */
 auto
-simplifyPolygon(const Polygon &polygon, double threshold, bool preserveTopology)
-    -> std::unique_ptr<Geometry>
+simplifyPolygon(const Polygon &polygon, double threshold,
+                bool /*preserveTopology*/) -> std::unique_ptr<Geometry>
 {
   // Extract dimension info
   CoordinateType dimension = polygon.getCoordinateType();
