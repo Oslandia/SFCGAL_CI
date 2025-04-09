@@ -42,6 +42,12 @@ Please follow these guidelines to ensure consistency and quality across the code
 - Include comments and documentation where appropriate.
 - Write tests for new features and bug fixes.
 
+### Commit linter
+
+We use the linter [commitizen](https://github.com/commitizen-tools/commitizen) with the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) configuration (the default one).
+
+The commit message writing process can be guided by using `cz commit` instead of `git commit`.
+
 ### Code of Conduct
 
 By participating in this project, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md). Please be respectful and considerate in your interactions with others.

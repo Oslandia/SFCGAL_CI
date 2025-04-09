@@ -1,0 +1,11 @@
+lint-commitizen:
+  stage: lint
+  image: python:3.13-slim-bookworm
+  before_script:
+    - apt update && apt install -y git
+    - pip install commitizen
+  script:
+    - cz check --rev-range $CI_MERGE_REQUEST_DIFF_BASE_SHA..HEAD
+  only:
+    refs:
+      - merge_requests

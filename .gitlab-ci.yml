@@ -45,6 +45,7 @@ include:
   - local: /.gitlab/pipeline/build-debian-docker.yml
   - local: /.gitlab/pipeline/build-windows.yml
   - local: /.gitlab/pipeline/documentation.yml
+  - local: /.gitlab/pipeline/commitizen.yml
 
 semgrep-sast:
   stage: lint
