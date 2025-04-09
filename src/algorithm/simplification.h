@@ -16,7 +16,7 @@ namespace algorithm {
  *  https://doc.cgal.org/latest/Polyline_simplification_2/index.html
  *
  * @param geometry The geometry to simplify
- * @param threshold The distance threshold for simplification
+ * @param threshold The distance (in geometry unit) threshold for simplification
  * @param preserveTopology Whether to preserve topology during simplification
  * @return A simplified copy of the input geometry
  */
