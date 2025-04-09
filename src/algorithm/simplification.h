@@ -13,6 +13,7 @@ namespace algorithm {
 
 /**
  * @brief Simplifies a geometry using the CGAL algorithm
+ *  https://doc.cgal.org/latest/Polyline_simplification_2/index.html
  *
  * @param geometry The geometry to simplify
  * @param threshold The distance threshold for simplification
