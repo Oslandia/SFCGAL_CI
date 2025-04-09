@@ -78,4 +78,6 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_GeometryTest)
 // template <class Archive> void serialize( Archive& ar, const unsigned int
 // version )
 
+BOOST_AUTO_TEST_CASE(getCoordinateType) {}
+
 BOOST_AUTO_TEST_SUITE_END()

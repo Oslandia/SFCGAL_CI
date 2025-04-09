@@ -430,7 +430,8 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(!line3D.is3D());
   BOOST_CHECK(!line3D.dropZ());
 
-  std::unique_ptr<Geometry> lineM(io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
+  std::unique_ptr<Geometry> lineM(
+      io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
   BOOST_CHECK(!lineM->is3D());
   BOOST_CHECK(lineM->isMeasured());
   BOOST_CHECK(!lineM->dropZ());
@@ -474,14 +475,29 @@ BOOST_AUTO_TEST_CASE(testSwapXY)
   line3D.swapXY();
   BOOST_CHECK_EQUAL(line3D.asText(0), "LINESTRING Z (0 -2 2,1 5 5)");
 
-  std::unique_ptr<Geometry> lineM(io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
+  std::unique_ptr<Geometry> lineM(
+      io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
   lineM->swapXY();
   BOOST_CHECK_EQUAL(lineM->asText(0), "LINESTRING M (0 0 4,1 1 5,2 2 6)");
-
 
   LineString lineZM(Point(3.0, 0.0, 2.0, 4.0), Point(1.0, 23.0, 5.0, 4.0));
   lineZM.swapXY();
   BOOST_CHECK_EQUAL(lineZM.asText(0), "LINESTRING ZM (0 3 2 4,23 1 5 4)");
+}
+
+BOOST_AUTO_TEST_CASE(getCoordinateType)
+{
+  BOOST_CHECK_EQUAL(io::readWkt("LINESTRING (0 0, 1 1)")->getCoordinateType(),
+                    CoordinateType::COORDINATE_XY);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("LINESTRING Z (0 0 1, 1 1 1)")->getCoordinateType(),
+      CoordinateType::COORDINATE_XYZ);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("LINESTRING M (0 0 2, 1 1 2)")->getCoordinateType(),
+      CoordinateType::COORDINATE_XYM);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("LINESTRING ZM (0 0 1 2, 1 1 1 2)")->getCoordinateType(),
+      CoordinateType::COORDINATE_XYZM);
 }
 
 // template < typename Derived > inline const Derived &  Geometry::as() const

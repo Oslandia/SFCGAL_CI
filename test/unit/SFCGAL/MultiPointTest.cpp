@@ -167,7 +167,8 @@ BOOST_AUTO_TEST_CASE(swapXY)
   multiPointZM.addGeometry(new Point(-2.0, -3.0, 5.0, 6.0));
   multiPointZM.addGeometry(new Point(42.0, -5.0, 7.0, 8.0));
   multiPointZM.swapXY();
-  BOOST_CHECK_EQUAL(multiPointZM.asText(0), "MULTIPOINT ZM ((-3 -2 5 6),(-5 42 7 8))");
+  BOOST_CHECK_EQUAL(multiPointZM.asText(0),
+                    "MULTIPOINT ZM ((-3 -2 5 6),(-5 42 7 8))");
 }
 //-- is< T >
 
@@ -183,4 +184,19 @@ BOOST_AUTO_TEST_CASE(isMultiPoint)
   BOOST_CHECK(g.is<MultiPoint>());
 }
 
+BOOST_AUTO_TEST_CASE(getCoordinateType)
+{
+  BOOST_CHECK_EQUAL(
+      io::readWkt("MULTIPOINT((0 0), (1 1))")->getCoordinateType(),
+      CoordinateType::COORDINATE_XY);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("MULTIPOINT Z((0 0 1), (1 1 1))")->getCoordinateType(),
+      CoordinateType::COORDINATE_XYZ);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("MULTIPOINT M((0 0 2), (1 1 2))")->getCoordinateType(),
+      CoordinateType::COORDINATE_XYM);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("MULTIPOINT ZM((0 0 1 2), (1 1 1 2))")->getCoordinateType(),
+      CoordinateType::COORDINATE_XYZM);
+}
 BOOST_AUTO_TEST_SUITE_END()
