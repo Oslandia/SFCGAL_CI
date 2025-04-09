@@ -42,23 +42,8 @@ Point::Point(const double &x, const double &y, const double &z, const double &m)
 
 Point::Point(const double &x, const double &y, const double &z, const double &m,
              CoordinateType dim)
+    : Point(Kernel::FT(x), Kernel::FT(y), Kernel::FT(z), m, dim)
 {
-  bool _is3D = (dim == CoordinateType::COORDINATE_XYZ) ||
-               (dim == CoordinateType::COORDINATE_XYZM);
-  bool _hasM = (dim == CoordinateType::COORDINATE_XYM) ||
-               (dim == CoordinateType::COORDINATE_XYZM);
-
-  if (_is3D) {
-    _coordinate = Coordinate(x, y, z);
-  } else {
-    _coordinate = Coordinate(x, y);
-  }
-
-  if (_hasM) {
-    _m = m;
-  } else {
-    _m = NaN();
-  }
 }
 
 Point::Point(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z,
