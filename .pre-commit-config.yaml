@@ -51,6 +51,14 @@ repos:
           - markdown
           - non-executable
 
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.5.1
+    hooks:
+      - id: commitizen
+      - id: commitizen-branch
+        stages: [push]
+
+
   # - repo: https://github.com/pocc/pre-commit-hooks
   #   rev: v1.3.5
   #   hooks:
