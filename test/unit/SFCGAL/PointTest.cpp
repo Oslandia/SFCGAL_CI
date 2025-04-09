@@ -75,6 +75,24 @@ BOOST_AUTO_TEST_CASE(xyzConstructor)
   BOOST_CHECK_EQUAL(g.y(), 3.0);
   BOOST_CHECK_EQUAL(g.z(), 4.0);
 }
+
+BOOST_AUTO_TEST_CASE(dimensionConstructor)
+{
+  const double x = 1.0;
+  const double y = 2.0;
+  const double z = 3.0;
+  const double m = 4.0;
+
+  BOOST_CHECK(Point(x, y, z, m, CoordinateType::COORDINATE_XY) == Point(x, y));
+  BOOST_CHECK(Point(x, y, z, m, CoordinateType::COORDINATE_XYZ) ==
+              Point(x, y, z));
+  BOOST_CHECK(Point(x, y, z, m, CoordinateType::COORDINATE_XYZM) ==
+              Point(x, y, z, m));
+  Point xym{x, y};
+  xym.setM(m);
+  BOOST_CHECK(Point(x, y, z, m, CoordinateType::COORDINATE_XYM) == xym);
+}
+
 // Point( const Kernel::Point_2 & other ) ;
 // Point( const Kernel::Point_3 & other ) ;
 // Point( const Point & other ) ;
