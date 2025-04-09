@@ -386,4 +386,16 @@ BOOST_AUTO_TEST_CASE(testAccessors)
   BOOST_CHECK_EQUAL(g3D.numGeometries(), 1U);
 }
 
+BOOST_AUTO_TEST_CASE(getCoordinateType)
+{
+  BOOST_CHECK_EQUAL(io::readWkt("POINT (0 0)")->getCoordinateType(),
+                    CoordinateType::COORDINATE_XY);
+  BOOST_CHECK_EQUAL(io::readWkt("POINT Z (0 0 1)")->getCoordinateType(),
+                    CoordinateType::COORDINATE_XYZ);
+  BOOST_CHECK_EQUAL(io::readWkt("POINT M (0 0 2)")->getCoordinateType(),
+                    CoordinateType::COORDINATE_XYM);
+  BOOST_CHECK_EQUAL(io::readWkt("POINT ZM (0 0 1 2)")->getCoordinateType(),
+                    CoordinateType::COORDINATE_XYZM);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

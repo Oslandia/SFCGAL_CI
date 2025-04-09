@@ -224,40 +224,47 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
   BOOST_CHECK_EQUAL(emptyGeom->numGeometries(), 0);
   BOOST_CHECK_THROW(emptyGeom->geometryN(0), Exception);
 
-  std::string const triangulatedSurfaceStr =
-    "TIN Z ("
-    "((0 0 0, 2 0 2, 1 2 4, 0 0 0)),"
-    "((2 0 2, 3 2 3, 1 2 4, 2 0 2)),"
-    "((1 2 4, 3 2 3, 2 4 6, 1 2 4))"
-    ")";
+  std::string const triangulatedSurfaceStr = "TIN Z ("
+                                             "((0 0 0, 2 0 2, 1 2 4, 0 0 0)),"
+                                             "((2 0 2, 3 2 3, 1 2 4, 2 0 2)),"
+                                             "((1 2 4, 3 2 3, 2 4 6, 1 2 4))"
+                                             ")";
 
   std::unique_ptr<Geometry> geom(io::readWkt(triangulatedSurfaceStr));
   BOOST_CHECK(!geom->isEmpty());
   BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
-  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0), "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
-  BOOST_CHECK_EQUAL(geom->geometryN(1).asText(0), "TRIANGLE Z ((2 0 2,3 2 3,1 2 4,2 0 2))");
-  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0), "TRIANGLE Z ((1 2 4,3 2 3,2 4 6,1 2 4))");
+  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0),
+                    "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
+  BOOST_CHECK_EQUAL(geom->geometryN(1).asText(0),
+                    "TRIANGLE Z ((2 0 2,3 2 3,1 2 4,2 0 2))");
+  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0),
+                    "TRIANGLE Z ((1 2 4,3 2 3,2 4 6,1 2 4))");
   BOOST_CHECK_THROW(geom->geometryN(3), Exception);
 
   // set new Polygon at index 1 from a Geometry object
-  std::string const newTriangleStr = "TRIANGLE Z ((0 0 0, 2 0 4, 1 2 2, 0 0 0))";
+  std::string const newTriangleStr =
+      "TRIANGLE Z ((0 0 0, 2 0 4, 1 2 2, 0 0 0))";
   std::unique_ptr<Geometry> newGeom(io::readWkt(newTriangleStr));
   geom->setGeometryN(newGeom->clone(), 1);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
-  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0), "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
+  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0),
+                    "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
   BOOST_CHECK_EQUAL(geom->geometryN(1).asText(), newGeom->asText());
-  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0), "TRIANGLE Z ((1 2 4,3 2 3,2 4 6,1 2 4))");
+  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0),
+                    "TRIANGLE Z ((1 2 4,3 2 3,2 4 6,1 2 4))");
 
   // set New Triangle at index 2 from a Triangle
-  std::string const newTriangleStr2 = "TRIANGLE Z ((0 0 0, 0 15 0, 15 15 15, 0 0 0))";
+  std::string const newTriangleStr2 =
+      "TRIANGLE Z ((0 0 0, 0 15 0, 15 15 15, 0 0 0))";
   std::unique_ptr<Geometry> newGeom2(io::readWkt(newTriangleStr2));
   Triangle *newTriangle2 = dynamic_cast<Triangle *>(newGeom2.get());
   BOOST_CHECK(newTriangle2);
   geom->setGeometryN(newTriangle2->clone(), 2);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
-  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0), "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
+  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0),
+                    "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
   BOOST_CHECK_EQUAL(geom->geometryN(1).asText(), newGeom->asText());
   BOOST_CHECK_EQUAL(geom->geometryN(2).asText(), newGeom2->asText());
 }
@@ -271,23 +278,26 @@ BOOST_AUTO_TEST_CASE(dropZMTest)
   BOOST_CHECK(!surfaceEmpty.dropZ());
   BOOST_CHECK(!surfaceEmpty.dropM());
 
-  std::string const triangulatedSurface3DStr =
-    "TIN Z ("
-    "((0 0 0, 2 0 2, 1 2 4, 0 0 0)),"
-    "((2 0 2, 3 2 3, 1 2 4, 2 0 2)),"
-    "((1 2 4, 3 2 3, 2 4 6, 1 2 4))"
-    ")";
+  std::string const triangulatedSurface3DStr = "TIN Z ("
+                                               "((0 0 0, 2 0 2, 1 2 4, 0 0 0)),"
+                                               "((2 0 2, 3 2 3, 1 2 4, 2 0 2)),"
+                                               "((1 2 4, 3 2 3, 2 4 6, 1 2 4))"
+                                               ")";
 
   std::unique_ptr<Geometry> geom3D(io::readWkt(triangulatedSurface3DStr));
   BOOST_CHECK(!geom3D->isEmpty());
   BOOST_CHECK(geom3D->is3D());
   BOOST_CHECK(geom3D->dropZ());
   BOOST_CHECK_EQUAL(geom3D->numGeometries(), 3);
-  BOOST_CHECK_EQUAL(geom3D->geometryN(0).asText(0), "TRIANGLE ((0 0,2 0,1 2,0 0))");
-  BOOST_CHECK_EQUAL(geom3D->geometryN(1).asText(0), "TRIANGLE ((2 0,3 2,1 2,2 0))");
-  BOOST_CHECK_EQUAL(geom3D->geometryN(2).asText(0), "TRIANGLE ((1 2,3 2,2 4,1 2))");
+  BOOST_CHECK_EQUAL(geom3D->geometryN(0).asText(0),
+                    "TRIANGLE ((0 0,2 0,1 2,0 0))");
+  BOOST_CHECK_EQUAL(geom3D->geometryN(1).asText(0),
+                    "TRIANGLE ((2 0,3 2,1 2,2 0))");
+  BOOST_CHECK_EQUAL(geom3D->geometryN(2).asText(0),
+                    "TRIANGLE ((1 2,3 2,2 4,1 2))");
 
-  std::string const triangulatedSurfaceMStr = "TIN M(((0 0 0, 0 1 0, 1 1 0, 0 0 0)))";
+  std::string const triangulatedSurfaceMStr =
+      "TIN M(((0 0 0, 0 1 0, 1 1 0, 0 0 0)))";
   std::unique_ptr<Geometry> geomM(io::readWkt(triangulatedSurfaceMStr));
   BOOST_CHECK(!geomM->is3D());
   BOOST_CHECK(geomM->isMeasured());
@@ -299,17 +309,22 @@ BOOST_AUTO_TEST_CASE(dropZMTest)
   BOOST_CHECK(!geomM->dropZ());
   BOOST_CHECK(!geomM->dropM());
 
-  std::string const triangulatedSurfaceZMStr = "TIN ZM (((0 0 10 1, 10 0 15 2, 5 5 12 3, 0 0 10 1)),((5 5 12 3, 10 0 15 2, 10 10 20 4, 5 5 12 3)))";
+  std::string const triangulatedSurfaceZMStr =
+      "TIN ZM (((0 0 10 1, 10 0 15 2, 5 5 12 3, 0 0 10 1)),((5 5 12 3, 10 0 15 "
+      "2, 10 10 20 4, 5 5 12 3)))";
   std::unique_ptr<Geometry> geomZM(io::readWkt(triangulatedSurfaceZMStr));
   BOOST_CHECK(geomZM->is3D());
   BOOST_CHECK(geomZM->isMeasured());
   BOOST_CHECK(geomZM->dropM());
   BOOST_CHECK(geomZM->is3D());
   BOOST_CHECK(!geomZM->isMeasured());
-  BOOST_CHECK_EQUAL(geomZM->asText(0), "TIN Z (((0 0 10,10 0 15,5 5 12,0 0 10)),((5 5 12,10 0 15,10 10 20,5 5 12)))");
+  BOOST_CHECK_EQUAL(geomZM->asText(0),
+                    "TIN Z (((0 0 10,10 0 15,5 5 12,0 0 10)),((5 5 12,10 0 "
+                    "15,10 10 20,5 5 12)))");
   BOOST_CHECK(!geomZM->dropM());
   BOOST_CHECK(geomZM->dropZ());
-  BOOST_CHECK_EQUAL(geomZM->asText(0),"TIN (((0 0,10 0,5 5,0 0)),((5 5,10 0,10 10,5 5)))");
+  BOOST_CHECK_EQUAL(geomZM->asText(0),
+                    "TIN (((0 0,10 0,5 5,0 0)),((5 5,10 0,10 10,5 5)))");
   BOOST_CHECK(!geomZM->isMeasured());
   BOOST_CHECK(!geomZM->is3D());
   BOOST_CHECK(!geomZM->dropZ());
@@ -323,32 +338,50 @@ BOOST_AUTO_TEST_CASE(swapXYTest)
   surfaceEmpty.swapXY();
   BOOST_CHECK(surfaceEmpty.isEmpty());
 
-  std::string const triangulatedSurface3DStr =
-    "TIN Z ("
-    "((0 0 0, 2 0 2, 1 2 4, 0 0 0)),"
-    "((2 0 2, 3 2 3, 1 2 4, 2 0 2)),"
-    "((1 2 4, 3 2 3, 2 4 6, 1 2 4))"
-    ")";
+  std::string const         triangulatedSurface3DStr = "TIN Z ("
+                                                       "((0 0 0, 2 0 2, 1 2 4, 0 0 0)),"
+                                                       "((2 0 2, 3 2 3, 1 2 4, 2 0 2)),"
+                                                       "((1 2 4, 3 2 3, 2 4 6, 1 2 4))"
+                                                       ")";
   std::unique_ptr<Geometry> geom3D(io::readWkt(triangulatedSurface3DStr));
   geom3D->swapXY();
-  BOOST_CHECK_EQUAL(geom3D->asText(0),
-                    "TIN Z "
-                    "(((0 0 0,0 2 2,2 1 4,0 0 0)),"
-                    "((0 2 2,2 3 3,2 1 4,0 2 2)),"
-                    "((2 1 4,2 3 3,4 2 6,2 1 4)))");
+  BOOST_CHECK_EQUAL(geom3D->asText(0), "TIN Z "
+                                       "(((0 0 0,0 2 2,2 1 4,0 0 0)),"
+                                       "((0 2 2,2 3 3,2 1 4,0 2 2)),"
+                                       "((2 1 4,2 3 3,4 2 6,2 1 4)))");
 
-  std::string const triangulatedSurfaceMStr = "TIN M(((0 0 0, 0 1 0, 1 1 0, 0 0 0)))";
+  std::string const triangulatedSurfaceMStr =
+      "TIN M(((0 0 0, 0 1 0, 1 1 0, 0 0 0)))";
   std::unique_ptr<Geometry> geomM(io::readWkt(triangulatedSurfaceMStr));
   geomM->swapXY();
   BOOST_CHECK_EQUAL(geomM->asText(0), "TIN M (((0 0 0,1 0 0,1 1 0,0 0 0)))");
 
-  std::string const triangulatedSurfaceZMStr = "TIN ZM (((0 0 10 1, 10 0 15 2, 5 5 12 3, 0 0 10 1)),((5 5 12 3, 10 0 15 2, 10 10 20 4, 5 5 12 3)))";
+  std::string const triangulatedSurfaceZMStr =
+      "TIN ZM (((0 0 10 1, 10 0 15 2, 5 5 12 3, 0 0 10 1)),((5 5 12 3, 10 0 15 "
+      "2, 10 10 20 4, 5 5 12 3)))";
   std::unique_ptr<Geometry> geomZM(io::readWkt(triangulatedSurfaceZMStr));
   geomZM->swapXY();
   BOOST_CHECK_EQUAL(geomZM->asText(0),
                     "TIN ZM "
                     "(((0 0 10 1,0 10 15 2,5 5 12 3,0 0 10 1)),"
                     "((5 5 12 3,0 10 15 2,10 10 20 4,5 5 12 3)))");
+}
+
+BOOST_AUTO_TEST_CASE(getCoordinateType)
+{
+  BOOST_CHECK_EQUAL(
+      io::readWkt("TIN(((0 0, 1 0, 0 1, 0 0)))")->getCoordinateType(),
+      CoordinateType::COORDINATE_XY);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("TIN Z(((0 0 1, 1 0 1, 0 1 1, 0 0 1)))")->getCoordinateType(),
+      CoordinateType::COORDINATE_XYZ);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("TIN M(((0 0 2, 1 0 2, 0 1 2, 0 0 2)))")->getCoordinateType(),
+      CoordinateType::COORDINATE_XYM);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("TIN ZM(((0 0 1 2, 1 0 1 2, 0 1 1 2, 0 0 1 2)))")
+          ->getCoordinateType(),
+      CoordinateType::COORDINATE_XYZM);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

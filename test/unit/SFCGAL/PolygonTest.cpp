@@ -261,7 +261,8 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(!polygon3D.isMeasured());
   BOOST_CHECK(!polygon3D.dropM());
 
-  std::unique_ptr<Geometry> polygonM(io::readWkt("POLYGON M ((0 0 4, 0 3 5, 3 3 6, 3 0 7, 0 0 4))").release());
+  std::unique_ptr<Geometry> polygonM(
+      io::readWkt("POLYGON M ((0 0 4, 0 3 5, 3 3 6, 3 0 7, 0 0 4))").release());
   BOOST_CHECK(!polygonM->is3D());
   BOOST_CHECK(polygonM->isMeasured());
   BOOST_CHECK(!polygonM->dropZ());
@@ -284,7 +285,8 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(polygonZM.dropM());
   BOOST_CHECK(polygonZM.is3D());
   BOOST_CHECK(!polygonZM.isMeasured());
-  BOOST_CHECK_EQUAL(polygonZM.asText(0), "POLYGON Z ((0 0 2,1 0 2,1 1 2,0 1 2,0 0 2))");
+  BOOST_CHECK_EQUAL(polygonZM.asText(0),
+                    "POLYGON Z ((0 0 2,1 0 2,1 1 2,0 1 2,0 0 2))");
   BOOST_CHECK(!polygonZM.dropM());
 
   BOOST_CHECK(polygonZM.dropZ());
@@ -317,9 +319,11 @@ BOOST_AUTO_TEST_CASE(testSwapXY)
   polygon3D.exteriorRing().addPoint(Point(7.0, 2.0, 2.0));
   polygon3D.swapXY();
   BOOST_CHECK_EQUAL(polygon3D.asText(1),
-                    "POLYGON Z ((0.0 3.0 2.0,0.0 1.0 2.0,1.0 1.0 2.0,1.0 0.0 2.0,2.0 7.0 2.0))");
+                    "POLYGON Z ((0.0 3.0 2.0,0.0 1.0 2.0,1.0 1.0 2.0,1.0 0.0 "
+                    "2.0,2.0 7.0 2.0))");
 
-  std::unique_ptr<Geometry> polygonM(io::readWkt("POLYGON M ((0 0 4, 0 3 5, 3 3 6, 3 0 7, 0 0 4))").release());
+  std::unique_ptr<Geometry> polygonM(
+      io::readWkt("POLYGON M ((0 0 4, 0 3 5, 3 3 6, 3 0 7, 0 0 4))").release());
   polygonM->swapXY();
   BOOST_CHECK_EQUAL(polygonM->asText(0),
                     "POLYGON M ((0 0 4,3 0 5,3 3 6,0 3 7,0 0 4))");
@@ -341,6 +345,26 @@ BOOST_AUTO_TEST_CASE(isPolygon)
   Polygon const g;
   BOOST_CHECK(g.is<Polygon>());
 }
+
+BOOST_AUTO_TEST_CASE(getCoordinateType)
+{
+  BOOST_CHECK_EQUAL(
+      io::readWkt("POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))")->getCoordinateType(),
+      CoordinateType::COORDINATE_XY);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("POLYGON Z((0 0 1, 1 0 1, 1 1 1, 0 1 1, 0 0 1))")
+          ->getCoordinateType(),
+      CoordinateType::COORDINATE_XYZ);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("POLYGON M((0 0 2, 1 0 2, 1 1 2, 0 1 2, 0 0 2))")
+          ->getCoordinateType(),
+      CoordinateType::COORDINATE_XYM);
+  BOOST_CHECK_EQUAL(
+      io::readWkt("POLYGON ZM((0 0 1 2, 1 0 1 2, 1 1 1 2, 0 1 1 2, 0 0 1 2))")
+          ->getCoordinateType(),
+      CoordinateType::COORDINATE_XYZM);
+}
+
 // template < typename Derived > inline const Derived &  Geometry::as() const
 // template < typename Derived > inline Derived &        Geometry::as()
 
