@@ -1,6 +1,7 @@
 #include <utility>
 
 #include "SFCGAL/Cylinder.h"
+#include "SFCGAL/numeric.h"
 
 namespace SFCGAL {
 
@@ -71,7 +72,7 @@ auto
 Cylinder::normalize(const Vector_3 &v) -> Vector_3
 {
   double length = std::sqrt(CGAL::to_double(v.squared_length()));
-  if (length < 1e-8) {
+  if (length < EPSILON) {
     return v;
   }
   return v / length;
@@ -103,7 +104,7 @@ Cylinder::generateSurfaceMesh() -> Surface_mesh_3
   Vector_3 normalized_axis = normalize(m_axis);
   Vector_3 perpendicular =
       normalize(CGAL::cross_product(normalized_axis, Vector_3(0, 0, 1)));
-  if (perpendicular.squared_length() < 1e-8) {
+  if (perpendicular.squared_length() < EPSILON) {
     perpendicular =
         normalize(CGAL::cross_product(normalized_axis, Vector_3(0, 1, 0)));
   }

@@ -14,6 +14,8 @@
 
 namespace SFCGAL {
 
+constexpr double EPSILON = 1e-8;
+
 #if defined(__clang__)
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wfloat-equal"

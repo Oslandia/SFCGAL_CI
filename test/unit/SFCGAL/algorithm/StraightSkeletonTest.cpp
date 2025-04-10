@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE(testDegenerateMultiLineString)
       "1297000 200400, 1296000 200400, 1294585.78643762995488942 "
       "200985.78643762698629871),(1297000 202400, 1297000 212400, 1296000 "
       "212400, 1296000 202400, 1297000 202400))"));
-  const double                    tolerance = 1e-8;
+  const double                    tolerance = EPSILON;
   std::unique_ptr<Geometry>       out(
       algorithm::straightSkeleton(*g, tolerance != 0.0));
   for (size_t i = 0; i < out->numGeometries(); i++) {

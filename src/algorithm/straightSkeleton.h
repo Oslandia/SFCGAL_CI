@@ -45,7 +45,7 @@ SFCGAL_API std::unique_ptr<MultiLineString>
 SFCGAL_API std::unique_ptr<MultiLineString>
            straightSkeleton(const Geometry &g, bool autoOrientation = true,
                             bool innerOnly = false, bool outputDistanceInM = false,
-                            const double &toleranceAbs = 1e-8);
+                            const double &toleranceAbs = EPSILON);
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
@@ -61,7 +61,7 @@ SFCGAL_API std::unique_ptr<MultiLineString>
 SFCGAL_API std::unique_ptr<MultiLineString>
 straightSkeleton(const Geometry &g, bool autoOrientation, NoValidityCheck,
                  bool innerOnly = false, bool outputDistanceInM = false,
-                 const double &toleranceAbs = 1e-8);
+                 const double &toleranceAbs = EPSILON);
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
@@ -71,7 +71,7 @@ straightSkeleton(const Geometry &g, bool autoOrientation, NoValidityCheck,
 SFCGAL_API std::unique_ptr<MultiLineString>
            straightSkeleton(const Polygon &g, bool autoOrientation = true,
                             bool innerOnly = false, bool outputDistanceInM = false,
-                            const double &toleranceAbs = 1e-8);
+                            const double &toleranceAbs = EPSILON);
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
@@ -81,7 +81,7 @@ SFCGAL_API std::unique_ptr<MultiLineString>
 SFCGAL_API std::unique_ptr<MultiLineString>
            straightSkeleton(const MultiPolygon &g, bool autoOrientation = true,
                             bool innerOnly = false, bool outputDistanceInM = false,
-                            const double &toleranceAbs = 1e-8);
+                            const double &toleranceAbs = EPSILON);
 
 /**
  * @brief build a 3D straight skeleton extruded for a Polygon
