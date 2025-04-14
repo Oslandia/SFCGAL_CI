@@ -308,6 +308,12 @@ private:
   auto
   applyByDimension(Func2D func2D, Func3D func3D) const
       -> std::invoke_result_t<Func2D>;
+
+  /// Private helper method to calculate parameter from a point
+  template <typename SegmentType, typename PointType>
+  auto
+  calculateParameterFromPoint(const SegmentType &segment,
+                              const PointType   &point) const -> Kernel::FT;
 };
 
 // Template implementation
@@ -373,6 +379,17 @@ Segment::distanceToPoint(Args &&...args) const -> double
   throw std::invalid_argument("Invalid arguments for distanceToPoint");
 }
 
+template <typename SegmentType, typename PointType>
+auto
+Segment::calculateParameterFromPoint(const SegmentType &segment,
+                                     const PointType &point) const -> Kernel::FT
+{
+  const auto v = segment.to_vector();
+  const auto w = point - segment.source();
+  auto       t = (w * v) / v.squared_length();
+  return std::clamp(t, Kernel::FT(0), Kernel::FT(1));
+}
+
 template <typename PointType>
 auto
 Segment::exactInterpolationParameter(const PointType &p) const -> Kernel::FT
@@ -387,20 +404,13 @@ Segment::exactInterpolationParameter(const PointType &p) const -> Kernel::FT
         [this, &p]() { return exactInterpolationParameter(p.toPoint_3()); });
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_2>) {
     const auto segment = toSegment_2();
-
     if (segment.is_degenerate()) {
       return 0; // Return source point parameter
     }
 
-    const auto v = segment.to_vector();
-    const auto w = p - segment.source();
-
-    auto t = (w * v) / v.squared_length();
-
-    return std::clamp(t, Kernel::FT(0), Kernel::FT(1));
+    return calculateParameterFromPoint(segment, p);
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_3>) {
     const auto segment = toSegment_3();
-
     if (segment.is_degenerate()) {
       return 0; // Return source point parameter
     }
@@ -408,12 +418,7 @@ Segment::exactInterpolationParameter(const PointType &p) const -> Kernel::FT
     const auto line       = segment.supporting_line();
     const auto projection = line.projection(p);
 
-    const auto v = segment.to_vector();
-    const auto w = projection - segment.source();
-
-    auto t = (w * v) / v.squared_length();
-
-    return std::clamp(t, Kernel::FT(0), Kernel::FT(1));
+    return calculateParameterFromPoint(segment, projection);
   }
 }
 
