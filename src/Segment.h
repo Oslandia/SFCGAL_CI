@@ -309,11 +309,48 @@ private:
   applyByDimension(Func2D func2D, Func3D func3D) const
       -> std::invoke_result_t<Func2D>;
 
-  /// Private helper method to calculate parameter from a point
+  /**
+   * @brief Calculates interpolation parameter for a point on a segment
+   *
+   * This helper method calculates the parameter value t (between 0 and 1)
+   * that represents where the given point (or its projection) falls along the
+   * segment.
+   * - t=0 corresponds to the source point
+   * - t=1 corresponds to the target point
+   * - 0<t<1 represents a point on the segment
+   * The parameter is clamped to the range [0,1].
+   *
+   * @tparam SegmentType CGAL segment type (Segment_2 or Segment_3)
+   * @tparam PointType CGAL point type (Point_2 or Point_3)
+   * @param segment The segment to calculate the parameter for
+   * @param point The point (or projection) to locate on the segment
+   * @return Parameter value t in [0,1]
+   */
   template <typename SegmentType, typename PointType>
   auto
   calculateParameterFromPoint(const SegmentType &segment,
                               const PointType   &point) const -> Kernel::FT;
+
+  /**
+   * @brief Checks if a point lies on a segment within a tolerance
+   *
+   * Determines whether a point is on a segment by checking:
+   * 1. If the segment is degenerate (zero length), checks distance to source
+   * point
+   * 2. If the point is exactly on the segment via CGAL's has_on method
+   * 3. If the distance from the point to the segment is within the tolerance
+   *
+   * @tparam SegmentType CGAL segment type (Segment_2 or Segment_3)
+   * @tparam PointType CGAL point type (Point_2 or Point_3)
+   * @param segment The segment to check against
+   * @param point The point to test
+   * @param tolerance Maximum distance tolerance (Euclidean)
+   * @return true if point is on segment within tolerance, false otherwise
+   */
+  template <typename SegmentType, typename PointType>
+  auto
+  checkPointOnSegment(const SegmentType &segment, const PointType &point,
+                      double tolerance) const -> bool;
 };
 
 // Template implementation
@@ -443,6 +480,23 @@ Segment::interpolationParameter(Args &&...args) const -> double
   throw std::invalid_argument("Invalid arguments for interpolationParameter");
 }
 
+template <typename SegmentType, typename PointType>
+auto
+Segment::checkPointOnSegment(const SegmentType &segment, const PointType &point,
+                             double tolerance) const -> bool
+{
+  if (segment.is_degenerate()) {
+    return CGAL::squared_distance(point, segment.source()) <=
+           tolerance * tolerance;
+  }
+
+  if (segment.has_on(point)) {
+    return true;
+  }
+
+  return CGAL::squared_distance(point, segment) <= tolerance * tolerance;
+}
+
 template <typename PointType>
 auto
 Segment::hasOn(const PointType &p, double tolerance) const -> bool
@@ -456,31 +510,9 @@ Segment::hasOn(const PointType &p, double tolerance) const -> bool
         [this, &p, tolerance]() { return hasOn(p.toPoint_2(), tolerance); },
         [this, &p, tolerance]() { return hasOn(p.toPoint_3(), tolerance); });
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_2>) {
-    const auto segment = toSegment_2();
-
-    if (segment.is_degenerate()) {
-      return CGAL::squared_distance(p, segment.source()) <=
-             tolerance * tolerance;
-    }
-
-    if (segment.has_on(p)) {
-      return true;
-    }
-
-    return CGAL::squared_distance(p, segment) <= tolerance * tolerance;
+    return checkPointOnSegment(toSegment_2(), p, tolerance);
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_3>) {
-    const auto segment = toSegment_3();
-
-    if (segment.is_degenerate()) {
-      return CGAL::squared_distance(p, segment.source()) <=
-             tolerance * tolerance;
-    }
-
-    if (segment.has_on(p)) {
-      return true;
-    }
-
-    return CGAL::squared_distance(p, segment) <= tolerance * tolerance;
+    return checkPointOnSegment(toSegment_3(), p, tolerance);
   }
 
   return false;
