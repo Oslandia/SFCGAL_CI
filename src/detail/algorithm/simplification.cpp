@@ -1,13 +1,15 @@
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
-#include <SFCGAL/algorithm/simplification.h>
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/algorithm/simplification.h"
+#include "SFCGAL/detail/SegmentStore.h"
+#include "SFCGAL/detail/ConstraintInfo.h"
 
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
 #include <CGAL/Constrained_triangulation_face_base_2.h>
@@ -43,377 +45,8 @@ using Points_in_constraint_iterator = CT::Points_in_constraint_iterator;
 using Stop                          = PS::Stop_above_cost_threshold;
 using Cost                          = PS::Squared_distance_cost;
 
-/**
- * @brief Structure to identify constraint sources for topology-preserving mode
- */
-struct ConstraintInfo {
-  enum class Type {
-    LINESTRING,
-    POLYGON_EXTERIOR,
-    POLYGON_INTERIOR,
-    POLYHEDRALSURFACE_EXTERIOR,
-    POLYHEDRALSURFACE_INTERIOR,
-    MULTIPOLYGON_EXTERIOR,
-    MULTIPOLYGON_INTERIOR
-  };
-
-  Type   type;
-  size_t geomIndex;
-  size_t ringIndex;
-
-  ConstraintInfo(Type t, size_t gIdx, size_t rIdx = 0)
-      : type(t), geomIndex(gIdx), ringIndex(rIdx)
-  {
-  }
-};
-
-/**
- * @brief Structure to store constraint order information
- * Allows recovering the original insertion order after simplification
- */
-struct ConstraintOrderInfo {
-  Constraint_id cid;       // Constraint ID returned by insertion
-  size_t        geomIndex; // Index of the geometry in the collection
-  size_t polyIndex; // Index of the polygon in MultiPolygon (if applicable)
-  size_t ringIndex; // Ring index (0=exterior, >0=hole)
-  size_t order; // Local order (for multiple constraints of the same polygon)
-  ConstraintInfo::Type
-      type; // Geometry type (linestring, polygon exterior, polygon interior)
-
-  ConstraintOrderInfo(
-      Constraint_id cid_, size_t geomIndex_, size_t polyIndex_ = 0,
-      size_t ringIndex_ = 0, size_t order_ = 0,
-      ConstraintInfo::Type type_ = ConstraintInfo::Type::LINESTRING)
-      : cid(cid_), geomIndex(geomIndex_), polyIndex(polyIndex_),
-        ringIndex(ringIndex_), order(order_), type(type_)
-  {
-  }
-};
-
-/**
- * @brief Comparison function for sorting constraints by original order
- */
-inline bool
-compareConstraintInfo(const ConstraintOrderInfo &a,
-                      const ConstraintOrderInfo &b)
-{
-  if (a.geomIndex != b.geomIndex)
-    return a.geomIndex < b.geomIndex;
-  if (a.polyIndex != b.polyIndex)
-    return a.polyIndex < b.polyIndex;
-  if (a.ringIndex != b.ringIndex)
-    return a.ringIndex < b.ringIndex;
-  return a.order < b.order;
-}
-
-/**
- * @brief Represents a segment with endpoints to interpolate Z/M values
- */
-struct Segment {
-  Point p1;
-  Point p2;
-
-  Segment(const Point &p1_, const Point &p2_) : p1(p1_), p2(p2_) {}
-
-  // Distance from point to segment (in XY plane)
-  double
-  distanceToPoint(double x, double y) const
-  {
-    double x1 = CGAL::to_double(p1.x());
-    double y1 = CGAL::to_double(p1.y());
-    double x2 = CGAL::to_double(p2.x());
-    double y2 = CGAL::to_double(p2.y());
-
-    // Vector from p1 to p2
-    double dx   = x2 - x1;
-    double dy   = y2 - y1;
-    double len2 = dx * dx + dy * dy;
-
-    if (len2 < EPSILON) {
-      // Segment is degenerate, return distance to p1
-      double distX = x - x1;
-      double distY = y - y1;
-      return std::sqrt(distX * distX + distY * distY);
-    }
-
-    // Calculate projection parameter
-    double t = ((x - x1) * dx + (y - y1) * dy) / len2;
-
-    // Constrain to segment
-    t = std::max(0.0, std::min(1.0, t));
-
-    // Calculate projection point
-    double projX = x1 + t * dx;
-    double projY = y1 + t * dy;
-
-    // Calculate distance
-    double distX = x - projX;
-    double distY = y - projY;
-    return std::sqrt(distX * distX + distY * distY);
-  }
-
-  // Interpolation parameter for a point projected onto the segment
-  double
-  interpolationParameter(double x, double y) const
-  {
-    double x1 = CGAL::to_double(p1.x());
-    double y1 = CGAL::to_double(p1.y());
-    double x2 = CGAL::to_double(p2.x());
-    double y2 = CGAL::to_double(p2.y());
-
-    double dx   = x2 - x1;
-    double dy   = y2 - y1;
-    double len2 = dx * dx + dy * dy;
-
-    if (len2 < EPSILON) {
-      return 0.0; // Degenerate segment, use first point
-    }
-
-    // Parameter along line (clamped to [0,1] for the segment)
-    double t = ((x - x1) * dx + (y - y1) * dy) / len2;
-    return std::max(0.0, std::min(1.0, t));
-  }
-};
-
-/**
- * @brief Collection of segments from a geometry for interpolation
- */
-class SegmentStore {
-private:
-  std::vector<Segment> segments;
-  bool                 hasZCoord = false;
-  bool                 hasMCoord = false;
-
-public:
-  SegmentStore() {}
-
-  void
-  addSegment(const Segment &segment)
-  {
-    segments.push_back(segment);
-
-    // Update dimension flags
-    if (segment.p1.is3D() && segment.p2.is3D()) {
-      hasZCoord = true;
-    }
-
-    if (segment.p1.isMeasured() && segment.p2.isMeasured()) {
-      hasMCoord = true;
-    }
-  }
-
-  // Check if store contains segments with Z coordinates
-  bool
-  hasZ() const
-  {
-    return hasZCoord;
-  }
-
-  // Check if store contains segments with M values
-  bool
-  hasM() const
-  {
-    return hasMCoord;
-  }
-
-  // Find the nearest segment to a point
-  Segment
-  findNearestSegment(double x, double y) const
-  {
-    if (segments.empty()) {
-      // Return a dummy segment if store is empty
-      return Segment(Point(), Point());
-    }
-
-    double minDist = std::numeric_limits<double>::max();
-    size_t bestIdx = 0;
-
-    for (size_t i = 0; i < segments.size(); ++i) {
-      double dist = segments[i].distanceToPoint(x, y);
-      if (dist < minDist) {
-        minDist = dist;
-        bestIdx = i;
-      }
-    }
-
-    return segments[bestIdx];
-  }
-
-  // Interpolate Z value for a point
-  double
-  interpolateZ(double x, double y) const
-  {
-    if (segments.empty() || !hasZCoord) {
-      return NaN();
-    }
-
-    Segment nearest = findNearestSegment(x, y);
-    double  t       = nearest.interpolationParameter(x, y);
-
-    if (!nearest.p1.is3D() || !nearest.p2.is3D()) {
-      return NaN();
-    }
-
-    double z1 = CGAL::to_double(nearest.p1.z());
-    double z2 = CGAL::to_double(nearest.p2.z());
-
-    return z1 + t * (z2 - z1);
-  }
-
-  // Interpolate M value for a point
-  double
-  interpolateM(double x, double y) const
-  {
-    if (segments.empty() || !hasMCoord) {
-      return NaN();
-    }
-
-    Segment nearest = findNearestSegment(x, y);
-    double  t       = nearest.interpolationParameter(x, y);
-
-    if (!nearest.p1.isMeasured() || !nearest.p2.isMeasured()) {
-      return NaN();
-    }
-
-    double m1 = nearest.p1.m();
-    double m2 = nearest.p2.m();
-
-    return m1 + t * (m2 - m1);
-  }
-};
-
-/**
- * @brief Extract segments from a LineString for interpolation
- */
-void
-extractSegments(const LineString &lineString, SegmentStore &store)
-{
-  if (lineString.numPoints() < 2) {
-    return;
-  }
-
-  for (size_t i = 1; i < lineString.numPoints(); ++i) {
-    const Point &p1 = lineString.pointN(i - 1);
-    const Point &p2 = lineString.pointN(i);
-    store.addSegment(Segment(p1, p2));
-  }
-}
-
-/**
- * @brief Extract segments from a Polygon for interpolation
- */
-void
-extractSegments(const Polygon &polygon, SegmentStore &store)
-{
-  // Extract from exterior ring
-  extractSegments(polygon.exteriorRing(), store);
-
-  // Extract from interior rings
-  for (size_t i = 0; i < polygon.numInteriorRings(); ++i) {
-    extractSegments(polygon.interiorRingN(i), store);
-  }
-}
-
-/**
- * @brief Extract segments from all geometry types
- */
-void
-extractSegments(const Geometry &geometry, SegmentStore &store)
-{
-  switch (geometry.geometryTypeId()) {
-  case TYPE_POINT:
-    // Points don't have segments
-    break;
-
-  case TYPE_LINESTRING:
-    extractSegments(static_cast<const LineString &>(geometry), store);
-    break;
-
-  case TYPE_POLYGON:
-    extractSegments(static_cast<const Polygon &>(geometry), store);
-    break;
-
-  case TYPE_MULTIPOINT:
-    // MultiPoints don't have segments
-    break;
-
-  case TYPE_MULTILINESTRING: {
-    const auto &multiLine = static_cast<const MultiLineString &>(geometry);
-    for (size_t i = 0; i < multiLine.numGeometries(); ++i) {
-      extractSegments(multiLine.lineStringN(i), store);
-    }
-    break;
-  }
-
-  case TYPE_MULTIPOLYGON: {
-    const auto &multiPolygon = static_cast<const MultiPolygon &>(geometry);
-    for (size_t i = 0; i < multiPolygon.numGeometries(); ++i) {
-      extractSegments(multiPolygon.polygonN(i), store);
-    }
-    break;
-  }
-
-  case TYPE_GEOMETRYCOLLECTION: {
-    const auto &collection = static_cast<const GeometryCollection &>(geometry);
-    for (size_t i = 0; i < collection.numGeometries(); ++i) {
-      extractSegments(collection.geometryN(i), store);
-    }
-    break;
-  }
-
-  case TYPE_POLYHEDRALSURFACE: {
-    const auto &surface = static_cast<const PolyhedralSurface &>(geometry);
-    for (size_t i = 0; i < surface.numPolygons(); ++i) {
-      extractSegments(surface.polygonN(i), store);
-    }
-    break;
-  }
-
-  default:
-    // Other types not supported
-    break;
-  }
-}
-
-/**
- * @brief Create a point with interpolated Z and M values
- */
-Point
-createPointWithInterpolatedZM(double x, double y, double z,
-                              const SegmentStore &store,
-                              CoordinateType      dimension)
-{
-  // Determine if we need Z and/or M values
-  bool needsZ = (dimension == CoordinateType::COORDINATE_XYZ ||
-                 dimension == CoordinateType::COORDINATE_XYZM);
-
-  bool needsM = (dimension == CoordinateType::COORDINATE_XYM ||
-                 dimension == CoordinateType::COORDINATE_XYZM);
-
-  // If no interpolation needed, return point with original values
-  if (!needsZ && !needsM) {
-    return Point(x, y);
-  }
-
-  double finalZ = z;
-  double finalM = NaN();
-
-  // Interpolate Z if needed
-  if (needsZ && store.hasZ()) {
-    double interpolatedZ = store.interpolateZ(x, y);
-    if (!std::isnan(interpolatedZ)) {
-      finalZ = interpolatedZ;
-    }
-  }
-
-  // Interpolate M if needed
-  if (needsM && store.hasM()) {
-    finalM = store.interpolateM(x, y);
-  }
-
-  // Create point with appropriate dimensions
-  return Point(x, y, finalZ, finalM, dimension);
-}
+// Type alias for our constraint order info with the specific Constraint_id type
+using ConstraintInfoType = ConstraintOrderInfo<Constraint_id>;
 
 /**
  * @brief Simplifies a LineString
@@ -452,7 +85,7 @@ simplifyLineString(const LineString &lineString, double           threshold,
     double z = CGAL::to_double(vit->z());
 
     // Create point with interpolated ZM values
-    result->addPoint(createPointWithInterpolatedZM(x, y, z, store, dimension));
+    result->addPoint(createPoint(x, y, z, store, dimension));
   }
 
   return result;
@@ -475,7 +108,7 @@ simplifyMultiLineString(const MultiLineString &multiLine, double threshold,
   if (preserveTopology) {
     // Topology-preserving mode: simplify all LineStrings together
     CT                               ct;
-    std::vector<ConstraintOrderInfo> constraintInfos;
+    std::vector<ConstraintInfoType> constraintInfos;
 
     // Add all LineStrings as constraints
     for (size_t i = 0; i < multiLine.numGeometries(); ++i) {
@@ -500,7 +133,9 @@ simplifyMultiLineString(const MultiLineString &multiLine, double threshold,
 
     // Sort constraints by original order
     std::sort(constraintInfos.begin(), constraintInfos.end(),
-              compareConstraintInfo);
+          [](const ConstraintInfoType& a, const ConstraintInfoType& b) {
+            return compareConstraintInfo<Constraint_id>(a, b);
+          });
 
     // Reconstruct simplified MultiLineString
     auto result = std::make_unique<MultiLineString>();
@@ -516,7 +151,7 @@ simplifyMultiLineString(const MultiLineString &multiLine, double threshold,
         double z = CGAL::to_double(vit->z());
 
         // Create point with interpolated ZM values
-        ls->addPoint(createPointWithInterpolatedZM(x, y, z, store, dimension));
+        ls->addPoint(createPoint(x, y, z, store, dimension));
       }
 
       result->addGeometry(*ls);
@@ -556,7 +191,7 @@ simplifyPolygon(const Polygon &polygon, double threshold,
 
   // Create triangulation
   CT                               ct;
-  std::vector<ConstraintOrderInfo> constraintInfos;
+  std::vector<ConstraintInfoType> constraintInfos;
 
   // Add exterior ring
   {
@@ -610,7 +245,7 @@ simplifyPolygon(const Polygon &polygon, double threshold,
       double y = CGAL::to_double(vit->y());
       double z = CGAL::to_double(vit->z());
       simplifiedRing.addPoint(
-          createPointWithInterpolatedZM(x, y, z, store, dimension));
+          createPoint(x, y, z, store, dimension));
     }
 
     if (info.type == ConstraintInfo::Type::POLYGON_EXTERIOR &&
@@ -644,7 +279,7 @@ simplifyMultiPolygon(const MultiPolygon &multiPolygon, double threshold,
   if (preserveTopology) {
     // Topology-preserving mode: simplify all polygons together
     CT                               ct;
-    std::vector<ConstraintOrderInfo> constraintInfos;
+    std::vector<ConstraintInfoType> constraintInfos;
 
     // For each polygon in the MultiPolygon
     for (size_t polyIdx = 0; polyIdx < multiPolygon.numGeometries();
@@ -694,7 +329,9 @@ simplifyMultiPolygon(const MultiPolygon &multiPolygon, double threshold,
 
     // Sort constraints by original order
     std::sort(constraintInfos.begin(), constraintInfos.end(),
-              compareConstraintInfo);
+          [](const ConstraintInfoType& a, const ConstraintInfoType& b) {
+            return compareConstraintInfo<Constraint_id>(a, b);
+          });
 
     // Reconstruct simplified MultiPolygon
     auto result = std::make_unique<MultiPolygon>();
@@ -718,7 +355,7 @@ simplifyMultiPolygon(const MultiPolygon &multiPolygon, double threshold,
         double y = CGAL::to_double(vit->y());
         double z = CGAL::to_double(vit->z());
         simplifiedRing.addPoint(
-            createPointWithInterpolatedZM(x, y, z, store, dimension));
+            createPoint(x, y, z, store, dimension));
       }
 
       // Add ring to appropriate polygon
@@ -773,7 +410,7 @@ simplifyGeometryCollectionTopology(const GeometryCollection &collection,
 
   // Create triangulation to hold all constraints
   CT                               ct;
-  std::vector<ConstraintOrderInfo> constraintInfos;
+  std::vector<ConstraintInfoType> constraintInfos;
 
   // Extract all LineStrings and polygon boundaries
   for (std::size_t geomIdx = 0; geomIdx < collection.numGeometries();
@@ -982,7 +619,9 @@ simplifyGeometryCollectionTopology(const GeometryCollection &collection,
 
   // Sort constraints by original order
   std::sort(constraintInfos.begin(), constraintInfos.end(),
-            compareConstraintInfo);
+          [](const ConstraintInfoType& a, const ConstraintInfoType& b) {
+            return compareConstraintInfo<Constraint_id>(a, b);
+          });
 
   // Create structures to hold matched geometry components
   std::map<size_t, std::unique_ptr<LineString>> linestrings;
@@ -1005,7 +644,7 @@ simplifyGeometryCollectionTopology(const GeometryCollection &collection,
       double z = CGAL::to_double(vit->z());
 
       simplifiedRing.addPoint(
-          createPointWithInterpolatedZM(x, y, z, store, dimension));
+          createPoint(x, y, z, store, dimension));
     }
 
     // Check geometry type based on constraint info
