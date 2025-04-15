@@ -4,17 +4,18 @@
 #ifndef SFCGAL_DETAIL_SEGMENTSTORE_H_
 #define SFCGAL_DETAIL_SEGMENTSTORE_H_
 
-#include <vector>
-#include <limits>
 #include <cmath>
+#include <limits>
+#include <tuple>
+#include <vector>
 
-#include "SFCGAL/Segment.h"
-#include "SFCGAL/Point.h"
-#include "SFCGAL/LineString.h"
-#include "SFCGAL/Polygon.h"
-#include "SFCGAL/MultiPolygon.h"
-#include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Segment.h"
 #include "SFCGAL/numeric.h"
 
 namespace SFCGAL {
@@ -38,8 +39,10 @@ public:
     segments.push_back(segment);
 
     // Update dimension flags
-    hasZCoord = segment.source().is3D() && segment.target().is3D();
-    hasMCoord = segment.source().isMeasured() && segment.target().isMeasured();
+    hasZCoord =
+        hasZCoord || (segment.source().is3D() && segment.target().is3D());
+    hasMCoord = hasMCoord || (segment.source().isMeasured() &&
+                              segment.target().isMeasured());
   }
 
   // Check if store contains segments with Z coordinates
@@ -79,46 +82,41 @@ public:
     return segments[bestIdx];
   }
 
-  // Interpolate Z value for a point
-  double
-  interpolateZ(double x, double y) const
+  /**
+   * @brief Interpolate Z and M values for a point
+   * @param x X-coordinate of the point
+   * @param y Y-coordinate of the point
+   * @return Tuple with interpolated (z, m) values, NaN if not applicable
+   */
+  std::tuple<double, double>
+  interpolateZM(double x, double y) const
   {
-    if (segments.empty() || !hasZCoord) {
-      return NaN();
+    double z = NaN();
+    double m = NaN();
+
+    if (segments.empty()) {
+      return std::make_tuple(z, m);
     }
 
     Segment nearest = findNearestSegment(x, y);
     double  t       = nearest.interpolationParameter(x, y);
 
-    if (!nearest.source().is3D() || !nearest.target().is3D()) {
-      return NaN();
+    // Interpolate Z if available
+    if (hasZCoord && nearest.source().is3D() && nearest.target().is3D()) {
+      double z1 = CGAL::to_double(nearest.source().z());
+      double z2 = CGAL::to_double(nearest.target().z());
+      z         = z1 + t * (z2 - z1);
     }
 
-    double z1 = CGAL::to_double(nearest.source().z());
-    double z2 = CGAL::to_double(nearest.target().z());
-
-    return z1 + t * (z2 - z1);
-  }
-
-  // Interpolate M value for a point
-  double
-  interpolateM(double x, double y) const
-  {
-    if (segments.empty() || !hasMCoord) {
-      return NaN();
+    // Interpolate M if available
+    if (hasMCoord && nearest.source().isMeasured() &&
+        nearest.target().isMeasured()) {
+      double m1 = nearest.source().m();
+      double m2 = nearest.target().m();
+      m         = m1 + t * (m2 - m1);
     }
 
-    Segment nearest = findNearestSegment(x, y);
-    double  t       = nearest.interpolationParameter(x, y);
-
-    if (!nearest.source().isMeasured() || !nearest.target().isMeasured()) {
-      return NaN();
-    }
-
-    double m1 = nearest.source().m();
-    double m2 = nearest.target().m();
-
-    return m1 + t * (m2 - m1);
+    return std::make_tuple(z, m);
   }
 };
 
@@ -219,9 +217,8 @@ extractSegments(const Geometry &geometry, SegmentStore &store)
  * @brief Create a point with interpolated Z and M values
  */
 Point
-createPoint(double x, double y, double z,
-                              const SegmentStore &store,
-                              CoordinateType dimension)
+createPoint(double x, double y, double z, const SegmentStore &store,
+            CoordinateType dimension)
 {
   // Determine if we need Z and/or M values
   bool needsZ = (dimension == CoordinateType::COORDINATE_XYZ ||
@@ -230,39 +227,8 @@ createPoint(double x, double y, double z,
   bool needsM = (dimension == CoordinateType::COORDINATE_XYM ||
                  dimension == CoordinateType::COORDINATE_XYZM);
 
-  // If no interpolation needed, return point with original values
-  if (!needsZ && !needsM) {
-    return Point(x, y);
-  }
-
-  double finalZ = z;
-  double finalM = NaN();
-
-  // Interpolate Z if needed
-  if (needsZ && store.hasZ()) {
-    double interpolatedZ = store.interpolateZ(x, y);
-    if (!std::isnan(interpolatedZ)) {
-      finalZ = interpolatedZ;
-    }
-  }
-
-  // Interpolate M if needed
-  if (needsM && store.hasM()) {
-    finalM = store.interpolateM(x, y);
-  }
-
-  // Create point with appropriate dimensions
-  if (needsZ && needsM) {
-    return Point(x, y, finalZ, finalM);
-  } else if (needsZ) {
-    return Point(x, y, finalZ);
-  } else if (needsM) {
-    Point p(x, y);
-    p.setM(finalM);
-    return p;
-  } else {
-    return Point(x, y);
-  }
+  auto [interpZ, interpM] = store.interpolateZM(x, y);
+  return Point(x, y, interpZ, interpM, dimension);
 }
 
 } // namespace detail
