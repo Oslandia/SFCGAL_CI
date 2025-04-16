@@ -33,7 +33,7 @@ template <int Dim>
 struct CollisionMapper {
   using PrimitiveHandleSet = std::vector<PrimitiveHandle<Dim> *>;
   using Map = std::map<PrimitiveHandle<Dim> *, PrimitiveHandleSet>;
-  CollisionMapper(Map &map) : _map(map){};
+  CollisionMapper(Map &map) : _map(map) {};
   void
   operator()(const typename PrimitiveBox<Dim>::Type &a,
              const typename PrimitiveBox<Dim>::Type &b)

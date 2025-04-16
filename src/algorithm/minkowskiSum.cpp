@@ -219,7 +219,7 @@ minkowskiSum(const Polygon &gA, const Polygon_2 &gB, Polygon_set_2 &polygonSet)
         it_hole->reverse_orientation();
         polygonSet.difference(*it_hole);
       } // foreach hole
-    }   // foreach polygon
+    } // foreach polygon
   }
 }
 

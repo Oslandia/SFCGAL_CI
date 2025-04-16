@@ -283,7 +283,7 @@ isValid(const Polygon &p, const double &toleranceAbs) -> const Validity
     {
       using namespace boost;
       using Graph    = adjacency_list<vecS, vecS, undirectedS, no_property,
-                                   property<edge_color_t, default_color_type>>;
+                                      property<edge_color_t, default_color_type>>;
       using vertex_t = graph_traits<Graph>::vertex_descriptor;
 
       Graph g(touchingRings.begin(), touchingRings.end(), numRings);

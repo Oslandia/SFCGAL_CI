@@ -113,9 +113,9 @@ void
 save(boost::archive::binary_oarchive &ar, const CGAL::Gmpz &z,
      const unsigned int /* version*/)
 {
-  const mpz_t   &mpz  = z.mpz();
-  int32_t const  size = mpz->_mp_size;
-  ar            &size;
+  const mpz_t  &mpz  = z.mpz();
+  int32_t const size = mpz->_mp_size;
+  ar & size;
   uint32_t const rsize = size >= 0 ? size : -size;
 
   for (uint32_t i = 0; i < rsize; ++i) {
@@ -140,7 +140,7 @@ load(boost::archive::binary_iarchive &ar, CGAL::Gmpz &z,
   int32_t  size  = 0;
   uint32_t rsize = 0;
   mpz_t   &mpz   = z.mpz();
-  ar      &size;
+  ar & size;
   rsize         = size >= 0 ? size : -size;
   mpz->_mp_size = size;
   _mpz_realloc(mpz, rsize);
@@ -167,9 +167,9 @@ void
 save(boost::archive::binary_oarchive &ar, const mpz_class &z,
      const unsigned int /* version*/)
 {
-  mpz_srcptr     mpz  = z.get_mpz_t();
-  int32_t const  size = mpz->_mp_size;
-  ar            &size;
+  mpz_srcptr    mpz  = z.get_mpz_t();
+  int32_t const size = mpz->_mp_size;
+  ar & size;
   uint32_t const rsize = size >= 0 ? size : -size;
 
   for (uint32_t i = 0; i < rsize; ++i) {
@@ -194,7 +194,7 @@ load(boost::archive::binary_iarchive &ar, mpz_class &z,
   int32_t  size  = 0;
   uint32_t rsize = 0;
   mpz_ptr  mpz   = z.get_mpz_t();
-  ar      &size;
+  ar & size;
   rsize         = size >= 0 ? size : -size;
   mpz->_mp_size = size;
   _mpz_realloc(mpz, rsize);

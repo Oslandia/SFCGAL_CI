@@ -22,7 +22,7 @@ namespace SFCGAL::detail::io {
 class SFCGAL_API WkbWriter {
 public:
   WkbWriter(std::ostream &s, bool asHexString = false)
-      : _s(s), _asHexString(asHexString){};
+      : _s(s), _asHexString(asHexString) {};
 
   /**
    * write WKB for a geometry

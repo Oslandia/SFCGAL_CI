@@ -250,7 +250,7 @@ public:
   serialize(Archive &ar, const unsigned int /*version*/)
   {
     ar &boost::serialization::base_object<Geometry>(*this);
-    ar &_coordinate;
+    ar & _coordinate;
   }
 
 private:

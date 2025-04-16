@@ -145,7 +145,7 @@ public:
   serialize(Archive &ar, const unsigned int /*version*/)
   {
     ar &boost::serialization::base_object<Geometry>(*this);
-    ar &_geometries;
+    ar & _geometries;
   }
 
 private:

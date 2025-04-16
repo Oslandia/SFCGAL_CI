@@ -112,18 +112,18 @@ public:
   void
   save(Archive &ar, const unsigned int /*version*/) const
   {
-    ar             &_srid;
+    ar & _srid;
     const Geometry *pgeom = _geometry.get();
-    ar             &pgeom;
+    ar & pgeom;
   }
 
   template <class Archive>
   void
   load(Archive &ar, const unsigned int /*version*/)
   {
-    ar       &_srid;
+    ar & _srid;
     Geometry *pgeom;
-    ar       &pgeom;
+    ar & pgeom;
     _geometry.reset(pgeom);
   }
 

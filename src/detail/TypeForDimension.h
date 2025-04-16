@@ -23,7 +23,7 @@ TypeForKernel<K, 2>::Point is equivalent to CGAL::Point_2<K> for instance
 TypeForDimension<2>::Bbox is equivalent to CGAL::Bbox_2
 */
 
-struct SFCGAL_API NoVolume {};
+struct SFCGAL_API NoVolume{};
 
 /// Generic traits, default dimension is 2
 template <int Dim>

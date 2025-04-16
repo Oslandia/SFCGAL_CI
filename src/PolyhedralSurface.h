@@ -272,7 +272,7 @@ public:
   serialize(Archive &ar, const unsigned int /*version*/)
   {
     ar &boost::serialization::base_object<Geometry>(*this);
-    ar &_polygons;
+    ar & _polygons;
   }
 
 private:

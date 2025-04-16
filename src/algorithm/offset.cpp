@@ -283,7 +283,7 @@ offset(const Polygon &g, const double &radius, Offset_polygon_set_2 &polygonSet)
         it_hole->reverse_orientation();
         polygonSet.difference(*it_hole);
       } // foreach hole
-    }   // foreach polygon
+    } // foreach polygon
   }
 }
 

@@ -6,12 +6,13 @@
 clang-format:
   stage: lint
   image:
-    name: kszonek/clang-format-16
-    entrypoint: [""]
+    name: debian:stable-slim
+  before_script:
+    - apt update && apt install --no-install-recommends --yes clang-format-19
   script:
     # We need to use simple BusyBox `find` syntax here.
     - >
-      clang-format --dry-run --Werror
+      clang-format-19 --dry-run --Werror
       $(find src/ -iname '*.cpp' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.h')
   # script:
   #   - run-clang-format.py -r src --style=file
