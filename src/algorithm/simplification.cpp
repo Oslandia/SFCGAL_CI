@@ -1,3 +1,4 @@
+#include "SFCGAL/detail/SegmentStore.h"
 #include <SFCGAL/GeometryCollection.h>
 #include <SFCGAL/LineString.h>
 #include <SFCGAL/MultiLineString.h>
@@ -30,7 +31,7 @@ simplify(const Geometry &geometry, double threshold, bool preserveTopology)
   case TYPE_LINESTRING: {
     // Extract segments for interpolation
     detail::SegmentStore store;
-    detail::extractSegments(geometry, store);
+    store.extractSegments(geometry);
 
     return detail::simplifyLineString(static_cast<const LineString &>(geometry),
                                       squaredThreshold, preserveTopology,

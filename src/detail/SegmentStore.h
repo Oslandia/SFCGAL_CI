@@ -11,6 +11,8 @@
 
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
@@ -118,118 +120,118 @@ public:
 
     return std::make_tuple(z, m);
   }
+
+  /**
+   * @brief Extract segments from a LineString for interpolation
+   */
+  void
+  extractSegments(const LineString &lineString)
+  {
+    if (lineString.numPoints() < 2) {
+      return;
+    }
+
+    for (size_t i = 1; i < lineString.numPoints(); ++i) {
+      const Point &p1 = lineString.pointN(i - 1);
+      const Point &p2 = lineString.pointN(i);
+      addSegment(Segment(p1, p2));
+    }
+  }
+
+  /**
+   * @brief Extract segments from a Polygon for interpolation
+   */
+  void
+  extractSegments(const Polygon &polygon)
+  {
+    // Extract from exterior ring
+    extractSegments(polygon.exteriorRing());
+
+    // Extract from interior rings
+    for (size_t i = 0; i < polygon.numInteriorRings(); ++i) {
+      extractSegments(polygon.interiorRingN(i));
+    }
+  }
+
+  /**
+   * @brief Extract segments from all geometry types
+   */
+  void
+  extractSegments(const Geometry &geometry)
+  {
+    switch (geometry.geometryTypeId()) {
+    case TYPE_POINT:
+      // Points don't have segments
+      break;
+
+    case TYPE_LINESTRING:
+      extractSegments(static_cast<const LineString &>(geometry));
+      break;
+
+    case TYPE_POLYGON:
+      extractSegments(static_cast<const Polygon &>(geometry));
+      break;
+
+    case TYPE_MULTIPOINT:
+      // MultiPoints don't have segments
+      break;
+
+    case TYPE_MULTILINESTRING: {
+      const auto &multiLine = static_cast<const MultiLineString &>(geometry);
+      for (size_t i = 0; i < multiLine.numGeometries(); ++i) {
+        extractSegments(multiLine.lineStringN(i));
+      }
+      break;
+    }
+
+    case TYPE_MULTIPOLYGON: {
+      const auto &multiPolygon = static_cast<const MultiPolygon &>(geometry);
+      for (size_t i = 0; i < multiPolygon.numGeometries(); ++i) {
+        extractSegments(multiPolygon.polygonN(i));
+      }
+      break;
+    }
+
+    case TYPE_GEOMETRYCOLLECTION: {
+      const auto &collection =
+          static_cast<const GeometryCollection &>(geometry);
+      for (size_t i = 0; i < collection.numGeometries(); ++i) {
+        extractSegments(collection.geometryN(i));
+      }
+      break;
+    }
+
+    case TYPE_POLYHEDRALSURFACE: {
+      const auto &surface = static_cast<const PolyhedralSurface &>(geometry);
+      for (size_t i = 0; i < surface.numPolygons(); ++i) {
+        extractSegments(surface.polygonN(i));
+      }
+      break;
+    }
+
+    default:
+      // Other types not supported
+      break;
+    }
+  }
+
+  /**
+   * @brief Create a point with interpolated Z and M values
+   */
+  Point
+  createPoint(double x, double y, double z, CoordinateType dimension) const
+  {
+    // Determine if we need Z and/or M values
+    bool needsZ = (dimension == CoordinateType::COORDINATE_XYZ ||
+                   dimension == CoordinateType::COORDINATE_XYZM);
+
+    bool needsM = (dimension == CoordinateType::COORDINATE_XYM ||
+                   dimension == CoordinateType::COORDINATE_XYZM);
+
+    auto [interpZ, interpM] = interpolateZM(x, y);
+    return Point(x, y, interpZ, interpM, dimension);
+  }
 };
-
-/**
- * @brief Extract segments from a LineString for interpolation
- */
-void
-extractSegments(const LineString &lineString, SegmentStore &store)
-{
-  if (lineString.numPoints() < 2) {
-    return;
-  }
-
-  for (size_t i = 1; i < lineString.numPoints(); ++i) {
-    const Point &p1 = lineString.pointN(i - 1);
-    const Point &p2 = lineString.pointN(i);
-    store.addSegment(Segment(p1, p2));
-  }
-}
-
-/**
- * @brief Extract segments from a Polygon for interpolation
- */
-void
-extractSegments(const Polygon &polygon, SegmentStore &store)
-{
-  // Extract from exterior ring
-  extractSegments(polygon.exteriorRing(), store);
-
-  // Extract from interior rings
-  for (size_t i = 0; i < polygon.numInteriorRings(); ++i) {
-    extractSegments(polygon.interiorRingN(i), store);
-  }
-}
-
-/**
- * @brief Extract segments from all geometry types
- */
-void
-extractSegments(const Geometry &geometry, SegmentStore &store)
-{
-  switch (geometry.geometryTypeId()) {
-  case TYPE_POINT:
-    // Points don't have segments
-    break;
-
-  case TYPE_LINESTRING:
-    extractSegments(static_cast<const LineString &>(geometry), store);
-    break;
-
-  case TYPE_POLYGON:
-    extractSegments(static_cast<const Polygon &>(geometry), store);
-    break;
-
-  case TYPE_MULTIPOINT:
-    // MultiPoints don't have segments
-    break;
-
-  case TYPE_MULTILINESTRING: {
-    const auto &multiLine = static_cast<const MultiLineString &>(geometry);
-    for (size_t i = 0; i < multiLine.numGeometries(); ++i) {
-      extractSegments(multiLine.lineStringN(i), store);
-    }
-    break;
-  }
-
-  case TYPE_MULTIPOLYGON: {
-    const auto &multiPolygon = static_cast<const MultiPolygon &>(geometry);
-    for (size_t i = 0; i < multiPolygon.numGeometries(); ++i) {
-      extractSegments(multiPolygon.polygonN(i), store);
-    }
-    break;
-  }
-
-  case TYPE_GEOMETRYCOLLECTION: {
-    const auto &collection = static_cast<const GeometryCollection &>(geometry);
-    for (size_t i = 0; i < collection.numGeometries(); ++i) {
-      extractSegments(collection.geometryN(i), store);
-    }
-    break;
-  }
-
-  case TYPE_POLYHEDRALSURFACE: {
-    const auto &surface = static_cast<const PolyhedralSurface &>(geometry);
-    for (size_t i = 0; i < surface.numPolygons(); ++i) {
-      extractSegments(surface.polygonN(i), store);
-    }
-    break;
-  }
-
-  default:
-    // Other types not supported
-    break;
-  }
-}
-
-/**
- * @brief Create a point with interpolated Z and M values
- */
-Point
-createPoint(double x, double y, double z, const SegmentStore &store,
-            CoordinateType dimension)
-{
-  // Determine if we need Z and/or M values
-  bool needsZ = (dimension == CoordinateType::COORDINATE_XYZ ||
-                 dimension == CoordinateType::COORDINATE_XYZM);
-
-  bool needsM = (dimension == CoordinateType::COORDINATE_XYM ||
-                 dimension == CoordinateType::COORDINATE_XYZM);
-
-  auto [interpZ, interpM] = store.interpolateZM(x, y);
-  return Point(x, y, interpZ, interpM, dimension);
-}
 
 } // namespace detail
 } // namespace SFCGAL

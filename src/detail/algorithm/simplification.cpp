@@ -100,7 +100,7 @@ buildLineStringFromConstraint(const CT &ct, const Constraint_id &cid,
     double y = CGAL::to_double(vit->y());
     double z = CGAL::to_double(vit->z());
 
-    result.addPoint(createPoint(x, y, z, store, dimension));
+    result.addPoint(store.createPoint(x, y, z, dimension));
   }
 
   return result;
@@ -662,7 +662,7 @@ simplifyLineString(const LineString &lineString, double           threshold,
     double z = CGAL::to_double(vit->z());
 
     // Create point with interpolated ZM values
-    result->addPoint(createPoint(x, y, z, store, dimension));
+    result->addPoint(store.createPoint(x, y, z, dimension));
   }
 
   return result;
@@ -684,7 +684,7 @@ simplifyMultiLineString(const MultiLineString &multiLine, double threshold,
 
   // Extract segments for interpolation
   SegmentStore store;
-  extractSegments(multiLine, store);
+  store.extractSegments(multiLine);
 
   if (preserveTopology) {
     // Topology-preserving mode: simplify all LineStrings together
@@ -749,7 +749,7 @@ simplifyPolygon(const Polygon &polygon, double threshold,
 
   // Extract segments for interpolation
   SegmentStore store;
-  extractSegments(polygon, store);
+  store.extractSegments(polygon);
 
   // Create triangulation
   CT                              ct;
@@ -800,7 +800,7 @@ simplifyMultiPolygon(const MultiPolygon &multiPolygon, double threshold,
 
   // Extract segments for interpolation
   SegmentStore store;
-  extractSegments(multiPolygon, store);
+  store.extractSegments(multiPolygon);
 
   if (preserveTopology) {
     // Topology-preserving mode: simplify all polygons together
@@ -890,7 +890,7 @@ simplifyPolyhedralSurface(const PolyhedralSurface &polySurface,
 
   // Extract segments for interpolation
   SegmentStore store;
-  extractSegments(polySurface, store);
+  store.extractSegments(polySurface);
 
   if (preserveTopology) {
     // Topology-preserving mode: use direct approach
@@ -999,7 +999,7 @@ simplifyGeometryCollectionTopology(const GeometryCollection &collection,
 
   // Extract segments for interpolation
   SegmentStore store;
-  extractSegments(collection, store);
+  store.extractSegments(collection);
 
   // Create triangulation to hold all constraints
   CT                              ct;
