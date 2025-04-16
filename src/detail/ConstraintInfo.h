@@ -63,18 +63,20 @@ struct ConstraintOrderInfo {
  * @brief Comparison function for sorting constraints by original order
  */
 template <typename Constraint_id>
-inline bool
-compareConstraintInfo(const ConstraintOrderInfo<Constraint_id> &a,
-                      const ConstraintOrderInfo<Constraint_id> &b)
-{
-  if (a.geomIndex != b.geomIndex)
-    return a.geomIndex < b.geomIndex;
-  if (a.polyIndex != b.polyIndex)
-    return a.polyIndex < b.polyIndex;
-  if (a.ringIndex != b.ringIndex)
-    return a.ringIndex < b.ringIndex;
-  return a.order < b.order;
-}
+struct ConstraintInfoCompare {
+  bool
+  operator()(const ConstraintOrderInfo<Constraint_id> &a,
+             const ConstraintOrderInfo<Constraint_id> &b) const
+  {
+    if (a.geomIndex != b.geomIndex)
+      return a.geomIndex < b.geomIndex;
+    if (a.polyIndex != b.polyIndex)
+      return a.polyIndex < b.polyIndex;
+    if (a.ringIndex != b.ringIndex)
+      return a.ringIndex < b.ringIndex;
+    return a.order < b.order;
+  }
+};
 
 } // namespace detail
 } // namespace SFCGAL

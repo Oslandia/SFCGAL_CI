@@ -702,9 +702,7 @@ simplifyMultiLineString(const MultiLineString &multiLine, double threshold,
 
     // Sort constraints by original order
     std::sort(constraintInfos.begin(), constraintInfos.end(),
-              [](const ConstraintInfoType &a, const ConstraintInfoType &b) {
-                return compareConstraintInfo<Constraint_id>(a, b);
-              });
+              ConstraintInfoCompare<Constraint_id>());
 
     // Reconstruct simplified MultiLineString
     auto result = std::make_unique<MultiLineString>();
@@ -815,9 +813,7 @@ simplifyMultiPolygon(const MultiPolygon &multiPolygon, double threshold,
 
     // Sort constraints by original order
     std::sort(constraintInfos.begin(), constraintInfos.end(),
-              [](const ConstraintInfoType &a, const ConstraintInfoType &b) {
-                return compareConstraintInfo<Constraint_id>(a, b);
-              });
+              ConstraintInfoCompare<Constraint_id>());
 
     // Create a GeometryCollection to use our reconstructAllGeometries function
     GeometryCollection tempCollection;
@@ -905,9 +901,7 @@ simplifyPolyhedralSurface(const PolyhedralSurface &polySurface,
 
     // Sort constraints by original order
     std::sort(constraintInfos.begin(), constraintInfos.end(),
-              [](const ConstraintInfoType &a, const ConstraintInfoType &b) {
-                return compareConstraintInfo<Constraint_id>(a, b);
-              });
+              ConstraintInfoCompare<Constraint_id>());
 
     // Create a GeometryCollection to use our reconstructAllGeometries function
     GeometryCollection tempCollection;
@@ -1013,9 +1007,7 @@ simplifyGeometryCollectionTopology(const GeometryCollection &collection,
 
   // Step 3: Sort constraints by original order
   std::sort(constraintInfos.begin(), constraintInfos.end(),
-            [](const ConstraintInfoType &a, const ConstraintInfoType &b) {
-              return compareConstraintInfo<Constraint_id>(a, b);
-            });
+            ConstraintInfoCompare<Constraint_id>());
 
   // Step 4: Create structures to hold matched geometry components
   std::map<size_t, std::unique_ptr<LineString>>  linestrings;
