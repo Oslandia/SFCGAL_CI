@@ -4,9 +4,9 @@
 #ifndef SFCGAL_ALGORITHM_SIMPLIFICATION_H
 #define SFCGAL_ALGORITHM_SIMPLIFICATION_H
 
-#include <SFCGAL/Exception.h>
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/config.h>
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 namespace algorithm {
