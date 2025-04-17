@@ -377,7 +377,8 @@ organizeSimplifiedConstraints(
 }
 
 /**
- * @brief Reconstructs a LineString from simplified constraints
+ * @brief Reconstructs a LineString in a GeometryCollection from simplified
+ * constraints
  * @param linestrings Map of simplified linestrings
  * @param collection The original GeometryCollection
  * @param geomIdx The geometry index
@@ -401,7 +402,7 @@ reconstructLineString(
 }
 
 /**
- * @brief Reconstructs a Polygon from simplified rings
+ * @brief Reconstructs a Polygon in a GeometryCollection from simplified rings
  * @param polygonRings Map of simplified polygon rings
  * @param collection The original GeometryCollection
  * @param geomIdx The geometry index
@@ -440,8 +441,8 @@ reconstructPolygon(
 }
 
 /**
- * @brief Reconstructs a MultiPolygon from simplified rings, preserving
- * dimensions
+ * @brief Reconstructs a MultiPolygon in a GeometryCollection from simplified
+ * rings, preserving dimensions
  * @param multiPolygonRings Map of simplified multipolygon rings
  * @param collection The original GeometryCollection
  * @param geomIdx The geometry index
@@ -506,8 +507,8 @@ reconstructMultiPolygon(
 }
 
 /**
- * @brief Reconstructs a PolyhedralSurface from simplified rings, preserving
- * dimensions
+ * @brief Reconstructs a PolyhedralSurface in a GeometryCollection from
+ * simplified rings, preserving dimensions
  * @param polyhedralSurfaceRings Map of simplified polyhedral surface rings
  * @param collection The original GeometryCollection
  * @param geomIdx The geometry index
