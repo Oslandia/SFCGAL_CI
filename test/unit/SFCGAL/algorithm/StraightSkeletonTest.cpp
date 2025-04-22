@@ -427,7 +427,7 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionLShapedPolygon)
       io::readWkt("POLYGON ((0 0, 0 2, 1 2, 1 1, 2 1, 2 0, 0 0))"));
   std::unique_ptr<Geometry> out(algorithm::straightSkeletonPartition(*g));
   std::string const         expectedWKT(
-      "MULTIPOLYGON (((0.00 0.00,0.50 0.50,0.50 1.50,0.00 2.00)),((2.00 "
+      "POLYHEDRALSURFACE (((0.00 0.00,0.50 0.50,0.50 1.50,0.00 2.00)),((2.00 "
               "0.00,1.50 0.50,0.50 0.50,0.00 0.00)),((2.00 1.00,1.50 0.50,2.00 "
               "0.00)),((1.00 1.00,0.50 0.50,1.50 0.50,2.00 1.00)),((1.00 2.00,0.50 "
               "1.50,0.50 0.50,1.00 1.00)),((0.00 2.00,0.50 1.50,1.00 2.00)))");
@@ -439,10 +439,10 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionSimpleRectangle)
   std::unique_ptr<Geometry> g(
       io::readWkt("POLYGON ((0 0, 0 2, 3 2, 3 0, 0 0))"));
   std::unique_ptr<Geometry> out(algorithm::straightSkeletonPartition(*g));
-  BOOST_CHECK(out->is<MultiPolygon>());
-  BOOST_CHECK_EQUAL(out->as<MultiPolygon>().numGeometries(), 4);
+  BOOST_CHECK(out->is<PolyhedralSurface>());
+  BOOST_CHECK_EQUAL(out->as<PolyhedralSurface>().numGeometries(), 4);
   std::string const expectedWKT(
-      "MULTIPOLYGON (((0.00 0.00,1.00 1.00,0.00 2.00)),((3.00 0.00,2.00 "
+      "POLYHEDRALSURFACE (((0.00 0.00,1.00 1.00,0.00 2.00)),((3.00 0.00,2.00 "
       "1.00,1.00 1.00,0.00 0.00)),((3.00 2.00,2.00 1.00,3.00 0.00)),((0.00 "
       "2.00,1.00 1.00,2.00 1.00,3.00 2.00)))");
   BOOST_CHECK_EQUAL(out->asText(2), expectedWKT);
@@ -453,10 +453,10 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionComplexPolygon)
   std::unique_ptr<Geometry> g(
       io::readWkt("POLYGON ((0 0, 0 3, 1 3, 1 2, 2 2, 2 3, 3 3, 3 0, 0 0))"));
   std::unique_ptr<Geometry> out(algorithm::straightSkeletonPartition(*g));
-  BOOST_CHECK(out->is<MultiPolygon>());
-  BOOST_CHECK_EQUAL(out->as<MultiPolygon>().numGeometries(), 8);
+  BOOST_CHECK(out->is<PolyhedralSurface>());
+  BOOST_CHECK_EQUAL(out->as<PolyhedralSurface>().numGeometries(), 8);
   std::string const expectedWKT(
-      "MULTIPOLYGON (((0.00 0.00,1.00 1.00,0.50 1.50,0.50 2.50,0.00 "
+      "POLYHEDRALSURFACE (((0.00 0.00,1.00 1.00,0.50 1.50,0.50 2.50,0.00 "
       "3.00)),((3.00 0.00,2.00 1.00,1.00 1.00,0.00 0.00)),((3.00 3.00,2.50 "
       "2.50,2.50 1.50,2.00 1.00,3.00 0.00)),((2.00 3.00,2.50 2.50,3.00 "
       "3.00)),((2.00 2.00,2.50 1.50,2.50 2.50,2.00 3.00)),((1.00 2.00,0.50 "
@@ -470,9 +470,9 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionPolygonWithHole)
   std::unique_ptr<Geometry> g(io::readWkt(
       "POLYGON ((0 0, 0 4, 4 4, 4 0, 0 0), (1 1, 3 1, 3 3, 1 3, 1 1))"));
   std::unique_ptr<Geometry> out(algorithm::straightSkeletonPartition(*g));
-  BOOST_CHECK(out->is<MultiPolygon>());
+  BOOST_CHECK(out->is<PolyhedralSurface>());
   std::string const expectedWKT(
-      "MULTIPOLYGON (((0.00 0.00,0.50 0.50,0.50 3.50,0.00 4.00)),((4.00 "
+      "POLYHEDRALSURFACE (((0.00 0.00,0.50 0.50,0.50 3.50,0.00 4.00)),((4.00 "
       "0.00,3.50 0.50,0.50 0.50,0.00 0.00)),((4.00 4.00,3.50 3.50,3.50 "
       "0.50,4.00 0.00)),((0.00 4.00,0.50 3.50,3.50 3.50,4.00 4.00)),((1.00 "
       "1.00,0.50 0.50,3.50 0.50,3.00 1.00)),((1.00 3.00,0.50 3.50,0.50 "
@@ -487,9 +487,9 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionMultiPolygon)
       io::readWkt("MULTIPOLYGON (((0 0, 0 2, 2 2, 2 0, 0 0)), ((3 3, 3 5, 5 5, "
                   "5 3, 3 3)))"));
   std::unique_ptr<Geometry> out(algorithm::straightSkeletonPartition(*g));
-  BOOST_CHECK(out->is<MultiPolygon>());
+  BOOST_CHECK(out->is<PolyhedralSurface>());
   std::string const expectedWKT(
-      "MULTIPOLYGON (((0.00 0.00,1.00 1.00,0.00 2.00)),((2.00 0.00,1.00 "
+      "POLYHEDRALSURFACE (((0.00 0.00,1.00 1.00,0.00 2.00)),((2.00 0.00,1.00 "
       "1.00,0.00 0.00)),((2.00 2.00,1.00 1.00,2.00 0.00)),((0.00 2.00,1.00 "
       "1.00,2.00 2.00)),((3.00 3.00,4.00 4.00,3.00 5.00)),((5.00 3.00,4.00 "
       "4.00,3.00 3.00)),((5.00 5.00,4.00 4.00,5.00 3.00)),((3.00 5.00,4.00 "
@@ -501,9 +501,9 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionEmptyPolygon)
 {
   std::unique_ptr<Geometry> g(io::readWkt("POLYGON EMPTY"));
   std::unique_ptr<Geometry> out(algorithm::straightSkeletonPartition(*g));
-  BOOST_CHECK(out->is<MultiPolygon>());
+  BOOST_CHECK(out->is<PolyhedralSurface>());
   BOOST_CHECK(out->isEmpty());
-  std::string const expectedWKT("MULTIPOLYGON EMPTY");
+  std::string const expectedWKT("POLYHEDRALSURFACE EMPTY");
   BOOST_CHECK_EQUAL(out->asText(2), expectedWKT);
 }
 
