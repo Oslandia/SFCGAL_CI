@@ -10,6 +10,7 @@
 
 namespace SFCGAL {
 namespace algorithm {
+struct NoValidityCheck;
 
 /**
  * Partition algorithm available
@@ -38,6 +39,16 @@ enum PartitionAlgorithm {
  */
 SFCGAL_API auto
 partition_2(const Geometry &g, PartitionAlgorithm alg = y_monotone)
+    -> std::unique_ptr<Geometry>;
+
+/**
+ * Compute the partition of a 2D polygon
+ * https://doc.cgal.org/latest/Partition_2/index.html#Chapter_2D_Polygon_Partitioning
+ * @pre g is a valid geometry
+ * @warning No actual validity check is done
+ */
+SFCGAL_API auto
+partition_2(const Geometry &g, PartitionAlgorithm alg, NoValidityCheck)
     -> std::unique_ptr<Geometry>;
 
 } // namespace algorithm

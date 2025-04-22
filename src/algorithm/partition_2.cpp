@@ -5,6 +5,8 @@
 
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/Polygon.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/orientation.h"
 
 #include "SFCGAL/detail/GetPointsVisitor.h"
 
@@ -62,6 +64,9 @@ toTPolygon_2(const Polygon &poly) -> CGAL::Partition_traits_2<Kernel>::Polygon_2
 
   TPolygon_2 result(points.begin(), points.end());
 
+  if (result.orientation() != CGAL::COUNTERCLOCKWISE) {
+    result.reverse_orientation();
+  }
   return result;
 }
 
@@ -92,8 +97,8 @@ polygons_to_geometry(const std::list<TPolygon_2> &polys)
 /// @publicsection
 
 auto
-partition_2(const Geometry &g, PartitionAlgorithm alg)
-    -> std::unique_ptr<Geometry>
+partition_2(const Geometry &g, PartitionAlgorithm alg,
+            NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
   using CGAL::object_cast;
 
@@ -129,6 +134,14 @@ partition_2(const Geometry &g, PartitionAlgorithm alg)
     break;
   }
   return polygons_to_geometry(partition_polys);
+}
+
+auto
+partition_2(const Geometry &g, PartitionAlgorithm alg)
+    -> std::unique_ptr<Geometry>
+{
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
+  return partition_2(g, alg, NoValidityCheck());
 }
 
 } // namespace SFCGAL::algorithm
