@@ -113,8 +113,9 @@ extrudeStraightSkeleton(const Geometry &g, double building_height,
  * This function creates a partition of the input geometry based on its straight
  * skeleton. For unsupported geometry types, an empty MultiPolygon is returned.
  */
-SFCGAL_API std::unique_ptr<MultiPolygon>
-straightSkeletonPartition(const Geometry &g, bool autoOrientation = true);
+SFCGAL_API auto
+straightSkeletonPartition(const Geometry &g, bool autoOrientation = true)
+    -> std::unique_ptr<PolyhedralSurface>;
 
 /**
  * @brief Build a 2D straight skeleton partition for a Polygon
@@ -130,8 +131,9 @@ straightSkeletonPartition(const Geometry &g, bool autoOrientation = true);
  * skeleton. It uses CGAL's Arrangement_2 to handle the intersection of skeleton
  * and polygon edges.
  */
-SFCGAL_API std::unique_ptr<MultiPolygon>
-straightSkeletonPartition(const Polygon &g, bool autoOrientation = true);
+SFCGAL_API auto
+straightSkeletonPartition(const Polygon &g, bool autoOrientation = true)
+    -> std::unique_ptr<PolyhedralSurface>;
 
 /**
  * @brief Build a 2D straight skeleton partition for a MultiPolygon
@@ -144,8 +146,9 @@ straightSkeletonPartition(const Polygon &g, bool autoOrientation = true);
  * This function applies the straight skeleton partition to each polygon in the
  * input multi-polygon and combines the results into a single MultiPolygon.
  */
-SFCGAL_API std::unique_ptr<MultiPolygon>
-straightSkeletonPartition(const MultiPolygon &g, bool autoOrientation = true);
+SFCGAL_API auto
+straightSkeletonPartition(const MultiPolygon &g, bool autoOrientation = true)
+    -> std::unique_ptr<PolyhedralSurface>;
 
 } // namespace algorithm
 } // namespace SFCGAL

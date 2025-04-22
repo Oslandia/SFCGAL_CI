@@ -448,11 +448,11 @@ extrudeStraightSkeleton(const Geometry &g, double building_height,
 
 auto
 straightSkeletonPartition(const Geometry &g, bool autoOrientation)
-    -> std::unique_ptr<MultiPolygon>
+    -> std::unique_ptr<PolyhedralSurface>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
 
-  std::unique_ptr<MultiPolygon> result(new MultiPolygon);
+  std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
 
   switch (g.geometryTypeId()) {
   case TYPE_TRIANGLE:
@@ -472,15 +472,15 @@ straightSkeletonPartition(const Geometry &g, bool autoOrientation)
 
 auto
 straightSkeletonPartition(const MultiPolygon &g, bool autoOrientation)
-    -> std::unique_ptr<MultiPolygon>
+    -> std::unique_ptr<PolyhedralSurface>
 {
-  std::unique_ptr<MultiPolygon> result(new MultiPolygon);
+  std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
 
   for (size_t i = 0; i < g.numGeometries(); i++) {
-    std::unique_ptr<MultiPolygon> partitioned =
+    std::unique_ptr<PolyhedralSurface> partitioned =
         straightSkeletonPartition(g.polygonN(i), autoOrientation);
     for (size_t j = 0; j < partitioned->numGeometries(); j++) {
-      result->addGeometry(partitioned->geometryN(j));
+      result->addPolygon(partitioned->geometryN(j));
     }
   }
 
@@ -489,9 +489,9 @@ straightSkeletonPartition(const MultiPolygon &g, bool autoOrientation)
 
 auto
 straightSkeletonPartition(const Polygon &g, bool /*autoOrientation*/)
-    -> std::unique_ptr<MultiPolygon>
+    -> std::unique_ptr<PolyhedralSurface>
 {
-  std::unique_ptr<MultiPolygon> result(new MultiPolygon);
+  std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
 
   if (g.isEmpty()) {
     return result;
@@ -542,7 +542,7 @@ straightSkeletonPartition(const Polygon &g, bool /*autoOrientation*/)
       continue;
     }
 
-    result->addGeometry(create_polygon_from_face(face));
+    result->addPolygon(create_polygon_from_face(face));
   }
 
   return result;
