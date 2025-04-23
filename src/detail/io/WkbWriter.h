@@ -85,9 +85,16 @@ private:
              boost::endian::order      wkbOrder = boost::endian::order::native);
 
   /**
+   * Dedicated method to write PolyhedralSurface into _wkb data
+   */
+  void
+  writeInner(const PolyhedralSurface &polyhedralSurface,
+             boost::endian::order     wkbOrder = boost::endian::order::native);
+
+  /**
    * Dedicated method to write Multi Geometries into _wkb data
-   * Multi Geometries are: MultiPoint, MultiLineString, MultiPolygon,
-   * PolyhedralSurface and TriangulatedSurface.
+   * Multi Geometries are: MultiPoint, MultiLineString, MultiPolygon
+   * and TriangulatedSurface.
    */
   template <typename M, typename G>
   void

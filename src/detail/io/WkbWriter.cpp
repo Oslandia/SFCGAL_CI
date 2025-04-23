@@ -66,7 +66,7 @@ WkbWriter::writeRec(const Geometry &g, boost::endian::order wkbOrder)
     return;
 
   case TYPE_POLYHEDRALSURFACE:
-    writeInner<PolyhedralSurface, Polygon>(g.as<PolyhedralSurface>(), wkbOrder);
+    writeInner(g.as<PolyhedralSurface>(), wkbOrder);
     return;
 
   default:
@@ -245,6 +245,24 @@ WkbWriter::writeInner(const GeometryCollection &g,
 
   for (size_t i = 0; i < g.numGeometries(); i++) {
     writeRec(g.geometryN(i), wkbOrder);
+  }
+}
+
+void
+WkbWriter::writeInner(const PolyhedralSurface &polyhedralSurface,
+                      boost::endian::order     wkbOrder)
+{
+  // Endianness
+  toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
+
+  // WkbType
+  writeGeometryType(polyhedralSurface, wkbOrder);
+
+  // Number of Polygons
+  toByte(static_cast<uint32_t>(polyhedralSurface.numPatchs()), wkbOrder);
+
+  for (size_t i = 0; i < polyhedralSurface.numPatchs(); i++) {
+    writeRec(polyhedralSurface.patchN(i), wkbOrder);
   }
 }
 
