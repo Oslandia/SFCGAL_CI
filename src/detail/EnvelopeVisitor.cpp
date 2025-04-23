@@ -110,8 +110,8 @@ EnvelopeVisitor::visit(const PolyhedralSurface &g)
 void
 EnvelopeVisitor::visit(const TriangulatedSurface &g)
 {
-  for (size_t i = 0; i < g.numGeometries(); i++) {
-    visit(g.geometryN(i));
+  for (size_t i = 0; i < g.numPatchs(); i++) {
+    visit(g.patchN(i));
   }
 }
 
