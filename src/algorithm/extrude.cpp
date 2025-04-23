@@ -226,13 +226,13 @@ extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v) -> Solid *
   }
 
   // bottom and top
-  for (size_t i = 0; i < g.numGeometries(); i++) {
-    Triangle bottomPart(g.geometryN(i));
+  for (size_t i = 0; i < g.numPatchs(); i++) {
+    Triangle bottomPart(g.patchN(i));
     force3D(bottomPart);
     bottomPart.reverse();
     result->exteriorShell().addPatch(bottomPart);
 
-    Triangle topPart(g.geometryN(i));
+    Triangle topPart(g.patchN(i));
     force3D(topPart);
     translate(topPart, v);
     result->exteriorShell().addPatch(topPart);
