@@ -728,6 +728,19 @@ sfcgal_polyhedral_surface_add_patch(sfcgal_geometry_t *polyhedral,
                                     sfcgal_geometry_t *patch);
 
 /**
+ * Set the ith patch of a given PolyhedralSurface
+ * @pre polyhedral must be a PolyhedralSurface.
+ * @pre patch must be a Polygon.
+ * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_patchs(polyhedral)
+ * The ownership of the polygon is taken. The caller is not responsible anymore
+ * of its deallocation.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_polyhedral_surface_set_patch_n(sfcgal_geometry_t *polyhedral,
+                                      sfcgal_geometry_t *patch, size_t i);
+
+/**
  * Adds a Polygon to a given PolyhedralSurface
  * @pre polyhedral must be a PolyhedralSurface
  * @pre polygon must be a Polygon

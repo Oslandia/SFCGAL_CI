@@ -953,6 +953,15 @@ sfcgal_polyhedral_surface_add_patch(sfcgal_geometry_t *geom,
 }
 
 extern "C" void
+sfcgal_polyhedral_surface_set_patch_n(sfcgal_geometry_t *polyhedral,
+                                      sfcgal_geometry_t *patch, size_t i)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      return down_cast<SFCGAL::PolyhedralSurface>(polyhedral)
+          ->setGeometryN(down_cast<SFCGAL::Polygon>(patch), i);)
+}
+
+extern "C" void
 sfcgal_polyhedral_surface_add_polygon(sfcgal_geometry_t *geom,
                                       sfcgal_geometry_t *poly)
 {
