@@ -406,12 +406,12 @@ WktWriter::write(const TriangulatedSurface &g)
 
   _s << "("; // begin TIN
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
+  for (size_t i = 0; i < g.numPatchs(); i++) {
     if (i != 0) {
       _s << ",";
     }
 
-    writeInner(g.geometryN(i));
+    writeInner(g.patchN(i));
   }
 
   _s << ")"; // end TIN
