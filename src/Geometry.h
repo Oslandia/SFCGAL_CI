@@ -294,19 +294,22 @@ public:
 
   /**
    * @brief [OGC/SFA]Gets the number of geometries in a collection of geometries
-   * @warning 1 for Point, LineString, Polygon, PolyhedralSurface, Triangle
+   * @warning 1 for Point, LineString, Polygon, PolyhedralSurface, Triangle,
+   * TriangulatedSurface
    */
   virtual size_t
   numGeometries() const;
   /**
    * @brief [OGC/SFA]Returns the n-th geometry
-   * @warning *this for Point, LineString, Polygon, PolyhedralSurface, Triangle
+   * @warning *this for Point, LineString, Polygon, PolyhedralSurface, Triangle,
+   * TriangulatedSurface
    */
   virtual const Geometry &
   geometryN(size_t const &n) const;
   /**
    * @brief [OGC/SFA]Returns the n-th geometry
-   * @warning *this for Point, LineString, Polygon, PolyhedralSurface, Triangle
+   * @warning *this for Point, LineString, Polygon, PolyhedralSurface, Triangle,
+   * TriangulatedSurface
    */
   virtual Geometry &
   geometryN(size_t const &n);

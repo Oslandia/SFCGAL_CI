@@ -99,21 +99,13 @@ public:
   /**
    * [SFA/OGC]Returns the n-th patch
    */
-  inline const Triangle &
-  patchN(size_t const &n) const
-  {
-    BOOST_ASSERT(n < _triangles.size());
-    return _triangles[n];
-  }
+  auto
+  patchN(size_t const &n) const -> const Triangle &;
   /**
    * [SFA/OGC]Returns the n-th patch
    */
-  inline Triangle &
-  patchN(size_t const &n)
-  {
-    BOOST_ASSERT(n < _triangles.size());
-    return _triangles[n];
-  }
+  auto
+  patchN(size_t const &n) -> Triangle &;
   /**
    * add a Patch to the TriangulatedSurface
    */
@@ -189,16 +181,6 @@ public:
    */
   void
   addTriangles(const TriangulatedSurface &other);
-
-  //-- SFCGAL::Geometry
-  size_t
-  numGeometries() const override;
-  //-- SFCGAL::Geometry
-  const Triangle &
-  geometryN(size_t const &n) const override;
-  //-- SFCGAL::Geometry
-  Triangle &
-  geometryN(size_t const &n) override;
 
   /**
    * Sets the n-th Geometry, starting at zero

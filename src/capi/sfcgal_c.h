@@ -264,7 +264,7 @@ sfcgal_geometry_delete(sfcgal_geometry_t *);
 
 /**
  * Returns the number of geometries of the given geometry collection
- * @pre geometry must be a GeometryCollection or a TriangulatedSurface.
+ * @pre geometry must be a GeometryCollection.
  * Otherwise, 1 is returned.  For empty geometries 0 is
  * returned.
  * @ingroup capi
@@ -274,7 +274,7 @@ sfcgal_geometry_num_geometries(const sfcgal_geometry_t *geometryCollection);
 
 /**
  * Returns the n-th geometry of the given geometry collection
- * @pre geometry must be a GeometryCollection or a TriangulatedSurface.
+ * @pre geometry must be a GeometryCollection.
  * Otherwise, the geometry is returned.
  * @post the returned Geometry is not writable and must not be deallocated by
  * the caller
@@ -286,8 +286,8 @@ sfcgal_geometry_get_geometry_n(const sfcgal_geometry_t *geometryCollection,
 
 /**
  * Sets the n-th geometry of the given geometry collection
- * @pre geometryCollection must be a GeometryCollection, a PolyhedralSurface or
- * a TriangulatedSurface. Otherwise, nothing happens. The ownership of the
+ * @pre geometryCollection must be a GeometryCollection.
+ * Otherwise, nothing happens. The ownership of the
  * geometry is taken. The caller is not responsible anymore of its deallocation.
  * @ingroup capi
  */

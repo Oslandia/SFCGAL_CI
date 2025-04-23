@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(testTriangulatePolygon)
         triangulate::triangulatePolygon3D(*g, triangulatedSurface));
 
     BOOST_TEST_MESSAGE(boost::format("#%1% triangle(s)") %
-                       triangulatedSurface.numGeometries());
+                       triangulatedSurface.numPatchs());
 
     /*
      * make some checks
