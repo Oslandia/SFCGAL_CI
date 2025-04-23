@@ -452,7 +452,7 @@ reconstructMultiPolygon(
     const std::map<size_t, std::map<size_t, std::map<size_t, LineString>>>
                              &multiPolygonRings,
     const GeometryCollection &collection, std::size_t geomIdx,
-    GeometryCollection &result, bool preserveTopology)
+    GeometryCollection &result)
 {
 
   auto        it = multiPolygonRings.find(geomIdx);
@@ -518,7 +518,7 @@ reconstructPolyhedralSurface(
     const std::map<size_t, std::map<size_t, std::map<size_t, LineString>>>
                              &polyhedralSurfaceRings,
     const GeometryCollection &collection, std::size_t geomIdx,
-    GeometryCollection &result, bool preserveTopology)
+    GeometryCollection &result)
 {
 
   auto        it = polyhedralSurfaceRings.find(geomIdx);
@@ -578,7 +578,6 @@ reconstructPolyhedralSurface(
  * @param polygonRings Map of simplified polygon rings
  * @param multiPolygonRings Map of simplified multipolygon rings
  * @param polyhedralSurfaceRings Map of simplified polyhedral surface rings
- * @param preserveTopology Whether topology has been preserved
  * @return A unique_ptr to a GeometryCollection with reconstructed geometries
  */
 static std::unique_ptr<GeometryCollection>
@@ -589,8 +588,7 @@ reconstructAllGeometries(
     const std::map<size_t, std::map<size_t, std::map<size_t, LineString>>>
         &multiPolygonRings,
     const std::map<size_t, std::map<size_t, std::map<size_t, LineString>>>
-        &polyhedralSurfaceRings,
-    bool preserveTopology)
+        &polyhedralSurfaceRings)
 {
 
   auto result = std::make_unique<GeometryCollection>();
@@ -609,13 +607,12 @@ reconstructAllGeometries(
       break;
 
     case TYPE_MULTIPOLYGON:
-      reconstructMultiPolygon(multiPolygonRings, collection, geomIdx, *result,
-                              preserveTopology);
+      reconstructMultiPolygon(multiPolygonRings, collection, geomIdx, *result);
       break;
 
     case TYPE_POLYHEDRALSURFACE:
       reconstructPolyhedralSurface(polyhedralSurfaceRings, collection, geomIdx,
-                                   *result, preserveTopology);
+                                   *result);
       break;
 
     default:
@@ -840,7 +837,7 @@ simplifyMultiPolygon(const MultiPolygon &multiPolygon, double threshold,
     // Reconstruct collection with just this MultiPolygon
     auto result = reconstructAllGeometries(tempCollection, emptyLinestrings,
                                            emptyPolygonRings, multiPolygonRings,
-                                           emptyPolyhedralRings, true);
+                                           emptyPolyhedralRings);
 
     // Extract the MultiPolygon from the collection
     if (result->numGeometries() > 0) {
@@ -929,7 +926,7 @@ simplifyPolyhedralSurface(const PolyhedralSurface &polySurface,
     // Reconstruct collection with just this PolyhedralSurface
     auto result = reconstructAllGeometries(
         tempCollection, emptyLinestrings, emptyPolygonRings,
-        emptyMultiPolygonRings, polyhedralSurfaceRings, true);
+        emptyMultiPolygonRings, polyhedralSurfaceRings);
 
     // Extract the PolyhedralSurface from the collection
     if (result->numGeometries() > 0) {
@@ -1023,8 +1020,7 @@ simplifyGeometryCollectionTopology(const GeometryCollection &collection,
 
   // Step 6: Reconstruct geometries in original order
   return reconstructAllGeometries(collection, linestrings, polygonRings,
-                                  multiPolygonRings, polyhedralSurfaceRings,
-                                  true);
+                                  multiPolygonRings, polyhedralSurfaceRings);
 }
 
 /**
