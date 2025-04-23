@@ -219,15 +219,8 @@ public:
    * @brief Create a point with interpolated Z and M values
    */
   Point
-  createPoint(double x, double y, double z, CoordinateType dimension) const
+  createPoint(double x, double y, CoordinateType dimension) const
   {
-    // Determine if we need Z and/or M values
-    bool needsZ = (dimension == CoordinateType::COORDINATE_XYZ ||
-                   dimension == CoordinateType::COORDINATE_XYZM);
-
-    bool needsM = (dimension == CoordinateType::COORDINATE_XYM ||
-                   dimension == CoordinateType::COORDINATE_XYZM);
-
     auto [interpZ, interpM] = interpolateZM(x, y);
     return Point(x, y, interpZ, interpM, dimension);
   }

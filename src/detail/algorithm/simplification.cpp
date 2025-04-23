@@ -98,9 +98,8 @@ buildLineStringFromConstraint(const CT &ct, const Constraint_id &cid,
        vit != ct.points_in_constraint_end(cid); ++vit) {
     double x = CGAL::to_double(vit->x());
     double y = CGAL::to_double(vit->y());
-    double z = CGAL::to_double(vit->z());
 
-    result.addPoint(store.createPoint(x, y, z, dimension));
+    result.addPoint(store.createPoint(x, y, dimension));
   }
 
   return result;
@@ -660,10 +659,9 @@ simplifyLineString(const LineString &lineString, double           threshold,
 
     double x = CGAL::to_double(vit->x());
     double y = CGAL::to_double(vit->y());
-    double z = CGAL::to_double(vit->z());
 
     // Create point with interpolated ZM values
-    result->addPoint(store.createPoint(x, y, z, dimension));
+    result->addPoint(store.createPoint(x, y, dimension));
   }
 
   return result;
