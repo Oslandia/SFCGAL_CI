@@ -2159,7 +2159,7 @@ sfcgal_geometry_is_almost_equals(const sfcgal_geometry_t *ga,
 }
 
 extern "C" auto
-sfcgal_geometry_simplify(sfcgal_geometry_t *geom, double threshold,
+sfcgal_geometry_simplify(const sfcgal_geometry_t *geom, double threshold,
                          bool preserveTopology) -> sfcgal_geometry_t *
 {
   const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
