@@ -227,7 +227,7 @@ PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
 }
 
 void
-PolyhedralSurface::setGeometryN(Polygon *polygon, size_t const &n)
+PolyhedralSurface::setPatchN(Polygon *patch, size_t const &n)
 {
   BOOST_ASSERT(polygon != NULL);
 
@@ -239,17 +239,17 @@ PolyhedralSurface::setGeometryN(Polygon *polygon, size_t const &n)
                       .str()));
   }
 
-  _polygons.replace(n, polygon);
+  _polygons.replace(n, patch);
 }
 
 void
-PolyhedralSurface::setGeometryN(const Polygon &polygon, size_t const &n)
+PolyhedralSurface::setPatchN(const Polygon &patch, size_t const &n)
 {
-  setGeometryN(polygon.clone(), n);
+  setPatchN(patch.clone(), n);
 }
 
 void
-PolyhedralSurface::setGeometryN(Geometry *geometry, size_t const &n)
+PolyhedralSurface::setPatchN(Geometry *geometry, size_t const &n)
 {
   if (geometry->geometryTypeId() != TYPE_POLYGON) {
     std::ostringstream oss;
@@ -259,13 +259,13 @@ PolyhedralSurface::setGeometryN(Geometry *geometry, size_t const &n)
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
-  setGeometryN(dynamic_cast<Polygon *>(geometry), n);
+  setPatchN(dynamic_cast<Polygon *>(geometry), n);
 }
 
 void
-PolyhedralSurface::setGeometryN(const Geometry &geometry, size_t const &n)
+PolyhedralSurface::setPatchN(const Geometry &geometry, size_t const &n)
 {
-  setGeometryN(geometry.clone(), n);
+  setPatchN(geometry.clone(), n);
 }
 
 void

@@ -642,7 +642,7 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(polySurface.get(), 2), polySurface2.get()));
   BOOST_CHECK(hasError == false);
   std::unique_ptr<Geometry> const simplePolygon(io::readWkt("POLYGON Z ((0 0 0, 2 0 1, 2 2 2, 0 2 1, 0 0 0))"));
-  sfcgal_geometry_set_geometry_n(polySurface.get(), simplePolygon->clone(), 1);
+  sfcgal_polyhedral_surface_set_patch_n(polySurface.get(), simplePolygon->clone(), 1);
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_polyhedral_surface_patch_n(polySurface.get(), 1), simplePolygon.get()));
 
   // TIN - should succeed

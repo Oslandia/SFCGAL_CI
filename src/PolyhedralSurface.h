@@ -235,7 +235,7 @@ public:
    * It needs to be a polygon.
    */
   void
-  setGeometryN(const Geometry &geometry, size_t const &n) override;
+  setPatchN(const Geometry &geometry, size_t const &n);
 
   /**
    * Sets the n-th Geometry, starting at zero
@@ -244,21 +244,21 @@ public:
    * anymore of its deallocation.
    */
   void
-  setGeometryN(Geometry *geometry, size_t const &n) override;
+  setPatchN(Geometry *geometry, size_t const &n);
 
   /**
-   * Sets the n-th Polygon, starting at zero
+   * Sets the n-th Patch, starting at zero
    */
   void
-  setGeometryN(const Polygon &polygon, size_t const &n);
+  setPatchN(const Polygon &patch, size_t const &n);
 
   /**
-   * Sets the n-th Polygon, starting at zero
+   * Sets the n-th Patch, starting at zero
    * The ownership of the polygon is taken. The caller is not responsible
    * anymore of its deallocation.
    */
   void
-  setGeometryN(Polygon *polygon, size_t const &n);
+  setPatchN(Polygon *patch, size_t const &n);
 
   /**
    * Convert to CGAL::Polyhedron_3

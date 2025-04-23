@@ -17,7 +17,7 @@ using namespace SFCGAL;
 
 BOOST_AUTO_TEST_SUITE(SFCGAL_PolyhedralSurfaceTest)
 
-BOOST_AUTO_TEST_CASE(setGeometryNTest)
+BOOST_AUTO_TEST_CASE(setPatchNTest)
 {
   std::unique_ptr<Geometry> emptyGeom(io::readWkt("POLYHEDRALSURFACE EMPTY"));
   BOOST_CHECK(emptyGeom->is<PolyhedralSurface>());
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
   std::string const newPolygonStr =
       "POLYGON Z ((0 0 0, 0 5 0, 5 5 5, 5 0 5, 0 0 0))";
   std::unique_ptr<Geometry> newGeom(io::readWkt(newPolygonStr));
-  geom->setGeometryN(newGeom->clone(), 1);
+  geom->as<PolyhedralSurface>().setPatchN(newGeom->clone(), 1);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatchs(), 3);
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
   std::unique_ptr<Geometry> newGeom2(io::readWkt(newPolygonStr2));
   Polygon *newPolygon2 = dynamic_cast<Polygon *>(newGeom2.get());
   BOOST_CHECK(newPolygon2);
-  geom->setGeometryN(newPolygon2->clone(), 2);
+  geom->as<PolyhedralSurface>().setPatchN(newPolygon2->clone(), 2);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatchs(), 3);
