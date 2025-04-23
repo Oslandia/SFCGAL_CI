@@ -23,7 +23,8 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
   BOOST_CHECK(emptyGeom->is<PolyhedralSurface>());
   BOOST_CHECK(emptyGeom->isEmpty());
   BOOST_CHECK_EQUAL(emptyGeom->numGeometries(), 0);
-  BOOST_CHECK_THROW(emptyGeom->geometryN(0), Exception);
+  BOOST_CHECK_EQUAL(emptyGeom->as<PolyhedralSurface>().numPatchs(), 0);
+  BOOST_CHECK_EQUAL(emptyGeom->geometryN(0).asText(), emptyGeom->asText());
 
   std::string const polyhedralStr = "POLYHEDRALSURFACE Z ("
                                     "((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0)),"
@@ -33,14 +34,14 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
 
   std::unique_ptr<Geometry> geom(io::readWkt(polyhedralStr));
   BOOST_CHECK(!geom->isEmpty());
-  BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
-  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0),
+  BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(0).asText(0),
                     "POLYGON Z ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))");
-  BOOST_CHECK_EQUAL(geom->geometryN(1).asText(0),
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(0),
                     "POLYGON Z ((0 0 0,10 0 0,5 0 5,0 0 0))");
-  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0),
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(2).asText(0),
                     "POLYGON Z ((0 0 0,0 10 0,5 5 5,0 0 0))");
-  BOOST_CHECK_THROW(geom->geometryN(3), Exception);
 
   // set new Polygon at index 1 from a Geometry object
   std::string const newPolygonStr =
@@ -48,13 +49,13 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
   std::unique_ptr<Geometry> newGeom(io::readWkt(newPolygonStr));
   geom->setGeometryN(newGeom->clone(), 1);
 
-  BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
-  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0),
+  BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(0).asText(0),
                     "POLYGON Z ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))");
-  BOOST_CHECK_EQUAL(geom->geometryN(1).asText(), newGeom->asText());
-  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(0),
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(), newGeom->asText());
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(2).asText(0),
                     "POLYGON Z ((0 0 0,0 10 0,5 5 5,0 0 0))");
-  BOOST_CHECK_THROW(geom->geometryN(3), Exception);
 
   // set New Polygon at index 2 from a Polygon
   std::string const newPolygonStr2 =
@@ -64,12 +65,12 @@ BOOST_AUTO_TEST_CASE(setGeometryNTest)
   BOOST_CHECK(newPolygon2);
   geom->setGeometryN(newPolygon2->clone(), 2);
 
-  BOOST_CHECK_EQUAL(geom->numGeometries(), 3);
-  BOOST_CHECK_EQUAL(geom->geometryN(0).asText(0),
+  BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(0).asText(0),
                     "POLYGON Z ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))");
-  BOOST_CHECK_EQUAL(geom->geometryN(1).asText(), newGeom->asText());
-  BOOST_CHECK_EQUAL(geom->geometryN(2).asText(), newGeom2->asText());
-  BOOST_CHECK_THROW(geom->geometryN(3), Exception);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(), newGeom->asText());
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(2).asText(), newGeom2->asText());
 }
 
 BOOST_AUTO_TEST_CASE(dropZMTest)

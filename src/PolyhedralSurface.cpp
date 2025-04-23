@@ -226,50 +226,16 @@ PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
   return addPatchs(polyhedralSurface);
 }
 
-auto
-PolyhedralSurface::numGeometries() const -> size_t
-{
-  return _polygons.size();
-}
-
-auto
-PolyhedralSurface::geometryN(size_t const &n) const -> const Polygon &
-{
-  if (n >= numGeometries()) {
-    BOOST_THROW_EXCEPTION(
-        Exception((boost::format("Cannot access geometry at position %s. "
-                                 "PolyhedralSurface has only %d geometries.") %
-                   n % numGeometries())
-                      .str()));
-  }
-
-  return _polygons[n];
-}
-
-auto
-PolyhedralSurface::geometryN(size_t const &n) -> Polygon &
-{
-  if (n >= numGeometries()) {
-    BOOST_THROW_EXCEPTION(
-        Exception((boost::format("Cannot access geometry at position %s. "
-                                 "PolyhedralSurface has only %d geometries.") %
-                   n % numGeometries())
-                      .str()));
-  }
-
-  return _polygons[n];
-}
-
 void
 PolyhedralSurface::setGeometryN(Polygon *polygon, size_t const &n)
 {
   BOOST_ASSERT(polygon != NULL);
 
-  if (n >= numGeometries()) {
+  if (n >= numPatchs()) {
     BOOST_THROW_EXCEPTION(
         Exception((boost::format("Cannot set geometry at position %s. "
                                  "PolyhedralSurface has only %d geometries.") %
-                   n % numGeometries())
+                   n % numPatchs())
                       .str()));
   }
 

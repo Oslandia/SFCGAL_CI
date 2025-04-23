@@ -136,6 +136,8 @@ public:
 
   /**
    * [SFA/OGC]Returns the number of patchs
+   * @warning PolyhedralSurface is treated as one geometry. numGeometries
+   * returns 1 or 0 for empty PolyhedralSurface
    */
   inline size_t
   numPatchs() const
@@ -145,7 +147,11 @@ public:
 
   /**
    * [SFA/OGC]Returns the number of polygons
+   *
+   * @warning PolyhedralSurface is treated as one geometry. numGeometries
+   * returns 1 or 0 for empty PolyhedralSurface
    * @deprecated see numPatchs
+   * @see numGeometries()
    */
   inline size_t
   numPolygons() const
@@ -223,16 +229,6 @@ public:
    */
   void
   addPolygons(const PolyhedralSurface &polyhedralSurface);
-
-  //-- SFCGAL::Geometry
-  size_t
-  numGeometries() const override;
-  //-- SFCGAL::Geometry
-  const Polygon &
-  geometryN(size_t const &n) const override;
-  //-- SFCGAL::Geometry
-  Polygon &
-  geometryN(size_t const &n) override;
 
   /**
    * Sets the n-th Geometry, starting at zero
