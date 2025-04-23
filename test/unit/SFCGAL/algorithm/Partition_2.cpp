@@ -52,6 +52,7 @@ BOOST_AUTO_TEST_CASE(testPartition2_YMonotonePartition2)
   exteriorRing.addPoint(Point(2.0, 2.0));
   exteriorRing.addPoint(Point(1.0, 1.0));
   exteriorRing.addPoint(Point(0.0, 2.0));
+  exteriorRing.addPoint(Point(0.0, 0.0));
 
   Polygon const g(exteriorRing);
 
@@ -59,8 +60,9 @@ BOOST_AUTO_TEST_CASE(testPartition2_YMonotonePartition2)
       algorithm::partition_2(g, SFCGAL::algorithm::y_monotone));
   BOOST_CHECK(!result->isEmpty());
 
-  std::string const expectedWKT("GEOMETRYCOLLECTION (POLYGON ((0.0 0.0,2.0 "
-                                "0.0,2.0 2.0,1.0 1.0,0.0 0.0)))");
+  std::string const expectedWKT(
+      "GEOMETRYCOLLECTION (POLYGON ((2.0 0.0,2.0 2.0,1.0 1.0,2.0 0.0)),POLYGON "
+      "((0.0 0.0,2.0 0.0,1.0 1.0,0.0 2.0,0.0 0.0)))");
   BOOST_CHECK_EQUAL(result->asText(1), expectedWKT);
 }
 
