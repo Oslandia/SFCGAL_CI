@@ -23,6 +23,7 @@
 
 using namespace SFCGAL;
 
+#include "../../../test_config.h"
 // always after CGAL
 using namespace boost::unit_test;
 
@@ -139,6 +140,19 @@ BOOST_AUTO_TEST_CASE(testIsCounterClockWiseOriented_LineString)
   BOOST_CHECK(algorithm::isCounterClockWiseOriented(ring));
   ring.reverse();
   BOOST_CHECK(!algorithm::isCounterClockWiseOriented(ring));
+}
+
+BOOST_AUTO_TEST_CASE(testPostGISIssue3651)
+{
+  std::string inputData(SFCGAL_TEST_DIRECTORY);
+  inputData += "/data/postgis_crash_orientation_3651.wkt";
+  std::ifstream ifs(inputData.c_str());
+  BOOST_REQUIRE(ifs.good());
+
+  std::string inputWkt;
+  std::getline(ifs, inputWkt);
+  std::unique_ptr<Geometry> g(io::readWkt(inputWkt));
+  algorithm::isCounterClockWiseOriented(g->as<Polygon>());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
