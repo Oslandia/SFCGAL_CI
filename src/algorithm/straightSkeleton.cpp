@@ -479,8 +479,8 @@ straightSkeletonPartition(const MultiPolygon &g, bool autoOrientation)
   for (size_t i = 0; i < g.numGeometries(); i++) {
     std::unique_ptr<PolyhedralSurface> partitioned =
         straightSkeletonPartition(g.polygonN(i), autoOrientation);
-    for (size_t j = 0; j < partitioned->numGeometries(); j++) {
-      result->addPatch(partitioned->geometryN(j));
+    for (size_t j = 0; j < partitioned->numPatchs(); j++) {
+      result->addPatch(partitioned->patchN(j));
     }
   }
 
