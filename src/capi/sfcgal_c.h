@@ -804,6 +804,19 @@ SFCGAL_API const sfcgal_geometry_t *
 sfcgal_triangulated_surface_triangle_n(const sfcgal_geometry_t *tin, size_t i);
 
 /**
+ * Set the ith patch of a given TriangulatedSurface
+ * @pre tin must be a TriangulatedSurface
+ * @pre patch must be a Triangle.
+ * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patchs( tin )
+ * The ownership of the triangle is taken. The caller is not responsible anymore
+ * of its deallocation.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_triangulated_surface_set_patch_n(sfcgal_geometry_t *tin,
+                                        sfcgal_geometry_t *patch, size_t i);
+
+/**
  * Adds a Patch to a given TriangulatedSurface
  * @pre tin must be a TriangulatedSurface
  * @pre patch must be a Triangle

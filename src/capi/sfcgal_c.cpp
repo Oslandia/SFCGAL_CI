@@ -1012,6 +1012,15 @@ sfcgal_triangulated_surface_triangle_n(const sfcgal_geometry_t *geom, size_t i)
 }
 
 extern "C" void
+sfcgal_triangulated_surface_set_patch_n(sfcgal_geometry_t *tin,
+                                        sfcgal_geometry_t *patch, size_t i)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      return down_cast<SFCGAL::TriangulatedSurface>(tin)->setGeometryN(
+          down_cast<SFCGAL::Triangle>(patch), i);)
+}
+
+extern "C" void
 sfcgal_triangulated_surface_add_patch(sfcgal_geometry_t *tin,
                                       sfcgal_geometry_t *patch)
 {

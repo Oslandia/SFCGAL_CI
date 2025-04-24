@@ -658,7 +658,7 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 2), tin2.get()));
   BOOST_CHECK(hasError == false);
   std::unique_ptr<Geometry> const simpleTriangle(io::readWkt("TRIANGLE Z ((0 0 0, 2 0 1, 2 2 2, 0 0 0))"));
-  sfcgal_geometry_set_geometry_n(tin.get(), simpleTriangle->clone(), 1);
+  sfcgal_triangulated_surface_set_patch_n(tin.get(), simpleTriangle->clone(), 1);
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 1), simpleTriangle.get()));
 
   // Line - should return itself
