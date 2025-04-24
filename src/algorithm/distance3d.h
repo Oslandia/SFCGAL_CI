@@ -72,6 +72,14 @@ distancePointPolyhedralSurface3D(const Point             &pointA,
                                  const PolyhedralSurface &polySurfaceB)
     -> double;
 /**
+ * distance between a Point and a TriangulatedSurface
+ * @ingroup detail
+ */
+SFCGAL_API auto
+distancePointTriangulatedSurface3D(
+    const Point &pointA, const TriangulatedSurface &triangulatedSurfaceB)
+    -> double;
+/**
  * distance between a Point and a Solid
  * @ingroup detail
  */
@@ -111,6 +119,14 @@ distanceLineStringPolygon3D(const LineString &gA, const Polygon &gB);
 SFCGAL_API auto
 distanceLineStringPolyhedralSurface3D(const LineString        &lineA,
                                       const PolyhedralSurface &polySurfaceB)
+    -> double;
+/**
+ * distance between a LineString and a TriangulatedSurface
+ * @ingroup detail
+ */
+SFCGAL_API auto
+distanceLineStringTriangulatedSurface3D(
+    const LineString &lineA, const TriangulatedSurface &triangulatedSurfaceB)
     -> double;
 /**
  * distance between a LineString and a Solid
@@ -153,6 +169,16 @@ distancePolygonGeometry3D(const Polygon &gA, const Geometry &gB);
 SFCGAL_API auto
 distancePolyhedralSurfaceGeometry3D(const PolyhedralSurface &polySurfaceA,
                                     const Geometry          &geomB) -> double;
+
+/**
+ * dispatch distance between a TriangulatedSurface and a Geometry
+ * @ingroup detail
+ */
+SFCGAL_API auto
+distanceTriangulatedSurfaceGeometry3D(
+    const TriangulatedSurface &triangulatedSurfaceA, const Geometry &geomB)
+    -> double;
+
 /**
  * dispatch distance between a Solid and a Geometry
  * @ingroup detail
