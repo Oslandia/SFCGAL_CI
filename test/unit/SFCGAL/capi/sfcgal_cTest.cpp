@@ -626,7 +626,7 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   hasError = false;
   BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 2), geomCollection2.get()));
   BOOST_CHECK(hasError == false);
-  sfcgal_geometry_set_geometry_n(geomCollection.get(), point->clone(), 1);
+  sfcgal_geometry_collection_set_geometry_n(geomCollection.get(), point->clone(), 1);
   BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 1), point.get()));
 
   // PolyhedralSurface - should succeed

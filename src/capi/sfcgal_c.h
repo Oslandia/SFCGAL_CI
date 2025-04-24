@@ -626,6 +626,19 @@ sfcgal_geometry_collection_geometry_n(const sfcgal_geometry_t *collection,
                                       size_t                   i);
 
 /**
+ * Set the ith geometry of a given GeometryCollection
+ * @pre collection is a GeometryCollection
+ * @pre i >= 0 and i < sfcgal_geometry_num_geometries( collection )
+ * The ownership of the geometry is taken. The caller is not responsible anymore
+ * of its deallocation.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_geometry_collection_set_geometry_n(sfcgal_geometry_t *collection,
+                                          sfcgal_geometry_t *geometry,
+                                          size_t             i);
+
+/**
  * Adds a Geometry to a given GeometryCollection
  * @pre collection must be a GeometryCollection
  * @post the ownership of the given geometry is taken. The caller is not

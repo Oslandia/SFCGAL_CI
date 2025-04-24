@@ -863,6 +863,16 @@ sfcgal_geometry_collection_geometry_n(const sfcgal_geometry_t *geom, size_t i)
       return static_cast<const SFCGAL::Geometry *>(&g->geometryN(i));)
 }
 
+extern "C" auto
+sfcgal_geometry_collection_set_geometry_n(sfcgal_geometry_t *collection,
+                                          sfcgal_geometry_t *geometry, size_t i)
+    -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      return down_cast<SFCGAL::GeometryCollection>(collection)
+          ->setGeometryN(reinterpret_cast<SFCGAL::Geometry *>(geometry), i);)
+}
+
 extern "C" void
 sfcgal_geometry_collection_add_geometry(sfcgal_geometry_t *geom,
                                         sfcgal_geometry_t *ngeom)
