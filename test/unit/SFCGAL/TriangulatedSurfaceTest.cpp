@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(polyhedronConversionTest)
   BOOST_CHECK_EQUAL(poly->size_of_vertices(), 6U);
 }
 
-BOOST_AUTO_TEST_CASE(setTriangleNTest)
+BOOST_AUTO_TEST_CASE(setPatchNTest)
 {
   std::unique_ptr<Geometry> emptyGeom(io::readWkt("TIN EMPTY"));
   BOOST_CHECK(emptyGeom->is<TriangulatedSurface>());
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE(setTriangleNTest)
   std::string const newTriangleStr =
       "TRIANGLE Z ((0 0 0, 2 0 4, 1 2 2, 0 0 0))";
   std::unique_ptr<Geometry> newGeom(io::readWkt(newTriangleStr));
-  geom->setGeometryN(newGeom->clone(), 1);
+  geom->as<TriangulatedSurface>().setPatchN(newGeom->clone(), 1);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatchs(), 3);
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(setTriangleNTest)
   std::unique_ptr<Geometry> newGeom2(io::readWkt(newTriangleStr2));
   Triangle *newTriangle2 = dynamic_cast<Triangle *>(newGeom2.get());
   BOOST_CHECK(newTriangle2);
-  geom->setGeometryN(newTriangle2->clone(), 2);
+  geom->as<TriangulatedSurface>().setPatchN(newTriangle2->clone(), 2);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatchs(), 3);

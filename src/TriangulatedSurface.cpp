@@ -153,11 +153,11 @@ TriangulatedSurface::patchN(size_t const &n) const -> const Triangle &
 auto
 TriangulatedSurface::patchN(size_t const &n) -> Triangle &
 {
-  if (n >= numGeometries()) {
+  if (n >= numPatchs()) {
     BOOST_THROW_EXCEPTION(Exception(
         (boost::format("Cannot access geometry at position %s. "
                        "TriangulatedSurface has only %d geometries.") %
-         n % numGeometries())
+         n % numPatchs())
             .str()));
   }
 
@@ -165,7 +165,7 @@ TriangulatedSurface::patchN(size_t const &n) -> Triangle &
 }
 
 void
-TriangulatedSurface::setGeometryN(Triangle *triangle, size_t const &n)
+TriangulatedSurface::setPatchN(Triangle *triangle, size_t const &n)
 {
   BOOST_ASSERT(triangle != NULL);
 
@@ -181,13 +181,13 @@ TriangulatedSurface::setGeometryN(Triangle *triangle, size_t const &n)
 }
 
 void
-TriangulatedSurface::setGeometryN(const Triangle &triangle, size_t const &n)
+TriangulatedSurface::setPatchN(const Triangle &triangle, size_t const &n)
 {
-  setGeometryN(triangle.clone(), n);
+  setPatchN(triangle.clone(), n);
 }
 
 void
-TriangulatedSurface::setGeometryN(Geometry *geometry, size_t const &n)
+TriangulatedSurface::setPatchN(Geometry *geometry, size_t const &n)
 {
   if (geometry->geometryTypeId() != TYPE_TRIANGLE) {
     std::ostringstream oss;
@@ -197,13 +197,13 @@ TriangulatedSurface::setGeometryN(Geometry *geometry, size_t const &n)
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
-  setGeometryN(dynamic_cast<Triangle *>(geometry), n);
+  setPatchN(dynamic_cast<Triangle *>(geometry), n);
 }
 
 void
-TriangulatedSurface::setGeometryN(const Geometry &geometry, size_t const &n)
+TriangulatedSurface::setPatchN(const Geometry &geometry, size_t const &n)
 {
-  setGeometryN(geometry.clone(), n);
+  setPatchN(geometry.clone(), n);
 }
 
 void
