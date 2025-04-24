@@ -273,29 +273,6 @@ SFCGAL_API size_t
 sfcgal_geometry_num_geometries(const sfcgal_geometry_t *geometryCollection);
 
 /**
- * Returns the n-th geometry of the given geometry collection
- * @pre geometry must be a GeometryCollection.
- * Otherwise, the geometry is returned.
- * @post the returned Geometry is not writable and must not be deallocated by
- * the caller
- * @ingroup capi
- */
-SFCGAL_API const sfcgal_geometry_t *
-sfcgal_geometry_get_geometry_n(const sfcgal_geometry_t *geometryCollection,
-                               size_t                   n);
-
-/**
- * Sets the n-th geometry of the given geometry collection
- * @pre geometryCollection must be a GeometryCollection.
- * Otherwise, nothing happens. The ownership of the
- * geometry is taken. The caller is not responsible anymore of its deallocation.
- * @ingroup capi
- */
-SFCGAL_API void
-sfcgal_geometry_set_geometry_n(sfcgal_geometry_t *geometryCollection,
-                               sfcgal_geometry_t *geometry, size_t n);
-
-/**
  * Returns a WKT representation of the given geometry using CGAL exact integer
  * fractions as coordinate values
  * @post buffer is returned allocated and must be freed by the caller
@@ -617,10 +594,8 @@ sfcgal_geometry_collection_num_geometries(const sfcgal_geometry_t *collection);
  * @pre i >= 0 and i < sfcgal_geometry_collection_num_geometries
  * @post the returned Geometry is not writable and must not be deallocated by
  * the caller
- * @deprecated Use sfcgal_geometry_get_geometry_n
  * @ingroup capi
  */
-SFCGAL_DEPRECATED("Use sfcgal_geometry_get_geometry_n instead.")
 SFCGAL_API const sfcgal_geometry_t *
 sfcgal_geometry_collection_geometry_n(const sfcgal_geometry_t *collection,
                                       size_t                   i);

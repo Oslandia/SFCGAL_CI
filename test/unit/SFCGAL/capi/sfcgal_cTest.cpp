@@ -615,66 +615,60 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   std::unique_ptr<Geometry> const tin0(io::readWkt("TRIANGLE Z ((0 0 0, 1 0 0, 0.5 1 1, 0 0 0))"));
   std::unique_ptr<Geometry> const tin2(io::readWkt("TRIANGLE Z ((0.5 1 1, 1.5 1 1, 1 2 2, 0.5 1 1))"));
 
-  // GeometryCollection - should succeed
+  // GeometryCollection
   hasError = false;
   BOOST_CHECK(!geomCollection->isEmpty());
   BOOST_CHECK(!geomCollection0->isEmpty());
   BOOST_CHECK(!geomCollection2->isEmpty());
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(geomCollection.get()), 4);
-  BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 0), geomCollection0.get()));
+  BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_collection_geometry_n(geomCollection.get(), 0), geomCollection0.get()));
   BOOST_CHECK(hasError == false);
   hasError = false;
-  BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 2), geomCollection2.get()));
+  BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_collection_geometry_n(geomCollection.get(), 2), geomCollection2.get()));
   BOOST_CHECK(hasError == false);
   sfcgal_geometry_collection_set_geometry_n(geomCollection.get(), point->clone(), 1);
-  BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_get_geometry_n(geomCollection.get(), 1), point.get()));
+  BOOST_CHECK(sfcgal_geometry_covers(sfcgal_geometry_collection_geometry_n(geomCollection.get(), 1), point.get()));
 
-  // PolyhedralSurface - should succeed
+  // PolyhedralSurface
   hasError = false;
   BOOST_CHECK(!polySurface->isEmpty());
   BOOST_CHECK(!polySurface0->isEmpty());
   BOOST_CHECK(!polySurface2->isEmpty());
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(polySurface.get()), 1);
   BOOST_CHECK_EQUAL(sfcgal_polyhedral_surface_num_patchs(polySurface.get()), 3);
-  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(polySurface.get(), 0), polySurface0.get()));
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_polyhedral_surface_patch_n(polySurface.get(), 0), polySurface0.get()));
   BOOST_CHECK(hasError == false);
   hasError = false;
-  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(polySurface.get(), 2), polySurface2.get()));
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_polyhedral_surface_patch_n(polySurface.get(), 2), polySurface2.get()));
   BOOST_CHECK(hasError == false);
   std::unique_ptr<Geometry> const simplePolygon(io::readWkt("POLYGON Z ((0 0 0, 2 0 1, 2 2 2, 0 2 1, 0 0 0))"));
   sfcgal_polyhedral_surface_set_patch_n(polySurface.get(), simplePolygon->clone(), 1);
   BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_polyhedral_surface_patch_n(polySurface.get(), 1), simplePolygon.get()));
 
-  // TIN - should succeed
+  // TIN
   hasError = false;
   BOOST_CHECK(!tin->isEmpty());
   BOOST_CHECK(!tin0->isEmpty());
   BOOST_CHECK(!tin2->isEmpty());
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(tin.get()), 1);
   BOOST_CHECK_EQUAL(sfcgal_triangulated_surface_num_patchs(tin.get()), 3);
-  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 0), tin0.get()));
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_triangulated_surface_patch_n(tin.get(), 0), tin0.get()));
   BOOST_CHECK(hasError == false);
   hasError = false;
-  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 2), tin2.get()));
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_triangulated_surface_patch_n(tin.get(), 2), tin2.get()));
   BOOST_CHECK(hasError == false);
   std::unique_ptr<Geometry> const simpleTriangle(io::readWkt("TRIANGLE Z ((0 0 0, 2 0 1, 2 2 2, 0 0 0))"));
   sfcgal_triangulated_surface_set_patch_n(tin.get(), simpleTriangle->clone(), 1);
-  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_geometry_get_geometry_n(tin.get(), 1), simpleTriangle.get()));
+  BOOST_CHECK(sfcgal_geometry_covers_3d(sfcgal_triangulated_surface_patch_n(tin.get(), 1), simpleTriangle.get()));
 
-  // Line - should return itself
+  // Line
   hasError = false;
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(line.get()), 1);
-  BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(line.get(), 0), line.get());
-  sfcgal_geometry_set_geometry_n(line.get(), simpleTriangle->clone(), 1);
-  BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(line.get(), 1), line.get());
   BOOST_CHECK(hasError == false);
 
-  // Point - should return itself
+  // Point
   hasError = false;
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(point.get()), 1);
-  BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(point.get(), 5), point.get());
-  sfcgal_geometry_set_geometry_n(point.get(), simpleTriangle->clone(), 1);
-  BOOST_CHECK_EQUAL(sfcgal_geometry_get_geometry_n(point.get(), 1), point.get());
   BOOST_CHECK(hasError == false);
 }
 
