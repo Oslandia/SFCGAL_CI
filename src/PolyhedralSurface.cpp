@@ -29,8 +29,8 @@ PolyhedralSurface::PolyhedralSurface(const std::unique_ptr<Geometry> &geometry)
   } else if (geometry->is<TriangulatedSurface>()) {
     const TriangulatedSurface &triangulatedSurface =
         geometry->as<TriangulatedSurface>();
-    for (size_t i = 0; i < triangulatedSurface.numTriangles(); ++i) {
-      this->addPatch(triangulatedSurface.triangleN(i));
+    for (size_t i = 0; i < triangulatedSurface.numPatchs(); ++i) {
+      this->addPatch(triangulatedSurface.patchN(i));
     }
   } else if (geometry->is<Polygon>()) {
     this->addPatch(geometry->as<Polygon>());

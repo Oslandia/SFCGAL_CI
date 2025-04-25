@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructor)
 {
   TriangulatedSurface const g;
   BOOST_CHECK(g.isEmpty());
-  BOOST_CHECK_EQUAL(g.numTriangles(), 0U);
+  BOOST_CHECK_EQUAL(g.numPatchs(), 0U);
   BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
 }
 // TriangulatedSurface( const std::vector< Triangle > & triangle ) ;
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(constructorWithTriangles)
 
   TriangulatedSurface const g(triangles);
   BOOST_CHECK(!g.isEmpty());
-  BOOST_CHECK_EQUAL(g.numTriangles(), 2U);
+  BOOST_CHECK_EQUAL(g.numPatchs(), 2U);
   BOOST_CHECK_EQUAL(g.numGeometries(), 2U);
 }
 
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(constructorWithTriangles)
 // TriangulatedSurface& operator = ( const TriangulatedSurface & other ) ;
 //~TriangulatedSurface() ;
 
-// inline size_t             numTriangles() const { return _triangles.size(); }
+// inline size_t             numPatchs() const { return _triangles.size(); }
 // inline const Triangle  &  triangleN( size_t const& n ) const {
 // inline Triangle &         triangleN( size_t const& n ) {
 // inline void               addTriangle( const Triangle & triangle )
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(testClone)
 
   std::unique_ptr<Geometry> copy(g.clone());
   BOOST_REQUIRE(copy->is<TriangulatedSurface>());
-  BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numTriangles(), 2U);
+  BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numPatchs(), 2U);
   BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numGeometries(), 2U);
 }
 

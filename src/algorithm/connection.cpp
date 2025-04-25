@@ -125,13 +125,13 @@ SurfaceGraph::SurfaceGraph(const PolyhedralSurface &surf)
 SurfaceGraph::SurfaceGraph(const TriangulatedSurface &tin)
     : _numVertices(0), _isValid(Validity::valid())
 {
-  const size_t numTriangles = tin.numTriangles();
+  const size_t numPatchs = tin.numPatchs();
 
-  for (size_t t = 0; t != numTriangles; ++t) { // for each polygon
+  for (size_t t = 0; t != numPatchs; ++t) { // for each polygon
     const FaceIndex idx = boost::add_vertex(_graph);
     BOOST_ASSERT(idx == t);
     (void)idx;
-    const Triangle &triangle = tin.triangleN(t);
+    const Triangle &triangle = tin.patchN(t);
     addRing(triangle.toPolygon().exteriorRing(), t);
   }
 }

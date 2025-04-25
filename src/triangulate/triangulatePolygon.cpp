@@ -77,14 +77,14 @@ triangulatePolygon3D(const Triangle      &triangle,
     return;
   }
 
-  triangulatedSurface.addTriangle(triangle);
+  triangulatedSurface.addPatch(triangle);
 }
 
 void
 triangulatePolygon3D(const TriangulatedSurface &g,
                      TriangulatedSurface       &triangulatedSurface)
 {
-  triangulatedSurface.addTriangles(g);
+  triangulatedSurface.addPatchs(g);
 }
 
 void

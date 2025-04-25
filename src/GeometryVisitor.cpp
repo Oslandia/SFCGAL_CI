@@ -83,8 +83,8 @@ GeometryVisitor::visit(Geometry &g)
 /////
 // void GeometryVisitor::visit( TriangulatedSurface & g )
 //{
-//	for ( size_t i = 0; i < g.numTriangles(); i++ ){
-//		visit( g.triangleN(i) );
+//	for ( size_t i = 0; i < g.numPatchs(); i++ ){
+//		visit( g.patchN(i) );
 //	}
 //}
 
@@ -154,8 +154,8 @@ ConstGeometryVisitor::visit(const Geometry &g)
 /////
 // void ConstGeometryVisitor::visit( const TriangulatedSurface & g )
 //{
-//	for ( size_t i = 0; i < g.numTriangles(); i++ ){
-//		visit( g.triangleN(i) );
+//	for ( size_t i = 0; i < g.numPatchs(); i++ ){
+//		visit( g.patchN(i) );
 //	}
 //}
 //

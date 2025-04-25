@@ -457,7 +457,7 @@ WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
   while (!_reader.eof()) {
     std::unique_ptr<Triangle> triangle(new Triangle());
     readInnerTriangle(*triangle);
-    g.addTriangle(triangle.release());
+    g.addPatch(triangle.release());
 
     if (!_reader.match(',')) {
       break;

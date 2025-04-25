@@ -123,11 +123,17 @@ TriangulatedSurface::swapXY() -> void
 }
 
 void
-TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
+TriangulatedSurface::addPatchs(const TriangulatedSurface &other)
 {
   for (const auto &it : other) {
-    addTriangle(it);
+    addPatch(it);
   }
+}
+
+void
+TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
+{
+  return addPatchs(other);
 }
 
 auto

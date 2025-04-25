@@ -35,7 +35,7 @@ ConsistentOrientationBuilder::buildTriangulatedSurface() -> TriangulatedSurface
   TriangulatedSurface triangulatedSurface;
 
   for (size_t i = 0; i < numTriangles(); i++) {
-    triangulatedSurface.addTriangle(triangleN(i));
+    triangulatedSurface.addPatch(triangleN(i));
   }
 
   return triangulatedSurface;

@@ -187,7 +187,7 @@ WkbReader::readInnerTriangulatedSurface() -> TriangulatedSurface
       readWkb();
       if (_geometry != nullptr) {
         SFCGAL::Triangle const geom{_geometry->as<SFCGAL::Triangle>()};
-        result.addTriangle(geom);
+        result.addPatch(geom);
       }
     }
   } catch (std::exception &e) {

@@ -88,8 +88,7 @@ void
 ConstraintDelaunayTriangulation::getTriangles(
     TriangulatedSurface &triangulatedSurface, bool filterExteriorParts) const
 {
-  triangulatedSurface.reserve(triangulatedSurface.numTriangles() +
-                              numTriangles());
+  triangulatedSurface.reserve(triangulatedSurface.numPatchs() + numTriangles());
 
   for (Finite_faces_iterator it = finite_faces_begin();
        it != finite_faces_end(); ++it) {
@@ -104,8 +103,7 @@ ConstraintDelaunayTriangulation::getTriangles(
     const Coordinate &c = it->vertex(2)->info().original;
 
     if (!a.isEmpty() && !b.isEmpty() && !c.isEmpty()) {
-      triangulatedSurface.addTriangle(
-          new Triangle(Point(a), Point(b), Point(c)));
+      triangulatedSurface.addPatch(new Triangle(Point(a), Point(b), Point(c)));
     }
   }
 }

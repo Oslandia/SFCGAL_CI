@@ -129,8 +129,8 @@ area(const TriangulatedSurface &g) -> double
 {
   double result = 0.0;
 
-  for (size_t i = 0; i < g.numTriangles(); i++) {
-    result += area(g.triangleN(i));
+  for (size_t i = 0; i < g.numPatchs(); i++) {
+    result += area(g.PatchN(i));
   }
 
   return result;

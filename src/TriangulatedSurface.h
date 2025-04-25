@@ -88,8 +88,57 @@ public:
   swapXY() -> void override;
 
   /**
-   * [SFA/OGC]Returns the number of points
+   * [SFA/OGC]Returns the number of patchs
    * @deprecated see numGeometries()
+   */
+  inline size_t
+  numPatchs() const
+  {
+    return _triangles.size();
+  }
+  /**
+   * [SFA/OGC]Returns the n-th patch
+   */
+  inline const Triangle &
+  patchN(size_t const &n) const
+  {
+    BOOST_ASSERT(n < _triangles.size());
+    return _triangles[n];
+  }
+  /**
+   * [SFA/OGC]Returns the n-th patch
+   */
+  inline Triangle &
+  patchN(size_t const &n)
+  {
+    BOOST_ASSERT(n < _triangles.size());
+    return _triangles[n];
+  }
+  /**
+   * add a Patch to the TriangulatedSurface
+   */
+  inline void
+  addPatch(const Triangle &patch)
+  {
+    addPatch(patch.clone());
+  }
+  /**
+   * add a Patch to the TriangulatedSurface
+   */
+  inline void
+  addPatch(Triangle *patch)
+  {
+    _triangles.push_back(patch);
+  }
+  /**
+   * add patchs from an other TriangulatedSurface
+   */
+  void
+  addPatchs(const TriangulatedSurface &other);
+
+  /**
+   * [SFA/OGC]Returns the number of points
+   * @deprecated see numPatchs()
    */
   inline size_t
   numTriangles() const
@@ -98,7 +147,7 @@ public:
   }
   /**
    * [SFA/OGC]Returns the n-th point
-   * @deprecated see geometryN()
+   * @deprecated see patchN()
    */
   inline const Triangle &
   triangleN(size_t const &n) const
@@ -108,7 +157,7 @@ public:
   }
   /**
    * [SFA/OGC]Returns the n-th point
-   * @deprecated see geometryN()
+   * @deprecated see patchN()
    */
   inline Triangle &
   triangleN(size_t const &n)
@@ -118,6 +167,7 @@ public:
   }
   /**
    * add a Triangle to the TriangulatedSurface
+   * @deprecated see addPatch()
    */
   inline void
   addTriangle(const Triangle &triangle)
@@ -126,6 +176,7 @@ public:
   }
   /**
    * add a Triangle to the TriangulatedSurface
+   * @deprecated see addPatch()
    */
   inline void
   addTriangle(Triangle *triangle)
@@ -134,6 +185,7 @@ public:
   }
   /**
    * add triangles from an other TriangulatedSurface
+   * @deprecated see addPatchs()
    */
   void
   addTriangles(const TriangulatedSurface &other);
