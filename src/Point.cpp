@@ -42,12 +42,20 @@ Point::Point(const double &x, const double &y, const double &z, const double &m)
 
 Point::Point(const double &x, const double &y, const double &z, const double &m,
              CoordinateType dim)
-    : Point(Kernel::FT(x), Kernel::FT(y), Kernel::FT(z), m, dim)
 {
+  newPoint(x, y, z, m, dim);
 }
 
 Point::Point(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z,
              const double &m, CoordinateType dim)
+{
+  newPoint(x, y, z, m, dim);
+}
+
+template <typename T>
+void
+Point::newPoint(const T &x, const T &y, const T &z, const double &m,
+                CoordinateType dim)
 {
   bool _is3D = (dim == CoordinateType::COORDINATE_XYZ) ||
                (dim == CoordinateType::COORDINATE_XYZM);

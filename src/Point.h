@@ -266,6 +266,10 @@ public:
   }
 
 private:
+  template <typename T>
+  void
+             newPoint(const T &x, const T &y, const T &z, const double &m,
+                      CoordinateType dim);
   Coordinate _coordinate;
   /**
    * @brief m coordinates (NaN if not defined)
