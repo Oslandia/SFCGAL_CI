@@ -108,7 +108,7 @@ extrude(const LineString &g, const Kernel::Vector_3 &v) -> PolyhedralSurface *
     ring->addPoint(new Point(a + v));
     ring->addPoint(new Point(a));
 
-    polyhedralSurface->addPolygon(new Polygon(ring.release()));
+    polyhedralSurface->addPatch(new Polygon(ring.release()));
   }
 
   return polyhedralSurface.release();
@@ -134,23 +134,23 @@ extrude(const Polygon &g, const Kernel::Vector_3 &v, bool addTop) -> Solid *
     bottom.reverse();
   }
 
-  polyhedralSurface.addPolygon(bottom);
+  polyhedralSurface.addPatch(bottom);
 
   // "top"
   if (addTop) {
     Polygon top(bottom);
     top.reverse();
     translate(top, v);
-    polyhedralSurface.addPolygon(top);
+    polyhedralSurface.addPatch(top);
   }
   // exterior ring and interior rings extruded
   for (size_t i = 0; i < bottom.numRings(); i++) {
     std::unique_ptr<PolyhedralSurface> boundaryExtruded(
         extrude(bottom.ringN(i), v));
 
-    for (size_t j = 0; j < boundaryExtruded->numPolygons(); j++) {
-      boundaryExtruded->polygonN(j).reverse();
-      polyhedralSurface.addPolygon(boundaryExtruded->polygonN(j));
+    for (size_t j = 0; j < boundaryExtruded->numPatchs(); j++) {
+      boundaryExtruded->patchN(j).reverse();
+      polyhedralSurface.addPatch(boundaryExtruded->patchN(j));
     }
   }
 
@@ -192,8 +192,8 @@ extrude(const MultiLineString &g, const Kernel::Vector_3 &v)
   for (size_t i = 0; i < g.numGeometries(); i++) {
     std::unique_ptr<PolyhedralSurface> extruded(extrude(g.lineStringN(i), v));
 
-    for (size_t j = 0; j < extruded->numPolygons(); j++) {
-      result->addPolygon(extruded->polygonN(j));
+    for (size_t j = 0; j < extruded->numPatchs(); j++) {
+      result->addPatch(extruded->patchN(j));
     }
   }
 
@@ -230,12 +230,12 @@ extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v) -> Solid *
     Triangle bottomPart(g.geometryN(i));
     force3D(bottomPart);
     bottomPart.reverse();
-    result->exteriorShell().addPolygon(bottomPart);
+    result->exteriorShell().addPatch(bottomPart);
 
     Triangle topPart(g.geometryN(i));
     force3D(topPart);
     translate(topPart, v);
-    result->exteriorShell().addPolygon(topPart);
+    result->exteriorShell().addPatch(topPart);
   }
 
   // boundary

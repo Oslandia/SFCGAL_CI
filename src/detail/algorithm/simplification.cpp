@@ -255,8 +255,8 @@ extractPolyhedralSurfaceConstraints(
     std::vector<ConstraintInfoType> &constraintInfos, std::size_t geomIdx)
 {
   // Process each polygon in the PolyhedralSurface
-  for (std::size_t polyIdx = 0; polyIdx < surface.numPolygons(); ++polyIdx) {
-    const auto &polygon = surface.polygonN(polyIdx);
+  for (std::size_t polyIdx = 0; polyIdx < surface.numPatchs(); ++polyIdx) {
+    const auto &polygon = surface.patchN(polyIdx);
 
     // Add exterior ring
     if (extractPolygonExteriorConstraint(
@@ -530,7 +530,7 @@ reconstructPolyhedralSurface(
     auto surfacePtr = std::make_unique<PolyhedralSurface>();
 
     // Process each polygon in the original PolyhedralSurface
-    for (std::size_t polyIdx = 0; polyIdx < originalSurface.numPolygons();
+    for (std::size_t polyIdx = 0; polyIdx < originalSurface.numPatchs();
          ++polyIdx) {
       auto polyIt = it->second.find(polyIdx);
 
@@ -548,18 +548,18 @@ reconstructPolyhedralSurface(
         for (const auto &[ringIdx, ring] : polyIt->second) {
           if (ringIdx > 0) {
             LineString ringCopy(ring);
-            if (polyIdx < originalSurface.numPolygons() &&
+            if (polyIdx < originalSurface.numPatchs() &&
                 ringIdx - 1 <
-                    originalSurface.polygonN(polyIdx).numInteriorRings()) {
+                    originalSurface.patchN(polyIdx).numInteriorRings()) {
             }
             simplifiedPolygon.addInteriorRing(ringCopy);
           }
         }
 
-        surfacePtr->addPolygon(simplifiedPolygon);
+        surfacePtr->addPatch(simplifiedPolygon);
       } else {
         // No simplified version of this polygon, use the original
-        surfacePtr->addPolygon(originalSurface.polygonN(polyIdx));
+        surfacePtr->addPatch(originalSurface.patchN(polyIdx));
       }
     }
 
@@ -944,8 +944,8 @@ simplifyPolyhedralSurface(const PolyhedralSurface &polySurface,
     // coordinate type
     MultiPolygon multiPolygon;
 
-    for (size_t i = 0; i < polySurface.numPolygons(); ++i) {
-      Polygon polygon = polySurface.polygonN(i);
+    for (size_t i = 0; i < polySurface.numPatchs(); ++i) {
+      Polygon polygon = polySurface.patchN(i);
       multiPolygon.addGeometry(polygon);
     }
 
@@ -966,7 +966,7 @@ simplifyPolyhedralSurface(const PolyhedralSurface &polySurface,
     for (size_t i = 0; i < simplifiedMultiPolygon->numGeometries(); ++i) {
       const auto &polygon = simplifiedMultiPolygon->polygonN(i);
       Polygon     polygonCopy(polygon);
-      result->addPolygon(polygonCopy);
+      result->addPatch(polygonCopy);
     }
 
     return result;

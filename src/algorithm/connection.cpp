@@ -107,13 +107,13 @@ SurfaceGraph::addRing(const LineString &ring, FaceIndex faceIndex)
 SurfaceGraph::SurfaceGraph(const PolyhedralSurface &surf)
     : _numVertices(0), _isValid(Validity::valid())
 {
-  const size_t numPolygons = surf.numPolygons();
+  const size_t numPatchs = surf.numPatchs();
 
-  for (size_t p = 0; p != numPolygons; ++p) { // for each polygon
+  for (size_t p = 0; p != numPatchs; ++p) { // for each polygon
     const FaceIndex idx = boost::add_vertex(_graph);
     BOOST_ASSERT(idx == p);
     (void)idx;
-    const Polygon &polygon  = surf.polygonN(p);
+    const Polygon &polygon  = surf.patchN(p);
     const size_t   numRings = polygon.numRings();
 
     for (size_t r = 0; r != numRings; ++r) { // for each ring

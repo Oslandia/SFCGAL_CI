@@ -473,10 +473,10 @@ isValid(const PolyhedralSurface &s, const SurfaceGraph &graph,
     return Validity::valid();
   }
 
-  size_t const numPolygons = s.numPolygons();
+  size_t const numPatchs = s.numPatchs();
 
-  for (size_t p = 0; p != numPolygons; ++p) {
-    Validity const v = isValid(s.polygonN(p), toleranceAbs);
+  for (size_t p = 0; p != numPatchs; ++p) {
+    Validity const v = isValid(s.patchN(p), toleranceAbs);
 
     if (!v) {
       return Validity::invalid(

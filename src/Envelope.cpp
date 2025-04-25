@@ -164,7 +164,7 @@ Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
     ring.addPoint(b);
     ring.addPoint(ring.startPoint());
 
-    shell->addPolygon(Polygon(ring));
+    shell->addPatch(Polygon(ring));
   }
 
   // top : e,f,g,h
@@ -176,7 +176,7 @@ Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
     ring.addPoint(h);
     ring.addPoint(ring.startPoint());
 
-    shell->addPolygon(Polygon(ring));
+    shell->addPatch(Polygon(ring));
   }
 
   // front : a,b,f,e
@@ -188,7 +188,7 @@ Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
     ring.addPoint(e);
     ring.addPoint(ring.startPoint());
 
-    shell->addPolygon(Polygon(ring));
+    shell->addPatch(Polygon(ring));
   }
 
   // back : c,d,h,g
@@ -200,7 +200,7 @@ Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
     ring.addPoint(g);
     ring.addPoint(ring.startPoint());
 
-    shell->addPolygon(Polygon(ring));
+    shell->addPatch(Polygon(ring));
   }
 
   // right : b,c,g,f
@@ -212,7 +212,7 @@ Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
     ring.addPoint(f);
     ring.addPoint(ring.startPoint());
 
-    shell->addPolygon(Polygon(ring));
+    shell->addPatch(Polygon(ring));
   }
 
   // left : a,e,h,d
@@ -224,7 +224,7 @@ Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
     ring.addPoint(d);
     ring.addPoint(ring.startPoint());
 
-    shell->addPolygon(Polygon(ring));
+    shell->addPatch(Polygon(ring));
   }
 
   return shell;

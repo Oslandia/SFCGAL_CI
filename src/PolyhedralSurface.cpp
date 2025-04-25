@@ -30,10 +30,10 @@ PolyhedralSurface::PolyhedralSurface(const std::unique_ptr<Geometry> &geometry)
     const TriangulatedSurface &triangulatedSurface =
         geometry->as<TriangulatedSurface>();
     for (size_t i = 0; i < triangulatedSurface.numTriangles(); ++i) {
-      this->addPolygon(triangulatedSurface.triangleN(i));
+      this->addPatch(triangulatedSurface.triangleN(i));
     }
   } else if (geometry->is<Polygon>()) {
-    this->addPolygon(geometry->as<Polygon>());
+    this->addPatch(geometry->as<Polygon>());
   } else {
     throw std::invalid_argument("Cannot convert geometry to PolyhedralSurface");
   }
@@ -188,24 +188,42 @@ PolyhedralSurface::toTriangulatedSurface() const -> TriangulatedSurface
 }
 
 void
+PolyhedralSurface::addPatch(const Polygon &patch)
+{
+  addPatch(patch.clone());
+}
+
+void
+PolyhedralSurface::addPatch(Polygon *patch)
+{
+  BOOST_ASSERT(polygon != NULL);
+  _polygons.push_back(patch);
+}
+
+void
+PolyhedralSurface::addPatchs(const PolyhedralSurface &polyhedralSurface)
+{
+  for (size_t i = 0; i < polyhedralSurface.numPatchs(); i++) {
+    addPatch(polyhedralSurface.patchN(i));
+  }
+}
+
+void
 PolyhedralSurface::addPolygon(const Polygon &polygon)
 {
-  addPolygon(polygon.clone());
+  return addPatch(polygon);
 }
 
 void
 PolyhedralSurface::addPolygon(Polygon *polygon)
 {
-  BOOST_ASSERT(polygon != NULL);
-  _polygons.push_back(polygon);
+  return addPatch(polygon);
 }
 
 void
 PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
 {
-  for (size_t i = 0; i < polyhedralSurface.numPolygons(); i++) {
-    addPolygon(polyhedralSurface.polygonN(i));
-  }
+  return addPatchs(polyhedralSurface);
 }
 
 auto

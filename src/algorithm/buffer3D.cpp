@@ -186,7 +186,7 @@ Buffer3D::computeCylSphereBuffer() const -> std::unique_ptr<PolyhedralSurface>
 
   // Convert the merged mesh to PolyhedralSurface and return
   auto resultSurface = std::make_unique<PolyhedralSurface>();
-  resultSurface->addPolygons(merged_mesh);
+  resultSurface->addPatchs(merged_mesh);
 
   return resultSurface;
 }

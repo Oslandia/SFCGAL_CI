@@ -132,28 +132,28 @@ BOOST_AUTO_TEST_CASE(testRotatePolyhedralSurface)
                                 Point(0, 1, 0), Point(0, 0, 0)};
   std::vector<Point> points2 = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 0, 1),
                                 Point(0, 0, 1), Point(0, 0, 0)};
-  surface.addPolygon(Polygon(LineString(points1)));
-  surface.addPolygon(Polygon(LineString(points2)));
+  surface.addPatch(Polygon(LineString(points1)));
+  surface.addPatch(Polygon(LineString(points2)));
 
   rotate(surface, M_PI / 2,
          Kernel::Vector_3(1, 0, 0)); // 90 degree rotation around X-axis
 
-  BOOST_CHECK(pointsAreClose(surface.polygonN(0).exteriorRing().pointN(0),
+  BOOST_CHECK(pointsAreClose(surface.patchN(0).exteriorRing().pointN(0),
                              Point(0, 0, 0)));
-  BOOST_CHECK(pointsAreClose(surface.polygonN(0).exteriorRing().pointN(1),
+  BOOST_CHECK(pointsAreClose(surface.patchN(0).exteriorRing().pointN(1),
                              Point(1, 0, 0)));
-  BOOST_CHECK(pointsAreClose(surface.polygonN(0).exteriorRing().pointN(2),
+  BOOST_CHECK(pointsAreClose(surface.patchN(0).exteriorRing().pointN(2),
                              Point(1, 0, 1)));
-  BOOST_CHECK(pointsAreClose(surface.polygonN(0).exteriorRing().pointN(3),
+  BOOST_CHECK(pointsAreClose(surface.patchN(0).exteriorRing().pointN(3),
                              Point(0, 0, 1)));
 
-  BOOST_CHECK(pointsAreClose(surface.polygonN(1).exteriorRing().pointN(0),
+  BOOST_CHECK(pointsAreClose(surface.patchN(1).exteriorRing().pointN(0),
                              Point(0, 0, 0)));
-  BOOST_CHECK(pointsAreClose(surface.polygonN(1).exteriorRing().pointN(1),
+  BOOST_CHECK(pointsAreClose(surface.patchN(1).exteriorRing().pointN(1),
                              Point(1, 0, 0)));
-  BOOST_CHECK(pointsAreClose(surface.polygonN(1).exteriorRing().pointN(2),
+  BOOST_CHECK(pointsAreClose(surface.patchN(1).exteriorRing().pointN(2),
                              Point(1, -1, 0)));
-  BOOST_CHECK(pointsAreClose(surface.polygonN(1).exteriorRing().pointN(3),
+  BOOST_CHECK(pointsAreClose(surface.patchN(1).exteriorRing().pointN(3),
                              Point(0, -1, 0)));
 }
 
@@ -164,17 +164,17 @@ BOOST_AUTO_TEST_CASE(testRotateSolid)
                                Point(0, 1, 0), Point(0, 0, 1), Point(1, 0, 1),
                                Point(1, 1, 1), Point(0, 1, 1)};
   PolyhedralSurface  shell;
-  shell.addPolygon(Polygon(
+  shell.addPatch(Polygon(
       LineString({points[0], points[1], points[2], points[3], points[0]})));
-  shell.addPolygon(Polygon(
+  shell.addPatch(Polygon(
       LineString({points[4], points[5], points[6], points[7], points[4]})));
-  shell.addPolygon(Polygon(
+  shell.addPatch(Polygon(
       LineString({points[0], points[1], points[5], points[4], points[0]})));
-  shell.addPolygon(Polygon(
+  shell.addPatch(Polygon(
       LineString({points[1], points[2], points[6], points[5], points[1]})));
-  shell.addPolygon(Polygon(
+  shell.addPatch(Polygon(
       LineString({points[2], points[3], points[7], points[6], points[2]})));
-  shell.addPolygon(Polygon(
+  shell.addPatch(Polygon(
       LineString({points[3], points[0], points[4], points[7], points[3]})));
 
   Solid solid(shell);
@@ -183,16 +183,16 @@ BOOST_AUTO_TEST_CASE(testRotateSolid)
   rotate(solid, M_PI / 2, Kernel::Vector_3(0, 0, 1));
 
   BOOST_CHECK(
-      pointsAreClose(solid.exteriorShell().polygonN(0).exteriorRing().pointN(0),
+      pointsAreClose(solid.exteriorShell().patchN(0).exteriorRing().pointN(0),
                      Point(0, 0, 0), 1e-6));
   BOOST_CHECK(
-      pointsAreClose(solid.exteriorShell().polygonN(0).exteriorRing().pointN(1),
+      pointsAreClose(solid.exteriorShell().patchN(0).exteriorRing().pointN(1),
                      Point(0, 1, 0), 1e-6));
   BOOST_CHECK(
-      pointsAreClose(solid.exteriorShell().polygonN(0).exteriorRing().pointN(2),
+      pointsAreClose(solid.exteriorShell().patchN(0).exteriorRing().pointN(2),
                      Point(-1, 1, 0), 1e-6));
   BOOST_CHECK(
-      pointsAreClose(solid.exteriorShell().polygonN(0).exteriorRing().pointN(3),
+      pointsAreClose(solid.exteriorShell().patchN(0).exteriorRing().pointN(3),
                      Point(-1, 0, 0), 1e-6));
 }
 // Test 2D rotation with a negative angle
@@ -307,12 +307,12 @@ BOOST_AUTO_TEST_CASE(testRotateSolidExtraLargeAngle)
                               points[3]};
 
   // Add faces to the polyhedral surface
-  shell.addPolygon(Polygon(LineString(face1)));
-  shell.addPolygon(Polygon(LineString(face2)));
-  shell.addPolygon(Polygon(LineString(face3)));
-  shell.addPolygon(Polygon(LineString(face4)));
-  shell.addPolygon(Polygon(LineString(face5)));
-  shell.addPolygon(Polygon(LineString(face6)));
+  shell.addPatch(Polygon(LineString(face1)));
+  shell.addPatch(Polygon(LineString(face2)));
+  shell.addPatch(Polygon(LineString(face3)));
+  shell.addPatch(Polygon(LineString(face4)));
+  shell.addPatch(Polygon(LineString(face5)));
+  shell.addPatch(Polygon(LineString(face6)));
 
   Solid solid(shell);
 
@@ -322,16 +322,16 @@ BOOST_AUTO_TEST_CASE(testRotateSolidExtraLargeAngle)
   // Check if the vertices of the first face are in the correct position after
   // rotation
   BOOST_CHECK(
-      pointsAreClose(solid.exteriorShell().polygonN(0).exteriorRing().pointN(0),
+      pointsAreClose(solid.exteriorShell().patchN(0).exteriorRing().pointN(0),
                      Point(0, 0, 0), 1e-6));
   BOOST_CHECK(
-      pointsAreClose(solid.exteriorShell().polygonN(0).exteriorRing().pointN(1),
+      pointsAreClose(solid.exteriorShell().patchN(0).exteriorRing().pointN(1),
                      Point(0, 1, 0), 1e-6));
   BOOST_CHECK(
-      pointsAreClose(solid.exteriorShell().polygonN(0).exteriorRing().pointN(2),
+      pointsAreClose(solid.exteriorShell().patchN(0).exteriorRing().pointN(2),
                      Point(-1, 1, 0), 1e-6));
   BOOST_CHECK(
-      pointsAreClose(solid.exteriorShell().polygonN(0).exteriorRing().pointN(3),
+      pointsAreClose(solid.exteriorShell().patchN(0).exteriorRing().pointN(3),
                      Point(-1, 0, 0), 1e-6));
 }
 BOOST_AUTO_TEST_SUITE_END()

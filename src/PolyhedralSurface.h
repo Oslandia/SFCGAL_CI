@@ -135,46 +135,91 @@ public:
   toTriangulatedSurface() const;
 
   /**
+   * [SFA/OGC]Returns the number of patchs
+   */
+  inline size_t
+  numPatchs() const
+  {
+    return _polygons.size();
+  }
+
+  /**
    * [SFA/OGC]Returns the number of polygons
-   * @deprecated see numGeometries
+   * @deprecated see numPatchs
    */
   inline size_t
   numPolygons() const
   {
-    return _polygons.size();
+    return numPatchs();
+  }
+
+  /**
+   * [SFA/OGC]Returns the n-th patch
+   */
+  inline const Polygon &
+  patchN(size_t const &n) const
+  {
+    BOOST_ASSERT(n < _polygons.size());
+    return _polygons[n];
   }
   /**
+   * [SFA/OGC]Returns the n-th patch
+   */
+  inline Polygon &
+  patchN(size_t const &n)
+  {
+    BOOST_ASSERT(n < _polygons.size());
+    return _polygons[n];
+  }
+  /**
+   * add a patch to the PolyhedralSurface
+   */
+  void
+  addPatch(const Polygon &polygon);
+  /**
+   * add a patch to the PolyhedralSurface
+   */
+  void
+  addPatch(Polygon *polygon);
+  /**
+   * add patchs from an other PolyhedralSurface
+   */
+  void
+  addPatchs(const PolyhedralSurface &polyhedralSurface);
+
+  /**
    * [SFA/OGC]Returns the n-th polygon
-   * @deprecated see geometryN()
+   * @deprecated see patchN()
    */
   inline const Polygon &
   polygonN(size_t const &n) const
   {
-    BOOST_ASSERT(n < _polygons.size());
-    return _polygons[n];
+    return patchN(n);
   }
   /**
    * [SFA/OGC]Returns the n-th polygon
-   * @deprecated see geometryN()
+   * @deprecated see patchN()
    */
   inline Polygon &
   polygonN(size_t const &n)
   {
-    BOOST_ASSERT(n < _polygons.size());
-    return _polygons[n];
+    return patchN(n);
   }
   /**
    * add a polygon to the PolyhedralSurface
+   * @deprecated see addPatch()
    */
   void
   addPolygon(const Polygon &polygon);
   /**
    * add a polygon to the PolyhedralSurface
+   * @deprecated see addPatch()
    */
   void
   addPolygon(Polygon *polygon);
   /**
    * add polygons from an other PolyhedralSurface
+   * @deprecated see addPatchs()
    */
   void
   addPolygons(const PolyhedralSurface &polyhedralSurface);

@@ -175,10 +175,10 @@ BOOST_AUTO_TEST_CASE(testScalePolyhedralSurface)
   auto *surface = dynamic_cast<PolyhedralSurface *>(g.get());
   BOOST_CHECK(surface != nullptr);
   BOOST_CHECK(
-      geometriesEqual(surface->polygonN(0).exteriorRing().pointN(2).asText(1),
+      geometriesEqual(surface->patchN(0).exteriorRing().pointN(2).asText(1),
                       "POINT Z (2.0 2.0 0.0)"));
   BOOST_CHECK(
-      geometriesEqual(surface->polygonN(3).exteriorRing().pointN(0).asText(1),
+      geometriesEqual(surface->patchN(3).exteriorRing().pointN(0).asText(1),
                       "POINT Z (2.0 2.0 2.0)"));
 }
 

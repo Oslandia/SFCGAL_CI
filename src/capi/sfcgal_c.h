@@ -672,28 +672,60 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_polyhedral_surface_create();
 
 /**
- * Returns the number of polygons of a given PolyhedralSurface
+ * Returns the number of patchs of a given PolyhedralSurface
  * @pre polyhedral must be a PolyhedralSurface
- * @deprecated Use sfcgal_geometry_num_geometries instead
  * @ingroup capi
  */
-SFCGAL_DEPRECATED("Use sfcgal_geometry_num_geometries instead.")
+SFCGAL_API size_t
+sfcgal_polyhedral_surface_num_patchs(const sfcgal_geometry_t *polyhedral);
+
+/**
+ * Returns the number of polygons of a given PolyhedralSurface
+ * @pre polyhedral must be a PolyhedralSurface
+ * @deprecated Use sfcgal_polyhedral_surface_num_patchs instead.
+ * @ingroup capi
+ */
+SFCGAL_DEPRECATED("Use sfcgal_polyhedral_surface_num_patchs instead.")
 SFCGAL_API size_t
 sfcgal_polyhedral_surface_num_polygons(const sfcgal_geometry_t *polyhedral);
 
 /**
- * Returns the ith polygon of a given PolyhedralSurface
+ * Returns the ith patch of a given PolyhedralSurface
  * @pre polyhedral must be a PolyhedralSurface
- * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_polygons(polyhedral)
+ * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_patchs(polyhedral)
  * @post the returned Polygon is not writable and must not be deallocated by the
  * caller
- * @deprecated Use sfcgal_geometry_get_geometry_n instead
  * @ingroup capi
  */
-SFCGAL_DEPRECATED("Use sfcgal_geometry_get_geometry_n instead.")
+SFCGAL_API const sfcgal_geometry_t *
+sfcgal_polyhedral_surface_patch_n(const sfcgal_geometry_t *polyhedral,
+                                  size_t                   i);
+
+/**
+ * Returns the ith polygon of a given PolyhedralSurface
+ * @pre polyhedral must be a PolyhedralSurface
+ * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_patchs(polyhedral)
+ * @post the returned Polygon is not writable and must not be deallocated by the
+ * caller
+ * @deprecated Use sfcgal_polyhedral_surface_patch_n instead
+ * @ingroup capi
+ */
+SFCGAL_DEPRECATED("Use sfcgal_polyhedral_surface_patch_n instead.")
 SFCGAL_API const sfcgal_geometry_t *
 sfcgal_polyhedral_surface_polygon_n(const sfcgal_geometry_t *polyhedral,
                                     size_t                   i);
+
+/**
+ * Adds a Patch to a given PolyhedralSurface
+ * @pre polyhedral must be a PolyhedralSurface
+ * @pre patch must be a Polygon
+ * @post the ownership of the Polygon is taken. The caller is not responsible
+ * anymore of its deallocation
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_polyhedral_surface_add_patch(sfcgal_geometry_t *polyhedral,
+                                    sfcgal_geometry_t *patch);
 
 /**
  * Adds a Polygon to a given PolyhedralSurface
@@ -701,8 +733,10 @@ sfcgal_polyhedral_surface_polygon_n(const sfcgal_geometry_t *polyhedral,
  * @pre polygon must be a Polygon
  * @post the ownership of the Polygon is taken. The caller is not responsible
  * anymore of its deallocation
+ * @deprecated Use sfcgal_polyhedral_surface_add_patch instead.
  * @ingroup capi
  */
+SFCGAL_DEPRECATED("Use sfcgal_polyhedral_surface_add_patch instead.")
 SFCGAL_API void
 sfcgal_polyhedral_surface_add_polygon(sfcgal_geometry_t *polyhedral,
                                       sfcgal_geometry_t *polygon);

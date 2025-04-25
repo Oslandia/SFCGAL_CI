@@ -442,7 +442,7 @@ extrudeStraightSkeleton(const Geometry &g, double building_height,
   std::unique_ptr<Geometry> building(extrude(g.as<Polygon>(), building_height));
   std::unique_ptr<PolyhedralSurface> result{
       new PolyhedralSurface(building->as<Solid>().exteriorShell())};
-  result->addPolygons(*roof);
+  result->addPatchs(*roof);
   return result;
 }
 
@@ -480,7 +480,7 @@ straightSkeletonPartition(const MultiPolygon &g, bool autoOrientation)
     std::unique_ptr<PolyhedralSurface> partitioned =
         straightSkeletonPartition(g.polygonN(i), autoOrientation);
     for (size_t j = 0; j < partitioned->numGeometries(); j++) {
-      result->addPolygon(partitioned->geometryN(j));
+      result->addPatch(partitioned->geometryN(j));
     }
   }
 
@@ -542,7 +542,7 @@ straightSkeletonPartition(const Polygon &g, bool /*autoOrientation*/)
       continue;
     }
 
-    result->addPolygon(create_polygon_from_face(face));
+    result->addPatch(create_polygon_from_face(face));
   }
 
   return result;

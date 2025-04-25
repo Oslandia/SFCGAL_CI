@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_IntersectsTest)
 //	}
 //	// close the polygon
 //	ext_ring.addPoint( obj.vertexN( face[0].v ) );
-//	surf.addPolygon( Polygon(ext_ring) );
+//	surf.addPatch( Polygon(ext_ring) );
 //    }
 //
 //    Triangle tri1( Point(3.0, 1.8, 0.0), Point(-2.99, 1.8, -0.081),

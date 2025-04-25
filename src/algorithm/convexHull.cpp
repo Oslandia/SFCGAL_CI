@@ -144,7 +144,7 @@ convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
 
       ring.push_back(ring.front());
 
-      result->addPolygon(Polygon(ring));
+      result->addPatch(Polygon(ring));
     }
 
     return std::unique_ptr<Geometry>(result.release());

@@ -517,8 +517,8 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
   case TYPE_POLYHEDRALSURFACE: {
     const auto &tri = g.as<PolyhedralSurface>();
 
-    for (size_t i = 0; i < tri.numPolygons(); ++i) {
-      _decompose(tri.polygonN(i));
+    for (size_t i = 0; i < tri.numPatchs(); ++i) {
+      _decompose(tri.patchN(i));
     }
 
     break;
