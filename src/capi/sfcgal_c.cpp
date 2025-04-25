@@ -274,7 +274,8 @@ sfcgal_free_buffer(void *buffer)
 extern "C" void
 sfcgal_init()
 {
-  // Empty for now
+  set_error_behaviour(CGAL::THROW_EXCEPTION);
+  set_warning_behaviour(CGAL::THROW_EXCEPTION);
 }
 
 extern "C" auto
