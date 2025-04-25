@@ -260,4 +260,16 @@ BOOST_AUTO_TEST_CASE(testDistancePolygonSolid)
   BOOST_CHECK_EQUAL(gA->distance3D(*gB), 0);
 }
 
+BOOST_AUTO_TEST_CASE(testDistancePolygonSolid_disjoint)
+{
+  std::unique_ptr<Geometry> polygonA(
+      io::readWkt("POLYGON Z ((2 2 2, 3 2 2, 3 3 2, 2 3 2, 2 2 2))"));
+  std::unique_ptr<Geometry> const solidB(
+      io::readWkt("SOLID ((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((0 0 0,0 0 1,0 1 "
+                  "1,0 1 0,0 0 0)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),((1 1 1,0 "
+                  "1 1,0 0 1,1 0 1,1 1 1)),((1 1 1,1 0 1,1 0 0,1 1 0,1 1 "
+                  "1)),((1 1 1,1 1 0,0 1 0,0 1 1,1 1 1))))"));
+  BOOST_CHECK_CLOSE(polygonA->distance3D(*solidB), 1.7320508, 1e-6);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
