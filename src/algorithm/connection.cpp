@@ -125,7 +125,7 @@ SurfaceGraph::SurfaceGraph(const PolyhedralSurface &surf)
 SurfaceGraph::SurfaceGraph(const TriangulatedSurface &tin)
     : _numVertices(0), _isValid(Validity::valid())
 {
-  const size_t numPatchs = tin.numPatchs();
+  const size_t numPatchs = tin.numPatches();
 
   for (size_t t = 0; t != numPatchs; ++t) { // for each polygon
     const FaceIndex idx = boost::add_vertex(_graph);

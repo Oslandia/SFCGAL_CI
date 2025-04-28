@@ -129,7 +129,7 @@ area(const TriangulatedSurface &g) -> double
 {
   double result = 0.0;
 
-  for (size_t i = 0; i < g.numPatchs(); i++) {
+  for (size_t i = 0; i < g.numPatches(); i++) {
     result += area(g.patchN(i));
   }
 
@@ -285,7 +285,7 @@ area3D(const TriangulatedSurface &g) -> double
 {
   double result = 0.0;
 
-  for (size_t i = 0; i < g.numPatchs(); i++) {
+  for (size_t i = 0; i < g.numPatches(); i++) {
     result += area3D(g.patchN(i));
   }
 

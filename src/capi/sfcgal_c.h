@@ -755,22 +755,22 @@ sfcgal_triangulated_surface_create();
  * @ingroup capi
  */
 SFCGAL_API size_t
-sfcgal_triangulated_surface_num_patchs(const sfcgal_geometry_t *tin);
+sfcgal_triangulated_surface_num_patches(const sfcgal_geometry_t *tin);
 
 /**
  * Returns the number of triangles of a given TriangulatedSurface
  * @pre tin must be a TriangulatedSurface
- * @deprecated Use sfcgal_triangulated_surface_num_patchs instead.
+ * @deprecated Use sfcgal_triangulated_surface_num_patches instead.
  * @ingroup capi
  */
-SFCGAL_DEPRECATED("Use sfcgal_triangulated_surface_num_patchs instead.")
+SFCGAL_DEPRECATED("Use sfcgal_triangulated_surface_num_patches instead.")
 SFCGAL_API size_t
 sfcgal_triangulated_surface_num_triangles(const sfcgal_geometry_t *tin);
 
 /**
  * Returns the ith Patch of a given TriangulatedSurface
  * @pre tin must be a TriangulatedSurface
- * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patchs( tin )
+ * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patches( tin )
  * @post the returned Triangle is not writable and must not be deallocated by
  * the caller
  * @ingroup capi
@@ -781,7 +781,7 @@ sfcgal_triangulated_surface_patch_n(const sfcgal_geometry_t *tin, size_t i);
 /**
  * Returns the ith Triangle of a given TriangulatedSurface
  * @pre tin must be a TriangulatedSurface
- * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patchs( tin )
+ * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patches( tin )
  * @post the returned Triangle is not writable and must not be deallocated by
  * the caller
  * @deprecated Use sfcgal_triangulated_surface_patch_n instead.
@@ -795,7 +795,7 @@ sfcgal_triangulated_surface_triangle_n(const sfcgal_geometry_t *tin, size_t i);
  * Set the ith patch of a given TriangulatedSurface
  * @pre tin must be a TriangulatedSurface
  * @pre patch must be a Triangle.
- * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patchs( tin )
+ * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patches( tin )
  * The ownership of the triangle is taken. The caller is not responsible anymore
  * of its deallocation.
  * @ingroup capi

@@ -221,7 +221,7 @@ distancePointTriangulatedSurface3D(
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < triangulatedSurfaceB.numPatchs(); i++) {
+  for (size_t i = 0; i < triangulatedSurfaceB.numPatches(); i++) {
     dMin = std::min(dMin, distancePolygonGeometry3D(
                               triangulatedSurfaceB.patchN(i), pointA));
   }
@@ -388,7 +388,7 @@ distanceLineStringTriangulatedSurface3D(
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < triangulatedSurfaceB.numPatchs(); i++) {
+  for (size_t i = 0; i < triangulatedSurfaceB.numPatches(); i++) {
     dMin = std::min(
         dMin, distancePolygonGeometry3D(triangulatedSurfaceB.patchN(i), lineA));
   }
@@ -498,7 +498,7 @@ distanceTriangleTriangulatedSurface3D(
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < triangulatedSurfaceB.numPatchs(); i++) {
+  for (size_t i = 0; i < triangulatedSurfaceB.numPatches(); i++) {
     dMin = std::min(dMin, triangulatedSurfaceB.patchN(i).distance3D(triangleA));
   }
 
@@ -578,7 +578,7 @@ distanceTriangulatedSurfaceGeometry3D(
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < triangulatedSurfaceA.numPatchs(); i++) {
+  for (size_t i = 0; i < triangulatedSurfaceA.numPatches(); i++) {
     dMin = std::min(dMin, triangulatedSurfaceA.patchN(i).distance3D(geomB));
   }
 

@@ -275,10 +275,10 @@ WkbWriter::writeInner(const TriangulatedSurface &triangulatedSurface,
   // WkbType
   writeGeometryType(triangulatedSurface, wkbOrder);
 
-  // Number of Polygons
-  toByte(static_cast<uint32_t>(triangulatedSurface.numPatchs()), wkbOrder);
+  // Number of Triangles
+  toByte(static_cast<uint32_t>(triangulatedSurface.numPatches()), wkbOrder);
 
-  for (size_t i = 0; i < triangulatedSurface.numPatchs(); i++) {
+  for (size_t i = 0; i < triangulatedSurface.numPatches(); i++) {
     writeRec(triangulatedSurface.patchN(i), wkbOrder);
   }
 }

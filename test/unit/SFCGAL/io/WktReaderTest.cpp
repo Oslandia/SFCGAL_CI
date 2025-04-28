@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(triangulatedSurface_fourTriangles)
   BOOST_CHECK(!g->isEmpty());
 
   BOOST_CHECK_EQUAL(g->as<TriangulatedSurface>().numGeometries(), 1U);
-  BOOST_CHECK_EQUAL(g->as<TriangulatedSurface>().numPatchs(), 4U);
+  BOOST_CHECK_EQUAL(g->as<TriangulatedSurface>().numPatches(), 4U);
 }
 
 BOOST_AUTO_TEST_CASE(wkt_exactTest)

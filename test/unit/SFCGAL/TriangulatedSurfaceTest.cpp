@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructor)
 {
   TriangulatedSurface const g;
   BOOST_CHECK(g.isEmpty());
-  BOOST_CHECK_EQUAL(g.numPatchs(), 0U);
+  BOOST_CHECK_EQUAL(g.numPatches(), 0U);
   BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
 }
 // TriangulatedSurface( const std::vector< Triangle > & triangle ) ;
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(constructorWithTriangles)
 
   TriangulatedSurface const g(triangles);
   BOOST_CHECK(!g.isEmpty());
-  BOOST_CHECK_EQUAL(g.numPatchs(), 2U);
+  BOOST_CHECK_EQUAL(g.numPatches(), 2U);
   BOOST_CHECK_EQUAL(g.numGeometries(), 1U);
 }
 
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(constructorWithTriangles)
 // TriangulatedSurface& operator = ( const TriangulatedSurface & other ) ;
 //~TriangulatedSurface() ;
 
-// inline size_t             numPatchs() const { return _triangles.size(); }
+// inline size_t             numPatches() const { return _triangles.size(); }
 // inline const Triangle  &  patchN( size_t const& n ) const {
 // inline Triangle &         patchN( size_t const& n ) {
 // inline void               addTriangle( const Triangle & triangle )
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(testClone)
 
   std::unique_ptr<Geometry> copy(g.clone());
   BOOST_REQUIRE(copy->is<TriangulatedSurface>());
-  BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numPatchs(), 2U);
+  BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numPatches(), 2U);
   BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numGeometries(), 1U);
 }
 
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   BOOST_CHECK(emptyGeom->is<TriangulatedSurface>());
   BOOST_CHECK(emptyGeom->isEmpty());
   BOOST_CHECK_EQUAL(emptyGeom->numGeometries(), 0);
-  BOOST_CHECK_EQUAL(emptyGeom->as<TriangulatedSurface>().numPatchs(), 0);
+  BOOST_CHECK_EQUAL(emptyGeom->as<TriangulatedSurface>().numPatches(), 0);
 
   std::string const triangulatedSurfaceStr = "TIN Z ("
                                              "((0 0 0, 2 0 2, 1 2 4, 0 0 0)),"
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   std::unique_ptr<Geometry> geom(io::readWkt(triangulatedSurfaceStr));
   BOOST_CHECK(!geom->isEmpty());
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
-  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(0).asText(0),
                     "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(1).asText(0),
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   geom->as<TriangulatedSurface>().setPatchN(newGeom->clone(), 1);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
-  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(0).asText(0),
                     "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(1).asText(), newGeom->asText());
@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   geom->as<TriangulatedSurface>().setPatchN(newTriangle2->clone(), 2);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
-  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(0).asText(0),
                     "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(1).asText(), newGeom->asText());
@@ -291,7 +291,7 @@ BOOST_AUTO_TEST_CASE(dropZMTest)
   BOOST_CHECK(geom3D->is3D());
   BOOST_CHECK(geom3D->dropZ());
   BOOST_CHECK_EQUAL(geom3D->numGeometries(), 1);
-  BOOST_CHECK_EQUAL(geom3D->as<TriangulatedSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom3D->as<TriangulatedSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom3D->as<TriangulatedSurface>().patchN(0).asText(0),
                     "TRIANGLE ((0 0,2 0,1 2,0 0))");
   BOOST_CHECK_EQUAL(geom3D->as<TriangulatedSurface>().patchN(1).asText(0),

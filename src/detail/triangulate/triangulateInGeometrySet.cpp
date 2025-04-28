@@ -100,7 +100,7 @@ triangulate(const CGAL::Polygon_with_holes_2<Kernel> &polygon,
   TriangulatedSurface surf;
   triangulatePolygon3D(poly, surf);
 
-  for (size_t i = 0; i < surf.numPatchs(); ++i) {
+  for (size_t i = 0; i < surf.numPatches(); ++i) {
     output.addGeometry(surf.patchN(i));
   }
 }

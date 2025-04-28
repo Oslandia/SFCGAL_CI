@@ -226,7 +226,7 @@ extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v) -> Solid *
   }
 
   // bottom and top
-  for (size_t i = 0; i < g.numPatchs(); i++) {
+  for (size_t i = 0; i < g.numPatches(); i++) {
     Triangle bottomPart(g.patchN(i));
     force3D(bottomPart);
     bottomPart.reverse();

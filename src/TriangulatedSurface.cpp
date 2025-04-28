@@ -139,7 +139,7 @@ TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
 auto
 TriangulatedSurface::patchN(size_t const &n) const -> const Triangle &
 {
-  if (n >= numPatchs()) {
+  if (n >= numPatches()) {
     BOOST_THROW_EXCEPTION(Exception(
         (boost::format("Cannot access geometry at position %s. "
                        "TriangulatedSurface has only %d geometries.") %
@@ -153,11 +153,11 @@ TriangulatedSurface::patchN(size_t const &n) const -> const Triangle &
 auto
 TriangulatedSurface::patchN(size_t const &n) -> Triangle &
 {
-  if (n >= numPatchs()) {
+  if (n >= numPatches()) {
     BOOST_THROW_EXCEPTION(Exception(
         (boost::format("Cannot access geometry at position %s. "
                        "TriangulatedSurface has only %d geometries.") %
-         n % numPatchs())
+         n % numPatches())
             .str()));
   }
 
@@ -169,11 +169,11 @@ TriangulatedSurface::setPatchN(Triangle *triangle, size_t const &n)
 {
   BOOST_ASSERT(triangle != NULL);
 
-  if (n >= numPatchs()) {
+  if (n >= numPatches()) {
     BOOST_THROW_EXCEPTION(Exception(
         (boost::format("Cannot set geometry at position %s. "
                        "TriangulatedSurface has only %d geometries.") %
-         n % numPatchs())
+         n % numPatches())
             .str()));
   }
 
@@ -241,7 +241,7 @@ public:
   void
   operator()(HDS &hds) override
   {
-    const size_t nrPatchs = surf.numPatchs();
+    const size_t nrPatchs = surf.numPatches();
     // Postcondition: `hds' is a valid polyhedral surface.
     CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
     B.begin_surface(/* vertices */ nrPatchs * 3,

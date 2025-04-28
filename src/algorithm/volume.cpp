@@ -20,7 +20,7 @@ volume(const Solid &solid, NoValidityCheck /*unused*/) -> const Kernel::FT
   for (size_t i = 0; i < numShells; i++) {
     std::unique_ptr<Geometry>  t(tesselate(solid.shellN(i), NoValidityCheck()));
     const TriangulatedSurface &tin       = t->as<TriangulatedSurface>();
-    const size_t               numPatchs = tin.numPatchs();
+    const size_t               numPatchs = tin.numPatches();
 
     for (size_t j = 0; j < numPatchs; j++) {
       const Triangle &tri = tin.patchN(j);

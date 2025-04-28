@@ -602,10 +602,10 @@ auto
 selfIntersectsImpl(const TriangulatedSurface &tin, const SurfaceGraph &graph)
     -> bool
 {
-  size_t const numPatchs = tin.numPatchs();
+  size_t const numPatches = tin.numPatches();
 
-  for (size_t ti = 0; ti != numPatchs; ++ti) {
-    for (size_t tj = ti + 1; tj < numPatchs; ++tj) {
+  for (size_t ti = 0; ti != numPatches; ++ti) {
+    for (size_t tj = ti + 1; tj < numPatches; ++tj) {
       std::unique_ptr<Geometry> inter =
           Dim == 3 ? intersection3D(tin.patchN(ti), tin.patchN(tj))
                    : intersection(tin.patchN(ti), tin.patchN(tj));

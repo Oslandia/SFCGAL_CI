@@ -157,7 +157,7 @@ public:
 
     std::vector<std::vector<edge_descriptor>> triangles;
 
-    for (size_t i = 0; i < triangulatedSurface.numPatchs(); i++) {
+    for (size_t i = 0; i < triangulatedSurface.numPatches(); i++) {
       triangles.push_back(
           addTriangle(triangulatedSurface.patchN(i), edgeProperties));
     }

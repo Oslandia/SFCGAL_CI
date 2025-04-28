@@ -119,7 +119,7 @@ void
 ForceValidityVisitor::visit(TriangulatedSurface &g)
 {
   g.forceValidityFlag(valid_);
-  for (size_t i = 0; i < g.numPatchs(); i++) {
+  for (size_t i = 0; i < g.numPatches(); i++) {
     visit(g.patchN(i));
   }
 }

@@ -431,7 +431,7 @@ isValid(const TriangulatedSurface &tin, const SurfaceGraph &graph,
     return Validity::valid();
   }
 
-  size_t const numPatchs = tin.numPatchs();
+  size_t const numPatchs = tin.numPatches();
 
   for (size_t t = 0; t != numPatchs; ++t) {
     Validity const v = isValid(tin.patchN(t), toleranceAbs);

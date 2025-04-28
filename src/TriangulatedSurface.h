@@ -91,8 +91,8 @@ public:
    * [SFA/OGC]Returns the number of patchs
    * @deprecated see numGeometries()
    */
-  inline size_t
-  numPatchs() const
+  inline auto
+  numPatches() const -> size_t
   {
     return _triangles.size();
   }

@@ -67,7 +67,7 @@ save(const Geometry &geom, std::ostream &out)
         }
         case TYPE_TRIANGULATEDSURFACE: {
           const auto &ts = g.as<TriangulatedSurface>();
-          for (size_t i = 0; i < ts.numPatchs(); ++i) {
+          for (size_t i = 0; i < ts.numPatches(); ++i) {
             process_geometry(ts.patchN(i));
           }
           break;

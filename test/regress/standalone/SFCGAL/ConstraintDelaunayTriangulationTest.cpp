@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(testTriangulateRGC)
 
   std::unique_ptr<TriangulatedSurface> triangulatedSurface =
       triangulation.getTriangulatedSurface();
-  BOOST_CHECK_EQUAL(triangulatedSurface->numPatchs(), 73114U);
+  BOOST_CHECK_EQUAL(triangulatedSurface->numPatches(), 73114U);
   BOOST_CHECK_CLOSE(algorithm::area(*triangulatedSurface), 818056610000.0, 0.1);
 }
 
