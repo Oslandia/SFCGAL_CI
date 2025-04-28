@@ -517,7 +517,7 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
   case TYPE_POLYHEDRALSURFACE: {
     const auto &tri = g.as<PolyhedralSurface>();
 
-    for (size_t i = 0; i < tri.numPatchs(); ++i) {
+    for (size_t i = 0; i < tri.numPatches(); ++i) {
       _decompose(tri.patchN(i));
     }
 
@@ -732,7 +732,7 @@ recompose_surfaces(const GeometrySet<3>::SurfaceCollection &surfaces,
 
   algorithm::SurfaceGraph const graph(*tri);
   std::vector<size_t> component(boost::num_vertices(graph.faceGraph()));
-  BOOST_ASSERT(tri->numPatchs() == component.size());
+  BOOST_ASSERT(tri->numPatches() == component.size());
   const size_t numComponents =
       boost::connected_components(graph.faceGraph(), component.data());
 
@@ -746,9 +746,9 @@ recompose_surfaces(const GeometrySet<3>::SurfaceCollection &surfaces,
       output.push_back(sout[c]);
     }
 
-    const size_t numPatchs = tri->numPatches();
+    const size_t numPatches = tri->numPatches();
 
-    for (size_t t = 0; t != numPatchs; ++t) {
+    for (size_t t = 0; t != numPatches; ++t) {
       sout[component[t]]->addPatch(tri->patchN(t));
     }
   }

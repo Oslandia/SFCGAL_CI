@@ -139,8 +139,8 @@ public:
    * @warning PolyhedralSurface is treated as one geometry. numGeometries
    * returns 1 or 0 for empty PolyhedralSurface
    */
-  inline size_t
-  numPatchs() const
+  inline auto
+  numPatches() const -> size_t
   {
     return _polygons.size();
   }
@@ -150,13 +150,13 @@ public:
    *
    * @warning PolyhedralSurface is treated as one geometry. numGeometries
    * returns 1 or 0 for empty PolyhedralSurface
-   * @deprecated see numPatchs
+   * @deprecated see numPatches
    * @see numGeometries()
    */
   inline size_t
   numPolygons() const
   {
-    return numPatchs();
+    return numPatches();
   }
 
   /**

@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(testConvexHull3D_LineStringCoplanar)
   LineString const          lineString(points);
   std::unique_ptr<Geometry> hull(algorithm::convexHull3D(lineString));
   BOOST_CHECK(hull->is<PolyhedralSurface>());
-  BOOST_CHECK_EQUAL(hull->as<PolyhedralSurface>().numPatchs(), 2U);
+  BOOST_CHECK_EQUAL(hull->as<PolyhedralSurface>().numPatches(), 2U);
 }
 
 BOOST_AUTO_TEST_CASE(testConvexHull3D_Tetrahedron)
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(testConvexHull3D_Tetrahedron)
   LineString const          lineString(points);
   std::unique_ptr<Geometry> hull(algorithm::convexHull3D(lineString));
   BOOST_CHECK(hull->is<PolyhedralSurface>());
-  BOOST_CHECK_EQUAL(hull->as<PolyhedralSurface>().numPatchs(), 4U);
+  BOOST_CHECK_EQUAL(hull->as<PolyhedralSurface>().numPatches(), 4U);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

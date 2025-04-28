@@ -198,7 +198,7 @@ distancePointPolyhedralSurface3D(const Point             &pointA,
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < polySurfaceB.numPatchs(); i++) {
+  for (size_t i = 0; i < polySurfaceB.numPatches(); i++) {
     dMin = std::min(dMin,
                     distancePolygonGeometry3D(polySurfaceB.patchN(i), pointA));
   }
@@ -365,7 +365,7 @@ distanceLineStringPolyhedralSurface3D(const LineString        &lineA,
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < polySurfaceB.numPatchs(); i++) {
+  for (size_t i = 0; i < polySurfaceB.numPatches(); i++) {
     dMin = std::min(dMin,
                     distancePolygonGeometry3D(polySurfaceB.patchN(i), lineA));
   }
@@ -476,7 +476,7 @@ distanceTrianglePolyhedralSurface3D(const Triangle          &triangleA,
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < polySurfaceB.numPatchs(); i++) {
+  for (size_t i = 0; i < polySurfaceB.numPatches(); i++) {
     dMin = std::min(dMin, polySurfaceB.patchN(i).distance3D(triangleA));
   }
 
@@ -555,7 +555,7 @@ distancePolyhedralSurfaceGeometry3D(const PolyhedralSurface &polySurfaceA,
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < polySurfaceA.numPatchs(); i++) {
+  for (size_t i = 0; i < polySurfaceA.numPatches(); i++) {
     dMin = std::min(dMin,
                     distancePolygonGeometry3D(polySurfaceA.patchN(i), geomB));
   }

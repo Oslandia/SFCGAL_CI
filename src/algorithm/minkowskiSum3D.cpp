@@ -112,7 +112,7 @@ geometryToNef(const Geometry &g) -> Nef_polyhedron_3
         case TYPE_POLYHEDRALSURFACE: {
           const auto  &ps = geom.as<PolyhedralSurface>();
           Polyhedron_3 poly;
-          for (size_t i = 0; i < ps.numPatchs(); ++i) {
+          for (size_t i = 0; i < ps.numPatches(); ++i) {
             Nef_polyhedron_3 temp_nef = geometryToNef(ps.patchN(i));
             if (i == 0) {
               result = temp_nef;

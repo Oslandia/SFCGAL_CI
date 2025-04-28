@@ -130,7 +130,7 @@ public:
 
   /**
    * [SFA/OGC]Returns the number of points
-   * @deprecated see numPatchs()
+   * @deprecated see numPatches()
    */
   inline size_t
   numTriangles() const

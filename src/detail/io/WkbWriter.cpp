@@ -258,9 +258,9 @@ WkbWriter::writeInner(const PolyhedralSurface &polyhedralSurface,
   writeGeometryType(polyhedralSurface, wkbOrder);
 
   // Number of Polygons
-  toByte(static_cast<uint32_t>(polyhedralSurface.numPatchs()), wkbOrder);
+  toByte(static_cast<uint32_t>(polyhedralSurface.numPatches()), wkbOrder);
 
-  for (size_t i = 0; i < polyhedralSurface.numPatchs(); i++) {
+  for (size_t i = 0; i < polyhedralSurface.numPatches(); i++) {
     writeRec(polyhedralSurface.patchN(i), wkbOrder);
   }
 }

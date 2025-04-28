@@ -255,7 +255,7 @@ extractPolyhedralSurfaceConstraints(
     std::vector<ConstraintInfoType> &constraintInfos, std::size_t geomIdx)
 {
   // Process each polygon in the PolyhedralSurface
-  for (std::size_t polyIdx = 0; polyIdx < surface.numPatchs(); ++polyIdx) {
+  for (std::size_t polyIdx = 0; polyIdx < surface.numPatches(); ++polyIdx) {
     const auto &polygon = surface.patchN(polyIdx);
 
     // Add exterior ring
@@ -530,7 +530,7 @@ reconstructPolyhedralSurface(
     auto surfacePtr = std::make_unique<PolyhedralSurface>();
 
     // Process each polygon in the original PolyhedralSurface
-    for (std::size_t polyIdx = 0; polyIdx < originalSurface.numPatchs();
+    for (std::size_t polyIdx = 0; polyIdx < originalSurface.numPatches();
          ++polyIdx) {
       auto polyIt = it->second.find(polyIdx);
 
@@ -548,7 +548,7 @@ reconstructPolyhedralSurface(
         for (const auto &[ringIdx, ring] : polyIt->second) {
           if (ringIdx > 0) {
             LineString ringCopy(ring);
-            if (polyIdx < originalSurface.numPatchs() &&
+            if (polyIdx < originalSurface.numPatches() &&
                 ringIdx - 1 <
                     originalSurface.patchN(polyIdx).numInteriorRings()) {
             }
@@ -944,7 +944,7 @@ simplifyPolyhedralSurface(const PolyhedralSurface &polySurface,
     // coordinate type
     MultiPolygon multiPolygon;
 
-    for (size_t i = 0; i < polySurface.numPatchs(); ++i) {
+    for (size_t i = 0; i < polySurface.numPatches(); ++i) {
       Polygon polygon = polySurface.patchN(i);
       multiPolygon.addGeometry(polygon);
     }

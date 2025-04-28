@@ -166,7 +166,7 @@ void
 triangulatePolygon3D(const PolyhedralSurface &polyhedralSurface,
                      TriangulatedSurface     &triangulatedSurface)
 {
-  for (size_t i = 0; i < polyhedralSurface.numPatchs(); i++) {
+  for (size_t i = 0; i < polyhedralSurface.numPatches(); i++) {
     triangulatePolygon3D(polyhedralSurface.patchN(i), triangulatedSurface);
   }
 }

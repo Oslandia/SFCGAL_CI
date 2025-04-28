@@ -203,7 +203,7 @@ public:
 
     case TYPE_POLYHEDRALSURFACE: {
       const auto &surface = static_cast<const PolyhedralSurface &>(geometry);
-      for (size_t i = 0; i < surface.numPatchs(); ++i) {
+      for (size_t i = 0; i < surface.numPatches(); ++i) {
         extractSegments(surface.patchN(i));
       }
       break;

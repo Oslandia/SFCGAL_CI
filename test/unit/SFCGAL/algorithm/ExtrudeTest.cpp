@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(testExtrudeSquare)
   std::unique_ptr<Geometry> ext(algorithm::extrude(g, 0.0, 0.0, 1.0));
   BOOST_CHECK(ext->is<Solid>());
   BOOST_CHECK_EQUAL(ext->as<Solid>().numShells(), 1U);
-  BOOST_CHECK_EQUAL(ext->as<Solid>().exteriorShell().numPatchs(), 6U);
+  BOOST_CHECK_EQUAL(ext->as<Solid>().exteriorShell().numPatches(), 6U);
 }
 
 BOOST_AUTO_TEST_CASE(testExtrudePolyhedral)
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(testExtrudeSquareWithHole)
   std::unique_ptr<Geometry> ext(algorithm::extrude(g, 0.0, 0.0, 1.0));
   BOOST_CHECK(ext->is<Solid>());
   BOOST_CHECK_EQUAL(ext->as<Solid>().numShells(), 1U);
-  BOOST_CHECK_EQUAL(ext->as<Solid>().exteriorShell().numPatchs(), 10U);
+  BOOST_CHECK_EQUAL(ext->as<Solid>().exteriorShell().numPatches(), 10U);
 }
 
 // SELECT ST_AsText(ST_Extrude(ST_Extrude(ST_Extrude('POINT (0 0)', 1, 0, 0), 0,

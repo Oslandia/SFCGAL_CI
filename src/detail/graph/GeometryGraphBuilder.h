@@ -178,7 +178,7 @@ public:
 
     std::vector<std::vector<std::vector<edge_descriptor>>> polygons;
 
-    for (size_t i = 0; i < polyhedralSurface.numPatchs(); i++) {
+    for (size_t i = 0; i < polyhedralSurface.numPatches(); i++) {
       polygons.push_back(
           addPolygon(polyhedralSurface.patchN(i), edgeProperties));
     }

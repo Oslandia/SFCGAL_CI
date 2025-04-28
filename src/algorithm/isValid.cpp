@@ -431,9 +431,9 @@ isValid(const TriangulatedSurface &tin, const SurfaceGraph &graph,
     return Validity::valid();
   }
 
-  size_t const numPatchs = tin.numPatches();
+  size_t const numPatches = tin.numPatches();
 
-  for (size_t t = 0; t != numPatchs; ++t) {
+  for (size_t t = 0; t != numPatches; ++t) {
     Validity const v = isValid(tin.patchN(t), toleranceAbs);
 
     if (!v) {
@@ -473,9 +473,9 @@ isValid(const PolyhedralSurface &s, const SurfaceGraph &graph,
     return Validity::valid();
   }
 
-  size_t const numPatchs = s.numPatchs();
+  size_t const numPatches = s.numPatches();
 
-  for (size_t p = 0; p != numPatchs; ++p) {
+  for (size_t p = 0; p != numPatches; ++p) {
     Validity const v = isValid(s.patchN(p), toleranceAbs);
 
     if (!v) {

@@ -61,9 +61,9 @@ isSimple(const PolyhedralSurface &phs, const double &toleranceAbs)
   if (phs.isEmpty()) {
     return Simplicity::simple();
   }
-  const size_t numPatchs = phs.numPatchs();
+  const size_t numPatches = phs.numPatches();
 
-  for (size_t g = 0; g != numPatchs; ++g) {
+  for (size_t g = 0; g != numPatches; ++g) {
     Simplicity const s = isSimple(phs.patchN(g), toleranceAbs);
 
     if (!s) {

@@ -141,7 +141,7 @@ area(const PolyhedralSurface &g) -> double
 {
   double result = 0.0;
 
-  for (size_t i = 0; i < g.numPatchs(); i++) {
+  for (size_t i = 0; i < g.numPatches(); i++) {
     result += area(g.patchN(i));
   }
 
@@ -273,7 +273,7 @@ area3D(const PolyhedralSurface &g) -> double
 {
   double area = 0.0;
 
-  for (size_t i = 0; i < g.numPatchs(); i++) {
+  for (size_t i = 0; i < g.numPatches(); i++) {
     area += area3D(g.patchN(i));
   }
 

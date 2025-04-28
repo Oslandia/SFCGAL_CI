@@ -124,7 +124,7 @@ OsgFactory::addToGeometry(osg::Geometry *geometry, const TriangulatedSurface &g)
 
   size_t start = vertices->size();
 
-  for (size_t i = 0; i < g.numPatchs(); i++) {
+  for (size_t i = 0; i < g.numPatches(); i++) {
     const Triangle &triangle = g.patchN(i);
 
     osg::Vec3 a = createVec3(triangle.vertex(0));
@@ -147,7 +147,7 @@ OsgFactory::addToGeometry(osg::Geometry *geometry, const TriangulatedSurface &g)
 
   geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
   geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLES,
-                                                start, g.numPatchs() * 3));
+                                                start, g.numPatches() * 3));
 }
 
 void

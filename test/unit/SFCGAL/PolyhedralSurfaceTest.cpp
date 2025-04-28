@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   BOOST_CHECK(emptyGeom->is<PolyhedralSurface>());
   BOOST_CHECK(emptyGeom->isEmpty());
   BOOST_CHECK_EQUAL(emptyGeom->numGeometries(), 0);
-  BOOST_CHECK_EQUAL(emptyGeom->as<PolyhedralSurface>().numPatchs(), 0);
+  BOOST_CHECK_EQUAL(emptyGeom->as<PolyhedralSurface>().numPatches(), 0);
   BOOST_CHECK_EQUAL(emptyGeom->geometryN(0).asText(), emptyGeom->asText());
 
   std::string const polyhedralStr = "POLYHEDRALSURFACE Z ("
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   std::unique_ptr<Geometry> geom(io::readWkt(polyhedralStr));
   BOOST_CHECK(!geom->isEmpty());
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
-  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(0).asText(0),
                     "POLYGON Z ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))");
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(0),
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   geom->as<PolyhedralSurface>().setPatchN(newGeom->clone(), 1);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
-  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(0).asText(0),
                     "POLYGON Z ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))");
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(), newGeom->asText());
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   geom->as<PolyhedralSurface>().setPatchN(newPolygon2->clone(), 2);
 
   BOOST_CHECK_EQUAL(geom->numGeometries(), 1);
-  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatchs(), 3);
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(0).asText(0),
                     "POLYGON Z ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))");
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(), newGeom->asText());

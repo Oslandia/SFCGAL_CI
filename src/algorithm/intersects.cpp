@@ -547,10 +547,10 @@ auto
 selfIntersectsImpl(const PolyhedralSurface &s, const SurfaceGraph &graph)
     -> bool
 {
-  size_t const numPatchs = s.numPatchs();
+  size_t const numPatches = s.numPatches();
 
-  for (size_t pi = 0; pi != numPatchs; ++pi) {
-    for (size_t pj = pi + 1; pj < numPatchs; ++pj) {
+  for (size_t pi = 0; pi != numPatches; ++pi) {
+    for (size_t pj = pi + 1; pj < numPatches; ++pj) {
       std::unique_ptr<Geometry> inter =
           Dim == 3 ? intersection3D(s.patchN(pi), s.patchN(pj))
                    : intersection(s.patchN(pi), s.patchN(pj));

@@ -70,7 +70,7 @@ AffineTransform3::transform(Polygon &poly)
 void
 AffineTransform3::transform(PolyhedralSurface &surf)
 {
-  for (size_t i = 0; i < surf.numPatchs(); ++i) {
+  for (size_t i = 0; i < surf.numPatches(); ++i) {
     transform(surf.patchN(i));
   }
 }
