@@ -56,6 +56,7 @@ sonar:build-test:
   artifacts:
     paths:
       - build/
+      - test/test_config.h
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: always
