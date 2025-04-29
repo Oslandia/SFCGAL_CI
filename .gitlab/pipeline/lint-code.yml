@@ -22,3 +22,21 @@ clang-format:
         - "src/**/*.{c,h,cpp,hpp}"
         - ".clang-format"
         - ".clang-format-ignore"
+
+# check doxygen warnings
+doxygen-warnings:
+  stage: lint
+  image:
+    name: debian:stable-slim
+  before_script:
+    - apt update && apt install --no-install-recommends --yes doxygen git
+  script:
+   - .gitlab/doxygen-check.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "src/**/*.{c,h,cpp,hpp}"
+  artifacts:
+    when: on_failure
+    paths:
+      - doxygen_warnings.log
