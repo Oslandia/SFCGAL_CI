@@ -1399,17 +1399,17 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
 /**
  * Returns the 3D alpha wrapping of a geometry
  * @pre isValid(geom) == true
- * @pre relativeAlpa >= 0
- * @pre relativeOffset >= 0
+ * @pre relative_alpha >= 0
+ * @pre relative_offset >= 0
  * @post isValid(return) == true
  * @param geom input geometry
- * @param relativeAlpha This parameter is used to determine which features will
- *  appear in the output. A small relativeAlpha will produce an output less
+ * @param relative_alpha This parameter is used to determine which features will
+ *  appear in the output. A small relative_alpha will produce an output less
  *  complex but less faithful to the input.
- * @param relativeOffset  This parameter controls the tightness of the result.
- *  A large relativeOffset parameter will tend to better preserve sharp features
- *  as projection. If this parameter is equal to 0, it is computed from the
- * alpha parameter
+ * @param relative_offset  This parameter controls the tightness of the result.
+ *  A large relative_offset parameter will tend to better preserve sharp
+ * features as projection. If this parameter is equal to 0, it is computed from
+ * the alpha parameter
  * @return A PolyhedralSurface representing the 3D alpha wrapping of the
  * geometry
  * @ingroup capi
