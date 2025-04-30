@@ -24,5 +24,6 @@ test:clang-tidy:
         - "src/**/*.{c,h,cpp,hpp}"
         - ".clang-tidy"
   artifacts:
+    when: on_failure
     paths:
       - errors.yml
