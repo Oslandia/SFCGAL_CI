@@ -196,7 +196,7 @@ PolyhedralSurface::addPatch(const Polygon &patch)
 void
 PolyhedralSurface::addPatch(Polygon *patch)
 {
-  BOOST_ASSERT(polygon != NULL);
+  BOOST_ASSERT(patch != NULL);
   _polygons.push_back(patch);
 }
 
@@ -229,7 +229,7 @@ PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
 void
 PolyhedralSurface::setPatchN(Polygon *patch, size_t const &n)
 {
-  BOOST_ASSERT(polygon != NULL);
+  BOOST_ASSERT(patch != NULL);
 
   if (n >= numPatches()) {
     BOOST_THROW_EXCEPTION(
