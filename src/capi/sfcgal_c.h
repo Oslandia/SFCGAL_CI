@@ -661,7 +661,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_polyhedral_surface_create();
 
 /**
- * Returns the number of patchs of a given PolyhedralSurface
+ * Returns the number of patches of a given PolyhedralSurface
  * @pre polyhedral must be a PolyhedralSurface
  * @ingroup capi
  */
@@ -751,7 +751,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_triangulated_surface_create();
 
 /**
- * Returns the number of patchs of a given TriangulatedSurface
+ * Returns the number of patches of a given TriangulatedSurface
  * @pre tin must be a TriangulatedSurface
  * @ingroup capi
  */
