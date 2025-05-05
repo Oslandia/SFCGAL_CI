@@ -428,6 +428,7 @@ sfcgal_linestring_num_points(const sfcgal_geometry_t *linestring);
 
 /**
  * Returns the ith point of a given LineString
+ * @param linestring the input LineString
  * @param i is the point index in the LineString
  * @pre linestring must be a LineString
  * @pre i >= and i < sfcgal_linestring_num_points
