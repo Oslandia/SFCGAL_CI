@@ -135,7 +135,7 @@ public:
   toTriangulatedSurface() const;
 
   /**
-   * [SFA/OGC]Returns the number of patchs
+   * [SFA/OGC]Returns the number of patches
    * @warning PolyhedralSurface is treated as one geometry. numGeometries
    * returns 1 or 0 for empty PolyhedralSurface
    */
@@ -188,7 +188,7 @@ public:
   void
   addPatch(Polygon *polygon);
   /**
-   * add patchs from an other PolyhedralSurface
+   * add patches from an other PolyhedralSurface
    */
   void
   addPatchs(const PolyhedralSurface &polyhedralSurface);
