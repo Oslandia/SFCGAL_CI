@@ -978,8 +978,11 @@ sfcgal_prepared_geometry_set_srid(sfcgal_prepared_geometry_t *prepared, srid_t);
 
 /**
  * Returns an EWKT representation of the given PreparedGeometry
- * @param num_decimals number of decimals. -2 for a variable number of decimals.
- * -1 for an exact representation
+ * @param[in] prepared the input geometry
+ * @param[in] num_decimals number of decimals. -2 for a variable number of
+ * decimals.
+ * @param[out] buffer the EWKT buffer
+ * @param[out] len the size of the buffer
  * @post buffer is returned allocated and must be freed by the caller
  * @ingroup capi
  */
