@@ -1378,6 +1378,11 @@ sfcgal_geometry_line_sub_string(const sfcgal_geometry_t *geom, double start,
  * @pre isValid(geom) == true
  * @pre alpha >= 0
  * @post isValid(return) == true
+ * @param geom the input geometry
+ * @param alpha It can have values from 0 to infinity. Smaller alpha values
+ * produce more concave results. Alpha values greater than some data-dependent
+ * value produce the convex hull of the input.
+ * @param allow_holes defines whether alpha shapes are allowed to contain holes
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -1390,6 +1395,10 @@ sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
  * @pre alpha >= 0
  * @pre nb_components >= 0
  * @post isValid(return) == true
+ * @param geom the input geometry
+ * @param allow_holes defines whether alpha shapes are allowed to contain holes
+ * @param nb_components the number of connected components in the output
+ * geometry
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
