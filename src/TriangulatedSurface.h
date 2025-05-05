@@ -88,7 +88,7 @@ public:
   swapXY() -> void override;
 
   /**
-   * [SFA/OGC]Returns the number of patchs
+   * [SFA/OGC]Returns the number of patches
    * @deprecated see numGeometries()
    */
   inline auto
