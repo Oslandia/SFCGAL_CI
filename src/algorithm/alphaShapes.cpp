@@ -89,7 +89,17 @@ computeAlpha(const Geometry &g, Alpha_shape_2 &alphaShape, double alpha = 0,
   alphaShape.set_alpha(Kernel::FT(alpha));
   alpha_edges(alphaShape, std::back_inserter(segments));
 
-  result = CGAL::to_double(*alphaShape.find_optimal_alpha(nb_components));
+  // Ensure we compare the iterator from find_optimal_alpha(nb_components)
+  // against alpha_end() before dereferencing to avoid potential crash when
+  // no valid alpha is found.
+  auto it_alpha = alphaShape.find_optimal_alpha(nb_components);
+  if (it_alpha != alphaShape.alpha_end()) {
+    result = CGAL::to_double(*it_alpha);
+  } else {
+    std::ostringstream oss;
+    oss << "Can't find alpha value.";
+    throw std::runtime_error(oss.str());
+  }
 
   return result;
 }
