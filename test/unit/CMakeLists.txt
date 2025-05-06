@@ -1,6 +1,6 @@
 #-- build unit tests
 
-find_package(Boost REQUIRED COMPONENTS unit_test_framework serialization)
+find_package(Boost REQUIRED COMPONENTS ${SFCGAL_Boost_COMPONENTS})
 
 if( SFCGAL_USE_STATIC_LIBS )
   add_definitions( "-DSFCGAL_USE_STATIC_LIBS" )

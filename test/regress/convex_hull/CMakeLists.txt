@@ -9,7 +9,7 @@ file( GLOB_RECURSE SFCGAL_REGRESS_CONVEX_HULL_TEST_SOURCES *.cpp )
 set( REGRESS_NAME test-regress-convex_hull )
 add_executable( ${REGRESS_NAME} ${SFCGAL_REGRESS_CONVEX_HULL_TEST_SOURCES} )
 
-find_package(Boost REQUIRED COMPONENTS program_options filesystem serialization)
+find_package(Boost REQUIRED COMPONENTS ${SFCGAL_Boost_COMPONENTS})
 
 target_link_libraries( ${REGRESS_NAME} SFCGAL)
 
