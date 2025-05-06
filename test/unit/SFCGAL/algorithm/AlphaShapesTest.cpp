@@ -162,4 +162,18 @@ BOOST_AUTO_TEST_CASE(testAlphaShapes2D_MultiPoint)
   }
 }
 
+// https://gitlab.com/sfcgal/SFCGAL/-/issues/254
+BOOST_AUTO_TEST_CASE(testAlphaShapes2D_InvalidPolygon_Issue254)
+{
+  std::vector<Point> points;
+  points.emplace_back(1.0, 2.0);
+  points.emplace_back(1.0, 2.0);
+  points.emplace_back(1.0, 2.0);
+  points.emplace_back(1.0, 2.0);
+
+  LineString const lineString(points);
+  BOOST_CHECK_THROW(algorithm::alphaShapes(lineString, 20.1, false),
+                    std::runtime_error);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
