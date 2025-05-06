@@ -10,7 +10,7 @@ jobs:
         os:
           - { name: freebsd, version: '14.2' }
           - { name: netbsd, version: '10.1' }
-          - { name: openbsd, version: '7.5' }
+          - { name: openbsd, version: '7.7' }
     steps:
       - uses: actions/checkout@v4
 
