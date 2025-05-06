@@ -90,6 +90,8 @@ endif()
 find_package( CGAL 5.6 COMPONENTS Core REQUIRED )
 message( STATUS "CGAL ${CGAL_VERSION} found" )
 
+set(CGAL_3RD_PARTY_LIBRARIES CGAL::CGAL CGAL::CGAL_Core)
+
 include_directories( ${CMAKE_BINARY_DIR}/include )
 
 #-- BOOST --------------------------------------------------
@@ -121,13 +123,9 @@ endif()
 
 #-- minimalist build allowed with boost version older than 1.48
 set( SFCGAL_Boost_COMPONENTS thread system serialization )
-#-- unit test
-if ( SFCGAL_BUILD_TESTS )
-	set( SFCGAL_Boost_COMPONENTS unit_test_framework program_options ${SFCGAL_Boost_COMPONENTS} )
-endif()
 #-- program_options
 if ( SFCGAL_BUILD_TESTS OR SFCGAL_BUILD_EXAMPLES OR SFCGAL_BUILD_OSG )
-	set( SFCGAL_Boost_COMPONENTS program_options chrono filesystem timer ${SFCGAL_Boost_COMPONENTS} )
+	set( SFCGAL_Boost_COMPONENTS chrono unit_test_framework filesystem program_options timer ${SFCGAL_Boost_COMPONENTS} )
 endif()
 find_package( Boost COMPONENTS ${SFCGAL_Boost_COMPONENTS} REQUIRED )
 if((${Boost_MAJOR_VERSION} EQUAL 1) AND (${Boost_MINOR_VERSION} EQUAL 58))

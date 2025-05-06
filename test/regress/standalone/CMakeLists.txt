@@ -7,9 +7,9 @@ endif()
 file( GLOB_RECURSE SFCGAL_REGRESS_STANDALONE_TEST_SOURCES *.cpp )
 add_executable( standalone-regress-test-SFCGAL ${SFCGAL_REGRESS_STANDALONE_TEST_SOURCES} )
 
-find_package(Boost REQUIRED COMPONENTS unit_test_framework filesystem serialization)
+find_package(Boost REQUIRED COMPONENTS ${SFCGAL_Boost_COMPONENTS})
 
-target_link_libraries( standalone-regress-test-SFCGAL SFCGAL ${Boost_LIBRARIES})
+target_link_libraries( standalone-regress-test-SFCGAL SFCGAL ${CGAL_3RD_PARTY_LIBRARIES} ${Boost_LIBRARIES})
 
 set_target_properties( standalone-regress-test-SFCGAL PROPERTIES DEBUG_POSTFIX "d" )
 install( TARGETS standalone-regress-test-SFCGAL DESTINATION bin )
