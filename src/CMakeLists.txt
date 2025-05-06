@@ -68,6 +68,9 @@ if( CGAL_USE_GMPXX )
 endif()
 
 target_link_libraries( SFCGAL ${Boost_LIBRARIES} )
+set_target_properties(SFCGAL PROPERTIES
+  INTERFACE_LINK_LIBRARIES ""
+)
 
 if ( ${Use_precompiled_headers} )
   if(PCHSupport_FOUND)
