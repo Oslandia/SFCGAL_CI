@@ -6,6 +6,18 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC )
     list(REMOVE_ITEM SFCGAL_HEADERS ${CMAKE_SOURCE_DIR}/src/algorithm/alphaShapes.h)
 endif()
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND
+    CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15.0 AND
+    CGAL_VERSION VERSION_LESS 6.0.2)
+  set(ALPHAWRAP_SRC ${CMAKE_SOURCE_DIR}/src/algorithm/alphaWrapping3D.cpp)
+  list(FIND SFCGAL_SOURCES  ${ALPHAWRAP_SRC} ALPHA_WRAPPING_INDEX)
+  if (ALPHA_WRAPPING_INDEX GREATER_EQUAL 0)
+    # With inline enabled CGAL::alpha_wrap_3 may segfault with GCC 15
+    # See: https://github.com/CGAL/cgal/issues/8876
+    set_source_files_properties(${ALPHAWRAP_SRC} PROPERTIES COMPILE_OPTIONS "-fno-inline")
+  endif()
+endif()
+
 file( GLOB_RECURSE SFCGAL_HEADERS_COPIED RELATIVE ${CMAKE_SOURCE_DIR}/src "*.h" )
 add_custom_target(copy)
 foreach (header ${SFCGAL_HEADERS_COPIED})
