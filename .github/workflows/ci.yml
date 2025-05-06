@@ -10,12 +10,12 @@ jobs:
         os:
           - { name: freebsd, version: '14.2' }
           - { name: netbsd, version: '10.1' }
-          - { name: openbsd, version: '7.6' }
+          - { name: openbsd, version: '7.7' }
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies and build on ${{ matrix.os.name }} ${{ matrix.os.version }}
-        uses: cross-platform-actions/action@v0.27.0
+        uses: cross-platform-actions/action@master
         with:
           operating_system: ${{ matrix.os.name }}
           version: ${{ matrix.os.version }}
