@@ -23,7 +23,7 @@
   parallel:
     matrix:
       - CGAL_VERSION: ["5.6.2", $CGAL_LATEST_VERSION]
-        OS_VERSION: ["40", "41"]
+        OS_VERSION: ["40", "41", "42"]
 
 fedora_clang:
   extends: .fedora_test_base
