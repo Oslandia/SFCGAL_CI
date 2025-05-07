@@ -823,8 +823,10 @@ sfcgal_triangulated_surface_add_patch(sfcgal_geometry_t *tin,
  * @pre triangle must be a Triangle
  * @post the ownership of the Triangle is taken. The caller is not responsible
  * anymore of its deallocation
+ * @deprecated Use sfcgal_triangulated_surface_add_patch instead.
  * @ingroup capi
  */
+SFCGAL_DEPRECATED("Use sfcgal_triangulated_surface_add_patch instead.")
 SFCGAL_API void
 sfcgal_triangulated_surface_add_triangle(sfcgal_geometry_t *tin,
                                          sfcgal_geometry_t *triangle);
