@@ -15,7 +15,7 @@ namespace algorithm {
  * Holds weighted data to compute the centroid for a Geometry
  * @ingroup detail
  */
-SFCGAL_API class WeightedCentroid {
+class SFCGAL_API WeightedCentroid {
 public:
   /// total area or length
   SFCGAL::Kernel::FT area;
