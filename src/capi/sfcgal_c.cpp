@@ -30,6 +30,8 @@
 
 #include "SFCGAL/capi/sfcgal_c.h"
 
+#include <cstdarg>
+
 #include "SFCGAL/detail/io/Serialization.h"
 #include "SFCGAL/io/OBJ.h"
 #include "SFCGAL/io/STL.h"
@@ -79,7 +81,7 @@
 #include "SFCGAL/detail/transform/ForceOrderPoints.h"
 #include "SFCGAL/detail/transform/ForceZOrderPoints.h"
 #include "SFCGAL/detail/transform/RoundTransform.h"
-#include <cmath>
+#include <cstdio>
 
 //
 // Note about sfcgal_geometry_t pointers: they are basically void* pointers that
@@ -288,21 +290,52 @@ sfcgal_free_buffer(void *buffer)
   }
 }
 
-extern "C" void
-sfcgal_init(void)
+extern "C" /**
+            * @brief Initialize SFCGAL's error and warning behavior.
+            *
+            * Configures CGAL to raise exceptions on errors and warnings by
+            * setting both the global error and warning handlers to throw
+            * (CGAL::THROW_EXCEPTION).
+            *
+            * This affects how downstream C API calls report internal CGAL
+            * failures: instead of printing/terminating, CGAL will throw
+            * exceptions which the wrapper translates into C-style error
+            * returns.
+            */
+    void
+    sfcgal_init(void)
 {
   set_error_behaviour(CGAL::THROW_EXCEPTION);
   set_warning_behaviour(CGAL::THROW_EXCEPTION);
 }
 
-extern "C" auto
-sfcgal_version(void) -> const char *
+extern "C" /**
+            * @brief Returns the SFCGAL library version string.
+            *
+            * The returned pointer refers to an internal, null-terminated string
+            * owned by the library; the caller must not modify or free it.
+            *
+            * @return const char* Null-terminated version string (e.g.,
+            * "1.0.0").
+            */
+    auto
+    sfcgal_version(void) -> const char *
 {
   return SFCGAL::Version();
 }
 
-extern "C" auto
-sfcgal_full_version(void) -> const char *
+extern "C" /**
+            * @brief Return the library's full version string.
+            *
+            * Returns a pointer to a null-terminated, static string describing
+            * the full SFCGAL version (including build/patch details when
+            * available).
+            *
+            * @return const char* Pointer to a statically-allocated version
+            * string; do not free.
+            */
+    auto
+    sfcgal_full_version(void) -> const char *
 {
   return SFCGAL::Full_Version();
 }
@@ -649,8 +682,18 @@ sfcgal_geometry_as_obj(const sfcgal_geometry_t *pgeom, char **buffer,
 /**
  * Point
  */
-extern "C" auto
-sfcgal_point_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create an empty 2D point geometry.
+            *
+            * Allocates and returns a new Point geometry (initially at the
+            * origin). The caller takes ownership of the returned geometry and
+            * must free it with sfcgal_geometry_delete().
+            *
+            * @return sfcgal_geometry_t* Pointer to the newly created Point, or
+            * `nullptr` if an internal error occurred.
+            */
+    auto
+    sfcgal_point_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Point());)
@@ -719,8 +762,19 @@ sfcgal_point_m(const sfcgal_geometry_t *geom) -> double
 /**
  * LineString
  */
-extern "C" auto
-sfcgal_linestring_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create an empty LineString geometry.
+            *
+            * Allocates and returns a new LineString instance wrapped as an
+            * sfcgal_geometry_t*. The returned geometry is owned by the caller
+            * and must be freed with sfcgal_geometry_delete(). On internal error
+            * or exception the function returns nullptr.
+            *
+            * @return sfcgal_geometry_t* Pointer to the newly created
+            * LineString, or nullptr on error.
+            */
+    auto
+    sfcgal_linestring_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::LineString());)
@@ -753,8 +807,19 @@ sfcgal_linestring_add_point(sfcgal_geometry_t *geom, sfcgal_geometry_t *point)
 /**
  * Triangle
  */
-extern "C" auto
-sfcgal_triangle_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create a new empty Triangle geometry.
+            *
+            * Allocates and returns a new Triangle geometry instance.
+            *
+            * @return sfcgal_geometry_t* Pointer to the newly created Triangle,
+            * or `nullptr` if an error occurred.
+            *
+            * @note The caller takes ownership of the returned geometry and must
+            * free it using sfcgal_geometry_delete().
+            */
+    auto
+    sfcgal_triangle_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Triangle());)
@@ -810,8 +875,18 @@ sfcgal_triangle_set_vertex_from_xyz(sfcgal_geometry_t *geom, int i, double x,
 /**
  * Polygon
  */
-extern "C" auto
-sfcgal_polygon_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create an empty Polygon geometry.
+            *
+            * Returns a newly allocated, empty SFCGAL Polygon geometry object.
+            * Ownership is transferred to the caller; free it with
+            * sfcgal_geometry_delete().
+            *
+            * @return sfcgal_geometry_t* Pointer to the created Polygon, or
+            * nullptr on error.
+            */
+    auto
+    sfcgal_polygon_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Polygon());)
@@ -864,8 +939,21 @@ sfcgal_polygon_add_interior_ring(sfcgal_geometry_t *geom,
  * Geometry collection
  */
 
-extern "C" auto
-sfcgal_geometry_collection_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create an empty GeometryCollection.
+            *
+            * Constructs and returns a newly allocated, empty GeometryCollection
+            * instance.
+            *
+            * @return sfcgal_geometry_t* Pointer to the created
+            * GeometryCollection, or `nullptr` if an internal error/exception
+            * occurred.
+            *
+            * @note The caller is responsible for freeing the returned geometry
+            * with sfcgal_geometry_delete().
+            */
+    auto
+    sfcgal_geometry_collection_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::GeometryCollection());)
@@ -911,29 +999,73 @@ sfcgal_geometry_collection_add_geometry(sfcgal_geometry_t *geom,
 /**
  * Multi-*
  */
-extern "C" auto
-sfcgal_multi_point_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create a new empty MultiPoint geometry.
+            *
+            * Creates and returns a newly allocated MultiPoint instance wrapped
+            * as an sfcgal_geometry_t.
+            *
+            * @return sfcgal_geometry_t* Pointer to the created MultiPoint on
+            * success; nullptr if an error occurred.
+            *
+            * @note The caller owns the returned geometry and must free it using
+            * sfcgal_geometry_delete().
+            */
+    auto
+    sfcgal_multi_point_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiPoint());)
 }
 
-extern "C" auto
-sfcgal_multi_linestring_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create an empty MultiLineString geometry.
+            *
+            * Allocates and returns a new, empty MultiLineString instance
+            * wrapped as an sfcgal_geometry_t pointer. The caller takes
+            * ownership of the returned geometry and must free it with
+            * sfcgal_geometry_delete().
+            *
+            * @return sfcgal_geometry_t* Pointer to the created MultiLineString,
+            * or nullptr if an error occurred.
+            */
+    auto
+    sfcgal_multi_linestring_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiLineString());)
 }
 
-extern "C" auto
-sfcgal_multi_polygon_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create an empty MultiPolygon geometry.
+            *
+            * Returns a newly allocated, empty MultiPolygon instance. The caller
+            * takes ownership of the returned geometry and must free it with
+            * sfcgal_geometry_delete when no longer needed.
+            *
+            * @return sfcgal_geometry_t* Pointer to the created MultiPolygon, or
+            * nullptr if an error occurred.
+            */
+    auto
+    sfcgal_multi_polygon_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiPolygon());)
 }
 
-extern "C" auto
-sfcgal_multi_solid_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create an empty MultiSolid geometry.
+            *
+            * Creates and returns a new, heap-allocated SFCGAL MultiSolid
+            * instance wrapped as an sfcgal_geometry_t pointer. The caller owns
+            * the returned geometry and must free it with
+            * sfcgal_geometry_delete().
+            *
+            * @return sfcgal_geometry_t* Pointer to the newly created
+            * MultiSolid, or nullptr if an error occurred.
+            */
+    auto
+    sfcgal_multi_solid_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiSolid());)
@@ -943,8 +1075,19 @@ sfcgal_multi_solid_create(void) -> sfcgal_geometry_t *
  * Polyhedral surface
  */
 
-extern "C" auto
-sfcgal_polyhedral_surface_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create an empty PolyhedralSurface geometry.
+            *
+            * Allocates and returns a new PolyhedralSurface instance wrapped as
+            * an opaque sfcgal_geometry_t pointer. The caller takes ownership
+            * and must free it with sfcgal_geometry_delete when no longer
+            * needed.
+            *
+            * @return sfcgal_geometry_t* Pointer to the newly created
+            * PolyhedralSurface, or nullptr if an error occurred.
+            */
+    auto
+    sfcgal_polyhedral_surface_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::PolyhedralSurface());)
@@ -1010,8 +1153,18 @@ sfcgal_polyhedral_surface_add_polygon(sfcgal_geometry_t *geom,
  * Triangulated surface
  */
 
-extern "C" auto
-sfcgal_triangulated_surface_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create an empty TriangulatedSurface geometry.
+            *
+            * Allocates and returns a new TriangulatedSurface instance wrapped
+            * as an sfcgal_geometry_t pointer. The caller is responsible for
+            * freeing the returned geometry with sfcgal_geometry_delete().
+            *
+            * @return sfcgal_geometry_t* Pointer to the newly created
+            * TriangulatedSurface, or nullptr if an internal error occurred.
+            */
+    auto
+    sfcgal_triangulated_surface_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(
@@ -1078,8 +1231,20 @@ sfcgal_triangulated_surface_add_triangle(sfcgal_geometry_t *geom,
  * Solid
  */
 
-extern "C" auto
-sfcgal_solid_create(void) -> sfcgal_geometry_t *
+extern "C" /**
+            * @brief Create a new empty Solid geometry.
+            *
+            * Constructs and returns a newly allocated SFCGAL Solid wrapped as a
+            * sfcgal_geometry_t pointer. On error (e.g., internal allocation
+            * failure) this function returns nullptr and reports an error via
+            * the library's error handler.
+            *
+            * @return sfcgal_geometry_t* Pointer to the newly created Solid, or
+            * nullptr on error. The caller is responsible for freeing the
+            * geometry using sfcgal_geometry_delete().
+            */
+    auto
+    sfcgal_solid_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Solid());)
@@ -1128,8 +1293,18 @@ sfcgal_solid_set_exterior_shell(sfcgal_geometry_t *geom,
           down_cast<SFCGAL::PolyhedralSurface>(shell));)
 }
 
-extern "C" auto
-sfcgal_prepared_geometry_create(void) -> sfcgal_prepared_geometry_t *
+extern "C" /**
+            * @brief Create an empty PreparedGeometry instance.
+            *
+            * Allocates and returns a new PreparedGeometry object. The caller
+            * takes ownership of the returned handle and must free it with
+            * sfcgal_prepared_geometry_delete().
+            *
+            * @return sfcgal_prepared_geometry_t* Pointer to the newly created
+            * PreparedGeometry, or nullptr on error.
+            */
+    auto
+    sfcgal_prepared_geometry_create(void) -> sfcgal_prepared_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(return new SFCGAL::PreparedGeometry();)
 }
