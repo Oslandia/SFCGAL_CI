@@ -63,6 +63,7 @@ Default building options should work out-of-the-box. You may want to fine-tune t
 | `CMAKE_INSTALL_PREFIX`    | /usr/local | Specifies where SFCGAL will be installed when `make install` is invoked                                               |
 | `CMAKE_BUILD_TYPE`        | Release    | Switches between a `Release` build for speed efficiency and a `Debug` build for development (slower, with assertions) |
 | `SFCGAL_BUILD_BENCH`      | OFF        | Turn to `ON` to build benchmark tests                                                                                 |
+| `SFCGAL_BUILD_CLI`        | ON         | Specifies whether to build the SFCGAL command-line interface tool                                                     |
 | `SFCGAL_BUILD_DOC`        | OFF        | Turn to `ON` to build documentation                                                                                   |
 | `SFCGAL_BUILD_EXAMPLES`   | OFF        | Turn to `ON` to build examples                                                                                        |
 | `SFCGAL_BUILD_TESTS`      | OFF        | Turn to `ON` to build unit and regression tests (run tests with `unit-test-SFCGAL`, etc.)                             |

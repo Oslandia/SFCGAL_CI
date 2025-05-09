@@ -294,6 +294,13 @@ if( SFCGAL_BUILD_DOC )
   add_subdirectory( doc )
 endif()
 
+
+#-- Option to build the command-line interface
+option(SFCGAL_BUILD_CLI "Build the SFCGAL command-line interface tool" ON)
+if(SFCGAL_BUILD_CLI)
+    add_subdirectory(sfcgalop)
+endif()
+
 #-- install directories
 install(DIRECTORY ${CMAKE_BINARY_DIR}/include DESTINATION .)
 
