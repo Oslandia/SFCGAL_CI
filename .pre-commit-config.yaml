@@ -29,7 +29,7 @@ repos:
     hooks:
       - id: clang-format
         args: ["--style=file", "-i"]  # Use the .clang-format file for configuration and apply all fixes
-        files: ^src/.*\.(c|h|cpp|hpp)$
+        files: ^(src|test)/.*\.(c|h|cpp|hpp)$
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.42.0

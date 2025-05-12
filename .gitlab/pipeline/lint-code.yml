@@ -13,13 +13,14 @@ clang-format:
     # We need to use simple BusyBox `find` syntax here.
     - >
       clang-format-19 --dry-run --Werror
-      $(find src/ -iname '*.cpp' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.h')
+      $(find src/ test/ -iname '*.cpp' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.h')
   # script:
   #   - run-clang-format.py -r src --style=file
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push")
       changes:
         - "src/**/*.{c,h,cpp,hpp}"
+        - "test/**/*.{c,h,cpp,hpp}"
         - ".clang-format"
         - ".clang-format-ignore"
 
