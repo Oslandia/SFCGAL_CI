@@ -251,7 +251,8 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(0).asText(0),
                     "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
-  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(1).asText(), newGeom->asText());
+  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(1).asText(),
+                    newGeom->asText());
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(2).asText(0),
                     "TRIANGLE Z ((1 2 4,3 2 3,2 4 6,1 2 4))");
 
@@ -267,8 +268,10 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(0).asText(0),
                     "TRIANGLE Z ((0 0 0,2 0 2,1 2 4,0 0 0))");
-  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(1).asText(), newGeom->asText());
-  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(2).asText(), newGeom2->asText());
+  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(1).asText(),
+                    newGeom->asText());
+  BOOST_CHECK_EQUAL(geom->as<TriangulatedSurface>().patchN(2).asText(),
+                    newGeom2->asText());
 }
 
 BOOST_AUTO_TEST_CASE(dropZMTest)

@@ -97,51 +97,63 @@ BOOST_AUTO_TEST_CASE(dropZM)
   BOOST_CHECK(!multiLineStringEmpty.dropM());
 
   MultiLineString multiLineString2D;
-  multiLineString2D.addGeometry(new LineString(Point(2.0, 3.0), Point(4.0, 5.0)));
-  multiLineString2D.addGeometry(new LineString(Point(6.0, 7.0), Point(9.0, 10.0)));
+  multiLineString2D.addGeometry(
+      new LineString(Point(2.0, 3.0), Point(4.0, 5.0)));
+  multiLineString2D.addGeometry(
+      new LineString(Point(6.0, 7.0), Point(9.0, 10.0)));
   BOOST_CHECK(!multiLineString2D.is3D());
   BOOST_CHECK(!multiLineString2D.isMeasured());
   BOOST_CHECK(!multiLineString2D.dropM());
   BOOST_CHECK(!multiLineString2D.dropZ());
 
   MultiLineString multiLineString3D;
-  multiLineString3D.addGeometry(new LineString(Point(2.0, 3.0, 5.0), Point(4.0, 5.0, 5.0)));
-  multiLineString3D.addGeometry(new LineString(Point(6.0, 7.0, 5.0), Point(9.0, 10.0, 5.0)));
+  multiLineString3D.addGeometry(
+      new LineString(Point(2.0, 3.0, 5.0), Point(4.0, 5.0, 5.0)));
+  multiLineString3D.addGeometry(
+      new LineString(Point(6.0, 7.0, 5.0), Point(9.0, 10.0, 5.0)));
   BOOST_CHECK(multiLineString3D.is3D());
   BOOST_CHECK(!multiLineString3D.isMeasured());
   BOOST_CHECK(!multiLineString3D.dropM());
   BOOST_CHECK(multiLineString3D.dropZ());
-  BOOST_CHECK_EQUAL(multiLineString3D.asText(0), "MULTILINESTRING ((2 3,4 5),(6 7,9 10))");
+  BOOST_CHECK_EQUAL(multiLineString3D.asText(0),
+                    "MULTILINESTRING ((2 3,4 5),(6 7,9 10))");
   BOOST_CHECK(!multiLineString3D.is3D());
   BOOST_CHECK(!multiLineString3D.isMeasured());
   BOOST_CHECK(!multiLineString3D.dropM());
   BOOST_CHECK(!multiLineString3D.dropZ());
 
   MultiLineString multiLineStringM;
-  multiLineStringM.addGeometry(io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
-  multiLineStringM.addGeometry(io::readWkt("LINESTRING M (3 2 4, 4 2 5)").release());
+  multiLineStringM.addGeometry(
+      io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
+  multiLineStringM.addGeometry(
+      io::readWkt("LINESTRING M (3 2 4, 4 2 5)").release());
   BOOST_CHECK(!multiLineStringM.is3D());
   BOOST_CHECK(multiLineStringM.isMeasured());
   BOOST_CHECK(!multiLineStringM.dropZ());
   BOOST_CHECK(multiLineStringM.dropM());
-  BOOST_CHECK_EQUAL(multiLineStringM.asText(0), "MULTILINESTRING ((0 0,1 1,2 2),(3 2,4 2))");
+  BOOST_CHECK_EQUAL(multiLineStringM.asText(0),
+                    "MULTILINESTRING ((0 0,1 1,2 2),(3 2,4 2))");
   BOOST_CHECK(!multiLineStringM.is3D());
   BOOST_CHECK(!multiLineStringM.isMeasured());
   BOOST_CHECK(!multiLineStringM.dropM());
   BOOST_CHECK(!multiLineStringM.dropZ());
 
   MultiLineString multiLineStringZM;
-  multiLineStringZM.addGeometry(new LineString(Point(2.0, 3.0, 5.0, 2.0), Point(4.0, 5.0, 5.0, 2.0)));
-  multiLineStringZM.addGeometry(new LineString(Point(6.0, 7.0, 5.0, 1.0), Point(9.0, 10.0, 5.0, 1.0)));
+  multiLineStringZM.addGeometry(
+      new LineString(Point(2.0, 3.0, 5.0, 2.0), Point(4.0, 5.0, 5.0, 2.0)));
+  multiLineStringZM.addGeometry(
+      new LineString(Point(6.0, 7.0, 5.0, 1.0), Point(9.0, 10.0, 5.0, 1.0)));
   BOOST_CHECK(multiLineStringZM.is3D());
   BOOST_CHECK(multiLineStringZM.isMeasured());
   BOOST_CHECK(multiLineStringZM.dropM());
   BOOST_CHECK(multiLineStringZM.is3D());
   BOOST_CHECK(!multiLineStringZM.isMeasured());
-  BOOST_CHECK_EQUAL(multiLineStringZM.asText(0), "MULTILINESTRING Z ((2 3 5,4 5 5),(6 7 5,9 10 5))");
+  BOOST_CHECK_EQUAL(multiLineStringZM.asText(0),
+                    "MULTILINESTRING Z ((2 3 5,4 5 5),(6 7 5,9 10 5))");
   BOOST_CHECK(!multiLineStringZM.dropM());
   BOOST_CHECK(multiLineStringZM.dropZ());
-  BOOST_CHECK_EQUAL(multiLineStringZM.asText(0), "MULTILINESTRING ((2 3,4 5),(6 7,9 10))");
+  BOOST_CHECK_EQUAL(multiLineStringZM.asText(0),
+                    "MULTILINESTRING ((2 3,4 5),(6 7,9 10))");
   BOOST_CHECK(!multiLineStringZM.is3D());
   BOOST_CHECK(!multiLineStringZM.isMeasured());
   BOOST_CHECK(!multiLineStringZM.dropM());
@@ -156,28 +168,41 @@ BOOST_AUTO_TEST_CASE(swapXY)
   BOOST_CHECK(multiLineStringEmpty.isEmpty());
 
   MultiLineString multiLineString2D;
-  multiLineString2D.addGeometry(new LineString(Point(2.0, 3.0), Point(4.0, 5.0)));
-  multiLineString2D.addGeometry(new LineString(Point(6.0, 7.0), Point(9.0, 10.0)));
+  multiLineString2D.addGeometry(
+      new LineString(Point(2.0, 3.0), Point(4.0, 5.0)));
+  multiLineString2D.addGeometry(
+      new LineString(Point(6.0, 7.0), Point(9.0, 10.0)));
   multiLineString2D.swapXY();
-  BOOST_CHECK_EQUAL(multiLineString2D.asText(0), "MULTILINESTRING ((3 2,5 4),(7 6,10 9))");
+  BOOST_CHECK_EQUAL(multiLineString2D.asText(0),
+                    "MULTILINESTRING ((3 2,5 4),(7 6,10 9))");
 
   MultiLineString multiLineString3D;
-  multiLineString3D.addGeometry(new LineString(Point(2.0, 3.0, 5.0), Point(4.0, 5.0, 5.0)));
-  multiLineString3D.addGeometry(new LineString(Point(6.0, 7.0, 5.0), Point(9.0, 10.0, 5.0)));
+  multiLineString3D.addGeometry(
+      new LineString(Point(2.0, 3.0, 5.0), Point(4.0, 5.0, 5.0)));
+  multiLineString3D.addGeometry(
+      new LineString(Point(6.0, 7.0, 5.0), Point(9.0, 10.0, 5.0)));
   multiLineString3D.swapXY();
-  BOOST_CHECK_EQUAL(multiLineString3D.asText(0), "MULTILINESTRING Z ((3 2 5,5 4 5),(7 6 5,10 9 5))");
+  BOOST_CHECK_EQUAL(multiLineString3D.asText(0),
+                    "MULTILINESTRING Z ((3 2 5,5 4 5),(7 6 5,10 9 5))");
 
   MultiLineString multiLineStringM;
-  multiLineStringM.addGeometry(io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
-  multiLineStringM.addGeometry(io::readWkt("LINESTRING M (3 2 4, 4 2 5)").release());
+  multiLineStringM.addGeometry(
+      io::readWkt("LINESTRING M (0 0 4, 1 1 5, 2 2 6)").release());
+  multiLineStringM.addGeometry(
+      io::readWkt("LINESTRING M (3 2 4, 4 2 5)").release());
   multiLineStringM.swapXY();
-  BOOST_CHECK_EQUAL(multiLineStringM.asText(0), "MULTILINESTRING M ((0 0 4,1 1 5,2 2 6),(2 3 4,2 4 5))");
+  BOOST_CHECK_EQUAL(multiLineStringM.asText(0),
+                    "MULTILINESTRING M ((0 0 4,1 1 5,2 2 6),(2 3 4,2 4 5))");
 
   MultiLineString multiLineStringZM;
-  multiLineStringZM.addGeometry(new LineString(Point(2.0, 3.0, 5.0, 2.0), Point(4.0, 5.0, 5.0, 2.0)));
-  multiLineStringZM.addGeometry(new LineString(Point(6.0, 7.0, 5.0, 1.0), Point(9.0, 10.0, 5.0, 1.0)));
+  multiLineStringZM.addGeometry(
+      new LineString(Point(2.0, 3.0, 5.0, 2.0), Point(4.0, 5.0, 5.0, 2.0)));
+  multiLineStringZM.addGeometry(
+      new LineString(Point(6.0, 7.0, 5.0, 1.0), Point(9.0, 10.0, 5.0, 1.0)));
   multiLineStringZM.swapXY();
-  BOOST_CHECK_EQUAL(multiLineStringZM.asText(0), "MULTILINESTRING ZM ((3 2 5 2,5 4 5 2),(7 6 5 1,10 9 5 1))");
+  BOOST_CHECK_EQUAL(
+      multiLineStringZM.asText(0),
+      "MULTILINESTRING ZM ((3 2 5 2,5 4 5 2),(7 6 5 1,10 9 5 1))");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

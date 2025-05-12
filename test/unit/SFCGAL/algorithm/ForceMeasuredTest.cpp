@@ -3,8 +3,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "SFCGAL/Point.h"
 #include "SFCGAL/LineString.h"
+#include "SFCGAL/Point.h"
 #include "SFCGAL/algorithm/forceMeasured.h"
 
 #include "SFCGAL/detail/tools/Registry.h"
@@ -25,7 +25,8 @@ BOOST_AUTO_TEST_CASE(testIgnoreEmpty)
   for (const auto &typeName : typeNames) {
     BOOST_TEST_MESSAGE(typeName);
 
-    std::unique_ptr<Geometry> geometry(registry.newGeometryByTypeName(typeName));
+    std::unique_ptr<Geometry> geometry(
+        registry.newGeometryByTypeName(typeName));
     BOOST_REQUIRE(geometry.get() != nullptr);
     algorithm::forceMeasured(*geometry);
     BOOST_CHECK(geometry->isEmpty());
@@ -60,8 +61,9 @@ BOOST_AUTO_TEST_CASE(test_MixedLineString3DM)
   lineString.addPoint(Point(3.0, 3.0, 2.0));
   algorithm::forceMeasured(lineString);
   // should keep 5.0 for the second point
-  BOOST_CHECK_EQUAL(lineString.asText(1),
-                    "LINESTRING ZM (1.0 1.0 3.0 0.0,2.0 3.0 4.0 5.0,3.0 3.0 2.0 0.0)");
+  BOOST_CHECK_EQUAL(
+      lineString.asText(1),
+      "LINESTRING ZM (1.0 1.0 3.0 0.0,2.0 3.0 4.0 5.0,3.0 3.0 2.0 0.0)");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -229,10 +229,12 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(!triangle2D.dropZ());
   BOOST_CHECK(!triangle2D.dropM());
 
-  Triangle triangle3D(Point(2.0, 3.0, 1.0), Point(4.0, 5.0, 1.0), Point(7.0, -1.0, 1.0));
+  Triangle triangle3D(Point(2.0, 3.0, 1.0), Point(4.0, 5.0, 1.0),
+                      Point(7.0, -1.0, 1.0));
   BOOST_CHECK(!triangle3D.dropM());
   BOOST_CHECK(triangle3D.dropZ());
-  BOOST_CHECK_EQUAL(triangle3D.asText(1), "TRIANGLE ((2.0 3.0,4.0 5.0,7.0 -1.0,2.0 3.0))");
+  BOOST_CHECK_EQUAL(triangle3D.asText(1),
+                    "TRIANGLE ((2.0 3.0,4.0 5.0,7.0 -1.0,2.0 3.0))");
   BOOST_CHECK(!triangle3D.dropZ());
 
   std::unique_ptr<Geometry> pt1M(io::readWkt("POINT M (5 3 4)"));
@@ -248,14 +250,16 @@ BOOST_AUTO_TEST_CASE(testDropZM)
   BOOST_CHECK(!triangleM.dropM());
   BOOST_CHECK(!triangleM.dropZ());
 
-  Triangle triangleZM(Point(2.0, 3.0, 1.0, 2.0), Point(4.0, 5.0, 1.0, 5.0), Point(7.0, -1.0, 1.0, 7.0));
+  Triangle triangleZM(Point(2.0, 3.0, 1.0, 2.0), Point(4.0, 5.0, 1.0, 5.0),
+                      Point(7.0, -1.0, 1.0, 7.0));
   BOOST_CHECK(triangleZM.isMeasured());
   BOOST_CHECK(triangleZM.is3D());
 
   BOOST_CHECK(triangleZM.dropM());
   BOOST_CHECK(triangleZM.is3D());
   BOOST_CHECK(!triangleZM.isMeasured());
-  BOOST_CHECK_EQUAL(triangleZM.asText(0), "TRIANGLE Z ((2 3 1,4 5 1,7 -1 1,2 3 1))");
+  BOOST_CHECK_EQUAL(triangleZM.asText(0),
+                    "TRIANGLE Z ((2 3 1,4 5 1,7 -1 1,2 3 1))");
   BOOST_CHECK(!triangleZM.dropM());
 
   BOOST_CHECK(triangleZM.dropZ());
@@ -277,20 +281,25 @@ BOOST_AUTO_TEST_CASE(testSwapXY)
   triangle2D.swapXY();
   BOOST_CHECK_EQUAL(triangle2D.asText(0), "TRIANGLE ((3 2,5 4,-1 7,3 2))");
 
-  Triangle triangle3D(Point(2.0, 3.0, 1.0), Point(4.0, 5.0, 1.0), Point(7.0, -1.0, 1.0));
+  Triangle triangle3D(Point(2.0, 3.0, 1.0), Point(4.0, 5.0, 1.0),
+                      Point(7.0, -1.0, 1.0));
   triangle3D.swapXY();
-  BOOST_CHECK_EQUAL(triangle3D.asText(0), "TRIANGLE Z ((3 2 1,5 4 1,-1 7 1,3 2 1))");
+  BOOST_CHECK_EQUAL(triangle3D.asText(0),
+                    "TRIANGLE Z ((3 2 1,5 4 1,-1 7 1,3 2 1))");
 
   std::unique_ptr<Geometry> pt1M(io::readWkt("POINT M (2 3 4)"));
   std::unique_ptr<Geometry> pt2M(io::readWkt("POINT M (4 5 4)"));
   std::unique_ptr<Geometry> pt3M(io::readWkt("POINT M (7 -1 4)"));
   Triangle triangleM(pt1M->as<Point>(), pt2M->as<Point>(), pt3M->as<Point>());
   triangleM.swapXY();
-  BOOST_CHECK_EQUAL(triangleM.asText(0), "TRIANGLE M ((3 2 4,5 4 4,-1 7 4,3 2 4))");
+  BOOST_CHECK_EQUAL(triangleM.asText(0),
+                    "TRIANGLE M ((3 2 4,5 4 4,-1 7 4,3 2 4))");
 
-  Triangle triangleZM(Point(2.0, 3.0, 1.0, 2.0), Point(4.0, 5.0, 1.0, 5.0), Point(7.0, -1.0, 1.0, 7.0));
+  Triangle triangleZM(Point(2.0, 3.0, 1.0, 2.0), Point(4.0, 5.0, 1.0, 5.0),
+                      Point(7.0, -1.0, 1.0, 7.0));
   triangleZM.swapXY();
-  BOOST_CHECK_EQUAL(triangleZM.asText(0), "TRIANGLE ZM ((3 2 1 2,5 4 1 5,-1 7 1 7,3 2 1 2))");
+  BOOST_CHECK_EQUAL(triangleZM.asText(0),
+                    "TRIANGLE ZM ((3 2 1 2,5 4 1 5,-1 7 1 7,3 2 1 2))");
 }
 
 // template < typename Derived > inline bool Geometry::is() const

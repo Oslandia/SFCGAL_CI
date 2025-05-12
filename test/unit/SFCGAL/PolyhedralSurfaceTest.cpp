@@ -53,7 +53,8 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(0).asText(0),
                     "POLYGON Z ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))");
-  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(), newGeom->asText());
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(),
+                    newGeom->asText());
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(2).asText(0),
                     "POLYGON Z ((0 0 0,0 10 0,5 5 5,0 0 0))");
 
@@ -69,8 +70,10 @@ BOOST_AUTO_TEST_CASE(setPatchNTest)
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().numPatches(), 3);
   BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(0).asText(0),
                     "POLYGON Z ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))");
-  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(), newGeom->asText());
-  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(2).asText(), newGeom2->asText());
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(1).asText(),
+                    newGeom->asText());
+  BOOST_CHECK_EQUAL(geom->as<PolyhedralSurface>().patchN(2).asText(),
+                    newGeom2->asText());
 }
 
 BOOST_AUTO_TEST_CASE(dropZMTest)

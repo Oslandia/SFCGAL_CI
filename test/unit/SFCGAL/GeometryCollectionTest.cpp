@@ -82,7 +82,8 @@ BOOST_AUTO_TEST_CASE(testAccessors)
   BOOST_CHECK_EQUAL(g.geometryN(1).asText(0), "POINT (0 0)");
   BOOST_CHECK_EQUAL(g.geometryN(2).asText(0), "TRIANGLE ((0 0,1 0,1 1,0 0))");
 
-  g.setGeometryN(new Triangle(Point(3.0, 0.0), Point(4.0, 0.0), Point(4.0, 1.0)), 2);
+  g.setGeometryN(
+      new Triangle(Point(3.0, 0.0), Point(4.0, 0.0), Point(4.0, 1.0)), 2);
   BOOST_CHECK_EQUAL(g.numGeometries(), 3U);
   BOOST_CHECK_EQUAL(g.geometryN(0).asText(0), "POINT (2 3)");
   BOOST_CHECK_EQUAL(g.geometryN(1).asText(0), "POINT (0 0)");
@@ -182,7 +183,8 @@ BOOST_AUTO_TEST_CASE(testDropZM)
 
   GeometryCollection geom2D;
   geom2D.addGeometry(Point(2.0, 3.0));
-  geom2D.addGeometry(Triangle(Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0)));
+  geom2D.addGeometry(
+      Triangle(Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0)));
   BOOST_CHECK(!geom2D.is3D());
   BOOST_CHECK(!geom2D.isMeasured());
   BOOST_CHECK(!geom2D.dropZ());
@@ -190,28 +192,28 @@ BOOST_AUTO_TEST_CASE(testDropZM)
 
   GeometryCollection geom3D;
   geom3D.addGeometry(Point(2.0, 3.0, 5.0));
-  geom3D.addGeometry(Triangle(Point(0.0, 0.0, 6.0), Point(1.0, 0.0, 6.0), Point(1.0, 1.0, 6.0)));
+  geom3D.addGeometry(Triangle(Point(0.0, 0.0, 6.0), Point(1.0, 0.0, 6.0),
+                              Point(1.0, 1.0, 6.0)));
   BOOST_CHECK(geom3D.is3D());
   BOOST_CHECK(!geom3D.isMeasured());
   BOOST_CHECK(!geom3D.dropM());
   BOOST_CHECK(geom3D.dropZ());
-  BOOST_CHECK_EQUAL(
-      geom3D.asText(1),
-      "GEOMETRYCOLLECTION (POINT (2.0 3.0),TRIANGLE ((0.0 "
-      "0.0,1.0 0.0,1.0 1.0,0.0 0.0)))");
+  BOOST_CHECK_EQUAL(geom3D.asText(1),
+                    "GEOMETRYCOLLECTION (POINT (2.0 3.0),TRIANGLE ((0.0 "
+                    "0.0,1.0 0.0,1.0 1.0,0.0 0.0)))");
   BOOST_CHECK(!geom3D.dropZ());
   BOOST_CHECK(!geom3D.dropM());
 
   GeometryCollection geomM;
   geomM.addGeometry(io::readWkt("POINT M (2 3 4)").release());
-  geomM.addGeometry(io::readWkt("TRIANGLE M ((0 0 1, 5 5 5, 0 5 2, 0 0 1))").release());
+  geomM.addGeometry(
+      io::readWkt("TRIANGLE M ((0 0 1, 5 5 5, 0 5 2, 0 0 1))").release());
   BOOST_REQUIRE(geomM.is<GeometryCollection>());
   BOOST_CHECK(!geomM.is3D());
   BOOST_CHECK(geomM.isMeasured());
   BOOST_CHECK(!geomM.dropZ());
   BOOST_CHECK(geomM.dropM());
-  BOOST_CHECK_EQUAL(
-                    geomM.asText(1),
+  BOOST_CHECK_EQUAL(geomM.asText(1),
                     "GEOMETRYCOLLECTION (POINT (2.0 3.0),"
                     "TRIANGLE ((0.0 0.0,5.0 5.0,0.0 5.0,0.0 0.0)))");
   BOOST_CHECK(!geomM.dropZ());
@@ -221,23 +223,22 @@ BOOST_AUTO_TEST_CASE(testDropZM)
 
   GeometryCollection geomZM;
   geomZM.addGeometry(Point(2.0, 3.0, 5.0, 4.0));
-  geomZM.addGeometry(Triangle(Point(0.0, 0.0, 6.0, 2.0), Point(1.0, 0.0, 6.0, 2.0), Point(1.0, 1.0, 6.0, 2.0)));
+  geomZM.addGeometry(Triangle(Point(0.0, 0.0, 6.0, 2.0),
+                              Point(1.0, 0.0, 6.0, 2.0),
+                              Point(1.0, 1.0, 6.0, 2.0)));
   BOOST_CHECK(geomZM.is3D());
   BOOST_CHECK(geomZM.isMeasured());
   BOOST_CHECK(geomZM.dropM());
   BOOST_CHECK(geomZM.is3D());
   BOOST_CHECK(!geomZM.isMeasured());
-  BOOST_CHECK_EQUAL(
-                    geomZM.asText(0),
+  BOOST_CHECK_EQUAL(geomZM.asText(0),
                     "GEOMETRYCOLLECTION Z (POINT Z (2 3 5),"
                     "TRIANGLE Z ((0 0 6,1 0 6,1 1 6,0 0 6)))");
   BOOST_CHECK(geomZM.dropZ());
   BOOST_CHECK(!geomZM.is3D());
   BOOST_CHECK(!geomZM.isMeasured());
-  BOOST_CHECK_EQUAL(
-                    geomZM.asText(0),
-                    "GEOMETRYCOLLECTION (POINT (2 3),"
-                    "TRIANGLE ((0 0,1 0,1 1,0 0)))");
+  BOOST_CHECK_EQUAL(geomZM.asText(0), "GEOMETRYCOLLECTION (POINT (2 3),"
+                                      "TRIANGLE ((0 0,1 0,1 1,0 0)))");
   BOOST_CHECK(!geomZM.dropZ());
   BOOST_CHECK(!geomZM.dropM());
 }
@@ -251,7 +252,8 @@ BOOST_AUTO_TEST_CASE(testSwapXY)
 
   GeometryCollection geom2D;
   geom2D.addGeometry(Point(2.0, 3.0));
-  geom2D.addGeometry(Triangle(Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0)));
+  geom2D.addGeometry(
+      Triangle(Point(0.0, 0.0), Point(1.0, 0.0), Point(1.0, 1.0)));
   geom2D.swapXY();
   BOOST_CHECK_EQUAL(geom2D.asText(1),
                     "GEOMETRYCOLLECTION "
@@ -260,26 +262,32 @@ BOOST_AUTO_TEST_CASE(testSwapXY)
 
   GeometryCollection geom3D;
   geom3D.addGeometry(Point(2.0, 3.0, 5.0));
-  geom3D.addGeometry(Triangle(Point(0.0, 0.0, 6.0), Point(1.0, 0.0, 6.0), Point(1.0, 1.0, 6.0)));
+  geom3D.addGeometry(Triangle(Point(0.0, 0.0, 6.0), Point(1.0, 0.0, 6.0),
+                              Point(1.0, 1.0, 6.0)));
   geom3D.swapXY();
-  BOOST_CHECK_EQUAL(geom3D.asText(1),
-                    "GEOMETRYCOLLECTION Z "
-                    "(POINT Z (3.0 2.0 5.0),"
-                    "TRIANGLE Z ((0.0 0.0 6.0,0.0 1.0 6.0,1.0 1.0 6.0,0.0 0.0 6.0)))");
+  BOOST_CHECK_EQUAL(
+      geom3D.asText(1),
+      "GEOMETRYCOLLECTION Z "
+      "(POINT Z (3.0 2.0 5.0),"
+      "TRIANGLE Z ((0.0 0.0 6.0,0.0 1.0 6.0,1.0 1.0 6.0,0.0 0.0 6.0)))");
 
   GeometryCollection geomM;
   geomM.addGeometry(io::readWkt("POINT M (2 3 4)").release());
-  geomM.addGeometry(io::readWkt("TRIANGLE M ((0 0 1, 5 5 5, 0 5 2, 0 0 1))").release());
+  geomM.addGeometry(
+      io::readWkt("TRIANGLE M ((0 0 1, 5 5 5, 0 5 2, 0 0 1))").release());
   BOOST_REQUIRE(geomM.is<GeometryCollection>());
   geomM.swapXY();
-  BOOST_CHECK_EQUAL(geomM.asText(1),
-                    "GEOMETRYCOLLECTION M "
-                    "(POINT M (3.0 2.0 4.0),"
-                    "TRIANGLE M ((0.0 0.0 1.0,5.0 5.0 5.0,5.0 0.0 2.0,0.0 0.0 1.0)))");
+  BOOST_CHECK_EQUAL(
+      geomM.asText(1),
+      "GEOMETRYCOLLECTION M "
+      "(POINT M (3.0 2.0 4.0),"
+      "TRIANGLE M ((0.0 0.0 1.0,5.0 5.0 5.0,5.0 0.0 2.0,0.0 0.0 1.0)))");
 
   GeometryCollection geomZM;
   geomZM.addGeometry(Point(2.0, 3.0, 5.0, 4.0));
-  geomZM.addGeometry(Triangle(Point(0.0, 0.0, 6.0, 2.0), Point(1.0, 0.0, 6.0, 2.0), Point(1.0, 1.0, 6.0, 2.0)));
+  geomZM.addGeometry(Triangle(Point(0.0, 0.0, 6.0, 2.0),
+                              Point(1.0, 0.0, 6.0, 2.0),
+                              Point(1.0, 1.0, 6.0, 2.0)));
   geomZM.swapXY();
   BOOST_CHECK_EQUAL(geomZM.asText(0),
                     "GEOMETRYCOLLECTION ZM "
