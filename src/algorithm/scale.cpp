@@ -1,9 +1,9 @@
 // scale.cpp
+#include "SFCGAL/algorithm/scale.h"
+#include "SFCGAL/detail/transform/AffineTransform2.h"
+#include "SFCGAL/detail/transform/AffineTransform3.h"
 #include <CGAL/Aff_transformation_2.h>
 #include <CGAL/Aff_transformation_3.h>
-#include <SFCGAL/algorithm/scale.h>
-#include <SFCGAL/detail/transform/AffineTransform2.h>
-#include <SFCGAL/detail/transform/AffineTransform3.h>
 
 namespace SFCGAL::algorithm {
 

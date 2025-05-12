@@ -2,8 +2,8 @@
 #ifndef SFCGAL_ALGORITHM_SCALE_H
 #define SFCGAL_ALGORITHM_SCALE_H
 
-#include <SFCGAL/Geometry.h>
-#include <SFCGAL/config.h>
+#include "SFCGAL/Geometry.h"
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 namespace algorithm {

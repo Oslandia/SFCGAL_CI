@@ -3,7 +3,7 @@
 #ifndef SFCGAL_IO_VTK_H_
 #define SFCGAL_IO_VTK_H_
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 #include <ostream>
 #include <string>
 
