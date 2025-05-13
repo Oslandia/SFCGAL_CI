@@ -3,276 +3,406 @@
  */
 
 #include "io.h"
+#include "util.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
+#include <errno.h>
 
-#define BUFFER_SIZE 8192
+#define INITIAL_BUFFER_SIZE 8192
+
+// WKT Geometry type prefixes
+static const char* const WKT_PREFIXES[] = {
+    "POINT", "LINESTRING", "POLYGON", "MULTIPOINT", "MULTILINESTRING",
+    "MULTIPOLYGON", "GEOMETRYCOLLECTION", "TRIANGLE", "POLYHEDRALSURFACE",
+    "TIN", "SOLID", "MULTISOLID"
+};
+
+static const size_t WKT_PREFIXES_COUNT = sizeof(WKT_PREFIXES) / sizeof(WKT_PREFIXES[0]);
 
 /**
- * Check if a string starts with "POINT", "LINESTRING", etc.
+ * Check if a string starts with any WKT geometry type
+ * 
+ * @param str String to check
+ * @return true if it's a WKT string, false otherwise
  */
 static bool is_wkt(const char* str) {
-    const char* wkt_types[] = {
-        "POINT", "LINESTRING", "POLYGON", "MULTIPOINT", "MULTILINESTRING",
-        "MULTIPOLYGON", "GEOMETRYCOLLECTION", "TRIANGLE", "POLYHEDRALSURFACE",
-        "TIN", "SOLID", "MULTISOLID"
-    };
+    if (!str) {
+        return false;
+    }
     
-    int n_types = sizeof(wkt_types) / sizeof(wkt_types[0]);
-    while (*str && (isspace((unsigned char)*str) || !isprint((unsigned char)*str))) 
+    // Skip leading whitespace
+    while (*str && isspace((unsigned char)*str)) {
         str++;
-
-    for (int i = 0; i < n_types; i++) {
-        if (strncasecmp(str, wkt_types[i], strlen(wkt_types[i])) == 0) {
+    }
+    
+    // Check each geometry type prefix
+    for (size_t i = 0; i < WKT_PREFIXES_COUNT; i++) {
+        if (strncasecmp(str, WKT_PREFIXES[i], strlen(WKT_PREFIXES[i])) == 0) {
             return true;
         }
     }
+    
     return false;
 }
 
 /**
  * Check if a string is a hexadecimal representation of WKB
+ * 
+ * @param str String to check
+ * @return true if it's a hex WKB string, false otherwise
  */
 static bool is_hex_wkb(const char* str) {
-    // Skip leading whitespace
-    while (isspace((unsigned char)*str)) str++;
+    if (!str) {
+        return false;
+    }
     
-    // Check if string contains only hex characters
+    // Skip leading whitespace
+    while (*str && isspace((unsigned char)*str)) {
+        str++;
+    }
+    
+    // Empty string is not valid hex WKB
+    if (*str == '\0') {
+        return false;
+    }
+    
+    // Check if string contains only hex characters and whitespace
+    bool has_hex = false;
     while (*str) {
-        if (!isxdigit((unsigned char)*str) && !isspace((unsigned char)*str)) {
+        if (isxdigit((unsigned char)*str)) {
+            has_hex = true;
+        } else if (!isspace((unsigned char)*str)) {
             return false;
         }
         str++;
     }
     
-    return true;
+    return has_hex;
+}
+
+/**
+ * Remove whitespace from a string in-place
+ * 
+ * @param str String to clean
+ */
+static void remove_whitespace(char* str) {
+    if (!str) {
+        return;
+    }
+    
+    size_t i = 0, j = 0;
+    while (str[j]) {
+        if (!isspace((unsigned char)str[j])) {
+            str[i++] = str[j];
+        }
+        j++;
+    }
+    str[i] = '\0';
 }
 
 /**
  * Load a geometry from a WKT string
+ * 
+ * @param wkt WKT string
+ * @param geometry Pointer to store the loaded geometry
+ * @return true on success, false on failure
  */
-static int load_from_wkt(const char* wkt, sfcgal_geometry_t** geometry) {
+static bool load_from_wkt(const char* wkt, sfcgal_geometry_t** geometry) {
+    if (!wkt || !geometry) {
+        return false;
+    }
+    
     *geometry = sfcgal_io_read_wkt(wkt, strlen(wkt));
-    return (*geometry == NULL) ? -1 : 0;
+    return (*geometry != NULL);
 }
 
 /**
- * Load a geometry from a WKB string (hex)
+ * Load a geometry from a WKB hex string
+ * 
+ * @param hex_wkb WKB hex string
+ * @param geometry Pointer to store the loaded geometry
+ * @return true on success, false on failure
  */
-static int load_from_hex_wkb(const char* hex_wkb, sfcgal_geometry_t** geometry) {
-    // Skip whitespace for accurate reading
-    char* cleaned_hex = strdup(hex_wkb);
+static bool load_from_hex_wkb(const char* hex_wkb, sfcgal_geometry_t** geometry) {
+    if (!hex_wkb || !geometry) {
+        return false;
+    }
+    
+    // Copy the string so we can modify it
+    char* cleaned_hex = safe_strdup(hex_wkb);
     if (!cleaned_hex) {
-        return -1;
+        return false;
     }
     
-    // Remove whitespace from hex string
-    size_t i = 0, j = 0;
-    while (hex_wkb[j]) {
-        if (!isspace((unsigned char)hex_wkb[j])) {
-            cleaned_hex[i++] = hex_wkb[j];
-        }
-        j++;
-    }
-    cleaned_hex[i] = '\0';
+    // Remove whitespace
+    remove_whitespace(cleaned_hex);
     
-    // Now we can read the WKB directly using SFCGAL's function
+    // Load the geometry
     *geometry = sfcgal_io_read_wkb(cleaned_hex, strlen(cleaned_hex));
     
     free(cleaned_hex);
-    return (*geometry == NULL) ? -1 : 0;
+    return (*geometry != NULL);
 }
 
 /**
- * Load a geometry from a file containing WKT
+ * Safely grow a buffer to accommodate more data
+ * 
+ * @param buffer Pointer to buffer pointer
+ * @param current_size Current buffer size
+ * @param required_size Required buffer size
+ * @return true if buffer was successfully grown, false on failure
  */
-static int load_from_file_wkt(const char* filename, sfcgal_geometry_t** geometry) {
-    FILE* file = fopen(filename, "r");
-    if (!file) {
-        return -1;
+static bool grow_buffer(void** buffer, size_t* current_size, size_t required_size) {
+    if (!buffer || !current_size || *current_size >= required_size) {
+        return false;
     }
     
-    // Read file content into buffer
-    char* buffer = (char*) malloc(BUFFER_SIZE);
-    if (!buffer) {
-        fclose(file);
-        return -1;
+    // Calculate new size (double the current size)
+    size_t new_size = *current_size * 2;
+    
+    // Ensure new size is at least as large as required
+    if (new_size < required_size) {
+        new_size = required_size;
     }
     
-    size_t buffer_size = BUFFER_SIZE;
-    size_t total_read = 0;
-    size_t bytes_read;
-    
-    // Read the entire file, potentially growing the buffer
-    while ((bytes_read = fread(buffer + total_read, 1, buffer_size - total_read - 1, file)) > 0) {
-        total_read += bytes_read;
-        
-        // Check if we need to grow the buffer
-        if (total_read >= buffer_size - 1) {
-            buffer_size *= 2;
-            char* new_buffer = (char*) realloc(buffer, buffer_size);
-            if (!new_buffer) {
-                free(buffer);
-                fclose(file);
-                return -1;
-            }
-            buffer = new_buffer;
-        }
+    // Reallocate buffer
+    void* new_buffer = realloc(*buffer, new_size);
+    if (!new_buffer) {
+        return false;
     }
     
-    buffer[total_read] = '\0';
-    fclose(file);
-    
-    // Now process the buffer to remove \r and \n characters
-    size_t write_pos = 0;
-    for (size_t read_pos = 0; read_pos < total_read; read_pos++) {
-        if (buffer[read_pos] != '\r' && buffer[read_pos] != '\n') {
-            buffer[write_pos++] = buffer[read_pos];
-        }
-    }
-    buffer[write_pos] = '\0';
-    
-    // Now try to parse the WKT
-    int result = -1;
-    if( is_wkt(buffer)) {
-        result = load_from_wkt(buffer, geometry);
-    }
-    free(buffer);
-    
-    return result;
+    *buffer = new_buffer;
+    *current_size = new_size;
+    return true;
 }
 
 /**
- * Load a geometry from a file containing WKB (binary)
+ * Load contents from a file into a buffer
+ * 
+ * @param filename Path to file
+ * @param buffer Pointer to store the buffer
+ * @param size Pointer to store the buffer size
+ * @return true on success, false on failure
  */
-static int load_from_file_wkb(const char* filename, sfcgal_geometry_t** geometry) {
+static bool load_file_contents(const char* filename, void** buffer, size_t* size) {
+    if (!filename || !buffer || !size) {
+        return false;
+    }
+    
     FILE* file = fopen(filename, "rb");
     if (!file) {
-        return -1;
+        fprintf(stderr, "Error opening file '%s': %s\n", filename, strerror(errno));
+        return false;
     }
     
     // Get file size
     if (fseek(file, 0, SEEK_END) != 0) {
         fclose(file);
-        return -1;
+        return false;
     }
     
-    long file_size_long = ftell(file);
-    if (file_size_long < 0) {
+    long file_size = ftell(file);
+    if (file_size < 0) {
         fclose(file);
-        return -1;
+        return false;
     }
     
     if (fseek(file, 0, SEEK_SET) != 0) {
         fclose(file);
-        return -1;
+        return false;
     }
     
-    // Safe conversion from long to size_t
-    size_t file_size = (size_t)file_size_long;
-    
-    // Allocate buffer with explicit cast
-    unsigned char* buffer = (unsigned char*)malloc(file_size);
-    if (!buffer) {
+    // Allocate buffer
+    *buffer = malloc((size_t)file_size + 1);  // +1 for null terminator
+    if (!*buffer) {
         fclose(file);
-        return -1;
+        return false;
     }
     
-    size_t bytes_read = fread(buffer, 1, file_size, file);
+    // Read file contents
+    size_t bytes_read = fread(*buffer, 1, (size_t)file_size, file);
     fclose(file);
     
-    // Use SFCGAL's function to read WKB directly from binary
-    *geometry = sfcgal_io_read_wkb((const char*)buffer, bytes_read);
+    if (bytes_read != (size_t)file_size) {
+        free(*buffer);
+        *buffer = NULL;
+        return false;
+    }
+    
+    // Null-terminate buffer
+    ((char*)*buffer)[bytes_read] = '\0';
+    *size = bytes_read;
+    
+    return true;
+}
+
+/**
+ * Load a geometry from a file containing WKT
+ * 
+ * @param filename Path to file
+ * @param geometry Pointer to store the loaded geometry
+ * @return true on success, false on failure
+ */
+static bool load_from_file_wkt(const char* filename, sfcgal_geometry_t** geometry) {
+    if (!filename || !geometry) {
+        return false;
+    }
+    
+    char* buffer = NULL;
+    size_t size = 0;
+    
+    if (!load_file_contents(filename, (void**)&buffer, &size)) {
+        return false;
+    }
+    
+    // Remove linebreaks to make WKT parsing more robust
+    for (size_t i = 0; i < size; i++) {
+        if (buffer[i] == '\r' || buffer[i] == '\n') {
+            buffer[i] = ' ';
+        }
+    }
+    
+    // Load geometry from WKT
+    bool success = is_wkt(buffer) && load_from_wkt(buffer, geometry);
     
     free(buffer);
-    return (*geometry == NULL) ? -1 : 0;
+    return success;
+}
+
+/**
+ * Load a geometry from a file containing WKB (binary)
+ * 
+ * @param filename Path to file
+ * @param geometry Pointer to store the loaded geometry
+ * @return true on success, false on failure
+ */
+static bool load_from_file_wkb(const char* filename, sfcgal_geometry_t** geometry) {
+    if (!filename || !geometry) {
+        return false;
+    }
+    
+    void* buffer = NULL;
+    size_t size = 0;
+    
+    if (!load_file_contents(filename, &buffer, &size)) {
+        return false;
+    }
+    
+    // Load geometry from WKB
+    *geometry = sfcgal_io_read_wkb((const char*)buffer, size);
+    
+    free(buffer);
+    return (*geometry != NULL);
+}
+
+/**
+ * Load content from stdin into a buffer
+ * 
+ * @param buffer Pointer to store the buffer
+ * @param size Pointer to store the buffer size
+ * @param binary Whether to read in binary mode
+ * @return true on success, false on failure
+ */
+static bool load_stdin_contents(void** buffer, size_t* size, bool binary) {
+    if (!buffer || !size) {
+        return false;
+    }
+    
+    size_t buffer_size = INITIAL_BUFFER_SIZE;
+    *buffer = malloc(buffer_size);
+    if (!*buffer) {
+        return false;
+    }
+    
+    size_t bytes_read = 0;
+    int c;
+    
+    // Read input until EOF
+    while ((c = getchar()) != EOF) {
+        // Check if buffer needs to grow
+        if (bytes_read >= buffer_size - 1) {
+            if (!grow_buffer(buffer, &buffer_size, bytes_read + 2)) {
+                free(*buffer);
+                *buffer = NULL;
+                return false;
+            }
+        }
+        
+        ((char*)*buffer)[bytes_read++] = (char)c;
+    }
+    
+    if (!binary) {
+        // Null-terminate for text mode
+        ((char*)*buffer)[bytes_read] = '\0';
+    }
+    
+    *size = bytes_read;
+    return true;
 }
 
 /**
  * Load a geometry from stdin (WKT)
+ * 
+ * @param geometry Pointer to store the loaded geometry
+ * @return true on success, false on failure
  */
-static int load_from_stdin_wkt(sfcgal_geometry_t** geometry) {
-    // Allocate initial buffer
-    size_t buffer_size = BUFFER_SIZE;
-    char* buffer = (char*) malloc(buffer_size);
-    if (!buffer) {
-        return -1;
+static bool load_from_stdin_wkt(sfcgal_geometry_t** geometry) {
+    if (!geometry) {
+        return false;
     }
     
-    size_t bytes_read = 0;
-    int c;
+    char* buffer = NULL;
+    size_t size = 0;
     
-    // Read input until EOF
-    while ((c = getchar()) != EOF) {
-        // Resize buffer if necessary
-        if (bytes_read >= buffer_size - 1) {
-            buffer_size *= 2;
-            char* new_buffer = (char*) realloc(buffer, buffer_size);
-            if (!new_buffer) {
-                free(buffer);
-                return -1;
-            }
-            buffer = new_buffer;
-        }
-        
-        buffer[bytes_read++] = (char)c;
+    if (!load_stdin_contents((void**)&buffer, &size, false)) {
+        return false;
     }
     
-    // Null-terminate the buffer
-    buffer[bytes_read] = '\0';
+    // Load geometry from WKT
+    bool success = load_from_wkt(buffer, geometry);
     
-    int result = load_from_wkt(buffer, geometry);
     free(buffer);
-    
-    return result;
+    return success;
 }
 
 /**
  * Load a geometry from stdin (WKB binary)
+ * 
+ * @param geometry Pointer to store the loaded geometry
+ * @return true on success, false on failure
  */
-static int load_from_stdin_wkb(sfcgal_geometry_t** geometry) {
-    // Allocate initial buffer
-    size_t buffer_size = BUFFER_SIZE;
-    unsigned char* buffer = (unsigned char*) malloc(buffer_size);
-    if (!buffer) {
-        return -1;
+static bool load_from_stdin_wkb(sfcgal_geometry_t** geometry) {
+    if (!geometry) {
+        return false;
     }
     
-    size_t bytes_read = 0;
-    int c;
+    void* buffer = NULL;
+    size_t size = 0;
     
-    // Read input until EOF
-    while ((c = getchar()) != EOF) {
-        // Resize buffer if necessary
-        if (bytes_read >= buffer_size) {
-            buffer_size *= 2;
-            unsigned char* new_buffer = (unsigned char*) realloc(buffer, buffer_size);
-            if (!new_buffer) {
-                free(buffer);
-                return -1;
-            }
-            buffer = new_buffer;
-        }
-        
-        buffer[bytes_read++] = (unsigned char)c;
+    if (!load_stdin_contents(&buffer, &size, true)) {
+        return false;
     }
     
-    // Use SFCGAL's function to read WKB directly
-    *geometry = sfcgal_io_read_wkb((const char*)buffer, bytes_read);
+    // Load geometry from WKB
+    *geometry = sfcgal_io_read_wkb((const char*)buffer, size);
     
     free(buffer);
-    return (*geometry == NULL) ? -1 : 0;
+    return (*geometry != NULL);
 }
 
 /**
  * Load a geometry from a source
  */
-int load_geometry(const char* source, sfcgal_geometry_t** geometry) {
+bool load_geometry(const char* source, sfcgal_geometry_t** geometry) {
     if (!source || !geometry) {
-        return -1;
+        return false;
     }
+    
+    // Initialize output parameter
+    *geometry = NULL;
     
     // Check if source is a WKT string
     if (is_wkt(source)) {
@@ -294,132 +424,195 @@ int load_geometry(const char* source, sfcgal_geometry_t** geometry) {
         return load_from_stdin_wkb(geometry);
     }
     
-    // Try to load from file
-    // First try as WKT
-    if (load_from_file_wkt(source, geometry) == 0) {
-        return 0;
+    // Try to load from file (first as WKT, then as WKB)
+    if (load_from_file_wkt(source, geometry)) {
+        return true;
     }
     
-    // Then try as WKB
     return load_from_file_wkb(source, geometry);
 }
 
 /**
  * Output a geometry as WKT
+ * 
+ * @param geometry Geometry to output
+ * @param precision Precision for floating-point coordinates
+ * @return true on success, false on failure
  */
-static void output_as_wkt(const sfcgal_geometry_t* geometry, int precision) {
-    char* wkt;
-    size_t len;
+static bool output_as_wkt(const sfcgal_geometry_t* geometry, int precision) {
+    if (!geometry) {
+        return false;
+    }
+    
+    char* wkt = NULL;
+    size_t len = 0;
     
     sfcgal_geometry_as_text_decim(geometry, precision, &wkt, &len);
     
-    if (wkt) {
-        printf("%s\n", wkt);
-        sfcgal_free_buffer(wkt);
+    if (!wkt) {
+        return false;
     }
+    
+    printf("%s\n", wkt);
+    sfcgal_free_buffer(wkt);
+    
+    return true;
 }
 
 /**
  * Output a geometry as WKB (hex)
+ * 
+ * @param geometry Geometry to output
+ * @return true on success, false on failure
  */
-static void output_as_wkb(const sfcgal_geometry_t* geometry) {
-    char* wkb;
-    size_t len;
+static bool output_as_wkb(const sfcgal_geometry_t* geometry) {
+    if (!geometry) {
+        return false;
+    }
+    
+    char* wkb = NULL;
+    size_t len = 0;
     
     sfcgal_geometry_as_hexwkb(geometry, &wkb, &len);
     
-    if (wkb) {
-        printf("%s\n", wkb);
-        sfcgal_free_buffer(wkb);
+    if (!wkb) {
+        return false;
     }
+    
+    printf("%s\n", wkb);
+    sfcgal_free_buffer(wkb);
+    
+    return true;
 }
 
 /**
  * Output a geometry as plain text
+ * 
+ * @param geometry Geometry to output
+ * @param precision Precision for floating-point coordinates
+ * @return true on success, false on failure
  */
-static void output_as_txt(const sfcgal_geometry_t* geometry, int precision) {
-    char* wkt;
-    size_t len;
-    
-    sfcgal_geometry_as_text_decim(geometry, precision, &wkt, &len);
-    
-    if (wkt) {
-        printf("%s\n", wkt);
-        sfcgal_free_buffer(wkt);
+static bool output_as_txt(const sfcgal_geometry_t* geometry, int precision) {
+    // For now, this is the same as WKT
+    return output_as_wkt(geometry, precision);
+}
+
+/**
+ * Get GeoJSON type string for a WKT type
+ * 
+ * @param wkt_type WKT geometry type string
+ * @return GeoJSON type string
+ */
+static const char* get_geojson_type(const char* wkt_type) {
+    if (!wkt_type) {
+        return "Unknown";
     }
+    
+    struct {
+        const char* wkt_prefix;
+        const char* json_type;
+    } type_map[] = {
+        {"POINT", "Point"},
+        {"LINESTRING", "LineString"},
+        {"POLYGON", "Polygon"},
+        {"MULTIPOINT", "MultiPoint"},
+        {"MULTILINESTRING", "MultiLineString"},
+        {"MULTIPOLYGON", "MultiPolygon"},
+        {"GEOMETRYCOLLECTION", "GeometryCollection"},
+        {NULL, "Unknown"}
+    };
+    
+    for (int i = 0; type_map[i].wkt_prefix != NULL; i++) {
+        if (strncasecmp(wkt_type, type_map[i].wkt_prefix, strlen(type_map[i].wkt_prefix)) == 0) {
+            return type_map[i].json_type;
+        }
+    }
+    
+    return "Unknown";
 }
 
 /**
  * Output a geometry as GeoJSON
+ * 
+ * @param geometry Geometry to output
+ * @param precision Precision for floating-point coordinates
+ * @return true on success, false on failure
  */
-static void output_as_geojson(const sfcgal_geometry_t* geometry, int precision) {
-    char* wkt;
-    size_t len;
+static bool output_as_geojson(const sfcgal_geometry_t* geometry, int precision) {
+    if (!geometry) {
+        return false;
+    }
+    
+    char* wkt = NULL;
+    size_t len = 0;
     
     // Get WKT representation first
     sfcgal_geometry_as_text_decim(geometry, precision, &wkt, &len);
     
     if (!wkt) {
-        return;
+        return false;
     }
     
-    // This is a very basic GeoJSON conversion and doesn't handle all cases properly
-    // For a production implementation, a proper GeoJSON library should be used
+    // This is a basic GeoJSON conversion - for production a proper library should be used
+    const char* geojson_type = get_geojson_type(wkt);
     
     printf("{\n");
     printf("  \"type\": \"Feature\",\n");
     printf("  \"geometry\": {\n");
-    
-    if (strncmp(wkt, "POINT", 5) == 0) {
-        printf("    \"type\": \"Point\",\n");
-    } else if (strncmp(wkt, "LINESTRING", 10) == 0) {
-        printf("    \"type\": \"LineString\",\n");
-    } else if (strncmp(wkt, "POLYGON", 7) == 0) {
-        printf("    \"type\": \"Polygon\",\n");
-    } else if (strncmp(wkt, "MULTIPOINT", 10) == 0) {
-        printf("    \"type\": \"MultiPoint\",\n");
-    } else if (strncmp(wkt, "MULTILINESTRING", 15) == 0) {
-        printf("    \"type\": \"MultiLineString\",\n");
-    } else if (strncmp(wkt, "MULTIPOLYGON", 12) == 0) {
-        printf("    \"type\": \"MultiPolygon\",\n");
-    } else if (strncmp(wkt, "GEOMETRYCOLLECTION", 18) == 0) {
-        printf("    \"type\": \"GeometryCollection\",\n");
-    } else {
-        printf("    \"type\": \"Unknown\",\n");
-    }
+    printf("    \"type\": \"%s\",\n", geojson_type);
     
     // For a proper implementation, we would need to parse the WKT and convert it to GeoJSON coordinates
-    printf("    \"coordinates\": \"WKT conversion not fully implemented\"\n");
+    printf("    \"coordinates\": \"Detailed coordinates conversion not implemented\"\n");
     printf("  },\n");
     printf("  \"properties\": {}\n");
     printf("}\n");
     
     sfcgal_free_buffer(wkt);
+    return true;
 }
 
 /**
  * Output a geometry in the specified format
  */
-void output_geometry(const sfcgal_geometry_t* geometry, OutputFormat format, int precision) {
-    if (!geometry) {
-        return;
+bool output_geometry(const sfcgal_geometry_t* geometry, OutputFormat format, int precision) {
+    if (!geometry || precision < 0) {
+        return false;
     }
     
     switch (format) {
         case FORMAT_WKT:
-            output_as_wkt(geometry, precision);
-            break;
+            return output_as_wkt(geometry, precision);
         case FORMAT_WKB:
-            output_as_wkb(geometry);
-            break;
+            return output_as_wkb(geometry);
         case FORMAT_TXT:
-            output_as_txt(geometry, precision);
-            break;
+            return output_as_txt(geometry, precision);
         case FORMAT_GEOJSON:
-            output_as_geojson(geometry, precision);
-            break;
+            return output_as_geojson(geometry, precision);
         default:
             fprintf(stderr, "Unknown output format\n");
-            break;
+            return false;
     }
+}
+
+/**
+ * Convert string to output format
+ */
+bool parse_output_format(const char* format_str, OutputFormat* format) {
+    if (!format_str || !format) {
+        return false;
+    }
+    
+    if (strcasecmp(format_str, "wkt") == 0) {
+        *format = FORMAT_WKT;
+    } else if (strcasecmp(format_str, "wkb") == 0) {
+        *format = FORMAT_WKB;
+    } else if (strcasecmp(format_str, "txt") == 0) {
+        *format = FORMAT_TXT;
+    } else if (strcasecmp(format_str, "geojson") == 0) {
+        *format = FORMAT_GEOJSON;
+    } else {
+        return false;
+    }
+    
+    return true;
 }

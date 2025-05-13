@@ -1,0 +1,69 @@
+/**
+ * operations_validity.c - Implementation of geometry validity operations
+ */
+
+#include "operations_validity.h"
+#include "operations_common.h"
+#include "../util.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+/**
+ * Check if a geometry is valid
+ */
+DEFINE_BOOLEAN_OP_SINGLE(is_valid, sfcgal_geometry_is_valid)
+
+/**
+ * Check if a polygon is planar
+ */
+DEFINE_BOOLEAN_OP_SINGLE(is_planar, sfcgal_geometry_is_planar)
+
+/**
+ * Get detailed information about geometry validity
+ */
+OperationResult op_is_validity_detail(const char* op_arg, sfcgal_geometry_t* geom_a, sfcgal_geometry_t* geom_b) {
+    OperationResult result = {
+        .type = RESULT_TEXT,
+        .error = false
+    };
+    
+    // Ignore op_arg and geom_b
+    (void)op_arg;
+    (void)geom_b;
+    
+    char* reason = NULL;
+    sfcgal_geometry_t* location = NULL;
+    
+    int valid = sfcgal_geometry_is_valid_detail(geom_a, &reason, &location);
+    
+    if (valid < 0) {
+        result.error = true;
+        result.error_message = "Error checking validity detail";
+        if (reason) free(reason);
+        if (location) sfcgal_geometry_delete(location);
+        return result;
+    }
+    
+    if (valid == 1) {
+        result.text_result = strdup("Geometry is valid");
+    } else {
+        if (reason != NULL) {
+            char* full_message = malloc(strlen(reason) + 50);
+            if (full_message) {
+                sprintf(full_message, "Geometry is invalid. Reason: %s", reason);
+                result.text_result = full_message;
+            } else {
+                result.error = true;
+                result.error_message = "Memory allocation failed";
+            }
+            free(reason);
+        } else {
+            result.text_result = strdup("Geometry is invalid. No details available.");
+        }
+    }
+    
+    if (location) sfcgal_geometry_delete(location);
+    
+    return result;
+}
