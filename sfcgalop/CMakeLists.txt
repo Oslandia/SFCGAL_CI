@@ -16,7 +16,19 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # Sources for sfcgalop
 set(SFCGALOP_SOURCES
     main.c
-    operations.c
+    operations/operations.c
+    operations/operations_params.c
+    operations/operations_registry.c
+    operations/operations_validity.c
+    operations/operations_metrics.c
+    operations/operations_construction.c
+    operations/operations_spatial_analysis.c
+    operations/operations_transformation.c
+    operations/operations_skeleton.c
+    operations/operations_tesselation.c
+    operations/operations_alphashapes.c
+    operations/operations_visibility.c
+    operations/operations_coordinate.c
     io.c
     util.c
 )

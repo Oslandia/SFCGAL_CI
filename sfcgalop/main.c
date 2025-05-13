@@ -1,238 +1,318 @@
 /**
- * SFCGALOP - Command-line tool for SFCGAL operations
+ * main.c - Command-line tool for SFCGAL operations
  * 
  * This utility allows executing SFCGAL geometric operations from the command line.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
 #include <getopt.h>
+#include <errno.h>
+#include <limits.h>
 #include "sfcgal_c.h"
-#include "operations.h"
+#include "operations/operations.h"
 #include "io.h"
 #include "timeus.h"
 #include "util.h"
 
-// Command-line options
-typedef struct {
-    char* sourceA;
-    char* sourceB;
-    OutputFormat format;
-    int precision;
-    bool quiet;
-    bool showTime;
-    bool verbose;
-} Options;
+#define PROGRAM_NAME "sfcgalop"
+#define VERSION "1.0.0"
 
-// Function prototypes
-void printHelp(void);
-void printVersion(void);
-Options parseOptions(int argc, char* argv[]);
-void handleOperation(const char* opName, const char* opArg, Options* options);
-bool operationRequiresArg(const char* opName);
+/**
+ * Command-line options structure
+ */
+typedef struct {
+    char* source_a;        // Source for A geometries
+    char* source_b;        // Source for B geometries (optional)
+    OutputFormat format;   // Output format
+    int precision;         // Decimal precision for output
+    bool quiet;            // Suppress result output
+    bool show_time;        // Show execution time
+    bool verbose;          // Enable verbose output
+    bool help_requested;   // Help was requested
+    bool version_requested;// Version info was requested
+    char* operation;       // Operation name
+    char* op_arg;          // Operation argument
+} Options;
 
 /**
  * Print help information
  */
-void printHelp(void) {
+static void print_help(void) {
+    printf("Usage: %s [OPTION...] operation [operation_arg]\n\n", PROGRAM_NAME);
     printf("SFCGALOP - Command-line tool for SFCGAL operations\n\n");
-    printf("Usage: sfcgalop [OPTION...] opName [opArg]\n");
-    printf("  -a arg               source for A geometries (WKT, WKB, file, stdin, stdin.wkb)\n");
-    printf("  -b arg               source for B geometries (WKT, WKB, file, stdin, stdin.wkb)\n");
-    printf("  -f, --format arg     Output format (wkt, wkb, txt or geojson)\n");
-    printf("  -p, --precision arg  Set number of decimal places in output coordinates\n");
-    printf("  -q, --quiet          Disable result output\n");
-    printf("  -t, --time           Print execution time\n");
-    printf("  -v, --verbose        Verbose output\n");
-    printf("  -h, --help           Print help\n");
-    printf("\nSupported operations:\n");
+    printf("Options:\n");
+    printf("  -a, --geom-a=ARG        Source for A geometries (WKT, WKB, file, stdin, stdin.wkb)\n");
+    printf("  -b, --geom-b=ARG        Source for B geometries (WKT, WKB, file, stdin, stdin.wkb)\n");
+    printf("  -f, --format=ARG        Output format (wkt, wkb, txt, geojson)\n");
+    printf("  -p, --precision=N       Set number of decimal places in output coordinates\n");
+    printf("  -q, --quiet             Disable result output\n");
+    printf("  -t, --time              Print execution time\n");
+    printf("  -v, --verbose           Verbose output\n");
+    printf("  -h, --help              Print help\n");
+    printf("  -V, --version           Print version information\n");
+    printf("      --help-op=OPERATION Print help for specific operation\n");
+    printf("\nAvailable operations:\n");
     print_available_operations();
+    printf("\nExamples:\n");
+    printf("  %s -a \"POINT(0 0)\" -b \"POINT(1 1)\" distance\n", PROGRAM_NAME);
+    printf("  %s -a \"POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))\" area\n", PROGRAM_NAME);
+    printf("  %s -a \"POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))\" offset_polygon radius=5\n", PROGRAM_NAME);
+    printf("  %s -a input.wkt -f geojson convexhull\n", PROGRAM_NAME);
+    printf("\nOperation arguments can be specified positionally or by name (name=value).\n");
+    printf("For example: offset_polygon radius=5 or offset_polygon 5\n");
 }
 
 /**
  * Print version information
  */
-void printVersion(void) {
+static void print_version(void) {
+    printf("%s version %s\n", PROGRAM_NAME, VERSION);
     printf("SFCGAL version: %s\n", sfcgal_version());
     printf("SFCGAL full version: %s\n", sfcgal_full_version());
 }
 
 /**
- * Parse command-line options
+ * Initialize default options
+ * 
+ * @param options Pointer to options structure
  */
-Options parseOptions(int argc, char* argv[]) {
-    Options options = {
-        .sourceA = NULL,
-        .sourceB = NULL,
-        .format = FORMAT_WKT,
-        .precision = 6,
-        .quiet = false,
-        .showTime = false,
-        .verbose = false
-    };
+static void init_options(Options* options) {
+    if (!options) {
+        return;
+    }
+    
+    options->source_a = NULL;
+    options->source_b = NULL;
+    options->format = FORMAT_WKT;
+    options->precision = 6;
+    options->quiet = false;
+    options->show_time = false;
+    options->verbose = false;
+    options->help_requested = false;
+    options->version_requested = false;
+    options->operation = NULL;
+    options->op_arg = NULL;
+}
 
+/**
+ * Parse command-line options
+ * 
+ * @param argc Number of arguments
+ * @param argv Array of argument strings
+ * @param options Pointer to options structure
+ * @return true on success, false on failure
+ */
+static bool parse_options(int argc, char* argv[], Options* options) {
+    if (!argv || !options) {
+        return false;
+    }
+    
+    // Initialize options with defaults
+    init_options(options);
+    
+    // If no arguments, show help
+    if (argc == 1) {
+        options->help_requested = true;
+        return true;
+    }
+    
+    // Long options
     static struct option long_options[] = {
-        {"format", required_argument, 0, 'f'},
+        {"geom-a",    required_argument, 0, 'a'},
+        {"geom-b",    required_argument, 0, 'b'},
+        {"format",    required_argument, 0, 'f'},
         {"precision", required_argument, 0, 'p'},
-        {"quiet", no_argument, 0, 'q'},
-        {"time", no_argument, 0, 't'},
-        {"verbose", no_argument, 0, 'v'},
-        {"help", no_argument, 0, 'h'},
-        {"version", no_argument, 0, 'V'},
+        {"quiet",     no_argument,       0, 'q'},
+        {"time",      no_argument,       0, 't'},
+        {"verbose",   no_argument,       0, 'v'},
+        {"help",      no_argument,       0, 'h'},
+        {"version",   no_argument,       0, 'V'},
+        {"help-op",   required_argument, 0, 'H'},
         {0, 0, 0, 0}
     };
 
     int c;
     int option_index = 0;
+    bool error = false;
 
+    // Process options
     while ((c = getopt_long(argc, argv, "a:b:f:p:qtvhV", long_options, &option_index)) != -1) {
         switch (c) {
             case 'a':
-                options.sourceA = optarg;
+                options->source_a = optarg;
                 break;
             case 'b':
-                options.sourceB = optarg;
+                options->source_b = optarg;
                 break;
             case 'f':
-                if (strcmp(optarg, "wkt") == 0) {
-                    options.format = FORMAT_WKT;
-                } else if (strcmp(optarg, "wkb") == 0) {
-                    options.format = FORMAT_WKB;
-                } else if (strcmp(optarg, "txt") == 0) {
-                    options.format = FORMAT_TXT;
-                } else if (strcmp(optarg, "geojson") == 0) {
-                    options.format = FORMAT_GEOJSON;
-                } else {
+                if (!parse_output_format(optarg, &options->format)) {
                     fprintf(stderr, "Unknown format: %s\n", optarg);
-                    exit(EXIT_FAILURE);
+                    fprintf(stderr, "Valid formats are: wkt, wkb, txt, geojson\n");
+                    error = true;
                 }
                 break;
             case 'p':
-                options.precision = atoi(optarg);
-                if (options.precision < 0) {
-                    fprintf(stderr, "Precision must be non-negative\n");
-                    exit(EXIT_FAILURE);
+                errno = 0;
+                char* endptr;
+                long precision = strtol(optarg, &endptr, 10);
+                
+                if (errno != 0 || *endptr != '\0' || precision < 0 || precision > INT_MAX) {
+                    fprintf(stderr, "Invalid precision: %s\n", optarg);
+                    fprintf(stderr, "Precision must be a non-negative integer\n");
+                    error = true;
+                } else {
+                    options->precision = (int)precision;
                 }
                 break;
             case 'q':
-                options.quiet = true;
+                options->quiet = true;
                 break;
             case 't':
-                options.showTime = true;
+                options->show_time = true;
                 break;
             case 'v':
-                options.verbose = true;
+                options->verbose = true;
                 break;
             case 'h':
-                printHelp();
-                exit(EXIT_SUCCESS);
+                options->help_requested = true;
                 break;
             case 'V':
-                printVersion();
-                exit(EXIT_SUCCESS);
+                options->version_requested = true;
+                break;
+            case 'H':
+                if (print_operation_help(optarg)) {
+                    exit(EXIT_SUCCESS);
+                } else {
+                    exit(EXIT_FAILURE);
+                }
                 break;
             case '?':
                 // getopt_long already printed an error message
-                exit(EXIT_FAILURE);
+                error = true;
                 break;
             default:
-                abort();
+                fprintf(stderr, "Unexpected getopt return value: %d\n", c);
+                error = true;
+                break;
+        }
+        
+        if (error) {
+            break;
         }
     }
-
-    // Ensure we have enough arguments for operation
-    if (optind >= argc) {
-        fprintf(stderr, "Missing required argument: opName\n");
-        exit(EXIT_FAILURE);
-    }
-
-    // If no sourceA is provided, assume stdin
-    if (options.sourceA == NULL) {
-        options.sourceA = "stdin";
-    }
-
-    return options;
-}
-
-/**
- * Check if an operation requires an argument
- */
-bool operationRequiresArg(const char* opName) {
-    const Operation* op = find_operation(opName);
     
-    if (op == NULL) {
-        // Operation not found, assume it doesn't require an argument
+    if (error) {
         return false;
     }
     
-    return op->requires_arg;
+    // Check remaining arguments (operation and optional operation argument)
+    if (optind < argc) {
+        options->operation = argv[optind++];
+        
+        // Check for operation argument
+        if (optind < argc) {
+            options->op_arg = argv[optind++];
+            
+            // Check for unexpected additional arguments
+            if (optind < argc) {
+                fprintf(stderr, "Unexpected extra arguments starting with: %s\n", argv[optind]);
+                return false;
+            }
+        } else if (operation_requires_arg(options->operation)) {
+            // If operation requires an argument but none was provided
+            fprintf(stderr, "Error: Operation '%s' requires arguments\n", options->operation);
+            fprintf(stderr, "Run '%s --help-op=%s' for more information\n", 
+                    PROGRAM_NAME, options->operation);
+            return false;
+        }
+    } else if (!options->help_requested && !options->version_requested) {
+        // No operation provided and not asking for help or version
+        fprintf(stderr, "Missing required argument: operation\n");
+        return false;
+    }
+    
+    // If no source_a is provided, assume stdin
+    if (!options->source_a) {
+        options->source_a = "stdin";
+    }
+    
+    return true;
 }
 
 /**
  * Execute the requested operation with the given options
+ * 
+ * @param options Command-line options
+ * @return true on success, false on failure
  */
-void handleOperation(const char* opName, const char* opArg, Options* options) {
-    double start = 0.0, end = 0.0;
-    double elapsed_time = 0.0;
+static bool handle_operation(const Options* options) {
+    if (!options || !options->operation) {
+        return false;
+    }
     
     if (options->verbose) {
-        printf("Operation: %s\n", opName);
-        if (opArg) {
-            printf("Argument: %s\n", opArg);
+        printf("Operation: %s\n", options->operation);
+        if (options->op_arg) {
+            printf("Arguments: %s\n", options->op_arg);
         }
-        printf("Source A: %s\n", options->sourceA);
-        if (options->sourceB) {
-            printf("Source B: %s\n", options->sourceB);
+        printf("Source A: %s\n", options->source_a);
+        if (options->source_b) {
+            printf("Source B: %s\n", options->source_b);
         }
     }
 
+    double start = 0.0, end = 0.0;
+    
     // Load geometry A
-    sfcgal_geometry_t* geomA = NULL;
-    if (load_geometry(options->sourceA, &geomA) != 0) {
-        fprintf(stderr, "Failed to load geometry A from source: %s\n", options->sourceA);
-        exit(EXIT_FAILURE);
+    sfcgal_geometry_t* geom_a = NULL;
+    if (!load_geometry(options->source_a, &geom_a)) {
+        fprintf(stderr, "Failed to load geometry A from source: %s\n", options->source_a);
+        return false;
     }
 
     // Load geometry B if needed
-    sfcgal_geometry_t* geomB = NULL;
-    if (options->sourceB != NULL) {
-        if (load_geometry(options->sourceB, &geomB) != 0) {
-            fprintf(stderr, "Failed to load geometry B from source: %s\n", options->sourceB);
-            sfcgal_geometry_delete(geomA);
-            exit(EXIT_FAILURE);
+    sfcgal_geometry_t* geom_b = NULL;
+    if (options->source_b) {
+        if (!load_geometry(options->source_b, &geom_b)) {
+            fprintf(stderr, "Failed to load geometry B from source: %s\n", options->source_b);
+            sfcgal_geometry_delete(geom_a);
+            return false;
         }
     }
 
     // Start timing if requested
-    if (options->showTime) {
+    if (options->show_time) {
         start = get_time_us();
     }
 
     // Execute the operation
-    OperationResult result = execute_operation(opName, opArg, geomA, geomB);
+    OperationResult result = execute_operation(options->operation, options->op_arg, geom_a, geom_b);
 
     // End timing if requested
-    if (options->showTime) {
+    if (options->show_time) {
         end = get_time_us();
-        elapsed_time = end - start;
-        printf("Execution time: %.6f microseconds\n", elapsed_time);
+        printf("Execution time: %.6f microseconds\n", end - start);
     }
 
     // Check for operation errors
     if (result.error) {
         fprintf(stderr, "Operation failed: %s\n", result.error_message);
-        sfcgal_geometry_delete(geomA);
-        if (geomB) sfcgal_geometry_delete(geomB);
-        exit(EXIT_FAILURE);
+        sfcgal_geometry_delete(geom_a);
+        if (geom_b) sfcgal_geometry_delete(geom_b);
+        return false;
     }
 
     // Output result if not quiet
     if (!options->quiet) {
         switch (result.type) {
             case RESULT_GEOMETRY:
-                output_geometry(result.geometry_result, options->format, options->precision);
+                if (!output_geometry(result.geometry_result, options->format, options->precision)) {
+                    fprintf(stderr, "Error outputting geometry\n");
+                }
                 break;
             case RESULT_BOOLEAN:
                 printf("%s\n", result.boolean_result ? "true" : "false");
@@ -250,8 +330,8 @@ void handleOperation(const char* opName, const char* opArg, Options* options) {
     }
 
     // Free resources
-    sfcgal_geometry_delete(geomA);
-    if (geomB) sfcgal_geometry_delete(geomB);
+    sfcgal_geometry_delete(geom_a);
+    if (geom_b) sfcgal_geometry_delete(geom_b);
     
     // Free result resources if necessary
     if (result.type == RESULT_GEOMETRY && result.geometry_result) {
@@ -259,6 +339,8 @@ void handleOperation(const char* opName, const char* opArg, Options* options) {
     } else if (result.type == RESULT_TEXT && result.text_result) {
         free((void*)result.text_result);
     }
+    
+    return true;
 }
 
 /**
@@ -268,27 +350,31 @@ int main(int argc, char* argv[]) {
     // Initialize SFCGAL
     sfcgal_init();
     
-    // Parse command-line options
-    Options options = parseOptions(argc, argv);
-    
-    // Get operation name
-    const char* opName = argv[optind];
-    
-    // Get operation argument if provided
-    const char* opArg = NULL;
-    if (optind + 1 < argc) {
-        opArg = argv[optind + 1];
-    } else if (operationRequiresArg(opName)) {
-        // Error if operation requires an argument but none was provided
-        fprintf(stderr, "Error: Operation '%s' requires an argument\n", opName);
-        exit(EXIT_FAILURE);
-    }
-    
-    // Set error handlers
+    // Set up error handlers
     setup_error_handlers();
     
+    // Parse command-line options
+    Options options;
+    if (!parse_options(argc, argv, &options)) {
+        fprintf(stderr, "Try '%s --help' for more information.\n", PROGRAM_NAME);
+        return EXIT_FAILURE;
+    }
+    
+    // Handle special commands
+    if (options.help_requested) {
+        print_help();
+        return EXIT_SUCCESS;
+    }
+    
+    if (options.version_requested) {
+        print_version();
+        return EXIT_SUCCESS;
+    }
+    
     // Execute the operation
-    handleOperation(opName, opArg, &options);
+    if (!handle_operation(&options)) {
+        return EXIT_FAILURE;
+    }
     
     return EXIT_SUCCESS;
 }

@@ -34,6 +34,15 @@ typedef struct {
 } OperationResult;
 
 /**
+ * Parameter structure for operations
+ */
+typedef struct {
+    const char* name;
+    const char* description;
+    double default_value;
+} OperationParam;
+
+/**
  * Operation function typedef
  */
 typedef OperationResult (*OperationFunction)(const char* op_arg, sfcgal_geometry_t* geom_a, sfcgal_geometry_t* geom_b);
@@ -42,13 +51,15 @@ typedef OperationResult (*OperationFunction)(const char* op_arg, sfcgal_geometry
  * Operation structure to map operation names to functions
  */
 typedef struct {
-    const char* name;
-    OperationFunction func;
-    bool requires_geom_b;
-    const char* description;
-    const char* category;    // Category of the operation
-    ResultType result_type;  // Type of result the operation returns
-    bool requires_arg;       // Whether the operation requires an additional argument
+    const char* name;                // Name of the operation
+    OperationFunction func;          // Function pointer for the operation
+    bool requires_geom_b;            // Whether the operation requires a second geometry
+    const char* description;         // Description of the operation
+    const char* category;            // Category of the operation
+    ResultType result_type;          // Type of result the operation returns
+    bool requires_arg;               // Whether the operation requires an additional argument
+    const OperationParam* params;    // Array of parameters
+    int param_count;                 // Number of parameters
 } Operation;
 
 /**
@@ -61,7 +72,7 @@ typedef struct {
  * @return OperationResult structure containing the result
  */
 OperationResult execute_operation(const char* op_name, const char* op_arg, 
-                                 sfcgal_geometry_t* geom_a, sfcgal_geometry_t* geom_b);
+                                  sfcgal_geometry_t* geom_a, sfcgal_geometry_t* geom_b);
 
 /**
  * Find an operation by name
@@ -75,5 +86,21 @@ const Operation* find_operation(const char* name);
  * Print available operations to stdout
  */
 void print_available_operations(void);
+
+/**
+ * Print help for a specific operation
+ * 
+ * @param name Operation name
+ * @return true if the operation was found and help printed, false otherwise
+ */
+bool print_operation_help(const char* name);
+
+/**
+ * Check if an operation requires arguments
+ * 
+ * @param name Operation name
+ * @return true if the operation requires arguments, false otherwise
+ */
+bool operation_requires_arg(const char* name);
 
 #endif /* OPERATIONS_H */
