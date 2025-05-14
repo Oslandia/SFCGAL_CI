@@ -6,7 +6,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 WORKDIR "c:\SFCGAL"
 COPY src ./src
 COPY test ./test
-COPY CMakeLists.txt sfcgal.pc.in sfcgal-config.in ./
+COPY CMakeLists.txt SFCGALConfig.cmake.in sfcgal.pc.in sfcgal-config.in ./
 
 RUN cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
