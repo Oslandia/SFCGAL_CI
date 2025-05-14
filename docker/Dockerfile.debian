@@ -4,7 +4,7 @@ WORKDIR /SFCGAL
 
 COPY src ./src
 COPY test ./test
-COPY CMakeLists.txt sfcgal.pc.in sfcgal-config.in ci/debian/before_install.sh ./
+COPY CMakeLists.txt SFCGALConfig.cmake.in sfcgal.pc.in sfcgal-config.in ci/debian/before_install.sh ./
 
 RUN apt update -qq && \
     apt install --no-install-recommends --yes sudo wget build-essential
