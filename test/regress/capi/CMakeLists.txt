@@ -15,4 +15,3 @@ target_link_libraries( ${REGRESS_NAME}	SFCGAL)
 
 
 set_target_properties( ${REGRESS_NAME} PROPERTIES DEBUG_POSTFIX "d" )
-install( TARGETS ${REGRESS_NAME} DESTINATION bin )

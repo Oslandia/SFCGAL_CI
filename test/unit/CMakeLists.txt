@@ -17,7 +17,6 @@ target_link_libraries( unit-test-SFCGAL SFCGAL)
 target_link_libraries(unit-test-SFCGAL ${CGAL_3RD_PARTY_LIBRARIES} ${Boost_LIBRARIES})
 
 set_target_properties( unit-test-SFCGAL PROPERTIES DEBUG_POSTFIX "d" )
-install( TARGETS unit-test-SFCGAL DESTINATION bin )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" )
     add_test( unit-testd ${CMAKE_CURRENT_BINARY_DIR}/unit-test-SFCGALd --auto_start_dbg=y --log_level=all)
