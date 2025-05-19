@@ -89,8 +89,26 @@ _intersection_solid_segment(const PrimitiveHandle<3> &pa,
         } else {
           output.addPrimitive(interSeg);
         }
-      } else { // !source_inside && !target_inside => intersection on a point
-        output.addPrimitive(inter.points().begin()->primitive());
+      } else { // !source_inside && !target_inside
+        if (inter.points().size() == 1) {
+          // Single intersection point: tangent case
+          output.addPrimitive(inter.points().begin()->primitive());
+        } else if (inter.points().size() >= 2) {
+          // Multiple intersection points: create segment between first two
+          // This is the fix for the main bug
+          auto                  it          = inter.points().begin();
+          CGAL::Point_3<Kernel> first_point = it->primitive();
+          ++it;
+          CGAL::Point_3<Kernel> second_point = it->primitive();
+
+          CGAL::Segment_3<Kernel> const interSeg(first_point, second_point);
+          if (interSeg.source() == interSeg.target()) {
+            output.addPrimitive(first_point);
+          } else {
+            output.addPrimitive(interSeg);
+          }
+        }
+        // If no intersection points, do nothing
       }
     }
 
