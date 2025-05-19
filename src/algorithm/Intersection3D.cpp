@@ -27,17 +27,78 @@ namespace SFCGAL::algorithm {
 /// @{
 /// @privatesection
 
+// Helper function to handle source inside, target outside case
+static void
+handle_source_inside_target_outside(const CGAL::Segment_3<Kernel> *segment,
+                                    const GeometrySet<3> &intersection_points,
+                                    GeometrySet<3>       &output)
+{
+  CGAL::Segment_3<Kernel> const intersectionSegment(
+      segment->source(), intersection_points.points().begin()->primitive());
+
+  if (intersectionSegment.source() == intersectionSegment.target()) {
+    output.addPrimitive(segment->source());
+  } else {
+    output.addPrimitive(intersectionSegment);
+  }
+}
+
+// Helper function to handle source outside, target inside case
+static void
+handle_source_outside_target_inside(const CGAL::Segment_3<Kernel> *segment,
+                                    const GeometrySet<3> &intersection_points,
+                                    GeometrySet<3>       &output)
+{
+  CGAL::Segment_3<Kernel> const intersectionSegment(
+      intersection_points.points().begin()->primitive(), segment->target());
+
+  if (intersectionSegment.source() == intersectionSegment.target()) {
+    output.addPrimitive(segment->target());
+  } else {
+    output.addPrimitive(intersectionSegment);
+  }
+}
+
+// Helper function to handle both source and target outside case
+static void
+handle_both_outside(const GeometrySet<3> &intersection_points,
+                    GeometrySet<3>       &output)
+{
+  if (intersection_points.points().size() == 1) {
+    // Single intersection point: tangent case
+    output.addPrimitive(intersection_points.points().begin()->primitive());
+  } else if (intersection_points.points().size() >= 2) {
+    // Multiple intersection points: create segment between first two
+    // This is the fix for the main bug
+    auto                  iterator    = intersection_points.points().begin();
+    CGAL::Point_3<Kernel> first_point = iterator->primitive();
+    ++iterator;
+    CGAL::Point_3<Kernel> second_point = iterator->primitive();
+
+    CGAL::Segment_3<Kernel> const intersectionSegment(first_point,
+                                                      second_point);
+    // NOLINTBEGIN(bugprone-branch-clone)
+    if (intersectionSegment.source() == intersectionSegment.target()) {
+      output.addPrimitive(first_point);
+    } else {
+      output.addPrimitive(intersectionSegment);
+    } // NOLINTEND(bugprone-branch-clone)
+  }
+  // If no intersection points, do nothing
+}
+
+// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 void
-_intersection_solid_segment(const PrimitiveHandle<3> &pa,
-                            const PrimitiveHandle<3> &pb,
+_intersection_solid_segment(const PrimitiveHandle<3> &polyhedron_handle,
+                            const PrimitiveHandle<3> &segment_handle,
                             GeometrySet<3>           &output)
 {
   // typedef CGAL::Polyhedral_mesh_domain_3<MarkedPolyhedron, Kernel>
   // Mesh_domain;
 
-  const auto *ext_poly = pa.as<MarkedPolyhedron>();
+  const auto *ext_poly = polyhedron_handle.as<MarkedPolyhedron>();
   BOOST_ASSERT(ext_poly->is_closed());
-  const auto *segment = pb.as<CGAL::Segment_3<Kernel>>();
+  const auto *segment = segment_handle.as<CGAL::Segment_3<Kernel>>();
 
   auto *ext_poly_nc = const_cast<MarkedPolyhedron *>(ext_poly);
   CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> const is_in_ext(
@@ -57,89 +118,62 @@ _intersection_solid_segment(const PrimitiveHandle<3> &pa,
 
   if (source_inside && target_inside) {
     // the entire segment intersects the volume, return the segment
-    output.addPrimitive(pb);
+    output.addPrimitive(segment_handle);
   } else {
-    GeometrySet<3> triangles;
-    GeometrySet<3> g;
-    triangulate::triangulate(*ext_poly, triangles);
-    g.addPrimitive(pb);
-    GeometrySet<3> inter;
+    GeometrySet<3> poly_triangles;
+    GeometrySet<3> geometry_set;
+    triangulate::triangulate(*ext_poly, poly_triangles);
+    geometry_set.addPrimitive(segment_handle);
+    GeometrySet<3> intersection_result;
 
     // call recursively on triangulated polyhedron
-    intersection(g, triangles, inter);
+    intersection(geometry_set, poly_triangles, intersection_result);
 
-    if (!inter.points().empty()) {
+    if (!intersection_result.points().empty()) {
       // the intersection is a point, build a segment from that point to the
       // other end
       if (!source_inside && target_inside) {
-        CGAL::Segment_3<Kernel> const interSeg(
-            inter.points().begin()->primitive(), segment->target());
-
-        if (interSeg.source() == interSeg.target()) {
-          output.addPrimitive(segment->target());
-        } else {
-          output.addPrimitive(interSeg);
-        }
+        handle_source_outside_target_inside(segment, intersection_result,
+                                            output);
       } else if (source_inside && !target_inside) {
-        CGAL::Segment_3<Kernel> const interSeg(
-            segment->source(), inter.points().begin()->primitive());
-
-        if (interSeg.source() == interSeg.target()) {
-          output.addPrimitive(segment->source());
-        } else {
-          output.addPrimitive(interSeg);
-        }
+        handle_source_inside_target_outside(segment, intersection_result,
+                                            output);
       } else { // !source_inside && !target_inside
-        if (inter.points().size() == 1) {
-          // Single intersection point: tangent case
-          output.addPrimitive(inter.points().begin()->primitive());
-        } else if (inter.points().size() >= 2) {
-          // Multiple intersection points: create segment between first two
-          // This is the fix for the main bug
-          auto                  it          = inter.points().begin();
-          CGAL::Point_3<Kernel> first_point = it->primitive();
-          ++it;
-          CGAL::Point_3<Kernel> second_point = it->primitive();
-
-          CGAL::Segment_3<Kernel> const interSeg(first_point, second_point);
-          if (interSeg.source() == interSeg.target()) {
-            output.addPrimitive(first_point);
-          } else {
-            output.addPrimitive(interSeg);
-          }
-        }
-        // If no intersection points, do nothing
+        handle_both_outside(intersection_result, output);
       }
     }
 
-    if (!inter.segments().empty()) {
+    if (!intersection_result.segments().empty()) {
       // the intersection is a segment
-      output.addPrimitive(inter.segments().begin()->primitive());
+      output.addPrimitive(intersection_result.segments().begin()->primitive());
     }
   }
 }
+// NOLINTEND(bugprone-easily-swappable-parameters)
 
 using Polyline_3 = std::vector<Kernel::Point_3>;
 
 struct Is_not_marked {
   auto
-  operator()(MarkedPolyhedron::Halfedge_const_handle h) const -> bool
+  operator()(MarkedPolyhedron::Halfedge_const_handle halfedge) const -> bool
   {
-    return !h->mark;
+    return !halfedge->mark;
   }
 };
 
+// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 void
-_intersection_solid_triangle(const MarkedPolyhedron         &pa,
-                             const CGAL::Triangle_3<Kernel> &tri,
+_intersection_solid_triangle(const MarkedPolyhedron         &polyhedron,
+                             const CGAL::Triangle_3<Kernel> &triangle,
                              GeometrySet<3>                 &output)
 {
-  BOOST_ASSERT(pa.is_closed());
+  BOOST_ASSERT(polyhedron.is_closed());
 
   MarkedPolyhedron polyb;
-  polyb.make_triangle(tri.vertex(0), tri.vertex(1), tri.vertex(2));
+  polyb.make_triangle(triangle.vertex(0), triangle.vertex(1),
+                      triangle.vertex(2));
 
-  MarkedPolyhedron                                            polya = pa;
+  MarkedPolyhedron polya = polyhedron;
   CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> const side_of_tm(polya);
 
   std::list<Polyline_3> polylines;
@@ -149,8 +183,8 @@ _intersection_solid_triangle(const MarkedPolyhedron         &pa,
     // no surface intersection
     // if one of the point of the triangle is inside the polyhedron,
     // the triangle is inside
-    if (side_of_tm(tri.vertex(0)) != CGAL::ON_UNBOUNDED_SIDE) {
-      output.addPrimitive(tri);
+    if (side_of_tm(triangle.vertex(0)) != CGAL::ON_UNBOUNDED_SIDE) {
+      output.addPrimitive(triangle);
     }
     return;
   }
@@ -196,10 +230,12 @@ _intersection_solid_triangle(const MarkedPolyhedron         &pa,
     }
   }
 }
+// NOLINTEND(bugprone-easily-swappable-parameters)
 
 void
-_intersection_solid_solid(const MarkedPolyhedron &pa,
-                          const MarkedPolyhedron &pb, GeometrySet<3> &output)
+_intersection_solid_solid(const MarkedPolyhedron &polyhedron_a,
+                          const MarkedPolyhedron &polyhedron_b,
+                          GeometrySet<3>         &output)
 {
   // 1. find intersections on surfaces
   // CGAL corefinement or polyhedra_intersection do not return polygon
@@ -211,16 +247,16 @@ _intersection_solid_solid(const MarkedPolyhedron &pa,
     GeometrySet<3> gsb;
     // convert polyhedra to geometry sets
     // (no actual triangulation is done if the polyhedra are pure_triangle()
-    triangulate::triangulate(pa, gsa);
-    triangulate::triangulate(pb, gsb);
+    triangulate::triangulate(polyhedron_a, gsa);
+    triangulate::triangulate(polyhedron_b, gsb);
     // "recurse" call on triangles
     algorithm::intersection(gsa, gsb, output);
   }
 
   // 2. find intersections in volumes
   {
-    MarkedPolyhedron polya = pa;
-    MarkedPolyhedron polyb = pb;
+    MarkedPolyhedron polya = polyhedron_a;
+    MarkedPolyhedron polyb = polyhedron_b;
     if (CGAL::Polygon_mesh_processing::corefine_and_compute_intersection(
             polya, polyb, polya)) {
       if (std::next(vertices(polya).first) != vertices(polya).second) {
@@ -239,45 +275,47 @@ _intersection_solid_solid(const MarkedPolyhedron &pa,
 
 /// must be called with pa's dimension larger than pb's
 void
-intersection(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb,
-             GeometrySet<3> &output, dim_t<3> /*unused*/)
+intersection(const PrimitiveHandle<3> &primitive_a,
+             const PrimitiveHandle<3> &primitive_b, GeometrySet<3> &output,
+             dim_t<3> /*unused*/)
 {
   // everything vs a point
-  if (pb.handle.which() == PrimitivePoint) {
-    if (algorithm::intersects(pa, pb)) {
+  if (primitive_b.handle.which() == PrimitivePoint) {
+    if (algorithm::intersects(primitive_a, primitive_b)) {
       output.addPrimitive(
-          *boost::get<const TypeForDimension<3>::Point *>(pb.handle));
+          *boost::get<const TypeForDimension<3>::Point *>(primitive_b.handle));
     }
-  } else if (pa.handle.which() == PrimitiveSegment &&
-             pb.handle.which() == PrimitiveSegment) {
-    const auto        *seg1     = pa.as<CGAL::Segment_3<Kernel>>();
-    const auto        *seg2     = pb.as<CGAL::Segment_3<Kernel>>();
+  } else if (primitive_a.handle.which() == PrimitiveSegment &&
+             primitive_b.handle.which() == PrimitiveSegment) {
+    const auto        *seg1     = primitive_a.as<CGAL::Segment_3<Kernel>>();
+    const auto        *seg2     = primitive_b.as<CGAL::Segment_3<Kernel>>();
     CGAL::Object const interObj = CGAL::intersection(*seg1, *seg2);
     output.addPrimitive(interObj);
-  } else if (pa.handle.which() == PrimitiveSurface) {
-    const auto *tri1 = pa.as<CGAL::Triangle_3<Kernel>>();
+  } else if (primitive_a.handle.which() == PrimitiveSurface) {
+    const auto *tri1 = primitive_a.as<CGAL::Triangle_3<Kernel>>();
 
-    if (pb.handle.which() == PrimitiveSegment) {
-      const auto        *seg2     = pb.as<CGAL::Segment_3<Kernel>>();
+    if (primitive_b.handle.which() == PrimitiveSegment) {
+      const auto        *seg2     = primitive_b.as<CGAL::Segment_3<Kernel>>();
       CGAL::Object const interObj = CGAL::intersection(*tri1, *seg2);
       output.addPrimitive(interObj);
-    } else if (pb.handle.which() == PrimitiveSurface) {
-      const auto        *tri2     = pb.as<CGAL::Triangle_3<Kernel>>();
+    } else if (primitive_b.handle.which() == PrimitiveSurface) {
+      const auto        *tri2     = primitive_b.as<CGAL::Triangle_3<Kernel>>();
       CGAL::Object const interObj = CGAL::intersection(*tri1, *tri2);
       output.addPrimitive(interObj, /* pointsAsRing */ true);
     }
-  } else if (pa.handle.which() == PrimitiveVolume) {
-    if (pb.handle.which() == PrimitiveSegment) {
-      _intersection_solid_segment(pa, pb, output);
-    } else if (pb.handle.which() == PrimitiveSurface) {
-      _intersection_solid_triangle(*pa.as<MarkedPolyhedron>(),
-                                   *pb.as<CGAL::Triangle_3<Kernel>>(), output);
-    } else if (pb.handle.which() == PrimitiveVolume) {
-      const MarkedPolyhedron &sa = *pa.as<MarkedPolyhedron>();
-      const MarkedPolyhedron &sb = *pb.as<MarkedPolyhedron>();
-      BOOST_ASSERT(sa.is_closed());
-      BOOST_ASSERT(sb.is_closed());
-      _intersection_solid_solid(sa, sb, output);
+  } else if (primitive_a.handle.which() == PrimitiveVolume) {
+    if (primitive_b.handle.which() == PrimitiveSegment) {
+      _intersection_solid_segment(primitive_a, primitive_b, output);
+    } else if (primitive_b.handle.which() == PrimitiveSurface) {
+      _intersection_solid_triangle(*primitive_a.as<MarkedPolyhedron>(),
+                                   *primitive_b.as<CGAL::Triangle_3<Kernel>>(),
+                                   output);
+    } else if (primitive_b.handle.which() == PrimitiveVolume) {
+      const MarkedPolyhedron &solid_a = *primitive_a.as<MarkedPolyhedron>();
+      const MarkedPolyhedron &solid_b = *primitive_b.as<MarkedPolyhedron>();
+      BOOST_ASSERT(solid_a.is_closed());
+      BOOST_ASSERT(solid_b.is_closed());
+      _intersection_solid_solid(solid_a, solid_b, output);
     }
   }
 }
