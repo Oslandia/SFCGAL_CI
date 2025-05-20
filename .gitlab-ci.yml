@@ -43,6 +43,7 @@ include:
   - local: /.gitlab/pipeline/clang-tidy.yml
   - local: /.gitlab/pipeline/test-code.yml
   - local: /.gitlab/pipeline/build-debian-docker.yml
+  - local: /.gitlab/pipeline/build-macos.yml
   - local: /.gitlab/pipeline/build-windows.yml
   - local: /.gitlab/pipeline/documentation.yml
   - local: /.gitlab/pipeline/commitizen.yml

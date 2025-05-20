@@ -1,0 +1,34 @@
+build:macos_clang:
+  stage: plateform-build-test
+  tags:
+    - saas-macos-large-m2pro
+  image: macos-15-xcode-16
+  variables:
+    HOMEBREW_NO_AUTO_UPDATE: 1
+    HOMEBREW_NO_INSTALL_UPGRADE: 1
+    HOMEBREW_NO_INSTALL_CLEANUP: 1
+    HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+    SFCGAL_VERSION: "2.1.0"
+  dependencies: []
+  rules:
+    # on default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
+    # on a tag
+    - if: $CI_COMMIT_TAG
+      when: always
+    # on a MR if previous jobs are successful
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+  before_script:
+    - brew install boost cgal cmake gmp mpfr ninja
+  script:
+    - cmake -GNinja -S . -B build -DSFCGAL_BUILD_TESTS=OFF
+    - cmake --build build
+    - mkdir -p ${CI_PROJECT_DIR}/install
+    - cmake --install build --prefix ${CI_PROJECT_DIR}/install
+    - .gitlab/generate-homebrew.sh ${CI_PROJECT_DIR}/install ${SFCGAL_VERSION}
+  artifacts:
+    paths:
+      - sfcgal--latest.arm64_sequoia.bottle.tar.gz
+      - sfcgal-latest.rb
