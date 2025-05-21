@@ -5,13 +5,13 @@
 
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/Solid.h"
-#include "SFCGAL/Sphere.h"
 #include "SFCGAL/algorithm/area.h"
 #include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/minkowskiSum3D.h"
 #include "SFCGAL/algorithm/volume.h"
 #include "SFCGAL/detail/tools/Registry.h"
 #include "SFCGAL/io/wkt.h"
+#include "SFCGAL/primitive3d/Sphere.h"
 
 using namespace SFCGAL;
 using namespace boost::unit_test;

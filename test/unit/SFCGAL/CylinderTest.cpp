@@ -1,4 +1,4 @@
-#include "SFCGAL/Cylinder.h"
+#include "SFCGAL/primitive3d/Cylinder.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/io/wkt.h"
 #include <boost/test/unit_test.hpp>

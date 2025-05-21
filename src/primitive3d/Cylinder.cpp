@@ -1,7 +1,7 @@
 #include <utility>
 
-#include "SFCGAL/Cylinder.h"
 #include "SFCGAL/numeric.h"
+#include "SFCGAL/primitive3d/Cylinder.h"
 
 namespace SFCGAL {
 

@@ -1,4 +1,4 @@
-#include "SFCGAL/Sphere.h"
+#include "SFCGAL/primitive3d/Sphere.h"
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Vector_3.h>
 #include <cmath>

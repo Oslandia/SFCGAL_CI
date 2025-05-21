@@ -4,13 +4,13 @@
 #ifndef SFCGAL_BUFFER3D_ALGORITHM
 #define SFCGAL_BUFFER3D_ALGORITHM
 
-#include "SFCGAL/Cylinder.h"
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/PolyhedralSurface.h"
-#include "SFCGAL/Sphere.h"
 #include "SFCGAL/algorithm/minkowskiSum3D.h"
+#include "SFCGAL/primitive3d/Cylinder.h"
+#include "SFCGAL/primitive3d/Sphere.h"
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>

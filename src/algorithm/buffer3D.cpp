@@ -1,12 +1,12 @@
 #include "SFCGAL/algorithm/buffer3D.h"
-#include "SFCGAL/Cylinder.h"
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/PolyhedralSurface.h"
-#include "SFCGAL/Sphere.h"
 #include "SFCGAL/algorithm/minkowskiSum3D.h"
 #include "SFCGAL/algorithm/union.h"
 #include "SFCGAL/detail/GeometrySet.h"
 #include "SFCGAL/numeric.h"
+#include "SFCGAL/primitive3d/Cylinder.h"
+#include "SFCGAL/primitive3d/Sphere.h"
 #include "SFCGAL/triangulate/triangulatePolygon.h"
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/Polygon_mesh_processing/corefinement.h>

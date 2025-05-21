@@ -1,4 +1,4 @@
-#include "SFCGAL/Sphere.h"
+#include "SFCGAL/primitive3d/Sphere.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/io/wkt.h"
 #include <boost/test/unit_test.hpp>
