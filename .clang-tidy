@@ -2,6 +2,10 @@ Checks: '-*,clang-analyzer-*,cert-*,bugprone-*,-bugprone-easily-swappable-parame
 CheckOptions:
     - key: bugprone-argument-comment.StrictMode
       value: 1
+    - key:   readability-identifier-length.IgnoredVariableNames
+      value: 'x|y|z|m'
+    - key:   readability-identifier-length.IgnoredLoopCounterNames
+      value: 'i|j|k|x|y|z|m'
 FormatStyle: 'file'
 HeaderFileExtensions:         ['', 'h','hpp']
 ImplementationFileExtensions: ['c','cpp']
