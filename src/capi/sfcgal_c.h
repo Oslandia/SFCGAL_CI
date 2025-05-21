@@ -339,6 +339,20 @@ SFCGAL_API void
 sfcgal_geometry_as_obj(const sfcgal_geometry_t *, char **buffer, size_t *len);
 
 /**
+ * Creates a STL string of the given geometry
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_geometry_as_stl(const sfcgal_geometry_t *, char **buffer, size_t *len);
+
+/**
+ * Creates a STL file of the given geometry
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_geometry_as_stl_file(const sfcgal_geometry_t *, const char *filename);
+
+/**
  * Creates an empty point
  * @ingroup capi
  */

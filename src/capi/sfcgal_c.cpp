@@ -22,6 +22,7 @@
 
 #include "SFCGAL/detail/io/Serialization.h"
 #include "SFCGAL/io/OBJ.h"
+#include "SFCGAL/io/STL.h"
 #include "SFCGAL/io/ewkt.h"
 #include "SFCGAL/io/vtk.h"
 #include "SFCGAL/io/wkb.h"
@@ -579,6 +580,25 @@ sfcgal_geometry_as_vtk(const sfcgal_geometry_t *pgeom, char **buffer,
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       std::string obj = SFCGAL::io::VTK::saveToString(
+          *reinterpret_cast<const SFCGAL::Geometry *>(pgeom));
+      alloc_and_copy(obj, buffer, len);)
+}
+
+extern "C" auto
+sfcgal_geometry_as_stl_file(const sfcgal_geometry_t *pgeom,
+                            const char              *filename) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      SFCGAL::io::STL::save(*reinterpret_cast<const SFCGAL::Geometry *>(pgeom),
+                            filename);)
+}
+
+extern "C" auto
+sfcgal_geometry_as_stl(const sfcgal_geometry_t *pgeom, char **buffer,
+                       size_t *len) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      std::string obj = SFCGAL::io::STL::saveToString(
           *reinterpret_cast<const SFCGAL::Geometry *>(pgeom));
       alloc_and_copy(obj, buffer, len);)
 }
