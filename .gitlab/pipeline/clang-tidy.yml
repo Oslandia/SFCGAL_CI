@@ -23,6 +23,7 @@ test:clang-tidy:
       changes:
         - "src/**/*.{c,h,cpp,hpp}"
         - ".clang-tidy"
+        - "test/.clang-tidy"
   artifacts:
     when: on_failure
     paths:
