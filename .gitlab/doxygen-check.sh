@@ -21,7 +21,7 @@ DOT_GRAPH_MAX_NODES = 100
 EOF
 
 echo "changed files"
-CHANGED_FILES=$(git diff-tree --name-only -r $CI_MERGE_REQUEST_DIFF_BASE_SHA $CI_COMMIT_SHA 'src/***.cpp' 'src/***.hpp' 'src/***.c' 'src/***.h')
+CHANGED_FILES=$(git diff-tree --diff-filter=d --name-only -r $CI_MERGE_REQUEST_DIFF_BASE_SHA $CI_COMMIT_SHA 'src/***.cpp' 'src/***.hpp' 'src/***.c' 'src/***.h')
 echo $CHANGED_FILES;
 
 echo "INPUT = "${CHANGED_FILES} >> ${DOXYGEN_CONFIG_FILE}
