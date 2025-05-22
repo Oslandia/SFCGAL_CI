@@ -31,7 +31,7 @@ doc:build:
     when: always
 
 # -- DEPLOYMENT JOBS ------------
-doc:deploy:
+pages:
   stage: doc
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
