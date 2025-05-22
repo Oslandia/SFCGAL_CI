@@ -436,13 +436,47 @@ extrudeStraightSkeleton(const Geometry &g, double building_height,
                         double roof_height)
     -> std::unique_ptr<PolyhedralSurface>
 {
-  std::unique_ptr<PolyhedralSurface> const roof{
+  // Create complete roof with base
+  std::unique_ptr<PolyhedralSurface> completeRoof{
       extrudeStraightSkeleton(g, roof_height)};
+  
+  // Filter out base faces (z = 0) from roof
+  std::unique_ptr<PolyhedralSurface> roof(new PolyhedralSurface);
+  
+  for (size_t i = 0; i < completeRoof->numPatches(); ++i) {
+    const Polygon& patch = completeRoof->patchN(i);
+    
+    // Check if all points of the patch are at z = 0 (base face)
+    bool isBaseFace = true;
+    const LineString& exterior = patch.exteriorRing();
+    
+    for (size_t j = 0; j < exterior.numPoints(); ++j) {
+      const Point& pt = exterior.pointN(j);
+      if (pt.z() != 0.0) {
+        isBaseFace = false;
+        break;
+      }
+    }
+    
+    // Keep only non-base faces (roof slopes)
+    if (!isBaseFace) {
+      roof->addPatch(patch);
+    }
+  }
+  
+  // Translate roof to building height
   translate(*roof, 0.0, 0.0, building_height);
+  
+  // Create building walls
   std::unique_ptr<Geometry> building(extrude(g.as<Polygon>(), building_height));
+  
+  // Create result from building exterior shell
   std::unique_ptr<PolyhedralSurface> result{
       new PolyhedralSurface(building->as<Solid>().exteriorShell())};
+  
+  // Add filtered roof patches
   result->addPatchs(*roof);
+  
   return result;
 }
 
