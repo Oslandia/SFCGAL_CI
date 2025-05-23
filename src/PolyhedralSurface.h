@@ -316,6 +316,17 @@ public:
     ar & _polygons;
   }
 
+  //-- iterators
+  using value_type      = Polygon;
+  using reference       = Polygon &;
+  using const_reference = const Polygon &;
+
+  void
+  push_back(const Polygon &polygon)
+  {
+    addPatch(polygon);
+  }
+
 private:
   boost::ptr_vector<Polygon> _polygons;
 
