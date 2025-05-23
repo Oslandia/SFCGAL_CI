@@ -437,43 +437,32 @@ extrudeStraightSkeleton(const Geometry &geom, double building_height,
     -> std::unique_ptr<PolyhedralSurface>
 {
   // Create complete roof with base
-  std::unique_ptr<PolyhedralSurface> completeRoof{
-      extrudeStraightSkeleton(geom, roof_height)};
+  auto completeRoof = extrudeStraightSkeleton(geom, roof_height);
 
-  // Filter out base faces (z = 0) from roof
-  std::unique_ptr<PolyhedralSurface> roof(new PolyhedralSurface);
+  // Create new roof surface
+  auto roof = std::make_unique<PolyhedralSurface>();
 
-  for (size_t i = 0; i < completeRoof->numPatches(); ++i) {
-    const Polygon &patch = completeRoof->patchN(i);
+  // Predicate to identify non-base faces (roof slopes)
+  auto isNotBaseFace = [](const Polygon &patch) {
+    const LineString &exterior = patch.exteriorRing();
 
-    // Check if all points of the patch are at z = 0 (base face)
-    bool              isBaseFace = true;
-    const LineString &exterior   = patch.exteriorRing();
+    // Check if any point has z != 0 (not a base face)
+    return std::any_of(exterior.begin(), exterior.end(),
+                       [](const Point &point) { return point.z() != 0.0; });
+  };
 
-    for (size_t j = 0; j < exterior.numPoints(); ++j) {
-      const Point &point = exterior.pointN(j);
-      if (point.z() != 0.0) {
-        isBaseFace = false;
-        break;
-      }
-    }
-
-    // Keep only non-base faces (roof slopes)
-    if (!isBaseFace) {
-      roof->addPatch(patch);
-    }
-  }
+  std::copy_if(completeRoof->begin(), completeRoof->end(),
+               std::back_inserter(*roof), isNotBaseFace);
 
   // Translate roof to building height
   translate(*roof, 0.0, 0.0, building_height);
 
   // Create building walls
-  std::unique_ptr<Geometry> building(
-      extrude(geom.as<Polygon>(), building_height));
+  auto building = extrude(geom.as<Polygon>(), building_height);
 
   // Create result from building exterior shell
-  std::unique_ptr<PolyhedralSurface> result{
-      new PolyhedralSurface(building->as<Solid>().exteriorShell())};
+  auto result = std::make_unique<PolyhedralSurface>(
+      building->as<Solid>().exteriorShell());
 
   // Add filtered roof patches
   result->addPatchs(*roof);
