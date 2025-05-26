@@ -1,166 +1,166 @@
 solid SFCGAL_export
-  facet normal 0 -0 -1
+  facet normal 0 0 -1
     outer loop
       vertex 0 0 0
       vertex 0 1 0
       vertex 1 1 0
     endloop
   endfacet
-  facet normal 0 -0 -1
+  facet normal 0 0 -1
     outer loop
       vertex 1 0 0
       vertex 0 0 0
       vertex 1 1 0
     endloop
   endfacet
-  facet normal -0 0 1
+  facet normal 0 0 1
     outer loop
       vertex 0 1 1
       vertex 1 0 1
       vertex 1 1 1
     endloop
   endfacet
-  facet normal -0 -0 1
+  facet normal 0 0 1
     outer loop
       vertex 0 1 1
       vertex 0 0 1
       vertex 1 0 1
     endloop
   endfacet
-  facet normal -0 -1 0
+  facet normal 0 -1 0
     outer loop
       vertex 0 0 1
       vertex 1 0 0
       vertex 1 0 1
     endloop
   endfacet
-  facet normal -0 -1 0
+  facet normal 0 -1 0
     outer loop
       vertex 0 0 1
       vertex 0 0 0
       vertex 1 0 0
     endloop
   endfacet
-  facet normal -0 1 -0
+  facet normal 0 1 0
     outer loop
       vertex 1 1 1
       vertex 0 1 0
       vertex 0 1 1
     endloop
   endfacet
-  facet normal -0 1 -0
+  facet normal 0 1 0
     outer loop
       vertex 1 1 1
       vertex 1 1 0
       vertex 0 1 0
     endloop
   endfacet
-  facet normal 1 -0 0
+  facet normal 1 0 0
     outer loop
       vertex 1 0 1
       vertex 1 1 0
       vertex 1 1 1
     endloop
   endfacet
-  facet normal 1 -0 -0
+  facet normal 1 0 0
     outer loop
       vertex 1 0 1
       vertex 1 0 0
       vertex 1 1 0
     endloop
   endfacet
-  facet normal -1 0 -0
+  facet normal -1 0 0
     outer loop
       vertex 0 0 0
       vertex 0 0 1
       vertex 0 1 1
     endloop
   endfacet
-  facet normal -1 0 -0
+  facet normal -1 0 0
     outer loop
       vertex 0 1 0
       vertex 0 0 0
       vertex 0 1 1
     endloop
   endfacet
-  facet normal 0 -0 -1
+  facet normal 0 0 -1
     outer loop
       vertex 2 4 6
       vertex 2 5 6
       vertex 3 5 6
     endloop
   endfacet
-  facet normal 0 -0 -1
+  facet normal 0 0 -1
     outer loop
       vertex 3 4 6
       vertex 2 4 6
       vertex 3 5 6
     endloop
   endfacet
-  facet normal -0 0 1
+  facet normal 0 0 1
     outer loop
       vertex 2 5 7
       vertex 3 4 7
       vertex 3 5 7
     endloop
   endfacet
-  facet normal -0 -0 1
+  facet normal 0 0 1
     outer loop
       vertex 2 5 7
       vertex 2 4 7
       vertex 3 4 7
     endloop
   endfacet
-  facet normal -0 -1 0
+  facet normal 0 -1 0
     outer loop
       vertex 2 4 7
       vertex 3 4 6
       vertex 3 4 7
     endloop
   endfacet
-  facet normal -0 -1 0
+  facet normal 0 -1 0
     outer loop
       vertex 2 4 7
       vertex 2 4 6
       vertex 3 4 6
     endloop
   endfacet
-  facet normal -0 1 -0
+  facet normal 0 1 0
     outer loop
       vertex 3 5 7
       vertex 2 5 6
       vertex 2 5 7
     endloop
   endfacet
-  facet normal -0 1 -0
+  facet normal 0 1 0
     outer loop
       vertex 3 5 7
       vertex 3 5 6
       vertex 2 5 6
     endloop
   endfacet
-  facet normal 1 -0 0
+  facet normal 1 0 0
     outer loop
       vertex 3 4 7
       vertex 3 5 6
       vertex 3 5 7
     endloop
   endfacet
-  facet normal 1 -0 -0
+  facet normal 1 0 0
     outer loop
       vertex 3 4 7
       vertex 3 4 6
       vertex 3 5 6
     endloop
   endfacet
-  facet normal -1 0 -0
+  facet normal -1 0 0
     outer loop
       vertex 2 4 6
       vertex 2 4 7
       vertex 2 5 7
     endloop
   endfacet
-  facet normal -1 0 -0
+  facet normal -1 0 0
     outer loop
       vertex 2 5 6
       vertex 2 4 6

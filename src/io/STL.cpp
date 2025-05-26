@@ -15,6 +15,23 @@
 
 namespace SFCGAL::io::STL {
 
+// Utility function to normalize "-0" strings to "0" for consistent output
+auto
+normalizeZeroString(const std::string &str) -> std::string
+{
+  return (str == "-0") ? "0" : str;
+}
+
+// Convert value using kernel and normalize -0 to 0
+template <typename T>
+auto
+normalizeKernelValue(const T &value) -> std::string
+{
+  std::ostringstream oss;
+  oss << value;
+  return normalizeZeroString(oss.str());
+}
+
 auto
 save(const Geometry &geom, std::ostream &out) -> void
 {
@@ -80,13 +97,23 @@ save(const Geometry &geom, std::ostream &out) -> void
     CGAL::Vector_3<Kernel> normal = CGAL::normal(
         triangle.vertex(0).toPoint_3(), triangle.vertex(1).toPoint_3(),
         triangle.vertex(2).toPoint_3());
-    out << "  facet normal " << normal.x() << " " << normal.y() << " "
-        << normal.z() << "\n";
+
+    // Get normalized string values to avoid -0 output
+    std::string normalizedX = normalizeKernelValue(normal.x());
+    std::string normalizedY = normalizeKernelValue(normal.y());
+    std::string normalizedZ = normalizeKernelValue(normal.z());
+
+    out << "  facet normal " << normalizedX << " " << normalizedY << " "
+        << normalizedZ << "\n";
     out << "    outer loop\n";
     for (int i = 0; i < 3; ++i) {
-      const auto &vertex = triangle.vertex(i);
-      out << "      vertex " << vertex.x() << " " << vertex.y() << " "
-          << (vertex.is3D() ? vertex.z() : 0.0) << "\n";
+      const auto &vertex  = triangle.vertex(i);
+      std::string vertexX = normalizeKernelValue(vertex.x());
+      std::string vertexY = normalizeKernelValue(vertex.y());
+      std::string vertexZ =
+          vertex.is3D() ? normalizeKernelValue(vertex.z()) : "0";
+      out << "      vertex " << vertexX << " " << vertexY << " " << vertexZ
+          << "\n";
     }
     out << "    endloop\n";
     out << "  endfacet\n";
