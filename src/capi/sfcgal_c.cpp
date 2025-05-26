@@ -39,7 +39,7 @@
 #include "SFCGAL/io/wkt.h"
 #include "sfcgal_c.h"
 
-#if !_MSC_VER
+#if !defined(_MSC_VER)
   #include "SFCGAL/algorithm/alphaShapes.h"
 #endif
 #include "SFCGAL/algorithm/alphaWrapping3D.h"
