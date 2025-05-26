@@ -1790,7 +1790,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_line_sub_string(const sfcgal_geometry_t *geom, double start,
                                 double end);
 
-#if !_MSC_VER
+#if !defined(_MSC_VER)
 /**
  * Returns the alpha shapes of geom
  * @pre isValid(geom) == true
