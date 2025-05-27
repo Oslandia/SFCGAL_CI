@@ -289,20 +289,20 @@ sfcgal_free_buffer(void *buffer)
 }
 
 extern "C" void
-sfcgal_init()
+sfcgal_init(void)
 {
   set_error_behaviour(CGAL::THROW_EXCEPTION);
   set_warning_behaviour(CGAL::THROW_EXCEPTION);
 }
 
 extern "C" auto
-sfcgal_version() -> const char *
+sfcgal_version(void) -> const char *
 {
   return SFCGAL::Version();
 }
 
 extern "C" auto
-sfcgal_full_version() -> const char *
+sfcgal_full_version(void) -> const char *
 {
   return SFCGAL::Full_Version();
 }
@@ -650,7 +650,7 @@ sfcgal_geometry_as_obj(const sfcgal_geometry_t *pgeom, char **buffer,
  * Point
  */
 extern "C" auto
-sfcgal_point_create() -> sfcgal_geometry_t *
+sfcgal_point_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Point());)
@@ -720,7 +720,7 @@ sfcgal_point_m(const sfcgal_geometry_t *geom) -> double
  * LineString
  */
 extern "C" auto
-sfcgal_linestring_create() -> sfcgal_geometry_t *
+sfcgal_linestring_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::LineString());)
@@ -754,7 +754,7 @@ sfcgal_linestring_add_point(sfcgal_geometry_t *geom, sfcgal_geometry_t *point)
  * Triangle
  */
 extern "C" auto
-sfcgal_triangle_create() -> sfcgal_geometry_t *
+sfcgal_triangle_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Triangle());)
@@ -811,7 +811,7 @@ sfcgal_triangle_set_vertex_from_xyz(sfcgal_geometry_t *geom, int i, double x,
  * Polygon
  */
 extern "C" auto
-sfcgal_polygon_create() -> sfcgal_geometry_t *
+sfcgal_polygon_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Polygon());)
@@ -865,7 +865,7 @@ sfcgal_polygon_add_interior_ring(sfcgal_geometry_t *geom,
  */
 
 extern "C" auto
-sfcgal_geometry_collection_create() -> sfcgal_geometry_t *
+sfcgal_geometry_collection_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::GeometryCollection());)
@@ -912,28 +912,28 @@ sfcgal_geometry_collection_add_geometry(sfcgal_geometry_t *geom,
  * Multi-*
  */
 extern "C" auto
-sfcgal_multi_point_create() -> sfcgal_geometry_t *
+sfcgal_multi_point_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiPoint());)
 }
 
 extern "C" auto
-sfcgal_multi_linestring_create() -> sfcgal_geometry_t *
+sfcgal_multi_linestring_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiLineString());)
 }
 
 extern "C" auto
-sfcgal_multi_polygon_create() -> sfcgal_geometry_t *
+sfcgal_multi_polygon_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiPolygon());)
 }
 
 extern "C" auto
-sfcgal_multi_solid_create() -> sfcgal_geometry_t *
+sfcgal_multi_solid_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::MultiSolid());)
@@ -944,7 +944,7 @@ sfcgal_multi_solid_create() -> sfcgal_geometry_t *
  */
 
 extern "C" auto
-sfcgal_polyhedral_surface_create() -> sfcgal_geometry_t *
+sfcgal_polyhedral_surface_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::PolyhedralSurface());)
@@ -1011,7 +1011,7 @@ sfcgal_polyhedral_surface_add_polygon(sfcgal_geometry_t *geom,
  */
 
 extern "C" auto
-sfcgal_triangulated_surface_create() -> sfcgal_geometry_t *
+sfcgal_triangulated_surface_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(
@@ -1079,7 +1079,7 @@ sfcgal_triangulated_surface_add_triangle(sfcgal_geometry_t *geom,
  */
 
 extern "C" auto
-sfcgal_solid_create() -> sfcgal_geometry_t *
+sfcgal_solid_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::Solid());)
@@ -1129,7 +1129,7 @@ sfcgal_solid_set_exterior_shell(sfcgal_geometry_t *geom,
 }
 
 extern "C" auto
-sfcgal_prepared_geometry_create() -> sfcgal_prepared_geometry_t *
+sfcgal_prepared_geometry_create(void) -> sfcgal_prepared_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(return new SFCGAL::PreparedGeometry();)
 }
@@ -2624,7 +2624,7 @@ convertKnotArray(const double *knots, size_t num_knots)
 } // anonymous namespace
 
 extern "C" auto
-sfcgal_nurbs_curve_create() -> sfcgal_geometry_t *
+sfcgal_nurbs_curve_create(void) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::NURBSCurve());)

@@ -457,7 +457,7 @@ sfcgal_geometry_as_stl_file(const sfcgal_geometry_t *geom,
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_point_create();
+sfcgal_point_create(void);
 
 /**
  * Creates a point from two X and Y coordinates
@@ -555,7 +555,7 @@ sfcgal_point_m(const sfcgal_geometry_t *geom);
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_linestring_create();
+sfcgal_linestring_create(void);
 
 /**
  * Returns the number of points of the given SFCGAL::LineString
@@ -600,7 +600,7 @@ sfcgal_linestring_add_point(sfcgal_geometry_t *linestring,
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_triangle_create();
+sfcgal_triangle_create(void);
 
 /**
  * Creates a SFCGAL::Triangle from three given SFCGAL::Point
@@ -685,7 +685,7 @@ sfcgal_triangle_set_vertex_from_xyz(sfcgal_geometry_t *triangle, int i,
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_polygon_create();
+sfcgal_polygon_create(void);
 
 /**
  * Creates an empty SFCGAL::Polygon from an exterior ring
@@ -756,7 +756,7 @@ sfcgal_polygon_add_interior_ring(sfcgal_geometry_t *polygon,
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_geometry_collection_create();
+sfcgal_geometry_collection_create(void);
 
 /**
  * Returns the number of geometries of a given SFCGAL::GeometryCollection
@@ -820,7 +820,7 @@ sfcgal_geometry_collection_add_geometry(sfcgal_geometry_t *collection,
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_multi_point_create();
+sfcgal_multi_point_create(void);
 
 /**
  * Creates an empty SFCGAL::MultiLineString
@@ -828,7 +828,7 @@ sfcgal_multi_point_create();
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_multi_linestring_create();
+sfcgal_multi_linestring_create(void);
 
 /**
  * Creates an empty SFCGAL::MultiPolygon
@@ -836,7 +836,7 @@ sfcgal_multi_linestring_create();
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_multi_polygon_create();
+sfcgal_multi_polygon_create(void);
 
 /**
  * Creates an empty SFCGAL::MultiSolid
@@ -844,7 +844,7 @@ sfcgal_multi_polygon_create();
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_multi_solid_create();
+sfcgal_multi_solid_create(void);
 
 /**
  * Creates an empty SFCGAL::PolyhedralSurface
@@ -852,7 +852,7 @@ sfcgal_multi_solid_create();
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_polyhedral_surface_create();
+sfcgal_polyhedral_surface_create(void);
 
 /**
  * Returns the number of patches of a given SFCGAL::PolyhedralSurface
@@ -960,7 +960,7 @@ sfcgal_polyhedral_surface_add_polygon(sfcgal_geometry_t *polyhedral,
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_triangulated_surface_create();
+sfcgal_triangulated_surface_create(void);
 
 /**
  * Returns the number of patches of a given SFCGAL::TriangulatedSurface
@@ -1067,7 +1067,7 @@ sfcgal_triangulated_surface_add_triangle(sfcgal_geometry_t *tin,
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_solid_create();
+sfcgal_solid_create(void);
 
 /**
  * Creates a SFCGAL::Solid from an exterior shell
@@ -1170,7 +1170,7 @@ typedef void sfcgal_prepared_geometry_t;
  * @ingroup capi
  */
 SFCGAL_API sfcgal_prepared_geometry_t *
-sfcgal_prepared_geometry_create();
+sfcgal_prepared_geometry_create(void);
 
 /**
  * Creates a SFCGAL::PreparedGeometry from a Geometry and an SRID
@@ -2490,7 +2490,7 @@ sfcgal_free_buffer(void *buffer);
  * @ingroup capi
  */
 SFCGAL_API void
-sfcgal_init();
+sfcgal_init(void);
 
 /**
  * Get version
@@ -2498,7 +2498,7 @@ sfcgal_init();
  * @return SFCGAL version as string
  */
 SFCGAL_API const char *
-sfcgal_version();
+sfcgal_version(void);
 
 /**
  * Get full version (including CGAL and Boost versions)
@@ -2506,7 +2506,7 @@ sfcgal_version();
  * @ingroup capi
  */
 SFCGAL_API const char *
-sfcgal_full_version();
+sfcgal_full_version(void);
 
 /*--------------------------------------------------------------------------------------*
  *
@@ -2552,7 +2552,7 @@ typedef enum {
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_nurbs_curve_create();
+sfcgal_nurbs_curve_create(void);
 
 /**
  * Creates a NURBS curve from control points with uniform weights
