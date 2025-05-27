@@ -6,6 +6,7 @@
 #define TIMEUS_H
 
 #include <stdint.h>
+#include <float.h>
 
 #if defined(_WIN32)
   #include <windows.h>
