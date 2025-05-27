@@ -4,8 +4,6 @@
 
 #include "operations_params.h"
 #include "../safe_string.h"
-#include "../util.h"
-#include <ctype.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
@@ -24,8 +22,8 @@ is_named_parameter(const char *arg, const char *name, const char **value_start)
   }
 
   /* Validate input lengths */
-  size_t arg_len  = safe_strlen(arg, MAX_PARAM_LENGTH);
-  size_t name_len = safe_strlen(name, MAX_PARAM_LENGTH);
+  size_t arg_len  = safe_strlen(arg, SAFE_MAX_PARAM_LENGTH);
+  size_t name_len = safe_strlen(name, SAFE_MAX_PARAM_LENGTH);
 
   if (arg_len == SIZE_MAX || name_len == SIZE_MAX || name_len == 0) {
     return false;
@@ -56,13 +54,13 @@ find_parameter(const char *arg_list, const char *name, bool *found)
   *found = false;
 
   /* Validate input lengths */
-  size_t arg_list_len = safe_strlen(arg_list, MAX_PARAM_LENGTH);
+  size_t arg_list_len = safe_strlen(arg_list, SAFE_MAX_PARAM_LENGTH);
   if (arg_list_len == SIZE_MAX) {
     return NULL;
   }
 
   /* Make a copy of the argument list since safe_strtok modifies it */
-  char *arg_copy = safe_strdup_checked(arg_list, MAX_PARAM_LENGTH);
+  char *arg_copy = safe_strdup(arg_list, SAFE_MAX_PARAM_LENGTH);
   if (!arg_copy) {
     return NULL;
   }
@@ -77,7 +75,7 @@ find_parameter(const char *arg_list, const char *name, bool *found)
     /* Check if this token is in name=value format for our parameter */
     if (is_named_parameter(token, name, &value_start)) {
       *found = true;
-      result = safe_strdup_checked(value_start, MAX_PARAM_LENGTH);
+      result = safe_strdup(value_start, SAFE_MAX_PARAM_LENGTH);
       break;
     }
     token = safe_strtok(NULL, ",", &saveptr);
@@ -112,7 +110,7 @@ parse_double_parameter(const char *arg_list, const char *name, int param_index,
   }
 
   /* Validate input length */
-  if (safe_strlen(arg_list, MAX_PARAM_LENGTH) == SIZE_MAX) {
+  if (safe_strlen(arg_list, SAFE_MAX_PARAM_LENGTH) == SIZE_MAX) {
     return false;
   }
 
@@ -136,7 +134,7 @@ parse_double_parameter(const char *arg_list, const char *name, int param_index,
     return success;
   } else if (!found) {
     /* Try to find by position */
-    char *arg_copy = safe_strdup_checked(arg_list, MAX_PARAM_LENGTH);
+    char *arg_copy = safe_strdup(arg_list, SAFE_MAX_PARAM_LENGTH);
     if (!arg_copy) {
       return false;
     }
@@ -228,7 +226,7 @@ parse_bool_parameter(const char *arg_list, const char *name, int param_index,
   }
 
   /* Validate input length */
-  if (safe_strlen(arg_list, MAX_PARAM_LENGTH) == SIZE_MAX) {
+  if (safe_strlen(arg_list, SAFE_MAX_PARAM_LENGTH) == SIZE_MAX) {
     return false;
   }
 
@@ -252,7 +250,7 @@ parse_bool_parameter(const char *arg_list, const char *name, int param_index,
     return success;
   } else if (!found) {
     /* Try to find by position */
-    char *arg_copy = safe_strdup_checked(arg_list, MAX_PARAM_LENGTH);
+    char *arg_copy = safe_strdup(arg_list, SAFE_MAX_PARAM_LENGTH);
     if (!arg_copy) {
       return false;
     }

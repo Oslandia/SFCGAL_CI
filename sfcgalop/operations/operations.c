@@ -5,6 +5,7 @@
 #include "operations.h"
 #include "operations/operations_params.h"
 #include "operations/operations_registry.h"
+#include "safe_string.h"
 #include "util.h"
 #include <limits.h>
 #include <stdio.h>
@@ -174,7 +175,8 @@ get_unique_categories(int *num_categories)
 
     // If not found, add it
     if (!found) {
-      categories[*num_categories] = safe_strdup(operations[i].category);
+      categories[*num_categories] =
+          safe_strdup(operations[i].category, SAFE_MAX_STRING_LENGTH);
       (*num_categories)++;
     }
   }
