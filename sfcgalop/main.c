@@ -7,6 +7,7 @@
 
 #include "io.h"
 #include "operations/operations.h"
+#include "safe_string.h"
 #include "sfcgal_c.h"
 #include "timeus.h"
 #include "util.h"
@@ -271,7 +272,7 @@ parse_options(int argc, char *argv[], Options *options)
 
   // If no source_a is provided, assume stdin
   if (!options->source_a) {
-    options->source_a = safe_strdup("stdin");
+    options->source_a = safe_strdup("stdin", SAFE_MAX_STRING_LENGTH);
   }
 
   return true;

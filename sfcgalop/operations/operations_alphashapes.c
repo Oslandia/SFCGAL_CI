@@ -4,10 +4,8 @@
  */
 
 #include "operations_alphashapes.h"
-#include "../util.h"
-#include "operations_common.h"
+#include "../safe_string.h"
 #include <limits.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -3,7 +3,7 @@
  */
 
 #include "operations_validity.h"
-#include "../util.h"
+#include "../safe_string.h"
 #include "operations_common.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,21 +48,22 @@ op_is_validity_detail(const char *op_arg, const sfcgal_geometry_t *geom_a,
   }
 
   if (valid == 1) {
-    result.text_result = safe_strdup("Geometry is valid");
+    result.text_result =
+        safe_strdup("Geometry is valid", SAFE_MAX_STRING_LENGTH);
   } else {
     if (reason != NULL) {
       char *full_message = malloc(strlen(reason) + 50);
       if (full_message) {
         sprintf(full_message, "Geometry is invalid. Reason: %s", reason);
-        result.text_result = safe_strdup(full_message);
+        result.text_result = safe_strdup(full_message, SAFE_MAX_STRING_LENGTH);
       } else {
         result.error         = true;
         result.error_message = "Memory allocation failed";
       }
       free(reason);
     } else {
-      result.text_result =
-          safe_strdup("Geometry is invalid. No details available.");
+      result.text_result = safe_strdup(
+          "Geometry is invalid. No details available.", SAFE_MAX_STRING_LENGTH);
     }
   }
 

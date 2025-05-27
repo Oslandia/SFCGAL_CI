@@ -3,7 +3,7 @@
  */
 
 #include "io.h"
-#include "util.h"
+#include "safe_string.h"
 #include <ctype.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -217,7 +217,7 @@ load_from_hex_wkb(const char *hex_wkb, sfcgal_geometry_t **geometry)
   }
 
   // Copy the string so we can modify it
-  char *cleaned_hex = safe_strdup(hex_wkb);
+  char *cleaned_hex = safe_strdup(hex_wkb, SAFE_MAX_STRING_LENGTH);
   if (!cleaned_hex) {
     return false;
   }

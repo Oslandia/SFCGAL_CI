@@ -1,13 +1,10 @@
 /**
- * safe_string.c - Implementation of thread-safe string manipulation functions
+ * safe_string.c - Implementation of secure string and memory operations
  */
 
 #include "safe_string.h"
-#include "util.h"
 #include <errno.h>
-#include <float.h>
 #include <limits.h>
-#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +13,10 @@
 #if defined(_WIN32)
   #include <windows.h>
 #endif
+
+/* ========================================================================== */
+/* STRING MANIPULATION FUNCTIONS */
+/* ========================================================================== */
 
 /**
  * Thread-safe string tokenizer
@@ -44,7 +45,7 @@ safe_strtok(char *str, const char *delim, char **saveptr)
  * Safe string duplication with length validation
  */
 char *
-safe_strdup_checked(const char *str, size_t max_len)
+safe_strdup(const char *str, size_t max_len)
 {
   if (!str) {
     return NULL;
@@ -56,7 +57,7 @@ safe_strdup_checked(const char *str, size_t max_len)
     return NULL;
   }
 
-  char *result = safe_malloc_checked(len + 1, max_len + 1);
+  char *result = safe_malloc(len + 1, max_len + 1);
   if (!result) {
     return NULL;
   }
@@ -85,6 +86,82 @@ safe_strlen(const char *str, size_t max_len)
 }
 
 /**
+ * Safe string concatenation
+ */
+bool
+safe_strcat(char *dest, size_t dest_size, const char *src)
+{
+  if (!dest || !src || dest_size == 0) {
+    return false;
+  }
+
+  size_t dest_len = safe_strlen(dest, dest_size);
+  size_t src_len  = safe_strlen(src, SAFE_MAX_STRING_LENGTH);
+
+  if (dest_len == SIZE_MAX || src_len == SIZE_MAX) {
+    return false;
+  }
+
+  /* Check if concatenation would overflow */
+  if (dest_len + src_len >= dest_size) {
+    errno = ERANGE;
+    return false;
+  }
+
+#if defined(_WIN32) && defined(_MSC_VER)
+  errno_t err = strcat_s(dest, dest_size, src);
+  return (err == 0);
+#elif defined(__STDC_LIB_EXT1__)
+  errno_t err = strcat_s(dest, dest_size, src);
+  return (err == 0);
+#else
+  strcat(dest, src);
+  return true;
+#endif
+}
+
+/**
+ * Safe string copy
+ */
+bool
+safe_strcpy(char *dest, size_t dest_size, const char *src)
+{
+  if (!dest || !src || dest_size == 0) {
+    return false;
+  }
+
+  size_t src_len = safe_strlen(src, SAFE_MAX_STRING_LENGTH);
+  if (src_len == SIZE_MAX || src_len >= dest_size) {
+    errno = ERANGE;
+    return false;
+  }
+
+#if defined(_WIN32) && defined(_MSC_VER)
+  errno_t err = strcpy_s(dest, dest_size, src);
+  return (err == 0);
+#elif defined(__STDC_LIB_EXT1__)
+  errno_t err = strcpy_s(dest, dest_size, src);
+  return (err == 0);
+#else
+  strcpy(dest, src);
+  return true;
+#endif
+}
+
+/**
+ * Check if a string is null or empty
+ */
+bool
+safe_string_is_empty(const char *str)
+{
+  return str == NULL || str[0] == '\0';
+}
+
+/* ========================================================================== */
+/* STRING CONVERSION FUNCTIONS */
+/* ========================================================================== */
+
+/**
  * Safe string to long conversion with error checking
  */
 bool
@@ -101,7 +178,7 @@ safe_strtol(const char *str, char **endptr, int base, long *result)
   }
 
   /* Check string length to prevent DoS */
-  if (safe_strlen(str, MAX_PARAM_LENGTH) == SIZE_MAX) {
+  if (safe_strlen(str, SAFE_MAX_PARAM_LENGTH) == SIZE_MAX) {
     errno = EINVAL;
     return false;
   }
@@ -141,7 +218,7 @@ safe_strtod(const char *str, char **endptr, double *result)
   }
 
   /* Check string length to prevent DoS */
-  if (safe_strlen(str, MAX_PARAM_LENGTH) == SIZE_MAX) {
+  if (safe_strlen(str, SAFE_MAX_PARAM_LENGTH) == SIZE_MAX) {
     errno = EINVAL;
     return false;
   }
@@ -176,33 +253,52 @@ safe_strtod(const char *str, char **endptr, double *result)
 }
 
 /**
- * Secure memory zeroing (prevents compiler optimization)
+ * Safe integer parsing with overflow checking
  */
-void
-secure_zero(void *ptr, size_t size)
+bool
+safe_parse_int(const char *str, int *result, int base)
 {
-  if (!ptr || size == 0) {
-    return;
+  if (!str || !result) {
+    return false;
   }
 
-#if defined(_WIN32) && defined(_MSC_VER)
-  SecureZeroMemory(ptr, size);
-#elif defined(__STDC_LIB_EXT1__)
-  memset_s(ptr, size, 0, size);
-#else
-  /* Prevent compiler optimization with volatile */
-  volatile unsigned char *p = (volatile unsigned char *)ptr;
-  for (size_t i = 0; i < size; i++) {
-    p[i] = 0;
+  long long_result;
+  if (!safe_strtol(str, NULL, base, &long_result)) {
+    return false;
   }
-#endif
+
+  /* Check for integer overflow */
+  if (long_result > INT_MAX || long_result < INT_MIN) {
+    errno = ERANGE;
+    return false;
+  }
+
+  *result = (int)long_result;
+  return true;
 }
+
+/**
+ * Safe double parsing with overflow checking
+ */
+bool
+safe_parse_double(const char *str, double *result)
+{
+  if (!str || !result) {
+    return false;
+  }
+
+  return safe_strtod(str, NULL, result);
+}
+
+/* ========================================================================== */
+/* MEMORY MANAGEMENT FUNCTIONS */
+/* ========================================================================== */
 
 /**
  * Safe memory allocation with size validation
  */
 void *
-safe_malloc_checked(size_t size, size_t max_size)
+safe_malloc(size_t size, size_t max_size)
 {
   if (size == 0 || size > max_size) {
     errno = EINVAL;
@@ -230,7 +326,7 @@ safe_malloc_checked(size_t size, size_t max_size)
  * Safe memory reallocation with size validation
  */
 void *
-safe_realloc_checked(void *ptr, size_t size, size_t max_size)
+safe_realloc(void *ptr, size_t size, size_t max_size)
 {
   if (size > max_size) {
     errno = EINVAL;
@@ -255,4 +351,41 @@ safe_realloc_checked(void *ptr, size_t size, size_t max_size)
   }
 
   return new_ptr;
+}
+
+/**
+ * Safe allocation with zero initialization
+ */
+void *
+safe_calloc(size_t size, size_t max_size)
+{
+  if (size == 0 || size > max_size) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  return safe_malloc(size, max_size);
+}
+
+/**
+ * Secure memory zeroing (prevents compiler optimization)
+ */
+void
+safe_secure_zero(void *ptr, size_t size)
+{
+  if (!ptr || size == 0) {
+    return;
+  }
+
+#if defined(_WIN32) && defined(_MSC_VER)
+  SecureZeroMemory(ptr, size);
+#elif defined(__STDC_LIB_EXT1__)
+  memset_s(ptr, size, 0, size);
+#else
+  /* Prevent compiler optimization with volatile */
+  volatile unsigned char *p = (volatile unsigned char *)ptr;
+  for (size_t i = 0; i < size; i++) {
+    p[i] = 0;
+  }
+#endif
 }
