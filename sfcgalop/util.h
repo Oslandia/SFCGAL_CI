@@ -5,6 +5,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <float.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -150,6 +152,44 @@ safe_parse_int(const char *str, int *result, int base);
  */
 bool
 safe_parse_double(const char *str, double *result);
+
+/**
+ * Cross-platform isfinite implementation
+ * Handles the differences between MinGW, MSVC, and POSIX systems
+ */
+static inline int
+safe_isfinite_double(double x)
+{
+#if defined(_WIN32) && defined(__MINGW32__)
+  /* MinGW specific implementation to avoid float conversion warning */
+  return !(_isnan(x) || !_finite(x));
+#elif defined(_WIN32) && defined(_MSC_VER)
+  /* MSVC implementation */
+  return _finite(x) && !_isnan(x);
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+  /* C99 and later */
+  return isfinite(x);
+#else
+  /* Fallback for older compilers */
+  return (x == x) && (x != HUGE_VAL) && (x != -HUGE_VAL);
+#endif
+}
+
+/**
+ * Cross-platform isnan implementation
+ */
+static inline int
+safe_isnan_double(double x)
+{
+#if defined(_WIN32) && (defined(__MINGW32__) || defined(_MSC_VER))
+  return _isnan(x);
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+  return isnan(x);
+#else
+  /* Fallback: NaN is the only value that is not equal to itself */
+  return (x != x);
+#endif
+}
 
 #ifdef __cplusplus
 }

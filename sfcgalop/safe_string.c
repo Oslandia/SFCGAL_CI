@@ -3,6 +3,7 @@
  */
 
 #include "safe_string.h"
+#include "util.h"
 #include <errno.h>
 #include <float.h>
 #include <limits.h>
@@ -155,7 +156,7 @@ safe_strtod(const char *str, char **endptr, double *result)
   }
 
   /* Check for infinite or NaN results */
-  if (!isfinite(value)) {
+  if (!safe_isfinite_double(value)) {
     errno = ERANGE;
     return false;
   }

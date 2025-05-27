@@ -5,8 +5,8 @@
 #ifndef TIMEUS_H
 #define TIMEUS_H
 
-#include <stdint.h>
 #include <float.h>
+#include <stdint.h>
 
 #if defined(_WIN32)
   #include <windows.h>
