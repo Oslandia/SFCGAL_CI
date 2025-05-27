@@ -82,9 +82,6 @@ elseif(UNIX)
     find_package(Threads REQUIRED)
     target_link_libraries(sfcgalop PRIVATE Threads::Threads)
     
-    # Link librt for clock_gettime on older systems
-    target_link_libraries(sfcgalop PRIVATE rt)
-    
     target_link_libraries(sfcgalop PRIVATE m)
 endif()
 
@@ -143,11 +140,21 @@ if(ENABLE_SECURITY_HARDENING)
         
         target_compile_options(sfcgalop PRIVATE ${SECURITY_COMPILE_FLAGS})
         
-        target_link_options(sfcgalop PRIVATE
-            -Wl,-z,relro
-            -Wl,-z,now
-            -Wl,-z,noexecstack
-        )
+        if(CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD|OpenBSD|NetBSD|DragonFly|SunOS")
+            # ELF
+            target_link_options(sfcgalop PRIVATE
+                -Wl,-z,relro
+                -Wl,-z,now
+                -Wl,-z,noexecstack
+            )
+        elseif(APPLE)
+            # troll^WmacOS Mach-O
+            target_link_options(sfcgalop PRIVATE
+                -Wl,-bind_at_load
+                -Wl,-dead_strip
+            )
+        endif()
+
         
         # Enable FORTIFY_SOURCE for release builds
         if(ENABLE_FORTIFY_SOURCE)
