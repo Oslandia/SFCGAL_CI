@@ -8,6 +8,9 @@ project(sfcgalop
         DESCRIPTION "Command-line utility for SFCGAL operations"
         LANGUAGES C)
 
+# Include CheckCCompilerFlag module for compiler flag checking
+include(CheckCCompilerFlag)
+
 # Set C standard
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -63,7 +66,12 @@ endif()
 
 if(ENABLE_SECURITY_HARDENING)
     if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-        target_compile_options(sfcgalop PRIVATE
+        # Check for availability of security flags
+        check_c_compiler_flag("-fstack-clash-protection" HAVE_STACK_CLASH_PROTECTION)
+        check_c_compiler_flag("-fcf-protection=full" HAVE_CF_PROTECTION)
+        
+        # Base warning and security flags
+        set(SECURITY_COMPILE_FLAGS
             # Basic warnings
             -Wall
             -Wextra
@@ -89,11 +97,20 @@ if(ENABLE_SECURITY_HARDENING)
             -Wunused-variable
             -Wunused-function
             
-            # Additional security flags
+            # Always available security flags
             -fstack-protector-strong
-            -fstack-clash-protection
-            -fcf-protection=full
         )
+        
+        # Add conditional security flags
+        if(HAVE_STACK_CLASH_PROTECTION)
+            list(APPEND SECURITY_COMPILE_FLAGS -fstack-clash-protection)
+        endif()
+        
+        if(HAVE_CF_PROTECTION)
+            list(APPEND SECURITY_COMPILE_FLAGS -fcf-protection=full)
+        endif()
+        
+        target_compile_options(sfcgalop PRIVATE ${SECURITY_COMPILE_FLAGS})
         
         target_link_options(sfcgalop PRIVATE
             -Wl,-z,relro
@@ -117,8 +134,13 @@ if(ENABLE_SECURITY_HARDENING)
             /Wall                               # Enable all warnings
             /sdl                                # Enable additional security checks
             /guard:cf                           # Control Flow Guard
-            /Qspectre                           # Spectre mitigation (if available)
         )
+        
+        # Check for Spectre mitigation availability (newer MSVC versions)
+        check_c_compiler_flag("/Qspectre" HAVE_SPECTRE_MITIGATION)
+        if(HAVE_SPECTRE_MITIGATION)
+            target_compile_options(sfcgalop PRIVATE /Qspectre)
+        endif()
         
         # Security-related definitions for MSVC
         target_compile_definitions(sfcgalop PRIVATE
