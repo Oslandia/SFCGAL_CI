@@ -37,7 +37,7 @@ op_alpha_shapes(const char *op_arg, const sfcgal_geometry_t *geom_a,
   }
 
   /* Validate alpha parameter range */
-  if (alpha < 0.0 || !isfinite(alpha)) {
+  if (alpha < 0.0 || !safe_isfinite_double(alpha)) {
     result.error         = true;
     result.error_message = "Alpha parameter must be non-negative and finite";
     return result;
