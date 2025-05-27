@@ -123,11 +123,18 @@ if(ENABLE_SECURITY_HARDENING)
             
             # Always available security flags
             -fstack-protector-strong
+
+            # Avoid CI errors on OpenBSD/mingw
+            -Wno-unused-command-line-argument
         )
         
         # Add conditional security flags
         if(HAVE_STACK_CLASH_PROTECTION)
-            list(APPEND SECURITY_COMPILE_FLAGS -fstack-clash-protection)
+            # macOS may have stack clash protection, but not on arm64 aka m* chip
+            EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
+            if ( NOT ${ARCHITECTURE} STREQUAL arm64 )
+                list(APPEND SECURITY_COMPILE_FLAGS -fstack-clash-protection)
+            endif()
         endif()
         
         if(HAVE_CF_PROTECTION)
