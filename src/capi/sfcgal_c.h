@@ -16,31 +16,31 @@ extern "C" {
 
 #if defined(__has_c_attribute)
   #if __has_c_attribute(deprecated)
-    #define SFCGAL_DEPRECATED(msg) [[deprecated(msg)]]
+    #define SFCGAL_DEPRECATED(msg2) [[deprecated(msg2)]]
   #elif defined(__clang__) || defined(__GNUC__)
-    #define SFCGAL_DEPRECATED(msg) __attribute__((deprecated(msg)))
+    #define SFCGAL_DEPRECATED(msg2) __attribute__((deprecated(msg2)))
   #elif defined(_MSC_VER)
-    #define SFCGAL_DEPRECATED(msg) __declspec(deprecated(msg))
+    #define SFCGAL_DEPRECATED(msg2) __declspec(deprecated(msg2))
   #else
-    #define SFCGAL_DEPRECATED(msg)
+    #define SFCGAL_DEPRECATED(msg2)
   #endif
 #elif defined(__has_cpp_attribute)
   #if __has_cpp_attribute(deprecated)
-    #define SFCGAL_DEPRECATED(msg) [[deprecated(msg)]]
+    #define SFCGAL_DEPRECATED(msg2) [[deprecated(msg2)]]
   #elif defined(__clang__) || defined(__GNUC__)
-    #define SFCGAL_DEPRECATED(msg) __attribute__((deprecated(msg)))
+    #define SFCGAL_DEPRECATED(msg2) __attribute__((deprecated(msg2)))
   #elif defined(_MSC_VER)
-    #define SFCGAL_DEPRECATED(msg) __declspec(deprecated(msg))
+    #define SFCGAL_DEPRECATED(msg2) __declspec(deprecated(msg2))
   #else
-    #define SFCGAL_DEPRECATED(msg)
+    #define SFCGAL_DEPRECATED(msg2)
   #endif
 #elif defined(__clang__) || defined(__GNUC__)
-  #define SFCGAL_DEPRECATED(msg) __attribute__((deprecated(msg)))
+  #define SFCGAL_DEPRECATED(msg2) __attribute__((deprecated(msg2)))
 #elif defined(_MSC_VER)
-  #define SFCGAL_DEPRECATED(msg) __declspec(deprecated(msg))
+  #define SFCGAL_DEPRECATED(msg2) __declspec(deprecated(msg2))
 #else
   #pragma message("WARNING: deprecated if not supported by this compiler")
-  #define SFCGAL_DEPRECATED(msg)
+  #define SFCGAL_DEPRECATED(msg2)
 #endif
 
 // TODO : return of errors ! => error handler
