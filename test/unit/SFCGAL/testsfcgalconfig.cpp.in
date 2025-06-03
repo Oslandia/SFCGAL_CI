@@ -11,6 +11,8 @@ using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(SFCGAL_Config)
 
+static const char* SFCGAL_CONFIG_PATH = "@SFCGAL_CONFIG_EXECUTABLE@";
+
 #if defined(_WIN32)
   #define popen _popen
   #define pclose _pclose
@@ -31,7 +33,7 @@ static std::string ExecCommand(const std::string& cmd) {
 }
 
 BOOST_AUTO_TEST_CASE(LibsFlagContainsValidPath) {
-    std::string output = ExecCommand("sfcgal-config --libs");
+    std::string output = ExecCommand(std::string(SFCGAL_CONFIG_PATH) + " --libs");
     BOOST_REQUIRE(!output.empty());
 
     std::smatch match;
