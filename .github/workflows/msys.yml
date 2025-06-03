@@ -36,7 +36,18 @@ jobs:
 
     - name: '🚧 Build TOOL'
       run: |
-        MSYSTEM= cmake -G"Ninja" -B build -DCMAKE_BUILD_TYPE=Release -DSFCGAL_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=D:/a/_temp/msys64/${{ matrix.sys }}
+        MSYSTEM= cmake -G"Ninja" -B build -DCMAKE_BUILD_TYPE=Release -DSFCGAL_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=D:/a/_temp/msys64/${{ matrix.sys }} -DSFCGAL_CONFIG_EXECUTABLE=D:/a/_temp/msys64/${{ matrix.sys }}/bin/sfcgal-config
         MSYSTEM= cmake --build build
         MSYSTEM= cmake --install build
+        echo "🔍 Testing sfcgal-config --libs output..."
+        LIBS_OUTPUT=$(MSYSTEM= D:/a/_temp/msys64/${{ matrix.sys }}/bin/sfcgal-config --libs)
+        echo "Output: $LIBS_OUTPUT"
+        if [[ "$LIBS_OUTPUT" =~ -L[[:space:]]*-l ]]; then
+          echo "❌ ERROR: sfcgal-config --libs returned empty library path: $LIBS_OUTPUT"
+          exit 1
+        elif [[ "$LIBS_OUTPUT" =~ -L.*/${{ matrix.sys }}/lib.*-lSFCGAL ]]; then
+          echo "✅ SUCCESS: sfcgal-config --libs returned valid path: $LIBS_OUTPUT"
+        else
+          echo "⚠️  WARNING: Unexpected format for sfcgal-config --libs: $LIBS_OUTPUT"
+        fi
         MSYSTEM= ctest -V --output-on-failure --test-dir build
