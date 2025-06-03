@@ -1,0 +1,47 @@
+#include <boost/test/unit_test.hpp>
+#include <string>
+#include <array>
+#include <regex>
+#include <cstdlib>
+#include <cstdio>
+
+#include <boost/test/unit_test.hpp>
+
+using namespace boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE(SFCGAL_Config)
+
+#if defined(_WIN32)
+  #define popen _popen
+  #define pclose _pclose
+#endif
+
+static std::string ExecCommand(const std::string& cmd) {
+    std::array<char, 256> buffer;
+    std::string result;
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (!pipe) {
+        return "";
+    }
+    while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe) != nullptr) {
+        result += buffer.data();
+    }
+    pclose(pipe);
+    return result;
+}
+
+BOOST_AUTO_TEST_CASE(LibsFlagContainsValidPath) {
+    std::string output = ExecCommand("sfcgal-config --libs");
+    BOOST_REQUIRE(!output.empty());
+
+    std::smatch match;
+    std::regex re("-L(\\S+)");
+    bool found = std::regex_search(output, match, re);
+    BOOST_REQUIRE(found);
+
+    std::string libPath = match[1];
+    BOOST_CHECK(!libPath.empty());
+    BOOST_CHECK(libPath != "-");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
