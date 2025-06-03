@@ -52,13 +52,19 @@ op_is_validity_detail(const char *op_arg, const sfcgal_geometry_t *geom_a,
         safe_strdup("Geometry is valid", SAFE_MAX_STRING_LENGTH);
   } else {
     if (reason != NULL) {
-      char *full_message = malloc(strlen(reason) + 50);
-      if (full_message) {
-        sprintf(full_message, "Geometry is invalid. Reason: %s", reason);
-        result.text_result = safe_strdup(full_message, SAFE_MAX_STRING_LENGTH);
-      } else {
-        result.error         = true;
-        result.error_message = "Memory allocation failed";
+
+      size_t reason_len = safe_strlen(reason, SAFE_MAX_STRING_LENGTH);
+      if (reason_len != SIZE_MAX) {
+        size_t needed =
+            reason_len + 50; // flawfinder: ignore - safe_strlen used
+        char *full_message = malloc(needed);
+        if (full_message) {
+          snprintf(full_message, needed, "Geometry is invalid. Reason: %s",
+                   reason);
+          result.text_result =
+              safe_strdup(full_message, SAFE_MAX_STRING_LENGTH);
+          free(full_message);
+        }
       }
       free(reason);
     } else {

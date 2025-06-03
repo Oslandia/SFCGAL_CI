@@ -90,23 +90,11 @@ operation_requires_arg(const char *name)
 static const char *
 get_input_type_str(const Operation *op)
 {
-  static char buffer[32];
-
   if (op->requires_geom_b) {
-    if (op->requires_arg) {
-      strcpy(buffer, "A, B, params");
-    } else {
-      strcpy(buffer, "A, B");
-    }
+    return op->requires_arg ? "A, B, params" : "A, B";
   } else {
-    if (op->requires_arg) {
-      strcpy(buffer, "A, params");
-    } else {
-      strcpy(buffer, "A");
-    }
+    return op->requires_arg ? "A, params" : "A";
   }
-
-  return buffer;
 }
 
 /**
@@ -214,7 +202,10 @@ calculate_column_widths(size_t *max_category_width, size_t *max_operation_width,
 
   // Check category width
   for (int i = 0; i < num_categories; i++) {
-    size_t category_len = strlen(categories[i]);
+    size_t category_len = safe_strlen(categories[i], SAFE_MAX_STRING_LENGTH);
+    if (category_len == SIZE_MAX) {
+      continue; // Skip invalid category names
+    }
     if (category_len > *max_category_width) {
       *max_category_width = category_len;
     }
@@ -226,14 +217,20 @@ calculate_column_widths(size_t *max_category_width, size_t *max_operation_width,
   // Check operation width, input width, output width, and description width
   for (int i = 0; operations[i].name != NULL; i++) {
     // Operation name
-    size_t name_len = strlen(operations[i].name);
+    size_t name_len = safe_strlen(operations[i].name, SAFE_MAX_STRING_LENGTH);
+    if (name_len == SIZE_MAX) {
+      continue; // Skip invalid operation names
+    }
     if (name_len > *max_operation_width) {
       *max_operation_width = name_len;
     }
 
     // Input type
     const char *input_type = get_input_type_str(&operations[i]);
-    size_t      input_len  = strlen(input_type);
+    size_t      input_len  = safe_strlen(input_type, SAFE_MAX_STRING_LENGTH);
+    if (input_len == SIZE_MAX) {
+      continue; // Skip invalid input type strings
+    }
     if (input_len > *max_input_width) {
       *max_input_width = input_len;
     }
@@ -241,7 +238,11 @@ calculate_column_widths(size_t *max_category_width, size_t *max_operation_width,
     // Output type (single character, no need to check)
 
     // Description
-    size_t desc_len = strlen(operations[i].description);
+    size_t desc_len =
+        safe_strlen(operations[i].description, SAFE_MAX_STRING_LENGTH);
+    if (desc_len == SIZE_MAX) {
+      continue; // Skip invalid descriptions
+    }
     if (desc_len > *max_description_width) {
       *max_description_width = desc_len;
     }

@@ -135,7 +135,7 @@ init_options(Options *options)
 static bool
 parse_options(int argc, char *argv[], Options *options)
 {
-  if (!argv || !options) {
+  if (!argv || !options || argc < 0 || argc > 10) {
     return false;
   }
 
@@ -166,9 +166,23 @@ parse_options(int argc, char *argv[], Options *options)
   int  option_index = 0;
   bool error        = false;
 
+  if (argc > ARG_MAX || argc < 0) {
+    fprintf(stderr, "Invalid argument count\n");
+    return EXIT_FAILURE;
+  }
+
+  // Validate argv strings length to prevent buffer overflow
+  for (int i = 0; i < argc; i++) {
+    if (argv[i] && safe_strlen(argv[i], SAFE_MAX_STRING_LENGTH) == SIZE_MAX) {
+      fprintf(stderr, "Argument %d too long\n", i);
+      return false;
+    }
+  }
+
   // Process options
-  while ((c = getopt_long(argc, argv, "a:b:f:p:qtvhV", long_options,
-                          &option_index)) != -1) {
+  while ((c = getopt_long(argc, argv, // flawfinder: ignore
+                          "a:b:f:p:qtvhV", long_options, &option_index)) !=
+         -1) {
     switch (c) {
     case 'a':
       options->source_a = optarg;

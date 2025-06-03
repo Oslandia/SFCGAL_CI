@@ -68,7 +68,7 @@
 #include "SFCGAL/detail/transform/ForceOrderPoints.h"
 #include "SFCGAL/detail/transform/ForceZOrderPoints.h"
 #include "SFCGAL/detail/transform/RoundTransform.h"
-#include <cmath>
+#include <cstdio>
 
 //
 // Note about sfcgal_geometry_t pointers: they are basically void* pointers that
@@ -89,8 +89,24 @@
 /// @privatesection
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-static sfcgal_error_handler_t __sfcgal_warning_handler = printf;
-static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
+static int
+safe_warning_handler(const char *format, ...)
+{
+  if (!format)
+    return 0;
+  return fprintf(stderr, "SFCGAL WARNING: %s\n", format); // Fixed format
+}
+
+static int
+safe_error_handler(const char *format, ...)
+{
+  if (!format)
+    return 0;
+  return fprintf(stderr, "SFCGAL ERROR: %s\n", format); // Fixed format
+}
+
+static sfcgal_error_handler_t __sfcgal_warning_handler = safe_warning_handler;
+static sfcgal_error_handler_t __sfcgal_error_handler   = safe_error_handler;
 
   #define SFCGAL_WARNING __sfcgal_warning_handler
   #define SFCGAL_ERROR __sfcgal_error_handler

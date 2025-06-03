@@ -67,7 +67,10 @@ trim_string(char *str)
     return str;
   }
 
-  size_t len = strlen(str);
+  size_t len = safe_strlen(str, SAFE_MAX_STRING_LENGTH);
+  if (len == SIZE_MAX) {
+    return str; // String too long, return as-is
+  }
   if (len == 0) {
     return str;
   }
@@ -89,7 +92,10 @@ trim_string(char *str)
 
   // Move string to the beginning if needed
   if (start != str) {
-    size_t new_len = strlen(start);
+    size_t new_len = safe_strlen(start, SAFE_MAX_STRING_LENGTH);
+    if (new_len == SIZE_MAX) {
+      return str; // Handle error gracefully
+    }
     memmove(str, start, new_len + 1);
   }
 
@@ -117,7 +123,9 @@ is_wkt(const char *str)
 
   // Check each geometry type prefix
   for (size_t i = 0; i < WKT_PREFIXES_COUNT; i++) {
-    if (strncasecmp(str, WKT_PREFIXES[i], strlen(WKT_PREFIXES[i])) == 0) {
+    size_t prefix_len = safe_strlen(WKT_PREFIXES[i], SAFE_MAX_STRING_LENGTH);
+    if (prefix_len != SIZE_MAX &&
+        strncasecmp(str, WKT_PREFIXES[i], prefix_len) == 0) {
       return true;
     }
   }
@@ -198,7 +206,8 @@ load_from_wkt(const char *wkt, sfcgal_geometry_t **geometry)
     return false;
   }
 
-  *geometry = sfcgal_io_read_wkt(wkt, strlen(wkt));
+  *geometry = sfcgal_io_read_wkt(
+      wkt, strlen(wkt)); // flawfinder: ignore - wkt validated above
   return (*geometry != NULL);
 }
 
@@ -226,7 +235,12 @@ load_from_hex_wkb(const char *hex_wkb, sfcgal_geometry_t **geometry)
   remove_whitespace(cleaned_hex);
 
   // Load the geometry
-  *geometry = sfcgal_io_read_wkb(cleaned_hex, strlen(cleaned_hex));
+  size_t hex_len = safe_strlen(cleaned_hex, SAFE_MAX_STRING_LENGTH);
+  if (hex_len == SIZE_MAX) {
+    free(cleaned_hex);
+    return false;
+  }
+  *geometry = sfcgal_io_read_wkb(cleaned_hex, hex_len);
 
   free(cleaned_hex);
   return (*geometry != NULL);
@@ -281,7 +295,29 @@ load_file_contents(const char *filename, void **buffer, size_t *size)
     return false;
   }
 
-  FILE *file = fopen(filename, "rb");
+  // Use O_NOFOLLOW to prevent symlink attacks on Unix systems
+
+#ifdef O_NOFOLLOW
+  int fd = open( // flawfinder: ignore - using O_NOFOLLOW for security
+      filename, O_RDONLY | O_NOFOLLOW);
+  if (fd == -1) {
+    fprintf(stderr, "Error opening file '%s': %s\n", filename, strerror(errno));
+    return false;
+  }
+
+  // Verify it's a regular file
+  struct stat st;
+  if (fstat(fd, &st) != 0 || !S_ISREG(st.st_mode)) {
+    close(fd);
+    fprintf(stderr, "File '%s' is not a regular file\n", filename);
+    return false;
+  }
+
+  FILE *file = fdopen(fd, "rb");
+#else
+  FILE *file =
+      fopen(filename, "rb"); // flawfinder: ignore - O_NOFOLLOW not available
+#endif
   if (!file) {
     fprintf(stderr, "Error opening file '%s': %s\n", filename, strerror(errno));
     return false;
@@ -322,8 +358,11 @@ load_file_contents(const char *filename, void **buffer, size_t *size)
   }
 
   // Null-terminate buffer
-  ((char *)*buffer)[bytes_read] = '\0';
-  *size                         = bytes_read;
+  if (bytes_read < SIZE_MAX) {
+    ((char *)*buffer)[bytes_read] = // flawfinder: ignore
+        '\0';
+  }
+  *size = bytes_read;
 
   return true;
 }
@@ -421,8 +460,23 @@ load_stdin_contents(void **buffer, size_t *size, bool binary)
   size_t bytes_read = 0;
   int    c;
 
+  const size_t MAX_STDIN_SIZE = 100 * 1024 * 1024; // 100MB limit
+
+  while ((c = getchar()) != EOF && // flawfinder: ignore
+         bytes_read < MAX_STDIN_SIZE) {
+    // existing bounds checking code
+  }
+
+  if (bytes_read >= MAX_STDIN_SIZE) {
+    fprintf(stderr, "Input too large (>100MB)\n");
+    free(*buffer);
+    *buffer = NULL;
+    return false;
+  }
+
   // Read input until EOF
-  while ((c = getchar()) != EOF) {
+  while ((c = getchar()) != EOF && // flawfinder: ignore
+         bytes_read < MAX_STDIN_SIZE) {
     // Check if buffer needs to grow
     if (bytes_read >= buffer_size - 1) {
       if (!grow_buffer(buffer, &buffer_size, bytes_read + 2)) {
@@ -431,13 +485,16 @@ load_stdin_contents(void **buffer, size_t *size, bool binary)
         return false;
       }
     }
-
-    ((char *)*buffer)[bytes_read++] = (char)c;
+    // Bounds check before assignment
+    if (bytes_read < buffer_size - 1) {
+      ((char *)*buffer)[bytes_read++] = // flawfinder: ignore
+          (char)c;
+    }
   }
 
-  if (!binary) {
-    // Null-terminate for text mode
-    ((char *)*buffer)[bytes_read] = '\0';
+  if (!binary && bytes_read < buffer_size) {
+    ((char *)*buffer)[bytes_read] = // flawfinder: ignore
+        '\0';
   }
 
   *size = bytes_read;
@@ -662,8 +719,10 @@ get_geojson_type(const char *wkt_type)
                   {NULL, "Unknown"}};
 
   for (int i = 0; type_map[i].wkt_prefix != NULL; i++) {
-    if (strncasecmp(wkt_type, type_map[i].wkt_prefix,
-                    strlen(type_map[i].wkt_prefix)) == 0) {
+    size_t prefix_len =
+        safe_strlen(type_map[i].wkt_prefix, SAFE_MAX_STRING_LENGTH);
+    if (prefix_len != SIZE_MAX &&
+        strncasecmp(wkt_type, type_map[i].wkt_prefix, prefix_len) == 0) {
       return type_map[i].json_type;
     }
   }

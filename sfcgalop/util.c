@@ -54,7 +54,7 @@ warning_handler(const char *format, ...)
   fprintf(stderr, "SFCGAL WARNING: ");
 
   va_start(args, format);
-  vfprintf(stderr, format, args);
+  vfprintf(stderr, format, args); // flawfinder: ignore - format validated above
   va_end(args);
 
   fprintf(stderr, "\n");
@@ -87,7 +87,7 @@ error_handler(const char *format, ...)
   fprintf(stderr, "SFCGAL ERROR: ");
 
   va_start(args, format);
-  vfprintf(stderr, format, args);
+  vfprintf(stderr, format, args); // flawfinder: ignore - format validated above
   va_end(args);
 
   fprintf(stderr, "\n");

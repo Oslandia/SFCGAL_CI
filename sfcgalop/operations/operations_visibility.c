@@ -34,11 +34,19 @@ op_visibility_segment(const char *op_arg, const sfcgal_geometry_t *geom_a,
     wkt_value = find_parameter(op_arg, "point_b", &found);
 
     if (found && wkt_value) {
-      point_b = sfcgal_io_read_wkt(wkt_value, strlen(wkt_value));
+      size_t wkt_len = safe_strlen(wkt_value, SAFE_MAX_STRING_LENGTH);
+      if (wkt_len != SIZE_MAX) {
+        point_b = sfcgal_io_read_wkt(wkt_value, wkt_len);
+      }
       free((void *)(uintptr_t)wkt_value);
     } else {
       // Try to use the full op_arg as a WKT string
-      point_b = sfcgal_io_read_wkt(op_arg, strlen(op_arg));
+      size_t arg_len = safe_strlen(op_arg, SAFE_MAX_STRING_LENGTH);
+      if (arg_len != SIZE_MAX) {
+        point_b = sfcgal_io_read_wkt(op_arg, arg_len);
+      } else {
+        point_b = NULL; // Handle string too long error
+      }
     }
 
     if (!point_b) {

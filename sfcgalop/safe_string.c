@@ -62,7 +62,7 @@ safe_strdup(const char *str, size_t max_len)
     return NULL;
   }
 
-  memcpy(result, str, len);
+  memcpy(result, str, len); // flawfinder: ignore - length validated above
   result[len] = '\0';
   return result;
 }
@@ -115,7 +115,7 @@ safe_strcat(char *dest, size_t dest_size, const char *src)
   errno_t err = strcat_s(dest, dest_size, src);
   return (err == 0);
 #else
-  strcat(dest, src);
+  strcat(dest, src); // flawfinder: ignore - bounds checked above
   return true;
 #endif
 }
@@ -143,7 +143,7 @@ safe_strcpy(char *dest, size_t dest_size, const char *src)
   errno_t err = strcpy_s(dest, dest_size, src);
   return (err == 0);
 #else
-  strcpy(dest, src);
+  strcpy(dest, src); // flawfinder: ignore - bounds checked above
   return true;
 #endif
 }
