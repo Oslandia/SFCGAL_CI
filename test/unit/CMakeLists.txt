@@ -6,7 +6,21 @@ if( SFCGAL_USE_STATIC_LIBS )
   add_definitions( "-DSFCGAL_USE_STATIC_LIBS" )
 endif()
 
-file( GLOB_RECURSE SFCGAL_UNIT_TEST_SOURCES *.cpp )
+set(SFCGAL_CONFIG_EXECUTABLE "${CMAKE_BINARY_DIR}/sfcgal-config")
+if(WIN32)
+  set(SFCGAL_CONFIG_EXECUTABLE "${CMAKE_BINARY_DIR}/sfcgal-config.exe")
+endif()
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/SFCGAL/testsfcgalconfig.cpp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/SFCGAL/testsfcgalconfig.cpp"
+  @ONLY
+)
+
+file(GLOB_RECURSE SFCGAL_UNIT_TEST_SOURCES
+     "${CMAKE_CURRENT_BINARY_DIR}/testsfcgalconfig.cpp"
+     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC )
     list(REMOVE_ITEM SFCGAL_UNIT_TEST_SOURCES ${CMAKE_SOURCE_DIR}/test/unit/SFCGAL/algorithm/AlphaShapesTest.cpp)
