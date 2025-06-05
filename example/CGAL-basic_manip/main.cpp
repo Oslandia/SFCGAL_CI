@@ -1,5 +1,6 @@
 /**
  *   SFCGAL
+// Copyright (c) 2024-2025, SFCGAL team.
  *
  *   Copyright (C) 2012-2013 Oslandia <infos@oslandia.com>
  *   Copyright (C) 2012-2013 IGN (http://www.ign.fr)

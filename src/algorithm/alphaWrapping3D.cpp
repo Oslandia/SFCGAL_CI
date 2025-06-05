@@ -1,4 +1,5 @@
 // Copyright (c) 2024-2024, SFCGAL Contributors and Oslandia
+// Copyright (c) 2024-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/algorithm/alphaWrapping3D.h"
