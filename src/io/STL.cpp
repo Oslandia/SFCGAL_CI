@@ -1,4 +1,5 @@
 // Copyright (c) 2025-2025, Oslandia.
+// Copyright (c) 2025-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/io/STL.h"
