@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2025 Oslandia
+// Copyright (c) 2024-2025, SFCGAL team.
 
 #include <stdio.h>
 #include <stdlib.h>
