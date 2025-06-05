@@ -1,3 +1,6 @@
+// Copyright (c) 2024-2024, Oslandia.
+// SPDX-License-Identifier: LGPL-2.0-or-later
+
 #include "SFCGAL/primitive3d/Sphere.h"
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Vector_3.h>

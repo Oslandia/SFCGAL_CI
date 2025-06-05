@@ -1,4 +1,7 @@
-// scale.cpp
+// Copyright (c) 2012-2013, IGN France.
+// Copyright (c) 2012-2024, Oslandia.
+// SPDX-License-Identifier: LGPL-2.0-or-later
+
 #include "SFCGAL/algorithm/scale.h"
 #include "SFCGAL/detail/transform/AffineTransform2.h"
 #include "SFCGAL/detail/transform/AffineTransform3.h"

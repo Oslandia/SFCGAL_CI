@@ -1,3 +1,6 @@
+// Copyright (c) 2024-2024, Oslandia.
+// SPDX-License-Identifier: LGPL-2.0-or-later
+
 #include "SFCGAL/io/vtk.h"
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryCollection.h"

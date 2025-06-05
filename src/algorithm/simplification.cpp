@@ -1,3 +1,6 @@
+// Copyright (c) 2025-2025, SFCGAL Team.
+// SPDX-License-Identifier: LGPL-2.0-or-later
+
 #include "SFCGAL/algorithm/simplification.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
