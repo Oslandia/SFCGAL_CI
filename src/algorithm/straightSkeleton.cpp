@@ -220,7 +220,7 @@ checkNoTouchingHoles(const Polygon &geom)
     for (size_t rj = ri + 1; rj < numRings; ++rj) {
       std::unique_ptr<Geometry> inter =
           geom.is3D() ? intersection3D(geom.ringN(ri), geom.ringN(rj))
-                   : intersection(geom.ringN(ri), geom.ringN(rj));
+                      : intersection(geom.ringN(ri), geom.ringN(rj));
 
       // @note this check would accept rings touching at
       //       more than a single point, which may be
@@ -284,7 +284,7 @@ extractPolygons(const Geometry &geom, std::vector<Polygon> &vect)
 /// @publicsection
 
 auto
-straightSkeleton(const Geometry &geom, bool          autoOrientation,
+straightSkeleton(const Geometry &geom, bool       autoOrientation,
                  NoValidityCheck /*unused*/, bool innerOnly,
                  bool outputDistanceInM, const double & /*toleranceAbs*/)
     -> std::unique_ptr<MultiLineString>
@@ -357,7 +357,8 @@ straightSkeleton(const MultiPolygon &geom, bool /*autoOrientation*/,
 
   for (size_t i = 0; i < geom.numGeometries(); i++) {
     Kernel::Vector_2           trans;
-    Polygon_with_holes_2 const polygon = preparePolygon(geom.polygonN(i), trans);
+    Polygon_with_holes_2 const polygon =
+        preparePolygon(geom.polygonN(i), trans);
     SHARED_PTR<Straight_skeleton_2> const skeleton = straightSkeleton(polygon);
 
     if (skeleton == nullptr) {
@@ -470,7 +471,8 @@ extrudeStraightSkeleton(const Geometry &geom, double building_height,
   auto building = extrude(geom.as<Polygon>(), building_height);
 
   // Create result from building exterior shell
-  result = std::make_unique<PolyhedralSurface>(building->as<Solid>().exteriorShell());
+  result = std::make_unique<PolyhedralSurface>(
+      building->as<Solid>().exteriorShell());
 
   // Add filtered roof patches
   result->addPatchs(*roof);
