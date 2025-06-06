@@ -212,15 +212,15 @@ straightSkeleton(const Polygon_with_holes_2 &poly)
 // @todo find upstream reference to find out exact case
 // See https://github.com/Oslandia/SFCGAL/issues/75
 void
-checkNoTouchingHoles(const Polygon &g)
+checkNoTouchingHoles(const Polygon &geom)
 {
-  const size_t numRings = g.numRings();
+  const size_t numRings = geom.numRings();
 
   for (size_t ri = 0; ri < numRings - 1; ++ri) {
     for (size_t rj = ri + 1; rj < numRings; ++rj) {
       std::unique_ptr<Geometry> inter =
-          g.is3D() ? intersection3D(g.ringN(ri), g.ringN(rj))
-                   : intersection(g.ringN(ri), g.ringN(rj));
+          geom.is3D() ? intersection3D(geom.ringN(ri), geom.ringN(rj))
+                   : intersection(geom.ringN(ri), geom.ringN(rj));
 
       // @note this check would accept rings touching at
       //       more than a single point, which may be
@@ -253,19 +253,19 @@ preparePolygon(const Polygon &poly, Kernel::Vector_2 &trans)
 }
 
 void
-extractPolygons(const Geometry &g, std::vector<Polygon> &vect)
+extractPolygons(const Geometry &geom, std::vector<Polygon> &vect)
 {
-  switch (g.geometryTypeId()) {
+  switch (geom.geometryTypeId()) {
   case TYPE_TRIANGLE:
-    vect.push_back(g.as<Triangle>().toPolygon());
+    vect.push_back(geom.as<Triangle>().toPolygon());
     break;
   case TYPE_POLYGON:
-    vect.push_back(g.as<Polygon>());
+    vect.push_back(geom.as<Polygon>());
     break;
   case TYPE_MULTIPOLYGON: {
-    const auto &mp = g.as<MultiPolygon>();
-    for (size_t i = 0; i < mp.numGeometries(); i++) {
-      vect.push_back(mp.polygonN(i));
+    const auto &multiPolygon = geom.as<MultiPolygon>();
+    for (size_t i = 0; i < multiPolygon.numGeometries(); i++) {
+      vect.push_back(multiPolygon.polygonN(i));
     }
     break;
   }
@@ -284,22 +284,22 @@ extractPolygons(const Geometry &g, std::vector<Polygon> &vect)
 /// @publicsection
 
 auto
-straightSkeleton(const Geometry &g, bool          autoOrientation,
+straightSkeleton(const Geometry &geom, bool          autoOrientation,
                  NoValidityCheck /*unused*/, bool innerOnly,
                  bool outputDistanceInM, const double & /*toleranceAbs*/)
     -> std::unique_ptr<MultiLineString>
 {
-  switch (g.geometryTypeId()) {
+  switch (geom.geometryTypeId()) {
   case TYPE_TRIANGLE:
-    return straightSkeleton(g.as<Triangle>().toPolygon(), autoOrientation,
+    return straightSkeleton(geom.as<Triangle>().toPolygon(), autoOrientation,
                             innerOnly, outputDistanceInM);
 
   case TYPE_POLYGON:
-    return straightSkeleton(g.as<Polygon>(), autoOrientation, innerOnly,
+    return straightSkeleton(geom.as<Polygon>(), autoOrientation, innerOnly,
                             outputDistanceInM);
 
   case TYPE_MULTIPOLYGON:
-    return straightSkeleton(g.as<MultiPolygon>(), autoOrientation, innerOnly,
+    return straightSkeleton(geom.as<MultiPolygon>(), autoOrientation, innerOnly,
                             outputDistanceInM);
 
   default:
@@ -308,30 +308,30 @@ straightSkeleton(const Geometry &g, bool          autoOrientation,
 }
 
 auto
-straightSkeleton(const Geometry &g, bool autoOrientation, bool innerOnly,
+straightSkeleton(const Geometry &geom, bool autoOrientation, bool innerOnly,
                  bool outputDistanceInM, const double & /*toleranceAbs*/)
     -> std::unique_ptr<MultiLineString>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geom);
 
   std::unique_ptr<MultiLineString> result(straightSkeleton(
-      g, autoOrientation, NoValidityCheck(), innerOnly, outputDistanceInM));
+      geom, autoOrientation, NoValidityCheck(), innerOnly, outputDistanceInM));
   propagateValidityFlag(*result, true);
   return result;
 }
 auto
-straightSkeleton(const Polygon &g, bool /*autoOrientation*/, bool innerOnly,
+straightSkeleton(const Polygon &geom, bool /*autoOrientation*/, bool innerOnly,
                  bool outputDistanceInM, const double &toleranceAbs)
     -> std::unique_ptr<MultiLineString>
 {
   std::unique_ptr<MultiLineString> result(new MultiLineString);
 
-  if (g.isEmpty()) {
+  if (geom.isEmpty()) {
     return result;
   }
 
   Kernel::Vector_2                      trans;
-  Polygon_with_holes_2 const            polygon  = preparePolygon(g, trans);
+  Polygon_with_holes_2 const            polygon  = preparePolygon(geom, trans);
   SHARED_PTR<Straight_skeleton_2> const skeleton = straightSkeleton(polygon);
 
   if (skeleton == nullptr) {
@@ -349,15 +349,15 @@ straightSkeleton(const Polygon &g, bool /*autoOrientation*/, bool innerOnly,
 }
 
 auto
-straightSkeleton(const MultiPolygon &g, bool /*autoOrientation*/,
+straightSkeleton(const MultiPolygon &geom, bool /*autoOrientation*/,
                  bool innerOnly, bool outputDistanceInM,
                  const double &toleranceAbs) -> std::unique_ptr<MultiLineString>
 {
   std::unique_ptr<MultiLineString> result(new MultiLineString);
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
+  for (size_t i = 0; i < geom.numGeometries(); i++) {
     Kernel::Vector_2           trans;
-    Polygon_with_holes_2 const polygon = preparePolygon(g.polygonN(i), trans);
+    Polygon_with_holes_2 const polygon = preparePolygon(geom.polygonN(i), trans);
     SHARED_PTR<Straight_skeleton_2> const skeleton = straightSkeleton(polygon);
 
     if (skeleton == nullptr) {
@@ -378,14 +378,14 @@ straightSkeleton(const MultiPolygon &g, bool /*autoOrientation*/,
 }
 
 auto
-approximateMedialAxis(const Geometry &g) -> std::unique_ptr<MultiLineString>
+approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geom);
 
   std::unique_ptr<MultiLineString> mx(new MultiLineString);
 
   std::vector<Polygon> polys;
-  extractPolygons(g, polys);
+  extractPolygons(geom, polys);
 
   for (auto &poly : polys) {
     Kernel::Vector_2                      trans;
@@ -420,16 +420,16 @@ extrudeStraightSkeleton(const Polygon &geom, double height)
 }
 
 auto
-extrudeStraightSkeleton(const Geometry &g, double height)
+extrudeStraightSkeleton(const Geometry &geom, double height)
     -> std::unique_ptr<PolyhedralSurface>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geom);
 
-  if (g.geometryTypeId() != TYPE_POLYGON) {
+  if (geom.geometryTypeId() != TYPE_POLYGON) {
     BOOST_THROW_EXCEPTION(Exception("Geometry must be a Polygon"));
   }
   std::unique_ptr<PolyhedralSurface> result(
-      extrudeStraightSkeleton(g.as<Polygon>(), height));
+      extrudeStraightSkeleton(geom.as<Polygon>(), height));
   propagateValidityFlag(*result, true);
   return result;
 }
@@ -481,21 +481,21 @@ extrudeStraightSkeleton(const Geometry &geom, double building_height,
 }
 
 auto
-straightSkeletonPartition(const Geometry &g, bool autoOrientation)
+straightSkeletonPartition(const Geometry &geom, bool autoOrientation)
     -> std::unique_ptr<PolyhedralSurface>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geom);
 
   std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
 
-  switch (g.geometryTypeId()) {
+  switch (geom.geometryTypeId()) {
   case TYPE_TRIANGLE:
-    return straightSkeletonPartition(g.as<Triangle>().toPolygon(),
+    return straightSkeletonPartition(geom.as<Triangle>().toPolygon(),
                                      autoOrientation);
   case TYPE_POLYGON:
-    return straightSkeletonPartition(g.as<Polygon>(), autoOrientation);
+    return straightSkeletonPartition(geom.as<Polygon>(), autoOrientation);
   case TYPE_MULTIPOLYGON:
-    return straightSkeletonPartition(g.as<MultiPolygon>(), autoOrientation);
+    return straightSkeletonPartition(geom.as<MultiPolygon>(), autoOrientation);
   default:
     BOOST_THROW_EXCEPTION(
         Exception("Geometry must be a Polygon or MultiPolygon"));
@@ -505,14 +505,14 @@ straightSkeletonPartition(const Geometry &g, bool autoOrientation)
 }
 
 auto
-straightSkeletonPartition(const MultiPolygon &g, bool autoOrientation)
+straightSkeletonPartition(const MultiPolygon &geom, bool autoOrientation)
     -> std::unique_ptr<PolyhedralSurface>
 {
   std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
+  for (size_t i = 0; i < geom.numGeometries(); i++) {
     std::unique_ptr<PolyhedralSurface> partitioned =
-        straightSkeletonPartition(g.polygonN(i), autoOrientation);
+        straightSkeletonPartition(geom.polygonN(i), autoOrientation);
     for (size_t j = 0; j < partitioned->numPatches(); j++) {
       result->addPatch(partitioned->patchN(j));
     }
@@ -522,17 +522,17 @@ straightSkeletonPartition(const MultiPolygon &g, bool autoOrientation)
 }
 
 auto
-straightSkeletonPartition(const Polygon &g, bool /*autoOrientation*/)
+straightSkeletonPartition(const Polygon &geom, bool /*autoOrientation*/)
     -> std::unique_ptr<PolyhedralSurface>
 {
   std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
 
-  if (g.isEmpty()) {
+  if (geom.isEmpty()) {
     return result;
   }
 
   Kernel::Vector_2                      trans;
-  Polygon_with_holes_2 const            polygon  = preparePolygon(g, trans);
+  Polygon_with_holes_2 const            polygon  = preparePolygon(geom, trans);
   SHARED_PTR<Straight_skeleton_2> const skeleton = straightSkeleton(polygon);
 
   if (skeleton == nullptr) {
