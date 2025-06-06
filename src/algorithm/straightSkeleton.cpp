@@ -405,14 +405,17 @@ approximateMedialAxis(const Geometry &g) -> std::unique_ptr<MultiLineString>
 }
 
 auto
-extrudeStraightSkeleton(const Polygon &g, double height)
+extrudeStraightSkeleton(const Polygon &geom, double height)
     -> std::unique_ptr<PolyhedralSurface>
 {
+  std::unique_ptr<PolyhedralSurface> polys(new PolyhedralSurface);
+  if (geom.isEmpty()) {
+    return polys;
+  }
   Surface_mesh_3 sm;
-  CGAL::extrude_skeleton(g.toPolygon_with_holes_2(), sm,
+  CGAL::extrude_skeleton(geom.toPolygon_with_holes_2(), sm,
                          CGAL::parameters::maximum_height(height));
-  std::unique_ptr<PolyhedralSurface> polys(new PolyhedralSurface(sm));
-
+  polys = std::make_unique<PolyhedralSurface>(sm);
   return polys;
 }
 
@@ -436,6 +439,12 @@ extrudeStraightSkeleton(const Geometry &geom, double building_height,
                         double roof_height)
     -> std::unique_ptr<PolyhedralSurface>
 {
+  std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
+
+  if (geom.isEmpty()) {
+    return result;
+  }
+
   // Create complete roof with base
   auto completeRoof = extrudeStraightSkeleton(geom, roof_height);
 
@@ -461,8 +470,7 @@ extrudeStraightSkeleton(const Geometry &geom, double building_height,
   auto building = extrude(geom.as<Polygon>(), building_height);
 
   // Create result from building exterior shell
-  auto result = std::make_unique<PolyhedralSurface>(
-      building->as<Solid>().exteriorShell());
+  result = std::make_unique<PolyhedralSurface>(building->as<Solid>().exteriorShell());
 
   // Add filtered roof patches
   result->addPatchs(*roof);
