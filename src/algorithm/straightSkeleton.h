@@ -29,8 +29,8 @@ struct NoValidityCheck;
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
-SFCGAL_API std::unique_ptr<MultiLineString>
-           approximateMedialAxis(const Geometry &geom);
+SFCGAL_API auto
+approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>;
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
@@ -45,10 +45,11 @@ SFCGAL_API std::unique_ptr<MultiLineString>
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
-SFCGAL_API std::unique_ptr<MultiLineString>
-           straightSkeleton(const Geometry &geom, bool autoOrientation = true,
-                            bool innerOnly = false, bool outputDistanceInM = false,
-                            const double &toleranceAbs = EPSILON);
+SFCGAL_API auto
+straightSkeleton(const Geometry &geom, bool autoOrientation = true,
+                 bool innerOnly = false, bool outputDistanceInM = false,
+                 const double &toleranceAbs = EPSILON)
+    -> std::unique_ptr<MultiLineString>;
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
@@ -63,10 +64,11 @@ SFCGAL_API std::unique_ptr<MultiLineString>
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
-SFCGAL_API std::unique_ptr<MultiLineString>
+SFCGAL_API auto
 straightSkeleton(const Geometry &geom, bool autoOrientation, NoValidityCheck,
                  bool innerOnly = false, bool outputDistanceInM = false,
-                 const double &toleranceAbs = EPSILON);
+                 const double &toleranceAbs = EPSILON)
+    -> std::unique_ptr<MultiLineString>;
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
@@ -74,10 +76,11 @@ straightSkeleton(const Geometry &geom, bool autoOrientation, NoValidityCheck,
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
-SFCGAL_API std::unique_ptr<MultiLineString>
-           straightSkeleton(const Polygon &geom, bool autoOrientation = true,
-                            bool innerOnly = false, bool outputDistanceInM = false,
-                            const double &toleranceAbs = EPSILON);
+SFCGAL_API auto
+straightSkeleton(const Polygon &geom, bool autoOrientation = true,
+                 bool innerOnly = false, bool outputDistanceInM = false,
+                 const double &toleranceAbs = EPSILON)
+    -> std::unique_ptr<MultiLineString>;
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
@@ -85,10 +88,11 @@ SFCGAL_API std::unique_ptr<MultiLineString>
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
-SFCGAL_API std::unique_ptr<MultiLineString>
+SFCGAL_API auto
 straightSkeleton(const MultiPolygon &geom, bool autoOrientation = true,
                  bool innerOnly = false, bool outputDistanceInM = false,
-                 const double &toleranceAbs = EPSILON);
+                 const double &toleranceAbs = EPSILON)
+    -> std::unique_ptr<MultiLineString>;
 
 /**
  * @brief build a 3D straight skeleton extruded for a Polygon
