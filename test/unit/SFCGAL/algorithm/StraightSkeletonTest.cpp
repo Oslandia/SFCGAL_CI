@@ -272,6 +272,24 @@ BOOST_AUTO_TEST_CASE(testDegenerateMultiLineString)
   }
 }
 
+BOOST_AUTO_TEST_CASE(testEmptyExtrudeStraightSkeleton)
+{
+  std::unique_ptr<Geometry> const    geom(io::readWkt("POLYGON EMPTY"));
+  std::unique_ptr<PolyhedralSurface> out(
+      algorithm::extrudeStraightSkeleton(*geom, 2.0));
+  std::string const expectedWKT("POLYHEDRALSURFACE EMPTY");
+  BOOST_CHECK_EQUAL(out->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testEmptyExtrudeStraightSkeletonRoofTop)
+{
+  std::unique_ptr<Geometry> const    geom(io::readWkt("POLYGON EMPTY"));
+  std::unique_ptr<PolyhedralSurface> out(
+      algorithm::extrudeStraightSkeleton(*geom, 2.0, 10.0));
+  std::string const expectedWKT("POLYHEDRALSURFACE EMPTY");
+  BOOST_CHECK_EQUAL(out->asText(2), expectedWKT);
+}
+
 BOOST_AUTO_TEST_CASE(testExtrudeStraightSkeleton)
 {
 
