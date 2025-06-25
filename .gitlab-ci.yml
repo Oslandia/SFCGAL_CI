@@ -47,6 +47,7 @@ include:
   - local: /.gitlab/pipeline/build-windows.yml
   - local: /.gitlab/pipeline/documentation.yml
   - local: /.gitlab/pipeline/commitizen.yml
+  - local: /.gitlab/pipeline/thread-safety.yml
 
 semgrep-sast:
   stage: lint

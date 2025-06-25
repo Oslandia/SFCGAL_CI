@@ -1,0 +1,26 @@
+thread_safety:
+  stage: plateform-build-test
+  variables:
+    TSAN_OPTIONS: "log_path=tsan"
+  image: fedora:42
+  rules:
+    # on default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+  script:
+    - yum update -qy
+    - yum install -y sudo wget clang
+    - ./ci/fedora/before_install.sh ${CGAL_LATEST_VERSION}
+    - cd $CI_PROJECT_DIR
+    - cmake -DCMAKE_BUILD_TYPE=Debug -DSFCGAL_TSAN=ON -DSFCGAL_BUILD_TESTS=ON -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCGAL_DIR=${CI_PROJECT_DIR}/CGAL-${CGAL_LATEST_VERSION}
+    - make -j$(nproc)
+    - ctest -VV || true
+    - :> warnings_tsan.txt
+    - find -type f -iname "tsan*" -exec grep -i "warning" {} \; > warnings_tsan.txt
+    - exit $(grep -ic "warning" warnings_tsan.txt)
+  artifacts:
+    when: on_failure
+    paths:
+      - "**/tsan.*"
