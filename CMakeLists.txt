@@ -47,6 +47,7 @@ option( SFCGAL_BUILD_DOC "Build documentation" OFF )
 
 option( SFCGAL_WITH_OSG "Compile with OpenSceneGraph support" OFF )
 option( SFCGAL_VALGRIND "Compile with Valgrind support" OFF )
+option( SFCGAL_TSAN "Enable ThreadSanitizer (Debug only)" OFF)
 
 # Configure CCache if available
 if(NOT MSVC)
@@ -75,6 +76,17 @@ endif ()
 if( SFCGAL_VALGRIND )
   # valgrind tends to alter how CGAL works. To avoid the '-frounding-math' warning we need to activate this define:
   add_definitions( "-DCGAL_DISABLE_ROUNDING_MATH_CHECK" )
+endif()
+
+# Require Debug build if SFCGAL_TSAN is ON
+if ( SFCGAL_TSAN )
+    if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(FATAL_ERROR "SFCGAL_TSAN is enabled but CMAKE_BUILD_TYPE is not Debug. Please configure with -DCMAKE_BUILD_TYPE=Debug")
+    endif()
+
+    message(STATUS "ThreadSanitizer enabled (C & C++)")
+    add_compile_options(-fsanitize=thread -g)
+    add_link_options(-fsanitize=thread)
 endif()
 
 #-- find CGAL  ---------------------------------------------
