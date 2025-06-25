@@ -502,8 +502,6 @@ sfcgal_triangle_vertex(const sfcgal_geometry_t *triangle, int i);
  * Sets one vertex of a Triangle
  * @pre triangle must be a Triangle
  * @pre vertex must be a Point
- * @post returns a pointer to one of the vertices as a Point. This pointer is
- * not writable and must not be deallocated by the caller
  * @ingroup capi
  */
 SFCGAL_API void
@@ -581,6 +579,8 @@ sfcgal_polygon_interior_ring_n(const sfcgal_geometry_t *polygon, size_t i);
  * Adds an interior ring to a given Polygon
  * @pre polygon must be a Polygon
  * @pre ring must be a LineString
+ * @post the ownership of the given ring is taken. The caller is not responsible
+ * anymore of its deallocation
  * @ingroup capi
  */
 SFCGAL_API void
@@ -620,8 +620,8 @@ sfcgal_geometry_collection_geometry_n(const sfcgal_geometry_t *collection,
  * Set the ith geometry of a given GeometryCollection
  * @pre collection is a GeometryCollection
  * @pre i >= 0 and i < sfcgal_geometry_num_geometries( collection )
- * The ownership of the geometry is taken. The caller is not responsible anymore
- * of its deallocation.
+ * @post The ownership of the geometry is taken. The caller is not responsible
+ * anymore of its deallocation.
  * @ingroup capi
  */
 SFCGAL_API void
@@ -736,8 +736,8 @@ sfcgal_polyhedral_surface_add_patch(sfcgal_geometry_t *polyhedral,
  * @pre polyhedral must be a PolyhedralSurface.
  * @pre patch must be a Polygon.
  * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_patches(polyhedral)
- * The ownership of the polygon is taken. The caller is not responsible anymore
- * of its deallocation.
+ * @post The ownership of the polygon is taken. The caller is not responsible
+ * anymore of its deallocation.
  * @ingroup capi
  */
 SFCGAL_API void
@@ -812,8 +812,8 @@ sfcgal_triangulated_surface_triangle_n(const sfcgal_geometry_t *tin, size_t i);
  * @pre tin must be a TriangulatedSurface
  * @pre patch must be a Triangle.
  * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patches( tin )
- * The ownership of the triangle is taken. The caller is not responsible anymore
- * of its deallocation.
+ * @post The ownership of the triangle is taken. The caller is not responsible
+ * anymore of its deallocation.
  * @ingroup capi
  */
 SFCGAL_API void
