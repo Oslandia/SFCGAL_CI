@@ -4,6 +4,9 @@
 #include <boost/test/unit_test.hpp>
 #include <cmath>
 
+#include <iostream>
+#include <thread>
+
 using namespace SFCGAL;
 
 BOOST_AUTO_TEST_SUITE(CylinderTests)
@@ -183,6 +186,23 @@ BOOST_AUTO_TEST_CASE(testPolyhedron)
       "0.0,0.0 1.0 0.0,-0.7 0.7 0.0)),((0.0 1.0 2.0,0.0 0.0 2.0,-0.7 0.7 "
       "2.0,0.0 1.0 2.0)),((-1.0 0.0 0.0,0.0 0.0 0.0,-0.7 0.7 0.0,-1.0 0.0 "
       "0.0)),((-0.7 0.7 2.0,0.0 0.0 2.0,-1.0 0.0 2.0,-0.7 0.7 2.0)))");
+}
+
+BOOST_AUTO_TEST_CASE(testFoo)
+{
+  int shared_var = 0;
+
+  auto thread_func = [&shared_var]() {
+    for (int i = 0; i < 1000; ++i) {
+      ++shared_var; // aie
+    }
+  };
+
+  std::thread thread1(thread_func);
+  std::thread thread2(thread_func);
+
+  thread1.join();
+  thread2.join();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
