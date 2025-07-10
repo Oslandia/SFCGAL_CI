@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2023, Oslandia.
+// Copyright (c) 2012-2024, Oslandia.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #ifndef SFCGAL_ALGORITHM_PARTITION_2_H_
