@@ -1,4 +1,5 @@
 // Copyright (c) 2023-2024, Oslandia.
+// Copyright (c) 2024-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #ifndef SFCGAL_ALGORITHM_VISIBILITY2D_H_

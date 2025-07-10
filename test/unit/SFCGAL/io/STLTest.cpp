@@ -3,9 +3,6 @@
 // Copyright (c) 2024-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-// Copyright (c) 2025-2025, Oslandia.
-// SPDX-License-Identifier: LGPL-2.0-or-later
-
 #include <boost/filesystem.hpp>
 
 #include "SFCGAL/io/STL.h"
