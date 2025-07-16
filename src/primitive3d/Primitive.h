@@ -20,7 +20,8 @@ namespace SFCGAL {
 enum class PrimitiveType : std::int8_t {
   TYPE_CYLINDER = 0,
   TYPE_SPHERE   = 1,
-  TYPE_TORUS    = 2
+  TYPE_TORUS    = 2,
+  TYPE_BOX      = 3
 };
 
 /**
