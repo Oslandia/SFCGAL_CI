@@ -366,4 +366,97 @@ BOOST_AUTO_TEST_CASE(testVisibility_PointOutPolygon)
   }
 }
 
+BOOST_AUTO_TEST_CASE(testVisibility_PointInEmptyPolygon)
+{
+  Polygon const emptyPoly;
+  Point const   point(1.0, 2.0);
+
+  std::unique_ptr<Polygon> result(algorithm::visibility(emptyPoly, point));
+
+  BOOST_CHECK(result->isEmpty());
+  std::string const expectedWkt = "POLYGON EMPTY";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testVisibility_EmptyPointInPolygon)
+{
+  std::vector<Point> points;
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(10.0, 0.0);
+  points.emplace_back(10.0, 10.0);
+  points.emplace_back(0.0, 10.0);
+  points.emplace_back(0.0, 0.0);
+
+  LineString const lineString(points);
+  Polygon const    poly(lineString);
+
+  Point const emptyPoint;
+
+  std::unique_ptr<Polygon> result(algorithm::visibility(poly, emptyPoint));
+
+  BOOST_CHECK(result->isEmpty());
+  std::string const expectedWkt = "POLYGON EMPTY";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testVisibility_SegmentInEmptyPolygon)
+{
+  Polygon const emptyPoly;
+  Point const   startPoint(1.0, 2.0);
+  Point const   endPoint(1.0, 2.0);
+
+  std::unique_ptr<Polygon> result(
+      algorithm::visibility(emptyPoly, startPoint, endPoint));
+
+  BOOST_CHECK(result->isEmpty());
+  std::string const expectedWkt = "POLYGON EMPTY";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testVisibility_SegmentWithEmptyPointA)
+{
+  std::vector<Point> points;
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(10.0, 0.0);
+  points.emplace_back(10.0, 10.0);
+  points.emplace_back(0.0, 10.0);
+  points.emplace_back(0.0, 0.0);
+
+  LineString const lineString(points);
+  Polygon const    poly(lineString);
+
+  Point const emptyStartPoint;
+  Point const endPoint(1.0, 2.0);
+
+  std::unique_ptr<Polygon> result(
+      algorithm::visibility(poly, emptyStartPoint, endPoint));
+
+  BOOST_CHECK(result->isEmpty());
+  std::string const expectedWkt = "POLYGON EMPTY";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testVisibility_SegmentWithEmptyPointB)
+{
+  std::vector<Point> points;
+  points.emplace_back(0.0, 0.0);
+  points.emplace_back(10.0, 0.0);
+  points.emplace_back(10.0, 10.0);
+  points.emplace_back(0.0, 10.0);
+  points.emplace_back(0.0, 0.0);
+
+  LineString const lineString(points);
+  Polygon const    poly(lineString);
+
+  Point const startPoint(1.0, 2.0);
+  Point const emptyEndPoint;
+
+  std::unique_ptr<Polygon> result(
+      algorithm::visibility(poly, startPoint, emptyEndPoint));
+
+  BOOST_CHECK(result->isEmpty());
+  std::string const expectedWkt = "POLYGON EMPTY";
+  BOOST_CHECK_EQUAL(result->asText(1), expectedWkt);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -90,6 +90,10 @@ visibility(const Geometry &polygon, const Geometry &point,
            NoValidityCheck /*unused*/) -> std::unique_ptr<Polygon>
 {
 
+  if (polygon.isEmpty() || point.isEmpty()) {
+    return std::make_unique<Polygon>();
+  }
+
   Point_2 const                     queryPoint{point.as<Point>().toPoint_2()};
   std::unique_ptr<LineString> const extRing{new LineString()};
 
@@ -199,6 +203,10 @@ visibility(const Geometry &polygon, const Geometry &pointA,
            const Geometry &pointB, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Polygon>
 {
+
+  if (polygon.isEmpty() || pointA.isEmpty() || pointB.isEmpty()) {
+    return std::make_unique<Polygon>();
+  }
 
   Point_2 const startPoint{pointA.as<Point>().toPoint_2()};
   Point_2 const endPoint{pointB.as<Point>().toPoint_2()};
