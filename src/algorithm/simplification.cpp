@@ -11,6 +11,7 @@
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/detail/SegmentStore.h"
 #include "SFCGAL/detail/algorithm/simplification.h"
 
@@ -23,6 +24,18 @@ namespace algorithm {
 auto
 simplify(const Geometry &geometry, double threshold, bool preserveTopology)
     -> std::unique_ptr<Geometry>
+{
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry);
+
+  std::unique_ptr<Geometry> result(
+      simplify(geometry, threshold, preserveTopology, NoValidityCheck()));
+  propagateValidityFlag(*result, true);
+  return result;
+}
+
+auto
+simplify(const Geometry &geometry, double threshold, bool preserveTopology,
+         NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
   if (geometry.isEmpty()) {
     return std::unique_ptr<Geometry>(geometry.clone());

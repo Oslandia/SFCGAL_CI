@@ -10,6 +10,7 @@
 
 namespace SFCGAL {
 namespace algorithm {
+struct NoValidityCheck;
 
 /**
  * @brief Simplifies a geometry using the CGAL algorithm
@@ -23,6 +24,20 @@ namespace algorithm {
 SFCGAL_API auto
 simplify(const Geometry &geometry, double threshold, bool preserveTopology)
     -> std::unique_ptr<Geometry>;
+
+/**
+ * @brief Simplifies a geometry using the CGAL algorithm
+ *  https://doc.cgal.org/latest/Polyline_simplification_2/index.html
+ *
+ * @param geometry The geometry to simplify
+ * @param threshold The distance (in geometry unit) threshold for simplification
+ * @param preserveTopology Whether to preserve topology during simplification
+ * @return A simplified copy of the input geometry
+ * @warning No actual validity check is done
+ */
+SFCGAL_API auto
+simplify(const Geometry &geometry, double threshold, bool preserveTopology,
+         NoValidityCheck) -> std::unique_ptr<Geometry>;
 
 } // namespace algorithm
 } // namespace SFCGAL

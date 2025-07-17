@@ -533,4 +533,15 @@ BOOST_AUTO_TEST_CASE(testSimplify_GeometryCollection_Dimensions)
   testSimplification(sourceWithEmpty, expectedWithEmpty_preserve, 4, true);
 }
 
+BOOST_AUTO_TEST_CASE(testSimplify_InvalidLineString)
+{
+  // https://trac.osgeo.org/postgis/ticket/5924
+  // SELECT CG_Simplify(ST_GeomFromText('LINESTRING(1 2, 1 2)',4326), 20.1,
+  // false)
+  std::unique_ptr<Geometry> source(io::readWkt("LINESTRING(1 2, 1 2)"));
+
+  BOOST_CHECK_THROW(algorithm::simplify(*source, 20.1, false),
+                    GeometryInvalidityException);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
