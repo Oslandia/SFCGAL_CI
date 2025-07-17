@@ -25,7 +25,15 @@ auto
 simplify(const Geometry &geometry, double threshold, bool preserveTopology)
     -> std::unique_ptr<Geometry>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry);
+  switch (geometry.geometryTypeId()) {
+  case TYPE_SOLID: {
+    // Is it make sense?
+    break;
+  }
+  default:
+    SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry);
+    break;
+  }
 
   std::unique_ptr<Geometry> result(
       simplify(geometry, threshold, preserveTopology, NoValidityCheck()));

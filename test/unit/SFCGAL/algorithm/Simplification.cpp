@@ -241,34 +241,31 @@ BOOST_AUTO_TEST_CASE(testSimplify_Polygon_Dimensions)
 {
   // XY Polygon
   testSimplification(
-      "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (2 2, 8 2, 8 8, 2 8, 2 2))",
-      "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (2 2, 8 2, 8 8, 2 8, 2 2))", 1,
+      "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (2 2, 2 8, 8 8, 8 2, 2 2))",
+      "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (2 2, 2 8, 8 8, 8 2, 2 2))", 1,
       false);
 
   // Test XYZ
   std::string sourceXYZ = "POLYGON Z((0 0 0, 10 0 5, 10 10 10, 0 10 5, 0 0 0), "
-                          "(2 2 1, 8 2 3, 8 8 5, 2 8 3, 2 2 1))";
-  std::string expectedXYZ =
-      "POLYGON Z((0 0 0, 10 0 5, 10 10 10, 0 10 5, 0 0 0), "
-      "(2 2 1, 8 2 3, 8 8 5, 2 8 3, 2 2 1))";
+                          "(2 2 1, 2 8 3, 8 8 5, 8 2 3, 2 2 1))";
+  std::string expectedXYZ = "POLYGON Z((0 0 0, 10 0 5, 10 10 10, 0 10 5, 0 0 "
+                            "0), (2 2 1, 2 8 3, 8 8 5, 8 2 3, 2 2 1))";
   testSimplification(sourceXYZ, expectedXYZ, 1, false);
 
   // Test XYM
-  std::string sourceXYM =
-      "POLYGON M((0 0 0, 10 0 50, 10 10 100, 0 10 50, 0 0 0), "
-      "(2 2 10, 8 2 30, 8 8 50, 2 8 30, 2 2 10))";
-  std::string expectedXYM =
-      "POLYGON M((0 0 0, 10 0 50, 10 10 100, 0 10 50, 0 0 0), "
-      "(2 2 10, 8 2 30, 8 8 50, 2 8 30, 2 2 10))";
+  std::string sourceXYM = "POLYGON M((0 0 0, 10 0 50, 10 10 100, 0 10 50, 0 0 "
+                          "0), (2 2 10, 2 8 30, 8 8 50, 8 2 30, 2 2 10))";
+  std::string expectedXYM = "POLYGON M((0 0 0, 10 0 50, 10 10 100, 0 10 50, 0 "
+                            "0 0), (2 2 10, 2 8 30, 8 8 50, 8 2 30, 2 2 10))";
   testSimplification(sourceXYM, expectedXYM, 1, false);
 
   // Test XYZM
   std::string sourceXYZM =
-      "POLYGON ZM((0 0 0 0, 10 0 5 50, 10 10 10 100, 0 10 5 50, 0 0 0 0), "
-      "(2 2 1 10, 8 2 3 30, 8 8 5 50, 2 8 3 30, 2 2 1 10))";
+      "POLYGON ZM((0 0 0 0, 10 0 5 50, 10 10 10 100, 0 10 5 50, 0 0 0 0), (2 2 "
+      "1 10, 2 8 3 30, 8 8 5 50, 8 2 3 30, 2 2 1 10))";
   std::string expectedXYZM =
-      "POLYGON ZM((0 0 0 0, 10 0 5 50, 10 10 10 100, 0 10 5 50, 0 0 0 0), "
-      "(2 2 1 10, 8 2 3 30, 8 8 5 50, 2 8 3 30, 2 2 1 10))";
+      "POLYGON ZM((0 0 0 0, 10 0 5 50, 10 10 10 100, 0 10 5 50, 0 0 0 0), (2 2 "
+      "1 10, 2 8 3 30, 8 8 5 50, 8 2 3 30, 2 2 1 10))";
   testSimplification(sourceXYZM, expectedXYZM, 1, false);
 
   // Empty Polygon
@@ -343,63 +340,57 @@ BOOST_AUTO_TEST_CASE(testSimplify_TriangulatedSurface)
 BOOST_AUTO_TEST_CASE(testSimplify_PolyhedralSurface)
 {
   // XY PolyhedralSurface
-  testSimplification("POLYHEDRALSURFACE (((0 0, 0 5, 5 5, 4.5 2.5, 5 0, 0 0)), "
-                     "((5 0, 4.5 2.5, 5 5, 10 5, 10 0, 5 0)))",
+  testSimplification("POLYHEDRALSURFACE (((0 0, 0 5, 5 5, 5 0, 0 0)), ((5 0, 5 "
+                     "5, 10 5, 10 0, 5 0)))",
                      "POLYHEDRALSURFACE (((0 0, 0 5, 5 5, 5 0, 0 0)), ((5 0, 5 "
                      "5, 10 5, 10 0, 5 0)))",
                      2, false);
-  testSimplification("POLYHEDRALSURFACE (((0 0, 0 5, 5 5, 4.5 2.5, 5 0, 0 0)), "
-                     "((5 0, 4.5 2.5, 5 5, 10 5, 10 0, 5 0)))",
+  testSimplification("POLYHEDRALSURFACE (((0 0, 0 5, 5 5, 5 0, 0 0)), ((5 0, 5 "
+                     "5, 10 5, 10 0, 5 0)))",
                      "POLYHEDRALSURFACE (((0 0, 0 5, 5 5, 5 0, 0 0)), ((5 0, 5 "
                      "5, 10 5, 10 0, 5 0)))",
                      2, true);
   // XYZ PolyhedralSurface
-  testSimplification(
-      "POLYHEDRALSURFACE Z(((0 0 10, 0 5 15, 5 5 20, 4.5 2.5 25, 5 0 30, 0 0 "
-      "10)), ((5 0 30, 4.5 2.5 25, 5 5 20, 10 5 35, 10 0 40, 5 0 30)))",
-      "POLYHEDRALSURFACE Z(((0 0 10, 0 5 15, 5 5 20, 5 0 30, 0 0 10)), ((5 0 "
-      "30, 5 5 20, 10 5 35, 10 0 40, 5 0 30)))",
-      2, false);
-  testSimplification(
-      "POLYHEDRALSURFACE Z(((0 0 10, 0 5 15, 5 5 20, 4.5 2.5 25, 5 0 30, 0 0 "
-      "10)), ((5 0 30, 4.5 2.5 25, 5 5 20, 10 5 35, 10 0 40, 5 0 30)))",
-      "POLYHEDRALSURFACE Z(((0 0 10, 0 5 15, 5 5 20, 5 0 30, 0 0 10)), ((5 0 "
-      "30, 5 5 20, 10 5 35, 10 0 40, 5 0 30)))",
-      2, true);
+  testSimplification("POLYHEDRALSURFACE Z(((0 0 10, 0 5 15, 5 5 20, 5 0 30, 0 "
+                     "0 10)), ((5 0 30, 5 5 20, 10 5 35, 10 0 40, 5 0 30)))",
+                     "POLYHEDRALSURFACE Z(((0 0 10, 0 5 15, 5 5 20, 5 0 30, 0 "
+                     "0 10)), ((5 0 30, 5 5 20, 10 5 35, 10 0 40, 5 0 30)))",
+                     2, false);
+  testSimplification("POLYHEDRALSURFACE Z(((0 0 10, 0 5 15, 5 5 20, 5 0 30, 0 "
+                     "0 10)), ((5 0 30, 5 5 20, 10 5 35, 10 0 40, 5 0 30)))",
+                     "POLYHEDRALSURFACE Z(((0 0 10, 0 5 15, 5 5 20, 5 0 30, 0 "
+                     "0 10)), ((5 0 30, 5 5 20, 10 5 35, 10 0 40, 5 0 30)))",
+                     2, true);
 
   // XYM PolyhedralSurface
   testSimplification(
-      "POLYHEDRALSURFACE M(((0 0 100, 0 5 150, 5 5 200, 4.5 2.5 250, 5 0 300, "
-      "0 0 100)), ((5 0 300, 4.5 2.5 250, 5 5 200, 10 5 350, 10 0 400, 5 0 "
-      "300)))",
+      "POLYHEDRALSURFACE M(((0 0 100, 0 5 150, 5 5 200, 5 0 300, 0 0 100)), "
+      "((5 0 300, 5 5 200, 10 5 350, 10 0 400, 5 0 300)))",
       "POLYHEDRALSURFACE M(((0 0 100, 0 5 150, 5 5 200, 5 0 300, 0 0 100)), "
       "((5 0 300, 5 5 200, 10 5 350, 10 0 400, 5 0 300)))",
       2, false);
   testSimplification(
-      "POLYHEDRALSURFACE M(((0 0 100, 0 5 150, 5 5 200, 4.5 2.5 250, 5 0 300, "
-      "0 0 100)), ((5 0 300, 4.5 2.5 250, 5 5 200, 10 5 350, 10 0 400, 5 0 "
-      "300)))",
+      "POLYHEDRALSURFACE M(((0 0 100, 0 5 150, 5 5 200, 5 0 300, 0 0 100)), "
+      "((5 0 300, 5 5 200, 10 5 350, 10 0 400, 5 0 300)))",
       "POLYHEDRALSURFACE M(((0 0 100, 0 5 150, 5 5 200, 5 0 300, 0 0 100)), "
       "((5 0 300, 5 5 200, 10 5 350, 10 0 400, 5 0 300)))",
       2, true);
 
   // XYZM PolyhedralSurface
-  testSimplification(
-      "POLYHEDRALSURFACE ZM(((0 0 10 100, 0 5 15 150, 5 5 20 200, 4.5 2.5 25 "
-      "250, 5 0 30 300, 0 0 10 100)), ((5 0 30 300, 4.5 2.5 25 250, 5 5 20 "
-      "200, 10 5 35 350, 10 0 40 400, 5 0 30 300)))",
-      "POLYHEDRALSURFACE ZM(((0 0 10 100, 0 5 15 150, 5 5 20 200, 5 0 30 300, "
-      "0 0 10 100)), ((5 0 30 300, 5 5 20 200, 10 5 35 350, 10 0 40 400, 5 0 "
-      "30 300)))",
-      2, false);
-  testSimplification(
-      "POLYHEDRALSURFACE ZM(((0 0 10 100, 0 5 15 150, 5 5 20 200, 4.5 2.5 25 "
-      "250, 5 0 30 300, 0 0 10 100)), ((5 0 30 300, 4.5 2.5 25 250, 5 5 20 "
-      "200, 10 5 35 350, 10 0 40 400, 5 0 30 300)))",
-      "POLYHEDRALSURFACE ZM(((0 0 10 100, 0 5 15 150, 5 5 20 200, 5 0 30 300, "
-      "0 0 10 100)), ((5 0 30 300, 5 5 20 200, 10 5 35 350, 10 0 40 400, 5 0 "
-      "30 300)))",
-      2, true);
+  testSimplification("POLYHEDRALSURFACE ZM(((0 0 10 100, 0 5 15 150, 5 5 20 "
+                     "200, 5 0 30 300, 0 0 10 100)), ((5 0 30 300, 5 5 20 200, "
+                     "10 5 35 350, 10 0 40 400, 5 0 30 300)))",
+                     "POLYHEDRALSURFACE ZM(((0 0 10 100, 0 5 15 150, 5 5 20 "
+                     "200, 5 0 30 300, 0 0 10 100)), ((5 0 30 300, 5 5 20 200, "
+                     "10 5 35 350, 10 0 40 400, 5 0 30 300)))",
+                     2, false);
+  testSimplification("POLYHEDRALSURFACE ZM(((0 0 10 100, 0 5 15 150, 5 5 20 "
+                     "200, 5 0 30 300, 0 0 10 100)), ((5 0 30 300, 5 5 20 200, "
+                     "10 5 35 350, 10 0 40 400, 5 0 30 300)))",
+                     "POLYHEDRALSURFACE ZM(((0 0 10 100, 0 5 15 150, 5 5 20 "
+                     "200, 5 0 30 300, 0 0 10 100)), ((5 0 30 300, 5 5 20 200, "
+                     "10 5 35 350, 10 0 40 400, 5 0 30 300)))",
+                     2, true);
 }
 
 BOOST_AUTO_TEST_CASE(testSimplify_Solid)
