@@ -1,0 +1,83 @@
+// Copyright (c) 2025-2025, SFCGAL team.
+// SPDX-License-Identifier: LGPL-2.0-or-later
+
+#include "SFCGAL/primitive3d/Cube.h"
+
+namespace SFCGAL {
+
+Cube::Cube(const Kernel::FT &size) : m_box(Box(size, size, size))
+{
+  // m_parameters["size"] is not necessary because the information is stored in
+  // m_box However, it is needed to be compatible with Primitive loginc
+  m_parameters["size"] = m_box.xExtent();
+}
+
+auto
+Cube::operator=(Cube &other) -> Cube &
+{
+  if (this != &other) {
+    Primitive::operator=(other);
+    m_box = other.m_box;
+  }
+  return *this;
+}
+
+auto
+Cube::primitiveType() const -> std::string
+{
+  return "Cube";
+}
+
+auto
+Cube::primitiveTypeId() const -> PrimitiveType
+{
+  return PrimitiveType::TYPE_CUBE;
+}
+
+void
+Cube::setSize(const Kernel::FT &size)
+{
+  m_box.setXExtent(size);
+  m_box.setYExtent(size);
+  m_box.setZExtent(size);
+  validateAndSetParameter("size", size);
+}
+
+void
+Cube::validateParameters(
+    std::unordered_map<std::string, PrimitiveParameter> const &tempParameters)
+    const
+{
+  const double size =
+      CGAL::to_double(std::get<Kernel::FT>(tempParameters.at("size")));
+
+  if (size < 0.) {
+    BOOST_THROW_EXCEPTION(Exception("Cube size cannot be negative."));
+  }
+}
+
+auto
+Cube::generatePolyhedralSurface() const -> PolyhedralSurface
+{
+  return m_box.generatePolyhedralSurface();
+}
+
+auto
+Cube::area3D() const -> double
+{
+  return m_box.area3D();
+}
+
+auto
+Cube::volume() const -> double
+{
+  return m_box.volume();
+}
+
+auto
+Cube::size() const -> const Kernel::FT &
+{
+  return m_box.xExtent();
+}
+
+} // namespace SFCGAL
