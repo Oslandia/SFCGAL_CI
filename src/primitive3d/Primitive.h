@@ -22,7 +22,8 @@ enum class PrimitiveType : std::int8_t {
   TYPE_SPHERE   = 1,
   TYPE_TORUS    = 2,
   TYPE_BOX      = 3,
-  TYPE_CUBE     = 4
+  TYPE_CUBE     = 4,
+  TYPE_CONE     = 5
 };
 
 /**
