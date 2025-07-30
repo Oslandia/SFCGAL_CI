@@ -22,7 +22,7 @@ This document outlines the steps and checks necessary to perform a release of th
     - Run integration tests and ensure no issues arise.
 
 3. **Update NEWS**
-    - If necessary, update NEWS file
+    - If necessary, update NEWS file and then edit it to make it more user readable. Especially, the `BREAKING CHANGE` needs to be reviewed carefully and often to be rewritten, including migration guide for instance.
 
 4. **Create a Tag**:
    - Navigate to the repository on GitLab.
