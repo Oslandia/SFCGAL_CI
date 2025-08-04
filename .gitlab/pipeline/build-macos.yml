@@ -8,7 +8,7 @@ build:macos_clang:
     HOMEBREW_NO_INSTALL_UPGRADE: 1
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
-    SFCGAL_VERSION: "2.1.0"
+    SFCGAL_VERSION: "2.2.0"
   dependencies: []
   rules:
     # on default branch
