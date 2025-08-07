@@ -8,7 +8,11 @@ SFCGAL is a C++ wrapper library around [CGAL](http://www.cgal.org) with the aim 
 
 Please refer to the <a href="http://sfcgal.gitlab.io/SFCGAL">project page</a> for an updated installation procedure.
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/sfcgal.svg)](https://repology.org/project/sfcgal/versions)
+<!-- markdownlint-disable MD033 -->
+ <a href="https://repology.org/project/sfcgal/versions">
+    <img src="https://repology.org/badge/vertical-allrepos/sfcgal.svg" alt="Packaging status" align="right">
+</a>
+<!-- markdownlint-enable MD033 -->
 
 ## Community Resources
 
