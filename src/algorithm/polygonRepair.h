@@ -54,7 +54,6 @@ enum class PolygonRepairRule {
  * @param repairRule repair strategy to use (default: EVEN_ODD_RULE)
  * @return repaired geometry as Polygon or MultiPolygon
  *
- * @pre geometry must not be empty
  * @post returned geometry is guaranteed to be valid
  *
  * @ingroup algorithms
