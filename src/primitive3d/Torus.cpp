@@ -82,8 +82,12 @@ Torus::generatePolyhedralSurface() -> PolyhedralSurface
     for (int j = 0; j < m_tube_num_radial; ++j) {
       std::vector<Point> points;
       for (int k = 0; k < 4; ++k) {
-        double main_angle = 2.0 * CGAL_PI * (i + (k & 1)) / m_main_num_radial;
-        double tube_angle = 2.0 * CGAL_PI * (j + (k >> 1)) / m_tube_num_radial;
+        double main_angle = 2.0 * CGAL_PI *
+                            ((i + (k & 1)) % m_main_num_radial) /
+                            m_main_num_radial;
+        double tube_angle = 2.0 * CGAL_PI *
+                            ((j + (k >> 1)) % m_tube_num_radial) /
+                            m_tube_num_radial;
 
         double x = (CGAL::to_double(m_main_radius) +
                     CGAL::to_double(m_tube_radius) * std::cos(tube_angle)) *
