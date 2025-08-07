@@ -12,6 +12,7 @@
 #include <boost/serialization/base_object.hpp>
 
 #include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/Polygon.h"
 
 #include <CGAL/Multipolygon_with_holes_2.h>
@@ -33,6 +34,12 @@ public:
    * Copy constructor
    */
   MultiPolygon(MultiPolygon const &other);
+
+  /**
+   * Constructor from CGAL::Multipolygon_with_holes_2<K>
+   */
+  MultiPolygon(const CGAL::Multipolygon_with_holes_2<Kernel> &other);
+
   /**
    * assign operator
    */
