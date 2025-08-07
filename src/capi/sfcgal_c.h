@@ -2517,6 +2517,36 @@ sfcgal_primitive_set_parameter_vector(sfcgal_primitive_t *primitive,
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_primitive_as_polyhedral_surface(const sfcgal_primitive_t *primitive);
 
+/**
+ * Polygon repair rules
+ * @ingroup capi
+ */
+typedef enum {
+  SFCGAL_POLYGON_REPAIR_EVEN_ODD, ///< Even-odd rule (default, available in
+                                  ///< CGAL 6.0+)
+  SFCGAL_POLYGON_REPAIR_NON_ZERO, ///< Non-zero winding rule (requires
+                                  ///< CGAL 6.1+)
+  SFCGAL_POLYGON_REPAIR_UNION, ///< Union of all polygons (requires CGAL 6.1+)
+  SFCGAL_POLYGON_REPAIR_INTERSECTION ///< Intersection of all polygons (requires
+                                     ///< CGAL 6.1+)
+} sfcgal_polygon_repair_rule_t;
+
+/**
+ * Repairs invalid polygons using CGAL's 2D Polygon Repair algorithm
+ * @param geom The input geometry (must be a Polygon or MultiPolygon)
+ * @param repair_rule The repair strategy to use (EVEN_ODD, NON_ZERO, UNION, or
+ * INTERSECTION)
+ * @return A new geometry representing the repaired polygon(s)
+ * @pre geom must be a Polygon or MultiPolygon
+ * @post The returned geometry must be deallocated by the caller
+ * @note Returns NULL on error
+ * @note CGAL 6.1+ required for NON_ZERO, UNION, and INTERSECTION rules
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
+                               sfcgal_polygon_repair_rule_t repair_rule);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Error handling

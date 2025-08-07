@@ -14,6 +14,46 @@ MultiPolygon::MultiPolygon(MultiPolygon const &other)
 
     = default;
 
+MultiPolygon::MultiPolygon(const CGAL::Multipolygon_with_holes_2<Kernel> &other)
+{
+  for (const auto &pwh : other.polygons_with_holes()) {
+    auto polygon = std::make_unique<Polygon>();
+
+    // Convert exterior ring
+    if (!pwh.outer_boundary().is_empty()) {
+      LineString exterior;
+      for (auto vertex_it = pwh.outer_boundary().vertices_begin();
+           vertex_it != pwh.outer_boundary().vertices_end(); ++vertex_it) {
+        exterior.addPoint(Point(CGAL::to_double(vertex_it->x()),
+                                CGAL::to_double(vertex_it->y())));
+      }
+      // Close the ring
+      if (!exterior.isEmpty()) {
+        exterior.addPoint(exterior.startPoint());
+        polygon->setExteriorRing(exterior);
+      }
+    }
+
+    // Convert holes
+    for (auto hole_it = pwh.holes_begin(); hole_it != pwh.holes_end();
+         ++hole_it) {
+      LineString hole_ring;
+      for (auto vertex_it = hole_it->vertices_begin();
+           vertex_it != hole_it->vertices_end(); ++vertex_it) {
+        hole_ring.addPoint(Point(CGAL::to_double(vertex_it->x()),
+                                 CGAL::to_double(vertex_it->y())));
+      }
+      // Close the ring
+      if (!hole_ring.isEmpty()) {
+        hole_ring.addPoint(hole_ring.startPoint());
+        polygon->addInteriorRing(hole_ring);
+      }
+    }
+
+    addGeometry(polygon.release());
+  }
+}
+
 auto
 MultiPolygon::operator=(MultiPolygon other) -> MultiPolygon &
 {
@@ -51,6 +91,22 @@ void
 MultiPolygon::accept(ConstGeometryVisitor &visitor) const
 {
   return visitor.visit(*this);
+}
+
+auto
+MultiPolygon::toMultipolygon_with_holes_2(bool fixOrientation) const
+    -> CGAL::Multipolygon_with_holes_2<Kernel>
+{
+  CGAL::Multipolygon_with_holes_2<Kernel> mp;
+
+  for (size_t i = 0; i < numGeometries(); ++i) {
+    const Polygon &polygon = polygonN(i);
+    if (!polygon.isEmpty()) {
+      mp.add_polygon_with_holes(polygon.toPolygon_with_holes_2(fixOrientation));
+    }
+  }
+
+  return mp;
 }
 
 } // namespace SFCGAL

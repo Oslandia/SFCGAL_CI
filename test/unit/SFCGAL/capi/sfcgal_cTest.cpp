@@ -2319,4 +2319,24 @@ BOOST_AUTO_TEST_CASE(testConeTest)
   sfcgal_primitive_delete(cone);
 }
 
+BOOST_AUTO_TEST_CASE(testPolygonRepairTest)
+{
+  std::unique_ptr<Geometry> polygon(
+      io::readWkt("POLYGON((0 0, 2 2, 2 0, 0 2, 0 0))"));
+
+  sfcgal_geometry_t *repaired = sfcgal_geometry_polygon_repair(
+      polygon.get(), SFCGAL_POLYGON_REPAIR_EVEN_ODD);
+  BOOST_CHECK(sfcgal_geometry_is_valid(repaired));
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(repaired, 0, &wkt, &len);
+  BOOST_CHECK_EQUAL(std::string(wkt),
+                    "MULTIPOLYGON (((0 0,1 1,0 2,0 0)),((1 1,2 0,2 2,1 1)))");
+
+  sfcgal_free_buffer(wkt);
+
+  sfcgal_geometry_delete(repaired);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

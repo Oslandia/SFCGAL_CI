@@ -12,7 +12,11 @@
 #include <boost/serialization/base_object.hpp>
 
 #include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/Polygon.h"
+
+#include <CGAL/Multipolygon_with_holes_2.h>
+#include <CGAL/Polygon_with_holes_2.h>
 
 namespace SFCGAL {
 
@@ -32,6 +36,13 @@ public:
    * @param other The multi-polygon to copy from
    */
   MultiPolygon(MultiPolygon const &other);
+
+  /**
+   * Constructor from CGAL::Multipolygon_with_holes_2<K>
+   * @param other The CGAL multi-polygon to convert
+   */
+  MultiPolygon(const CGAL::Multipolygon_with_holes_2<Kernel> &other);
+
   /**
    * assign operator
    * @param other The multi-polygon to assign from
@@ -75,6 +86,16 @@ public:
   {
     return geometryN(n).as<Polygon>();
   }
+
+  /**
+   * @brief Convert to CGAL::Multipolygon_with_holes_2
+   * @param fixOrientation force exterior ring orientation to counter
+   * clockwise and interior rings to clockwise
+   * @return CGAL 2D multi-polygon with holes representation
+   */
+  [[nodiscard]] auto
+  toMultipolygon_with_holes_2(bool fixOrientation = true) const
+      -> CGAL::Multipolygon_with_holes_2<Kernel>;
 
   //-- visitors
 
