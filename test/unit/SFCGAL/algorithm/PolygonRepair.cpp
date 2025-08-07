@@ -29,14 +29,12 @@ BOOST_AUTO_TEST_CASE(testValidPolygon)
   auto result  = polygonRepair(*polygon);
 
   BOOST_CHECK(!result->isEmpty());
-  BOOST_CHECK(result->geometryTypeId() == TYPE_POLYGON);
 
   // Test with explicit rule
   result = polygonRepair(*polygon, PolygonRepairRule::EVEN_ODD_RULE);
-  BOOST_CHECK(!result->isEmpty());
   BOOST_CHECK_EQUAL(
       result->asText(2),
-      "POLYGON ((0.00 0.00,1.00 0.00,1.00 1.00,0.00 1.00,0.00 0.00))");
+      "MULTIPOLYGON (((0.00 0.00,1.00 0.00,1.00 1.00,0.00 1.00,0.00 0.00)))");
 }
 
 /**
@@ -48,11 +46,8 @@ BOOST_AUTO_TEST_CASE(testSelfIntersectingPolygon)
   auto polygon = io::readWkt("POLYGON((0 0, 2 2, 2 0, 0 2, 0 0))");
   auto result  = polygonRepair(*polygon);
 
-  BOOST_CHECK(!result->isEmpty());
   // Self-intersecting polygon typically results in multipolygon with even-odd
   // rule
-  BOOST_CHECK(result->geometryTypeId() == TYPE_POLYGON ||
-              result->geometryTypeId() == TYPE_MULTIPOLYGON);
   BOOST_CHECK_EQUAL(result->asText(2),
                     "MULTIPOLYGON (((0.00 0.00,1.00 1.00,0.00 2.00,0.00 "
                     "0.00)),((1.00 1.00,2.00 0.00,2.00 2.00,1.00 1.00)))");
@@ -67,15 +62,10 @@ BOOST_AUTO_TEST_CASE(testPolygonWithHoles)
       "POLYGON((0 0, 4 0, 4 4, 0 4, 0 0), (1 1, 3 1, 3 3, 1 3, 1 1))");
   auto result = polygonRepair(*polygon);
 
-  BOOST_CHECK(!result->isEmpty());
-  BOOST_CHECK(result->geometryTypeId() == TYPE_POLYGON);
-  BOOST_CHECK_EQUAL(
-      result->asText(2),
-      "POLYGON ((0.00 0.00,4.00 0.00,4.00 4.00,0.00 4.00,0.00 0.00),(1.00 "
-      "1.00,1.00 3.00,3.00 3.00,3.00 1.00,1.00 1.00))");
-
-  const auto &repaired_polygon = result->as<Polygon>();
-  BOOST_CHECK(repaired_polygon.numInteriorRings() >= 1);
+  BOOST_CHECK_EQUAL(result->asText(2),
+                    "MULTIPOLYGON (((0.00 0.00,4.00 0.00,4.00 4.00,0.00 "
+                    "4.00,0.00 0.00),(1.00 "
+                    "1.00,1.00 3.00,3.00 3.00,3.00 1.00,1.00 1.00)))");
 }
 
 /**
@@ -87,15 +77,10 @@ BOOST_AUTO_TEST_CASE(testMultiPolygon)
       "MULTIPOLYGON(((0 0, 1 0, 1 1, 0 1, 0 0)), ((2 2, 3 2, 3 3, 2 3, 2 2)))");
   auto result = polygonRepair(*multipolygon);
 
-  BOOST_CHECK(!result->isEmpty());
-  BOOST_CHECK(result->geometryTypeId() == TYPE_MULTIPOLYGON);
   BOOST_CHECK_EQUAL(
       result->asText(2),
       "MULTIPOLYGON (((0.00 0.00,1.00 0.00,1.00 1.00,0.00 1.00,0.00 "
       "0.00)),((2.00 2.00,3.00 2.00,3.00 3.00,2.00 3.00,2.00 2.00)))");
-
-  const auto &repaired = result->as<MultiPolygon>();
-  BOOST_CHECK_EQUAL(repaired.numGeometries(), 2);
 }
 
 /**
@@ -106,8 +91,7 @@ BOOST_AUTO_TEST_CASE(testEmptyGeometry)
   auto empty  = io::readWkt("POLYGON EMPTY");
   auto result = polygonRepair(*empty);
 
-  BOOST_CHECK(result->isEmpty());
-  BOOST_CHECK_EQUAL(result->asText(2), "POLYGON EMPTY");
+  BOOST_CHECK_EQUAL(result->asText(2), "MULTIPOLYGON EMPTY");
 }
 
 /**
@@ -120,7 +104,6 @@ BOOST_AUTO_TEST_CASE(testRepairRules)
 
   // Test even-odd rule
   auto even_odd = polygonRepair(*polygon, PolygonRepairRule::EVEN_ODD_RULE);
-  BOOST_CHECK(!even_odd->isEmpty());
   BOOST_CHECK_EQUAL(even_odd->asText(2),
                     "MULTIPOLYGON (((0.00 0.00,1.00 1.00,0.00 2.00,0.00 "
                     "0.00)),((1.00 1.00,2.00 0.00,2.00 2.00,1.00 1.00)))");
@@ -128,25 +111,22 @@ BOOST_AUTO_TEST_CASE(testRepairRules)
 #if CGAL_VERSION_MAJOR == 6 && CGAL_VERSION_MINOR >= 1
   // Test non-zero rule
   auto non_zero = polygonRepair(*polygon, PolygonRepairRule::NON_ZERO_RULE);
-  BOOST_CHECK(!non_zero->isEmpty());
   BOOST_CHECK_EQUAL(non_zero->asText(2),
                     "MULTIPOLYGON (((0.00 0.00,1.00 1.00,0.00 2.00,0.00 "
                     "0.00)),((1.00 1.00,2.00 0.00,2.00 2.00,1.00 1.00)))");
 
   // Test union rule
   auto union_result = polygonRepair(*polygon, PolygonRepairRule::UNION_RULE);
-  BOOST_CHECK(!union_result->isEmpty());
-  std::cout << union_result->asText(2) << "\n";
-  BOOST_CHECK_EQUAL(union_result->asText(2),
-                    "POLYGON((0 0, 2 2, 2 0, 0 2, 0 0))");
+  BOOST_CHECK_EQUAL(
+      union_result->asText(2),
+      "MULTIPOLYGON (((0.00 0.00,1.00 1.00,0.00 2.00,0.00 0.00)))");
 
   // Test intersection rule
   auto intersection =
       polygonRepair(*polygon, PolygonRepairRule::INTERSECTION_RULE);
-  // Intersection of self-intersecting might be empty or small
-  BOOST_CHECK(intersection != nullptr);
-  BOOST_CHECK_EQUAL(intersection->asText(2),
-                    "POLYGON((0 0, 2 2, 2 0, 0 2, 0 0))");
+  BOOST_CHECK_EQUAL(
+      intersection->asText(2),
+      "MULTIPOLYGON (((0.00 0.00,1.00 1.00,0.00 2.00,0.00 0.00)))");
 #endif
 }
 
@@ -172,9 +152,10 @@ BOOST_AUTO_TEST_CASE(testOverlappingMultiPolygon)
   auto result = polygonRepair(*multipolygon, PolygonRepairRule::UNION_RULE);
 
   BOOST_CHECK(!result->isEmpty());
-  BOOST_CHECK_EQUAL(result->asText(2),
-                    "POLYGON ((0.00 0.00,2.00 0.00,2.00 1.00,3.00 1.00,3.00 "
-                    "3.00,1.00 3.00,1.00 2.00,0.00 2.00,0.00 0.00))");
+  BOOST_CHECK_EQUAL(
+      result->asText(2),
+      "MULTIPOLYGON (((0.00 0.00,2.00 0.00,2.00 1.00,3.00 1.00,3.00 "
+      "3.00,1.00 3.00,1.00 2.00,0.00 2.00,0.00 0.00)))");
 }
 #endif
 
@@ -188,10 +169,9 @@ BOOST_AUTO_TEST_CASE(testInvalidOrientation)
   auto result  = polygonRepair(*polygon);
 
   BOOST_CHECK(!result->isEmpty());
-  BOOST_CHECK(result->geometryTypeId() == TYPE_POLYGON);
   BOOST_CHECK_EQUAL(
       result->asText(2),
-      "POLYGON ((0.00 0.00,1.00 0.00,1.00 1.00,0.00 1.00,0.00 0.00))");
+      "MULTIPOLYGON (((0.00 0.00,1.00 0.00,1.00 1.00,0.00 1.00,0.00 0.00)))");
 }
 
 /**
@@ -202,10 +182,7 @@ BOOST_AUTO_TEST_CASE(testDegeneratePolygon)
   // Polygon collapsing to a line
   auto polygon = io::readWkt("POLYGON((0 0, 1 0, 1 0, 0 0, 0 0))");
   auto result  = polygonRepair(*polygon);
-  BOOST_CHECK_EQUAL(result->asText(2), "GEOMETRYCOLLECTION EMPTY");
-
-  // Should either be empty or a valid polygon
-  BOOST_CHECK(result != nullptr);
+  BOOST_CHECK_EQUAL(result->asText(2), "MULTIPOLYGON EMPTY");
 }
 
 /**
@@ -216,11 +193,9 @@ BOOST_AUTO_TEST_CASE(testPolygonWithDuplicates)
   auto polygon = io::readWkt("POLYGON((0 0, 1 0, 1 0, 1 1, 0 1, 0 1, 0 0))");
   auto result  = polygonRepair(*polygon);
 
-  BOOST_CHECK(!result->isEmpty());
-  BOOST_CHECK(result->geometryTypeId() == TYPE_POLYGON);
   BOOST_CHECK_EQUAL(
       result->asText(2),
-      "POLYGON ((0.00 0.00,1.00 0.00,1.00 1.00,0.00 1.00,0.00 0.00))");
+      "MULTIPOLYGON (((0.00 0.00,1.00 0.00,1.00 1.00,0.00 1.00,0.00 0.00)))");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

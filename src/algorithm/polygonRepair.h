@@ -52,7 +52,7 @@ enum class PolygonRepairRule {
  *
  * @param geometry input geometry (Polygon or MultiPolygon)
  * @param repairRule repair strategy to use (default: EVEN_ODD_RULE)
- * @return repaired geometry as Polygon or MultiPolygon
+ * @return repaired geometry as MultiPolygon
  *
  * @post returned geometry is guaranteed to be valid
  *

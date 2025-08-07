@@ -31,99 +31,6 @@ using Multipolygon_with_holes_2 = CGAL::Multipolygon_with_holes_2<Kernel>;
 namespace {
 
 /**
- * @brief Converts CGAL Multipolygon_with_holes_2 back to SFCGAL Geometry
- */
-auto
-multipolygonWithHolesToSFCGAL(const Multipolygon_with_holes_2 &mp)
-    -> std::unique_ptr<SFCGAL::Geometry>
-{
-  if (mp.number_of_polygons_with_holes() == 0) {
-    return std::make_unique<SFCGAL::GeometryCollection>();
-  }
-
-  if (mp.number_of_polygons_with_holes() == 1) {
-    // Single polygon - return as Polygon
-    const auto &pwh    = mp.polygons_with_holes().front();
-    auto        result = std::make_unique<SFCGAL::Polygon>();
-
-    // Convert exterior ring
-    if (!pwh.outer_boundary().is_empty()) {
-      SFCGAL::LineString exterior;
-      for (auto vertex_it = pwh.outer_boundary().vertices_begin();
-           vertex_it != pwh.outer_boundary().vertices_end(); ++vertex_it) {
-        exterior.addPoint(SFCGAL::Point(CGAL::to_double(vertex_it->x()),
-                                        CGAL::to_double(vertex_it->y())));
-      }
-      // Close the ring
-      if (!exterior.isEmpty()) {
-        exterior.addPoint(exterior.startPoint());
-        result->setExteriorRing(exterior);
-      }
-    }
-
-    // Convert holes
-    for (auto hole_it = pwh.holes_begin(); hole_it != pwh.holes_end();
-         ++hole_it) {
-      SFCGAL::LineString hole_ring;
-      for (auto vertex_it = hole_it->vertices_begin();
-           vertex_it != hole_it->vertices_end(); ++vertex_it) {
-        hole_ring.addPoint(SFCGAL::Point(CGAL::to_double(vertex_it->x()),
-                                         CGAL::to_double(vertex_it->y())));
-      }
-      // Close the ring
-      if (!hole_ring.isEmpty()) {
-        hole_ring.addPoint(hole_ring.startPoint());
-        result->addInteriorRing(hole_ring);
-      }
-    }
-
-    return result;
-  } else {
-    // Multiple polygons - return as MultiPolygon
-    auto result = std::make_unique<SFCGAL::MultiPolygon>();
-
-    for (const auto &pwh : mp.polygons_with_holes()) {
-      auto polygon = std::make_unique<SFCGAL::Polygon>();
-
-      // Convert exterior ring
-      if (!pwh.outer_boundary().is_empty()) {
-        SFCGAL::LineString exterior;
-        for (auto vertex_it = pwh.outer_boundary().vertices_begin();
-             vertex_it != pwh.outer_boundary().vertices_end(); ++vertex_it) {
-          exterior.addPoint(SFCGAL::Point(CGAL::to_double(vertex_it->x()),
-                                          CGAL::to_double(vertex_it->y())));
-        }
-        // Close the ring
-        if (!exterior.isEmpty()) {
-          exterior.addPoint(exterior.startPoint());
-          polygon->setExteriorRing(exterior);
-        }
-      }
-
-      // Convert holes
-      for (auto hole_it = pwh.holes_begin(); hole_it != pwh.holes_end();
-           ++hole_it) {
-        SFCGAL::LineString hole_ring;
-        for (auto vertex_it = hole_it->vertices_begin();
-             vertex_it != hole_it->vertices_end(); ++vertex_it) {
-          hole_ring.addPoint(SFCGAL::Point(CGAL::to_double(vertex_it->x()),
-                                           CGAL::to_double(vertex_it->y())));
-        }
-        // Close the ring
-        if (!hole_ring.isEmpty()) {
-          hole_ring.addPoint(hole_ring.startPoint());
-          polygon->addInteriorRing(hole_ring);
-        }
-      }
-
-      result->addGeometry(polygon.release());
-    }
-
-    return result;
-  }
-}
-
-/**
  * @brief Applies polygon repair with specified rule
  */
 template <typename RepairRuleType>
@@ -200,7 +107,7 @@ polygonRepair(const Geometry &geometry, PolygonRepairRule repairRule)
 {
   // Input validation
   if (geometry.isEmpty()) {
-    return std::unique_ptr<Geometry>(geometry.clone());
+    return std::make_unique<MultiPolygon>();
   }
 
   try {
@@ -210,8 +117,8 @@ polygonRepair(const Geometry &geometry, PolygonRepairRule repairRule)
     // Apply polygon repair
     auto repaired_mp = repairWithRule(cgal_mp, repairRule);
 
-    // Convert back to SFCGAL
-    return multipolygonWithHolesToSFCGAL(repaired_mp);
+    // Always return a MultiPolygon using the new constructor
+    return std::make_unique<MultiPolygon>(repaired_mp);
 
   } catch (const CGAL::Precondition_exception &e) {
     BOOST_THROW_EXCEPTION(Exception(
