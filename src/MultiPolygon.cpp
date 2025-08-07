@@ -59,4 +59,20 @@ MultiPolygon::accept(ConstGeometryVisitor &visitor) const
   return visitor.visit(*this);
 }
 
+auto
+MultiPolygon::toMultipolygon_with_holes_2(bool fixOrientation) const
+    -> CGAL::Multipolygon_with_holes_2<Kernel>
+{
+  CGAL::Multipolygon_with_holes_2<Kernel> mp;
+
+  for (size_t i = 0; i < numGeometries(); ++i) {
+    const Polygon &polygon = polygonN(i);
+    if (!polygon.isEmpty()) {
+      mp.add_polygon_with_holes(polygon.toPolygon_with_holes_2(fixOrientation));
+    }
+  }
+
+  return mp;
+}
+
 } // namespace SFCGAL

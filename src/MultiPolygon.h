@@ -14,6 +14,9 @@
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/Polygon.h"
 
+#include <CGAL/Multipolygon_with_holes_2.h>
+#include <CGAL/Polygon_with_holes_2.h>
+
 namespace SFCGAL {
 
 /**
@@ -67,6 +70,14 @@ public:
   {
     return geometryN(n).as<Polygon>();
   }
+
+  /**
+   * @brief Convert to CGAL::Multipolygon_with_holes_2
+   * @param fixOrientation force exterior ring orientation to counter
+   * clockwise and interior rings to clockwise
+   */
+  CGAL::Multipolygon_with_holes_2<Kernel>
+  toMultipolygon_with_holes_2(bool fixOrientation = true) const;
 
   //-- visitors
 
