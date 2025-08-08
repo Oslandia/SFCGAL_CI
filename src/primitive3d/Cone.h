@@ -66,7 +66,7 @@ public:
 
   /**
    * @brief Sets the top face radius of the cone
-   * @param bottom_radius The new top face radius
+   * @param top_radius The new top face radius
    */
   void
   setTopRadius(const Kernel::FT &top_radius);
