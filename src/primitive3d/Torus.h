@@ -52,14 +52,14 @@ public:
 
   /**
    * @brief Sets the main radius of the torus
-   * @param bottom_radius The new main radius
+   * @param main_radius The new main radius
    */
   void
   setMainRadius(const Kernel::FT &main_radius);
 
   /**
    * @brief Sets the tube radius of the torus
-   * @param bottom_radius The new tube radius
+   * @param tube_radius The new tube radius
    */
   void
   setTubeRadius(const Kernel::FT &tube_radius);
