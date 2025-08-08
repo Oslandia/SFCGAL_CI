@@ -111,7 +111,7 @@ public:
    * @return A CGAL::Surface_mesh object representing the torus
    */
   auto
-  generatePolyhedralSurface() -> PolyhedralSurface;
+  generatePolyhedralSurface() const -> PolyhedralSurface;
 
   /**
    * @brief Returns the perfect torus volume (without discretization)
@@ -128,11 +128,11 @@ public:
   area() const -> double;
 
 private:
-  Kernel::FT                       m_main_radius;
-  Kernel::FT                       m_tube_radius;
-  int                              m_main_num_radial;
-  int                              m_tube_num_radial;
-  std::optional<PolyhedralSurface> m_polyhedral_surface;
+  Kernel::FT                               m_main_radius;
+  Kernel::FT                               m_tube_radius;
+  int                                      m_main_num_radial;
+  int                                      m_tube_num_radial;
+  mutable std::optional<PolyhedralSurface> m_polyhedral_surface;
 
   /**
    * @brief Invalidates the cached polyhedral surface

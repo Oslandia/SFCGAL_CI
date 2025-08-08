@@ -69,7 +69,7 @@ Torus::invalidateCache()
 }
 
 auto
-Torus::generatePolyhedralSurface() -> PolyhedralSurface
+Torus::generatePolyhedralSurface() const -> PolyhedralSurface
 {
   if (m_polyhedral_surface) {
     return *m_polyhedral_surface;
