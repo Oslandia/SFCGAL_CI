@@ -66,6 +66,13 @@ typedef uint32_t srid_t;
 typedef void sfcgal_geometry_t;
 
 /**
+ * sfcgal_torus_t is an opaque pointer type that is used to represent a
+ * pointer to SFCGAL::Torus
+ * @ingroup capi
+ */
+typedef void sfcgal_torus_t;
+
+/**
  * Geometric types
  * @ingroup capi
  */
@@ -1843,6 +1850,122 @@ sfcgal_set_alloc_handlers(sfcgal_alloc_handler_t malloc_handler,
  */
 SFCGAL_API void
 sfcgal_free_buffer(void *buffer);
+
+/**
+ * Creates a torus
+ * @param main_radius the main radius of the torus
+ * @param tube_radius the tube radius of the torus
+ * @param main_num_radial The number of main radial divisions
+ * @param tube_num_radial The number of tube radial divisions
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_torus_t *
+sfcgal_torus_create(double main_radius, double tube_radius, int main_num_radial,
+                    int tube_num_radial);
+
+/**
+ * Deletes a given torus
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus to delete
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_torus_delete(sfcgal_torus_t *torus);
+
+/**
+ * Generates a PolyhedralSurface representation of the torus
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus to delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_torus_to_polyhedralsurface(const sfcgal_torus_t *torus);
+
+/**
+ * Returns the main radius of a torus
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus
+ * @ingroup capi
+ */
+SFCGAL_API double
+sfcgal_torus_main_radius(const sfcgal_torus_t *torus);
+
+/**
+ * Returns the tube radius of a torus
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus
+ * @ingroup capi
+ */
+SFCGAL_API double
+sfcgal_torus_tube_radius(const sfcgal_torus_t *torus);
+
+/**
+ * Returns the number of main radial divisions
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_torus_main_num_radial(const sfcgal_torus_t *torus);
+
+/**
+ * Returns the number of radial divisions for the tube
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_torus_tube_num_radial(const sfcgal_torus_t *torus);
+
+/**
+ * Sets the main radius of a torus
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus
+ * @param main_radius the new main radius
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_torus_set_main_radius(sfcgal_torus_t *torus, double main_radius);
+
+/**
+ * Sets the tube radius of a torus
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus
+ * @param tube_radius the new tube radius
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_torus_set_tube_radius(sfcgal_torus_t *torus, double tube_radius);
+
+/**
+ * Sets the number of main radial divisions
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus
+ * @param main_num_radial the new number of main radial divisions
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_torus_set_main_num_radial(sfcgal_torus_t *torus, int main_num_radial);
+
+/**
+ * Sets the number of radial divisions for the tube
+ * @pre the given pointer must have been previously allocated by
+ * sfcgal_torus_create
+ * @param torus the torus
+ * @param tube_num_radial the new number of radial divisions for the tube
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_torus_set_tube_num_radial(sfcgal_torus_t *torus, int tube_num_radial);
 
 /*--------------------------------------------------------------------------------------*
  *

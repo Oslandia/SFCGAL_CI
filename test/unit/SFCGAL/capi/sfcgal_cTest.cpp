@@ -1486,4 +1486,59 @@ BOOST_AUTO_TEST_CASE(testAlphaWrapping3DTest)
   sfcgal_geometry_delete(geomAlphaWrapping);
 }
 
+BOOST_AUTO_TEST_CASE(testTorusTest)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // check torus main parameters getter/setter
+  const double mainRadius    = 5.0;
+  const double tubeRadius    = 1.0;
+  const int    mainNumRadial = 16;
+  const int    tubeNumRadial = 8;
+
+  sfcgal_torus_t *torus =
+      sfcgal_torus_create(mainRadius, tubeRadius, mainNumRadial, tubeNumRadial);
+
+  BOOST_CHECK_EQUAL(sfcgal_torus_main_radius(torus), mainRadius);
+  BOOST_CHECK_EQUAL(sfcgal_torus_tube_radius(torus), tubeRadius);
+  BOOST_CHECK_EQUAL(sfcgal_torus_main_num_radial(torus), mainNumRadial);
+  BOOST_CHECK_EQUAL(sfcgal_torus_tube_num_radial(torus), tubeNumRadial);
+
+  const double newMainRadius    = 6.0;
+  const double newTubeRadius    = 2.0;
+  const int    newMainNumRadial = 17;
+  const int    newTubeNumRadial = 9;
+
+  sfcgal_torus_set_main_radius(torus, newMainRadius);
+  sfcgal_torus_set_tube_radius(torus, newTubeRadius);
+  sfcgal_torus_set_main_num_radial(torus, newMainNumRadial);
+  sfcgal_torus_set_tube_num_radial(torus, newTubeNumRadial);
+  BOOST_CHECK_EQUAL(sfcgal_torus_main_radius(torus), newMainRadius);
+  BOOST_CHECK_EQUAL(sfcgal_torus_tube_radius(torus), newTubeRadius);
+  BOOST_CHECK_EQUAL(sfcgal_torus_main_num_radial(torus), newMainNumRadial);
+  BOOST_CHECK_EQUAL(sfcgal_torus_tube_num_radial(torus), newTubeNumRadial);
+
+  // torus conversion to a polyhedral surface
+  sfcgal_geometry_t *polyhedralSurface =
+      sfcgal_torus_to_polyhedralsurface(torus);
+  sfcgal_torus_delete(torus);
+
+  char  *wkt;
+  size_t wktLen;
+  sfcgal_geometry_as_text_decim(polyhedralSurface, 0, &wkt, &wktLen);
+  sfcgal_geometry_delete(polyhedralSurface);
+
+  const std::string strWkt(wkt, wktLen);
+  sfcgal_free_buffer(wkt);
+
+  std::string expectedData(SFCGAL_TEST_DIRECTORY);
+  expectedData += "/data/torusWkt_expected.txt";
+  std::ifstream efs(expectedData.c_str());
+  BOOST_REQUIRE(efs.good());
+  std::string expectedWkt;
+  std::getline(efs, expectedWkt);
+
+  BOOST_CHECK_EQUAL(strWkt, expectedWkt);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -19,6 +19,8 @@
 #include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/version.h"
 
+#include "SFCGAL/primitive3d/Torus.h"
+
 #include "SFCGAL/capi/sfcgal_c.h"
 
 #include "SFCGAL/detail/io/Serialization.h"
@@ -212,12 +214,13 @@ down_cast(sfcgal_geometry_t *p) -> T *
   return q;
 }
 
-template <class T>
+template <class T_OUT, class T_IN = SFCGAL::Geometry,
+          class T_PARAM = sfcgal_geometry_t>
 inline auto
-down_const_cast(const sfcgal_geometry_t *p) -> const T *
+down_const_cast(const T_PARAM *p) -> const T_OUT *
 {
-  const T *q =
-      dynamic_cast<const T *>(reinterpret_cast<const SFCGAL::Geometry *>(p));
+  const auto *q =
+      dynamic_cast<const T_OUT *>(reinterpret_cast<const T_IN *>(p));
 
   if (!q) {
     BOOST_THROW_EXCEPTION(SFCGAL::Exception("wrong geometry type"));
@@ -2248,4 +2251,89 @@ sfcgal_geometry_simplify(const sfcgal_geometry_t *geom, double threshold,
 
   std::unique_ptr<SFCGAL::Geometry> out(result->clone());
   return out.release();
+}
+
+extern "C" auto
+sfcgal_torus_create(double main_radius, double tube_radius, int main_num_radial,
+                    int tube_num_radial) -> sfcgal_torus_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return static_cast<SFCGAL::Torus *>(new SFCGAL::Torus(
+          SFCGAL::Kernel::FT(main_radius), SFCGAL::Kernel::FT(tube_radius),
+          main_num_radial, tube_num_radial));)
+}
+
+extern "C" auto
+sfcgal_torus_delete(sfcgal_torus_t *torus) -> void
+{
+  delete reinterpret_cast<SFCGAL::Torus *>(torus);
+}
+
+extern "C" auto
+sfcgal_torus_to_polyhedralsurface(const sfcgal_torus_t *torus)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return new SFCGAL::PolyhedralSurface(
+                 down_const_cast<SFCGAL::Torus, SFCGAL::Torus, sfcgal_torus_t>(
+                     torus)
+                     ->generatePolyhedralSurface());)
+}
+
+extern "C" auto
+sfcgal_torus_main_radius(const sfcgal_torus_t *torus) -> double
+{
+  return CGAL::to_double(
+      down_const_cast<SFCGAL::Torus, SFCGAL::Torus, sfcgal_torus_t>(torus)
+          ->mainRadius());
+}
+
+extern "C" auto
+sfcgal_torus_tube_radius(const sfcgal_torus_t *torus) -> double
+{
+  return CGAL::to_double(
+      down_const_cast<SFCGAL::Torus, SFCGAL::Torus, sfcgal_torus_t>(torus)
+          ->tubeRadius());
+}
+
+extern "C" auto
+sfcgal_torus_main_num_radial(const sfcgal_torus_t *torus) -> int
+{
+  return down_const_cast<SFCGAL::Torus, SFCGAL::Torus, sfcgal_torus_t>(torus)
+      ->mainNumRadial();
+}
+
+extern "C" auto
+sfcgal_torus_tube_num_radial(const sfcgal_torus_t *torus) -> int
+{
+  return down_const_cast<SFCGAL::Torus, SFCGAL::Torus, sfcgal_torus_t>(torus)
+      ->tubeNumRadial();
+}
+
+extern "C" auto
+sfcgal_torus_set_main_radius(sfcgal_torus_t *torus, double main_radius) -> void
+{
+  reinterpret_cast<SFCGAL::Torus *>(torus)->setMainRadius(
+      SFCGAL::Kernel::FT(main_radius));
+}
+
+extern "C" auto
+sfcgal_torus_set_tube_radius(sfcgal_torus_t *torus, double tube_radius) -> void
+{
+  reinterpret_cast<SFCGAL::Torus *>(torus)->setTubeRadius(
+      SFCGAL::Kernel::FT(tube_radius));
+}
+
+extern "C" auto
+sfcgal_torus_set_main_num_radial(sfcgal_torus_t *torus, int main_num_radial)
+    -> void
+{
+  reinterpret_cast<SFCGAL::Torus *>(torus)->setMainNumRadial(main_num_radial);
+}
+
+extern "C" auto
+sfcgal_torus_set_tube_num_radial(sfcgal_torus_t *torus, int tube_num_radial)
+    -> void
+{
+  reinterpret_cast<SFCGAL::Torus *>(torus)->setTubeNumRadial(tube_num_radial);
 }
