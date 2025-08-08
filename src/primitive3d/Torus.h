@@ -66,17 +66,17 @@ public:
 
   /**
    * @brief Sets the main number of radial divisions
-   * @param num The new number of main radial
+   * @param main_num_radial The new number of main radial
    */
   void
-  setMainNumRadial(const int &num);
+  setMainNumRadial(const int &main_num_radial);
 
   /**
    * @brief Sets the number of radial divisions for the tube
-   * @param num The new number of tube radial divisions
+   * @param tube_num_radial The new number of tube radial divisions
    */
   void
-  setTubeNumRadial(const int &num);
+  setTubeNumRadial(const int &tube_num_radial);
 
   /**
    * @brief Gets the main radius of the torus
