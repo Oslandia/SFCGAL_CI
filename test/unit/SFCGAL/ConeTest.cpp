@@ -162,10 +162,9 @@ BOOST_AUTO_TEST_CASE(testPolyhedralSurface)
                         Solid(cone.generatePolyhedralSurface()))),
                     cone.volume(true));
 
-  // FIXME: why does it fail here with a big difference?
-  // BOOST_CHECK_EQUAL(
-  //     CGAL::to_double(algorithm::area(cone.generatePolyhedralSurface())),
-  //     cone.area(true));
+  BOOST_CHECK_EQUAL(
+      CGAL::to_double(algorithm::area3D(cone.generatePolyhedralSurface())),
+      cone.area(true));
 }
 
 BOOST_AUTO_TEST_CASE(testGetSetHeight)
