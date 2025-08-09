@@ -823,6 +823,60 @@ BOOST_AUTO_TEST_CASE(testLineSubstring)
   sfcgal_geometry_delete(subLine);
 }
 
+BOOST_AUTO_TEST_CASE(testTriangle)
+{
+  // Create an empty triangle
+  sfcgal_geometry_t *emptyTriangle = sfcgal_triangle_create();
+  BOOST_CHECK_EQUAL(sfcgal_geometry_type_id(emptyTriangle),
+                    SFCGAL_TYPE_TRIANGLE);
+  BOOST_CHECK(sfcgal_geometry_is_empty(emptyTriangle));
+  sfcgal_geometry_delete(emptyTriangle);
+
+  // Create triangle from points
+  sfcgal_geometry_t *pt1 = sfcgal_point_create_from_xyz(0., 0., 0.);
+  sfcgal_geometry_t *pt2 = sfcgal_point_create_from_xyz(4., 0., 0.);
+  sfcgal_geometry_t *pt3 = sfcgal_point_create_from_xyz(1., 1.5, 1.);
+  sfcgal_geometry_t *triangle1 =
+      sfcgal_triangle_create_from_points(pt1, pt2, pt3);
+  BOOST_CHECK_EQUAL(sfcgal_geometry_type_id(triangle1), SFCGAL_TYPE_TRIANGLE);
+  BOOST_CHECK(!sfcgal_geometry_is_empty(emptyTriangle));
+  sfcgal_geometry_t const *firstPt = sfcgal_triangle_vertex(triangle1, 0);
+  BOOST_CHECK(sfcgal_geometry_covers_3d(pt1, firstPt));
+  sfcgal_geometry_t const *secondPt = sfcgal_triangle_vertex(triangle1, 1);
+  BOOST_CHECK(sfcgal_geometry_covers_3d(pt2, secondPt));
+  sfcgal_geometry_t const *thirdPt = sfcgal_triangle_vertex(triangle1, 2);
+  BOOST_CHECK(sfcgal_geometry_covers_3d(pt3, thirdPt));
+  sfcgal_geometry_delete(pt1);
+  sfcgal_geometry_delete(pt2);
+  sfcgal_geometry_delete(pt3);
+  sfcgal_geometry_delete(triangle1);
+
+  // triangle from wkt
+  sfcgal_set_error_handlers(printf, on_error);
+  std::unique_ptr<Geometry> const triangle2(
+      io::readWkt("TRIANGLE Z ((0 0 0, 2 0 0, 1.5 1 1, 0 0 0))"));
+  BOOST_CHECK_EQUAL(sfcgal_geometry_type_id(triangle2.get()),
+                    SFCGAL_TYPE_TRIANGLE);
+  sfcgal_geometry_t const *vertex = sfcgal_triangle_vertex(triangle2.get(), 0);
+  sfcgal_geometry_t *expectedVertex = sfcgal_point_create_from_xyz(0., 0., 0.);
+  BOOST_CHECK(sfcgal_geometry_covers_3d(vertex, expectedVertex));
+  sfcgal_geometry_delete(expectedVertex);
+
+  // set vertex
+  sfcgal_geometry_t *newVertex = sfcgal_point_create_from_xyz(0.5, 0.5, 0.5);
+  sfcgal_triangle_set_vertex(triangle2.get(), 0, newVertex);
+  BOOST_CHECK(sfcgal_geometry_covers_3d(
+      sfcgal_triangle_vertex(triangle2.get(), 0), newVertex));
+  sfcgal_geometry_delete(newVertex);
+
+  sfcgal_triangle_set_vertex_from_xyz(triangle2.get(), 0, 0.4, 0.4, 0.4);
+  sfcgal_geometry_t *expectedNewVertex =
+      sfcgal_point_create_from_xyz(0.4, 0.4, 0.4);
+  BOOST_CHECK(sfcgal_geometry_covers_3d(
+      sfcgal_triangle_vertex(triangle2.get(), 0), expectedNewVertex));
+  sfcgal_geometry_delete(expectedNewVertex);
+}
+
 BOOST_AUTO_TEST_CASE(testForceRHR)
 {
   sfcgal_set_error_handlers(printf, on_error);
