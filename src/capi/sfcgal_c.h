@@ -502,6 +502,7 @@ sfcgal_triangle_vertex(const sfcgal_geometry_t *triangle, int i);
  * Sets one vertex of a Triangle
  * @pre triangle must be a Triangle
  * @pre vertex must be a Point
+ * @pre i >= 0 and i < 3
  * @ingroup capi
  */
 SFCGAL_API void
