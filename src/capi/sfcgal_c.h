@@ -503,6 +503,8 @@ sfcgal_triangle_vertex(const sfcgal_geometry_t *triangle, int i);
  * @pre triangle must be a Triangle
  * @pre vertex must be a Point
  * @pre i >= 0 and i < 3
+ * @post the ownership of the vertex is not taken. The caller is still
+ * responsible of its deallocation.
  * @ingroup capi
  */
 SFCGAL_API void
