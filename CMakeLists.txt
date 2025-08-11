@@ -133,13 +133,13 @@ else()
 	message( STATUS "Boost_USE_MULTITHREAD=OFF" )
 endif()
 
-#-- minimalist build allowed with boost version older than 1.48
-set( SFCGAL_Boost_COMPONENTS thread system serialization )
+#-- minimalist build allowed with boost version 1.69 or newer
+set( SFCGAL_Boost_COMPONENTS thread serialization )
 #-- program_options
 if ( SFCGAL_BUILD_TESTS OR SFCGAL_BUILD_EXAMPLES OR SFCGAL_BUILD_OSG )
 	set( SFCGAL_Boost_COMPONENTS chrono unit_test_framework filesystem program_options timer ${SFCGAL_Boost_COMPONENTS} )
 endif()
-find_package( Boost COMPONENTS ${SFCGAL_Boost_COMPONENTS} REQUIRED )
+find_package( Boost 1.69.0 COMPONENTS ${SFCGAL_Boost_COMPONENTS} REQUIRED )
 if((${Boost_MAJOR_VERSION} EQUAL 1) AND (${Boost_MINOR_VERSION} EQUAL 58))
 	message( STATUS "Defining BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT" )
 	add_definitions( "-DBOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT" )
