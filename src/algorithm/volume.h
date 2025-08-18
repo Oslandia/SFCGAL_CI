@@ -6,30 +6,50 @@
 #ifndef SFCGAL_ALGORITHM_VOLUME_H_
 #define SFCGAL_ALGORITHM_VOLUME_H_
 
-#include "SFCGAL/Geometry.h"
 #include "SFCGAL/Kernel.h"
-#include "SFCGAL/export.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/config.h"
 
 namespace SFCGAL {
 namespace algorithm {
 
-struct NoValidityCheck;
+/**
+ * @brief Calculate the volume of a closed PolyhedralSurface
+ * @param surface The surface whose volume to calculate
+ * @param noValidityCheck Tag to disable validity checking
+ * @return The volume of the surface (exact arithmetic)
+ * @throws GeometryInvalidityException if the surface is not closed
+ * @warning The surface must be closed and properly oriented
+ */
+SFCGAL_API auto
+volume(const PolyhedralSurface &surface,
+       NoValidityCheck noValidityCheck = NoValidityCheck()) -> Kernel::FT;
 
 /**
- * Computes the volume of a geometry
- * @pre g is a valid Geometry
+ * @brief Calculate the volume of a Solid
+ * @param solid The solid whose volume to calculate
+ * @param noValidityCheck Tag to disable validity checking
+ * @return The volume of the solid (exact arithmetic)
+ * @note Outer shell contributes positively, inner shells (holes) contribute
+ * negatively
  */
-SFCGAL_API Kernel::FT
-           volume(const Geometry &g);
+SFCGAL_API auto
+volume(const Solid &solid, NoValidityCheck noValidityCheck = NoValidityCheck())
+    -> Kernel::FT;
 
 /**
- * Computes the volume of a Solid
- * @pre (not checked) volume is closed and consistently oriented
+ * @brief Calculate the volume of any geometry
+ * @param g The geometry whose volume to calculate
+ * @return The volume of the geometry (0 for 2D geometries)
+ * @note Returns 0 for geometries of dimension < 3
+ * @note For MultiSolid and GeometryCollection, returns the sum of volumes
  */
-SFCGAL_API Kernel::FT
-           volume(const Solid &g, NoValidityCheck);
+SFCGAL_API auto
+volume(const Geometry &g) -> Kernel::FT;
 
 } // namespace algorithm
 } // namespace SFCGAL
 
-#endif
+#endif // SFCGAL_ALGORITHM_VOLUME_H_
