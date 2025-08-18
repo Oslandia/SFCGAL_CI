@@ -282,8 +282,10 @@ PolyhedralSurface::accept(ConstGeometryVisitor &visitor) const
 }
 
 // Explicit instantiations
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 template PolyhedralSurface::PolyhedralSurface(const detail::MarkedPolyhedron &);
 template PolyhedralSurface::PolyhedralSurface(
     const CGAL::Polyhedron_3<Kernel> &);
+#endif
 
 } // namespace SFCGAL
