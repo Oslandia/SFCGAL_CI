@@ -212,19 +212,19 @@ PolyhedralSurface::addPatchs(const PolyhedralSurface &polyhedralSurface)
 void
 PolyhedralSurface::addPolygon(const Polygon &polygon)
 {
-  return addPatch(polygon);
+  addPatch(polygon);
 }
 
 void
 PolyhedralSurface::addPolygon(Polygon *polygon)
 {
-  return addPatch(polygon);
+  addPatch(polygon);
 }
 
 void
 PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
 {
-  return addPatchs(polyhedralSurface);
+  addPatchs(polyhedralSurface);
 }
 
 void
