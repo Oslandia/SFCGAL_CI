@@ -182,12 +182,12 @@ public:
    * add a patch to the PolyhedralSurface
    */
   void
-  addPatch(const Polygon &polygon);
+  addPatch(const Polygon &patch);
   /**
    * add a patch to the PolyhedralSurface
    */
   void
-  addPatch(Polygon *polygon);
+  addPatch(Polygon *patch);
   /**
    * add patches from an other PolyhedralSurface
    */
