@@ -200,6 +200,14 @@ SFCGAL_API int
 sfcgal_geometry_is_empty(const sfcgal_geometry_t *);
 
 /**
+ * Tests if the given geometry is closed or not
+ * @post returns 1 if a geometry is closed. 0 otherwise.
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_geometry_is_closed(const sfcgal_geometry_t *);
+
+/**
  * Drops the z coordinate of the geometry
  * @post returns 1 if a Z value was present and has been removed. 0 otherwise.
  * @ingroup capi

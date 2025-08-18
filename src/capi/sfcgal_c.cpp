@@ -47,6 +47,7 @@
 #include "SFCGAL/algorithm/forceMeasured.h"
 #include "SFCGAL/algorithm/intersection.h"
 #include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/algorithm/isClosed.h"
 #include "SFCGAL/algorithm/isSimple.h"
 #include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/algorithm/length.h"
@@ -439,6 +440,14 @@ sfcgal_geometry_is_empty(const sfcgal_geometry_t *geom) -> int
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return (int)reinterpret_cast<const SFCGAL::Geometry *>(geom)->isEmpty();)
+}
+
+extern "C" auto
+sfcgal_geometry_is_closed(const sfcgal_geometry_t *geom) -> int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return (int)bool(SFCGAL::algorithm::isClosed(
+          *reinterpret_cast<const SFCGAL::Geometry *>(geom)));)
 }
 
 extern "C" auto

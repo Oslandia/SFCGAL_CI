@@ -1540,4 +1540,24 @@ BOOST_AUTO_TEST_CASE(testAlphaWrapping3DTest)
   sfcgal_geometry_delete(geomAlphaWrapping);
 }
 
+BOOST_AUTO_TEST_CASE(testIsClosed)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const closedLineString(
+      io::readWkt("LineString(0 0, 0 1, 1 1, 1 0, 0 0)"));
+  BOOST_CHECK(sfcgal_geometry_is_closed(closedLineString.get()));
+
+  std::string wkt = "POLYHEDRALSURFACE Z("
+                    "((0 0 0, 2 0 0, 2 2 0, 0 2 0, 0 0 0))," // Base
+                    "((0 0 0, 1 1 2, 2 0 0, 0 0 0)),"        // Front
+                    "((2 0 0, 1 1 2, 2 2 0, 2 0 0)),"        // Right
+                    "((2 2 0, 1 1 2, 0 2 0, 2 2 0)),"        // Back
+                    "((0 2 0, 1 1 2, 0 0 0, 0 2 0))"         // Left
+                    ")";
+
+  std::unique_ptr<Geometry> const polyhedralSurface(io::readWkt(wkt));
+  BOOST_CHECK(sfcgal_geometry_is_closed(polyhedralSurface.get()));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
