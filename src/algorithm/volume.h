@@ -19,15 +19,15 @@ struct NoValidityCheck;
  * Computes the volume of a geometry
  * @pre g is a valid Geometry
  */
-SFCGAL_API const Kernel::FT
-                 volume(const Geometry &g);
+SFCGAL_API Kernel::FT
+           volume(const Geometry &g);
 
 /**
  * Computes the volume of a Solid
  * @pre (not checked) volume is closed and consistently oriented
  */
-SFCGAL_API const Kernel::FT
-                 volume(const Solid &g, NoValidityCheck);
+SFCGAL_API Kernel::FT
+           volume(const Solid &g, NoValidityCheck);
 
 } // namespace algorithm
 } // namespace SFCGAL

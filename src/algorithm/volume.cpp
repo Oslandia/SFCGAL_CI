@@ -12,7 +12,7 @@
 namespace SFCGAL::algorithm {
 
 auto
-volume(const Solid &solid, NoValidityCheck /*unused*/) -> const Kernel::FT
+volume(const Solid &solid, NoValidityCheck /*unused*/) -> Kernel::FT
 {
   Kernel::FT                  vol = 0;
   const CGAL::Point_3<Kernel> origin(0, 0, 0);
@@ -35,7 +35,7 @@ volume(const Solid &solid, NoValidityCheck /*unused*/) -> const Kernel::FT
 }
 
 auto
-volume(const Geometry &g) -> const Kernel::FT
+volume(const Geometry &g) -> Kernel::FT
 {
   if (g.isEmpty()) {
     return 0;
