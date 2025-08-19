@@ -22,7 +22,7 @@ RUN CGAL_DIR=/CGAL cmake -B build \
 FROM debian:stable-slim AS run
 
 RUN apt update -qq && \
-    apt install --no-install-recommends --yes libmpfr-dev libgmp-dev libboost-serialization1.74.0
+    apt install --no-install-recommends --yes libmpfr-dev libgmp-dev libboost-serialization-dev
 
 WORKDIR /SFCGAL
 COPY --from=builder /SFCGAL/build /SFCGAL/build
