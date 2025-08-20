@@ -35,7 +35,7 @@ public:
    */
   Sphere(const Kernel::FT      &radius = 1.0,
          const Kernel::Point_3 &center = Kernel::Point_3(0, 0, 0),
-         int num_vertical = 16, int num_horizontal = 32,
+         unsigned int num_vertical = 16, unsigned int num_horizontal = 32,
          const Kernel::Vector_3 &direction = Kernel::Vector_3(0, 0, 1));
 
   /**
@@ -81,7 +81,7 @@ public:
    * @param num The new number of vertical divisions
    */
   inline void
-  setNumVertical(int num)
+  setNumVertical(unsigned int num)
   {
     m_num_vertical = num;
     invalidateCache();
@@ -92,7 +92,7 @@ public:
    * @param num The new number of horizontal divisions
    */
   inline void
-  setNumHorizontal(int num)
+  setNumHorizontal(unsigned int num)
   {
     m_num_horizontal = num;
     invalidateCache();
@@ -133,8 +133,8 @@ public:
    * @brief Gets the number of vertical divisions
    * @return The number of vertical divisions
    */
-  inline int
-  numVertical() const
+  [[nodiscard]] auto
+  numVertical() const -> unsigned int
   {
     return m_num_vertical;
   }
@@ -143,8 +143,8 @@ public:
    * @brief Gets the number of horizontal divisions
    * @return The number of horizontal divisions
    */
-  inline int
-  numHorizontal() const
+  [[nodiscard]] auto
+  numHorizontal() const -> unsigned int
   {
     return m_num_horizontal;
   }
@@ -198,8 +198,8 @@ public:
 private:
   Kernel::FT                                  m_radius;
   Kernel::Point_3                             m_center;
-  int                                         m_num_vertical;
-  int                                         m_num_horizontal;
+  unsigned int                                m_num_vertical;
+  unsigned int                                m_num_horizontal;
   Kernel::Vector_3                            m_direction;
   std::optional<CGAL::Polyhedron_3<Kernel>>   m_polyhedron;
   std::optional<std::vector<Kernel::Point_3>> m_points;

@@ -22,8 +22,9 @@ namespace SFCGAL {
 template <class HDS>
 class Sphere_builder : public CGAL::Modifier_base<HDS> {
 public:
-  Sphere_builder(double radius, int num_vertical, int num_horizontal,
-                 Point_3 center, const Kernel::Vector_3 &direction)
+  Sphere_builder(double radius, unsigned int num_vertical,
+                 unsigned int num_horizontal, Point_3 center,
+                 const Kernel::Vector_3 &direction)
       : radius(radius), num_vertical(num_vertical),
         num_horizontal(num_horizontal), center(std::move(center)),
         direction(normalizeVector(direction))
@@ -72,11 +73,11 @@ private:
     B.add_vertex(Point_3(center + direction * radius));
 
     // Add middle vertices
-    for (int i = 1; i < num_vertical; ++i) {
+    for (unsigned int i = 1; i < num_vertical; ++i) {
       double phi = M_PI * double(i) / double(num_vertical);
       double z   = radius * std::cos(phi);
       double r   = radius * std::sin(phi);
-      for (int j = 0; j < num_horizontal; ++j) {
+      for (unsigned int j = 0; j < num_horizontal; ++j) {
         double           theta = 2 * M_PI * double(j) / double(num_horizontal);
         Kernel::Vector_3 point_vec =
             r * (std::cos(theta) * v1 + std::sin(theta) * v2) + z * direction;
@@ -91,7 +92,7 @@ private:
   void
   addTopFaces(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
   {
-    for (int j = 0; j < num_horizontal; ++j) {
+    for (unsigned int j = 0; j < num_horizontal; ++j) {
       B.begin_facet();
       B.add_vertex_to_facet(0);
       B.add_vertex_to_facet(1 + (j + 1) % num_horizontal);
@@ -103,8 +104,8 @@ private:
   void
   addMiddleFaces(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
   {
-    for (int i = 1; i < num_vertical - 1; ++i) {
-      for (int j = 0; j < num_horizontal; ++j) {
+    for (unsigned int i = 1; i < num_vertical - 1; ++i) {
+      for (unsigned int j = 0; j < num_horizontal; ++j) {
         int current = 1 + (i - 1) * num_horizontal + j;
         int next    = 1 + (i - 1) * num_horizontal + (j + 1) % num_horizontal;
         int below_current = 1 + i * num_horizontal + j;
@@ -128,9 +129,9 @@ private:
   void
   addBottomFaces(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
   {
-    int last_vertex = (num_vertical - 1) * num_horizontal + 1;
-    int last_row    = 1 + (num_vertical - 2) * num_horizontal;
-    for (int j = 0; j < num_horizontal; ++j) {
+    unsigned int last_vertex = ((num_vertical - 1) * num_horizontal) + 1;
+    unsigned int last_row    = 1 + ((num_vertical - 2) * num_horizontal);
+    for (unsigned int j = 0; j < num_horizontal; ++j) {
       B.begin_facet();
       B.add_vertex_to_facet(last_vertex);
       B.add_vertex_to_facet(last_row + j);
@@ -140,8 +141,8 @@ private:
   }
 
   double           radius;
-  int              num_vertical;
-  int              num_horizontal;
+  unsigned int     num_vertical;
+  unsigned int     num_horizontal;
   Point_3          center;
   Kernel::Vector_3 direction;
 };
@@ -154,7 +155,7 @@ private:
 /// @publicsection
 
 Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
-               int num_vertical, int num_horizontal,
+               unsigned int num_vertical, unsigned int num_horizontal,
                const Kernel::Vector_3 &direction)
     : m_radius(std::move(radius)), m_center(std::move(center)),
       m_num_vertical(num_vertical), m_num_horizontal(num_horizontal),
@@ -226,12 +227,12 @@ Sphere::generateSpherePoints() -> std::vector<Point_3>
   Kernel::FT d_lat = CGAL_PI / (m_num_vertical - 1);
   Kernel::FT d_lon = 2 * CGAL_PI / m_num_horizontal;
 
-  for (int i = 0; i < m_num_vertical; ++i) {
-    Kernel::FT lat = CGAL_PI / 2 - i * d_lat;
+  for (unsigned int i = 0; i < m_num_vertical; ++i) {
+    Kernel::FT lat = CGAL_PI / 2 - static_cast<int>(i) * d_lat;
     Kernel::FT z   = m_radius * std::sin(CGAL::to_double(lat));
     Kernel::FT r   = m_radius * std::cos(CGAL::to_double(lat));
-    for (int j = 0; j < m_num_horizontal; ++j) {
-      Kernel::FT       lon       = j * d_lon;
+    for (unsigned int j = 0; j < m_num_horizontal; ++j) {
+      Kernel::FT       lon       = static_cast<int>(j) * d_lon;
       Kernel::Vector_3 point_vec = r * (std::cos(CGAL::to_double(lon)) * v1 +
                                         std::sin(CGAL::to_double(lon)) * v2) +
                                    z * m_direction;
