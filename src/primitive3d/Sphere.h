@@ -46,8 +46,8 @@ public:
   /**
    * @brief Assignment operator
    */
-  Sphere &
-  operator=(Sphere other);
+  auto
+  operator=(Sphere other) -> Sphere &;
 
   /**
    * @brief Destructor
@@ -113,8 +113,8 @@ public:
    * @brief Gets the radius of the sphere
    * @return The radius
    */
-  [[nodiscard]] const Kernel::FT &
-  radius() const
+  [[nodiscard]] auto
+  radius() const -> const Kernel::FT &
   {
     return m_radius;
   }
@@ -123,8 +123,8 @@ public:
    * @brief Gets the center of the sphere
    * @return The center point
    */
-  [[nodiscard]] const Kernel::Point_3 &
-  center() const
+  [[nodiscard]] auto
+  center() const -> const Kernel::Point_3 &
   {
     return m_center;
   }
@@ -153,8 +153,8 @@ public:
    * @brief Gets the direction of the sphere
    * @return The direction vector
    */
-  [[nodiscard]] const Kernel::Vector_3 &
-  direction() const
+  [[nodiscard]] auto
+  direction() const -> const Kernel::Vector_3 &
   {
     return m_direction;
   }
@@ -178,8 +178,8 @@ public:
    * @brief Calculates the volume of the Sphere
    * @return The volume of the sphere
    */
-  double
-  volume() const
+  auto
+  volume() const -> double
   {
     return CGAL::to_double((4.0 / 3.0) * m_radius * m_radius * m_radius *
                            CGAL_PI);
@@ -189,8 +189,8 @@ public:
    * @brief Calculates the surface area of the Sphere
    * @return The surface area of the sphere
    */
-  double
-  area() const
+  auto
+  area() const -> double
   {
     return CGAL::to_double(4 * m_radius * m_radius * CGAL_PI);
   }
@@ -214,8 +214,8 @@ private:
   generateSpherePoints() const -> std::vector<Kernel::Point_3>;
 
   // Function to get an orthogonal vector in the XY plane
-  static Kernel::Vector_3
-  get_orthogonal_vector(const Kernel::Vector_3 &vec)
+  static auto
+  get_orthogonal_vector(const Kernel::Vector_3 &vec) -> Kernel::Vector_3
   {
     if (vec.x() != 0 || vec.y() != 0) {
       return Kernel::Vector_3(-vec.y(), vec.x(), 0);
