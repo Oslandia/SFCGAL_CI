@@ -113,7 +113,7 @@ public:
    * @brief Gets the radius of the sphere
    * @return The radius
    */
-  inline const Kernel::FT &
+  [[nodiscard]] inline const Kernel::FT &
   radius() const
   {
     return m_radius;
@@ -123,7 +123,7 @@ public:
    * @brief Gets the center of the sphere
    * @return The center point
    */
-  inline const Kernel::Point_3 &
+  [[nodiscard]] inline const Kernel::Point_3 &
   center() const
   {
     return m_center;
@@ -153,7 +153,7 @@ public:
    * @brief Gets the direction of the sphere
    * @return The direction vector
    */
-  inline const Kernel::Vector_3 &
+  [[nodiscard]] inline const Kernel::Vector_3 &
   direction() const
   {
     return m_direction;
