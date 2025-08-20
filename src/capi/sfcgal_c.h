@@ -1867,6 +1867,161 @@ sfcgal_geometry_translate_2d(const sfcgal_geometry_t *geom, double dx,
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_simplify(const sfcgal_geometry_t *geom, double threshold,
                          bool preserveTopology);
+
+/*--------------------------------------------------------------------------------------*
+ *
+ * Support for SFCGAL::Primitive class hierarchy
+ *
+ *--------------------------------------------------------------------------------------*/
+
+/**
+ * sfcgal_primitive_t is an opaque pointer type that is used to represent a
+ * pointer to SFCGAL::Primitive
+ * @ingroup capi
+ */
+typedef void sfcgal_primitive_t;
+
+/**
+ * Primitive types
+ * @ingroup capi
+ */
+typedef enum {
+  SFCGAL_TYPE_CYLINDER = 0,
+  SFCGAL_TYPE_SPHERE   = 1
+} sfcgal_primitive_type_t;
+
+/**
+ * @brief Creates a new primitive of the specified type with default parameters.
+ * @param primitive_type The type of primitive to create.
+ * @return A pointer to an allocated @ref sfcgal_primitive_t object. The
+ * returned object must be freed by calling @ref sfcgal_primitive_delete.
+ * @post The returned pointer is non-NULL if allocation succeeds.
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_primitive_t *
+sfcgal_primitive_create(sfcgal_primitive_type_t primitive_type);
+
+/**
+ * @brief Deletes a previously allocated primitive.
+ * @param primitive Pointer to the primitive to delete.
+ * @pre @p primitive must be a valid pointer returned by a creation function
+ * (e.g. @ref sfcgal_primitive_create).
+ * @post After this call, the pointer is invalid and must not be used.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_primitive_delete(sfcgal_primitive_t *primitive);
+
+/**
+ * @brief Retrieves the value of a primitive parameter as a double.
+ * @param primitive Pointer to the primitive.
+ * @param name Name of the parameter to retrieve.
+ * @return The parameter value as a double.
+ * @pre The parameter identified by @p name must exist and be of type double.
+ * @ingroup capi
+ */
+SFCGAL_API double
+sfcgal_primitive_parameter_double(sfcgal_primitive_t *primitive,
+                                  const char         *name);
+
+/**
+ * @brief Sets the value of a primitive parameter as a double.
+ * @param primitive Pointer to the primitive.
+ * @param name Name of the parameter to set.
+ * @param parameter The new parameter value.
+ * @pre The parameter identified by @p name must exist and accept values of type
+ * double.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_primitive_set_parameter_double(sfcgal_primitive_t *primitive,
+                                      const char *name, double parameter);
+
+/**
+ * @brief Retrieves the value of a primitive parameter as an unsigned int.
+ * @param primitive Pointer to the primitive.
+ * @param name Name of the parameter to retrieve.
+ * @return The parameter value as an unsigned int.
+ * @pre The parameter identified by @p name must exist and be of type unsigned
+ * int.
+ * @ingroup capi
+ */
+SFCGAL_API unsigned int
+sfcgal_primitive_parameter_int(sfcgal_primitive_t *primitive, const char *name);
+
+/**
+ * @brief Sets the value of a primitive parameter as an unsigned int.
+ * @param primitive Pointer to the primitive.
+ * @param name Name of the parameter to set.
+ * @param parameter The new parameter value.
+ * @pre The parameter identified by @p name must exist and accept values of type
+ * unsigned int.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_primitive_set_parameter_int(sfcgal_primitive_t *primitive,
+                                   const char *name, unsigned int parameter);
+
+/**
+ * @brief Retrieves the value of a primitive parameter as a 3D point: an array
+ * of three doubles (x, y, z).
+ * @param primitive Pointer to the primitive.
+ * @param name Name of the parameter to retrieve.
+ * @return A newly allocated array of three doubles representing the 3D point on
+ * success, or a nullptr if the operation failed.
+ * @pre The parameter identified by @p name must exist and be of type 3D point.
+ * @post The returned array must be deallocated by calling @ref
+ * sfcgal_free_buffer.
+ * @ingroup capi
+ */
+SFCGAL_API double *
+sfcgal_primitive_parameter_point(sfcgal_primitive_t *primitive,
+                                 const char         *name);
+
+/**
+ * @brief Sets the value of a primitive parameter as a 3D point: an array of
+ * three doubles (x, y, z).
+ * @param primitive Pointer to the primitive.
+ * @param name Name of the parameter to set.
+ * @param point Array of three doubles representing the new 3D point.
+ * @pre The parameter identified by @p name must exist and accept values of type
+ * 3D point.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_primitive_set_parameter_point(sfcgal_primitive_t *primitive,
+                                     const char *name, const double *point);
+
+/**
+ * @brief Retrieves the value of a primitive parameter as a 3D vector: an array
+ * of three doubles (x, y, z).
+ * @param primitive Pointer to the primitive.
+ * @param name Name of the parameter to retrieve.
+ * @return A newly allocated array of three doubles representing the 3D vector
+ * on success, or a nullptr if the operation failed.
+ * @pre The parameter identified by @p name must exist and be of type 3D vector.
+ * @post The returned array must be deallocated by calling @ref
+ * sfcgal_free_buffer.
+ * @ingroup capi
+ */
+SFCGAL_API double *
+sfcgal_primitive_parameter_vector(sfcgal_primitive_t *primitive,
+                                  const char         *name);
+
+/**
+ * @brief Sets the value of a primitive parameter as a 3D vector: an array of
+ * three doubles (x, y, z).
+ * @param primitive Pointer to the primitive.
+ * @param name Name of the parameter to set.
+ * @param vector Array of three doubles representing the new 3D vector.
+ * @pre The parameter identified by @p name must exist and accept values of type
+ * 3D vector.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_primitive_set_parameter_vector(sfcgal_primitive_t *primitive,
+                                      const char *name, const double *vector);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Error handling

@@ -5,6 +5,7 @@
 
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
 #include "SFCGAL/MultiPoint.h"
@@ -17,6 +18,9 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/primitive3d/Cylinder.h"
+#include "SFCGAL/primitive3d/Primitive.h"
+#include "SFCGAL/primitive3d/Sphere.h"
 #include "SFCGAL/version.h"
 
 #include "SFCGAL/capi/sfcgal_c.h"
@@ -2259,4 +2263,167 @@ sfcgal_geometry_simplify(const sfcgal_geometry_t *geom, double threshold,
 
   std::unique_ptr<SFCGAL::Geometry> out(result->clone());
   return out.release();
+}
+
+extern "C" auto
+sfcgal_primitive_create(sfcgal_primitive_type_t primitive_type)
+    -> sfcgal_primitive_t *
+{
+  sfcgal_primitive_t *primitive = nullptr;
+
+  switch (primitive_type) {
+  case SFCGAL_TYPE_CYLINDER:
+    primitive = new SFCGAL::Cylinder();
+    break;
+  case SFCGAL_TYPE_SPHERE:
+    primitive = new SFCGAL::Sphere();
+    break;
+  }
+
+  if (primitive == nullptr) {
+    SFCGAL_ERROR("Invalid primitive type");
+  }
+
+  return primitive;
+}
+
+extern "C" auto
+sfcgal_primitive_delete(sfcgal_primitive_t *primitive) -> void
+{
+  delete reinterpret_cast<SFCGAL::Primitive *>(primitive);
+}
+
+extern "C" auto
+sfcgal_primitive_parameter_double(sfcgal_primitive_t *primitive,
+                                  const char         *name) -> double
+{
+  double returnValue = 0.;
+
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      SFCGAL::PrimitiveParameter parameter =
+          primitiveCast->parameter(std::string(name));
+      const SFCGAL::Kernel::FT *kernel_parameter =
+          std::get_if<SFCGAL::Kernel::FT>(&parameter);
+      if (kernel_parameter != nullptr) {
+        returnValue = CGAL::to_double(*kernel_parameter);
+      } else {
+        SFCGAL_ERROR("Parameter %s is not a double", name);
+      } return returnValue;);
+}
+
+extern "C" auto
+sfcgal_primitive_set_parameter_double(sfcgal_primitive_t *primitive,
+                                      const char *name, double parameter)
+    -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      primitiveCast->setParameter(std::string(name),
+                                  SFCGAL::Kernel::FT(parameter));)
+}
+
+extern "C" auto
+sfcgal_primitive_parameter_int(sfcgal_primitive_t *primitive, const char *name)
+    -> unsigned int
+{
+  unsigned int returnValue = 0;
+
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      SFCGAL::PrimitiveParameter parameter =
+          primitiveCast->parameter(std::string(name));
+      const unsigned int *kernel_parameter =
+          std::get_if<unsigned int>(&parameter);
+      if (kernel_parameter != nullptr) {
+        returnValue = *kernel_parameter;
+      } else {
+        SFCGAL_ERROR("Parameter %s is not a unsigned int", name);
+      } return returnValue;);
+}
+
+extern "C" auto
+sfcgal_primitive_set_parameter_int(sfcgal_primitive_t *primitive,
+                                   const char *name, unsigned int parameter)
+    -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      primitiveCast->setParameter(std::string(name), parameter);)
+}
+
+/// @{
+/// @privatesection
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+template <class T>
+auto
+primitive_parameter_array(sfcgal_primitive_t *primitive, const char *name,
+                          const char *parameter_type) -> double *
+{
+  double *returnArray = nullptr;
+
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      SFCGAL::PrimitiveParameter parameter =
+          primitiveCast->parameter(std::string(name));
+      const T *array = std::get_if<T>(&parameter); if (array != nullptr) {
+        returnArray =
+            static_cast<double *>(sfcgal_alloc_handler(3 * sizeof(double)));
+        returnArray[0] = CGAL::to_double(array->x());
+        returnArray[1] = CGAL::to_double(array->y());
+        returnArray[2] = CGAL::to_double(array->z());
+      } else {
+        SFCGAL_ERROR("Parameter %s is not a %s", name, parameter_type);
+      } return returnArray;);
+}
+
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
+/// @publicsection
+/// @publicsection
+
+template <class T>
+auto
+primitive_set_parameter_array(sfcgal_primitive_t *primitive, const char *name,
+                              const double *array) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      primitiveCast->setParameter(std::string(name),
+                                  T(array[0], array[1], array[2]));)
+}
+
+extern "C" auto
+sfcgal_primitive_parameter_point(sfcgal_primitive_t *primitive,
+                                 const char         *name) -> double *
+{
+  return primitive_parameter_array<SFCGAL::Kernel::Point_3>(primitive, name,
+                                                            "point");
+}
+
+extern "C" auto
+sfcgal_primitive_set_parameter_point(sfcgal_primitive_t *primitive,
+                                     const char *name, const double *point)
+    -> void
+{
+  primitive_set_parameter_array<SFCGAL::Kernel::Point_3>(primitive, name,
+                                                         point);
+}
+
+extern "C" auto
+sfcgal_primitive_parameter_vector(sfcgal_primitive_t *primitive,
+                                  const char         *name) -> double *
+{
+  return primitive_parameter_array<SFCGAL::Kernel::Vector_3>(primitive, name,
+                                                             "vector");
+}
+
+extern "C" auto
+sfcgal_primitive_set_parameter_vector(sfcgal_primitive_t *primitive,
+                                      const char *name, const double *vector)
+    -> void
+{
+  primitive_set_parameter_array<SFCGAL::Kernel::Vector_3>(primitive, name,
+                                                          vector);
 }
