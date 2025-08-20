@@ -163,16 +163,16 @@ public:
    * @brief Generates a polyhedron representation of the sphere
    * @return A CGAL::Polyhedron_3 object representing the sphere
    */
-  CGAL::Polyhedron_3<Kernel>
-  generatePolyhedron();
+  auto
+  generatePolyhedron() const -> CGAL::Polyhedron_3<Kernel>;
 
   /**
    * @brief Generates a point cloud representation of the sphere
    * @return A vector of Point_3 objects representing points on the sphere's
    * surface
    */
-  std::vector<Kernel::Point_3>
-  generatePoints();
+  auto
+  generatePoints() const -> std::vector<Kernel::Point_3>;
 
   /**
    * @brief Calculates the volume of the Sphere
@@ -196,20 +196,22 @@ public:
   }
 
 private:
-  Kernel::FT                                  m_radius;
-  Kernel::Point_3                             m_center;
-  unsigned int                                m_num_vertical;
-  unsigned int                                m_num_horizontal;
-  Kernel::Vector_3                            m_direction;
-  std::optional<CGAL::Polyhedron_3<Kernel>>   m_polyhedron;
-  std::optional<std::vector<Kernel::Point_3>> m_points;
+  Kernel::FT                                          m_radius;
+  Kernel::Point_3                                     m_center;
+  unsigned int                                        m_num_vertical;
+  unsigned int                                        m_num_horizontal;
+  Kernel::Vector_3                                    m_direction;
+  mutable std::optional<CGAL::Polyhedron_3<Kernel>>   m_polyhedron;
+  mutable std::optional<std::vector<Kernel::Point_3>> m_points;
 
   void
   invalidateCache();
-  CGAL::Polyhedron_3<Kernel>
-  generateSpherePolyhedron();
-  std::vector<Kernel::Point_3>
-  generateSpherePoints();
+
+  auto
+  generateSpherePolyhedron() const -> CGAL::Polyhedron_3<Kernel>;
+
+  auto
+  generateSpherePoints() const -> std::vector<Kernel::Point_3>;
 
   // Function to get an orthogonal vector in the XY plane
   static Kernel::Vector_3
