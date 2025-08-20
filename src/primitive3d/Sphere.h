@@ -58,7 +58,7 @@ public:
    * @brief Sets the radius of the sphere
    * @param radius The new radius
    */
-  inline void
+  void
   setRadius(const Kernel::FT &radius)
   {
     m_radius = radius;
@@ -69,7 +69,7 @@ public:
    * @brief Sets the center of the sphere
    * @param center The new center point
    */
-  inline void
+  void
   setCenter(const Kernel::Point_3 &center)
   {
     m_center = center;
@@ -80,7 +80,7 @@ public:
    * @brief Sets the number of vertical divisions
    * @param num The new number of vertical divisions
    */
-  inline void
+  void
   setNumVertical(unsigned int num)
   {
     m_num_vertical = num;
@@ -91,7 +91,7 @@ public:
    * @brief Sets the number of horizontal divisions
    * @param num The new number of horizontal divisions
    */
-  inline void
+  void
   setNumHorizontal(unsigned int num)
   {
     m_num_horizontal = num;
@@ -102,7 +102,7 @@ public:
    * @brief Sets the direction of the sphere
    * @param direction The new direction vector
    */
-  inline void
+  void
   setDirection(const Kernel::Vector_3 &direction)
   {
     m_direction = normalizeVector(direction);
@@ -113,7 +113,7 @@ public:
    * @brief Gets the radius of the sphere
    * @return The radius
    */
-  [[nodiscard]] inline const Kernel::FT &
+  [[nodiscard]] const Kernel::FT &
   radius() const
   {
     return m_radius;
@@ -123,7 +123,7 @@ public:
    * @brief Gets the center of the sphere
    * @return The center point
    */
-  [[nodiscard]] inline const Kernel::Point_3 &
+  [[nodiscard]] const Kernel::Point_3 &
   center() const
   {
     return m_center;
@@ -153,7 +153,7 @@ public:
    * @brief Gets the direction of the sphere
    * @return The direction vector
    */
-  [[nodiscard]] inline const Kernel::Vector_3 &
+  [[nodiscard]] const Kernel::Vector_3 &
   direction() const
   {
     return m_direction;
