@@ -185,7 +185,7 @@ Sphere::invalidateCache()
 
 // Generate the polyhedron representation of the sphere
 auto
-Sphere::generateSpherePolyhedron() -> Polyhedron_3
+Sphere::generateSpherePolyhedron() const -> Polyhedron_3
 {
   Polyhedron_3                             P;
   Sphere_builder<Polyhedron_3::HalfedgeDS> builder(
@@ -196,7 +196,7 @@ Sphere::generateSpherePolyhedron() -> Polyhedron_3
 }
 
 auto
-Sphere::generatePolyhedron() -> Polyhedron_3
+Sphere::generatePolyhedron() const -> Polyhedron_3
 {
   if (!m_polyhedron) {
     m_polyhedron = generateSpherePolyhedron();
@@ -205,7 +205,7 @@ Sphere::generatePolyhedron() -> Polyhedron_3
 }
 
 auto
-Sphere::generatePoints() -> std::vector<Point_3>
+Sphere::generatePoints() const -> std::vector<Point_3>
 {
   if (!m_points) {
     m_points = generateSpherePoints();
@@ -215,7 +215,7 @@ Sphere::generatePoints() -> std::vector<Point_3>
 
 // Generate points on the sphere's surface
 auto
-Sphere::generateSpherePoints() -> std::vector<Point_3>
+Sphere::generateSpherePoints() const -> std::vector<Point_3>
 {
   std::vector<Point_3> points;
   points.reserve(static_cast<size_t>(m_num_vertical) *
