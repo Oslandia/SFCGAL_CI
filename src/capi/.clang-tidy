@@ -1,2 +1,2 @@
 InheritParentConfig: true
-Checks: '-*,clang-analyzer-*,cert-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type,performance-*,portability-*,readability-*,-readability-magic-numbers,-header-filter=.*'
+Checks: '-*,clang-analyzer-*,cert-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type,-modernize-use-using,performance-*,portability-*,readability-*,-readability-magic-numbers,-header-filter=.*'
