@@ -8,6 +8,8 @@
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/export.h"
+#include "SFCGAL/primitive3d/Primitive.h"
+
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>
 #include <optional>
@@ -21,7 +23,7 @@ namespace SFCGAL {
  * This class provides methods to generate a polyhedron and a surface mesh
  * representation of a cylinder. It uses SFCGAL's Kernel for exact computations.
  */
-class SFCGAL_API Cylinder {
+class SFCGAL_API Cylinder : public Primitive {
 public:
   /**
    * @brief Constructs a Cylinder object
@@ -40,6 +42,12 @@ public:
    * @brief Copy constructor
    */
   Cylinder(const Cylinder &other) = default;
+
+  [[nodiscard]] auto
+  primitiveType() const -> std::string override;
+
+  [[nodiscard]] auto
+  primitiveTypeId() const -> PrimitiveType override;
 
   /**
    * @brief Assignment operator
@@ -94,7 +102,7 @@ public:
   [[nodiscard]] auto
   baseCenter() const -> const Point_3 &
   {
-    return m_base_center;
+    return std::get<Point_3>(m_parameters.at("base_center"));
   }
 
   /**
@@ -104,7 +112,7 @@ public:
   [[nodiscard]] auto
   axis() const -> const Vector_3 &
   {
-    return m_axis;
+    return std::get<Vector_3>(m_parameters.at("axis"));
   }
 
   /**
@@ -114,7 +122,7 @@ public:
   [[nodiscard]] auto
   radius() const -> const Kernel::FT &
   {
-    return m_radius;
+    return std::get<Kernel::FT>(m_parameters.at("radius"));
   }
 
   /**
@@ -124,7 +132,7 @@ public:
   [[nodiscard]] auto
   height() const -> const Kernel::FT &
   {
-    return m_height;
+    return std::get<Kernel::FT>(m_parameters.at("height"));
   }
 
   /**
@@ -134,7 +142,7 @@ public:
   [[nodiscard]] auto
   numRadial() const -> unsigned int
   {
-    return m_num_radial;
+    return std::get<unsigned int>(m_parameters.at("num_radial"));
   }
 
   /**
@@ -156,36 +164,31 @@ public:
    * @return A SFCGAL::PolyhedralSurface object representing the cylinder
    */
   auto
-  generatePolyhedralSurface() const -> PolyhedralSurface;
+  generatePolyhedralSurface() const -> PolyhedralSurface override;
 
   [[nodiscard]] auto
   volume() const -> double
   {
-    return CGAL::to_double(m_radius * m_radius * m_height * CGAL_PI);
+    return CGAL::to_double(radius() * radius() * height() * CGAL_PI);
   }
 
   [[nodiscard]] auto
   area3D() const -> double
   {
-    return CGAL::to_double(2 * m_radius * m_radius * CGAL_PI +
-                           2 * m_radius * m_height * CGAL_PI);
+    return CGAL::to_double(2 * radius() * radius() * CGAL_PI +
+                           2 * radius() * height() * CGAL_PI);
   }
 
-private:
-  Point_3                                  m_base_center;
-  Vector_3                                 m_axis;
-  Kernel::FT                               m_radius;
-  Kernel::FT                               m_height;
-  unsigned int                             m_num_radial;
-  mutable std::optional<Polyhedron_3>      m_polyhedron;
-  mutable std::optional<Surface_mesh_3>    m_surface_mesh;
-  mutable std::optional<PolyhedralSurface> m_polyhedral_surface;
-
+protected:
   /**
    * @brief Invalidates the cached polyhedron and surface mesh
    */
   void
-  invalidateCache();
+  invalidateCache() override;
+
+private:
+  mutable std::optional<Polyhedron_3>   m_polyhedron;
+  mutable std::optional<Surface_mesh_3> m_surface_mesh;
 
   /**
    * @brief Normalizes a vector
