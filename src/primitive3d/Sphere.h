@@ -15,8 +15,11 @@
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/export.h"
 #include "SFCGAL/numeric.h"
+#include "SFCGAL/primitive3d/Primitive.h"
 
 namespace SFCGAL {
+
+class PolyhedralSurface;
 
 /**
  * @brief Represents a sphere in 3D space
@@ -24,7 +27,7 @@ namespace SFCGAL {
  * This class provides methods to generate a polyhedron and a point cloud
  * representation of a sphere. It uses SFCGAL's Kernel for exact computations.
  */
-class SFCGAL_API Sphere {
+class SFCGAL_API Sphere : public Primitive {
 public:
   /**
    * @brief Constructs a Sphere object
@@ -55,6 +58,12 @@ public:
    */
   ~Sphere() = default;
 
+  [[nodiscard]] auto
+  primitiveType() const -> std::string override;
+
+  [[nodiscard]] auto
+  primitiveTypeId() const -> PrimitiveType override;
+
   /**
    * @brief Sets the radius of the sphere
    * @param radius The new radius
@@ -62,7 +71,7 @@ public:
   void
   setRadius(const Kernel::FT &radius)
   {
-    m_radius = radius;
+    m_parameters.at("radius") = radius;
     invalidateCache();
   }
 
@@ -73,7 +82,7 @@ public:
   void
   setCenter(const Kernel::Point_3 &center)
   {
-    m_center = center;
+    m_parameters.at("center") = center;
     invalidateCache();
   }
 
@@ -84,7 +93,7 @@ public:
   void
   setNumVertical(unsigned int num)
   {
-    m_num_vertical = num;
+    m_parameters.at("num_vertical") = num;
     invalidateCache();
   }
 
@@ -95,7 +104,7 @@ public:
   void
   setNumHorizontal(unsigned int num)
   {
-    m_num_horizontal = num;
+    m_parameters.at("num_horizontal") = num;
     invalidateCache();
   }
 
@@ -106,7 +115,7 @@ public:
   void
   setDirection(const Kernel::Vector_3 &direction)
   {
-    m_direction = normalizeVector(direction);
+    m_parameters.at("direction") = normalizeVector(direction);
     invalidateCache();
   }
 
@@ -117,7 +126,7 @@ public:
   [[nodiscard]] auto
   radius() const -> const Kernel::FT &
   {
-    return m_radius;
+    return std::get<Kernel::FT>(m_parameters.at("radius"));
   }
 
   /**
@@ -127,7 +136,7 @@ public:
   [[nodiscard]] auto
   center() const -> const Kernel::Point_3 &
   {
-    return m_center;
+    return std::get<Kernel::Point_3>(m_parameters.at("center"));
   }
 
   /**
@@ -137,7 +146,7 @@ public:
   [[nodiscard]] auto
   numVertical() const -> unsigned int
   {
-    return m_num_vertical;
+    return std::get<unsigned int>(m_parameters.at("num_vertical"));
   }
 
   /**
@@ -147,7 +156,7 @@ public:
   [[nodiscard]] auto
   numHorizontal() const -> unsigned int
   {
-    return m_num_horizontal;
+    return std::get<unsigned int>(m_parameters.at("num_horizontal"));
   }
 
   /**
@@ -157,7 +166,7 @@ public:
   [[nodiscard]] auto
   direction() const -> const Kernel::Vector_3 &
   {
-    return m_direction;
+    return std::get<Kernel::Vector_3>(m_parameters.at("direction"));
   }
 
   /**
@@ -180,7 +189,7 @@ public:
    * @return A SFCGAL::PolyhedralSurface object representing the sphere
    */
   auto
-  generatePolyhedralSurface() const -> PolyhedralSurface;
+  generatePolyhedralSurface() const -> PolyhedralSurface override;
 
   /**
    * @brief Calculates the volume of the Sphere
@@ -189,7 +198,7 @@ public:
   auto
   volume() const -> double
   {
-    return CGAL::to_double((4.0 / 3.0) * m_radius * m_radius * m_radius *
+    return CGAL::to_double((4.0 / 3.0) * radius() * radius() * radius() *
                            CGAL_PI);
   }
 
@@ -200,21 +209,25 @@ public:
   auto
   area3D() const -> double
   {
-    return CGAL::to_double(4 * m_radius * m_radius * CGAL_PI);
+    return CGAL::to_double(4 * radius() * radius() * CGAL_PI);
   }
 
+protected:
+  /**
+   * @brief Invalidates the cached geometries
+   */
+  void
+  invalidateCache() override;
+
 private:
-  Kernel::FT                                          m_radius;
-  Kernel::Point_3                                     m_center;
-  unsigned int                                        m_num_vertical;
-  unsigned int                                        m_num_horizontal;
-  Kernel::Vector_3                                    m_direction;
+  // Kernel::FT                                  m_radius;
+  // Kernel::Point_3                             m_center;
+  // int                                         m_num_vertical;
+  // int                                         m_num_horizontal;
+  // Kernel::Vector_3                            m_direction;
   mutable std::optional<CGAL::Polyhedron_3<Kernel>>   m_polyhedron;
   mutable std::optional<std::vector<Kernel::Point_3>> m_points;
   mutable std::optional<PolyhedralSurface>            m_polyhedral_surface;
-
-  void
-  invalidateCache();
 
   auto
   generateSpherePolyhedron() const -> CGAL::Polyhedron_3<Kernel>;

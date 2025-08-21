@@ -3,6 +3,10 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/primitive3d/Sphere.h"
+#include "SFCGAL/Kernel.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/primitive3d/Primitive.h"
+
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Vector_3.h>
 #include <cmath>
@@ -157,29 +161,39 @@ private:
 Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
                unsigned int num_vertical, unsigned int num_horizontal,
                const Kernel::Vector_3 &direction)
-    : m_radius(std::move(radius)), m_center(std::move(center)),
-      m_num_vertical(num_vertical), m_num_horizontal(num_horizontal),
-      m_direction(normalizeVector(direction))
 {
+  m_parameters["radius"]         = Kernel::FT(radius);
+  m_parameters["num_vertical"]   = num_vertical;
+  m_parameters["num_horizontal"] = num_horizontal;
+  m_parameters["center"]         = center;
+  m_parameters["direction"]      = normalizeVector(direction);
 }
 
 auto
 Sphere::operator=(Sphere other) -> Sphere &
 {
-  std::swap(m_radius, other.m_radius);
-  std::swap(m_center, other.m_center);
-  std::swap(m_num_vertical, other.m_num_vertical);
-  std::swap(m_num_horizontal, other.m_num_horizontal);
-  std::swap(m_direction, other.m_direction);
+  Primitive::operator=(other);
   std::swap(m_polyhedron, other.m_polyhedron);
   std::swap(m_points, other.m_points);
-  std::swap(m_polyhedral_surface, other.m_polyhedral_surface);
   return *this;
+}
+
+auto
+Sphere::primitiveType() const -> std::string
+{
+  return "Sphere";
+}
+
+auto
+Sphere::primitiveTypeId() const -> PrimitiveType
+{
+  return PrimitiveType::TYPE_SPHERE;
 }
 
 void
 Sphere::invalidateCache()
 {
+  Primitive::invalidateCache();
   m_polyhedron.reset();
   m_points.reset();
 }
@@ -190,8 +204,8 @@ Sphere::generateSpherePolyhedron() const -> Polyhedron_3
 {
   Polyhedron_3                             P;
   Sphere_builder<Polyhedron_3::HalfedgeDS> builder(
-      CGAL::to_double(m_radius), m_num_vertical, m_num_horizontal, m_center,
-      m_direction);
+      CGAL::to_double(radius()), numVertical(), numHorizontal(), center(),
+      direction());
   P.delegate(builder);
   return P;
 }
@@ -230,25 +244,26 @@ auto
 Sphere::generateSpherePoints() const -> std::vector<Point_3>
 {
   std::vector<Point_3> points;
-  points.reserve(static_cast<size_t>(m_num_vertical) *
-                 static_cast<size_t>(m_num_horizontal));
+  points.reserve(static_cast<unsigned long>(numVertical()) * numHorizontal());
 
-  Kernel::Vector_3 v1 = normalizeVector(get_orthogonal_vector(m_direction));
-  Kernel::Vector_3 v2 = normalizeVector(CGAL::cross_product(m_direction, v1));
+  Kernel::Vector_3 vec1 = normalizeVector(get_orthogonal_vector(direction()));
+  Kernel::Vector_3 vec2 =
+      normalizeVector(CGAL::cross_product(direction(), vec1));
 
-  Kernel::FT d_lat = CGAL_PI / (m_num_vertical - 1);
-  Kernel::FT d_lon = 2 * CGAL_PI / m_num_horizontal;
+  Kernel::FT d_lat = CGAL_PI / static_cast<double>(numVertical() - 1);
+  Kernel::FT d_lon = 2 * CGAL_PI / static_cast<double>(numHorizontal());
 
-  for (unsigned int i = 0; i < m_num_vertical; ++i) {
-    Kernel::FT lat = CGAL_PI / 2 - static_cast<int>(i) * d_lat;
-    Kernel::FT z   = m_radius * std::sin(CGAL::to_double(lat));
-    Kernel::FT r   = m_radius * std::cos(CGAL::to_double(lat));
-    for (unsigned int j = 0; j < m_num_horizontal; ++j) {
-      Kernel::FT       lon       = static_cast<int>(j) * d_lon;
-      Kernel::Vector_3 point_vec = r * (std::cos(CGAL::to_double(lon)) * v1 +
-                                        std::sin(CGAL::to_double(lon)) * v2) +
-                                   z * m_direction;
-      points.emplace_back(m_center + point_vec);
+  for (unsigned int i = 0; i < numVertical(); ++i) {
+    Kernel::FT lat        = CGAL_PI / 2 - static_cast<int>(i) * d_lat;
+    Kernel::FT z          = radius() * std::sin(CGAL::to_double(lat));
+    Kernel::FT lat_radius = radius() * std::cos(CGAL::to_double(lat));
+    for (unsigned int j = 0; j < numHorizontal(); ++j) {
+      Kernel::FT       lon = static_cast<int>(j) * d_lon;
+      Kernel::Vector_3 point_vec =
+          lat_radius * (std::cos(CGAL::to_double(lon)) * vec1 +
+                        std::sin(CGAL::to_double(lon)) * vec2) +
+          z * direction();
+      points.emplace_back(center() + point_vec);
     }
   }
   return points;

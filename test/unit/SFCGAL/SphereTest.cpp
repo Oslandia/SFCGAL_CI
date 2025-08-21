@@ -44,6 +44,18 @@ BOOST_AUTO_TEST_CASE(testSetters)
   BOOST_CHECK_EQUAL(sphere.center(), Point_3(1, 1, 1));
   BOOST_CHECK_EQUAL(sphere.numVertical(), 24);
   BOOST_CHECK_EQUAL(sphere.numHorizontal(), 48);
+
+  // test setter and getter from Primitive
+  sphere.setParameter(std::string("radius"), 12.3);
+  BOOST_CHECK_CLOSE(sphere.radius(), 12.3, 1e-6);
+
+  // sphere does not have a parameter called foo
+  BOOST_CHECK_THROW(sphere.setParameter(std::string("foo"), 12.3), Exception);
+  BOOST_CHECK_THROW(static_cast<void>(sphere.parameter("foo")), Exception);
+
+  // radius is not a point
+  BOOST_CHECK_THROW(
+      sphere.setParameter(std::string("radius"), Point_3(1, 1, 1)), Exception);
 }
 
 BOOST_AUTO_TEST_CASE(testGeneratePolyhedron)
