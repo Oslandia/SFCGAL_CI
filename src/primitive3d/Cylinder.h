@@ -141,14 +141,14 @@ public:
    * @return A CGAL::Polyhedron_3 object representing the cylinder
    */
   auto
-  generatePolyhedron() -> Polyhedron_3;
+  generatePolyhedron() const -> Polyhedron_3;
 
   /**
    * @brief Generates a surface mesh representation of the cylinder
    * @return A CGAL::Surface_mesh object representing the cylinder
    */
   auto
-  generateSurfaceMesh() -> Surface_mesh_3;
+  generateSurfaceMesh() const -> Surface_mesh_3;
 
   [[nodiscard]] auto
   volume() const -> double
@@ -164,13 +164,13 @@ public:
   }
 
 private:
-  Point_3                       m_base_center;
-  Vector_3                      m_axis;
-  Kernel::FT                    m_radius;
-  Kernel::FT                    m_height;
-  int                           m_num_radial;
-  std::optional<Polyhedron_3>   m_polyhedron;
-  std::optional<Surface_mesh_3> m_surface_mesh;
+  Point_3                               m_base_center;
+  Vector_3                              m_axis;
+  Kernel::FT                            m_radius;
+  Kernel::FT                            m_height;
+  int                                   m_num_radial;
+  mutable std::optional<Polyhedron_3>   m_polyhedron;
+  mutable std::optional<Surface_mesh_3> m_surface_mesh;
 
   /**
    * @brief Invalidates the cached polyhedron and surface mesh

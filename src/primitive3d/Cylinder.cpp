@@ -83,7 +83,7 @@ Cylinder::normalize(const Vector_3 &vector) -> Vector_3
 }
 
 auto
-Cylinder::generatePolyhedron() -> Polyhedron_3
+Cylinder::generatePolyhedron() const -> Polyhedron_3
 {
   if (m_polyhedron) {
     return *m_polyhedron;
@@ -97,7 +97,7 @@ Cylinder::generatePolyhedron() -> Polyhedron_3
 }
 
 auto
-Cylinder::generateSurfaceMesh() -> Surface_mesh_3
+Cylinder::generateSurfaceMesh() const -> Surface_mesh_3
 {
   if (m_surface_mesh) {
     return *m_surface_mesh;
