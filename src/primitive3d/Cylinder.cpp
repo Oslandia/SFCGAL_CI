@@ -73,13 +73,13 @@ Cylinder::invalidateCache()
 }
 
 auto
-Cylinder::normalize(const Vector_3 &v) -> Vector_3
+Cylinder::normalize(const Vector_3 &vector) -> Vector_3
 {
-  double length = std::sqrt(CGAL::to_double(v.squared_length()));
+  double length = std::sqrt(CGAL::to_double(vector.squared_length()));
   if (length < EPSILON) {
-    return v;
+    return vector;
   }
-  return v / length;
+  return vector / length;
 }
 
 auto

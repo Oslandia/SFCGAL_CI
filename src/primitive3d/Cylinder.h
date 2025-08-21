@@ -180,11 +180,11 @@ private:
 
   /**
    * @brief Normalizes a vector
-   * @param v The vector to normalize
+   * @param vector The vector to normalize
    * @return The normalized vector
    */
-  auto
-  normalize(const Vector_3 &v) -> Vector_3;
+  static auto
+  normalize(const Vector_3 &vector) -> Vector_3;
 };
 
 } // namespace SFCGAL
