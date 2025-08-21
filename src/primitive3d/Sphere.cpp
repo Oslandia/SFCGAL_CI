@@ -173,6 +173,7 @@ Sphere::operator=(Sphere other) -> Sphere &
   std::swap(m_direction, other.m_direction);
   std::swap(m_polyhedron, other.m_polyhedron);
   std::swap(m_points, other.m_points);
+  std::swap(m_polyhedral_surface, other.m_polyhedral_surface);
   return *this;
 }
 
@@ -211,6 +212,17 @@ Sphere::generatePoints() const -> std::vector<Point_3>
     m_points = generateSpherePoints();
   }
   return *m_points;
+}
+
+auto
+Sphere::generatePolyhedralSurface() const -> PolyhedralSurface
+{
+  if (m_polyhedral_surface) {
+    return *m_polyhedral_surface;
+  }
+
+  m_polyhedral_surface = PolyhedralSurface(generatePolyhedron());
+  return *m_polyhedral_surface;
 }
 
 // Generate points on the sphere's surface

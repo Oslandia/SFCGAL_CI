@@ -12,6 +12,7 @@
 #include <CGAL/squared_distance_3.h>
 
 #include "SFCGAL/Kernel.h"
+#include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/export.h"
 #include "SFCGAL/numeric.h"
 
@@ -175,6 +176,13 @@ public:
   generatePoints() const -> std::vector<Kernel::Point_3>;
 
   /**
+   * @brief Generates a surface mesh representation of the sphere
+   * @return A SFCGAL::PolyhedralSurface object representing the sphere
+   */
+  auto
+  generatePolyhedralSurface() const -> PolyhedralSurface;
+
+  /**
    * @brief Calculates the volume of the Sphere
    * @return The volume of the sphere
    */
@@ -203,6 +211,7 @@ private:
   Kernel::Vector_3                                    m_direction;
   mutable std::optional<CGAL::Polyhedron_3<Kernel>>   m_polyhedron;
   mutable std::optional<std::vector<Kernel::Point_3>> m_points;
+  mutable std::optional<PolyhedralSurface>            m_polyhedral_surface;
 
   void
   invalidateCache();
