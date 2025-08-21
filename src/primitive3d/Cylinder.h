@@ -6,6 +6,7 @@
 #define SFCGAL_CYLINDER_H_
 
 #include "SFCGAL/Kernel.h"
+#include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/export.h"
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>
@@ -150,6 +151,13 @@ public:
   auto
   generateSurfaceMesh() const -> Surface_mesh_3;
 
+  /**
+   * @brief Generates a surface mesh representation of the cylinder
+   * @return A SFCGAL::PolyhedralSurface object representing the cylinder
+   */
+  auto
+  generatePolyhedralSurface() const -> PolyhedralSurface;
+
   [[nodiscard]] auto
   volume() const -> double
   {
@@ -164,13 +172,14 @@ public:
   }
 
 private:
-  Point_3                               m_base_center;
-  Vector_3                              m_axis;
-  Kernel::FT                            m_radius;
-  Kernel::FT                            m_height;
-  unsigned int                          m_num_radial;
-  mutable std::optional<Polyhedron_3>   m_polyhedron;
-  mutable std::optional<Surface_mesh_3> m_surface_mesh;
+  Point_3                                  m_base_center;
+  Vector_3                                 m_axis;
+  Kernel::FT                               m_radius;
+  Kernel::FT                               m_height;
+  unsigned int                             m_num_radial;
+  mutable std::optional<Polyhedron_3>      m_polyhedron;
+  mutable std::optional<Surface_mesh_3>    m_surface_mesh;
+  mutable std::optional<PolyhedralSurface> m_polyhedral_surface;
 
   /**
    * @brief Invalidates the cached polyhedron and surface mesh

@@ -27,6 +27,7 @@ Cylinder::operator=(Cylinder other) -> Cylinder &
   std::swap(m_num_radial, other.m_num_radial);
   std::swap(m_polyhedron, other.m_polyhedron);
   std::swap(m_surface_mesh, other.m_surface_mesh);
+  std::swap(m_polyhedral_surface, other.m_polyhedral_surface);
   return *this;
 }
 
@@ -146,6 +147,17 @@ Cylinder::generateSurfaceMesh() const -> Surface_mesh_3
   }
   m_surface_mesh = mesh;
   return mesh;
+}
+
+auto
+Cylinder::generatePolyhedralSurface() const -> PolyhedralSurface
+{
+  if (m_polyhedral_surface) {
+    return *m_polyhedral_surface;
+  }
+
+  m_polyhedral_surface = PolyhedralSurface(generateSurfaceMesh());
+  return *m_polyhedral_surface;
 }
 
 } // namespace SFCGAL
