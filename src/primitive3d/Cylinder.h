@@ -10,7 +10,6 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>
 #include <optional>
-#include <vector>
 
 namespace SFCGAL {
 
