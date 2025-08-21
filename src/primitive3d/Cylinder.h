@@ -91,7 +91,7 @@ public:
    * @brief Gets the base center of the cylinder
    * @return The base center point
    */
-  auto
+  [[nodiscard]] auto
   baseCenter() const -> const Point_3 &
   {
     return m_base_center;
@@ -101,7 +101,7 @@ public:
    * @brief Gets the axis of the cylinder
    * @return The axis vector
    */
-  auto
+  [[nodiscard]] auto
   axis() const -> const Vector_3 &
   {
     return m_axis;
@@ -111,7 +111,7 @@ public:
    * @brief Gets the radius of the cylinder
    * @return The radius
    */
-  auto
+  [[nodiscard]] auto
   radius() const -> const Kernel::FT &
   {
     return m_radius;
@@ -121,7 +121,7 @@ public:
    * @brief Gets the height of the cylinder
    * @return The height
    */
-  auto
+  [[nodiscard]] auto
   height() const -> const Kernel::FT &
   {
     return m_height;
@@ -131,7 +131,7 @@ public:
    * @brief Gets the number of radial divisions
    * @return The number of radial divisions
    */
-  auto
+  [[nodiscard]] auto
   numRadial() const -> int
   {
     return m_num_radial;
@@ -151,13 +151,13 @@ public:
   auto
   generateSurfaceMesh() -> Surface_mesh_3;
 
-  auto
+  [[nodiscard]] auto
   volume() const -> double
   {
     return CGAL::to_double(m_radius * m_radius * m_height * CGAL_PI);
   }
 
-  auto
+  [[nodiscard]] auto
   area() const -> double
   {
     return CGAL::to_double(2 * m_radius * m_radius * CGAL_PI +
