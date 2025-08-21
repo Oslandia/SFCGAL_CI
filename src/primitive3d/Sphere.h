@@ -198,7 +198,7 @@ public:
    * @return The surface area of the sphere
    */
   auto
-  area() const -> double
+  area3D() const -> double
   {
     return CGAL::to_double(4 * m_radius * m_radius * CGAL_PI);
   }

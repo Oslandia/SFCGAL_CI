@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(testVolume)
 BOOST_AUTO_TEST_CASE(testSurfaceArea)
 {
   Sphere sphere(2.0, Point_3(0, 0, 0), 32, 64);
-  double area          = sphere.area();
+  double area          = sphere.area3D();
   double expected_area = 4.0 * M_PI * 2.0 * 2.0;
   BOOST_CHECK_CLOSE(area, expected_area, 0.1); // 0.1% tolerance
 }
