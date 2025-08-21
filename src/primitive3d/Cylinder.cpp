@@ -11,7 +11,7 @@ namespace SFCGAL {
 
 Cylinder::Cylinder(const Point_3 &base_center, const Vector_3 &axis,
                    const Kernel::FT &radius, const Kernel::FT &height,
-                   int num_radial)
+                   unsigned int num_radial)
     : m_base_center(base_center), m_axis(axis), m_radius(radius),
       m_height(height), m_num_radial(num_radial)
 {
@@ -59,7 +59,7 @@ Cylinder::setHeight(const Kernel::FT &height)
 }
 
 void
-Cylinder::setNumRadial(int num)
+Cylinder::setNumRadial(unsigned int num)
 {
   m_num_radial = num;
   invalidateCache();
@@ -118,7 +118,7 @@ Cylinder::generateSurfaceMesh() const -> Surface_mesh_3
   std::vector<Surface_mesh_3::Vertex_index> top_vertices;
 
   // Create vertices for the base and top
-  for (int i = 0; i < m_num_radial; ++i) {
+  for (unsigned int i = 0; i < m_num_radial; ++i) {
     double   angle  = 2.0 * M_PI * i / m_num_radial;
     Vector_3 offset = m_radius * (std::cos(angle) * perpendicular +
                                   std::sin(angle) * perpendicular2);
@@ -128,7 +128,7 @@ Cylinder::generateSurfaceMesh() const -> Surface_mesh_3
   }
 
   // Add side faces
-  for (int i = 0; i < m_num_radial; ++i) {
+  for (unsigned int i = 0; i < m_num_radial; ++i) {
     int next = (i + 1) % m_num_radial;
     mesh.add_face(base_vertices[i], top_vertices[i], top_vertices[next]);
     mesh.add_face(base_vertices[i], top_vertices[next], base_vertices[next]);
@@ -139,7 +139,7 @@ Cylinder::generateSurfaceMesh() const -> Surface_mesh_3
   Surface_mesh_3::Vertex_index top_center =
       mesh.add_vertex(m_base_center + m_height * normalized_axis);
 
-  for (int i = 0; i < m_num_radial; ++i) {
+  for (unsigned int i = 0; i < m_num_radial; ++i) {
     int next = (i + 1) % m_num_radial;
     mesh.add_face(base_center, base_vertices[i], base_vertices[next]);
     mesh.add_face(top_center, top_vertices[next], top_vertices[i]);

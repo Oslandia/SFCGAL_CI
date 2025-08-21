@@ -33,7 +33,7 @@ public:
   Cylinder(const Point_3    &base_center = Point_3(0, 0, 0),
            const Vector_3   &axis        = Vector_3(0, 0, 1),
            const Kernel::FT &radius = 1.0, const Kernel::FT &height = 1.0,
-           int num_radial = 32);
+           unsigned int num_radial = 32);
 
   /**
    * @brief Copy constructor
@@ -84,7 +84,7 @@ public:
    * @param num The new number of radial divisions
    */
   void
-  setNumRadial(int num);
+  setNumRadial(unsigned int num);
 
   /**
    * @brief Gets the base center of the cylinder
@@ -131,7 +131,7 @@ public:
    * @return The number of radial divisions
    */
   [[nodiscard]] auto
-  numRadial() const -> int
+  numRadial() const -> unsigned int
   {
     return m_num_radial;
   }
@@ -168,7 +168,7 @@ private:
   Vector_3                              m_axis;
   Kernel::FT                            m_radius;
   Kernel::FT                            m_height;
-  int                                   m_num_radial;
+  unsigned int                          m_num_radial;
   mutable std::optional<Polyhedron_3>   m_polyhedron;
   mutable std::optional<Surface_mesh_3> m_surface_mesh;
 
