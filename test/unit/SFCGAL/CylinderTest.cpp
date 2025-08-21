@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(testVolume)
 BOOST_AUTO_TEST_CASE(testSurfaceArea)
 {
   Cylinder cyl(Point_3(0, 0, 0), Vector_3(0, 0, 1), 2.0, 5.0, 32);
-  double   area          = cyl.area();
+  double   area          = cyl.area3D();
   double   expected_area = 2 * M_PI * 2.0 * 2.0 + 2 * M_PI * 2.0 * 5.0;
   BOOST_CHECK_CLOSE(area, expected_area, 0.01);
 }

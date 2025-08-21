@@ -165,7 +165,7 @@ public:
   }
 
   [[nodiscard]] auto
-  area() const -> double
+  area3D() const -> double
   {
     return CGAL::to_double(2 * m_radius * m_radius * CGAL_PI +
                            2 * m_radius * m_height * CGAL_PI);
