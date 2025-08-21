@@ -44,8 +44,8 @@ public:
   /**
    * @brief Assignment operator
    */
-  Cylinder &
-  operator=(Cylinder other);
+  auto
+  operator=(Cylinder other) -> Cylinder &;
 
   /**
    * @brief Destructor
@@ -91,8 +91,8 @@ public:
    * @brief Gets the base center of the cylinder
    * @return The base center point
    */
-  const Point_3 &
-  baseCenter() const
+  auto
+  baseCenter() const -> const Point_3 &
   {
     return m_base_center;
   }
@@ -101,8 +101,8 @@ public:
    * @brief Gets the axis of the cylinder
    * @return The axis vector
    */
-  const Vector_3 &
-  axis() const
+  auto
+  axis() const -> const Vector_3 &
   {
     return m_axis;
   }
@@ -111,8 +111,8 @@ public:
    * @brief Gets the radius of the cylinder
    * @return The radius
    */
-  const Kernel::FT &
-  radius() const
+  auto
+  radius() const -> const Kernel::FT &
   {
     return m_radius;
   }
@@ -121,8 +121,8 @@ public:
    * @brief Gets the height of the cylinder
    * @return The height
    */
-  const Kernel::FT &
-  height() const
+  auto
+  height() const -> const Kernel::FT &
   {
     return m_height;
   }
@@ -131,8 +131,8 @@ public:
    * @brief Gets the number of radial divisions
    * @return The number of radial divisions
    */
-  int
-  numRadial() const
+  auto
+  numRadial() const -> int
   {
     return m_num_radial;
   }
@@ -141,24 +141,24 @@ public:
    * @brief Generates a polyhedron representation of the cylinder
    * @return A CGAL::Polyhedron_3 object representing the cylinder
    */
-  Polyhedron_3
-  generatePolyhedron();
+  auto
+  generatePolyhedron() -> Polyhedron_3;
 
   /**
    * @brief Generates a surface mesh representation of the cylinder
    * @return A CGAL::Surface_mesh object representing the cylinder
    */
-  Surface_mesh_3
-  generateSurfaceMesh();
+  auto
+  generateSurfaceMesh() -> Surface_mesh_3;
 
-  double
-  volume() const
+  auto
+  volume() const -> double
   {
     return CGAL::to_double(m_radius * m_radius * m_height * CGAL_PI);
   }
 
-  double
-  area() const
+  auto
+  area() const -> double
   {
     return CGAL::to_double(2 * m_radius * m_radius * CGAL_PI +
                            2 * m_radius * m_height * CGAL_PI);
@@ -184,8 +184,8 @@ private:
    * @param v The vector to normalize
    * @return The normalized vector
    */
-  Vector_3
-  normalize(const Vector_3 &v);
+  auto
+  normalize(const Vector_3 &v) -> Vector_3;
 };
 
 } // namespace SFCGAL
