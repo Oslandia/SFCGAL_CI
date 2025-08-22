@@ -1734,4 +1734,61 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   sfcgal_primitive_delete(cylinder);
 }
 
+BOOST_AUTO_TEST_CASE(testTorusTest)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  sfcgal_primitive_t *torus = sfcgal_primitive_create(SFCGAL_TYPE_TORUS);
+
+  // main_radius parameter
+  double mainRadius = sfcgal_primitive_parameter_double(torus, "main_radius");
+  BOOST_CHECK_CLOSE(mainRadius, 10.0, 1e-6);
+
+  sfcgal_primitive_set_parameter_double(torus, "main_radius", 11.2);
+  double newMainRadius =
+      sfcgal_primitive_parameter_double(torus, "main_radius");
+  BOOST_CHECK_CLOSE(newMainRadius, 11.2, 1e-6);
+
+  // there is no parameter called min_radius
+  sfcgal_primitive_set_parameter_double(torus, "min_radius", 24.2);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  // main_num_radial is an unsigned int not a double
+  sfcgal_primitive_set_parameter_double(torus, "main_num_radial", 1.2);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  // tube_radius parameter
+  double tubeRadius = sfcgal_primitive_parameter_double(torus, "tube_radius");
+  BOOST_CHECK_CLOSE(tubeRadius, 2.0, 1e-6);
+
+  sfcgal_primitive_set_parameter_double(torus, "tube_radius", 5.2);
+  double newTubeRadius =
+      sfcgal_primitive_parameter_double(torus, "tube_radius");
+  BOOST_CHECK_CLOSE(newTubeRadius, 5.2, 1e-6);
+
+  // main num radial parameter
+  unsigned int mainNumRadial =
+      sfcgal_primitive_parameter_int(torus, "main_num_radial");
+  BOOST_CHECK_EQUAL(mainNumRadial, 32);
+  sfcgal_primitive_set_parameter_int(torus, "main_num_radial", 36);
+
+  double newMainNumRadial =
+      sfcgal_primitive_parameter_int(torus, "main_num_radial");
+  BOOST_CHECK_EQUAL(newMainNumRadial, 36);
+
+  // tube num radial parameter
+  unsigned int tubeNumRadial =
+      sfcgal_primitive_parameter_int(torus, "tube_num_radial");
+  BOOST_CHECK_EQUAL(tubeNumRadial, 16);
+  sfcgal_primitive_set_parameter_int(torus, "tube_num_radial", 18);
+
+  double newTubeNumRadial =
+      sfcgal_primitive_parameter_int(torus, "tube_num_radial");
+  BOOST_CHECK_EQUAL(newTubeNumRadial, 18);
+
+  sfcgal_primitive_delete(torus);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

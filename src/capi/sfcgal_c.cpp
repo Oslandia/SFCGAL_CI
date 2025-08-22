@@ -21,6 +21,7 @@
 #include "SFCGAL/primitive3d/Cylinder.h"
 #include "SFCGAL/primitive3d/Primitive.h"
 #include "SFCGAL/primitive3d/Sphere.h"
+#include "SFCGAL/primitive3d/Torus.h"
 #include "SFCGAL/version.h"
 
 #include "SFCGAL/capi/sfcgal_c.h"
@@ -2277,6 +2278,9 @@ sfcgal_primitive_create(sfcgal_primitive_type_t primitive_type)
     break;
   case SFCGAL_TYPE_SPHERE:
     primitive = new SFCGAL::Sphere();
+    break;
+  case SFCGAL_TYPE_TORUS:
+    primitive = new SFCGAL::Torus();
     break;
   }
 
