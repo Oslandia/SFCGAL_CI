@@ -1234,6 +1234,7 @@ sfcgal_io_read_ewkt(const char *str, size_t len) -> sfcgal_prepared_geometry_t *
 
 /// @{
 /// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 SFCGAL_GEOMETRY_FUNCTION_BINARY_PREDICATE(covers, SFCGAL::algorithm::covers)
 SFCGAL_GEOMETRY_FUNCTION_BINARY_PREDICATE(covers_3d,
@@ -1274,6 +1275,7 @@ SFCGAL_GEOMETRY_FUNCTION_UNARY_CONSTRUCTION(tesselate,
 SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(area, SFCGAL::algorithm::area)
 SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(area_3d, SFCGAL::algorithm::area3D)
 
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
 /// @} end of private section
 /// @publicsection
 
