@@ -1058,12 +1058,28 @@ sfcgal_io_read_wkb(const char *str, size_t len);
 /**
  * Serialization
  */
-/* allocates into char**, must be freed by the caller */
+
+/**
+ * Convert a Geometry to its binary representation.
+ * @param[in] geom the prepared geometry
+ * @param[out] buffer The binary buffer
+ * @param[out] len The size of @pre buffer
+ * @post buffer is returned allocated and must be freed by the caller
+ * @ingroup capi
+ */
 SFCGAL_API void
-sfcgal_io_write_binary_prepared(const sfcgal_prepared_geometry_t *, char **,
-                                size_t *);
+sfcgal_io_write_binary_prepared(const sfcgal_prepared_geometry_t *geom,
+                                char **buffer, size_t *);
+
+/**
+ * Read a PreparedGeometry from a binary representation.
+ * @param str The string representing the geometry.
+ * @param len The size of @pre str
+ * @post The returned prepared geometry must be deallocated by the caller
+ * @ingroup capi
+ */
 SFCGAL_API sfcgal_prepared_geometry_t *
-sfcgal_io_read_binary_prepared(const char *, size_t l);
+sfcgal_io_read_binary_prepared(const char *str, size_t len);
 
 /*--------------------------------------------------------------------------------------*
  *
