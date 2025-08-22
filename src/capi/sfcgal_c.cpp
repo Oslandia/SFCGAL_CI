@@ -241,9 +241,8 @@ alloc_and_copy(const std::string str, char **buffer, size_t *len) -> void
     *len = 0;
   }
 }
-
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
 /// @} end of private section
-#endif
 // ----------------------------------------------------------------------------------
 // -- public interface
 // ----------------------------------------------------------------------------------
