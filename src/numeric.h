@@ -131,7 +131,7 @@ SFCGAL_API CGAL::Gmpz
 
 /**
  * @brief Normalizes a vector
- * @param v The vector to normalize
+ * @param vec The vector to normalize
  * @return The normalized vector
  */
 inline Kernel::Vector_3
