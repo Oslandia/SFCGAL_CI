@@ -1275,6 +1275,7 @@ SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(area, SFCGAL::algorithm::area)
 SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(area_3d, SFCGAL::algorithm::area3D)
 
 /// @} end of private section
+/// @publicsection
 
 extern "C" auto
 sfcgal_geometry_volume(const sfcgal_geometry_t *ga) -> double
