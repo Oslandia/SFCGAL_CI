@@ -839,7 +839,7 @@ BOOST_AUTO_TEST_CASE(testTriangle)
   sfcgal_geometry_t *triangle1 =
       sfcgal_triangle_create_from_points(pt1, pt2, pt3);
   BOOST_CHECK_EQUAL(sfcgal_geometry_type_id(triangle1), SFCGAL_TYPE_TRIANGLE);
-  BOOST_CHECK(!sfcgal_geometry_is_empty(emptyTriangle));
+  BOOST_CHECK(!sfcgal_geometry_is_empty(triangle1));
   sfcgal_geometry_t const *firstPt = sfcgal_triangle_vertex(triangle1, 0);
   BOOST_CHECK(sfcgal_geometry_covers_3d(pt1, firstPt));
   sfcgal_geometry_t const *secondPt = sfcgal_triangle_vertex(triangle1, 1);
