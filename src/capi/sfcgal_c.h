@@ -911,6 +911,7 @@ sfcgal_solid_set_exterior_shell(sfcgal_geometry_t *solid,
 
 /**
  * Gets the validity flag of the geometry.
+ * @ingroup capi
  */
 SFCGAL_API int
 sfcgal_geometry_has_validity_flag(const sfcgal_geometry_t *geom);
@@ -918,6 +919,7 @@ sfcgal_geometry_has_validity_flag(const sfcgal_geometry_t *geom);
 /**
  * Sets the validity flag of the geometry.
  * FIXME We better have geometry constructors to directly build valid geometries
+ * @ingroup capi
  */
 SFCGAL_API void
 sfcgal_geometry_force_valid(sfcgal_geometry_t *geom, int valid);
@@ -1689,6 +1691,7 @@ sfcgal_geometry_buffer3d(const sfcgal_geometry_t *geom, double radius,
  * @param geom The geometry to rotate
  * @param angle Rotation angle in radians
  * @return The rotated geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_rotate(const sfcgal_geometry_t *geom, double angle);
@@ -1700,6 +1703,7 @@ sfcgal_geometry_rotate(const sfcgal_geometry_t *geom, double angle);
  * @param cx X-coordinate of the center point
  * @param cy Y-coordinate of the center point
  * @return The rotated geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_rotate_2d(const sfcgal_geometry_t *geom, double angle,
@@ -1713,6 +1717,7 @@ sfcgal_geometry_rotate_2d(const sfcgal_geometry_t *geom, double angle,
  * @param ay Y-coordinate of the axis vector
  * @param az Z-coordinate of the axis vector
  * @return The rotated geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_rotate_3d(const sfcgal_geometry_t *geom, double angle,
@@ -1730,6 +1735,7 @@ sfcgal_geometry_rotate_3d(const sfcgal_geometry_t *geom, double angle,
  * @param cy Y-coordinate of the center point
  * @param cz Z-coordinate of the center point
  * @return The rotated geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_rotate_3d_around_center(const sfcgal_geometry_t *geom,
@@ -1742,6 +1748,7 @@ sfcgal_geometry_rotate_3d_around_center(const sfcgal_geometry_t *geom,
  * @param geom The geometry to rotate
  * @param angle Rotation angle in radians
  * @return The rotated geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_rotate_x(const sfcgal_geometry_t *geom, double angle);
@@ -1751,6 +1758,7 @@ sfcgal_geometry_rotate_x(const sfcgal_geometry_t *geom, double angle);
  * @param geom The geometry to rotate
  * @param angle Rotation angle in radians
  * @return The rotated geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_rotate_y(const sfcgal_geometry_t *geom, double angle);
@@ -1760,6 +1768,7 @@ sfcgal_geometry_rotate_y(const sfcgal_geometry_t *geom, double angle);
  * @param geom The geometry to rotate
  * @param angle Rotation angle in radians
  * @return The rotated geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_rotate_z(const sfcgal_geometry_t *geom, double angle);
@@ -1769,6 +1778,7 @@ sfcgal_geometry_rotate_z(const sfcgal_geometry_t *geom, double angle);
  * @param geom The geometry to scale
  * @param s Scale factor
  * @return The scaled geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_scale(const sfcgal_geometry_t *geom, double s);
@@ -1780,6 +1790,7 @@ sfcgal_geometry_scale(const sfcgal_geometry_t *geom, double s);
  * @param sy Scale factor for y dimension
  * @param sz Scale factor for z dimension
  * @return The scaled geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_scale_3d(const sfcgal_geometry_t *geom, double sx, double sy,
@@ -1796,6 +1807,7 @@ sfcgal_geometry_scale_3d(const sfcgal_geometry_t *geom, double sx, double sy,
  * @param cy Y-coordinate of the center point
  * @param cz Z-coordinate of the center point
  * @return The scaled geometry
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_scale_3d_around_center(const sfcgal_geometry_t *geom, double sx,
@@ -1808,6 +1820,7 @@ sfcgal_geometry_scale_3d_around_center(const sfcgal_geometry_t *geom, double sx,
  * @param dx x component of the translation vector
  * @param dy y component of the translation vector
  * @param dz z component of the translation vector
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_translate_3d(const sfcgal_geometry_t *geom, double dx,
@@ -1818,6 +1831,7 @@ sfcgal_geometry_translate_3d(const sfcgal_geometry_t *geom, double dx,
  * @param geom the geometry to translate
  * @param dx x component of the translation vector
  * @param dy y component of the translation vector
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_translate_2d(const sfcgal_geometry_t *geom, double dx,
@@ -1828,6 +1842,7 @@ sfcgal_geometry_translate_2d(const sfcgal_geometry_t *geom, double dx,
  * @param geom the geometry to simplify
  * @param threshold threshold parameter
  * @param preserveTopology preserve the topology
+ * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_simplify(const sfcgal_geometry_t *geom, double threshold,
