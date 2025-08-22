@@ -1,6 +1,6 @@
 lint-commitizen:
   stage: lint
-  image: python:3.13-slim-bookworm
+  image: ${PYTHON_DOCKER_IMAGE}
   before_script:
     - apt update && apt install -y git
     - pip install commitizen
