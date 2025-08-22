@@ -138,8 +138,9 @@ inline Kernel::Vector_3
 normalizeVector(const Kernel::Vector_3 &vec)
 {
   Kernel::FT length = CGAL::sqrt(CGAL::to_double(vec.squared_length()));
+  // clang-tidy wrongly assumes that vec / length might leak
   return (length > 0) ? vec / length : vec;
-}
+} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
 } // namespace SFCGAL
 
 #endif
