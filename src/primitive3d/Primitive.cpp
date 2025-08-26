@@ -44,7 +44,19 @@ Primitive::setParameter(const std::string        &name,
     return;
   }
 
-  parameterIt->second = parameter;
+  // Validate the new value
+  validateAndSetParameter(name, parameter);
+}
+
+void
+Primitive::validateAndSetParameter(const std::string        &name,
+                                   const PrimitiveParameter &parameter)
+{
+  auto tempParameters     = m_parameters;
+  tempParameters.at(name) = parameter;
+  validateParameters(tempParameters);
+
+  m_parameters.at(name) = parameter;
   invalidateCache();
 }
 

@@ -219,6 +219,16 @@ protected:
   void
   invalidateCache() override;
 
+  /**
+   * @brief Verifies that all parameters are valid. For instance, it raises an
+   * error if a radius is negative.
+   * @throws SFCGAL::Exception if one of the parameters if not valid
+   * provided variant type is not compatible with the parameter.
+   */
+  void
+  validateParameters(std::unordered_map<std::string, PrimitiveParameter> const
+                         &tempParameters) const override;
+
 private:
   // Kernel::FT                                  m_radius;
   // Kernel::Point_3                             m_center;

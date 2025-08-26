@@ -198,6 +198,12 @@ Sphere::invalidateCache()
   m_points.reset();
 }
 
+void
+Sphere::validateParameters(
+    std::unordered_map<std::string, PrimitiveParameter> const &) const
+{
+}
+
 // Generate the polyhedron representation of the sphere
 auto
 Sphere::generateSpherePolyhedron() const -> Polyhedron_3

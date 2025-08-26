@@ -14,17 +14,11 @@ namespace SFCGAL {
 Torus::Torus(const Kernel::FT &main_radius, const Kernel::FT &tube_radius,
              unsigned int main_num_radial, unsigned int tube_num_radial)
 {
-  if (main_radius <= 0. || tube_radius <= 0.) {
-    BOOST_THROW_EXCEPTION(Exception("Torus parameters cannot be negative."));
-  } else if (tube_radius >= main_radius) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Tube radius cannot be greater than main radius."));
-  }
-
   m_parameters["main_radius"]     = main_radius;
   m_parameters["tube_radius"]     = tube_radius;
   m_parameters["main_num_radial"] = main_num_radial;
   m_parameters["tube_num_radial"] = tube_num_radial;
+  Torus::validateParameters(m_parameters);
 }
 
 auto
@@ -49,43 +43,43 @@ Torus::primitiveTypeId() const -> PrimitiveType
 void
 Torus::setMainRadius(const Kernel::FT &main_radius)
 {
-  if (main_radius <= 0.) {
-    BOOST_THROW_EXCEPTION(Exception("Main radius cannot be negative."));
-  } else if (tubeRadius() >= main_radius) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Tube radius cannot be greater than main radius."));
-  }
-
-  m_parameters.at("main_radius") = main_radius;
-  invalidateCache();
+  validateAndSetParameter("main_radius", main_radius);
 }
 
 void
 Torus::setTubeRadius(const Kernel::FT &tube_radius)
 {
-  if (tube_radius <= 0.) {
-    BOOST_THROW_EXCEPTION(Exception("Tube radius cannot be negative."));
-  } else if (tube_radius >= mainRadius()) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Tube radius cannot be greater than main radius."));
-  }
-
-  m_parameters.at("tube_radius") = tube_radius;
-  invalidateCache();
+  validateAndSetParameter("tube_radius", tube_radius);
 }
 
 void
 Torus::setMainNumRadial(const unsigned int &main_num_radial)
 {
-  m_parameters.at("main_num_radial") = main_num_radial;
-  invalidateCache();
+  validateAndSetParameter("main_num_radial", main_num_radial);
 }
 
 void
 Torus::setTubeNumRadial(const unsigned int &tube_num_radial)
 {
-  m_parameters.at("tube_num_radial") = tube_num_radial;
-  invalidateCache();
+  validateAndSetParameter("tube_num_radial", tube_num_radial);
+}
+
+void
+Torus::validateParameters(
+    std::unordered_map<std::string, PrimitiveParameter> const &tempParameters)
+    const
+{
+  const double mainRadius =
+      CGAL::to_double(std::get<Kernel::FT>(tempParameters.at("main_radius")));
+  const double tubeRadius =
+      CGAL::to_double(std::get<Kernel::FT>(tempParameters.at("tube_radius")));
+
+  if (mainRadius <= 0. || tubeRadius <= 0.) {
+    BOOST_THROW_EXCEPTION(Exception("Torus parameters cannot be negative."));
+  } else if (tubeRadius >= mainRadius) {
+    BOOST_THROW_EXCEPTION(
+        Exception("Tube radius cannot be greater than main radius."));
+  }
 }
 
 auto

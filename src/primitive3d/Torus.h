@@ -135,6 +135,17 @@ public:
    */
   [[nodiscard]] auto
   area3D() const -> double;
+
+protected:
+  /**
+   * @brief Verifies that all parameters are valid. For instance, it raises an
+   * error if a radius is negative.
+   * @throws SFCGAL::Exception if one of the parameters if not valid
+   * provided variant type is not compatible with the parameter.
+   */
+  void
+  validateParameters(std::unordered_map<std::string, PrimitiveParameter> const
+                         &tempParameters) const override;
 };
 
 } // namespace SFCGAL

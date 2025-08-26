@@ -112,6 +112,28 @@ protected:
   virtual void
   invalidateCache();
 
+  /**
+   * @brief Verifies that all parameters are valid. For instance, it raises an
+   * error if a radius is negative.
+   * @throws SFCGAL::Exception if one of the parameters if not valid
+   * provided variant type is not compatible with the parameter.
+   */
+  virtual void
+  validateParameters(std::unordered_map<std::string, PrimitiveParameter> const
+                         &tempParameters) const = 0;
+
+  /**
+   * @brief Checks that the new value is valid and sets it.
+   * This also invalidates the cache.
+   * Unlike @ref setParameter, this does not check that name exists and that it
+   * accepts the provided variant type. This assumes that name exists and the
+   * variant type is compatible with the parameter
+   * @throws SFCGAL::Exception if the parameter is not valid
+   */
+  void
+  validateAndSetParameter(const std::string        &name,
+                          const PrimitiveParameter &parameter);
+
   std::unordered_map<std::string, PrimitiveParameter> m_parameters;
   mutable std::optional<PolyhedralSurface>            m_polyhedral_surface;
 };

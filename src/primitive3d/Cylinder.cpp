@@ -77,6 +77,12 @@ Cylinder::setNumRadial(unsigned int num)
 }
 
 void
+Cylinder::validateParameters(
+    std::unordered_map<std::string, PrimitiveParameter> const &) const
+{
+}
+
+void
 Cylinder::invalidateCache()
 {
   Primitive::invalidateCache();
