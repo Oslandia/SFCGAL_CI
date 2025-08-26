@@ -98,6 +98,15 @@ public:
    */
   void
   visit(TriangulatedSurface &g) override;
+  /**
+   * Process NURBSCurve to set validity state.
+   *
+   * Sets the validity flag of the NURBSCurve to the configured state.
+   *
+   * @param g The NURBSCurve geometry to process.
+   */
+  void
+  visit(NURBSCurve &g) override;
 
 private:
   bool valid_;

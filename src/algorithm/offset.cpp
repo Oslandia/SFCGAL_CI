@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/offset.h"
 
+#include "SFCGAL/Curve.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/Polygon.h"
@@ -24,12 +25,12 @@
 #include <CGAL/approximated_offset_2.h>
 #include <CGAL/minkowski_sum_2.h>
 #include <CGAL/offset_polygon_2.h>
+#include <limits>
 
 // ----------------------------------------------------------------------------------
 // -- private interface
 // ----------------------------------------------------------------------------------
-/// @{
-/// @privatesection
+/// @cond PRIVATE_SECTION
 
 using Gps_traits_2   = CGAL::Gps_circle_segment_traits_2<SFCGAL::Kernel>;
 using Offset_curve_2 = Gps_traits_2::Curve_2;
@@ -100,7 +101,7 @@ approximate(const Offset_polygon_2 &polygon, const int &n = 0) -> Polygon_2
   }
 
   /*
-   * convertr to polygon
+   * convert to polygon
    */
   Polygon_2 result;
 
@@ -316,6 +317,21 @@ offset(const Geometry &g, const double &radius,
   case TYPE_LINESTRING:
     return offset(g.as<LineString>(), radius, polygonSet);
 
+  case TYPE_NURBSCURVE: {
+    // Convert NURBS curve to LineString and apply offset
+    auto lineString =
+        g.as<Curve>().toLineStringAdaptive(); // default tolerance FT(1e-3)
+    if (!lineString || lineString->isEmpty()) {
+      lineString = g.as<Curve>().toLineString(
+          256); // fallback to denser uniform sampling
+    }
+    if (!lineString || lineString->isEmpty()) {
+      return; // Cannot offset empty curve
+    }
+    offset(*lineString, radius, polygonSet);
+    return;
+  }
+
   case TYPE_POLYGON:
     return offset(g.as<Polygon>(), radius, polygonSet);
 
@@ -336,12 +352,11 @@ offset(const Geometry &g, const double &radius,
   }
 }
 
-/// @} end of private section
+/// @endcond
 
 // ----------------------------------------------------------------------------------
 // -- public interface
 // ----------------------------------------------------------------------------------
-/// @publicsection
 
 auto
 offset(const Geometry &g, const double &r, NoValidityCheck /*unused*/)

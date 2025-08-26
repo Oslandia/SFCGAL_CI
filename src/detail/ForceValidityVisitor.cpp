@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -116,12 +117,41 @@ ForceValidityVisitor::visit(PolyhedralSurface &g)
   }
 }
 
+/**
+ * @brief Forces the validity flag for a TriangulatedSurface and propagates the
+ * change to its patches.
+ *
+ * Sets the TriangulatedSurface's validity flag to the visitor's configured
+ * value and recursively visits each patch (invoking this visitor on every
+ * patch) so the same validity state is applied to all contained geometry.
+ */
 void
 ForceValidityVisitor::visit(TriangulatedSurface &g)
 {
   g.forceValidityFlag(valid_);
   for (size_t i = 0; i < g.numPatches(); i++) {
     visit(g.patchN(i));
+  }
+}
+
+/**
+ * @brief Force the validity flag for a NURBSCurve and recursively apply to its
+ * control points.
+ *
+ * Marks the provided NURBSCurve's validity flag to the visitor's configured
+ * value and then visits each control point so the same validity flag is applied
+ * recursively to contained point geometries.
+ *
+ * @param g The NURBSCurve to update and traverse.
+ */
+void
+ForceValidityVisitor::visit(NURBSCurve &g)
+{
+  g.forceValidityFlag(valid_);
+
+  // Visit all control points
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointN(i));
   }
 }
 

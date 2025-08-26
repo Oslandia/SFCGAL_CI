@@ -12,6 +12,20 @@
 
 #include <vector>
 
+/**
+ * Visitor that extracts point coordinates from geometries to expand an
+ * Envelope.
+ *
+ * Visits concrete Geometry types and updates the referenced `envelope` with all
+ * point coordinates encountered (vertices, control points, etc.), so the
+ * envelope bounds encompass the geometry. Supports points, line strings,
+ * polygons, triangles, solids, multis, collections, surfaces, triangulated
+ * surfaces and NURBS curves.
+ *
+ * The visitor holds a reference to the Envelope to populate (public member
+ * `envelope`). Use an instance of this visitor to traverse a Geometry with
+ * the goal of computing or extending its bounding envelope.
+ */
 namespace SFCGAL {
 namespace detail {
 
@@ -100,6 +114,10 @@ public:
    */
   void
   visit(const TriangulatedSurface &g) override;
+  /// @brief Process NURBSCurve to update envelope bounds
+  /// @param g The NURBSCurve geometry to process
+  void
+  visit(const NURBSCurve &g) override;
 
 public:
   Envelope &envelope; ///< Reference to the envelope being computed

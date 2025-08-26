@@ -9,7 +9,6 @@ Checks:
   - 'portability-*'
   - 'readability-*'
   - '-readability-magic-numbers'
-  - '-bugprone-easily-swappable-parameters'
 CheckOptions:
   - key: bugprone-argument-comment.StrictMode
     value: 1

@@ -10,10 +10,18 @@
 #include "SFCGAL/Kernel.h"
 
 namespace SFCGAL {
+class Curve;
+}
+
+namespace SFCGAL {
 namespace algorithm {
 
 /**
- * Holds weighted data to compute the centroid for a Geometry
+ * Holds weighted data used to compute a centroid for a Geometry.
+ *
+ * Contains accumulated weight (area or length), centroid vector, and
+ * weighted average of measured values for centroid computation.
+ *
  * @ingroup detail
  */
 class SFCGAL_API WeightedCentroid {
@@ -142,6 +150,22 @@ weightedCentroid(const LineString &lineString,
                  bool              enable3DComputation = false);
 
 /**
+ * @brief Computes the weighted centroid for a Curve
+ *
+ * @param curve The input curve for which the weighted centroid will be
+ * computed.
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the input geometry.
+ * @ingroup detail
+ */
+SFCGAL_API auto
+weightedCentroid(const Curve &g, bool enable3DComputation = false)
+    -> WeightedCentroid;
+
+/**
  * @brief Computes the weighted centroid of a Polygon.
  *
  * @param polygon The input polygon for which the weighted centroid will be
@@ -151,7 +175,6 @@ weightedCentroid(const LineString &lineString,
  *        the centroid for 3D geometries.
  *
  * @return WeightedCentroid The weighted centroid of the input geometry.
- *
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid

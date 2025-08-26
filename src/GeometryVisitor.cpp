@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -18,8 +19,16 @@
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
 
+#include <stdexcept>
+
 namespace SFCGAL {
 
+/**
+ * @brief Default destructor for GeometryVisitor.
+ *
+ * Defaulted destructor provided for proper destruction of derived visitor
+ * instances.
+ */
 GeometryVisitor::~GeometryVisitor() = default;
 
 void
@@ -91,6 +100,12 @@ GeometryVisitor::visit(Geometry &g)
 
 //---------------- ConstGeometryVisitor
 
+/**
+ * @brief Default destructor for ConstGeometryVisitor.
+ *
+ * Defaulted destructor provided for proper destruction of derived visitor
+ * instances.
+ */
 ConstGeometryVisitor::~ConstGeometryVisitor() = default;
 
 void
@@ -160,5 +175,43 @@ ConstGeometryVisitor::visit(const Geometry &g)
 //	}
 //}
 //
+
+/**
+ * @brief ABI-compatible default visitor for NURBSCurve.
+ *
+ * This default implementation does not process the NURBSCurve and exists only
+ * to preserve ABI compatibility. It throws std::runtime_error; derived
+ * visitors should override this method to provide proper NURBS handling
+ * (for example, by converting the NURBSCurve to a LineString and visiting it).
+ *
+ * @throws std::runtime_error Always thrown to indicate the NURBSCurve visitor
+ * is not implemented.
+ */
+void
+GeometryVisitor::visit(NURBSCurve & /*g*/)
+{
+  // Default implementation: convert to LineString and visit that
+  // Derived classes should override this method for proper NURBS handling
+  throw std::runtime_error("NURBSCurve visitor not implemented");
+}
+
+/**
+ * @brief Default const visitor for NURBSCurve.
+ *
+ * This ABI-compatible default implementation does not handle NURBSCurve
+ * directly. It throws std::runtime_error to force derived visitors to provide
+ * proper NURBS handling (the intended fallback behavior would be to convert the
+ * curve to a LineString and visit that).
+ *
+ * @throws std::runtime_error Always thrown with message "NURBSCurve const
+ * visitor not implemented".
+ */
+void
+ConstGeometryVisitor::visit(const NURBSCurve & /*g*/)
+{
+  // Default implementation: convert to LineString and visit that
+  // Derived classes should override this method for proper NURBS handling
+  throw std::runtime_error("NURBSCurve const visitor not implemented");
+}
 
 } // namespace SFCGAL

@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/length.h"
 
+#include "SFCGAL/Curve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 
@@ -47,6 +48,18 @@ length(const Geometry &g) -> double
 
   case TYPE_LINESTRING:
     return length(g.as<LineString>());
+
+  case TYPE_NURBSCURVE: {
+    // Use tessellation to compute XY length for consistency with LineString
+    auto lineString = g.as<Curve>().toLineStringAdaptive();
+    if (!lineString || lineString->isEmpty()) {
+      lineString = g.as<Curve>().toLineString(256);
+    }
+    if (!lineString || lineString->isEmpty()) {
+      return 0.0;
+    }
+    return length(*lineString);
+  }
 
   case TYPE_POLYGON:
     return 0.0;
@@ -109,6 +122,9 @@ length3D(const Geometry &g) -> double
 
   case TYPE_LINESTRING:
     return length3D(g.as<LineString>());
+
+  case TYPE_NURBSCURVE:
+    return CGAL::to_double(g.as<Curve>().length());
 
   case TYPE_POLYGON:
     return 0.0;

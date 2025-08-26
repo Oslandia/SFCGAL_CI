@@ -7,11 +7,13 @@
 
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -95,6 +97,10 @@ WktWriter::writeRec(const Geometry &geometry)
   case TYPE_MULTISOLID:
     write(geometry.as<MultiSolid>());
     return;
+
+  case TYPE_NURBSCURVE:
+    write(geometry.as<NURBSCurve>());
+    return;
   }
 
   std::ostringstream oss;
@@ -127,6 +133,23 @@ fixZeroNeg(double val, int precision) -> double
   if (std::abs(val) < std::pow(10, -precision)) {
     return 0;
   }
+  return val;
+}
+
+static auto
+fixZeroNegForWeights(double val, int precision) -> double
+{
+  // NURBS weights must be positive
+  if (val <= 0) {
+    // Convert non-positive weights to minimum positive value
+    return std::pow(10, -precision);
+  }
+
+  // For positive weights, preserve small values instead of converting to 0
+  if (val < std::pow(10, -precision)) {
+    return std::pow(10, -precision);
+  }
+
   return val;
 }
 
@@ -474,6 +497,130 @@ WktWriter::writeInner(const Solid &solid)
   }
 
   _s << ")"; // end SOLID
+}
+
+void
+WktWriter::write(const NURBSCurve &g)
+{
+  _s << "NURBSCURVE ";
+  writeCoordinateType(g);
+
+  if (g.isEmpty()) {
+    _s << "EMPTY";
+    return;
+  }
+
+  writeInner(g);
+}
+
+void
+WktWriter::writeInner(const NURBSCurve &g)
+{
+  _s << "(";
+
+  // NEW FORMAT: Always write degree first (ISO compliant)
+  _s << g.degree();
+
+  // Write control points
+  _s << ",(";
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    if (i != 0) {
+      _s << ",";
+    }
+    writeCoordinate(g.controlPointN(i));
+  }
+  _s << ")";
+
+  // Always write weights if they exist to ensure round-trip consistency
+  if (!g.weights().empty()) {
+    _s << ",";
+    writeWeights(g.weights());
+  }
+
+  // Always write knot vector if available to ensure round-trip consistency
+  const auto &knots = g.knotVector();
+  if (!knots.empty()) {
+    _s << ",";
+    writeKnots(knots);
+  }
+
+  _s << ")";
+}
+
+static auto
+generateUniformKnots(size_t numControlPoints, unsigned int degree)
+    -> std::vector<Kernel::FT>
+{
+  if (numControlPoints == 0 || degree >= numControlPoints) {
+    return {};
+  }
+
+  std::vector<Kernel::FT> knots;
+  size_t                  knotCount = numControlPoints + degree + 1;
+  knots.reserve(knotCount);
+
+  // Clamped uniform knots: [0, 0, ..., 0, 1/(n-p), 2/(n-p), ..., 1, 1, ..., 1]
+  for (unsigned int i = 0; i <= degree; ++i) {
+    knots.emplace_back(Kernel::FT(0));
+  }
+
+  size_t numInternal = knotCount - static_cast<size_t>(2 * (degree + 1));
+  for (size_t i = 1; i <= numInternal; ++i) {
+    knots.emplace_back(Kernel::FT(i) / Kernel::FT(numInternal + 1));
+  }
+
+  for (unsigned int i = 0; i <= degree; ++i) {
+    knots.emplace_back(Kernel::FT(1));
+  }
+
+  return knots;
+}
+
+void
+WktWriter::writeWeights(const std::vector<Kernel::FT> &weights)
+{
+  _s << "(";
+  for (size_t i = 0; i < weights.size(); i++) {
+    if (i != 0) {
+      _s << ",";
+    }
+
+    // Always ensure weight is positive - critical for NURBS validity
+    // Check if weight is zero or negative using CGAL comparison
+    if (weights[i] <= Kernel::FT(0)) {
+      // Throw exception for invalid weights instead of silent coercion
+      std::ostringstream oss;
+      oss << "Invalid NURBS weight at index " << i << ": "
+          << CGAL::to_double(weights[i]) << ". Weights must be positive.";
+      BOOST_THROW_EXCEPTION(Exception(oss.str()));
+    } else {
+      // Original weight is valid, use it
+      if (_exactWrite) {
+        impl::writeFT(_s, CGAL::exact(weights[i]));
+      } else {
+        double weight_val = CGAL::to_double(weights[i]);
+        _s << fixZeroNegForWeights(weight_val, _s.precision());
+      }
+    }
+  }
+  _s << ")";
+}
+
+void
+WktWriter::writeKnots(const std::vector<Kernel::FT> &knots)
+{
+  _s << "(";
+  for (size_t i = 0; i < knots.size(); i++) {
+    if (i != 0) {
+      _s << ",";
+    }
+    if (_exactWrite) {
+      impl::writeFT(_s, CGAL::exact(knots[i]));
+    } else {
+      _s << fixZeroNeg(CGAL::to_double(knots[i]), _s.precision());
+    }
+  }
+  _s << ")";
 }
 
 } // namespace SFCGAL::detail::io

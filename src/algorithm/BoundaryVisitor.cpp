@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -165,6 +166,17 @@ BoundaryVisitor::visit(const PolyhedralSurface &g)
   getBoundaryFromPolygons(graph);
 }
 
+/**
+ * @brief Compute and set the boundary of a TriangulatedSurface.
+ *
+ * Constructs a GeometryGraph from the provided triangulated surface and derives
+ * the boundary by calling getBoundaryFromPolygons. The visitor's internal
+ * boundary is updated (or cleared) according to the derived result.
+ *
+ * @param g TriangulatedSurface whose boundary will be computed.
+ *
+ * @see getBoundaryFromPolygons(const graph::GeometryGraph &)
+ */
 void
 BoundaryVisitor::visit(const TriangulatedSurface &g)
 {
@@ -175,6 +187,45 @@ BoundaryVisitor::visit(const TriangulatedSurface &g)
   getBoundaryFromPolygons(graph);
 }
 
+/**
+ * @brief Compute and set the boundary for a NURBSCurve.
+ *
+ * If the curve is empty or its start and end coordinates are identical, the
+ * visitor clears the internal boundary. Otherwise the boundary is set to a
+ * MultiPoint containing copies of the curve's start and end points.
+ */
+void
+BoundaryVisitor::visit(const NURBSCurve &g)
+{
+  if (g.isEmpty()) {
+    _boundary.reset();
+    return;
+  }
+
+  Point startPoint = g.startPoint();
+  Point endPoint   = g.endPoint();
+
+  if (startPoint.coordinate() == endPoint.coordinate()) {
+    _boundary.reset();
+  } else {
+    std::unique_ptr<MultiPoint> boundary(new MultiPoint);
+    boundary->addGeometry(new Point(startPoint));
+    boundary->addGeometry(new Point(endPoint));
+    _boundary = std::move(boundary);
+  }
+}
+
+/**
+ * @brief Releases and returns the visitor's current boundary geometry.
+ *
+ * If the visitor holds an internal boundary, ownership of that Geometry is
+ * transferred to the caller and the visitor no longer retains it. If no
+ * internal boundary exists, a newly allocated empty GeometryCollection is
+ * returned.
+ *
+ * @return Geometry* Pointer to a non-null Geometry instance owned by the
+ * caller. The caller is responsible for deleting the returned object.
+ */
 auto
 BoundaryVisitor::releaseBoundary() -> Geometry *
 {

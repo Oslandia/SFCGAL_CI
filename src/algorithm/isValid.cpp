@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Triangle.h"
@@ -104,7 +105,10 @@ SFCGAL_ASSERT_GEOMETRY_VALIDITY_ON_PLANE(const Geometry & /*g*/)
 
 namespace algorithm {
 
-// to detect unconnected interior in polygon
+/**
+ * @brief Internal utility to detect unconnected interior in polygon validation.
+ * @ingroup detail
+ */
 struct LoopDetector : public boost::dfs_visitor<> {
   LoopDetector(bool &hasLoop) : _hasLoop(hasLoop) {}
 
@@ -631,6 +635,13 @@ isValid(const MultiSolid &multisolid, const double &toleranceAbs) -> Validity
 }
 
 auto
+isValid(const NURBSCurve &nurbsCurve, const double &toleranceAbs) -> Validity
+{
+  auto [valid, reason] = nurbsCurve.validateData();
+  return valid ? Validity::valid() : Validity::invalid(reason);
+}
+
+auto
 isValid(const Geometry &geometry, const double &toleranceAbs) -> Validity
 {
   switch (geometry.geometryTypeId()) {
@@ -669,6 +680,9 @@ isValid(const Geometry &geometry, const double &toleranceAbs) -> Validity
 
   case TYPE_POLYHEDRALSURFACE:
     return isValid(geometry.as<PolyhedralSurface>(), toleranceAbs);
+
+  case TYPE_NURBSCURVE:
+    return isValid(geometry.as<NURBSCurve>(), toleranceAbs);
   }
 
   BOOST_THROW_EXCEPTION(Exception(

@@ -11,6 +11,20 @@
 #include "SFCGAL/GeometryVisitor.h"
 #include <vector>
 
+/**
+ * @brief Visitor that collects pointers to all Point instances contained in a
+ * Geometry.
+ *
+ * Traverses geometries by overriding ConstGeometryVisitor visit methods and
+ * appends pointers to discovered Point objects into the public 'points' vector.
+ * Includes points found directly (Point), on linear/area/volume geometries
+ * (LineString, Polygon, Triangle, Solid, etc.), within multi- and collection
+ * geometries, and control points of NURBSCurve. Collected pointers reference
+ * Points owned by the visited geometries; this visitor does not take ownership
+ * or modify them.
+ *
+ * Use the const_iterator typedef to iterate over the collected point pointers.
+ */
 namespace SFCGAL {
 namespace detail {
 
@@ -91,6 +105,10 @@ public:
    */
   void
   visit(const TriangulatedSurface &g) override;
+  /// @brief Process NURBSCurve to extract control points
+  /// @param g The NURBSCurve geometry to process
+  void
+  visit(const NURBSCurve &g) override;
 
 public:
   typedef std::vector<const Point *>::const_iterator
