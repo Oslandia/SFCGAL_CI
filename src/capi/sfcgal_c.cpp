@@ -18,6 +18,7 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/primitive3d/Box.h"
 #include "SFCGAL/primitive3d/Cylinder.h"
 #include "SFCGAL/primitive3d/Primitive.h"
 #include "SFCGAL/primitive3d/Sphere.h"
@@ -2281,6 +2282,9 @@ sfcgal_primitive_create(sfcgal_primitive_type_t primitive_type)
     break;
   case SFCGAL_TYPE_TORUS:
     primitive = new SFCGAL::Torus();
+    break;
+  case SFCGAL_TYPE_BOX:
+    primitive = new SFCGAL::Box();
     break;
   }
 

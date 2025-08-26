@@ -1801,4 +1801,47 @@ BOOST_AUTO_TEST_CASE(testTorusTest)
   sfcgal_primitive_delete(torus);
 }
 
+BOOST_AUTO_TEST_CASE(testBoxTest)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  sfcgal_primitive_t *box = sfcgal_primitive_create(SFCGAL_TYPE_BOX);
+
+  // x_extent parameter
+  double xExtent = sfcgal_primitive_parameter_double(box, "x_extent");
+  BOOST_CHECK_CLOSE(xExtent, 1.0, 1e-6);
+
+  sfcgal_primitive_set_parameter_double(box, "x_extent", 11.2);
+  double newXExtent = sfcgal_primitive_parameter_double(box, "x_extent");
+  BOOST_CHECK_CLOSE(newXExtent, 11.2, 1e-6);
+
+  // y_extent parameter
+  double yExtent = sfcgal_primitive_parameter_double(box, "y_extent");
+  BOOST_CHECK_CLOSE(yExtent, 1.0, 1e-6);
+
+  sfcgal_primitive_set_parameter_double(box, "y_extent", 5.2);
+  double newYExtent = sfcgal_primitive_parameter_double(box, "y_extent");
+  BOOST_CHECK_CLOSE(newYExtent, 5.2, 1e-6);
+
+  // z_extent parameter
+  double zExtent = sfcgal_primitive_parameter_double(box, "z_extent");
+  BOOST_CHECK_CLOSE(zExtent, 1.0, 1e-6);
+
+  sfcgal_primitive_set_parameter_double(box, "z_extent", 1.2);
+  double newZExtent = sfcgal_primitive_parameter_double(box, "z_extent");
+  BOOST_CHECK_CLOSE(newZExtent, 1.2, 1e-6);
+
+  // there is no parameter called radius
+  sfcgal_primitive_set_parameter_double(box, "radius", 24.2);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  // x_extent is a double nont an unsigned int
+  sfcgal_primitive_set_parameter_int(box, "x_extent", 5);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  sfcgal_primitive_delete(box);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
