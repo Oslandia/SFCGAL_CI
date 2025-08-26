@@ -1876,4 +1876,54 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
   sfcgal_primitive_delete(cube);
 }
 
+BOOST_AUTO_TEST_CASE(testConeTest)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  sfcgal_primitive_t *cone = sfcgal_primitive_create(SFCGAL_TYPE_CONE);
+
+  // bottom_radius parameter
+  double bottomRadius =
+      sfcgal_primitive_parameter_double(cone, "bottom_radius");
+  BOOST_CHECK_CLOSE(bottomRadius, 1.0, 1e-6);
+
+  sfcgal_primitive_set_parameter_double(cone, "bottom_radius", 14.31);
+  double newBottomRadius =
+      sfcgal_primitive_parameter_double(cone, "bottom_radius");
+  BOOST_CHECK_CLOSE(newBottomRadius, 14.31, 1e-6);
+
+  // there is no parameter called min_radius
+  sfcgal_primitive_set_parameter_double(cone, "min_radius", 24.2);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  // num_radial is an unsigned int not a double
+  sfcgal_primitive_set_parameter_double(cone, "num_radial", 1.2);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  // top_radius parameter
+  double topRadius = sfcgal_primitive_parameter_double(cone, "top_radius");
+  BOOST_CHECK_CLOSE(topRadius, 0.0, 1e-6);
+
+  sfcgal_primitive_set_parameter_double(cone, "top_radius", 0.3);
+  double newTubeRadius = sfcgal_primitive_parameter_double(cone, "top_radius");
+  BOOST_CHECK_CLOSE(newTubeRadius, 0.3, 1e-6);
+
+  // top_radius cannot be negative
+  sfcgal_primitive_set_parameter_double(cone, "top_radius", -2.3);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  // num radial parameter
+  unsigned int numRadial = sfcgal_primitive_parameter_int(cone, "num_radial");
+  BOOST_CHECK_EQUAL(numRadial, 32);
+  sfcgal_primitive_set_parameter_int(cone, "num_radial", 36);
+
+  double newNumRadial = sfcgal_primitive_parameter_int(cone, "num_radial");
+  BOOST_CHECK_EQUAL(newNumRadial, 36);
+
+  sfcgal_primitive_delete(cone);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

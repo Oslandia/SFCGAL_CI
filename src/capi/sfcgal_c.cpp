@@ -19,6 +19,7 @@
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/primitive3d/Box.h"
+#include "SFCGAL/primitive3d/Cone.h"
 #include "SFCGAL/primitive3d/Cube.h"
 #include "SFCGAL/primitive3d/Cylinder.h"
 #include "SFCGAL/primitive3d/Primitive.h"
@@ -2289,6 +2290,9 @@ sfcgal_primitive_create(sfcgal_primitive_type_t primitive_type)
     break;
   case SFCGAL_TYPE_CUBE:
     primitive = new SFCGAL::Cube();
+    break;
+  case SFCGAL_TYPE_CONE:
+    primitive = new SFCGAL::Cone();
     break;
   }
 
