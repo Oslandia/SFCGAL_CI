@@ -43,6 +43,8 @@ public:
   visit(const PolyhedralSurface &g) override;
   void
   visit(const TriangulatedSurface &g) override;
+  void
+  visit(const BezierCurve &g) override;
 
 public:
   typedef std::vector<const Point *>::const_iterator const_iterator;

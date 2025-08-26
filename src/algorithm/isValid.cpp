@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/isValid.h"
 
+#include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -566,6 +567,19 @@ isValid(const MultiSolid &ms, const double &toleranceAbs) -> const Validity
 }
 
 auto
+isValid(const BezierCurve &bcurve, const double &toleranceAbs) -> const Validity
+{
+  if (bcurve.isValid()) {
+    return Validity::valid();
+  }
+
+  return Validity::invalid(
+      boost::format("BezierCurve is invalid. All control points do not have "
+                    "consistent dimensions")
+          .str());
+}
+
+auto
 isValid(const Geometry &g, const double &toleranceAbs) -> const Validity
 {
   switch (g.geometryTypeId()) {
@@ -604,6 +618,9 @@ isValid(const Geometry &g, const double &toleranceAbs) -> const Validity
 
   case TYPE_POLYHEDRALSURFACE:
     return isValid(g.as<PolyhedralSurface>(), toleranceAbs);
+
+  case TYPE_BEZIERCURVE:
+    return isValid(g.as<BezierCurve>(), toleranceAbs);
   }
 
   BOOST_THROW_EXCEPTION(Exception(

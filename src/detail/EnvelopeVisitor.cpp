@@ -4,7 +4,9 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/detail/EnvelopeVisitor.h"
+#include "SFCGAL/algorithm/convexHull.h"
 
+#include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -113,6 +115,14 @@ EnvelopeVisitor::visit(const TriangulatedSurface &g)
 {
   for (size_t i = 0; i < g.numPatches(); i++) {
     visit(g.patchN(i));
+  }
+}
+
+void
+EnvelopeVisitor::visit(const BezierCurve &g)
+{
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointAt(i));
   }
 }
 

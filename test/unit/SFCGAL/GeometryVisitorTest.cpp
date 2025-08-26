@@ -5,6 +5,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -96,6 +97,12 @@ public:
     type = "TriangulatedSurface";
   }
 
+  void
+  visit(const BezierCurve & /*g*/) override
+  {
+    type = "BezierCurve";
+  }
+
   std::string type;
 };
 
@@ -170,4 +177,8 @@ BOOST_AUTO_TEST_CASE(testVisitSolid)
   BOOST_CHECK_EQUAL(getTypeWithVisitor<Solid>(), "Solid");
 }
 
+BOOST_AUTO_TEST_CASE(testVisitBezierCurve)
+{
+  BOOST_CHECK_EQUAL(getTypeWithVisitor<BezierCurve>(), "BezierCurve");
+}
 BOOST_AUTO_TEST_SUITE_END()
