@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/detail/EnvelopeVisitor.h"
+#include "SFCGAL/algorithm/convexHull.h"
 
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -11,6 +12,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -113,6 +115,28 @@ EnvelopeVisitor::visit(const TriangulatedSurface &g)
 {
   for (size_t i = 0; i < g.numPatches(); i++) {
     visit(g.patchN(i));
+  }
+}
+
+void
+EnvelopeVisitor::visit(const NURBSCurve &g)
+{
+  // Note: For precise bounds, we should evaluate the curve at critical points
+  // but control points provide a conservative bound
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointN(i));
+  }
+
+  // Optionally, for better precision, sample curve at additional points
+  if (!g.isEmpty()) {
+    auto      bounds      = g.parameterBounds();
+    const int sampleCount = 20; // Reasonable sampling for envelope
+
+    for (int i = 0; i <= sampleCount; ++i) {
+      auto  t = bounds.first + (bounds.second - bounds.first) * i / sampleCount;
+      Point samplePoint = g.evaluate(t);
+      visit(samplePoint);
+    }
   }
 }
 

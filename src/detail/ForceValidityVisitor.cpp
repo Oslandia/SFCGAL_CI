@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -122,6 +123,17 @@ ForceValidityVisitor::visit(TriangulatedSurface &g)
   g.forceValidityFlag(valid_);
   for (size_t i = 0; i < g.numPatches(); i++) {
     visit(g.patchN(i));
+  }
+}
+
+void
+ForceValidityVisitor::visit(NURBSCurve &g)
+{
+  g.forceValidityFlag(valid_);
+
+  // Visit all control points
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointN(i));
   }
 }
 

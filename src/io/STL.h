@@ -4,7 +4,7 @@
 #ifndef SFCGAL_IO_STL_H_
 #define SFCGAL_IO_STL_H_
 
-#include <SFCGAL/Geometry.h>
+#include "SFCGAL/Geometry.h"
 #include <ostream>
 #include <string>
 

@@ -67,6 +67,8 @@ public:
   visit(const PolyhedralSurface &g) override;
   void
   visit(const TriangulatedSurface &g) override;
+  void
+  visit(const NURBSCurve &g) override;
 
   /**
    * get the boundary

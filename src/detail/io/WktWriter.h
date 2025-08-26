@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/config.h"
 
 namespace SFCGAL {
@@ -84,6 +85,23 @@ protected:
   write(const Solid &g);
   void
   writeInner(const Solid &g);
+
+  /**
+   * Write vector of weights in WKT format: (w1, w2, w3, ...)
+   */
+  void
+  writeWeights(const std::vector<Kernel::FT> &weights);
+
+  /**
+   * Write vector of knots in WKT format: (k1, k2, k3, ...)
+   */
+  void
+  writeKnots(const std::vector<Kernel::FT> &knots);
+
+  void
+  write(const NURBSCurve &g);
+  void
+  writeInner(const NURBSCurve &g);
 
   // for recursive call use
   void

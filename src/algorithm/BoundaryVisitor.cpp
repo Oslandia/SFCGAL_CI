@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -173,6 +174,27 @@ BoundaryVisitor::visit(const TriangulatedSurface &g)
 
   graphBuilder.addTriangulatedSurface(g);
   getBoundaryFromPolygons(graph);
+}
+
+void
+BoundaryVisitor::visit(const NURBSCurve &g)
+{
+  if (g.isEmpty()) {
+    _boundary.reset();
+    return;
+  }
+
+  Point startPoint = g.startPoint();
+  Point endPoint   = g.endPoint();
+
+  if (startPoint.coordinate() == endPoint.coordinate()) {
+    _boundary.reset();
+  } else {
+    std::unique_ptr<MultiPoint> boundary(new MultiPoint);
+    boundary->addGeometry(startPoint);
+    boundary->addGeometry(endPoint);
+    _boundary = std::move(boundary);
+  }
 }
 
 auto

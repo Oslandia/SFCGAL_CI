@@ -11,6 +11,7 @@
 #include "SFCGAL/config.h"
 
 #include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/PreparedGeometry.h"
 
 #include "SFCGAL/detail/tools/InputStreamReader.h"
@@ -134,6 +135,32 @@ public:
   readInnerMultiSolid(MultiSolid &g);
 
   /**
+   * Read NURBSCurve content from wkt
+   * Supports syntax: NURBSCURVE((points), (weights), degree)
+   *                 NURBSCURVE((points), (weights), (knots), degree)
+   */
+  void
+  readInnerNURBSCurve(NURBSCurve &g);
+
+  /**
+   * Read vector of weights from WKT format: (w1, w2, w3, ...)
+   */
+  std::vector<Kernel::FT>
+  readWeightsVector();
+
+  /**
+   * Read vector of knots from WKT format: (k1, k2, k3, ...)
+   */
+  std::vector<Kernel::FT>
+  readKnotsVector();
+
+  /**
+   * Read degree value (unsigned integer)
+   */
+  unsigned int
+  readDegree();
+
+  /**
    * Read coordinate from WKT
    * @todo ZM management
    */
@@ -160,6 +187,19 @@ private:
    */
   std::string
   parseErrorMessage();
+
+  /**
+   * Generate uniform knot vector for given parameters
+   */
+  std::vector<Kernel::FT>
+  generateUniformKnots(size_t numControlPoints, unsigned int degree);
+
+  /**
+   * Validate knot vector for given parameters
+   */
+  bool
+  validateKnotVector(const std::vector<Kernel::FT> &knots,
+                     size_t numControlPoints, unsigned int degree);
 };
 
 } // namespace io

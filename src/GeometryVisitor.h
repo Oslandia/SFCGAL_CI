@@ -47,6 +47,8 @@ public:
   visit(PolyhedralSurface &g) = 0;
   virtual void
   visit(TriangulatedSurface &g) = 0;
+  virtual void
+  visit(NURBSCurve &g) = 0;
 };
 
 /**
@@ -86,6 +88,8 @@ public:
   visit(const PolyhedralSurface &g) = 0;
   virtual void
   visit(const TriangulatedSurface &g) = 0;
+  virtual void
+  visit(const NURBSCurve &g) = 0;
 };
 
 } // namespace SFCGAL

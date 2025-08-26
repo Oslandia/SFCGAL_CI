@@ -13,6 +13,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -24,7 +25,7 @@
 
 namespace SFCGAL::detail::io {
 
-WktReader::WktReader(std::istream &s) : _reader(s) {}
+WktReader::WktReader(std::istream &inputStream) : _reader(inputStream) {}
 
 auto
 WktReader::readSRID() -> srid_t
@@ -51,75 +52,81 @@ WktReader::readGeometry() -> Geometry *
 
   switch (geometryType) {
   case TYPE_POINT: {
-    std::unique_ptr<Point> g(new Point());
-    readInnerPoint(*g);
-    return g.release();
+    std::unique_ptr<Point> geom(new Point());
+    readInnerPoint(*geom);
+    return geom.release();
   }
 
   case TYPE_LINESTRING: {
-    std::unique_ptr<LineString> g(new LineString());
-    readInnerLineString(*g);
-    return g.release();
+    std::unique_ptr<LineString> geom(new LineString());
+    readInnerLineString(*geom);
+    return geom.release();
   }
 
   case TYPE_TRIANGLE: {
-    std::unique_ptr<Triangle> g(new Triangle());
-    readInnerTriangle(*g);
-    return g.release();
+    std::unique_ptr<Triangle> geom(new Triangle());
+    readInnerTriangle(*geom);
+    return geom.release();
   }
 
   case TYPE_POLYGON: {
-    std::unique_ptr<Polygon> g(new Polygon());
-    readInnerPolygon(*g);
-    return g.release();
+    std::unique_ptr<Polygon> geom(new Polygon());
+    readInnerPolygon(*geom);
+    return geom.release();
   }
 
   case TYPE_MULTIPOINT: {
-    std::unique_ptr<MultiPoint> g(new MultiPoint());
-    readInnerMultiPoint(*g);
-    return g.release();
+    std::unique_ptr<MultiPoint> geom(new MultiPoint());
+    readInnerMultiPoint(*geom);
+    return geom.release();
   }
 
   case TYPE_MULTILINESTRING: {
-    std::unique_ptr<MultiLineString> g(new MultiLineString());
-    readInnerMultiLineString(*g);
-    return g.release();
+    std::unique_ptr<MultiLineString> geom(new MultiLineString());
+    readInnerMultiLineString(*geom);
+    return geom.release();
   }
 
   case TYPE_MULTIPOLYGON: {
-    std::unique_ptr<MultiPolygon> g(new MultiPolygon());
-    readInnerMultiPolygon(*g);
-    return g.release();
+    std::unique_ptr<MultiPolygon> geom(new MultiPolygon());
+    readInnerMultiPolygon(*geom);
+    return geom.release();
   }
 
   case TYPE_GEOMETRYCOLLECTION: {
-    std::unique_ptr<GeometryCollection> g(new GeometryCollection());
-    readInnerGeometryCollection(*g);
-    return g.release();
+    std::unique_ptr<GeometryCollection> geom(new GeometryCollection());
+    readInnerGeometryCollection(*geom);
+    return geom.release();
   }
 
   case TYPE_TRIANGULATEDSURFACE: {
-    std::unique_ptr<TriangulatedSurface> g(new TriangulatedSurface());
-    readInnerTriangulatedSurface(*g);
-    return g.release();
+    std::unique_ptr<TriangulatedSurface> geom(new TriangulatedSurface());
+    readInnerTriangulatedSurface(*geom);
+    return geom.release();
   }
 
   case TYPE_POLYHEDRALSURFACE: {
-    std::unique_ptr<PolyhedralSurface> g(new PolyhedralSurface());
-    readInnerPolyhedralSurface(*g);
-    return g.release();
+    std::unique_ptr<PolyhedralSurface> geom(new PolyhedralSurface());
+    readInnerPolyhedralSurface(*geom);
+    return geom.release();
   }
 
   case TYPE_SOLID: {
-    std::unique_ptr<Solid> g(new Solid());
-    readInnerSolid(*g);
-    return g.release();
+    std::unique_ptr<Solid> geom(new Solid());
+    readInnerSolid(*geom);
+    return geom.release();
   }
 
   case TYPE_MULTISOLID: {
-    std::unique_ptr<MultiSolid> g(new MultiSolid());
-    readInnerMultiSolid(*g);
-    return g.release();
+    std::unique_ptr<MultiSolid> geom(new MultiSolid());
+    readInnerMultiSolid(*geom);
+    return geom.release();
+  }
+
+  case TYPE_NURBSCURVE: {
+    std::unique_ptr<NURBSCurve> geom(new NURBSCurve());
+    readInnerNURBSCurve(*geom);
+    return geom.release();
   }
   }
 
@@ -168,14 +175,17 @@ WktReader::readGeometryType() -> GeometryType
     // not official
     return TYPE_MULTISOLID;
   }
+  if (_reader.imatch("NURBSCURVE")) {
+    return TYPE_NURBSCURVE;
+  }
 
-  std::ostringstream oss;
-  oss << "can't parse WKT geometry type (" << _reader.context() << ")";
-  BOOST_THROW_EXCEPTION(WktParseException(oss.str()));
+  std::ostringstream errorStream;
+  errorStream << "can't parse WKT geometry type (" << _reader.context() << ")";
+  BOOST_THROW_EXCEPTION(WktParseException(errorStream.str()));
 }
 
 void
-WktReader::readInnerPoint(Point &g)
+WktReader::readInnerPoint(Point &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -185,7 +195,7 @@ WktReader::readInnerPoint(Point &g)
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
   }
 
-  readPointCoordinate(g);
+  readPointCoordinate(geom);
 
   if (!_reader.match(')')) {
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
@@ -193,7 +203,7 @@ WktReader::readInnerPoint(Point &g)
 }
 
 void
-WktReader::readInnerLineString(LineString &g)
+WktReader::readInnerLineString(LineString &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -205,10 +215,10 @@ WktReader::readInnerLineString(LineString &g)
 
   while (!_reader.eof()) {
 
-    std::unique_ptr<Point> p(new Point());
+    std::unique_ptr<Point> point(new Point());
 
-    if (readPointCoordinate(*p)) {
-      g.addPoint(p.release());
+    if (readPointCoordinate(*point)) {
+      geom.addPoint(point.release());
     } else {
       BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
     }
@@ -220,7 +230,7 @@ WktReader::readInnerLineString(LineString &g)
     break;
   }
 
-  if (g.numPoints() < 2U) {
+  if (geom.numPoints() < 2U) {
     BOOST_THROW_EXCEPTION(WktParseException(
         "WKT parse error, LineString should have at least 2 points"));
   }
@@ -231,7 +241,7 @@ WktReader::readInnerLineString(LineString &g)
 }
 
 void
-WktReader::readInnerPolygon(Polygon &g)
+WktReader::readInnerPolygon(Polygon &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -241,13 +251,13 @@ WktReader::readInnerPolygon(Polygon &g)
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
   }
 
-  for (int i = 0; !_reader.eof(); i++) {
-    if (i == 0) {
-      readInnerLineString(g.exteriorRing());
+  for (int ringIdx = 0; !_reader.eof(); ringIdx++) {
+    if (ringIdx == 0) {
+      readInnerLineString(geom.exteriorRing());
     } else {
       std::unique_ptr<LineString> interiorRing(new LineString);
       readInnerLineString(*interiorRing);
-      g.addRing(interiorRing.release());
+      geom.addRing(interiorRing.release());
     }
 
     // break if not followed by another ring
@@ -262,7 +272,7 @@ WktReader::readInnerPolygon(Polygon &g)
 }
 
 void
-WktReader::readInnerTriangle(Triangle &g)
+WktReader::readInnerTriangle(Triangle &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -299,7 +309,7 @@ WktReader::readInnerTriangle(Triangle &g)
                           "point for triangle"));
   }
 
-  g = Triangle(points[0], points[1], points[2]);
+  geom = Triangle(points[0], points[1], points[2]);
 
   if (!_reader.match(')')) {
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
@@ -311,7 +321,7 @@ WktReader::readInnerTriangle(Triangle &g)
 }
 
 void
-WktReader::readInnerMultiPoint(MultiPoint &g)
+WktReader::readInnerMultiPoint(MultiPoint &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -322,7 +332,7 @@ WktReader::readInnerMultiPoint(MultiPoint &g)
   }
 
   while (!_reader.eof()) {
-    std::unique_ptr<Point> p(new Point());
+    std::unique_ptr<Point> point(new Point());
 
     if (!_reader.imatch("EMPTY")) {
       // optional open/close parenthesis
@@ -332,15 +342,15 @@ WktReader::readInnerMultiPoint(MultiPoint &g)
         parenthesisOpen = true;
       }
 
-      readPointCoordinate(*p);
+      readPointCoordinate(*point);
 
       if (parenthesisOpen && !_reader.match(')')) {
         BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
       }
     }
 
-    if (!p->isEmpty()) {
-      g.addGeometry(p.release());
+    if (!point->isEmpty()) {
+      geom.addGeometry(point.release());
     }
 
     // break if not followed by another points
@@ -355,7 +365,7 @@ WktReader::readInnerMultiPoint(MultiPoint &g)
 }
 
 void
-WktReader::readInnerMultiLineString(MultiLineString &g)
+WktReader::readInnerMultiLineString(MultiLineString &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -370,7 +380,7 @@ WktReader::readInnerMultiLineString(MultiLineString &g)
     std::unique_ptr<LineString> lineString(new LineString());
     readInnerLineString(*lineString);
     if (!lineString->isEmpty()) {
-      g.addGeometry(lineString.release());
+      geom.addGeometry(lineString.release());
     }
 
     // break if not followed by another points
@@ -385,7 +395,7 @@ WktReader::readInnerMultiLineString(MultiLineString &g)
 }
 
 void
-WktReader::readInnerMultiPolygon(MultiPolygon &g)
+WktReader::readInnerMultiPolygon(MultiPolygon &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -400,7 +410,7 @@ WktReader::readInnerMultiPolygon(MultiPolygon &g)
     std::unique_ptr<Polygon> polygon(new Polygon());
     readInnerPolygon(*polygon);
     if (!polygon->isEmpty()) {
-      g.addGeometry(polygon.release());
+      geom.addGeometry(polygon.release());
     }
 
     // break if not followed by another points
@@ -415,7 +425,7 @@ WktReader::readInnerMultiPolygon(MultiPolygon &g)
 }
 
 void
-WktReader::readInnerGeometryCollection(GeometryCollection &g)
+WktReader::readInnerGeometryCollection(GeometryCollection &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -428,9 +438,9 @@ WktReader::readInnerGeometryCollection(GeometryCollection &g)
   while (!_reader.eof()) {
 
     // read a full wkt geometry ex : POINT (2.0 6.0)
-    Geometry *gg = readGeometry();
-    if (!gg->isEmpty()) {
-      g.addGeometry(gg);
+    Geometry *geometry = readGeometry();
+    if (!geometry->isEmpty()) {
+      geom.addGeometry(geometry);
     }
 
     // break if not followed by another points
@@ -445,7 +455,7 @@ WktReader::readInnerGeometryCollection(GeometryCollection &g)
 }
 
 void
-WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
+WktReader::readInnerTriangulatedSurface(TriangulatedSurface &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -458,7 +468,7 @@ WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
   while (!_reader.eof()) {
     std::unique_ptr<Triangle> triangle(new Triangle());
     readInnerTriangle(*triangle);
-    g.addPatch(triangle.release());
+    geom.addPatch(triangle.release());
 
     if (!_reader.match(',')) {
       break;
@@ -471,7 +481,7 @@ WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
 }
 
 void
-WktReader::readInnerPolyhedralSurface(PolyhedralSurface &g)
+WktReader::readInnerPolyhedralSurface(PolyhedralSurface &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -484,7 +494,7 @@ WktReader::readInnerPolyhedralSurface(PolyhedralSurface &g)
   while (!_reader.eof()) {
     std::unique_ptr<Polygon> polygon(new Polygon());
     readInnerPolygon(*polygon);
-    g.addPatch(polygon.release());
+    geom.addPatch(polygon.release());
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -498,7 +508,7 @@ WktReader::readInnerPolyhedralSurface(PolyhedralSurface &g)
 }
 
 void
-WktReader::readInnerSolid(Solid &g)
+WktReader::readInnerSolid(Solid &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -509,13 +519,13 @@ WktReader::readInnerSolid(Solid &g)
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
   }
 
-  for (int i = 0; !_reader.eof(); i++) {
-    if (i == 0) {
-      readInnerPolyhedralSurface(g.exteriorShell());
+  for (int shellIdx = 0; !_reader.eof(); shellIdx++) {
+    if (shellIdx == 0) {
+      readInnerPolyhedralSurface(geom.exteriorShell());
     } else {
       std::unique_ptr<PolyhedralSurface> shell(new PolyhedralSurface);
       readInnerPolyhedralSurface(*shell);
-      g.addInteriorShell(shell.release());
+      geom.addInteriorShell(shell.release());
     }
 
     // break if not followed by another points
@@ -531,7 +541,7 @@ WktReader::readInnerSolid(Solid &g)
 }
 
 void
-WktReader::readInnerMultiSolid(MultiSolid &g)
+WktReader::readInnerMultiSolid(MultiSolid &geom)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -546,7 +556,7 @@ WktReader::readInnerMultiSolid(MultiSolid &g)
     std::unique_ptr<Solid> solid(new Solid());
     readInnerSolid(*solid);
     if (!solid->isEmpty()) {
-      g.addGeometry(solid.release());
+      geom.addGeometry(solid.release());
     }
 
     // break if not followed by another points
@@ -560,19 +570,214 @@ WktReader::readInnerMultiSolid(MultiSolid &g)
   }
 }
 
-auto
-WktReader::readPointCoordinate(Point &p) -> bool
+void
+WktReader::readInnerNURBSCurve(NURBSCurve &geometry)
 {
-  std::vector<Kernel::Exact_kernel::FT> coordinates;
-  Kernel::Exact_kernel::FT              d;
+  if (_reader.imatch("EMPTY")) {
+    return;
+  }
+
+  // Read control points - always present
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  std::vector<Point> controlPoints;
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  while (!_reader.eof()) {
+    Point point;
+    readPointCoordinate(point);
+    controlPoints.push_back(point);
+
+    if (!_reader.match(',')) {
+      break;
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  if (controlPoints.empty()) {
+    BOOST_THROW_EXCEPTION(
+        WktParseException("NURBS curve must have at least one control point"));
+  }
+
+  // Parse optional elements after control points
+  std::vector<Kernel::FT> weights;
+  std::vector<Kernel::FT> knots;
+  unsigned int            degree =
+      controlPoints.empty()
+                     ? 0
+                     : static_cast<unsigned int>(controlPoints.size() - 1);
+
+  if (_reader.match(',')) {
+    // Look ahead to determine what comes next
+    _reader.begin(); // Save position
+
+    if (_reader.match('(')) {
+      _reader.rollback(); // Restore position
+
+      // Read first vector (could be weights or knots)
+      std::vector<Kernel::FT> firstVector = readWeightsVector();
+
+      if (_reader.match(',')) {
+        _reader.begin(); // Save position
+
+        if (_reader.match('(')) {
+          _reader.rollback(); // Restore position
+          // First was weights, second is knots
+          weights = firstVector;
+          knots   = readKnotsVector();
+
+          if (_reader.match(',')) {
+            degree = readDegree();
+          }
+        } else {
+          _reader.rollback(); // Restore position
+          // First was weights, next is degree
+          weights = firstVector;
+          degree  = readDegree();
+        }
+      } else {
+        // Only one vector provided - assume it's weights
+        weights = firstVector;
+      }
+    } else {
+      _reader.rollback(); // Restore position
+      // Direct degree
+      degree = readDegree();
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  // Validate degree
+  if (degree >= controlPoints.size()) {
+    BOOST_THROW_EXCEPTION(WktParseException(
+        "NURBS degree must be less than number of control points"));
+  }
+
+  // Validate weights if provided
+  if (!weights.empty() && weights.size() != controlPoints.size()) {
+    BOOST_THROW_EXCEPTION(WktParseException(
+        "Number of weights must match number of control points"));
+  }
+
+  // Validate knot vector if provided
+  if (!knots.empty() &&
+      !validateKnotVector(knots, controlPoints.size(), degree)) {
+    BOOST_THROW_EXCEPTION(
+        WktParseException("Invalid knot vector for NURBS curve"));
+  }
+
+  // Construct the NURBS curve using appropriate constructor
+  if (!knots.empty()) {
+    // Full constructor with knots
+    if (weights.empty()) {
+      weights = std::vector<Kernel::FT>(controlPoints.size(), Kernel::FT(1));
+    }
+    geometry = NURBSCurve(controlPoints, weights, degree, knots);
+  } else if (!weights.empty()) {
+    // Constructor with weights but no knots
+    geometry = NURBSCurve(controlPoints, weights, degree);
+  } else {
+    // Simple constructor with just control points and degree
+    geometry = NURBSCurve(controlPoints, degree);
+  }
+}
+
+std::vector<Kernel::FT>
+WktReader::readWeightsVector()
+{
+  std::vector<Kernel::FT> weights;
+
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  while (!_reader.eof()) {
+    Kernel::FT weight;
+    if (!_reader.read(weight)) {
+      BOOST_THROW_EXCEPTION(WktParseException("Expected weight value"));
+    }
+
+    if (weight <= Kernel::FT(0)) {
+      BOOST_THROW_EXCEPTION(
+          WktParseException("NURBS weights must be positive"));
+    }
+
+    weights.push_back(weight);
+
+    if (!_reader.match(',')) {
+      break;
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  return weights;
+}
+
+std::vector<Kernel::FT>
+WktReader::readKnotsVector()
+{
+  std::vector<Kernel::FT> knots;
+
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  while (!_reader.eof()) {
+    Kernel::FT knot;
+    if (!_reader.read(knot)) {
+      BOOST_THROW_EXCEPTION(WktParseException("Expected knot value"));
+    }
+
+    knots.push_back(knot);
+
+    if (!_reader.match(',')) {
+      break;
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  return knots;
+}
+
+unsigned int
+WktReader::readDegree()
+{
+  unsigned int degree;
+  if (!_reader.read(degree)) {
+    BOOST_THROW_EXCEPTION(WktParseException("Expected degree value"));
+  }
+  return degree;
+}
+
+auto
+WktReader::readPointCoordinate(Point &point) -> bool
+{
+  std::vector<Kernel::FT> coordinates;
+  Kernel::FT              coordinate;
 
   if (_reader.imatch("EMPTY")) {
-    p = Point();
+    point = Point();
     return false;
   }
 
-  while (_reader.read(d)) {
-    coordinates.push_back(d);
+  while (_reader.read(coordinate)) {
+    coordinates.push_back(coordinate);
   }
 
   if (coordinates.size() < 2) {
@@ -593,8 +798,8 @@ WktReader::readPointCoordinate(Point &p) -> bool
       BOOST_THROW_EXCEPTION(WktParseException("bad coordinate dimension"));
     }
 
-    p = Point(coordinates[0], coordinates[1], coordinates[2]);
-    p.setM(CGAL::to_double(coordinates[3]));
+    point = Point(coordinates[0], coordinates[1], coordinates[2]);
+    point.setM(CGAL::to_double(coordinates[3]));
   } else if (_isMeasured && !_is3D) {
     // XYM
     if (coordinates.size() != 3) {
@@ -602,14 +807,14 @@ WktReader::readPointCoordinate(Point &p) -> bool
           "bad coordinate dimension (expecting XYM coordinates)"));
     }
 
-    p = Point(coordinates[0], coordinates[1]);
-    p.setM(CGAL::to_double(coordinates[2]));
+    point = Point(coordinates[0], coordinates[1]);
+    point.setM(CGAL::to_double(coordinates[2]));
   } else if (coordinates.size() == 3) {
     // XYZ
-    p = Point(coordinates[0], coordinates[1], coordinates[2]);
+    point = Point(coordinates[0], coordinates[1], coordinates[2]);
   } else {
     // XY
-    p = Point(coordinates[0], coordinates[1]);
+    point = Point(coordinates[0], coordinates[1]);
   }
 
   return true;
@@ -618,9 +823,34 @@ WktReader::readPointCoordinate(Point &p) -> bool
 auto
 WktReader::parseErrorMessage() -> std::string
 {
-  std::ostringstream oss;
-  oss << "WKT parse error (" << _reader.context() << ")";
-  return oss.str();
+  std::ostringstream errorStream;
+  errorStream << "WKT parse error (" << _reader.context() << ")";
+  return errorStream.str();
+}
+
+/// Helper functions for knot vector validation
+
+bool
+WktReader::validateKnotVector(const std::vector<Kernel::FT> &knots,
+                              size_t numControlPoints, unsigned int degree)
+{
+  if (numControlPoints == 0) {
+    return knots.empty();
+  }
+
+  size_t expectedSize = numControlPoints + degree + 1;
+  if (knots.size() != expectedSize) {
+    return false;
+  }
+
+  // Check non-decreasing order
+  for (size_t knotIdx = 1; knotIdx < knots.size(); ++knotIdx) {
+    if (knots[knotIdx] < knots[knotIdx - 1]) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 } // namespace SFCGAL::detail::io
