@@ -48,6 +48,9 @@ class Solid;
 // not SFA, appears in GML/CityGML
 class MultiSolid;
 
+// Curves
+class BezierCurve;
+
 class Envelope;
 
 class GeometryVisitor;
@@ -87,7 +90,21 @@ enum GeometryType {
 
   //-- not official codes
   TYPE_SOLID      = 101,
-  TYPE_MULTISOLID = 102
+  TYPE_MULTISOLID = 102,
+
+  // Find type!
+  TYPE_CURVE           = 13, // Base curve type
+  TYPE_BEZIERCURVE     = 131,
+  TYPE_BSPLINECURVE    = 132,
+  TYPE_NURBSCURVE      = 133,
+  TYPE_HERMITECURVE    = 134,
+  TYPE_CATMULLROMCURVE = 135,
+
+  // Surface types (for future extension)
+  TYPE_SURFACE        = 14, // Base surface type
+  TYPE_BEZIERSURFACE  = 141,
+  TYPE_BSPLINESURFACE = 142,
+  TYPE_NURBSSURFACE   = 143
 };
 
 /**

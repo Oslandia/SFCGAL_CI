@@ -5,6 +5,7 @@
 
 #include "SFCGAL/GeometryVisitor.h"
 
+#include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"

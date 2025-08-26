@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -121,6 +122,12 @@ WktReader::readGeometry() -> Geometry *
     readInnerMultiSolid(*g);
     return g.release();
   }
+
+  case TYPE_BEZIERCURVE: {
+    std::unique_ptr<BezierCurve> g(new BezierCurve());
+    readInnerBezierCurve(*g);
+    return g.release();
+  }
   }
 
   BOOST_THROW_EXCEPTION(WktParseException("unexpected geometry"));
@@ -167,6 +174,10 @@ WktReader::readGeometryType() -> GeometryType
   if (_reader.imatch("MULTISOLID")) {
     // not official
     return TYPE_MULTISOLID;
+  }
+  if (_reader.imatch("BEZIERCURVE")) {
+    // not official
+    return TYPE_BEZIERCURVE;
   }
 
   std::ostringstream oss;
@@ -550,6 +561,33 @@ WktReader::readInnerMultiSolid(MultiSolid &g)
     }
 
     // break if not followed by another points
+    if (!_reader.match(',')) {
+      break;
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+}
+
+void
+WktReader::readInnerBezierCurve(BezierCurve &g)
+{
+  if (_reader.imatch("EMPTY")) {
+    return;
+  }
+
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  while (!_reader.eof()) {
+    Point point;
+    readPointCoordinate(point);
+    g.addControlPoint(point);
+
+    // Break if not followed by comma
     if (!_reader.match(',')) {
       break;
     }

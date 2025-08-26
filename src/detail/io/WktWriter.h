@@ -85,6 +85,11 @@ protected:
   void
   writeInner(const Solid &g);
 
+  void
+  write(const BezierCurve &g);
+  void
+  writeInner(const BezierCurve &g);
+
   // for recursive call use
   void
   writeRec(const Geometry &g);

@@ -40,6 +40,8 @@ public:
   visit(PolyhedralSurface &g) override;
   void
   visit(TriangulatedSurface &g) override;
+  void
+  visit(BezierCurve &g) override;
 
 private:
   bool valid_;
