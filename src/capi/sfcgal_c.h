@@ -1889,7 +1889,8 @@ typedef enum {
   SFCGAL_TYPE_CYLINDER = 0,
   SFCGAL_TYPE_SPHERE   = 1,
   SFCGAL_TYPE_TORUS    = 2,
-  SFCGAL_TYPE_BOX      = 3
+  SFCGAL_TYPE_BOX      = 3,
+  SFCGAL_TYPE_CUBE     = 4
 } sfcgal_primitive_type_t;
 
 /**

@@ -1844,4 +1844,36 @@ BOOST_AUTO_TEST_CASE(testBoxTest)
   sfcgal_primitive_delete(box);
 }
 
+BOOST_AUTO_TEST_CASE(testCubeTest)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  sfcgal_primitive_t *cube = sfcgal_primitive_create(SFCGAL_TYPE_CUBE);
+
+  // size parameter
+  double size = sfcgal_primitive_parameter_double(cube, "size");
+  BOOST_CHECK_CLOSE(size, 1.0, 1e-6);
+
+  sfcgal_primitive_set_parameter_double(cube, "size", 11.2);
+  double newXExtent = sfcgal_primitive_parameter_double(cube, "size");
+  BOOST_CHECK_CLOSE(newXExtent, 11.2, 1e-6);
+
+  // there is no parameter called radius
+  sfcgal_primitive_set_parameter_double(cube, "radius", 24.2);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  // size is a double nont an unsigned int
+  sfcgal_primitive_set_parameter_int(cube, "size", 3);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  // size cannot be negative
+  sfcgal_primitive_set_parameter_double(cube, "size", -2.2);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
+  sfcgal_primitive_delete(cube);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
