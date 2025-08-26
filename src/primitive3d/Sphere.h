@@ -71,8 +71,7 @@ public:
   void
   setRadius(const Kernel::FT &radius)
   {
-    m_parameters.at("radius") = radius;
-    invalidateCache();
+    validateAndSetParameter("radius", radius);
   }
 
   /**
@@ -82,8 +81,7 @@ public:
   void
   setCenter(const Kernel::Point_3 &center)
   {
-    m_parameters.at("center") = center;
-    invalidateCache();
+    validateAndSetParameter("center", center);
   }
 
   /**
@@ -93,8 +91,7 @@ public:
   void
   setNumVertical(unsigned int num)
   {
-    m_parameters.at("num_vertical") = num;
-    invalidateCache();
+    validateAndSetParameter("num_vertical", num);
   }
 
   /**
@@ -104,8 +101,7 @@ public:
   void
   setNumHorizontal(unsigned int num)
   {
-    m_parameters.at("num_horizontal") = num;
-    invalidateCache();
+    validateAndSetParameter("num_horizontal", num);
   }
 
   /**
@@ -115,8 +111,7 @@ public:
   void
   setDirection(const Kernel::Vector_3 &direction)
   {
-    m_parameters.at("direction") = normalizeVector(direction);
-    invalidateCache();
+    validateAndSetParameter("direction", direction);
   }
 
   /**

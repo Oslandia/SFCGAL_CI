@@ -167,6 +167,8 @@ Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
   m_parameters["num_horizontal"] = num_horizontal;
   m_parameters["center"]         = center;
   m_parameters["direction"]      = normalizeVector(direction);
+
+  Sphere::validateParameters(m_parameters);
 }
 
 auto
@@ -200,8 +202,15 @@ Sphere::invalidateCache()
 
 void
 Sphere::validateParameters(
-    std::unordered_map<std::string, PrimitiveParameter> const &) const
+    std::unordered_map<std::string, PrimitiveParameter> const &tempParameters)
+    const
 {
+  const double radius =
+      CGAL::to_double(std::get<Kernel::FT>(tempParameters.at("radius")));
+
+  if (radius <= 0.) {
+    BOOST_THROW_EXCEPTION(Exception("Sphere radius cannot be negative."));
+  }
 }
 
 // Generate the polyhedron representation of the sphere

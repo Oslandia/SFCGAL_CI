@@ -1586,6 +1586,11 @@ BOOST_AUTO_TEST_CASE(testSphereTest)
   BOOST_CHECK(hasError);
   hasError = false;
 
+  // radius cannot be negative
+  sfcgal_primitive_set_parameter_double(sphere, "radius", -2.2);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
   // center parameter
   double *center = sfcgal_primitive_parameter_point(sphere, "center");
   BOOST_CHECK(center != nullptr);
