@@ -230,11 +230,6 @@ protected:
                          &tempParameters) const override;
 
 private:
-  // Kernel::FT                                  m_radius;
-  // Kernel::Point_3                             m_center;
-  // int                                         m_num_vertical;
-  // int                                         m_num_horizontal;
-  // Kernel::Vector_3                            m_direction;
   mutable std::optional<CGAL::Polyhedron_3<Kernel>>   m_polyhedron;
   mutable std::optional<std::vector<Kernel::Point_3>> m_points;
   mutable std::optional<PolyhedralSurface>            m_polyhedral_surface;
