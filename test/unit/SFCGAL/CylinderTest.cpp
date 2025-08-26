@@ -49,6 +49,10 @@ BOOST_AUTO_TEST_CASE(testSetters)
   BOOST_CHECK_EQUAL(cyl.numRadial(), 24);
   BOOST_CHECK_EQUAL(cyl.baseCenter(), Point_3(1, 1, 1));
   BOOST_CHECK_EQUAL(cyl.axis(), Vector_3(1, 1, 1));
+
+  // radius and height cannot be negative
+  BOOST_CHECK_THROW(cyl.setHeight(-1.2), Exception);
+  BOOST_CHECK_THROW(cyl.setRadius(-3.2), Exception);
 }
 
 BOOST_AUTO_TEST_CASE(testGenerateSurfaceMesh)

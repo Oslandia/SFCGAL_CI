@@ -1717,6 +1717,11 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   BOOST_CHECK(hasError);
   hasError = false;
 
+  // radius cannot be negative
+  sfcgal_primitive_set_parameter_double(cylinder, "radius", -3.7);
+  BOOST_CHECK(hasError);
+  hasError = false;
+
   // height parameter
   double height = sfcgal_primitive_parameter_double(cylinder, "height");
   BOOST_CHECK_CLOSE(height, 1.0, 1e-6);

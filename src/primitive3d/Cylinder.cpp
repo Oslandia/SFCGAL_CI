@@ -18,6 +18,8 @@ Cylinder::Cylinder(const Point_3 &base_center, const Vector_3 &axis,
   m_parameters["radius"]      = radius;
   m_parameters["height"]      = height;
   m_parameters["num_radial"]  = num_radial;
+
+  Cylinder::validateParameters(m_parameters);
 }
 
 auto
@@ -44,42 +46,48 @@ Cylinder::primitiveTypeId() const -> PrimitiveType
 void
 Cylinder::setBaseCenter(const Point_3 &base_center)
 {
-  m_parameters.at("base_center") = base_center;
-  invalidateCache();
+  validateAndSetParameter("base_center", base_center);
 }
 
 void
 Cylinder::setAxis(const Vector_3 &axis)
 {
-  m_parameters.at("axis") = axis;
-  invalidateCache();
+  validateAndSetParameter("axis", axis);
 }
 
 void
 Cylinder::setRadius(const Kernel::FT &radius)
 {
-  m_parameters.at("radius") = radius;
-  invalidateCache();
+  validateAndSetParameter("radius", radius);
 }
 
 void
 Cylinder::setHeight(const Kernel::FT &height)
 {
-  m_parameters.at("height") = height;
-  invalidateCache();
+  validateAndSetParameter("height", height);
 }
 
 void
 Cylinder::setNumRadial(unsigned int num)
 {
-  m_parameters.at("num_radial") = num;
-  invalidateCache();
+  validateAndSetParameter("num_radial", num);
 }
 
 void
 Cylinder::validateParameters(
-    std::unordered_map<std::string, PrimitiveParameter> const &) const
+    std::unordered_map<std::string, PrimitiveParameter> const &tempParameters)
+    const
 {
+  const double radius =
+      CGAL::to_double(std::get<Kernel::FT>(tempParameters.at("radius")));
+  const double height =
+      CGAL::to_double(std::get<Kernel::FT>(tempParameters.at("height")));
+
+  if (radius <= 0.) {
+    BOOST_THROW_EXCEPTION(Exception("Cylinder radius cannot be negative."));
+  } else if (height <= 0.) {
+    BOOST_THROW_EXCEPTION(Exception("Cylinder height cannot be negative."));
+  }
 }
 
 void
