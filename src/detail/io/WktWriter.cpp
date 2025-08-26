@@ -5,6 +5,7 @@
 
 #include "SFCGAL/detail/io/WktWriter.h"
 
+#include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -94,6 +95,10 @@ WktWriter::writeRec(const Geometry &g)
 
   case TYPE_MULTISOLID:
     write(g.as<MultiSolid>());
+    return;
+
+  case TYPE_BEZIERCURVE:
+    write(g.as<BezierCurve>());
     return;
   }
 
@@ -476,4 +481,33 @@ WktWriter::writeInner(const Solid &g)
   _s << ")"; // end SOLID
 }
 
+void
+WktWriter::write(const BezierCurve &g)
+{
+  _s << "BEZIERCURVE ";
+  writeCoordinateType(g);
+
+  if (g.isEmpty()) {
+    _s << "EMPTY";
+    return;
+  }
+
+  writeInner(g);
+}
+
+void
+WktWriter::writeInner(const BezierCurve &g)
+{
+  _s << "(";
+
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    if (i != 0) {
+      _s << ",";
+    }
+
+    writeCoordinate(g.controlPointAt(i));
+  }
+
+  _s << ")";
+}
 } // namespace SFCGAL::detail::io

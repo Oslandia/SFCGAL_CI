@@ -134,6 +134,12 @@ public:
   readInnerMultiSolid(MultiSolid &g);
 
   /**
+   * Read BezierCurve content from wkt
+   */
+  void
+  readInnerBezierCurve(BezierCurve &g);
+
+  /**
    * Read coordinate from WKT
    * @todo ZM management
    */
