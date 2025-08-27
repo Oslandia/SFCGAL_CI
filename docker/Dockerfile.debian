@@ -1,4 +1,7 @@
-FROM debian:stable-slim AS builder
+# This image is used by pysfcgal to generate linux wheels
+# The wheels need to be compatible with glibc 2.35 (ubuntu 22.04 and forward)
+# Keep bookworm to ensure it
+FROM debian:bookworm-slim AS builder
 
 WORKDIR /SFCGAL
 
@@ -19,7 +22,7 @@ RUN CGAL_DIR=/CGAL cmake -B build \
     -DCMAKE_BUILD_TYPE=Release && \
     cmake --build build -j$(nproc)
 
-FROM debian:stable-slim AS run
+FROM debian:bookworm-slim AS run
 
 RUN apt update -qq && \
     apt install --no-install-recommends --yes libmpfr-dev libgmp-dev libboost-serialization-dev
