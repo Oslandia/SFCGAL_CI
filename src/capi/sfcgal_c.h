@@ -98,7 +98,9 @@ typedef enum {
  * Set the geometry validation mode
  * @ingroup capi
  * @note obsolete
+ * @deprecated It is not used anymore. It has no effect.
  */
+SFCGAL_DEPRECATED("It is not used anymore. It has no effect.")
 SFCGAL_API void
 sfcgal_set_geometry_validation(int enabled);
 
