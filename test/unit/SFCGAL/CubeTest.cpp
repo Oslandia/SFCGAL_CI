@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/primitive3d/Cube.h"
+#include "SFCGAL/algorithm/isValid.h"
 #include <boost/test/unit_test.hpp>
 
 using namespace SFCGAL;
@@ -47,10 +48,12 @@ BOOST_AUTO_TEST_CASE(testSurfaceArea)
 
 BOOST_AUTO_TEST_CASE(testPolyhedralSurface)
 {
+  // Create PolyhedralSurface from Polyhedron and check WKT output
   Cube cube(24);
   auto polyhedral_surface = cube.generatePolyhedralSurface();
 
-  // Create PolyhedralSurface from Polyhedron and check WKT output
+  BOOST_CHECK(algorithm::isValid(polyhedral_surface));
+
   BOOST_CHECK_EQUAL(
       polyhedral_surface.asText(1),
       "POLYHEDRALSURFACE Z (((0.0 0.0 0.0,0.0 24.0 0.0,24.0 24.0 0.0,24.0 0.0 "

@@ -172,10 +172,12 @@ BOOST_AUTO_TEST_CASE(testSurfaceArea)
 
 BOOST_AUTO_TEST_CASE(testPolyhedralSurface)
 {
+  // Create PolyhedralSurface from Polyhedron and check WKT output
   Cone cone(54, 21, 87, 7);
   auto polyhedral_surface = cone.generatePolyhedralSurface();
 
-  // Create PolyhedralSurface from Polyhedron and check WKT output
+  BOOST_CHECK(algorithm::isValid(polyhedral_surface));
+
   BOOST_CHECK_EQUAL(
       polyhedral_surface.asText(1),
       "POLYHEDRALSURFACE Z (((54.0 0.0 0.0,33.7 -42.2 0.0,-12.0 -52.6 "
