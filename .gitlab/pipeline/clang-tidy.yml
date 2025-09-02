@@ -13,7 +13,8 @@ test:clang-tidy:
     - apt-get update -qq
     - apt-get install -y --no-install-recommends git wget cmake make python3 ca-certificates build-essential pkg-config
     - ./ci/debian/before_install.sh $CGAL_LATEST_VERSION
-    - CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build \
+    - |
+      CGAL_DIR=$CI_PROJECT_DIR/CGAL cmake -S . -B build \
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
         -DSFCGAL_BUILD_TESTS=ON \
         -DCMAKE_C_COMPILER=${CC} \
