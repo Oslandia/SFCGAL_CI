@@ -106,31 +106,31 @@ set(CGAL_3RD_PARTY_LIBRARIES CGAL::CGAL CGAL::CGAL_Core)
 
 include_directories( ${CMAKE_BINARY_DIR}/include )
 
-# --- copy public headers to build/include so clang-tidy finds them early ---
-set(_sfcgal_hdr_src_dirs
-  "${CMAKE_SOURCE_DIR}/include"
-  "${CMAKE_SOURCE_DIR}/src"
-)
+# # --- copy public headers to build/include so clang-tidy finds them early ---
+# set(_sfcgal_hdr_src_dirs
+#   "${CMAKE_SOURCE_DIR}/include"
+#   "${CMAKE_SOURCE_DIR}/src"
+# )
 
-foreach(_d IN LISTS _sfcgal_hdr_src_dirs)
-  if(EXISTS "${_d}")
-    file(GLOB_RECURSE _hdrs
-      "${_d}/*.h"
-      "${_d}/*.hpp"
-      "${_d}/*.inl"
-    )
-    if(_hdrs)
-      message(STATUS "Copying headers from ${_d} to ${CMAKE_BINARY_DIR}/include/SFCGAL")
-      foreach(_h IN LISTS _hdrs)
-	# preserve relative layout under build/include/SFCGAL
-        file(RELATIVE_PATH _rel "${_d}" "${_h}")
-	get_filename_component(_dest_dir "${CMAKE_BINARY_DIR}/include/SFCGAL/${_rel}" DIRECTORY)
-        file(MAKE_DIRECTORY "${_dest_dir}")
-        file(COPY "${_h}" DESTINATION "${_dest_dir}")
-      endforeach()
-    endif()
-  endif()
-endforeach()
+# foreach(_d IN LISTS _sfcgal_hdr_src_dirs)
+#   if(EXISTS "${_d}")
+#     file(GLOB_RECURSE _hdrs
+#       "${_d}/*.h"
+#       "${_d}/*.hpp"
+#       "${_d}/*.inl"
+#     )
+#     if(_hdrs)
+#       message(STATUS "Copying headers from ${_d} to ${CMAKE_BINARY_DIR}/include/SFCGAL")
+#       foreach(_h IN LISTS _hdrs)
+# 	# preserve relative layout under build/include/SFCGAL
+#         file(RELATIVE_PATH _rel "${_d}" "${_h}")
+# 	get_filename_component(_dest_dir "${CMAKE_BINARY_DIR}/include/SFCGAL/${_rel}" DIRECTORY)
+#         file(MAKE_DIRECTORY "${_dest_dir}")
+#         file(COPY "${_h}" DESTINATION "${_dest_dir}")
+#       endforeach()
+#     endif()
+#   endif()
+# endforeach()
 # --------------------------------------------------------------------------
 
 
