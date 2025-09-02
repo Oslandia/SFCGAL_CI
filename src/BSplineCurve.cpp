@@ -1,5 +1,8 @@
 #include "SFCGAL/BSplineCurve.h"
 #include "SFCGAL/Exception.h"
+#include "SFCGAL/GeometryVisitor.h"
+#include "SFCGAL/config.h"
+#include <CGAL/number_utils.h>
 #include <algorithm>
 #include <cmath>
 
@@ -12,8 +15,8 @@ BSplineCurve::BSplineCurve(const std::vector<Point> &controlPoints,
     : _controlPoints(controlPoints), _degree(degree)
 {
   if (!_controlPoints.empty() && _degree >= _controlPoints.size()) {
-    throw InappropriateGeometryException(
-        "Degree must be less than the number of control points");
+    BOOST_THROW_EXCEPTION(
+        Exception("Degree must be less than the number of control points"));
   }
   generateUniformKnotVector();
 }
@@ -24,18 +27,13 @@ BSplineCurve::BSplineCurve(const std::vector<Point>  &controlPoints,
     : _controlPoints(controlPoints), _degree(degree), _knotVector(knotVector)
 {
   if (!_controlPoints.empty() && _degree >= _controlPoints.size()) {
-    throw InappropriateGeometryException(
-        "Degree must be less than the number of control points");
+    BOOST_THROW_EXCEPTION(
+        Exception("Degree must be less than the number of control points"));
   }
   if (!validateKnotVector()) {
-    throw InappropriateGeometryException("Invalid knot vector");
+    BOOST_THROW_EXCEPTION(Exception("Invalid knot vector"));
   }
 }
-
-BSplineCurve::BSplineCurve(const BSplineCurve &other) = default;
-
-auto
-BSplineCurve::operator=(const BSplineCurve &other) -> BSplineCurve & = default;
 
 auto
 BSplineCurve::geometryTypeId() const -> GeometryType
@@ -53,6 +51,18 @@ auto
 BSplineCurve::clone() const -> BSplineCurve *
 {
   return new BSplineCurve(*this);
+}
+
+void
+BSplineCurve::accept(GeometryVisitor &visitor)
+{
+  return visitor.visit(*this);
+}
+
+void
+BSplineCurve::accept(ConstGeometryVisitor &visitor) const
+{
+  return visitor.visit(*this);
 }
 
 auto
@@ -79,10 +89,20 @@ BSplineCurve::degree() const -> unsigned int
   return _degree;
 }
 
-auto
-BSplineCurve::numControlPoints() const -> size_t
+void
+BSplineCurve::setDegree(unsigned int newDegree)
 {
-  return _controlPoints.size();
+  if (!_controlPoints.empty() && newDegree >= _controlPoints.size()) {
+    BOOST_THROW_EXCEPTION(
+        Exception("Degree must be less than the number of control points"));
+  }
+
+  _degree = newDegree;
+
+  // Regenerate knot vector with new degree
+  if (!_knotVector.empty()) {
+    generateUniformKnotVector();
+  }
 }
 
 auto
@@ -110,6 +130,41 @@ auto
 BSplineCurve::controlPoints() const -> std::vector<Point>
 {
   return _controlPoints;
+}
+
+auto
+BSplineCurve::lerp(const Point &point1, const Point &point2, double parameter)
+    -> Point
+{
+  double coordX = (CGAL::to_double(point1.x()) * (1 - parameter)) +
+                  (CGAL::to_double(point2.x()) * parameter);
+  double coordY = (CGAL::to_double(point1.y()) * (1 - parameter)) +
+                  (CGAL::to_double(point2.y()) * parameter);
+
+  bool has3D = point1.is3D() && point2.is3D();
+  bool hasM  = point1.isMeasured() && point2.isMeasured();
+
+  CoordinateType coordType;
+  double         coordZ  = 0.0;
+  double         measure = 0.0;
+
+  if (has3D && hasM) {
+    coordType = COORDINATE_XYZM;
+    coordZ    = (CGAL::to_double(point1.z()) * (1 - parameter)) +
+             (CGAL::to_double(point2.z()) * parameter);
+    measure = (point1.m() * (1 - parameter)) + (point2.m() * parameter);
+  } else if (has3D) {
+    coordType = COORDINATE_XYZ;
+    coordZ    = (CGAL::to_double(point1.z()) * (1 - parameter)) +
+             (CGAL::to_double(point2.z()) * parameter);
+  } else if (hasM) {
+    coordType = COORDINATE_XYM;
+    measure   = (point1.m() * (1 - parameter)) + (point2.m() * parameter);
+  } else {
+    coordType = COORDINATE_XY;
+  }
+
+  return {coordX, coordY, coordZ, measure, coordType};
 }
 
 void
@@ -176,13 +231,12 @@ auto
 BSplineCurve::evaluate(double parameter) const -> Point
 {
   if (_controlPoints.empty()) {
-    throw InappropriateGeometryException(
-        "Cannot evaluate empty B-spline curve");
+    BOOST_THROW_EXCEPTION(Exception("Cannot evaluate empty B-spline curve"));
   }
 
   auto bounds = parameterBounds();
   if (parameter < bounds.first || parameter > bounds.second) {
-    throw InappropriateGeometryException("Parameter t is outside valid range");
+    BOOST_THROW_EXCEPTION(Exception("Parameter t is outside valid range"));
   }
 
   // De Boor's algorithm
@@ -194,37 +248,14 @@ BSplineCurve::evaluate(double parameter) const -> Point
     temp[pointIndex] = _controlPoints[span - _degree + pointIndex];
   }
 
-  // Apply de Boor's algorithm
+  // Apply de Boor's algorithm using lerp
   for (size_t level = 1; level <= _degree; ++level) {
     for (size_t pointIndex = _degree; pointIndex >= level; --pointIndex) {
       auto alpha = (parameter - _knotVector[span - _degree + pointIndex]) /
                    (_knotVector[span + pointIndex - level + 1] -
                     _knotVector[span - _degree + pointIndex]);
 
-      auto coordX = ((1 - alpha) * CGAL::to_double(temp[pointIndex - 1].x())) +
-                    (alpha * CGAL::to_double(temp[pointIndex].x()));
-      auto coordY = ((1 - alpha) * CGAL::to_double(temp[pointIndex - 1].y())) +
-                    (alpha * CGAL::to_double(temp[pointIndex].y()));
-
-      if (is3D()) {
-        auto coordZ =
-            ((1 - alpha) * CGAL::to_double(temp[pointIndex - 1].z())) +
-            (alpha * CGAL::to_double(temp[pointIndex].z()));
-        if (isMeasured()) {
-          auto measure = ((1 - alpha) * temp[pointIndex - 1].m()) +
-                         (alpha * temp[pointIndex].m());
-          temp[pointIndex] = Point(coordX, coordY, coordZ, measure);
-        } else {
-          temp[pointIndex] = Point(coordX, coordY, coordZ);
-        }
-      } else if (isMeasured()) {
-        temp[pointIndex] = Point(coordX, coordY);
-        auto measure     = ((1 - alpha) * temp[pointIndex - 1].m()) +
-                       (alpha * temp[pointIndex].m());
-        temp[pointIndex].setM(measure);
-      } else {
-        temp[pointIndex] = Point(coordX, coordY);
-      }
+      temp[pointIndex] = lerp(temp[pointIndex - 1], temp[pointIndex], alpha);
     }
   }
 
@@ -238,11 +269,19 @@ BSplineCurve::derivative(double parameter, unsigned int order) const -> Point
     return evaluate(parameter);
   }
 
+  CoordinateType coordType;
+  if (is3D() && isMeasured()) {
+    coordType = COORDINATE_XYZM;
+  } else if (is3D()) {
+    coordType = COORDINATE_XYZ;
+  } else if (isMeasured()) {
+    coordType = COORDINATE_XYM;
+  } else {
+    coordType = COORDINATE_XY;
+  }
+
   if (_degree < order) {
-    if (is3D()) {
-      return {0, 0, 0};
-    }
-    return {0, 0};
+    return Point(0.0, 0.0, 0.0, 0.0, coordType);
   }
 
   // Create derivative B-spline curve
@@ -258,14 +297,21 @@ BSplineCurve::derivative(double parameter, unsigned int order) const -> Point
                                   _controlPoints[index].y()) *
                   factor;
 
+    double deltaZ = 0.0;
+    double deltaM = 0.0;
+
     if (is3D()) {
-      auto deltaZ = CGAL::to_double(_controlPoints[index + 1].z() -
-                                    _controlPoints[index].z()) *
-                    factor;
-      derivativePoints.emplace_back(deltaX, deltaY, deltaZ);
-    } else {
-      derivativePoints.emplace_back(deltaX, deltaY);
+      deltaZ = CGAL::to_double(_controlPoints[index + 1].z() -
+                               _controlPoints[index].z()) *
+               factor;
     }
+
+    if (isMeasured()) {
+      deltaM =
+          (_controlPoints[index + 1].m() - _controlPoints[index].m()) * factor;
+    }
+
+    derivativePoints.emplace_back(deltaX, deltaY, deltaZ, deltaM, coordType);
   }
 
   // Create derivative knot vector
@@ -289,8 +335,7 @@ BSplineCurve::toLineString(unsigned int numSegments) const
   }
 
   if (numSegments < 2) {
-    throw InappropriateGeometryException(
-        "Number of segments must be at least 2");
+    BOOST_THROW_EXCEPTION(Exception("Number of segments must be at least 2"));
   }
 
   auto lineString = std::make_unique<LineString>();
@@ -355,8 +400,50 @@ BSplineCurve::setKnotVector(const std::vector<double> &knots)
 {
   _knotVector = knots;
   if (!validateKnotVector()) {
-    throw InappropriateGeometryException("Invalid knot vector");
+    BOOST_THROW_EXCEPTION(Exception("Invalid knot vector"));
   }
+}
+
+void
+BSplineCurve::addControlPoint(const Point &point)
+{
+  if (!_controlPoints.empty()) {
+    // Ensure dimensional consistency
+    bool needsZ = _controlPoints[0].is3D();
+    bool needsM = _controlPoints[0].isMeasured();
+
+    if (point.is3D() != needsZ || point.isMeasured() != needsM) {
+      BOOST_THROW_EXCEPTION(
+          Exception("Control point dimensions must be consistent"));
+    }
+  }
+
+  _controlPoints.push_back(point);
+
+  // Regenerate knot vector if uniform
+  if (!_knotVector.empty()) {
+    generateUniformKnotVector();
+  }
+}
+
+void
+BSplineCurve::removeControlPoint(size_t index)
+{
+  BOOST_ASSERT(index < _controlPoints.size());
+  _controlPoints.erase(_controlPoints.begin() + static_cast<ptrdiff_t>(index));
+
+  // Regenerate knot vector if uniform
+  if (!_knotVector.empty()) {
+    generateUniformKnotVector();
+  }
+}
+
+void
+BSplineCurve::clear()
+{
+  _controlPoints.clear();
+  _knotVector.clear();
+  _degree = 0;
 }
 
 auto
@@ -379,6 +466,72 @@ BSplineCurve::validateKnotVector() const -> bool
   }
 
   return true;
+}
+
+auto
+BSplineCurve::evaluateWithBasisFunctions(double parameter) const
+    -> std::pair<Point, std::vector<double>>
+{
+  if (_controlPoints.empty()) {
+    BOOST_THROW_EXCEPTION(Exception("Cannot evaluate empty B-spline curve"));
+  }
+
+  auto bounds = parameterBounds();
+  if (parameter < bounds.first || parameter > bounds.second) {
+    BOOST_THROW_EXCEPTION(Exception("Parameter t is outside valid range"));
+  }
+
+  size_t span = findSpan(parameter);
+
+  // Compute basis functions
+  std::vector<double> basisFunctions(_degree + 1);
+  std::vector<double> left(_degree + 1);
+  std::vector<double> right(_degree + 1);
+
+  basisFunctions[0] = 1.0;
+
+  for (size_t j = 1; j <= _degree; ++j) {
+    left[j]      = parameter - _knotVector[span + 1 - j];
+    right[j]     = _knotVector[span + j] - parameter;
+    double saved = 0.0;
+
+    for (size_t r = 0; r < j; ++r) {
+      double temp       = basisFunctions[r] / (right[r + 1] + left[j - r]);
+      basisFunctions[r] = saved + right[r + 1] * temp;
+      saved             = left[j - r] * temp;
+    }
+    basisFunctions[j] = saved;
+  }
+
+  // Compute curve point
+  CoordinateType coordType;
+  if (is3D() && isMeasured()) {
+    coordType = COORDINATE_XYZM;
+  } else if (is3D()) {
+    coordType = COORDINATE_XYZ;
+  } else if (isMeasured()) {
+    coordType = COORDINATE_XYM;
+  } else {
+    coordType = COORDINATE_XY;
+  }
+
+  double coordX = 0.0, coordY = 0.0, coordZ = 0.0, measure = 0.0;
+
+  for (size_t i = 0; i <= _degree; ++i) {
+    const Point &cp = _controlPoints[span - _degree + i];
+    coordX += CGAL::to_double(cp.x()) * basisFunctions[i];
+    coordY += CGAL::to_double(cp.y()) * basisFunctions[i];
+
+    if (is3D()) {
+      coordZ += CGAL::to_double(cp.z()) * basisFunctions[i];
+    }
+    if (isMeasured()) {
+      measure += cp.m() * basisFunctions[i];
+    }
+  }
+
+  return std::make_pair(Point(coordX, coordY, coordZ, measure, coordType),
+                        basisFunctions);
 }
 
 } // namespace SFCGAL

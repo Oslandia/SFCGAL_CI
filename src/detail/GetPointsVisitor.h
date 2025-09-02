@@ -45,6 +45,8 @@ public:
   visit(const TriangulatedSurface &g) override;
   void
   visit(const BezierCurve &g) override;
+  void
+  visit(const BSplineCurve &g) override;
 
 public:
   typedef std::vector<const Point *>::const_iterator const_iterator;

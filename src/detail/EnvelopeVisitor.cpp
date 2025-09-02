@@ -6,6 +6,7 @@
 #include "SFCGAL/detail/EnvelopeVisitor.h"
 #include "SFCGAL/algorithm/convexHull.h"
 
+#include "SFCGAL/BSplineCurve.h"
 #include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -120,6 +121,14 @@ EnvelopeVisitor::visit(const TriangulatedSurface &g)
 
 void
 EnvelopeVisitor::visit(const BezierCurve &g)
+{
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointAt(i));
+  }
+}
+
+void
+EnvelopeVisitor::visit(const BSplineCurve &g)
 {
   for (size_t i = 0; i < g.numControlPoints(); i++) {
     visit(g.controlPointAt(i));

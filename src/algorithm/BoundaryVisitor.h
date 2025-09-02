@@ -69,6 +69,8 @@ public:
   visit(const TriangulatedSurface &g) override;
   void
   visit(const BezierCurve &g) override;
+  void
+  visit(const BSplineCurve &g) override;
 
   /**
    * get the boundary

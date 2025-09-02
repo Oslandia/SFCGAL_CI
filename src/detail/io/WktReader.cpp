@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include "SFCGAL/BSplineCurve.h"
 #include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -128,6 +129,12 @@ WktReader::readGeometry() -> Geometry *
     readInnerBezierCurve(*g);
     return g.release();
   }
+
+  case TYPE_BSPLINECURVE: {
+    std::unique_ptr<BSplineCurve> g(new BSplineCurve());
+    readInnerBSplineCurve(*g);
+    return g.release();
+  }
   }
 
   BOOST_THROW_EXCEPTION(WktParseException("unexpected geometry"));
@@ -178,6 +185,10 @@ WktReader::readGeometryType() -> GeometryType
   if (_reader.imatch("BEZIERCURVE")) {
     // not official
     return TYPE_BEZIERCURVE;
+  }
+  if (_reader.imatch("BSPLINECURVE")) {
+    // not official
+    return TYPE_BSPLINECURVE;
   }
 
   std::ostringstream oss;
@@ -592,6 +603,56 @@ WktReader::readInnerBezierCurve(BezierCurve &g)
       break;
     }
   }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+}
+
+void
+WktReader::readInnerBSplineCurve(BSplineCurve &g)
+{
+  if (_reader.imatch("EMPTY")) {
+    return;
+  }
+
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  while (!_reader.eof()) {
+    Point point;
+    readPointCoordinate(point);
+    g.addControlPoint(point);
+
+    if (!_reader.match(',')) {
+      break;
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  if (!_reader.match(',')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  int degree;
+  if (!_reader.read(degree)) {
+    BOOST_THROW_EXCEPTION(
+        WktParseException("Expected degree value for BSplineCurve"));
+  }
+
+  if (degree < 0) {
+    BOOST_THROW_EXCEPTION(WktParseException("Degree cannot be negative"));
+  }
+
+  g.setDegree(static_cast<unsigned int>(degree));
 
   if (!_reader.match(')')) {
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));

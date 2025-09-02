@@ -49,6 +49,8 @@ public:
   visit(TriangulatedSurface &g) override;
   void
   visit(BezierCurve &g) override;
+  void
+  visit(BSplineCurve &g) override;
 };
 
 } // namespace SFCGAL

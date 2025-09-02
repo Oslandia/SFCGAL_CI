@@ -49,6 +49,8 @@ public:
   visit(TriangulatedSurface &g) = 0;
   virtual void
   visit(BezierCurve &g) = 0;
+  virtual void
+  visit(BSplineCurve &g) = 0;
 };
 
 /**
@@ -90,6 +92,8 @@ public:
   visit(const TriangulatedSurface &g) = 0;
   virtual void
   visit(const BezierCurve &g) = 0;
+  virtual void
+  visit(const BSplineCurve &g) = 0;
 };
 
 } // namespace SFCGAL

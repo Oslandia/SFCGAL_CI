@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/BoundaryVisitor.h"
 
+#include "SFCGAL/BSplineCurve.h"
 #include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -178,6 +179,24 @@ BoundaryVisitor::visit(const TriangulatedSurface &g)
 
 void
 BoundaryVisitor::visit(const BezierCurve &g)
+{
+  if (g.isEmpty()) {
+    _boundary.reset();
+    return;
+  }
+
+  if (g.startPoint().coordinate() == g.endPoint().coordinate()) {
+    _boundary.reset();
+  } else {
+    std::unique_ptr<MultiPoint> boundary(new MultiPoint);
+    boundary->addGeometry(g.startPoint());
+    boundary->addGeometry(g.endPoint());
+    _boundary = std::move(boundary);
+  }
+}
+
+void
+BoundaryVisitor::visit(const BSplineCurve &g)
 {
   if (g.isEmpty()) {
     _boundary.reset();

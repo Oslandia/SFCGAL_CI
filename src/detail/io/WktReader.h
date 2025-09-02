@@ -140,6 +140,12 @@ public:
   readInnerBezierCurve(BezierCurve &g);
 
   /**
+   * Read BSplineCurve content from wkt
+   */
+  void
+  readInnerBSplineCurve(BSplineCurve &g);
+
+  /**
    * Read coordinate from WKT
    * @todo ZM management
    */

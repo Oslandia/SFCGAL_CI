@@ -5,6 +5,7 @@
 
 #include "SFCGAL/Transform.h"
 
+#include "SFCGAL/BSplineCurve.h"
 #include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -119,6 +120,14 @@ Transform::visit(TriangulatedSurface &g)
 
 void
 Transform::visit(BezierCurve &g)
+{
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointAt(i));
+  }
+}
+
+void
+Transform::visit(BSplineCurve &g)
 {
   for (size_t i = 0; i < g.numControlPoints(); i++) {
     visit(g.controlPointAt(i));

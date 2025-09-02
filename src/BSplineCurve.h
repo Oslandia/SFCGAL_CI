@@ -70,7 +70,7 @@ public:
    * @brief Copy constructor
    * @param other Source curve to copy
    */
-  BSplineCurve(const BSplineCurve &other);
+  BSplineCurve(const BSplineCurve &other) = default;
 
   /**
    * @brief Assignment operator
@@ -78,12 +78,18 @@ public:
    * @return Reference to this curve
    */
   auto
-  operator=(const BSplineCurve &other) -> BSplineCurve &;
+  operator=(const BSplineCurve &other) -> BSplineCurve & = default;
 
   /**
    * @brief Virtual destructor
    */
   ~BSplineCurve() override = default;
+
+  void
+  accept(GeometryVisitor &visitor) override;
+
+  void
+  accept(ConstGeometryVisitor &visitor) const override;
 
   // Geometry interface
 
@@ -185,11 +191,22 @@ public:
   degree() const -> unsigned int;
 
   /**
+   * @brief Set curve degree
+   * @param newDegree New degree value
+   * @throws Exception if degree >= number of control points or invalid
+   */
+  void
+  setDegree(unsigned int newDegree);
+
+  /**
    * @brief Get number of control points
    * @return Number of control points
    */
   [[nodiscard]] auto
-  numControlPoints() const -> size_t override;
+  numControlPoints() const -> size_t override
+  {
+    return _controlPoints.size();
+  }
 
   /**
    * @brief Get control point at index (const)
@@ -226,6 +243,28 @@ public:
   controlPoints() const -> std::vector<Point> override;
 
   /**
+   * @brief Add control point to end
+   * @param point Control point to add
+   * @throws Exception if point dimensions inconsistent with existing points
+   */
+  void
+  addControlPoint(const Point &point);
+
+  /**
+   * @brief Remove control point at index
+   * @param index Index of control point to remove
+   * @throws Exception if index out of bounds
+   */
+  void
+  removeControlPoint(size_t index);
+
+  /**
+   * @brief Clear all control points and reset
+   */
+  void
+  clear();
+
+  /**
    * @brief Get the knot vector
    * @return Const reference to knot vector
    */
@@ -249,6 +288,19 @@ public:
    */
   void
   generateUniformKnotVector();
+
+  /**
+   * @brief Evaluate curve with basis functions for visualization
+   *
+   * This method returns both the evaluated point and the basis function values
+   * at the given parameter. Useful for visualization and debugging.
+   *
+   * @param parameter Parameter value within parameter bounds
+   * @return Pair containing the evaluated point and basis function values
+   */
+  [[nodiscard]] auto
+  evaluateWithBasisFunctions(double parameter) const
+      -> std::pair<Point, std::vector<double>>;
 
 protected:
   std::vector<Point>  _controlPoints; ///< Control points defining the curve
@@ -280,6 +332,16 @@ protected:
    */
   [[nodiscard]] auto
   validateKnotVector() const -> bool;
+
+  /**
+   * @brief Linear interpolation between two points
+   * @param point1 First point
+   * @param point2 Second point
+   * @param parameter Interpolation parameter [0,1]
+   * @return Interpolated point
+   */
+  [[nodiscard]] static auto
+  lerp(const Point &point1, const Point &point2, double parameter) -> Point;
 };
 
 } // namespace SFCGAL

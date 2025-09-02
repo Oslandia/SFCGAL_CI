@@ -5,6 +5,7 @@
 
 #include "SFCGAL/detail/ForceValidityVisitor.h"
 
+#include "SFCGAL/BSplineCurve.h"
 #include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -128,6 +129,15 @@ ForceValidityVisitor::visit(TriangulatedSurface &g)
 
 void
 ForceValidityVisitor::visit(BezierCurve &g)
+{
+  g.forceValidityFlag(valid_);
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointAt(i));
+  }
+}
+
+void
+ForceValidityVisitor::visit(BSplineCurve &g)
 {
   g.forceValidityFlag(valid_);
   for (size_t i = 0; i < g.numControlPoints(); i++) {

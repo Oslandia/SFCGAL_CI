@@ -50,6 +50,7 @@ class MultiSolid;
 
 // Curves
 class BezierCurve;
+class BSplineCurve;
 
 class Envelope;
 

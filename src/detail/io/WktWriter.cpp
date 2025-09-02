@@ -5,6 +5,7 @@
 
 #include "SFCGAL/detail/io/WktWriter.h"
 
+#include "SFCGAL/BSplineCurve.h"
 #include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryCollection.h"
@@ -99,6 +100,10 @@ WktWriter::writeRec(const Geometry &g)
 
   case TYPE_BEZIERCURVE:
     write(g.as<BezierCurve>());
+    return;
+
+  case TYPE_BSPLINECURVE:
+    write(g.as<BSplineCurve>());
     return;
   }
 
@@ -510,4 +515,42 @@ WktWriter::writeInner(const BezierCurve &g)
 
   _s << ")";
 }
+
+void
+WktWriter::write(const BSplineCurve &g)
+{
+  _s << "BSPLINECURVE ";
+  writeCoordinateType(g);
+
+  if (g.isEmpty()) {
+    _s << "EMPTY";
+    return;
+  }
+
+  writeInner(g);
+}
+
+void
+WktWriter::writeInner(const BSplineCurve &g)
+{
+  _s << "(";
+
+  _s << "(";
+
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    if (i != 0) {
+      _s << ",";
+    }
+    writeCoordinate(g.controlPointAt(i));
+  }
+
+  _s << ")";
+
+  _s << ",";
+
+  _s << g.degree();
+
+  _s << ")";
+}
+
 } // namespace SFCGAL::detail::io

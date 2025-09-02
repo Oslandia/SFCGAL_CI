@@ -5,6 +5,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "SFCGAL/BSplineCurve.h"
 #include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -103,6 +104,12 @@ public:
     type = "BezierCurve";
   }
 
+  void
+  visit(const BSplineCurve & /*g*/) override
+  {
+    type = "BSplineCurve";
+  }
+
   std::string type;
 };
 
@@ -181,4 +188,10 @@ BOOST_AUTO_TEST_CASE(testVisitBezierCurve)
 {
   BOOST_CHECK_EQUAL(getTypeWithVisitor<BezierCurve>(), "BezierCurve");
 }
+
+BOOST_AUTO_TEST_CASE(testVisitBSplineCurve)
+{
+  BOOST_CHECK_EQUAL(getTypeWithVisitor<BSplineCurve>(), "BSplineCurve");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

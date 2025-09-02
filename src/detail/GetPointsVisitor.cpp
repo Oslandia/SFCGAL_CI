@@ -5,6 +5,7 @@
 
 #include "SFCGAL/detail/GetPointsVisitor.h"
 
+#include "SFCGAL/BSplineCurve.h"
 #include "SFCGAL/BezierCurve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -117,6 +118,15 @@ GetPointsVisitor::visit(const TriangulatedSurface &g)
 
 void
 GetPointsVisitor::visit(const BezierCurve &g)
+{
+  auto linestring = g.toLineString();
+  for (size_t i = 0; i < linestring->numPoints(); i++) {
+    visit(linestring->pointN(i));
+  }
+}
+
+void
+GetPointsVisitor::visit(const BSplineCurve &g)
 {
   auto linestring = g.toLineString();
   for (size_t i = 0; i < linestring->numPoints(); i++) {

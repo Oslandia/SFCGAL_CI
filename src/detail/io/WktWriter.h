@@ -90,6 +90,11 @@ protected:
   void
   writeInner(const BezierCurve &g);
 
+  void
+  write(const BSplineCurve &g);
+  void
+  writeInner(const BSplineCurve &g);
+
   // for recursive call use
   void
   writeRec(const Geometry &g);
