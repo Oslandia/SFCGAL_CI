@@ -32,8 +32,8 @@ namespace algorithm {
 /**
  * @brief Check validity of a geometry
  */
-SFCGAL_API const Validity
-isValid(const Geometry &g, const double &toleranceAbs = 1e-9);
+SFCGAL_API auto
+isValid(const Geometry &g, const double &toleranceAbs = 1e-9) -> Validity;
 
 /**
  * Sets the geometry flag on a geometry and propagate to every internal

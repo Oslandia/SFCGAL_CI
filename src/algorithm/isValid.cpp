@@ -136,7 +136,7 @@ private:
 //}
 //
 auto
-isValid(const Point &p) -> const Validity
+isValid(const Point &p) -> Validity
 {
   if (p.isEmpty()) {
     return Validity::valid();
@@ -148,7 +148,7 @@ isValid(const Point &p) -> const Validity
 }
 
 auto
-isValid(const LineString &l, const double &toleranceAbs) -> const Validity
+isValid(const LineString &l, const double &toleranceAbs) -> Validity
 {
   if (l.isEmpty()) {
     return Validity::valid();
@@ -166,7 +166,7 @@ isValid(const LineString &l, const double &toleranceAbs) -> const Validity
 }
 
 auto
-isValid(const Polygon &p, const double &toleranceAbs) -> const Validity
+isValid(const Polygon &p, const double &toleranceAbs) -> Validity
 {
   if (p.isEmpty()) {
     return Validity::valid();
@@ -339,13 +339,13 @@ isValid(const Polygon &p, const double &toleranceAbs) -> const Validity
 }
 
 auto
-isValid(const Triangle &t, const double &toleranceAbs) -> const Validity
+isValid(const Triangle &t, const double &toleranceAbs) -> Validity
 {
   return isValid(t.toPolygon(), toleranceAbs);
 }
 
 auto
-isValid(const MultiLineString &ml, const double &toleranceAbs) -> const Validity
+isValid(const MultiLineString &ml, const double &toleranceAbs) -> Validity
 {
   if (ml.isEmpty()) {
     return Validity::valid();
@@ -367,7 +367,7 @@ isValid(const MultiLineString &ml, const double &toleranceAbs) -> const Validity
 }
 
 auto
-isValid(const MultiPolygon &mp, const double &toleranceAbs) -> const Validity
+isValid(const MultiPolygon &mp, const double &toleranceAbs) -> Validity
 {
   if (mp.isEmpty()) {
     return Validity::valid();
@@ -403,8 +403,7 @@ isValid(const MultiPolygon &mp, const double &toleranceAbs) -> const Validity
 }
 
 auto
-isValid(const GeometryCollection &gc, const double &toleranceAbs)
-    -> const Validity
+isValid(const GeometryCollection &gc, const double &toleranceAbs) -> Validity
 {
   if (gc.isEmpty()) {
     return Validity::valid();
@@ -427,7 +426,7 @@ isValid(const GeometryCollection &gc, const double &toleranceAbs)
 
 auto
 isValid(const TriangulatedSurface &tin, const SurfaceGraph &graph,
-        const double &toleranceAbs) -> const Validity
+        const double &toleranceAbs) -> Validity
 {
   if (tin.isEmpty()) {
     return Validity::valid();
@@ -456,8 +455,7 @@ isValid(const TriangulatedSurface &tin, const SurfaceGraph &graph,
 }
 
 auto
-isValid(const TriangulatedSurface &tin, const double &toleranceAbs)
-    -> const Validity
+isValid(const TriangulatedSurface &tin, const double &toleranceAbs) -> Validity
 {
   if (tin.isEmpty()) {
     return Validity::valid();
@@ -469,7 +467,7 @@ isValid(const TriangulatedSurface &tin, const double &toleranceAbs)
 
 auto
 isValid(const PolyhedralSurface &s, const SurfaceGraph &graph,
-        const double &toleranceAbs) -> const Validity
+        const double &toleranceAbs) -> Validity
 {
   if (s.isEmpty()) {
     return Validity::valid();
@@ -498,8 +496,7 @@ isValid(const PolyhedralSurface &s, const SurfaceGraph &graph,
 }
 
 auto
-isValid(const PolyhedralSurface &s, const double &toleranceAbs)
-    -> const Validity
+isValid(const PolyhedralSurface &s, const double &toleranceAbs) -> Validity
 {
   if (s.isEmpty()) {
     return Validity::valid();
@@ -510,7 +507,7 @@ isValid(const PolyhedralSurface &s, const double &toleranceAbs)
 }
 
 auto
-isValid(const Solid &solid, const double &toleranceAbs) -> const Validity
+isValid(const Solid &solid, const double &toleranceAbs) -> Validity
 {
   if (solid.isEmpty()) {
     return Validity::valid();
@@ -546,7 +543,7 @@ isValid(const Solid &solid, const double &toleranceAbs) -> const Validity
 }
 
 auto
-isValid(const MultiSolid &ms, const double &toleranceAbs) -> const Validity
+isValid(const MultiSolid &ms, const double &toleranceAbs) -> Validity
 {
   if (ms.isEmpty()) {
     return Validity::valid();
@@ -567,7 +564,7 @@ isValid(const MultiSolid &ms, const double &toleranceAbs) -> const Validity
 }
 
 auto
-isValid(const BezierCurve &bcurve, const double &toleranceAbs) -> const Validity
+isValid(const BezierCurve &bcurve, const double &toleranceAbs) -> Validity
 {
   if (bcurve.isValid()) {
     return Validity::valid();
@@ -580,7 +577,7 @@ isValid(const BezierCurve &bcurve, const double &toleranceAbs) -> const Validity
 }
 
 auto
-isValid(const Geometry &g, const double &toleranceAbs) -> const Validity
+isValid(const Geometry &g, const double &toleranceAbs) -> Validity
 {
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
