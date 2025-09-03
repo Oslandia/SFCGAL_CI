@@ -1,5 +1,6 @@
 #include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Exception.h"
+#include "SFCGAL/GeometryVisitor.h"
 #include <algorithm>
 #include <cmath>
 #include <numeric>
@@ -21,7 +22,7 @@ NURBSCurve::NURBSCurve(const std::vector<Point> &controlPoints,
     : BSplineCurve(controlPoints, degree), _weights(weights)
 {
   if (!validateWeights()) {
-    throw InappropriateGeometryException("Invalid weights for NURBS curve");
+    BOOST_THROW_EXCEPTION(Exception("Invalid weights for NURBS curve"));
   }
 }
 
@@ -31,20 +32,8 @@ NURBSCurve::NURBSCurve(const std::vector<Point> &controlPoints,
     : BSplineCurve(controlPoints, degree, knotVector), _weights(weights)
 {
   if (!validateWeights()) {
-    throw InappropriateGeometryException("Invalid weights for NURBS curve");
+    BOOST_THROW_EXCEPTION(Exception("Invalid weights for NURBS curve"));
   }
-}
-
-NURBSCurve::NURBSCurve(const NURBSCurve &other) = default;
-
-auto
-NURBSCurve::operator=(const NURBSCurve &other) -> NURBSCurve &
-{
-  if (this != &other) {
-    BSplineCurve::operator=(other);
-    _weights = other._weights;
-  }
-  return *this;
 }
 
 auto
@@ -65,16 +54,28 @@ NURBSCurve::clone() const -> NURBSCurve *
   return new NURBSCurve(*this);
 }
 
+void
+NURBSCurve::accept(GeometryVisitor &visitor)
+{
+  visitor.visit(*this);
+}
+
+void
+NURBSCurve::accept(ConstGeometryVisitor &visitor) const
+{
+  visitor.visit(*this);
+}
+
 auto
 NURBSCurve::evaluate(double parameter) const -> Point
 {
   if (_controlPoints.empty()) {
-    throw InappropriateGeometryException("Cannot evaluate empty NURBS curve");
+    BOOST_THROW_EXCEPTION(Exception("Cannot evaluate empty NURBS curve"));
   }
 
   auto bounds = parameterBounds();
   if (parameter < bounds.first || parameter > bounds.second) {
-    throw InappropriateGeometryException("Parameter t is outside valid range");
+    BOOST_THROW_EXCEPTION(Exception("Parameter t is outside valid range"));
   }
 
   // If all weights are uniform, fall back to B-spline evaluation
@@ -142,40 +143,46 @@ NURBSCurve::evaluateRational(double parameter) const -> Point
 
   // Project back to Euclidean space
   if (std::abs(temp[_degree].weight) < 1e-10) {
-    throw InappropriateGeometryException(
-        "Division by zero in NURBS evaluation");
+    BOOST_THROW_EXCEPTION(Exception("Division by zero in NURBS evaluation"));
   }
 
   double coordX = temp[_degree].weightedX / temp[_degree].weight;
   double coordY = temp[_degree].weightedY / temp[_degree].weight;
 
-  if (is3D()) {
-    double coordZ = temp[_degree].weightedZ / temp[_degree].weight;
-    if (isMeasured()) {
-      // Interpolate M values linearly
-      double segmentT = (parameter - _knotVector[span]) /
-                        (_knotVector[span + 1] - _knotVector[span]);
-      size_t idx1    = span - _degree;
-      size_t idx2    = std::min(idx1 + 1, _controlPoints.size() - 1);
-      double measure = ((1 - segmentT) * _controlPoints[idx1].m()) +
-                       (segmentT * _controlPoints[idx2].m());
-      return {coordX, coordY, coordZ, measure};
-    }
-    return {coordX, coordY, coordZ};
-  }
-  if (isMeasured()) {
+  // Use CoordinateType like BezierCurve
+  CoordinateType coordType;
+  double         coordZ  = 0.0;
+  double         measure = 0.0;
+
+  bool has3D = is3D();
+  bool hasM  = isMeasured();
+
+  if (has3D && hasM) {
+    coordType = COORDINATE_XYZM;
+    coordZ    = temp[_degree].weightedZ / temp[_degree].weight;
+    // Interpolate M values linearly
     double segmentT = (parameter - _knotVector[span]) /
                       (_knotVector[span + 1] - _knotVector[span]);
-    size_t idx1    = span - _degree;
-    size_t idx2    = std::min(idx1 + 1, _controlPoints.size() - 1);
-    double measure = ((1 - segmentT) * _controlPoints[idx1].m()) +
-                     (segmentT * _controlPoints[idx2].m());
-    auto resultPoint = Point(coordX, coordY);
-    resultPoint.setM(measure);
-    return resultPoint;
+    size_t idx1 = span - _degree;
+    size_t idx2 = std::min(idx1 + 1, _controlPoints.size() - 1);
+    measure     = ((1 - segmentT) * _controlPoints[idx1].m()) +
+              (segmentT * _controlPoints[idx2].m());
+  } else if (has3D) {
+    coordType = COORDINATE_XYZ;
+    coordZ    = temp[_degree].weightedZ / temp[_degree].weight;
+  } else if (hasM) {
+    coordType       = COORDINATE_XYM;
+    double segmentT = (parameter - _knotVector[span]) /
+                      (_knotVector[span + 1] - _knotVector[span]);
+    size_t idx1 = span - _degree;
+    size_t idx2 = std::min(idx1 + 1, _controlPoints.size() - 1);
+    measure     = ((1 - segmentT) * _controlPoints[idx1].m()) +
+              (segmentT * _controlPoints[idx2].m());
+  } else {
+    coordType = COORDINATE_XY;
   }
 
-  return {coordX, coordY};
+  return {coordX, coordY, coordZ, measure, coordType};
 }
 
 auto
@@ -218,13 +225,31 @@ NURBSCurve::derivative(double parameter, unsigned int order) const -> Point
   double deltaY =
       CGAL::to_double(derivative2.y() - derivative1.y()) / (2 * stepSize);
 
-  if (is3D()) {
-    double deltaZ =
+  // Use CoordinateType approach like BezierCurve
+  CoordinateType coordType;
+  double         deltaZ = 0.0;
+  double         deltaM = 0.0;
+
+  bool has3D = is3D();
+  bool hasM  = isMeasured();
+
+  if (has3D && hasM) {
+    coordType = COORDINATE_XYZM;
+    deltaZ =
         CGAL::to_double(derivative2.z() - derivative1.z()) / (2 * stepSize);
-    return {deltaX, deltaY, deltaZ};
+    deltaM = (derivative2.m() - derivative1.m()) / (2 * stepSize);
+  } else if (has3D) {
+    coordType = COORDINATE_XYZ;
+    deltaZ =
+        CGAL::to_double(derivative2.z() - derivative1.z()) / (2 * stepSize);
+  } else if (hasM) {
+    coordType = COORDINATE_XYM;
+    deltaM    = (derivative2.m() - derivative1.m()) / (2 * stepSize);
+  } else {
+    coordType = COORDINATE_XY;
   }
 
-  return {deltaX, deltaY};
+  return {deltaX, deltaY, deltaZ, deltaM, coordType};
 }
 
 auto
@@ -281,8 +306,7 @@ NURBSCurve::computeRationalDerivative(double parameter) const -> Point
   }
 
   if (std::abs(weight) < 1e-10) {
-    throw InappropriateGeometryException(
-        "Division by zero in NURBS derivative");
+    BOOST_THROW_EXCEPTION(Exception("Division by zero in NURBS derivative"));
   }
 
   // Apply quotient rule
@@ -294,14 +318,32 @@ NURBSCurve::computeRationalDerivative(double parameter) const -> Point
       ((derivativeWeightedY * weight) - (weightedY * derivativeWeight)) /
       weightSquared;
 
-  if (is3D()) {
-    double deltaZ =
-        ((derivativeWeightedZ * weight) - (weightedZ * derivativeWeight)) /
-        weightSquared;
-    return {deltaX, deltaY, deltaZ};
+  // Use CoordinateType approach
+  CoordinateType coordType;
+  double         deltaZ = 0.0;
+  double         deltaM = 0.0;
+
+  bool has3D = is3D();
+  bool hasM  = isMeasured();
+
+  if (has3D && hasM) {
+    coordType = COORDINATE_XYZM;
+    deltaZ = ((derivativeWeightedZ * weight) - (weightedZ * derivativeWeight)) /
+             weightSquared;
+    // For M coordinate, use linear interpolation of derivatives
+    deltaM = 0.0; // Simplified for now
+  } else if (has3D) {
+    coordType = COORDINATE_XYZ;
+    deltaZ = ((derivativeWeightedZ * weight) - (weightedZ * derivativeWeight)) /
+             weightSquared;
+  } else if (hasM) {
+    coordType = COORDINATE_XYM;
+    deltaM    = 0.0; // Simplified for now
+  } else {
+    coordType = COORDINATE_XY;
   }
 
-  return {deltaX, deltaY};
+  return {deltaX, deltaY, deltaZ, deltaM, coordType};
 }
 
 void
@@ -338,8 +380,7 @@ NURBSCurve::computeBasisDerivatives(
 {
   // Simplified version for first derivative only
   if (order != 1) {
-    throw InappropriateGeometryException(
-        "Only first derivative is implemented");
+    BOOST_THROW_EXCEPTION(Exception("Only first derivative is implemented"));
   }
 
   derivativeBasisFunctions.resize(_degree + 1, 0.0);
@@ -416,7 +457,7 @@ NURBSCurve::setWeights(const std::vector<double> &weights)
 {
   _weights = weights;
   if (!validateWeights()) {
-    throw InappropriateGeometryException("Invalid weights for NURBS curve");
+    BOOST_THROW_EXCEPTION(Exception("Invalid weights for NURBS curve"));
   }
 }
 
@@ -432,7 +473,7 @@ NURBSCurve::setWeight(size_t index, double weight)
 {
   BOOST_ASSERT(index < _weights.size());
   if (weight <= 0.0) {
-    throw InappropriateGeometryException("NURBS weights must be positive");
+    BOOST_THROW_EXCEPTION(Exception("NURBS weights must be positive"));
   }
   _weights[index] = weight;
 }
@@ -485,7 +526,7 @@ NURBSCurve::insertKnot(double parameter)
 {
   auto bounds = parameterBounds();
   if (parameter < bounds.first || parameter > bounds.second) {
-    throw InappropriateGeometryException("Knot value outside valid range");
+    BOOST_THROW_EXCEPTION(Exception("Knot value outside valid range"));
   }
 
   size_t span = findSpan(parameter);
@@ -526,18 +567,39 @@ NURBSCurve::insertKnot(double parameter)
     double newY =
         (((1 - alpha) * weightedY1) + (alpha * weightedY2)) / newWeight;
 
-    if (is3D()) {
+    // Use CoordinateType approach like BezierCurve
+    CoordinateType coordType;
+    double         newZ = 0.0;
+    double         newM = 0.0;
+
+    bool has3D = is3D();
+    bool hasM  = isMeasured();
+
+    if (has3D && hasM) {
+      coordType = COORDINATE_XYZM;
       double weightedZ1 =
           CGAL::to_double(_controlPoints[idx - 1].z()) * _weights[idx - 1];
       double weightedZ2 =
           CGAL::to_double(_controlPoints[idx].z()) * _weights[idx];
-      double newZ =
-          (((1 - alpha) * weightedZ1) + (alpha * weightedZ2)) / newWeight;
-      temp[index] = Point(newX, newY, newZ);
+      newZ = (((1 - alpha) * weightedZ1) + (alpha * weightedZ2)) / newWeight;
+      newM = ((1 - alpha) * _controlPoints[idx - 1].m()) +
+             (alpha * _controlPoints[idx].m());
+    } else if (has3D) {
+      coordType = COORDINATE_XYZ;
+      double weightedZ1 =
+          CGAL::to_double(_controlPoints[idx - 1].z()) * _weights[idx - 1];
+      double weightedZ2 =
+          CGAL::to_double(_controlPoints[idx].z()) * _weights[idx];
+      newZ = (((1 - alpha) * weightedZ1) + (alpha * weightedZ2)) / newWeight;
+    } else if (hasM) {
+      coordType = COORDINATE_XYM;
+      newM      = ((1 - alpha) * _controlPoints[idx - 1].m()) +
+             (alpha * _controlPoints[idx].m());
     } else {
-      temp[index] = Point(newX, newY);
+      coordType = COORDINATE_XY;
     }
 
+    temp[index]        = Point(newX, newY, newZ, newM, coordType);
     tempWeights[index] = newWeight;
   }
 
@@ -606,17 +668,16 @@ NURBSCurve::createCircularArc(const Point &center, double radius,
   double segmentAngle = angleSpan / static_cast<double>(numSegments);
   double weightValue  = std::cos(segmentAngle / 2);
 
+  CoordinateType coordType = is3D ? COORDINATE_XYZ : COORDINATE_XY;
+
   for (int index = 0; index <= 2 * numSegments; ++index) {
     double angle =
         startAngle + ((static_cast<double>(index) * segmentAngle) / 2);
     double coordX = CGAL::to_double(center.x()) + (radius * std::cos(angle));
     double coordY = CGAL::to_double(center.y()) + (radius * std::sin(angle));
+    double coordZ = is3D ? CGAL::to_double(center.z()) : 0.0;
 
-    if (is3D) {
-      controlPoints.emplace_back(coordX, coordY, CGAL::to_double(center.z()));
-    } else {
-      controlPoints.emplace_back(coordX, coordY);
-    }
+    controlPoints.emplace_back(coordX, coordY, coordZ, 0.0, coordType);
 
     // Weights: 1 for endpoints, w for intermediate points
     weights.emplace_back((index % 2 == 0) ? 1.0 : weightValue);
@@ -655,6 +716,41 @@ NURBSCurve::validateWeights() const -> bool
   // All weights must be positive
   return std::all_of(_weights.begin(), _weights.end(),
                      [](double weightValue) { return weightValue > 0.0; });
+}
+
+auto
+NURBSCurve::lerp(const Point &point1, const Point &point2, double parameter)
+    -> Point
+{
+  double coordX = (CGAL::to_double(point1.x()) * (1 - parameter)) +
+                  (CGAL::to_double(point2.x()) * parameter);
+  double coordY = (CGAL::to_double(point1.y()) * (1 - parameter)) +
+                  (CGAL::to_double(point2.y()) * parameter);
+
+  bool has3D = point1.is3D() && point2.is3D();
+  bool hasM  = point1.isMeasured() && point2.isMeasured();
+
+  CoordinateType coordType;
+  double         coordZ  = 0.0;
+  double         measure = 0.0;
+
+  if (has3D && hasM) {
+    coordType = COORDINATE_XYZM;
+    coordZ    = (CGAL::to_double(point1.z()) * (1 - parameter)) +
+             (CGAL::to_double(point2.z()) * parameter);
+    measure = (point1.m() * (1 - parameter)) + (point2.m() * parameter);
+  } else if (has3D) {
+    coordType = COORDINATE_XYZ;
+    coordZ    = (CGAL::to_double(point1.z()) * (1 - parameter)) +
+             (CGAL::to_double(point2.z()) * parameter);
+  } else if (hasM) {
+    coordType = COORDINATE_XYM;
+    measure   = (point1.m() * (1 - parameter)) + (point2.m() * parameter);
+  } else {
+    coordType = COORDINATE_XY;
+  }
+
+  return {coordX, coordY, coordZ, measure, coordType};
 }
 
 } // namespace SFCGAL

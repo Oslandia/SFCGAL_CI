@@ -51,6 +51,9 @@ public:
   visit(BezierCurve &g) override;
   void
   visit(BSplineCurve &g) override;
+
+  void
+  visit(NURBSCurve &g) override;
 };
 
 } // namespace SFCGAL

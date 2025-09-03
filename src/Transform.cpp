@@ -13,6 +13,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -128,6 +129,14 @@ Transform::visit(BezierCurve &g)
 
 void
 Transform::visit(BSplineCurve &g)
+{
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointAt(i));
+  }
+}
+
+void
+Transform::visit(NURBSCurve &g)
 {
   for (size_t i = 0; i < g.numControlPoints(); i++) {
     visit(g.controlPointAt(i));

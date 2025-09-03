@@ -13,6 +13,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Triangle.h"
@@ -593,6 +594,74 @@ isValid(const BSplineCurve &bcurve, const double &toleranceAbs)
 }
 
 auto
+isValid(const NURBSCurve &nurbsCurve, const double &toleranceAbs)
+    -> const Validity
+{
+  if (nurbsCurve.isEmpty()) {
+    return Validity::valid();
+  }
+
+  // Check basic curve validity from BSplineCurve
+  if (!nurbsCurve.BSplineCurve::isValid()) {
+    return Validity::invalid("Base B-spline curve is invalid");
+  }
+
+  // Check NURBS-specific validity
+  if (!nurbsCurve.isValid()) {
+    return Validity::invalid(
+        "NURBS curve has invalid weights or inconsistent dimensions");
+  }
+
+  // Validate weights
+  const std::vector<double> &weights = nurbsCurve.weights();
+  if (weights.size() != nurbsCurve.numControlPoints()) {
+    return Validity::invalid(
+        "Number of weights does not match number of control points");
+  }
+
+  for (size_t i = 0; i < weights.size(); ++i) {
+    if (weights[i] <= 0.0) {
+      return Validity::invalid(
+          (boost::format("Weight at index %1% is non-positive: %2%") % i %
+           weights[i])
+              .str());
+    }
+    if (!std::isfinite(weights[i])) {
+      return Validity::invalid(
+          (boost::format("Weight at index %1% is not finite: %2%") % i %
+           weights[i])
+              .str());
+    }
+  }
+
+  // Validate dimensional consistency
+  bool first3D       = false;
+  bool firstMeasured = false;
+  bool firstSet      = false;
+
+  for (size_t i = 0; i < nurbsCurve.numControlPoints(); ++i) {
+    const Point &pt = nurbsCurve.controlPointAt(i);
+
+    if (!firstSet) {
+      first3D       = pt.is3D();
+      firstMeasured = pt.isMeasured();
+      firstSet      = true;
+    } else {
+      if (pt.is3D() != first3D) {
+        return Validity::invalid(
+            "Inconsistent 3D dimensions in control points");
+      }
+      if (pt.isMeasured() != firstMeasured) {
+        return Validity::invalid(
+            "Inconsistent measured dimensions in control points");
+      }
+    }
+  }
+
+  return Validity::valid();
+}
+
+auto
 isValid(const Geometry &g, const double &toleranceAbs) -> const Validity
 {
   switch (g.geometryTypeId()) {
@@ -637,6 +706,9 @@ isValid(const Geometry &g, const double &toleranceAbs) -> const Validity
 
   case TYPE_BSPLINECURVE:
     return isValid(g.as<BSplineCurve>(), toleranceAbs);
+
+  case TYPE_NURBSCURVE:
+    return isValid(g.as<NURBSCurve>(), toleranceAbs);
   }
 
   BOOST_THROW_EXCEPTION(Exception(

@@ -95,6 +95,23 @@ protected:
   void
   writeInner(const BSplineCurve &g);
 
+  /**
+   * Write vector of weights in WKT format: (w1, w2, w3, ...)
+   */
+  void
+  writeWeights(const std::vector<double> &weights);
+
+  /**
+   * Write vector of knots in WKT format: (k1, k2, k3, ...)
+   */
+  void
+  writeKnots(const std::vector<double> &knots);
+
+  void
+  write(const NURBSCurve &g);
+  void
+  writeInner(const NURBSCurve &g);
+
   // for recursive call use
   void
   writeRec(const Geometry &g);

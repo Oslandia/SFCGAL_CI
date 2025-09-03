@@ -44,6 +44,8 @@ public:
   visit(BezierCurve &g) override;
   void
   visit(BSplineCurve &g) override;
+  void
+  visit(NURBSCurve &g) override;
 
 private:
   bool valid_;

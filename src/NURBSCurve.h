@@ -28,7 +28,7 @@ namespace SFCGAL {
  * - Projective invariance
  *
  * @ingroup public_api
- * @since 2.0
+ * @since 2.3.0
  */
 class SFCGAL_API NURBSCurve : public BSplineCurve {
 public:
@@ -71,7 +71,7 @@ public:
    * @brief Copy constructor
    * @param other Source curve to copy
    */
-  NURBSCurve(const NURBSCurve &other);
+  NURBSCurve(const NURBSCurve &other) = default;
 
   /**
    * @brief Assignment operator
@@ -79,12 +79,19 @@ public:
    * @return Reference to this curve
    */
   auto
-  operator=(const NURBSCurve &other) -> NURBSCurve &;
+  operator=(const NURBSCurve &other) -> NURBSCurve & = default;
 
   /**
    * @brief Virtual destructor
    */
   ~NURBSCurve() override = default;
+
+  // Visitor pattern implementation
+  void
+  accept(GeometryVisitor &visitor) override;
+
+  void
+  accept(ConstGeometryVisitor &visitor) const override;
 
   // Geometry interface
 
@@ -292,6 +299,16 @@ private:
    */
   [[nodiscard]] auto
   validateWeights() const -> bool;
+
+  /**
+   * @brief Linear interpolation between two points using CoordinateType
+   * @param point1 First point
+   * @param point2 Second point
+   * @param parameter Interpolation parameter [0,1]
+   * @return Interpolated point
+   */
+  [[nodiscard]] static auto
+  lerp(const Point &point1, const Point &point2, double parameter) -> Point;
 };
 
 } // namespace SFCGAL

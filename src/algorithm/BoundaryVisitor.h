@@ -71,6 +71,8 @@ public:
   visit(const BezierCurve &g) override;
   void
   visit(const BSplineCurve &g) override;
+  void
+  visit(const NURBSCurve &g) override;
 
   /**
    * get the boundary

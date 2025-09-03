@@ -14,6 +14,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -104,6 +105,10 @@ WktWriter::writeRec(const Geometry &g)
 
   case TYPE_BSPLINECURVE:
     write(g.as<BSplineCurve>());
+    return;
+
+  case TYPE_NURBSCURVE:
+    write(g.as<NURBSCurve>());
     return;
   }
 
@@ -550,6 +555,76 @@ WktWriter::writeInner(const BSplineCurve &g)
 
   _s << g.degree();
 
+  _s << ")";
+}
+
+void
+WktWriter::write(const NURBSCurve &g)
+{
+  _s << "NURBSCURVE ";
+  writeCoordinateType(g);
+
+  if (g.isEmpty()) {
+    _s << "EMPTY";
+    return;
+  }
+
+  writeInner(g);
+}
+
+void
+WktWriter::writeInner(const NURBSCurve &g)
+{
+  _s << "(";
+
+  // Write control points
+  _s << "(";
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    if (i != 0) {
+      _s << ",";
+    }
+    writeCoordinate(g.controlPointAt(i));
+  }
+  _s << ")";
+
+  // Only write weights if the curve is rational (non-uniform weights)
+  if (g.isRational()) {
+    _s << ",";
+    writeWeights(g.weights());
+  }
+
+  // For now, don't write knot vectors to keep it simple
+  // This matches the PostGIS examples which rarely use custom knots
+
+  // Always write degree
+  _s << "," << g.degree();
+
+  _s << ")";
+}
+
+void
+WktWriter::writeWeights(const std::vector<double> &weights)
+{
+  _s << "(";
+  for (size_t i = 0; i < weights.size(); i++) {
+    if (i != 0) {
+      _s << ",";
+    }
+    _s << weights[i];
+  }
+  _s << ")";
+}
+
+void
+WktWriter::writeKnots(const std::vector<double> &knots)
+{
+  _s << "(";
+  for (size_t i = 0; i < knots.size(); i++) {
+    if (i != 0) {
+      _s << ",";
+    }
+    _s << knots[i];
+  }
   _s << ")";
 }
 

@@ -51,6 +51,7 @@ class MultiSolid;
 // Curves
 class BezierCurve;
 class BSplineCurve;
+class NURBSCurve;
 
 class Envelope;
 

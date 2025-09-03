@@ -15,6 +15,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -135,6 +136,12 @@ WktReader::readGeometry() -> Geometry *
     readInnerBSplineCurve(*g);
     return g.release();
   }
+
+  case TYPE_NURBSCURVE: {
+    std::unique_ptr<NURBSCurve> g(new NURBSCurve());
+    readInnerNURBSCurve(*g);
+    return g.release();
+  }
   }
 
   BOOST_THROW_EXCEPTION(WktParseException("unexpected geometry"));
@@ -189,6 +196,10 @@ WktReader::readGeometryType() -> GeometryType
   if (_reader.imatch("BSPLINECURVE")) {
     // not official
     return TYPE_BSPLINECURVE;
+  }
+
+  if (_reader.imatch("NURBSCURVE")) {
+    return TYPE_NURBSCURVE;
   }
 
   std::ostringstream oss;
@@ -659,6 +670,180 @@ WktReader::readInnerBSplineCurve(BSplineCurve &g)
   }
 }
 
+void
+WktReader::readInnerNURBSCurve(NURBSCurve &g)
+{
+  if (_reader.imatch("EMPTY")) {
+    return;
+  }
+
+  // Read control points
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  std::vector<Point> controlPoints;
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  while (!_reader.eof()) {
+    Point point;
+    readPointCoordinate(point);
+    controlPoints.push_back(point);
+
+    if (!_reader.match(',')) {
+      break;
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  // Parse optional elements after control points
+  std::vector<double> weights;
+  std::vector<double> knots;
+  unsigned int        degree =
+      controlPoints.empty()
+                 ? 0
+                 : static_cast<unsigned int>(controlPoints.size() - 1);
+
+  if (_reader.match(',')) {
+    _reader.begin(); // Save position
+
+    if (_reader.match('(')) {
+      _reader.rollback(); // Restore position
+
+      // Read first vector (could be weights or knots)
+      std::vector<double> firstVector = readWeightsVector();
+
+      if (_reader.match(',')) {
+        _reader.begin(); // Save position
+
+        if (_reader.match('(')) {
+          _reader.rollback(); // Restore position
+          // First was weights, second is knots
+          weights = firstVector;
+          knots   = readKnotsVector();
+
+          if (_reader.match(',')) {
+            degree = readDegree();
+          }
+        } else {
+          _reader.rollback(); // Restore position
+          // First was weights, next is degree
+          weights = firstVector;
+          degree  = readDegree();
+        }
+      } else {
+        // Only one vector provided - assume it's weights
+        weights = firstVector;
+      }
+    } else {
+      _reader.rollback(); // Restore position
+      // Direct degree
+      degree = readDegree();
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  // Validate knot vector if provided
+  if (!knots.empty() &&
+      !validateKnotVector(knots, controlPoints.size(), degree)) {
+    BOOST_THROW_EXCEPTION(
+        WktParseException("Invalid knot vector for NURBS curve"));
+  }
+
+  // Construct the NURBS curve
+  if (!knots.empty()) {
+    if (weights.empty()) {
+      weights = std::vector<double>(controlPoints.size(), 1.0);
+    }
+    g = NURBSCurve(controlPoints, degree, weights, knots);
+  } else if (!weights.empty()) {
+    g = NURBSCurve(controlPoints, degree, weights);
+  } else {
+    g = NURBSCurve(controlPoints, degree);
+  }
+}
+
+std::vector<double>
+WktReader::readWeightsVector()
+{
+  std::vector<double> weights;
+
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  while (!_reader.eof()) {
+    double weight;
+    if (!_reader.read(weight)) {
+      BOOST_THROW_EXCEPTION(WktParseException("Expected weight value"));
+    }
+
+    if (weight <= 0.0) {
+      BOOST_THROW_EXCEPTION(
+          WktParseException("NURBS weights must be positive"));
+    }
+
+    weights.push_back(weight);
+
+    if (!_reader.match(',')) {
+      break;
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  return weights;
+}
+
+std::vector<double>
+WktReader::readKnotsVector()
+{
+  std::vector<double> knots;
+
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  while (!_reader.eof()) {
+    double knot;
+    if (!_reader.read(knot)) {
+      BOOST_THROW_EXCEPTION(WktParseException("Expected knot value"));
+    }
+
+    knots.push_back(knot);
+
+    if (!_reader.match(',')) {
+      break;
+    }
+  }
+
+  if (!_reader.match(')')) {
+    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  return knots;
+}
+
+unsigned int
+WktReader::readDegree()
+{
+  unsigned int degree;
+  if (!_reader.read(degree)) {
+    BOOST_THROW_EXCEPTION(WktParseException("Expected degree value"));
+  }
+  return degree;
+}
+
 auto
 WktReader::readPointCoordinate(Point &p) -> bool
 {
@@ -720,6 +905,60 @@ WktReader::parseErrorMessage() -> std::string
   std::ostringstream oss;
   oss << "WKT parse error (" << _reader.context() << ")";
   return oss.str();
+}
+
+/// Helper functions for knot vector
+
+std::vector<double>
+WktReader::generateUniformKnots(size_t numControlPoints, unsigned int degree)
+{
+  if (numControlPoints == 0) {
+    return {};
+  }
+
+  size_t              knotCount = numControlPoints + degree + 1;
+  std::vector<double> knots(knotCount);
+
+  // Clamp knots at start
+  for (size_t i = 0; i <= degree; ++i) {
+    knots[i] = 0.0;
+  }
+
+  // Internal knots uniformly spaced
+  size_t segments = numControlPoints - degree;
+  for (size_t i = degree + 1; i < knotCount - degree - 1; ++i) {
+    knots[i] = static_cast<double>(i - degree) / static_cast<double>(segments);
+  }
+
+  // Clamp knots at end
+  for (size_t i = knotCount - degree - 1; i < knotCount; ++i) {
+    knots[i] = 1.0;
+  }
+
+  return knots;
+}
+
+bool
+WktReader::validateKnotVector(const std::vector<double> &knots,
+                              size_t numControlPoints, unsigned int degree)
+{
+  if (numControlPoints == 0) {
+    return knots.empty();
+  }
+
+  size_t expectedSize = numControlPoints + degree + 1;
+  if (knots.size() != expectedSize) {
+    return false;
+  }
+
+  // Check non-decreasing order
+  for (size_t i = 1; i < knots.size(); ++i) {
+    if (knots[i] < knots[i - 1]) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 } // namespace SFCGAL::detail::io

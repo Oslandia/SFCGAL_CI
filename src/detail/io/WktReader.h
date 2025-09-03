@@ -146,6 +146,32 @@ public:
   readInnerBSplineCurve(BSplineCurve &g);
 
   /**
+   * Read NURBSCurve content from wkt
+   * Supports syntax: NURBSCURVE((points), (weights), degree)
+   *                 NURBSCURVE((points), (weights), (knots), degree)
+   */
+  void
+  readInnerNURBSCurve(NURBSCurve &g);
+
+  /**
+   * Read vector of weights from WKT format: (w1, w2, w3, ...)
+   */
+  std::vector<double>
+  readWeightsVector();
+
+  /**
+   * Read vector of knots from WKT format: (k1, k2, k3, ...)
+   */
+  std::vector<double>
+  readKnotsVector();
+
+  /**
+   * Read degree value (unsigned integer)
+   */
+  unsigned int
+  readDegree();
+
+  /**
    * Read coordinate from WKT
    * @todo ZM management
    */
@@ -172,6 +198,19 @@ private:
    */
   std::string
   parseErrorMessage();
+
+  /**
+   * Generate uniform knot vector for given parameters
+   */
+  std::vector<double>
+  generateUniformKnots(size_t numControlPoints, unsigned int degree);
+
+  /**
+   * Validate knot vector for given parameters
+   */
+  bool
+  validateKnotVector(const std::vector<double> &knots, size_t numControlPoints,
+                     unsigned int degree);
 };
 
 } // namespace io

@@ -14,6 +14,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -132,6 +133,29 @@ EnvelopeVisitor::visit(const BSplineCurve &g)
 {
   for (size_t i = 0; i < g.numControlPoints(); i++) {
     visit(g.controlPointAt(i));
+  }
+}
+
+void
+EnvelopeVisitor::visit(const NURBSCurve &g)
+{
+  // Note: For precise bounds, we should evaluate the curve at critical points
+  // but control points provide a conservative bound
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointAt(i));
+  }
+
+  // Optionally, for better precision, sample curve at additional points
+  if (!g.isEmpty()) {
+    auto      bounds      = g.parameterBounds();
+    const int sampleCount = 20; // Reasonable sampling for envelope
+
+    for (int i = 0; i <= sampleCount; ++i) {
+      double t =
+          bounds.first + (bounds.second - bounds.first) * i / sampleCount;
+      Point samplePoint = g.evaluate(t);
+      visit(samplePoint);
+    }
   }
 }
 

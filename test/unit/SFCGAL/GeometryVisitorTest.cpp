@@ -13,6 +13,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -110,6 +111,12 @@ public:
     type = "BSplineCurve";
   }
 
+  void
+  visit(const NURBSCurve & /*g*/) override
+  {
+    type = "NURBSCurve";
+  }
+
   std::string type;
 };
 
@@ -192,6 +199,11 @@ BOOST_AUTO_TEST_CASE(testVisitBezierCurve)
 BOOST_AUTO_TEST_CASE(testVisitBSplineCurve)
 {
   BOOST_CHECK_EQUAL(getTypeWithVisitor<BSplineCurve>(), "BSplineCurve");
+}
+
+BOOST_AUTO_TEST_CASE(testVisitNURBSCurve)
+{
+  BOOST_CHECK_EQUAL(getTypeWithVisitor<NURBSCurve>(), "NURBSCurve");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

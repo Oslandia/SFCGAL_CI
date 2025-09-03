@@ -51,6 +51,8 @@ public:
   visit(BezierCurve &g) = 0;
   virtual void
   visit(BSplineCurve &g) = 0;
+  virtual void
+  visit(NURBSCurve &g) = 0;
 };
 
 /**
@@ -94,6 +96,8 @@ public:
   visit(const BezierCurve &g) = 0;
   virtual void
   visit(const BSplineCurve &g) = 0;
+  virtual void
+  visit(const NURBSCurve &g) = 0;
 };
 
 } // namespace SFCGAL

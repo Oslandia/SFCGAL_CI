@@ -13,6 +13,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -131,6 +132,25 @@ GetPointsVisitor::visit(const BSplineCurve &g)
   auto linestring = g.toLineString();
   for (size_t i = 0; i < linestring->numPoints(); i++) {
     visit(linestring->pointN(i));
+  }
+}
+
+void
+GetPointsVisitor::visit(const NURBSCurve &g)
+{
+  // Option 1: Return control points only (faster, less accurate)
+  /*
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointAt(i));
+  }
+  */
+
+  // Option 2: Return sampled curve points (more accurate representation)
+  if (!g.isEmpty()) {
+    auto linestring = g.toLineString(32); // Default tessellation
+    for (size_t i = 0; i < linestring->numPoints(); i++) {
+      visit(linestring->pointN(i));
+    }
   }
 }
 
