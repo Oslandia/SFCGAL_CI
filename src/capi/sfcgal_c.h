@@ -1089,7 +1089,7 @@ sfcgal_io_read_wkb(const char *str, size_t len);
  */
 SFCGAL_API void
 sfcgal_io_write_binary_prepared(const sfcgal_prepared_geometry_t *geom,
-                                char **buffer, size_t *);
+                                char **buffer, size_t *len);
 
 /**
  * Read a PreparedGeometry from a binary representation.
