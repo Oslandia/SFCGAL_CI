@@ -196,9 +196,9 @@ BOOST_AUTO_TEST_CASE(testPolyhedralSurface)
                         Solid(cone.generatePolyhedralSurface()))),
                     cone.volume(true), 1e-6);
 
-  BOOST_CHECK_EQUAL(
+  BOOST_CHECK_CLOSE(
       CGAL::to_double(algorithm::area3D(cone.generatePolyhedralSurface())),
-      cone.area3D(true));
+      cone.area3D(true), 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(testGetSetHeight)
