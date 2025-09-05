@@ -16,19 +16,20 @@ namespace SFCGAL {
 /**
  * @brief Non-Uniform Rational B-Spline (NURBS) curve implementation
  *
- * OGC/SQL-MM compliance: supports XY, Z, M, ZM dimensions.
- * Weights affect XYZ in homogeneous coordinates (x*w, y*w, z*w, w).
+ * OGC/SQL-MM compliant implementation supporting XY, Z, M, ZM dimensions.
+ * Weights affect XYZ coordinates in homogeneous space (x*w, y*w, z*w, w).
  * M coordinate is interpolated non-rationally through basis functions.
  *
- * Based on "The NURBS Book" by Piegl & Tiller formulations.
- * Uses Kernel::FT (Epeck) for numerical robustness.
+ * Based on "The NURBS Book" by Piegl & Tiller algorithms.
+ * Uses Kernel::FT (Exact Predicates Exact Constructions) for numerical
+ * robustness.
  *
  * @ingroup public_api
  * @since 2.3.0
  */
 class SFCGAL_API NURBSCurve : public Curve {
 public:
-  // Type aliases for clarity
+  // Type aliases for clarity and consistency
   using FT           = Kernel::FT;
   using ControlPoint = Point;
   using Weight       = FT;
@@ -36,30 +37,30 @@ public:
   using Parameter    = FT;
 
   /**
-   * @brief Knot vector generation methods
+   * @brief Knot vector generation methods for parameterization
    */
   enum class KnotMethod : std::uint8_t {
-    UNIFORM,      ///< Uniform knot spacing
-    CHORD_LENGTH, ///< Based on Euclidean distances
-    CENTRIPETAL   ///< Square root of chord length
+    UNIFORM,      ///< Equal knot spacing (fastest generation)
+    CHORD_LENGTH, ///< Based on Euclidean distances between points
+    CENTRIPETAL ///< Square root of chord length (often best shape preservation)
   };
 
   /**
-   * @brief End conditions for curve fitting
+   * @brief End conditions for curve fitting and interpolation
    */
   enum class EndCondition : std::uint8_t {
-    CLAMPED,  ///< Multiplicity degree+1 at ends
-    NATURAL,  ///< Minimal curvature (cubic spline)
-    PERIODIC, ///< Closed periodic curve
-    TANGENT   ///< Imposed tangent constraints
+    CLAMPED,  ///< Multiplicity degree+1 at curve ends (standard)
+    NATURAL,  ///< Minimal curvature conditions (smoother)
+    PERIODIC, ///< Closed periodic curve (continuous derivatives)
+    TANGENT   ///< User-specified tangent constraints at ends
   };
 
   /**
-   * @brief Fitting methods
+   * @brief Curve fitting methods
    */
   enum class FitMethod : std::uint8_t {
-    INTERPOLATE, ///< Pass exactly through points
-    APPROXIMATE  ///< Least squares fitting
+    INTERPOLATE, ///< Pass exactly through all points (higher degree possible)
+    APPROXIMATE  ///< Least squares approximation within tolerance (smoother)
   };
 
   // Constructors
@@ -71,8 +72,8 @@ public:
 
   /**
    * @brief Constructor with control points and uniform weights
-   * @param controlPoints Control points
-   * @param degree Curve degree
+   * @param controlPoints Control points defining curve shape
+   * @param degree Polynomial degree of curve (must be < controlPoints.size())
    * @param knotMethod Method for generating knot vector
    */
   NURBSCurve(const std::vector<Point> &controlPoints, unsigned int degree,
@@ -80,9 +81,9 @@ public:
 
   /**
    * @brief Constructor with control points and explicit weights
-   * @param controlPoints Control points
-   * @param weights Weight for each control point
-   * @param degree Curve degree
+   * @param controlPoints Control points defining curve shape
+   * @param weights Weight for each control point (must match size)
+   * @param degree Polynomial degree of curve
    * @param knotMethod Method for generating knot vector
    */
   NURBSCurve(const std::vector<Point> &controlPoints,
@@ -90,11 +91,11 @@ public:
              KnotMethod knotMethod = KnotMethod::CHORD_LENGTH);
 
   /**
-   * @brief Full constructor with all parameters
-   * @param controlPoints Control points
-   * @param weights Weights (empty for uniform)
-   * @param degree Curve degree
-   * @param knotVector Custom knot vector
+   * @brief Full constructor with all NURBS parameters
+   * @param controlPoints Control points defining curve shape
+   * @param weights Weights (empty for uniform weights = 1.0)
+   * @param degree Polynomial degree
+   * @param knotVector Custom knot vector (must satisfy m = n + p + 1)
    */
   NURBSCurve(const std::vector<Point> &controlPoints,
              const std::vector<FT> &weights, unsigned int degree,
@@ -116,19 +117,19 @@ public:
    */
   ~NURBSCurve() override = default;
 
-  // Factory methods
+  // Factory methods for common curve types
 
   /**
    * @brief Create from Bezier control points
    * @param controlPoints Bezier control points
-   * @return NURBS curve with Bezier knot vector
+   * @return NURBS curve with clamped knot vector [0,...,0,1,...,1]
    */
   static auto
   fromBezier(const std::vector<Point> &controlPoints)
       -> std::unique_ptr<NURBSCurve>;
 
   /**
-   * @brief Create from B-spline
+   * @brief Create from B-spline parameters
    * @param controlPoints B-spline control points
    * @param degree Spline degree
    * @param knots Knot vector
@@ -139,7 +140,7 @@ public:
               const std::vector<Knot> &knots) -> std::unique_ptr<NURBSCurve>;
 
   /**
-   * @brief Create uniform B-spline
+   * @brief Create uniform B-spline with standard parameterization
    * @param controlPoints Control points
    * @param degree Spline degree
    * @return NURBS curve with uniform knots and weights
@@ -149,13 +150,13 @@ public:
       -> std::unique_ptr<NURBSCurve>;
 
   /**
-   * @brief Create circular arc
-   * @param center Arc center
-   * @param radius Arc radius
+   * @brief Create exact circular arc representation
+   * @param center Arc center point
+   * @param radius Arc radius (must be positive)
    * @param startAngle Start angle in radians
    * @param endAngle End angle in radians
-   * @param normal Normal vector (for 3D arcs)
-   * @return Exact NURBS representation of arc
+   * @param normal Normal vector for 3D arcs (default Z-axis)
+   * @return Exact NURBS representation of circular arc
    */
   static auto
   createCircularArc(const Point &center, FT radius, FT startAngle, FT endAngle,
@@ -163,10 +164,10 @@ public:
       -> std::unique_ptr<NURBSCurve>;
 
   /**
-   * @brief Interpolate points exactly (Piegl & Tiller Ch.9)
-   * @param points Points to interpolate
-   * @param degree Curve degree
-   * @param knotMethod Parameterization method
+   * @brief Interpolate points exactly with specified continuity
+   * @param points Points to interpolate through
+   * @param degree Curve degree (will be reduced if too high)
+   * @param knotMethod Parameterization method for stability
    * @param endCondition Boundary conditions
    * @return Interpolating NURBS curve
    */
@@ -174,6 +175,19 @@ public:
   interpolateCurve(const std::vector<Point> &points, unsigned int degree = 3,
                    KnotMethod   knotMethod   = KnotMethod::CENTRIPETAL,
                    EndCondition endCondition = EndCondition::CLAMPED)
+      -> std::unique_ptr<NURBSCurve>;
+
+  /**
+   * @brief Approximate points within tolerance using least squares
+   * @param points Points to approximate
+   * @param degree Target curve degree
+   * @param tolerance Maximum allowed deviation
+   * @param maxControlPoints Maximum control points to use
+   * @return Approximating NURBS curve within tolerance
+   */
+  static auto
+  approximateCurve(const std::vector<Point> &points, unsigned int degree,
+                   FT tolerance, size_t maxControlPoints = 50)
       -> std::unique_ptr<NURBSCurve>;
 
   // Geometry interface implementation
@@ -316,11 +330,11 @@ public:
   [[nodiscard]] auto
   boundingBox() const -> std::pair<Point, Point> override;
 
-  // NURBS-specific access methods
+  // NURBS-specific access and manipulation methods
 
   /**
-   * @brief Get control points
-   * @return Vector of control points
+   * @brief Get control points array
+   * @return Const reference to control points vector
    */
   [[nodiscard]] auto
   controlPoints() const -> const std::vector<Point> &
@@ -329,39 +343,44 @@ public:
   }
 
   /**
-   * @brief Set control points
+   * @brief Set all control points with validation
    * @param controlPoints New control points
+   * @throws Exception if dimensionally inconsistent or degree constraint
+   * violated
    */
   void
   setControlPoints(const std::vector<Point> &controlPoints);
 
   /**
-   * @brief Get control point at index (non-const version)
-   * @param index Control point index
-   * @return Control point reference
+   * @brief Access control point for modification
+   * @param index Control point index (must be valid)
+   * @return Non-const reference to control point
+   * @throws Exception if index out of bounds
    */
   [[nodiscard]] auto
   controlPointN(size_t index) -> Point &;
 
   /**
-   * @brief Get control point at index
-   * @param index Control point index
-   * @return Control point
+   * @brief Access control point for reading
+   * @param index Control point index (must be valid)
+   * @return Const reference to control point
+   * @throws Exception if index out of bounds
    */
   [[nodiscard]] auto
   controlPointN(size_t index) const -> const Point &;
 
   /**
-   * @brief Set control point at index
+   * @brief Set individual control point with validation
    * @param index Control point index
    * @param point New control point value
+   * @throws Exception if index invalid or dimension mismatch
    */
   void
   setControlPoint(size_t index, const Point &point);
 
   /**
-   * @brief Get weights
-   * @return Vector of weights
+   * @brief Get weights array
+   * @return Const reference to weights vector
    */
   [[nodiscard]] auto
   weights() const -> const std::vector<FT> &
@@ -370,52 +389,55 @@ public:
   }
 
   /**
-   * @brief Set weights
-   * @param weights New weights
+   * @brief Set all weights with validation
+   * @param weights New weights (must be positive and match control point count)
+   * @throws Exception if invalid weights provided
    */
   void
   setWeights(const std::vector<FT> &weights);
 
   /**
-   * @brief Get weight at index
+   * @brief Get weight at specified index
    * @param index Weight index
-   * @return Weight value
+   * @return Weight value (1.0 if using uniform weights)
+   * @throws Exception if index out of bounds
    */
   [[nodiscard]] auto
   weight(size_t index) const -> FT;
 
   /**
-   * @brief Set weight at index
+   * @brief Set weight at specified index
    * @param index Weight index
-   * @param weight New weight value
+   * @param weight New weight value (must be positive)
+   * @throws Exception if index invalid or weight non-positive
    */
   void
   setWeight(size_t index, FT weight);
 
   /**
-   * @brief Check if curve is rational (non-uniform weights)
-   * @return true if weights are non-uniform
+   * @brief Check if curve uses non-uniform rational weights
+   * @return true if weights vary significantly from uniform
    */
   [[nodiscard]] auto
   isRational() const -> bool;
 
   /**
-   * @brief Check if curve is a Bezier curve
-   * @return true if knot vector has Bezier form
+   * @brief Check if curve is in Bezier form
+   * @return true if knot vector has Bezier structure [0,...,0,1,...,1]
    */
   [[nodiscard]] auto
   isBezier() const -> bool;
 
   /**
-   * @brief Check if curve is a B-spline (uniform weights)
-   * @return true if all weights are equal
+   * @brief Check if curve is B-spline (uniform weights)
+   * @return true if all weights are effectively equal
    */
   [[nodiscard]] auto
   isBSpline() const -> bool;
 
   /**
    * @brief Get knot vector
-   * @return Knot vector
+   * @return Const reference to knot vector
    */
   [[nodiscard]] auto
   knotVector() const -> const std::vector<Knot> &
@@ -424,30 +446,33 @@ public:
   }
 
   /**
-   * @brief Set knot vector
-   * @param knots New knot vector
+   * @brief Set knot vector with full validation
+   * @param knots New knot vector (must satisfy NURBS constraints)
+   * @throws Exception if knot vector invalid for current curve parameters
    */
   void
   setKnotVector(const std::vector<Knot> &knots);
 
   /**
-   * @brief Get knot at index
+   * @brief Get knot value at index
    * @param index Knot index
    * @return Knot value
+   * @throws Exception if index out of bounds
    */
   [[nodiscard]] auto
   knot(size_t index) const -> Knot;
 
   /**
-   * @brief Get knot multiplicity
-   * @param value Knot value to check
-   * @return Multiplicity of the knot
+   * @brief Count multiplicity of knot value
+   * @param value Knot value to count
+   * @param tolerance Tolerance for knot equality
+   * @return Number of occurrences of knot value
    */
   [[nodiscard]] auto
-  knotMultiplicity(Knot value) const -> unsigned int;
+  knotMultiplicity(Knot value, FT tolerance = FT(1e-10)) const -> unsigned int;
 
   /**
-   * @brief Get order (degree + 1)
+   * @brief Get curve order (degree + 1)
    * @return Curve order
    */
   [[nodiscard]] auto
@@ -467,7 +492,7 @@ public:
   }
 
   /**
-   * @brief Get number of knots
+   * @brief Get number of knots in vector
    * @return Knot count
    */
   [[nodiscard]] auto
@@ -476,37 +501,59 @@ public:
     return _knotVector.size();
   }
 
-  // NURBS operations
+  // Advanced NURBS operations
 
   /**
-   * @brief Insert a knot
+   * @brief Insert knot into curve without changing shape (Oslo algorithm)
    * @param parameter Knot value to insert
-   * @param times Number of times to insert
+   * @param times Number of insertions (limited by degree)
    * @return New curve with inserted knot
+   * @throws Exception if parameter outside knot span or too many insertions
    */
-  auto
-  insertKnot(Knot parameter, unsigned int times = 1)
+  [[nodiscard]] auto
+  insertKnot(Knot parameter, unsigned int times = 1) const
       -> std::unique_ptr<NURBSCurve>;
 
   /**
-   * @brief Refine knot vector
-   * @param newKnots Knots to insert
-   * @return Refined curve
+   * @brief Refine knot vector by adding multiple knots
+   * @param newKnots Sorted knots to insert
+   * @return Refined curve (shape unchanged)
+   * @throws Exception if knots not properly ordered
    */
-  auto
-  refineKnotVector(const std::vector<Knot> &newKnots)
+  [[nodiscard]] auto
+  refineKnotVector(const std::vector<Knot> &newKnots) const
       -> std::unique_ptr<NURBSCurve>;
 
   /**
-   * @brief Elevate degree
+   * @brief Elevate degree of curve (increases smoothness)
    * @param times Number of degree elevations
-   * @return Curve with elevated degree
+   * @return Curve with elevated degree (shape unchanged)
+   * @throws Exception if elevation would create too many control points
    */
-  auto
-  elevateDegree(unsigned int times = 1) -> std::unique_ptr<NURBSCurve>;
+  [[nodiscard]] auto
+  elevateDegree(unsigned int times = 1) const -> std::unique_ptr<NURBSCurve>;
 
   /**
-   * @brief Get fit points if curve was created by fitting
+   * @brief Reduce degree if possible without shape change
+   * @param tolerance Maximum allowed deviation
+   * @return Degree-reduced curve or nullptr if reduction impossible within
+   * tolerance
+   */
+  [[nodiscard]] auto
+  reduceDegree(FT tolerance = FT(1e-6)) const -> std::unique_ptr<NURBSCurve>;
+
+  /**
+   * @brief Remove unnecessary knots while preserving shape
+   * @param tolerance Maximum allowed deviation
+   * @return Simplified curve with fewer knots
+   */
+  [[nodiscard]] auto
+  removeKnots(FT tolerance = FT(1e-6)) const -> std::unique_ptr<NURBSCurve>;
+
+  // Fitting and approximation data access
+
+  /**
+   * @brief Get original fit points if curve was created by fitting
    * @return Original fit points (empty if not applicable)
    */
   [[nodiscard]] auto
@@ -516,8 +563,8 @@ public:
   }
 
   /**
-   * @brief Get fit tolerance if curve was created by fitting
-   * @return Fit tolerance (0 if exact interpolation)
+   * @brief Get fitting tolerance used
+   * @return Fit tolerance (0.0 for exact interpolation)
    */
   [[nodiscard]] auto
   fitTolerance() const -> FT
@@ -526,52 +573,100 @@ public:
   }
 
   /**
-   * @brief Validate NURBS data consistency
-   * @return <true if data is valid, the invalidity raeson>
+   * @brief Get start tangent constraint if specified
+   * @return Optional start tangent vector
+   */
+  [[nodiscard]] auto
+  startTangent() const -> const std::optional<Point> &
+  {
+    return _startTangent;
+  }
+
+  /**
+   * @brief Get end tangent constraint if specified
+   * @return Optional end tangent vector
+   */
+  [[nodiscard]] auto
+  endTangent() const -> const std::optional<Point> &
+  {
+    return _endTangent;
+  }
+
+  /**
+   * @brief Comprehensive NURBS data validation
+   * @return Pair of (is_valid, error_description)
    */
   [[nodiscard]] auto
   validateData() const -> std::pair<bool, std::string>;
 
-protected:
-  // Core NURBS data
-  std::vector<Point> _controlPoints; ///< Control points (XYZM)
-  std::vector<FT>    _weights;       ///< Weights (empty = uniform)
-  unsigned int       _degree{0};     ///< Polynomial degree
-  std::vector<Knot>  _knotVector;    ///< Non-decreasing knot vector
+  /**
+   * @brief Get detailed curve statistics for debugging
+   * @return Map of curve properties and values
+   */
+  [[nodiscard]] auto
+  getCurveStatistics() const -> std::map<std::string, double>;
 
-  // Optional fit data (AutoCAD compatibility)
-  std::vector<Point>   _fitPoints;           ///< Original fit points
-  FT                   _fitTolerance{FT(0)}; ///< Fit tolerance
+protected:
+  // Core NURBS data with proper encapsulation
+  std::vector<Point> _controlPoints; ///< Control points in curve space
+  std::vector<FT>    _weights;       ///< Weights (empty = all 1.0)
+  unsigned int       _degree{0};     ///< Polynomial degree
+  std::vector<Knot>  _knotVector;    ///< Non-decreasing knot sequence
+
+  // Optional fitting metadata for CAD compatibility
+  std::vector<Point>   _fitPoints;           ///< Original points if fitted
+  FT                   _fitTolerance{FT(0)}; ///< Fitting tolerance used
   std::optional<Point> _startTangent;        ///< Start tangent constraint
   std::optional<Point> _endTangent;          ///< End tangent constraint
 
-  // Helper methods
+  // Core algorithmic methods
 
   /**
-   * @brief Find knot span for parameter (Piegl-Tiller Algorithm A2.1)
-   * @param parameter Parameter value
+   * @brief Find knot span containing parameter (Algorithm A2.1)
+   * @param parameter Parameter value to locate
    * @return Knot span index
    */
   [[nodiscard]] auto
   findSpan(Parameter parameter) const -> size_t;
 
   /**
-   * @brief Compute basis function derivatives
-   * @param span Knot span
+   * @brief Compute basis functions and derivatives (Algorithm A2.3)
+   * @param span Knot span index
    * @param parameter Parameter value
-   * @param order Derivative order
-   * @return Matrix of derivatives
+   * @param maxDerivative Maximum derivative order needed
+   * @return Matrix [derivative_order][basis_function] of values
    */
   [[nodiscard]] auto
   basisFunctionDerivatives(size_t span, Parameter parameter,
-                           unsigned int order) const
+                           unsigned int maxDerivative) const
       -> std::vector<std::vector<FT>>;
 
   /**
-   * @brief Generate knot vector by method
-   * @param points Reference points
+   * @brief Evaluate curve using De Boor's algorithm for rational curves
+   * @param span Knot span containing parameter
+   * @param parameter Parameter value
+   * @return Point on curve
+   */
+  [[nodiscard]] auto
+  deBoorRational(size_t span, Parameter parameter) const -> Point;
+
+  /**
+   * @brief Compute curve derivatives up to specified order (Algorithm A4.2)
+   * @param parameter Evaluation parameter
+   * @param maxOrder Maximum derivative order
+   * @return Vector of derivatives [C(u), C'(u), C''(u), ...]
+   */
+  [[nodiscard]] auto
+  computeDerivatives(Parameter parameter, unsigned int maxOrder) const
+      -> std::vector<Point>;
+
+  // Utility methods for curve generation and validation
+
+  /**
+   * @brief Generate knot vector using specified method
+   * @param points Reference points for parameterization
    * @param degree Curve degree
-   * @param method Generation method
+   * @param method Knot generation method
    * @return Generated knot vector
    */
   static auto
@@ -579,63 +674,87 @@ protected:
                      KnotMethod method) -> std::vector<Knot>;
 
   /**
-   * @brief Check dimensional consistency of control points
-   * @return true if all points have same dimensions
-   */
-  [[nodiscard]] auto
-  checkDimensionalConsistency() const -> bool;
-
-  /**
-   * @brief De Boor's algorithm for rational evaluation
-   * @param span Knot span
-   * @param parameter Parameter value
-   * @return Evaluated point
-   */
-  [[nodiscard]] auto
-  deBoorRational(size_t span, Parameter parameter) const -> Point;
-
-  /**
    * @brief Compute parameter values for point sequence
    * @param points Points to parameterize
    * @param method Parameterization method
-   * @return Parameter values
+   * @return Normalized parameter values [0,1]
    */
   static auto
   computeParameters(const std::vector<Point> &points, KnotMethod method)
       -> std::vector<Parameter>;
 
   /**
-   * @brief Compute all derivatives up to order (NURBS Book A4.2)
-   * @param parameter Evaluation parameter
-   * @param maxOrder Maximum derivative order
-   * @return Vector [C(u), C'(u), C''(u), ..., C^(maxOrder)(u)]
+   * @brief Check dimensional consistency across all control points
+   * @return true if all points have same XYZ and M dimensions
    */
-  auto
-  derivativesAt(Parameter parameter, unsigned int maxOrder) const
-      -> std::vector<Point>;
+  [[nodiscard]] auto
+  checkDimensionalConsistency() const -> bool;
 
   /**
-   * @brief Setup collocation matrix for interpolation
-   * @param parameters Parameter values
-   * @param degree Curve degree
-   * @param knots Knot vector
-   * @return Collocation matrix
+   * @brief Validate complete NURBS data structure
+   * @param controlPoints Control points to validate
+   * @param weights Weights to validate
+   * @param degree Degree to validate
+   * @param knots Knot vector to validate
+   * @return Pair of (is_valid, detailed_error_message)
    */
   static auto
-  setupCollocationMatrix(const std::vector<Parameter> &parameters,
-                         unsigned int degree, const std::vector<Knot> &knots)
-      -> std::vector<std::vector<FT>>;
+  validateNURBSData(const std::vector<Point> &controlPoints,
+                    const std::vector<FT> &weights, unsigned int degree,
+                    const std::vector<Knot> &knots)
+      -> std::pair<bool, std::string>;
+
+  // Advanced mathematical operations
 
   /**
-   * @brief Solve linear system for interpolation
-   * @param matrix Coefficient matrix
-   * @param rightHandSide RHS vectors (one per dimension)
-   * @return Solution vectors
+   * @brief Compute arc length using adaptive quadrature
+   * @param startParam Start parameter
+   * @param endParam End parameter
+   * @param tolerance Integration tolerance
+   * @param maxDepth Maximum recursion depth
+   * @return Arc length between parameters
    */
-  static auto
-  solveLinearSystem(const std::vector<std::vector<FT>> &matrix,
-                    const std::vector<std::vector<FT>> &rightHandSide)
-      -> std::vector<std::vector<FT>>;
+  [[nodiscard]] auto
+  computeArcLength(Parameter startParam, Parameter endParam, FT tolerance,
+                   unsigned int maxDepth = 10) const -> FT;
+
+  /**
+   * @brief Find parameter corresponding to arc length using Newton-Raphson
+   * @param targetLength Target arc length from start
+   * @param tolerance Convergence tolerance
+   * @param maxIterations Maximum iterations for convergence
+   * @return Parameter value at specified arc length
+   */
+  [[nodiscard]] auto
+  findParameterByArcLength(FT targetLength, FT tolerance,
+                           unsigned int maxIterations = 100) const -> Parameter;
+
+  /**
+   * @brief Project point onto curve using Newton's method
+   * @param point Point to project
+   * @param tolerance Convergence tolerance
+   * @param maxIterations Maximum iterations
+   * @return Pair of (closest_point_on_curve, parameter_value)
+   */
+  [[nodiscard]] auto
+  projectPointToCurve(const Point &point, FT tolerance = FT(1e-9),
+                      unsigned int maxIterations = 50) const
+      -> std::pair<Point, Parameter>;
+
+  // Memory and performance optimization helpers
+
+  /**
+   * @brief Reserve appropriate capacity for internal vectors
+   * @param expectedSize Expected final size for optimization
+   */
+  void
+  reserveCapacity(size_t expectedSize);
+
+  /**
+   * @brief Clear all optional data to minimize memory usage
+   */
+  void
+  clearOptionalData();
 };
 
 } // namespace SFCGAL
