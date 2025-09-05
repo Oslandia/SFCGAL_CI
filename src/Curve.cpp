@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/Curve.h"
-#include "SFCGAL/Exception.h"
+#include "SFCGAL/Exception.h" // AJOUT : nécessaire pour BOOST_THROW_EXCEPTION
 
 namespace SFCGAL {
 

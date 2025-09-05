@@ -4,6 +4,7 @@
 #ifndef SFCGAL_CURVE_H
 #define SFCGAL_CURVE_H
 
+#include "SFCGAL/Exception.h"
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/LineString.h"
@@ -331,6 +332,74 @@ public:
    */
   [[nodiscard]] virtual auto
   boundingBox() const -> std::pair<Point, Point> = 0;
+
+  // NURBS-specific interface methods (virtual with default implementations)
+
+  /**
+   * @brief Get number of control points
+   * @return Control point count
+   * @throws Exception if not implemented for curve type
+   */
+  [[nodiscard]] virtual auto
+  numControlPoints() const -> size_t
+  {
+    BOOST_THROW_EXCEPTION(
+        Exception("numControlPoints() not supported for this curve type"));
+  }
+
+  /**
+   * @brief Check if curve uses non-uniform rational weights
+   * @return false for non-NURBS curves, true if NURBS with varying weights
+   * @throws Exception if not implemented for curve type
+   */
+  [[nodiscard]] virtual auto
+  isRational() const -> bool
+  {
+    BOOST_THROW_EXCEPTION(
+        Exception("isRational() not supported for this curve type"));
+  }
+
+  /**
+   * @brief Get weight at specified index
+   * @param index Weight index
+   * @return Weight value
+   * @throws Exception if not implemented for curve type or index out of bounds
+   */
+  [[nodiscard]] virtual auto
+  weight(size_t index) const -> FT
+  {
+    static_cast<void>(index); // Suppress unused parameter warning
+    BOOST_THROW_EXCEPTION(
+        Exception("weight() not supported for this curve type"));
+  }
+
+  /**
+   * @brief Access control point for reading
+   * @param index Control point index
+   * @return Const reference to control point
+   * @throws Exception if not implemented for curve type or index out of bounds
+   */
+  [[nodiscard]] virtual auto
+  controlPointN(size_t index) const -> const Point &
+  {
+    static_cast<void>(index); // Suppress unused parameter warning
+    BOOST_THROW_EXCEPTION(
+        Exception("controlPointN() not supported for this curve type"));
+  }
+
+  /**
+   * @brief Access control point for modification
+   * @param index Control point index
+   * @return Non-const reference to control point
+   * @throws Exception if not implemented for curve type or index out of bounds
+   */
+  [[nodiscard]] virtual auto
+  controlPointN(size_t index) -> Point &
+  {
+    static_cast<void>(index); // Suppress unused parameter warning
+    BOOST_THROW_EXCEPTION(
+        Exception("controlPointN() not supported for this curve type"));
+  }
 
   // Convenience methods (implemented in base class)
 

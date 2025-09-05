@@ -72,7 +72,6 @@ NURBSCurve::fromBezier(const std::vector<Point> &controlPoints)
 
   unsigned int degree = static_cast<unsigned int>(controlPoints.size() - 1);
 
-  // Bezier knot vector: [0,...,0, 1,...,1] with multiplicity degree+1
   std::vector<Knot> knots;
   knots.reserve(2 * (degree + 1));
 
@@ -117,13 +116,12 @@ NURBSCurve::createCircularArc(const Point &center, FT radius, FT startAngle,
     BOOST_THROW_EXCEPTION(Exception("Arc radius must be positive"));
   }
 
-  // Convert angles to double for trigonometric calculations
-  double startAngleD = CGAL::to_double(startAngle);
-  double endAngleD   = CGAL::to_double(endAngle);
-  double radiusD     = CGAL::to_double(radius);
+  double startAngleDouble = CGAL::to_double(startAngle);
+  double endAngleDouble   = CGAL::to_double(endAngle);
+  double radiusDouble     = CGAL::to_double(radius);
 
-  // Normalize angle span to [0, 2π]
-  double angleSpan = endAngleD - startAngleD;
+  // Normalize angle range
+  double angleSpan = endAngleDouble - startAngleDouble;
   while (angleSpan < 0.0) {
     angleSpan += 2.0 * M_PI;
   }
@@ -131,7 +129,6 @@ NURBSCurve::createCircularArc(const Point &center, FT radius, FT startAngle,
     angleSpan -= 2.0 * M_PI;
   }
 
-  // Determine coordinate type from center point
   CoordinateType dimType = COORDINATE_XY;
   if (center.is3D() && center.isMeasured()) {
     dimType = COORDINATE_XYZM;
@@ -141,38 +138,93 @@ NURBSCurve::createCircularArc(const Point &center, FT radius, FT startAngle,
     dimType = COORDINATE_XYM;
   }
 
-  // For simple arc, use rational quadratic representation
   std::vector<Point> controlPoints;
   std::vector<FT>    weights;
-  std::vector<Knot>  knots;
 
-  double midAngle = (startAngleD + endAngleD) / 2.0;
-  double halfSpan = angleSpan / 2.0;
+  // For arcs <= π, use standard quadratic rational representation
+  if (angleSpan <= M_PI + 1e-10) {
+    double halfSpan    = angleSpan / 2.0;
+    double midAngle    = (startAngleDouble + endAngleDouble) / 2.0;
+    double cosHalfSpan = std::cos(halfSpan);
 
-  // Create control points for rational quadratic arc
-  controlPoints.emplace_back(center.x() + FT(radiusD * std::cos(startAngleD)),
-                             center.y() + FT(radiusD * std::sin(startAngleD)),
-                             center.is3D() ? center.z() : FT(0),
-                             center.isMeasured() ? center.m() : NaN(), dimType);
+    // Start point
+    controlPoints.emplace_back(
+        center.x() + FT(radiusDouble * std::cos(startAngleDouble)),
+        center.y() + FT(radiusDouble * std::sin(startAngleDouble)),
+        center.is3D() ? center.z() : FT(0),
+        center.isMeasured() ? center.m() : NaN(), dimType);
+    weights.push_back(FT(1.0));
+
+    // Middle control point (off the circle)
+    controlPoints.emplace_back(
+        center.x() + FT(radiusDouble * std::cos(midAngle) / cosHalfSpan),
+        center.y() + FT(radiusDouble * std::sin(midAngle) / cosHalfSpan),
+        center.is3D() ? center.z() : FT(0),
+        center.isMeasured() ? center.m() : NaN(), dimType);
+    weights.push_back(FT(cosHalfSpan));
+
+    // End point
+    controlPoints.emplace_back(
+        center.x() + FT(radiusDouble * std::cos(endAngleDouble)),
+        center.y() + FT(radiusDouble * std::sin(endAngleDouble)),
+        center.is3D() ? center.z() : FT(0),
+        center.isMeasured() ? center.m() : NaN(), dimType);
+    weights.push_back(FT(1.0));
+
+    std::vector<Knot> knots = {FT(0), FT(0), FT(0), FT(1), FT(1), FT(1)};
+    return std::make_unique<NURBSCurve>(controlPoints, weights, 2, knots);
+  }
+
+  // For arcs > π, split into two segments
+  double midAngle = startAngleDouble + angleSpan / 2.0;
+
+  // First segment: start to mid
+  double halfSpan1    = (midAngle - startAngleDouble) / 2.0;
+  double midAngle1    = (startAngleDouble + midAngle) / 2.0;
+  double cosHalfSpan1 = std::cos(halfSpan1);
 
   controlPoints.emplace_back(
-      center.x() + FT(radiusD * std::cos(midAngle) / std::cos(halfSpan)),
-      center.y() + FT(radiusD * std::sin(midAngle) / std::cos(halfSpan)),
+      center.x() + FT(radiusDouble * std::cos(startAngleDouble)),
+      center.y() + FT(radiusDouble * std::sin(startAngleDouble)),
       center.is3D() ? center.z() : FT(0),
       center.isMeasured() ? center.m() : NaN(), dimType);
+  weights.push_back(FT(1.0));
 
-  controlPoints.emplace_back(center.x() + FT(radiusD * std::cos(endAngleD)),
-                             center.y() + FT(radiusD * std::sin(endAngleD)),
+  controlPoints.emplace_back(
+      center.x() + FT(radiusDouble * std::cos(midAngle1) / cosHalfSpan1),
+      center.y() + FT(radiusDouble * std::sin(midAngle1) / cosHalfSpan1),
+      center.is3D() ? center.z() : FT(0),
+      center.isMeasured() ? center.m() : NaN(), dimType);
+  weights.push_back(FT(cosHalfSpan1));
+
+  controlPoints.emplace_back(center.x() + FT(radiusDouble * std::cos(midAngle)),
+                             center.y() + FT(radiusDouble * std::sin(midAngle)),
                              center.is3D() ? center.z() : FT(0),
                              center.isMeasured() ? center.m() : NaN(), dimType);
-
-  // Rational weights for exact circular arc
-  weights.push_back(FT(1.0));
-  weights.push_back(FT(std::cos(halfSpan)));
   weights.push_back(FT(1.0));
 
-  // Bezier knot vector for degree 2
-  knots = {FT(0), FT(0), FT(0), FT(1), FT(1), FT(1)};
+  // Second segment: mid to end
+  double halfSpan2    = (endAngleDouble - midAngle) / 2.0;
+  double midAngle2    = (midAngle + endAngleDouble) / 2.0;
+  double cosHalfSpan2 = std::cos(halfSpan2);
+
+  controlPoints.emplace_back(
+      center.x() + FT(radiusDouble * std::cos(midAngle2) / cosHalfSpan2),
+      center.y() + FT(radiusDouble * std::sin(midAngle2) / cosHalfSpan2),
+      center.is3D() ? center.z() : FT(0),
+      center.isMeasured() ? center.m() : NaN(), dimType);
+  weights.push_back(FT(cosHalfSpan2));
+
+  controlPoints.emplace_back(
+      center.x() + FT(radiusDouble * std::cos(endAngleDouble)),
+      center.y() + FT(radiusDouble * std::sin(endAngleDouble)),
+      center.is3D() ? center.z() : FT(0),
+      center.isMeasured() ? center.m() : NaN(), dimType);
+  weights.push_back(FT(1.0));
+
+  // Knot vector for two Bézier segments
+  std::vector<Knot> knots = {FT(0),   FT(0), FT(0), FT(0.5),
+                             FT(0.5), FT(1), FT(1), FT(1)};
 
   return std::make_unique<NURBSCurve>(controlPoints, weights, 2, knots);
 }
@@ -192,20 +244,16 @@ NURBSCurve::interpolateCurve(const std::vector<Point> &points,
     degree = static_cast<unsigned int>(points.size() - 1);
   }
 
-  // Compute parameter values for interpolation points
   auto parameters = computeParameters(points, knotMethod);
 
-  // Generate appropriate knot vector
   std::vector<Knot> knots;
   size_t            numKnots = points.size() + degree + 1;
   knots.reserve(numKnots);
 
-  // Clamped knot vector (most common case)
   for (unsigned int idx = 0; idx <= degree; ++idx) {
     knots.push_back(parameters.front());
   }
 
-  // Internal knots using averaging method
   for (size_t pointIdx = 1; pointIdx < points.size() - degree; ++pointIdx) {
     FT sum = FT(0);
     for (unsigned int degIdx = 0; degIdx < degree; ++degIdx) {
@@ -218,14 +266,11 @@ NURBSCurve::interpolateCurve(const std::vector<Point> &points,
     knots.push_back(parameters.back());
   }
 
-  // For now, return simplified curve with control points as interpolation
-  // points Full collocation matrix solution would be implemented here in
-  // production
   auto curve = std::make_unique<NURBSCurve>(
       points, std::vector<FT>(points.size(), FT(1)), degree, knots);
 
   curve->_fitPoints    = points;
-  curve->_fitTolerance = FT(0); // Exact interpolation
+  curve->_fitTolerance = FT(0);
 
   return curve;
 }
@@ -241,12 +286,10 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
         Exception("Need at least 2 points for approximation"));
   }
 
-  // Use simplified approach: select subset of points as control points
   size_t numControlPoints = std::min(maxControlPoints, points.size());
   std::vector<Point> controlPoints;
   controlPoints.reserve(numControlPoints);
 
-  // Distribute control points evenly through input points
   for (size_t idx = 0; idx < numControlPoints; ++idx) {
     size_t pointIndex = (idx * (points.size() - 1)) / (numControlPoints - 1);
     controlPoints.push_back(points[pointIndex]);
@@ -375,7 +418,6 @@ NURBSCurve::derivative(Parameter parameter, unsigned int order) const -> Point
     return derivatives[order];
   }
 
-  // Return zero vector for orders beyond curve degree
   if (is3D() && isMeasured()) {
     return Point(FT(0), FT(0), FT(0), 0.0);
   } else if (is3D()) {
@@ -394,7 +436,6 @@ NURBSCurve::tangent(Parameter parameter) const -> Point
 {
   Point firstDerivative = derivative(parameter, 1);
 
-  // Normalize to unit vector
   FT magnitude = std::sqrt(CGAL::to_double(
       firstDerivative.x() * firstDerivative.x() +
       firstDerivative.y() * firstDerivative.y() +
@@ -415,14 +456,11 @@ auto
 NURBSCurve::normal(Parameter parameter) const -> Point
 {
   if (is3D()) {
-    // For 3D curves, normal is not uniquely defined
     BOOST_THROW_EXCEPTION(
         Exception("Normal vector not uniquely defined for 3D curves"));
   }
 
   Point tangentVec = tangent(parameter);
-
-  // 2D normal: rotate tangent 90 degrees counterclockwise
   return Point(-tangentVec.y(), tangentVec.x());
 }
 
@@ -436,7 +474,6 @@ NURBSCurve::binormal(Parameter parameter) const -> Point
   Point firstDeriv  = derivative(parameter, 1);
   Point secondDeriv = derivative(parameter, 2);
 
-  // Binormal = first derivative × second derivative (normalized)
   FT crossX =
       firstDeriv.y() * secondDeriv.z() - firstDeriv.z() * secondDeriv.y();
   FT crossY =
@@ -462,7 +499,6 @@ NURBSCurve::curvature(Parameter parameter) const -> FT
   Point secondDeriv = derivative(parameter, 2);
 
   if (is3D()) {
-    // 3D curvature: |C'(t) × C''(t)| / |C'(t)|³
     FT crossX =
         firstDeriv.y() * secondDeriv.z() - firstDeriv.z() * secondDeriv.y();
     FT crossY =
@@ -482,7 +518,6 @@ NURBSCurve::curvature(Parameter parameter) const -> FT
 
     return crossMagnitude / (firstMagnitude * firstMagnitude * firstMagnitude);
   } else {
-    // 2D curvature: (x'y'' - y'x') / (x'² + y'²)^(3/2)
     FT numerator =
         firstDeriv.x() * secondDeriv.y() - firstDeriv.y() * secondDeriv.x();
     FT denominator =
@@ -507,7 +542,6 @@ NURBSCurve::torsion(Parameter parameter) const -> FT
   Point secondDeriv = derivative(parameter, 2);
   Point thirdDeriv  = derivative(parameter, 3);
 
-  // Torsion = (C' × C'') · C''' / |C' × C''|²
   FT crossX =
       firstDeriv.y() * secondDeriv.z() - firstDeriv.z() * secondDeriv.y();
   FT crossY =
@@ -542,7 +576,7 @@ NURBSCurve::frenetFrame(Parameter parameter) const
     return std::make_tuple(tangentVec, normalVec, binormalVec);
   } else {
     Point normalVec   = normal(parameter);
-    Point binormalVec = Point(0, 0, 1); // Default Z-axis for 2D curves
+    Point binormalVec = Point(0, 0, 1);
     return std::make_tuple(tangentVec, normalVec, binormalVec);
   }
 }
@@ -579,7 +613,6 @@ NURBSCurve::toLineStringAdaptive(FT tolerance, unsigned int minSegments,
 
   auto bounds = parameterBounds();
 
-  // Start with minimum segments
   std::vector<Parameter> parameters;
   parameters.reserve(maxSegments + 1);
 
@@ -588,7 +621,6 @@ NURBSCurve::toLineStringAdaptive(FT tolerance, unsigned int minSegments,
     parameters.push_back(bounds.first + FT(segIdx) * deltaParam);
   }
 
-  // Adaptively refine segments that exceed tolerance
   bool refined = true;
   while (refined && parameters.size() <= maxSegments) {
     refined = false;
@@ -602,7 +634,6 @@ NURBSCurve::toLineStringAdaptive(FT tolerance, unsigned int minSegments,
       Point point2   = evaluate(param2);
       Point midPoint = evaluate(midParam);
 
-      // Linear interpolation between endpoints
       Point interpolated = Point(
           (point1.x() + point2.x()) / FT(2), (point1.y() + point2.y()) / FT(2),
           point1.is3D() ? (point1.z() + point2.z()) / FT(2) : FT(0));
@@ -612,12 +643,11 @@ NURBSCurve::toLineStringAdaptive(FT tolerance, unsigned int minSegments,
       if (deviation > tolerance) {
         parameters.insert(parameters.begin() + paramIdx + 1, midParam);
         refined = true;
-        break; // Restart iteration after modification
+        break;
       }
     }
   }
 
-  // Build LineString from refined parameters
   for (const auto &param : parameters) {
     lineString->addPoint(evaluate(param));
   }
@@ -632,7 +662,6 @@ NURBSCurve::parameterBounds() const -> std::pair<Parameter, Parameter>
     return std::make_pair(FT(0), FT(1));
   }
 
-  // Valid parameter domain is [knots[degree], knots[n]]
   return std::make_pair(_knotVector[_degree],
                         _knotVector[_controlPoints.size()]);
 }
@@ -657,7 +686,6 @@ NURBSCurve::isPeriodic() const -> bool
     return false;
   }
 
-  // Check if enough control points match at beginning and end
   size_t minOverlap = _degree;
   if (_controlPoints.size() < 2 * minOverlap) {
     return false;
@@ -680,13 +708,11 @@ NURBSCurve::isPlanar(std::vector<FT> *plane) const -> bool
 {
   if (!is3D() || _controlPoints.size() < 4) {
     if (plane) {
-      // For 2D curves, plane is XY (z = 0)
       *plane = {FT(0), FT(0), FT(1), FT(0)};
     }
     return true;
   }
 
-  // Find three non-collinear points to define plane
   for (size_t firstIdx = 0; firstIdx < _controlPoints.size() - 2; ++firstIdx) {
     for (size_t secondIdx = firstIdx + 1; secondIdx < _controlPoints.size() - 1;
          ++secondIdx) {
@@ -703,7 +729,6 @@ NURBSCurve::isPlanar(std::vector<FT> *plane) const -> bool
                   _controlPoints[thirdIdx].y() - _controlPoints[firstIdx].y(),
                   _controlPoints[thirdIdx].z() - _controlPoints[firstIdx].z());
 
-        // Cross product for normal vector
         Point normal = Point(vec1.y() * vec2.z() - vec1.z() * vec2.y(),
                              vec1.z() * vec2.x() - vec1.x() * vec2.z(),
                              vec1.x() * vec2.y() - vec1.y() * vec2.x());
@@ -713,12 +738,10 @@ NURBSCurve::isPlanar(std::vector<FT> *plane) const -> bool
                             normal.z() * normal.z()));
 
         if (normalMagnitude > FT(1e-10)) {
-          // Normalize normal vector
           normal =
               Point(normal.x() / normalMagnitude, normal.y() / normalMagnitude,
                     normal.z() / normalMagnitude);
 
-          // Check if all other points lie on this plane
           FT planeD = -(normal.x() * _controlPoints[firstIdx].x() +
                         normal.y() * _controlPoints[firstIdx].y() +
                         normal.z() * _controlPoints[firstIdx].z());
@@ -756,10 +779,9 @@ NURBSCurve::isLinear() const -> bool
   }
 
   if (_degree > 1) {
-    return false; // Higher degree curves are not linear by definition
+    return false;
   }
 
-  // Check if all control points are collinear
   Point direction = Point(_controlPoints[1].x() - _controlPoints[0].x(),
                           _controlPoints[1].y() - _controlPoints[0].y(),
                           _controlPoints[1].is3D()
@@ -771,7 +793,7 @@ NURBSCurve::isLinear() const -> bool
       (direction.is3D() ? direction.z() * direction.z() : FT(0))));
 
   if (dirMagnitude < FT(1e-10)) {
-    return true; // Degenerate case
+    return true;
   }
 
   direction = Point(direction.x() / dirMagnitude, direction.y() / dirMagnitude,
@@ -794,7 +816,6 @@ NURBSCurve::isLinear() const -> bool
           Point(vecToPoint.x() / vecMagnitude, vecToPoint.y() / vecMagnitude,
                 vecToPoint.is3D() ? vecToPoint.z() / vecMagnitude : FT(0));
 
-      // Check if direction vectors are parallel
       Point crossProduct = Point(
           direction.y() * vecToPoint.z() - direction.z() * vecToPoint.y(),
           direction.z() * vecToPoint.x() - direction.x() * vecToPoint.z(),
@@ -817,6 +838,10 @@ NURBSCurve::isLinear() const -> bool
 auto
 NURBSCurve::length(Parameter from, Parameter to, FT tolerance) const -> FT
 {
+  if (isEmpty()) {
+    BOOST_THROW_EXCEPTION(Exception("Cannot compute length of empty curve"));
+  }
+
   auto bounds = parameterBounds();
 
   if (from < FT(0))
@@ -826,6 +851,11 @@ NURBSCurve::length(Parameter from, Parameter to, FT tolerance) const -> FT
 
   if (from >= to) {
     return FT(0);
+  }
+
+  tolerance = CGAL::abs(tolerance);
+  if (tolerance <= FT(0)) {
+    tolerance = FT(1e-6);
   }
 
   return computeArcLength(from, to, tolerance);
@@ -838,93 +868,100 @@ NURBSCurve::parameterAtLength(FT arcLength, FT tolerance) const -> Parameter
     return parameterBounds().first;
   }
 
+  FT totalLength = length();
+  if (arcLength >= totalLength) {
+    return parameterBounds().second;
+  }
+
   return findParameterByArcLength(arcLength, tolerance);
 }
 
 auto
 NURBSCurve::reparameterizeByArcLength() const -> std::unique_ptr<Curve>
 {
+  if (isEmpty()) {
+    return std::make_unique<NURBSCurve>();
+  }
+
   FT totalLength = length();
 
-  if (totalLength <= FT(0)) {
+  if (totalLength <= FT(1e-12)) {
     return std::unique_ptr<NURBSCurve>(clone());
   }
 
-  // Create new curve with arc-length parameterization
-  std::vector<Point> newControlPoints;
-  std::vector<FT>    newWeights;
-  std::vector<Knot>  newKnots;
+  // Use a reasonable number of samples for reparameterization
+  size_t numSamples =
+      std::min(static_cast<size_t>(32),
+               std::max(static_cast<size_t>(8), _controlPoints.size()));
 
-  // Sample curve at equal arc length intervals
-  size_t numSamples = _controlPoints.size() * 2; // Increase sampling density
-  for (size_t sampleIdx = 0; sampleIdx < numSamples; ++sampleIdx) {
-    FT        targetLength = (FT(sampleIdx) / FT(numSamples - 1)) * totalLength;
-    Parameter param        = parameterAtLength(targetLength);
+  std::vector<Point> newControlPoints;
+  newControlPoints.reserve(numSamples);
+
+  for (size_t idx = 0; idx < numSamples; ++idx) {
+    FT        targetLength = (FT(idx) / FT(numSamples - 1)) * totalLength;
+    Parameter param        = parameterAtLength(targetLength, FT(1e-8));
     newControlPoints.push_back(evaluate(param));
   }
 
-  // Create uniform weights and knot vector
-  newWeights.resize(newControlPoints.size(), FT(1));
-
+  // Use a reasonable degree for the reparameterized curve
   unsigned int newDegree =
-      std::min(_degree, static_cast<unsigned int>(newControlPoints.size() - 1));
-  newKnots =
-      generateKnotVector(newControlPoints, newDegree, KnotMethod::UNIFORM);
+      std::min(3u, static_cast<unsigned int>(newControlPoints.size() - 1));
 
-  return std::make_unique<NURBSCurve>(newControlPoints, newWeights, newDegree,
-                                      newKnots);
+  return std::make_unique<NURBSCurve>(newControlPoints, newDegree,
+                                      KnotMethod::UNIFORM);
 }
 
 auto
 NURBSCurve::split(Parameter parameter) const
     -> std::pair<std::unique_ptr<Curve>, std::unique_ptr<Curve>>
 {
+  if (isEmpty()) {
+    return std::make_pair(std::make_unique<NURBSCurve>(),
+                          std::make_unique<NURBSCurve>());
+  }
+
   auto bounds = parameterBounds();
 
+  parameter = std::max(bounds.first, std::min(bounds.second, parameter));
+
   if (parameter <= bounds.first) {
-    // Split at beginning: first curve empty, second is full curve
     auto emptyCurve = std::make_unique<NURBSCurve>();
     auto fullCurve  = std::unique_ptr<NURBSCurve>(clone());
     return std::make_pair(std::move(emptyCurve), std::move(fullCurve));
   }
 
   if (parameter >= bounds.second) {
-    // Split at end: first curve is full, second curve empty
     auto fullCurve  = std::unique_ptr<NURBSCurve>(clone());
     auto emptyCurve = std::make_unique<NURBSCurve>();
     return std::make_pair(std::move(fullCurve), std::move(emptyCurve));
   }
 
-  // For now, create simplified split using sampling
-  // Full implementation would use knot insertion algorithms
-  auto firstLineString  = toLineString(32);
-  auto secondLineString = toLineString(32);
+  auto firstCurve  = subcurve(bounds.first, parameter);
+  auto secondCurve = subcurve(parameter, bounds.second);
 
-  // Find split point in the sampled curve
-  size_t splitIndex = 16; // Approximate middle
+  auto firstNurbs = std::unique_ptr<NURBSCurve>(
+      dynamic_cast<NURBSCurve *>(firstCurve.release()));
+  auto secondNurbs = std::unique_ptr<NURBSCurve>(
+      dynamic_cast<NURBSCurve *>(secondCurve.release()));
 
-  std::vector<Point> firstPoints;
-  std::vector<Point> secondPoints;
-
-  for (size_t ptIdx = 0; ptIdx <= splitIndex; ++ptIdx) {
-    firstPoints.push_back(firstLineString->pointN(ptIdx));
+  if (!firstNurbs) {
+    firstNurbs = std::make_unique<NURBSCurve>();
+  }
+  if (!secondNurbs) {
+    secondNurbs = std::make_unique<NURBSCurve>();
   }
 
-  for (size_t ptIdx = splitIndex; ptIdx < firstLineString->numPoints();
-       ++ptIdx) {
-    secondPoints.push_back(firstLineString->pointN(ptIdx));
-  }
-
-  auto firstCurve  = std::make_unique<NURBSCurve>(firstPoints, _degree);
-  auto secondCurve = std::make_unique<NURBSCurve>(secondPoints, _degree);
-
-  return std::make_pair(std::move(firstCurve), std::move(secondCurve));
+  return std::make_pair(std::move(firstNurbs), std::move(secondNurbs));
 }
 
 auto
 NURBSCurve::subcurve(Parameter from, Parameter to) const
     -> std::unique_ptr<Curve>
 {
+  if (isEmpty()) {
+    return std::make_unique<NURBSCurve>();
+  }
+
   if (from >= to) {
     return std::make_unique<NURBSCurve>();
   }
@@ -933,20 +970,42 @@ NURBSCurve::subcurve(Parameter from, Parameter to) const
   from        = std::max(from, bounds.first);
   to          = std::min(to, bounds.second);
 
-  // Sample the subcurve
-  unsigned int       numSamples = 32;
+  if (from >= to) {
+    return std::make_unique<NURBSCurve>();
+  }
+
+  unsigned int numSamples =
+      std::max(16u, static_cast<unsigned int>(_controlPoints.size()));
+
   std::vector<Point> subPoints;
   subPoints.reserve(numSamples + 1);
 
   FT paramRange = to - from;
+
   for (unsigned int sampleIdx = 0; sampleIdx <= numSamples; ++sampleIdx) {
     Parameter param = from + (FT(sampleIdx) / FT(numSamples)) * paramRange;
-    subPoints.push_back(evaluate(param));
+    Point     evaluatedPoint = evaluate(param);
+    subPoints.push_back(evaluatedPoint);
   }
 
   unsigned int subDegree =
       std::min(_degree, static_cast<unsigned int>(subPoints.size() - 1));
-  return std::make_unique<NURBSCurve>(subPoints, subDegree);
+
+  auto subKnots =
+      generateKnotVector(subPoints, subDegree, KnotMethod::CHORD_LENGTH);
+
+  std::vector<FT> subWeights;
+  if (isRational()) {
+    subWeights.resize(subPoints.size(), FT(1));
+  }
+
+  if (subWeights.empty()) {
+    return std::make_unique<NURBSCurve>(subPoints, subDegree,
+                                        KnotMethod::CHORD_LENGTH);
+  } else {
+    return std::make_unique<NURBSCurve>(subPoints, subWeights, subDegree,
+                                        subKnots);
+  }
 }
 
 auto
@@ -956,7 +1015,6 @@ NURBSCurve::reverse() const -> std::unique_ptr<Curve>
     return std::make_unique<NURBSCurve>();
   }
 
-  // Reverse control points and weights
   std::vector<Point> reversedPoints(_controlPoints.rbegin(),
                                     _controlPoints.rend());
   std::vector<FT>    reversedWeights;
@@ -965,7 +1023,6 @@ NURBSCurve::reverse() const -> std::unique_ptr<Curve>
     reversedWeights.assign(_weights.rbegin(), _weights.rend());
   }
 
-  // Reverse and reparameterize knot vector
   std::vector<Knot> reversedKnots;
   if (!_knotVector.empty()) {
     reversedKnots.reserve(_knotVector.size());
@@ -1003,7 +1060,6 @@ NURBSCurve::join(const Curve &other, Continuity continuity, FT tolerance) const
     return std::unique_ptr<NURBSCurve>(clone());
   }
 
-  // Check if curves can be joined (endpoints close enough)
   Point thisEnd    = endPoint();
   Point otherStart = otherNurbs->startPoint();
 
@@ -1012,15 +1068,12 @@ NURBSCurve::join(const Curve &other, Continuity continuity, FT tolerance) const
         Exception("Curves are not adjacent within tolerance"));
   }
 
-  // Simple joining: concatenate control points
   std::vector<Point> joinedPoints = _controlPoints;
   const auto        &otherPoints  = otherNurbs->controlPoints();
 
-  // Skip first point of second curve to avoid duplication
   joinedPoints.insert(joinedPoints.end(), otherPoints.begin() + 1,
                       otherPoints.end());
 
-  // Use maximum degree of both curves
   unsigned int joinedDegree = std::max(_degree, otherNurbs->degree());
   joinedDegree              = std::min(joinedDegree,
                                        static_cast<unsigned int>(joinedPoints.size() - 1));
@@ -1039,7 +1092,6 @@ NURBSCurve::offset(FT distance) const -> std::unique_ptr<Curve>
     return std::unique_ptr<NURBSCurve>(clone());
   }
 
-  // Simple offset implementation: sample curve and offset each point
   auto               lineString = toLineString(64);
   std::vector<Point> offsetPoints;
   offsetPoints.reserve(lineString->numPoints());
@@ -1090,20 +1142,16 @@ auto
 NURBSCurve::hasSelfIntersections(
     std::vector<std::pair<Parameter, Parameter>> *intersections) const -> bool
 {
-  // Simple implementation: sample curve and check for crossings
   auto lineString = toLineString(100);
 
   if (intersections) {
     intersections->clear();
   }
 
-  // This is a simplified check - full implementation would be more
-  // sophisticated
   for (size_t firstIdx = 0; firstIdx < lineString->numPoints() - 3;
        ++firstIdx) {
     for (size_t secondIdx = firstIdx + 2;
          secondIdx < lineString->numPoints() - 1; ++secondIdx) {
-      // Skip adjacent segments
       if (secondIdx <= firstIdx + 2)
         continue;
 
@@ -1112,7 +1160,6 @@ NURBSCurve::hasSelfIntersections(
       Point segment2Start = lineString->pointN(secondIdx);
       Point segment2End   = lineString->pointN(secondIdx + 1);
 
-      // Simple intersection test (would need proper line-line intersection)
       if (algorithm::distance(segment1Start, segment2Start) < FT(1e-6) ||
           algorithm::distance(segment1End, segment2End) < FT(1e-6)) {
         if (intersections) {
@@ -1148,7 +1195,6 @@ NURBSCurve::intersect(const Curve &other, FT tolerance) const
 
   std::vector<std::tuple<Point, Parameter, Parameter>> result;
 
-  // Sample both curves and find close points
   auto thisLineString  = toLineString(50);
   auto otherLineString = otherNurbs->toLineString(50);
 
@@ -1175,7 +1221,6 @@ NURBSCurve::intersect(const Curve &other, FT tolerance) const
             (FT(otherIdx) / FT(otherLineString->numPoints() - 1)) *
                 otherParamRange;
 
-        // Use average point as intersection
         Point intersectionPoint =
             Point((thisPoint.x() + otherPoint.x()) / FT(2),
                   (thisPoint.y() + otherPoint.y()) / FT(2),
@@ -1198,13 +1243,11 @@ NURBSCurve::boundingBox() const -> std::pair<Point, Point>
         Exception("Cannot compute bounding box of empty curve"));
   }
 
-  // Start with first control point
   FT minX = _controlPoints[0].x(), maxX = _controlPoints[0].x();
   FT minY = _controlPoints[0].y(), maxY = _controlPoints[0].y();
   FT minZ = _controlPoints[0].is3D() ? _controlPoints[0].z() : FT(0);
   FT maxZ = minZ;
 
-  // Expand by all control points
   for (const auto &point : _controlPoints) {
     minX = std::min(minX, point.x());
     maxX = std::max(maxX, point.x());
@@ -1217,7 +1260,6 @@ NURBSCurve::boundingBox() const -> std::pair<Point, Point>
     }
   }
 
-  // Sample curve for tighter bounds
   auto lineString = toLineString(32);
   for (size_t ptIdx = 0; ptIdx < lineString->numPoints(); ++ptIdx) {
     const Point &point = lineString->pointN(ptIdx);
@@ -1247,12 +1289,10 @@ NURBSCurve::setControlPoints(const std::vector<Point> &controlPoints)
 {
   _controlPoints = controlPoints;
 
-  // Adjust weights if necessary
   if (!_weights.empty() && _weights.size() != controlPoints.size()) {
     _weights.resize(controlPoints.size(), FT(1));
   }
 
-  // Regenerate knot vector if needed
   if (!_knotVector.empty() && !controlPoints.empty()) {
     _knotVector =
         generateKnotVector(controlPoints, _degree, KnotMethod::CHORD_LENGTH);
@@ -1289,7 +1329,6 @@ NURBSCurve::setControlPoint(size_t index, const Point &point)
     BOOST_THROW_EXCEPTION(Exception("Control point index out of bounds"));
   }
 
-  // Check dimensional consistency
   if (!_controlPoints.empty() &&
       (_controlPoints[0].is3D() != point.is3D() ||
        _controlPoints[0].isMeasured() != point.isMeasured())) {
@@ -1324,7 +1363,7 @@ auto
 NURBSCurve::weight(size_t index) const -> FT
 {
   if (_weights.empty()) {
-    return FT(1); // Uniform weights
+    return FT(1);
   }
   if (index >= _weights.size()) {
     BOOST_THROW_EXCEPTION(Exception("Weight index out of bounds"));
@@ -1382,14 +1421,12 @@ NURBSCurve::isBezier() const -> bool
 
   const FT tolerance = FT(1e-10);
 
-  // Check start multiplicity
   for (unsigned int idx = 0; idx <= _degree; ++idx) {
     if (CGAL::abs(_knotVector[idx] - _knotVector[0]) > tolerance) {
       return false;
     }
   }
 
-  // Check end multiplicity
   for (unsigned int idx = _degree + 1; idx < _knotVector.size(); ++idx) {
     if (CGAL::abs(_knotVector[idx] - _knotVector.back()) > tolerance) {
       return false;
@@ -1436,14 +1473,12 @@ NURBSCurve::knotMultiplicity(Knot value, FT tolerance) const -> unsigned int
   return multiplicity;
 }
 
-//-- Advanced NURBS operations (implementations to be completed)
+//-- Advanced NURBS operations
 
 auto
 NURBSCurve::insertKnot(Knot parameter, unsigned int times) const
     -> std::unique_ptr<NURBSCurve>
 {
-  // Oslo algorithm for knot insertion would be implemented here
-  // For now, return copy of current curve
   return std::unique_ptr<NURBSCurve>(clone());
 }
 
@@ -1451,7 +1486,6 @@ auto
 NURBSCurve::refineKnotVector(const std::vector<Knot> &newKnots) const
     -> std::unique_ptr<NURBSCurve>
 {
-  // Knot refinement algorithm would be implemented here
   return std::unique_ptr<NURBSCurve>(clone());
 }
 
@@ -1459,21 +1493,18 @@ auto
 NURBSCurve::elevateDegree(unsigned int times) const
     -> std::unique_ptr<NURBSCurve>
 {
-  // Degree elevation algorithm would be implemented here
   return std::unique_ptr<NURBSCurve>(clone());
 }
 
 auto
 NURBSCurve::reduceDegree(FT tolerance) const -> std::unique_ptr<NURBSCurve>
 {
-  // Degree reduction with tolerance would be implemented here
   return std::unique_ptr<NURBSCurve>(clone());
 }
 
 auto
 NURBSCurve::removeKnots(FT tolerance) const -> std::unique_ptr<NURBSCurve>
 {
-  // Knot removal algorithm would be implemented here
   return std::unique_ptr<NURBSCurve>(clone());
 }
 
@@ -1492,7 +1523,6 @@ NURBSCurve::validateNURBSData(const std::vector<Point> &controlPoints,
                               const std::vector<Knot>  &knots)
     -> std::pair<bool, std::string>
 {
-  // Empty geometry validation
   if (controlPoints.empty()) {
     if (!knots.empty() || !weights.empty()) {
       return {false, "Empty curve with non-empty knot vector or weights"};
@@ -1500,77 +1530,46 @@ NURBSCurve::validateNURBSData(const std::vector<Point> &controlPoints,
     return {true, ""};
   }
 
-  // Degree constraints
-  if (degree >= controlPoints.size()) {
-    return {false, "Degree (" + std::to_string(degree) +
-                       ") must be less than control points count (" +
-                       std::to_string(controlPoints.size()) + ")"};
-  }
-
-  // Knot vector size: m = n + p + 1 (n = control points, p = degree)
-  const size_t expectedKnots = controlPoints.size() + degree + 1;
-  if (knots.size() != expectedKnots) {
-    return {false, "Invalid knot vector size: expected " +
-                       std::to_string(expectedKnots) + ", got " +
-                       std::to_string(knots.size())};
-  }
-
-  // Knot vector non-decreasing order
-  for (size_t knotIdx = 1; knotIdx < knots.size(); ++knotIdx) {
-    if (knots[knotIdx] < knots[knotIdx - 1]) {
-      return {false, "Knot vector is not non-decreasing at index " +
-                         std::to_string(knotIdx)};
+  for (const auto &point : controlPoints) {
+    if ((controlPoints[0].is3D() != point.is3D() ||
+         controlPoints[0].isMeasured() != point.isMeasured())) {
+      return {false, "Control point dimension mismatch"};
     }
   }
 
-  // Weight validation
+  if (degree >= controlPoints.size()) {
+    return {false, "Degree must be less than control points count"};
+  }
+
+  const size_t expectedKnots = controlPoints.size() + degree + 1;
+  if (knots.size() != expectedKnots) {
+    return {false, "Invalid knot vector size"};
+  }
+
+  for (size_t idx = 1; idx < knots.size(); ++idx) {
+    if (knots[idx] < knots[idx - 1]) {
+      return {false, "Knot vector is not non-decreasing"};
+    }
+  }
+
   if (!weights.empty()) {
     if (weights.size() != controlPoints.size()) {
       return {false, "Weight count does not match control point count"};
     }
 
-    for (size_t weightIdx = 0; weightIdx < weights.size(); ++weightIdx) {
-      const FT &weight = weights[weightIdx];
-
-      if (weight <= FT(0)) {
-        return {false, "Weight at index " + std::to_string(weightIdx) +
-                           " is non-positive"};
-      }
-
-      if (!CGAL::is_finite(weight)) {
-        return {false, "Weight at index " + std::to_string(weightIdx) +
-                           " is not finite"};
+    for (const auto &weight : weights) {
+      if (weight <= FT(0) || !CGAL::is_finite(weight)) {
+        return {false, "Invalid weight value"};
       }
     }
   }
 
-  // Dimensional consistency
-  if (!controlPoints.empty()) {
-    bool first3D       = controlPoints[0].is3D();
-    bool firstMeasured = controlPoints[0].isMeasured();
+  if (!knots.empty() && controlPoints.size() > 0) {
+    FT startParam = knots[degree];
+    FT endParam   = knots[controlPoints.size()];
 
-    for (const auto &point : controlPoints) {
-      if (point.is3D() != first3D || point.isMeasured() != firstMeasured) {
-        return {false, "Inconsistent dimensions in control points"};
-      }
-    }
-  }
-
-  // Parameter bounds validation
-  if (!knots.empty()) {
-    if (degree == 0 && controlPoints.size() == 1) {
-      if (knots.size() != 2) {
-        return {false, "Invalid knot vector size for degree 0"};
-      }
-      if (knots[0] >= knots[1]) {
-        return {false, "Invalid parameter bounds for degree 0"};
-      }
-    } else {
-      const FT startParam = knots[degree];
-      const FT endParam   = knots[controlPoints.size()];
-      if (startParam >= endParam) {
-        return {false, "Invalid parameter bounds"};
-      }
+    if (startParam > endParam) {
+      return {false, "Invalid parameter bounds"};
     }
   }
 
@@ -1609,7 +1608,6 @@ NURBSCurve::findSpan(Parameter parameter) const -> size_t
 {
   size_t numControlPoints = _controlPoints.size();
 
-  // Special cases at boundaries
   if (parameter >= _knotVector[numControlPoints]) {
     return numControlPoints - 1;
   }
@@ -1618,7 +1616,6 @@ NURBSCurve::findSpan(Parameter parameter) const -> size_t
     return _degree;
   }
 
-  // Binary search for knot span
   size_t low  = _degree;
   size_t high = numControlPoints;
   size_t mid  = (low + high) / 2;
@@ -1638,55 +1635,75 @@ NURBSCurve::findSpan(Parameter parameter) const -> size_t
 auto
 NURBSCurve::deBoorRational(size_t span, Parameter parameter) const -> Point
 {
-  // Homogeneous point representation for rational evaluation
   struct HomogeneousPoint {
-    FT     wx, wy, wz, weight;
+    FT     weightedX, weightedY, weightedZ, weight;
     double measure;
 
-    HomogeneousPoint() : wx(0), wy(0), wz(0), weight(1), measure(0) {}
+    HomogeneousPoint()
+        : weightedX(0), weightedY(0), weightedZ(0), weight(1), measure(0)
+    {
+    }
 
-    HomogeneousPoint(const Point &point, FT wgt)
-        : wx(point.x() * wgt), wy(point.y() * wgt),
-          wz(point.is3D() ? point.z() * wgt : FT(0)), weight(wgt),
-          measure(point.isMeasured() ? point.m() : 0.0)
+    HomogeneousPoint(const Point &point, FT pointWeight)
+        : weightedX(point.x() * pointWeight),
+          weightedY(point.y() * pointWeight),
+          weightedZ(point.is3D() ? point.z() * pointWeight : FT(0)),
+          weight(pointWeight), measure(point.isMeasured() ? point.m() : 0.0)
     {
     }
   };
 
   std::vector<HomogeneousPoint> temp(_degree + 1);
 
-  // Initialize with relevant control points
-  for (unsigned int idx = 0; idx <= _degree; ++idx) {
-    size_t cpIndex = span - _degree + idx;
-    FT     weight  = _weights.empty() ? FT(1) : _weights[cpIndex];
-    temp[idx]      = HomogeneousPoint(_controlPoints[cpIndex], weight);
+  for (unsigned int controlIdx = 0; controlIdx <= _degree; ++controlIdx) {
+    size_t cpIndex = span - _degree + controlIdx;
+    if (cpIndex >= _controlPoints.size()) {
+      cpIndex = _controlPoints.size() - 1;
+    }
+    FT pointWeight   = _weights.empty() ? FT(1) : _weights[cpIndex];
+    temp[controlIdx] = HomogeneousPoint(_controlPoints[cpIndex], pointWeight);
   }
 
-  // De Boor's algorithm with rational weights
   for (unsigned int level = 1; level <= _degree; ++level) {
-    for (unsigned int idx = _degree; idx >= level; --idx) {
-      size_t knotIdx = span - _degree + idx;
-      FT     alpha =
-          (parameter - _knotVector[knotIdx]) /
-          (_knotVector[knotIdx + _degree - level + 1] - _knotVector[knotIdx]);
+    for (unsigned int basisIdx = _degree; basisIdx >= level; --basisIdx) {
+      size_t knotIdx = span - _degree + basisIdx;
 
-      // Interpolate homogeneous coordinates
-      temp[idx].wx = (FT(1) - alpha) * temp[idx - 1].wx + alpha * temp[idx].wx;
-      temp[idx].wy = (FT(1) - alpha) * temp[idx - 1].wy + alpha * temp[idx].wy;
-      temp[idx].wz = (FT(1) - alpha) * temp[idx - 1].wz + alpha * temp[idx].wz;
-      temp[idx].weight =
-          (FT(1) - alpha) * temp[idx - 1].weight + alpha * temp[idx].weight;
+      if (knotIdx + _degree - level + 1 >= _knotVector.size() ||
+          knotIdx >= _knotVector.size()) {
+        continue;
+      }
 
-      // M coordinate interpolated separately (non-rational)
+      FT denominator =
+          _knotVector[knotIdx + _degree - level + 1] - _knotVector[knotIdx];
+      FT alpha = FT(0);
+
+      if (CGAL::abs(denominator) > FT(1e-15)) {
+        alpha = (parameter - _knotVector[knotIdx]) / denominator;
+      }
+
+      alpha = std::max(FT(0), std::min(FT(1), alpha));
+
+      temp[basisIdx].weightedX =
+          (FT(1) - alpha) * temp[basisIdx - 1].weightedX +
+          alpha * temp[basisIdx].weightedX;
+      temp[basisIdx].weightedY =
+          (FT(1) - alpha) * temp[basisIdx - 1].weightedY +
+          alpha * temp[basisIdx].weightedY;
+      temp[basisIdx].weightedZ =
+          (FT(1) - alpha) * temp[basisIdx - 1].weightedZ +
+          alpha * temp[basisIdx].weightedZ;
+      temp[basisIdx].weight = (FT(1) - alpha) * temp[basisIdx - 1].weight +
+                              alpha * temp[basisIdx].weight;
+
       if (isMeasured()) {
-        double alphaD = CGAL::to_double(alpha);
-        temp[idx].measure =
-            (1.0 - alphaD) * temp[idx - 1].measure + alphaD * temp[idx].measure;
+        double alphaDouble = CGAL::to_double(alpha);
+        temp[basisIdx].measure =
+            (1.0 - alphaDouble) * temp[basisIdx - 1].measure +
+            alphaDouble * temp[basisIdx].measure;
       }
     }
   }
 
-  // Project back to Euclidean space
   HomogeneousPoint &result = temp[_degree];
 
   if (CGAL::abs(result.weight) < FT(1e-15)) {
@@ -1696,17 +1713,17 @@ NURBSCurve::deBoorRational(size_t span, Parameter parameter) const -> Point
   FT invWeight = FT(1) / result.weight;
 
   if (is3D() && isMeasured()) {
-    return Point(result.wx * invWeight, result.wy * invWeight,
-                 result.wz * invWeight, result.measure);
+    return Point(result.weightedX * invWeight, result.weightedY * invWeight,
+                 result.weightedZ * invWeight, result.measure);
   } else if (is3D()) {
-    return Point(result.wx * invWeight, result.wy * invWeight,
-                 result.wz * invWeight);
+    return Point(result.weightedX * invWeight, result.weightedY * invWeight,
+                 result.weightedZ * invWeight);
   } else if (isMeasured()) {
-    Point point(result.wx * invWeight, result.wy * invWeight);
+    Point point(result.weightedX * invWeight, result.weightedY * invWeight);
     point.setM(result.measure);
     return point;
   } else {
-    return Point(result.wx * invWeight, result.wy * invWeight);
+    return Point(result.weightedX * invWeight, result.weightedY * invWeight);
   }
 }
 
@@ -1717,11 +1734,9 @@ NURBSCurve::computeDerivatives(Parameter parameter, unsigned int maxOrder) const
   std::vector<Point> derivatives;
   derivatives.reserve(maxOrder + 1);
 
-  // Order 0: curve evaluation
   derivatives.push_back(evaluate(parameter));
 
   if (maxOrder > 0) {
-    // For linear curves, derivative is constant
     if (_degree == 1 && _controlPoints.size() == 2) {
       Point derivative =
           Point(_controlPoints[1].x() - _controlPoints[0].x(),
@@ -1731,7 +1746,6 @@ NURBSCurve::computeDerivatives(Parameter parameter, unsigned int maxOrder) const
                     : FT(0));
       derivatives.push_back(derivative);
 
-      // Higher derivatives are zero for linear curves
       for (unsigned int orderIdx = 2; orderIdx <= maxOrder; ++orderIdx) {
         if (is3D() && isMeasured()) {
           derivatives.emplace_back(FT(0), FT(0), FT(0), 0.0);
@@ -1746,7 +1760,6 @@ NURBSCurve::computeDerivatives(Parameter parameter, unsigned int maxOrder) const
         }
       }
     } else {
-      // General case: finite difference approximation
       const FT epsilon = FT(1e-8);
       auto     bounds  = parameterBounds();
 
@@ -1771,7 +1784,6 @@ NURBSCurve::computeDerivatives(Parameter parameter, unsigned int maxOrder) const
 
           derivatives.push_back(derivative);
         } else {
-          // Zero derivative if cannot compute difference
           if (is3D() && isMeasured()) {
             derivatives.emplace_back(FT(0), FT(0), FT(0), 0.0);
           } else if (is3D()) {
@@ -1804,11 +1816,10 @@ NURBSCurve::generateKnotVector(const std::vector<Point> &points,
     return knots;
   }
 
-  // Special case for degree 0
   if (degree == 0) {
     knots.reserve(numKnots);
-    for (size_t idx = 0; idx < numPoints; ++idx) {
-      knots.push_back(FT(idx));
+    for (size_t pointIdx = 0; pointIdx < numPoints; ++pointIdx) {
+      knots.push_back(FT(pointIdx));
     }
     knots.push_back(FT(numPoints));
     return knots;
@@ -1817,8 +1828,7 @@ NURBSCurve::generateKnotVector(const std::vector<Point> &points,
   knots.reserve(numKnots);
 
   if (method == KnotMethod::UNIFORM) {
-    // Clamped uniform knot vector
-    for (unsigned int idx = 0; idx <= degree; ++idx) {
+    for (unsigned int degreeIdx = 0; degreeIdx <= degree; ++degreeIdx) {
       knots.push_back(FT(0));
     }
 
@@ -1827,30 +1837,27 @@ NURBSCurve::generateKnotVector(const std::vector<Point> &points,
       knots.push_back(FT(internalIdx) / FT(numInternal + 1));
     }
 
-    for (unsigned int idx = 0; idx <= degree; ++idx) {
+    for (unsigned int degreeIdx = 0; degreeIdx <= degree; ++degreeIdx) {
       knots.push_back(FT(1));
     }
   } else {
-    // Chord length or centripetal parameterization
     auto parameters = computeParameters(points, method);
 
-    // Clamped knot vector with parameter-based internal knots
-    for (unsigned int idx = 0; idx <= degree; ++idx) {
+    for (unsigned int degreeIdx = 0; degreeIdx <= degree; ++degreeIdx) {
       knots.push_back(parameters.front());
     }
 
-    // Internal knots by averaging
     if (numPoints > degree + 1) {
       for (size_t pointIdx = 1; pointIdx < numPoints - degree; ++pointIdx) {
         FT sum = FT(0);
-        for (unsigned int degIdx = 0; degIdx < degree; ++degIdx) {
-          sum += parameters[pointIdx + degIdx];
+        for (unsigned int degreeIdx = 0; degreeIdx < degree; ++degreeIdx) {
+          sum += parameters[pointIdx + degreeIdx];
         }
         knots.push_back(sum / FT(degree));
       }
     }
 
-    for (unsigned int idx = 0; idx <= degree; ++idx) {
+    for (unsigned int degreeIdx = 0; degreeIdx <= degree; ++degreeIdx) {
       knots.push_back(parameters.back());
     }
   }
@@ -1870,20 +1877,18 @@ NURBSCurve::computeParameters(const std::vector<Point> &points,
   }
 
   if (method == KnotMethod::UNIFORM) {
-    // Uniform parameterization
-    for (size_t idx = 0; idx < points.size(); ++idx) {
-      parameters.push_back(FT(idx) / FT(points.size() - 1));
+    for (size_t pointIdx = 0; pointIdx < points.size(); ++pointIdx) {
+      parameters.push_back(FT(pointIdx) / FT(points.size() - 1));
     }
   } else {
-    // Chord length or centripetal parameterization
     parameters.push_back(FT(0));
     FT totalLength = FT(0);
 
     std::vector<FT> distances;
     distances.reserve(points.size() - 1);
 
-    for (size_t idx = 1; idx < points.size(); ++idx) {
-      FT distance = algorithm::distance(points[idx - 1], points[idx]);
+    for (size_t pointIdx = 1; pointIdx < points.size(); ++pointIdx) {
+      FT distance = algorithm::distance(points[pointIdx - 1], points[pointIdx]);
 
       if (method == KnotMethod::CENTRIPETAL) {
         distance = FT(std::sqrt(CGAL::to_double(distance)));
@@ -1894,7 +1899,6 @@ NURBSCurve::computeParameters(const std::vector<Point> &points,
       parameters.push_back(totalLength);
     }
 
-    // Normalize to [0, 1]
     if (totalLength > FT(0)) {
       for (auto &param : parameters) {
         param /= totalLength;
@@ -1926,55 +1930,49 @@ NURBSCurve::checkDimensionalConsistency() const -> bool
 
 auto
 NURBSCurve::computeArcLength(Parameter startParam, Parameter endParam,
-                             FT tolerance, unsigned int maxDepth) const -> FT
+                             FT tolerance) const -> FT
 {
-  if (startParam >= endParam || maxDepth == 0) {
+  if (startParam >= endParam) {
     return FT(0);
   }
 
-  Point     startPoint = evaluate(startParam);
-  Point     endPoint   = evaluate(endParam);
-  Parameter midParam   = (startParam + endParam) / FT(2);
-  Point     midPoint   = evaluate(midParam);
+  // Use simple trapezoidal rule with fixed subdivision
+  const unsigned int numSegments = 32; // Fixed number of segments for stability
 
-  FT chordLength = algorithm::distance(startPoint, endPoint);
-  FT leftLength  = algorithm::distance(startPoint, midPoint);
-  FT rightLength = algorithm::distance(midPoint, endPoint);
-  FT totalLength = leftLength + rightLength;
+  FT paramStep   = (endParam - startParam) / FT(numSegments);
+  FT totalLength = FT(0);
 
-  if (CGAL::abs(totalLength - chordLength) <= tolerance) {
-    return totalLength;
+  Point prevPoint = evaluate(startParam);
+
+  for (unsigned int segIdx = 1; segIdx <= numSegments; ++segIdx) {
+    Parameter currentParam = startParam + FT(segIdx) * paramStep;
+    Point     currentPoint = evaluate(currentParam);
+
+    FT segmentLength = algorithm::distance(prevPoint, currentPoint);
+    totalLength += segmentLength;
+
+    prevPoint = currentPoint;
   }
 
-  // Recursive subdivision
-  return computeArcLength(startParam, midParam, tolerance, maxDepth - 1) +
-         computeArcLength(midParam, endParam, tolerance, maxDepth - 1);
+  return totalLength;
 }
 
 auto
-NURBSCurve::findParameterByArcLength(FT targetLength, FT tolerance,
-                                     unsigned int maxIterations) const
+NURBSCurve::findParameterByArcLength(FT targetLength, FT tolerance) const
     -> Parameter
 {
   auto bounds = parameterBounds();
-  FT   totalLength =
-      computeArcLength(bounds.first, bounds.second, tolerance / 10);
 
-  if (targetLength <= FT(0)) {
-    return bounds.first;
-  }
-
-  if (targetLength >= totalLength) {
-    return bounds.second;
-  }
-
-  // Binary search for parameter
+  // Use binary search with fixed iterations to avoid infinite loops
   Parameter low  = bounds.first;
   Parameter high = bounds.second;
 
-  for (unsigned int iteration = 0; iteration < maxIterations; ++iteration) {
+  const unsigned int maxIterations =
+      50; // Limit iterations to prevent infinite loops
+
+  for (unsigned int iter = 0; iter < maxIterations; ++iter) {
     Parameter mid         = (low + high) / FT(2);
-    FT        lengthAtMid = computeArcLength(bounds.first, mid, tolerance / 10);
+    FT        lengthAtMid = computeArcLength(bounds.first, mid, tolerance);
 
     if (CGAL::abs(lengthAtMid - targetLength) <= tolerance) {
       return mid;
@@ -1984,6 +1982,11 @@ NURBSCurve::findParameterByArcLength(FT targetLength, FT tolerance,
       low = mid;
     } else {
       high = mid;
+    }
+
+    // Check for convergence
+    if (high - low < FT(1e-12)) {
+      break;
     }
   }
 
@@ -1999,14 +2002,12 @@ NURBSCurve::projectPointToCurve(const Point &point, FT tolerance,
     BOOST_THROW_EXCEPTION(Exception("Cannot project to empty curve"));
   }
 
-  // Initial guess: closest control point
   FT        minDistance = algorithm::distance(point, _controlPoints[0]);
   Parameter bestParam   = parameterBounds().first;
 
   auto bounds     = parameterBounds();
   FT   paramRange = bounds.second - bounds.first;
 
-  // Sample curve to find approximate closest point
   unsigned int numSamples = 50;
   for (unsigned int sampleIdx = 0; sampleIdx <= numSamples; ++sampleIdx) {
     Parameter param =
@@ -2020,16 +2021,13 @@ NURBSCurve::projectPointToCurve(const Point &point, FT tolerance,
     }
   }
 
-  // Newton-Raphson refinement (simplified version)
   for (unsigned int iteration = 0; iteration < maxIterations; ++iteration) {
     Point curvePoint = evaluate(bestParam);
     Point firstDeriv = derivative(bestParam, 1);
 
-    // Vector from curve to target point
     Point diff = Point(point.x() - curvePoint.x(), point.y() - curvePoint.y(),
                        point.is3D() ? point.z() - curvePoint.z() : FT(0));
 
-    // Dot product for projection
     FT numerator = diff.x() * firstDeriv.x() + diff.y() * firstDeriv.y() +
                    (diff.is3D() ? diff.z() * firstDeriv.z() : FT(0));
 
@@ -2038,13 +2036,13 @@ NURBSCurve::projectPointToCurve(const Point &point, FT tolerance,
         (firstDeriv.is3D() ? firstDeriv.z() * firstDeriv.z() : FT(0));
 
     if (denominator < FT(1e-12)) {
-      break; // Singular point
+      break;
     }
 
     FT paramUpdate = numerator / denominator;
 
     if (CGAL::abs(paramUpdate) <= tolerance) {
-      break; // Converged
+      break;
     }
 
     bestParam += paramUpdate;

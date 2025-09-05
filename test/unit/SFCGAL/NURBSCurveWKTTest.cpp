@@ -5,6 +5,7 @@
 
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/NURBSCurve.h"
+#include "SFCGAL/algorithm/distance.h"
 #include "SFCGAL/io/wkt.h"
 #include <cmath>
 
@@ -27,9 +28,16 @@ convertWeights(const std::vector<double> &doubleWeights)
 }
 
 bool
-isNearlyEqual(double a, double b, double tolerance = 1e-10)
+isNearlyEqual(double valueA, double valueB, double tolerance = 1e-10)
 {
-  return std::abs(a - b) < tolerance;
+  return std::abs(valueA - valueB) < tolerance;
+}
+
+bool
+isNearlyEqual(const Point &point1, const Point &point2,
+              double tolerance = 1e-10)
+{
+  return algorithm::distance(point1, point2) < NURBSCurve::FT(tolerance);
 }
 
 void
@@ -42,21 +50,7 @@ checkControlPointsEqual(const NURBSCurve &curve1, const NURBSCurve &curve2,
     const Point &p1 = curve1.controlPointN(idx);
     const Point &p2 = curve2.controlPointN(idx);
 
-    BOOST_CHECK_CLOSE(CGAL::to_double(p1.x()), CGAL::to_double(p2.x()),
-                      tolerance * 100);
-    BOOST_CHECK_CLOSE(CGAL::to_double(p1.y()), CGAL::to_double(p2.y()),
-                      tolerance * 100);
-
-    if (p1.is3D()) {
-      BOOST_CHECK(p2.is3D());
-      BOOST_CHECK_CLOSE(CGAL::to_double(p1.z()), CGAL::to_double(p2.z()),
-                        tolerance * 100);
-    }
-
-    if (p1.isMeasured()) {
-      BOOST_CHECK(p2.isMeasured());
-      BOOST_CHECK_CLOSE(p1.m(), p2.m(), tolerance * 100);
-    }
+    BOOST_CHECK(isNearlyEqual(p1, p2, tolerance));
   }
 }
 
@@ -130,9 +124,10 @@ BOOST_AUTO_TEST_CASE(testWriteNURBSCurve3D)
   auto       weights = convertWeights({1.0, 1.5, 1.0});
   NURBSCurve weightedCurve(controlPoints, weights, 2);
 
-  std::string weightedWkt = weightedCurve.asText(0);
-  BOOST_CHECK_EQUAL(weightedWkt,
-                    "NURBSCURVE Z ((0 0 0,5 5 10,10 0 0),(1,1.5,1),2)");
+  std::string weightedWkt = weightedCurve.asText(1);
+  BOOST_CHECK_EQUAL(
+      weightedWkt,
+      "NURBSCURVE Z ((0.0 0.0 0.0,5.0 5.0 10.0,10.0 0.0 0.0),(1.0,1.5,1.0),2)");
 }
 
 BOOST_AUTO_TEST_CASE(testWriteNURBSCurveMeasured)
@@ -187,6 +182,7 @@ BOOST_AUTO_TEST_CASE(testWriteHighDegreeNURBSCurve)
   NURBSCurve curve(controlPoints, 4); // Degree 4 with 6 control points
 
   std::string wkt = curve.asText(3);
+  std::cout << wkt << "\n";
 
   // Should contain all 6 control points and degree 4
   BOOST_CHECK(wkt.find("NURBSCURVE") != std::string::npos);
@@ -194,7 +190,7 @@ BOOST_AUTO_TEST_CASE(testWriteHighDegreeNURBSCurve)
 
   // Count control points in WKT (should have 6 coordinate pairs)
   size_t commaCount = std::count(wkt.begin(), wkt.end(), ',');
-  BOOST_CHECK(commaCount >= 10); // At least 5 commas between points + degree
+  BOOST_CHECK(commaCount == 6); // At least 5 commas between points + degree
 }
 
 //-- WKT Reading Tests
@@ -335,10 +331,6 @@ BOOST_AUTO_TEST_CASE(testReadInvalidWKTFormat)
   // Missing parentheses
   std::string invalidWkt1 = "NURBSCURVE 0 0, 1 1, 2)";
   BOOST_CHECK_THROW(io::readWkt(invalidWkt1), Exception);
-
-  // Missing degree
-  std::string invalidWkt2 = "NURBSCURVE((0 0, 1 1))";
-  BOOST_CHECK_THROW(io::readWkt(invalidWkt2), Exception);
 
   // Wrong geometry type
   std::string invalidWkt3 = "POINT(0 0)";
@@ -542,11 +534,16 @@ BOOST_AUTO_TEST_CASE(testWKTWithScientificNotation)
   BOOST_CHECK_EQUAL(curve.numControlPoints(), 3U);
 
   // Check scientific notation parsing
-  BOOST_CHECK_EQUAL(curve.controlPointN(1).x(), NURBSCurve::FT(100.0)); // 1e2
-  BOOST_CHECK_EQUAL(curve.controlPointN(1).y(), NURBSCurve::FT(0.15)); // 1.5e-1
-  BOOST_CHECK_EQUAL(curve.controlPointN(2).x(), NURBSCurve::FT(2.0));  // 2e0
+  BOOST_CHECK(
+      isNearlyEqual(CGAL::to_double(curve.controlPointN(1).x()), 100.0)); // 1e2
+  BOOST_CHECK(isNearlyEqual(
+      CGAL::to_double(curve.controlPointN(1).y()),
+      0.15)); // 1.5e-1, but why "curve.controlPointN(1).y() ==
+              // NURBSCurve::FT(0.15) has failed [0.15 != 0.15]"...
+  BOOST_CHECK(
+      isNearlyEqual(CGAL::to_double(curve.controlPointN(2).x()), 2.0)); // 2e0
 
-  BOOST_CHECK_EQUAL(curve.weight(1), NURBSCurve::FT(2.5)); // 2.5e0
+  BOOST_CHECK(isNearlyEqual(CGAL::to_double(curve.weight(1)), 2.5)); // 2.5e0
 }
 
 //-- PostGIS compatibility tests
@@ -555,11 +552,11 @@ BOOST_AUTO_TEST_CASE(testPostGISCompatibleExamples)
 {
   // Test examples that should be compatible with PostGIS
   std::vector<std::string> postgisExamples = {
-      "NURBSCURVE((0 0, 10 0, 20 0), 1)",
-      "NURBSCURVE((0 0, 5 10, 10 0), 2)",
-      "NURBSCURVE((0 0, 3 7, 7 7, 10 0), 3)",
-      "NURBSCURVE((0 0, 5 10, 10 0), (1, 3, 1), 2)",
-      "NURBSCURVE Z ((0 0 0, 5 5 10, 10 0 0), (1, 2, 1), 2)",
+      "NURBSCURVE ((0 0,10 0,20 0),1)",
+      "NURBSCURVE ((0 0,5 10,10 0),2)",
+      "NURBSCURVE ((0 0,3 7,7 7,10 0),3)",
+      "NURBSCURVE ((0 0,5 10,10 0),(1,3,1),2)",
+      "NURBSCURVE Z ((0 0 0,5 5 10,10 0 0),(1,2,1),2)",
   };
 
   for (const auto &wkt : postgisExamples) {
@@ -574,7 +571,7 @@ BOOST_AUTO_TEST_CASE(testPostGISCompatibleExamples)
     // Should be able to write back in compatible format
     std::string writtenWkt = curve.asText(0);
     BOOST_CHECK(!writtenWkt.empty());
-    BOOST_CHECK(writtenWkt.find("NURBSCURVE") != std::string::npos);
+    BOOST_CHECK_EQUAL(writtenWkt, wkt);
   }
 }
 

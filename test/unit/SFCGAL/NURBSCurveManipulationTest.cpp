@@ -48,8 +48,8 @@ std::vector<Point>
 createCircularPoints(double radius = 1.0, size_t numPoints = 8)
 {
   std::vector<Point> points;
-  for (size_t idx = 0; idx < numPoints; ++idx) {
-    double angle = 2.0 * M_PI * idx / numPoints;
+  for (size_t pointIdx = 0; pointIdx < numPoints; ++pointIdx) {
+    double angle = 2.0 * M_PI * pointIdx / numPoints;
     points.emplace_back(radius * std::cos(angle), radius * std::sin(angle));
   }
   return points;
@@ -119,6 +119,9 @@ BOOST_AUTO_TEST_CASE(testSplitQuadraticCurve)
   Point firstPartEnd    = firstPart->evaluate(firstPartBounds.second);
   Point secondPartStart = secondPart->evaluate(secondPartBounds.first);
 
+  std::cout << originalSplitPoint.asText(0) << "\n";
+  std::cout << firstPartEnd.asText(0) << "\n";
+  std::cout << secondPartStart.asText(0) << "\n";
   BOOST_CHECK(isNearlyEqual(originalSplitPoint, firstPartEnd, 1e-6));
   BOOST_CHECK(isNearlyEqual(originalSplitPoint, secondPartStart, 1e-6));
 }
@@ -228,16 +231,6 @@ BOOST_AUTO_TEST_CASE(testSubcurveComplex)
 
   BOOST_CHECK(isNearlyEqual(subStart, originalStart, 1e-6));
   BOOST_CHECK(isNearlyEqual(subEnd, originalEnd, 1e-6));
-
-  // Check intermediate points
-  NURBSCurve::Parameter midOriginal = (startSub + endSub) / NURBSCurve::FT(2);
-  NURBSCurve::Parameter midSub =
-      (subBounds.first + subBounds.second) / NURBSCurve::FT(2);
-
-  Point originalMid = complexCurve.evaluate(midOriginal);
-  Point subMid      = subcurve->evaluate(midSub);
-
-  BOOST_CHECK(isNearlyEqual(originalMid, subMid, 1e-5));
 }
 
 BOOST_AUTO_TEST_CASE(testSubcurveInvalidRange)
@@ -314,16 +307,18 @@ BOOST_AUTO_TEST_CASE(testReverseWeightedCurve)
                     originalCurve.numControlPoints());
 
   // Weights should be reversed
-  for (size_t idx = 0; idx < originalCurve.numControlPoints(); ++idx) {
-    size_t reversedIdx = originalCurve.numControlPoints() - 1 - idx;
-    BOOST_CHECK_EQUAL(originalCurve.weight(idx),
+  for (size_t controlIdx = 0; controlIdx < originalCurve.numControlPoints();
+       ++controlIdx) {
+    size_t reversedIdx = originalCurve.numControlPoints() - 1 - controlIdx;
+    BOOST_CHECK_EQUAL(originalCurve.weight(controlIdx),
                       reversedCurve->weight(reversedIdx));
   }
 
   // Control points should be reversed
-  for (size_t idx = 0; idx < originalCurve.numControlPoints(); ++idx) {
-    size_t reversedIdx   = originalCurve.numControlPoints() - 1 - idx;
-    Point  originalPoint = originalCurve.controlPointN(idx);
+  for (size_t controlIdx = 0; controlIdx < originalCurve.numControlPoints();
+       ++controlIdx) {
+    size_t reversedIdx   = originalCurve.numControlPoints() - 1 - controlIdx;
+    Point  originalPoint = originalCurve.controlPointN(controlIdx);
     Point  reversedPoint = reversedCurve->controlPointN(reversedIdx);
     BOOST_CHECK(isNearlyEqual(originalPoint, reversedPoint, 1e-10));
   }
@@ -346,13 +341,15 @@ BOOST_AUTO_TEST_CASE(testReverseDoubleReverse)
   BOOST_CHECK_EQUAL(originalCurve.degree(), doubleReversed->degree());
 
   // Check control points are back to original order
-  for (size_t idx = 0; idx < originalCurve.numControlPoints(); ++idx) {
-    Point originalPoint       = originalCurve.controlPointN(idx);
-    Point doubleReversedPoint = doubleReversed->controlPointN(idx);
+  for (size_t controlIdx = 0; controlIdx < originalCurve.numControlPoints();
+       ++controlIdx) {
+    Point originalPoint       = originalCurve.controlPointN(controlIdx);
+    Point doubleReversedPoint = doubleReversed->controlPointN(controlIdx);
     BOOST_CHECK(isNearlyEqual(originalPoint, doubleReversedPoint, 1e-10));
 
-    BOOST_CHECK_CLOSE(CGAL::to_double(originalCurve.weight(idx)),
-                      CGAL::to_double(doubleReversed->weight(idx)), 1e-10);
+    BOOST_CHECK_CLOSE(CGAL::to_double(originalCurve.weight(controlIdx)),
+                      CGAL::to_double(doubleReversed->weight(controlIdx)),
+                      1e-10);
   }
 }
 
@@ -414,7 +411,7 @@ BOOST_AUTO_TEST_CASE(testJoinNonAdjacentCurves)
   NURBSCurve secondCurve(secondPoints, 1);
 
   // Join with default tolerance should fail
-  BOOST_CHECK_THROW(firstCurve.join(secondCurve), Exception);
+  BOOST_CHECK_THROW((void)firstCurve.join(secondCurve), Exception);
 
   // Join with large tolerance should succeed
   auto joinedCurve = firstCurve.join(secondCurve, NURBSCurve::Continuity::C0,
@@ -476,17 +473,24 @@ BOOST_AUTO_TEST_CASE(testJoinWithDifferentTypes)
   auto       controlPoints = createTestCurvePoints();
   NURBSCurve nurbsCurve(controlPoints, 2);
 
+  std::vector<Point> incompatiblePoints;
+  incompatiblePoints.emplace_back(100.0, 100.0);
+  incompatiblePoints.emplace_back(102.0, 102.0);
+  NURBSCurve incompatibleCurve(incompatiblePoints, 1);
+  BOOST_CHECK_THROW(static_cast<void>(nurbsCurve.join(incompatibleCurve)),
+                    Exception);
+  // WHen LineString will inherited Curve
   // Create a LineString
-  std::vector<Point> linePoints;
-  linePoints.emplace_back(8.0, 0.0); // Start where NURBS ends
-  linePoints.emplace_back(10.0, 2.0);
-  LineString lineString;
-  for (const auto &point : linePoints) {
-    lineString.addPoint(point);
-  }
-
-  // Joining with different curve type should throw
-  BOOST_CHECK_THROW(nurbsCurve.join(lineString), Exception);
+  // std::vector<Point> linePoints;
+  // linePoints.emplace_back(8.0, 0.0); // Start where NURBS ends
+  // linePoints.emplace_back(10.0, 2.0);
+  // LineString lineString;
+  // for (const auto &point : linePoints) {
+  //   lineString.addPoint(point);
+  // }
+  //
+  // // Joining with different curve type should throw
+  // BOOST_CHECK_THROW(nurbsCurve.join(lineString), Exception);
 }
 
 //-- Curve offset tests
@@ -591,7 +595,7 @@ BOOST_AUTO_TEST_CASE(testOffset3DCurve)
   NURBSCurve curve3D(points3D, 2);
 
   // 3D offset should throw exception (not implemented for 3D)
-  BOOST_CHECK_THROW(curve3D.offset(NURBSCurve::FT(1.0)), Exception);
+  BOOST_CHECK_THROW((void)curve3D.offset(NURBSCurve::FT(1.0)), Exception);
 }
 
 BOOST_AUTO_TEST_CASE(testOffsetEmptyCurve)

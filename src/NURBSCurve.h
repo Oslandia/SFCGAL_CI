@@ -358,7 +358,7 @@ public:
    * @throws Exception if index out of bounds
    */
   [[nodiscard]] auto
-  controlPointN(size_t index) -> Point &;
+  controlPointN(size_t index) -> Point & override;
 
   /**
    * @brief Access control point for reading
@@ -367,7 +367,7 @@ public:
    * @throws Exception if index out of bounds
    */
   [[nodiscard]] auto
-  controlPointN(size_t index) const -> const Point &;
+  controlPointN(size_t index) const -> const Point & override;
 
   /**
    * @brief Set individual control point with validation
@@ -403,7 +403,7 @@ public:
    * @throws Exception if index out of bounds
    */
   [[nodiscard]] auto
-  weight(size_t index) const -> FT;
+  weight(size_t index) const -> FT override;
 
   /**
    * @brief Set weight at specified index
@@ -419,7 +419,7 @@ public:
    * @return true if weights vary significantly from uniform
    */
   [[nodiscard]] auto
-  isRational() const -> bool;
+  isRational() const -> bool override;
 
   /**
    * @brief Check if curve is in Bezier form
@@ -486,7 +486,7 @@ public:
    * @return Control point count
    */
   [[nodiscard]] auto
-  numControlPoints() const -> size_t
+  numControlPoints() const -> size_t override
   {
     return _controlPoints.size();
   }
@@ -711,23 +711,20 @@ protected:
    * @param startParam Start parameter
    * @param endParam End parameter
    * @param tolerance Integration tolerance
-   * @param maxDepth Maximum recursion depth
    * @return Arc length between parameters
    */
   [[nodiscard]] auto
-  computeArcLength(Parameter startParam, Parameter endParam, FT tolerance,
-                   unsigned int maxDepth = 10) const -> FT;
+  computeArcLength(Parameter startParam, Parameter endParam, FT tolerance) const
+      -> FT;
 
   /**
    * @brief Find parameter corresponding to arc length using Newton-Raphson
    * @param targetLength Target arc length from start
    * @param tolerance Convergence tolerance
-   * @param maxIterations Maximum iterations for convergence
    * @return Parameter value at specified arc length
    */
   [[nodiscard]] auto
-  findParameterByArcLength(FT targetLength, FT tolerance,
-                           unsigned int maxIterations = 100) const -> Parameter;
+  findParameterByArcLength(FT targetLength, FT tolerance) const -> Parameter;
 
   /**
    * @brief Project point onto curve using Newton's method
