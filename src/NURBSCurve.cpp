@@ -5,13 +5,19 @@
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryVisitor.h"
 #include "SFCGAL/algorithm/distance.h"
+#include "SFCGAL/detail/ublas.h"
 #include <CGAL/Bbox_3.h>
 #include <algorithm>
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/lu.hpp>
 #include <cmath>
 #include <map>
 #include <numeric>
 
 namespace SFCGAL {
+
+// Type aliases for convenience in static helper functions
+using FT = NURBSCurve::FT;
 
 //-- Constructors and initialization
 
@@ -229,6 +235,423 @@ NURBSCurve::createCircularArc(const Point &center, FT radius, FT startAngle,
   return std::make_unique<NURBSCurve>(controlPoints, weights, 2, knots);
 }
 
+// Helper functions for different end condition interpolations
+
+// Static helper functions for matrix-based interpolation
+static auto
+findKnotSpan(FT parameter, unsigned int degree, const std::vector<FT> &knots)
+    -> size_t
+{
+  size_t n = knots.size() - degree - 1;
+
+  if (parameter >= knots[n]) {
+    return n - 1;
+  }
+  if (parameter <= knots[degree]) {
+    return degree;
+  }
+
+  size_t low  = degree;
+  size_t high = n;
+  size_t mid  = (low + high) / 2;
+
+  while (parameter < knots[mid] || parameter >= knots[mid + 1]) {
+    if (parameter < knots[mid]) {
+      high = mid;
+    } else {
+      low = mid;
+    }
+    mid = (low + high) / 2;
+  }
+
+  return mid;
+}
+
+static auto
+computeBasisFunctions(size_t span, FT parameter, unsigned int degree,
+                      const std::vector<FT> &knots) -> std::vector<FT>
+{
+  std::vector<FT> basis(degree + 1);
+  std::vector<FT> left(degree + 1);
+  std::vector<FT> right(degree + 1);
+
+  basis[0] = FT(1.0);
+
+  for (unsigned int j = 1; j <= degree; ++j) {
+    left[j]  = parameter - knots[span + 1 - j];
+    right[j] = knots[span + j] - parameter;
+
+    FT saved = FT(0.0);
+    for (unsigned int r = 0; r < j; ++r) {
+      FT temp  = basis[r] / (right[r + 1] + left[j - r]);
+      basis[r] = saved + right[r + 1] * temp;
+      saved    = left[j - r] * temp;
+    }
+    basis[j] = saved;
+  }
+
+  return basis;
+}
+
+static auto
+computeBasisDerivatives(size_t span, FT parameter, unsigned int degree,
+                        const std::vector<FT> &knots,
+                        unsigned int           maxDerivative)
+    -> std::vector<std::vector<FT>>
+{
+  std::vector<std::vector<FT>> ders(maxDerivative + 1,
+                                    std::vector<FT>(degree + 1, FT(0)));
+  std::vector<FT>              left(degree + 1);
+  std::vector<FT>              right(degree + 1);
+  std::vector<std::vector<FT>> ndu(degree + 1, std::vector<FT>(degree + 1));
+  std::vector<std::vector<FT>> a(2, std::vector<FT>(degree + 1));
+
+  ndu[0][0] = FT(1.0);
+
+  for (unsigned int j = 1; j <= degree; ++j) {
+    left[j]  = parameter - knots[span + 1 - j];
+    right[j] = knots[span + j] - parameter;
+    FT saved = FT(0.0);
+
+    for (unsigned int r = 0; r < j; ++r) {
+      ndu[j][r] = right[r + 1] + left[j - r];
+      FT temp   = ndu[r][j - 1] / ndu[j][r];
+      ndu[r][j] = saved + right[r + 1] * temp;
+      saved     = left[j - r] * temp;
+    }
+
+    ndu[j][j] = saved;
+  }
+
+  for (unsigned int j = 0; j <= degree; ++j) {
+    ders[0][j] = ndu[j][degree];
+  }
+
+  for (int r = 0; r <= static_cast<int>(degree); ++r) {
+    int s1 = 0, s2 = 1;
+    a[0][0] = FT(1.0);
+
+    for (unsigned int k = 1; k <= maxDerivative; ++k) {
+      FT  d  = FT(0.0);
+      int rk = r - static_cast<int>(k);
+      int pk = static_cast<int>(degree) - static_cast<int>(k);
+
+      if (r >= static_cast<int>(k)) {
+        a[s2][0] = a[s1][0] / ndu[pk + 1][rk];
+        d        = a[s2][0] * ndu[rk][pk];
+      }
+
+      int j1 = (rk >= -1) ? 1 : -rk;
+      int j2 = (r - 1 <= pk) ? static_cast<int>(k) - 1
+                             : static_cast<int>(degree) - r;
+
+      for (int j = j1; j <= j2; ++j) {
+        a[s2][j] = (a[s1][j] - a[s1][j - 1]) / ndu[pk + 1][rk + j];
+        d += a[s2][j] * ndu[rk + j][pk];
+      }
+
+      if (r <= pk) {
+        a[s2][k] = -a[s1][k - 1] / ndu[pk + 1][r];
+        d += a[s2][k] * ndu[r][pk];
+      }
+
+      ders[k][r] = d;
+
+      // Switch rows
+      std::swap(s1, s2);
+    }
+  }
+
+  // Multiply through by the correct factors
+  int r = static_cast<int>(degree);
+  for (unsigned int k = 1; k <= maxDerivative; ++k) {
+    for (unsigned int j = 0; j <= degree; ++j) {
+      ders[k][j] *= FT(r);
+    }
+    r *= (static_cast<int>(degree) - static_cast<int>(k));
+  }
+
+  return ders;
+}
+
+auto
+NURBSCurve::generateKnotVectorForEndCondition(
+    const std::vector<Parameter> &parameters, unsigned int degree,
+    EndCondition endCondition) -> std::vector<Knot>
+{
+  std::vector<Knot> knots;
+  size_t            numKnots = parameters.size() + degree + 1;
+  knots.reserve(numKnots);
+
+  switch (endCondition) {
+  case EndCondition::CLAMPED:
+  case EndCondition::NATURAL:
+  case EndCondition::TANGENT:
+    // Standard clamped knot vector
+    for (unsigned int idx = 0; idx <= degree; ++idx) {
+      knots.push_back(parameters.front());
+    }
+
+    for (size_t pointIdx = 1; pointIdx < parameters.size() - degree;
+         ++pointIdx) {
+      FT sum = FT(0);
+      for (unsigned int degIdx = 0; degIdx < degree; ++degIdx) {
+        sum += parameters[pointIdx + degIdx];
+      }
+      knots.push_back(sum / FT(degree));
+    }
+
+    for (unsigned int idx = 0; idx <= degree; ++idx) {
+      knots.push_back(parameters.back());
+    }
+    break;
+
+  case EndCondition::PERIODIC:
+    // Handled separately in interpolatePeriodicCurve
+    BOOST_THROW_EXCEPTION(Exception("Periodic knots handled separately"));
+    break;
+  }
+
+  return knots;
+}
+
+auto
+NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
+                                    const std::vector<Parameter> &parameters,
+                                    unsigned int                  degree,
+                                    const std::vector<Knot>      &knots)
+    -> std::vector<Point>
+{
+  // This is the original simple implementation - control points = data points
+  return points;
+}
+
+auto
+NURBSCurve::interpolateNaturalCurve(const std::vector<Point>     &points,
+                                    const std::vector<Parameter> &parameters,
+                                    unsigned int                  degree,
+                                    const std::vector<Knot>      &knots)
+    -> std::vector<Point>
+{
+  using namespace detail::ublas;
+
+  size_t n = points.size();
+  if (n < degree + 1) {
+    BOOST_THROW_EXCEPTION(
+        Exception("Not enough points for natural interpolation"));
+  }
+
+  // Set up the interpolation matrix system N * P = Q
+  // where N is the basis function matrix, P are control points, Q are data
+  // points
+
+  matrix<double> N(n, n);
+
+  // Fill basis function matrix
+  for (size_t i = 0; i < n; ++i) {
+    FT parameter = parameters[i];
+
+    // Find knot span
+    size_t span = findKnotSpan(parameter, degree, knots);
+
+    // Compute basis functions
+    auto basis = computeBasisFunctions(span, parameter, degree, knots);
+
+    // Fill row of matrix
+    std::fill(N.data().begin() + i * n, N.data().begin() + (i + 1) * n, 0.0);
+
+    size_t baseIdx = span - degree;
+    for (unsigned int j = 0; j <= degree && baseIdx + j < n; ++j) {
+      N(i, baseIdx + j) = CGAL::to_double(basis[j]);
+    }
+  }
+
+  // Add natural end conditions (minimize curvature at ends)
+  if (degree >= 2) {
+    // Replace first and last equations with curvature minimization
+    // Second derivative at ends should be minimal
+
+    // For simplicity, use zero second derivative conditions
+    // This is a simplified natural condition - full implementation would
+    // minimize integral of curvature
+
+    std::fill(N.data().begin(), N.data().begin() + n, 0.0);
+    std::fill(N.data().begin() + (n - 1) * n, N.data().begin() + n * n, 0.0);
+
+    // Set up second derivative = 0 at start
+    FT     startParam = parameters.front();
+    size_t startSpan  = findKnotSpan(startParam, degree, knots);
+    auto   startBasis2nd =
+        computeBasisDerivatives(startSpan, startParam, degree, knots, 2);
+
+    size_t startBaseIdx = startSpan - degree;
+    for (unsigned int j = 0; j <= degree && startBaseIdx + j < n; ++j) {
+      N(0, startBaseIdx + j) = CGAL::to_double(startBasis2nd[2][j]);
+    }
+
+    // Set up second derivative = 0 at end
+    FT     endParam = parameters.back();
+    size_t endSpan  = findKnotSpan(endParam, degree, knots);
+    auto   endBasis2nd =
+        computeBasisDerivatives(endSpan, endParam, degree, knots, 2);
+
+    size_t endBaseIdx = endSpan - degree;
+    for (unsigned int j = 0; j <= degree && endBaseIdx + j < n; ++j) {
+      N(n - 1, endBaseIdx + j) = CGAL::to_double(endBasis2nd[2][j]);
+    }
+  }
+
+  // Solve for each coordinate dimension
+  std::vector<Point> controlPoints;
+  controlPoints.reserve(n);
+
+  // Determine coordinate type from first point
+  CoordinateType coordType = COORDINATE_XY;
+  if (points[0].is3D() && points[0].isMeasured()) {
+    coordType = COORDINATE_XYZM;
+  } else if (points[0].is3D()) {
+    coordType = COORDINATE_XYZ;
+  } else if (points[0].isMeasured()) {
+    coordType = COORDINATE_XYM;
+  }
+
+  // Solve for X coordinates
+  vector<double> qx(n), px(n);
+  for (size_t i = 0; i < n; ++i) {
+    qx(i) = CGAL::to_double(points[i].x());
+    if (degree >= 2 && (i == 0 || i == n - 1)) {
+      qx(i) = 0.0; // Natural end condition: zero second derivative
+    }
+  }
+
+  // Solve N * px = qx
+  permutation_matrix<size_t> pm(n);
+  matrix<double>             NCopy = N;
+  lu_factorize(NCopy, pm);
+  lu_substitute(NCopy, pm, qx);
+  px = qx; // qx now contains solution
+
+  // Solve for Y coordinates
+  vector<double> qy(n), py(n);
+  for (size_t i = 0; i < n; ++i) {
+    qy(i) = CGAL::to_double(points[i].y());
+    if (degree >= 2 && (i == 0 || i == n - 1)) {
+      qy(i) = 0.0; // Natural end condition
+    }
+  }
+
+  NCopy = N;
+  lu_factorize(NCopy, pm);
+  lu_substitute(NCopy, pm, qy);
+  py = qy;
+
+  // Solve for Z coordinates if 3D
+  vector<double> pz(n);
+  if (points[0].is3D()) {
+    vector<double> qz(n);
+    for (size_t i = 0; i < n; ++i) {
+      qz(i) = CGAL::to_double(points[i].z());
+      if (degree >= 2 && (i == 0 || i == n - 1)) {
+        qz(i) = 0.0;
+      }
+    }
+
+    NCopy = N;
+    lu_factorize(NCopy, pm);
+    lu_substitute(NCopy, pm, qz);
+    pz = qz;
+  }
+
+  // Solve for M coordinates if measured
+  vector<double> pm_coord(n);
+  if (points[0].isMeasured()) {
+    vector<double> qm(n);
+    for (size_t i = 0; i < n; ++i) {
+      qm(i) = CGAL::to_double(points[i].m());
+      if (degree >= 2 && (i == 0 || i == n - 1)) {
+        qm(i) = 0.0;
+      }
+    }
+
+    NCopy = N;
+    lu_factorize(NCopy, pm);
+    lu_substitute(NCopy, pm, qm);
+    pm_coord = qm;
+  }
+
+  // Build control points
+  for (size_t i = 0; i < n; ++i) {
+    FT     x = FT(px(i));
+    FT     y = FT(py(i));
+    FT     z = points[0].is3D() ? FT(pz(i)) : FT(0);
+    double m = points[0].isMeasured() ? pm_coord(i) : NaN();
+
+    controlPoints.emplace_back(x, y, z, m, coordType);
+  }
+
+  return controlPoints;
+}
+
+auto
+NURBSCurve::interpolatePeriodicCurve(const std::vector<Point> &points,
+                                     unsigned int degree, KnotMethod knotMethod)
+    -> std::unique_ptr<NURBSCurve>
+{
+  if (points.size() < degree + 1) {
+    BOOST_THROW_EXCEPTION(
+        Exception("Not enough points for periodic interpolation"));
+  }
+
+  // Check if curve is actually closed
+  FT tolerance = FT(1e-10);
+  if (algorithm::distance(points.front(), points.back()) > tolerance) {
+    BOOST_THROW_EXCEPTION(
+        Exception("Points must form closed curve for periodic interpolation"));
+  }
+
+  // For periodic curves, we need to wrap points and create uniform knot spacing
+  std::vector<Point> periodicPoints = points;
+
+  // Remove duplicate end point for internal processing
+  if (periodicPoints.size() > 1) {
+    periodicPoints.pop_back();
+  }
+
+  size_t n = periodicPoints.size();
+
+  // Create periodic parameter vector
+  std::vector<Parameter> parameters;
+  parameters.reserve(n);
+
+  for (size_t i = 0; i < n; ++i) {
+    parameters.push_back(FT(i) / FT(n));
+  }
+
+  // Create periodic knot vector
+  std::vector<Knot> knots;
+  size_t            numKnots = n + degree + 1;
+  knots.reserve(numKnots);
+
+  // Periodic knots wrap around
+  for (size_t i = 0; i < numKnots; ++i) {
+    int knotIndex = static_cast<int>(i) - static_cast<int>(degree);
+    knots.push_back(FT(knotIndex) / FT(n));
+  }
+
+  // For now, use simple periodic control points (same as data points)
+  // A full implementation would solve a periodic interpolation system
+  std::vector<Point> controlPoints = periodicPoints;
+
+  auto curve = std::make_unique<NURBSCurve>(
+      controlPoints, std::vector<FT>(controlPoints.size(), FT(1)), degree,
+      knots);
+
+  curve->_fitPoints    = points;
+  curve->_fitTolerance = FT(0);
+
+  return curve;
+}
+
 auto
 NURBSCurve::interpolateCurve(const std::vector<Point> &points,
                              unsigned int degree, KnotMethod knotMethod,
@@ -240,34 +663,52 @@ NURBSCurve::interpolateCurve(const std::vector<Point> &points,
         Exception("Need at least 2 points for interpolation"));
   }
 
+  // Handle periodic curves specially
+  if (endCondition == EndCondition::PERIODIC) {
+    return interpolatePeriodicCurve(points, degree, knotMethod);
+  }
+
   if (degree >= points.size()) {
     degree = static_cast<unsigned int>(points.size() - 1);
   }
 
+  // Compute parameter values
   auto parameters = computeParameters(points, knotMethod);
 
-  std::vector<Knot> knots;
-  size_t            numKnots = points.size() + degree + 1;
-  knots.reserve(numKnots);
+  // Generate appropriate knot vector based on end condition
+  std::vector<Knot> knots =
+      generateKnotVectorForEndCondition(parameters, degree, endCondition);
 
-  for (unsigned int idx = 0; idx <= degree; ++idx) {
-    knots.push_back(parameters.front());
-  }
+  std::vector<Point> controlPoints;
 
-  for (size_t pointIdx = 1; pointIdx < points.size() - degree; ++pointIdx) {
-    FT sum = FT(0);
-    for (unsigned int degIdx = 0; degIdx < degree; ++degIdx) {
-      sum += parameters[pointIdx + degIdx];
-    }
-    knots.push_back(sum / FT(degree));
-  }
+  // Handle different end conditions
+  switch (endCondition) {
+  case EndCondition::CLAMPED:
+    controlPoints = interpolateClampedCurve(points, parameters, degree, knots);
+    break;
 
-  for (unsigned int idx = 0; idx <= degree; ++idx) {
-    knots.push_back(parameters.back());
+  case EndCondition::NATURAL:
+    controlPoints = interpolateNaturalCurve(points, parameters, degree, knots);
+    break;
+
+  case EndCondition::TANGENT:
+    // For now, fall back to clamped if no tangent vectors specified
+    // TODO: Add support for user-specified tangent vectors
+    controlPoints = interpolateClampedCurve(points, parameters, degree, knots);
+    break;
+
+  case EndCondition::PERIODIC:
+    // Already handled above
+    BOOST_THROW_EXCEPTION(Exception("Periodic case should be handled earlier"));
+    break;
+
+  default:
+    BOOST_THROW_EXCEPTION(Exception("Unknown EndCondition"));
   }
 
   auto curve = std::make_unique<NURBSCurve>(
-      points, std::vector<FT>(points.size(), FT(1)), degree, knots);
+      controlPoints, std::vector<FT>(controlPoints.size(), FT(1)), degree,
+      knots);
 
   curve->_fitPoints    = points;
   curve->_fitTolerance = FT(0);
@@ -304,6 +745,30 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
   curve->_fitTolerance = tolerance;
 
   return curve;
+}
+
+auto
+NURBSCurve::fitCurve(const std::vector<Point> &points, unsigned int degree,
+                     FitMethod fitMethod, KnotMethod knotMethod,
+                     EndCondition endCondition, FT tolerance,
+                     size_t maxControlPoints) -> std::unique_ptr<NURBSCurve>
+{
+  if (points.empty()) {
+    BOOST_THROW_EXCEPTION(Exception("Cannot fit curve with no points"));
+  }
+
+  switch (fitMethod) {
+  case FitMethod::INTERPOLATE:
+    // Use interpolation - pass through all points exactly
+    return interpolateCurve(points, degree, knotMethod, endCondition);
+
+  case FitMethod::APPROXIMATE:
+    // Use approximation - smooth curve within tolerance
+    return approximateCurve(points, degree, tolerance, maxControlPoints);
+
+  default:
+    BOOST_THROW_EXCEPTION(Exception("Unknown FitMethod"));
+  }
 }
 
 //-- Geometry interface implementation

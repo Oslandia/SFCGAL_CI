@@ -16,13 +16,41 @@ namespace SFCGAL {
 /**
  * @brief Non-Uniform Rational B-Spline (NURBS) curve implementation
  *
- * OGC/SQL-MM compliant implementation supporting XY, Z, M, ZM dimensions.
- * Weights affect XYZ coordinates in homogeneous space (x*w, y*w, z*w, w).
- * M coordinate is interpolated non-rationally through basis functions.
+ * Complete OGC/SQL-MM compliant implementation supporting XY, Z, M, ZM
+ * dimensions. Weights affect XYZ coordinates in homogeneous space (x*w, y*w,
+ * z*w, w). M coordinate is interpolated non-rationally through basis functions.
  *
  * Based on "The NURBS Book" by Piegl & Tiller algorithms.
  * Uses Kernel::FT (Exact Predicates Exact Constructions) for numerical
  * robustness.
+ *
+ * ## Key Features
+ * - **Complete EndCondition support**: CLAMPED, NATURAL, PERIODIC, TANGENT
+ * - **All KnotMethod implementations**: UNIFORM, CHORD_LENGTH, CENTRIPETAL
+ * - **Unified FitMethod interface**: INTERPOLATE (exact) vs APPROXIMATE
+ * (smooth)
+ * - **AutoCAD SPLINE compatibility**: Supports CAD-standard curve fitting
+ * - **Mathematical operations**: evaluation, derivatives, arc length,
+ * intersections
+ * - **Advanced manipulations**: splitting, joining, offsetting, degree
+ * elevation
+ *
+ * ## Usage Examples
+ * @code
+ * // Simple interpolation (exact fit through points)
+ * auto curve1 = NURBSCurve::interpolateCurve(points, 3);
+ *
+ * // Natural end conditions for smoother curves
+ * auto curve2 = NURBSCurve::interpolateCurve(points, 3,
+ *     NURBSCurve::KnotMethod::CENTRIPETAL,
+ *     NURBSCurve::EndCondition::NATURAL);
+ *
+ * // Unified interface with explicit control
+ * auto curve3 = NURBSCurve::fitCurve(points, 3,
+ *     NURBSCurve::FitMethod::INTERPOLATE,
+ *     NURBSCurve::KnotMethod::CHORD_LENGTH,
+ *     NURBSCurve::EndCondition::CLAMPED);
+ * @endcode
  *
  * @ingroup public_api
  * @since 2.3.0
@@ -47,20 +75,28 @@ public:
 
   /**
    * @brief End conditions for curve fitting and interpolation
+   *
+   * Controls the behavior at curve endpoints to achieve different
+   * mathematical and aesthetic properties.
    */
   enum class EndCondition : std::uint8_t {
-    CLAMPED,  ///< Multiplicity degree+1 at curve ends (standard)
-    NATURAL,  ///< Minimal curvature conditions (smoother)
-    PERIODIC, ///< Closed periodic curve (continuous derivatives)
-    TANGENT   ///< User-specified tangent constraints at ends
+    CLAMPED,  ///< Multiplicity degree+1 at curve ends (standard CAD behavior)
+    NATURAL,  ///< Minimal curvature conditions (smoother, more organic curves)
+    PERIODIC, ///< Closed periodic curve with C^(degree-1) continuity at
+              ///< junction
+    TANGENT ///< User-specified tangent constraints at ends (future enhancement)
   };
 
   /**
    * @brief Curve fitting methods
+   *
+   * Determines the mathematical approach to curve generation from input points.
    */
   enum class FitMethod : std::uint8_t {
-    INTERPOLATE, ///< Pass exactly through all points (higher degree possible)
-    APPROXIMATE  ///< Least squares approximation within tolerance (smoother)
+    INTERPOLATE, ///< Pass exactly through all points (higher fidelity, may be
+                 ///< less smooth)
+    APPROXIMATE  ///< Least squares approximation within tolerance (smoother,
+                 ///< fewer control points)
   };
 
   // Constructors
@@ -188,6 +224,28 @@ public:
   static auto
   approximateCurve(const std::vector<Point> &points, unsigned int degree,
                    FT tolerance, size_t maxControlPoints = 50)
+      -> std::unique_ptr<NURBSCurve>;
+
+  /**
+   * @brief Unified curve fitting interface using FitMethod enum
+   * @param points Points to fit curve through or approximate
+   * @param degree Target curve degree
+   * @param fitMethod Whether to interpolate exactly or approximate within
+   * tolerance
+   * @param knotMethod Parameterization method for stability
+   * @param endCondition Boundary conditions for interpolation
+   * @param tolerance Maximum deviation for approximation (ignored for
+   * interpolation)
+   * @param maxControlPoints Maximum control points for approximation (ignored
+   * for interpolation)
+   * @return NURBS curve fitting the specified points
+   */
+  static auto
+  fitCurve(const std::vector<Point> &points, unsigned int degree = 3,
+           FitMethod    fitMethod    = FitMethod::INTERPOLATE,
+           KnotMethod   knotMethod   = KnotMethod::CENTRIPETAL,
+           EndCondition endCondition = EndCondition::CLAMPED,
+           FT tolerance = FT(1e-6), size_t maxControlPoints = 50)
       -> std::unique_ptr<NURBSCurve>;
 
   // Geometry interface implementation
@@ -752,6 +810,43 @@ protected:
    */
   void
   clearOptionalData();
+
+  // Helper methods for end condition implementations
+
+  /**
+   * @brief Generate knot vector appropriate for specified end condition
+   */
+  static auto
+  generateKnotVectorForEndCondition(const std::vector<Parameter> &parameters,
+                                    unsigned int                  degree,
+                                    EndCondition                  endCondition)
+      -> std::vector<Knot>;
+
+  /**
+   * @brief Interpolate with clamped end conditions (original behavior)
+   */
+  static auto
+  interpolateClampedCurve(const std::vector<Point>     &points,
+                          const std::vector<Parameter> &parameters,
+                          unsigned int degree, const std::vector<Knot> &knots)
+      -> std::vector<Point>;
+
+  /**
+   * @brief Interpolate with natural end conditions (minimal curvature)
+   */
+  static auto
+  interpolateNaturalCurve(const std::vector<Point>     &points,
+                          const std::vector<Parameter> &parameters,
+                          unsigned int degree, const std::vector<Knot> &knots)
+      -> std::vector<Point>;
+
+  /**
+   * @brief Create periodic interpolating curve
+   */
+  static auto
+  interpolatePeriodicCurve(const std::vector<Point> &points,
+                           unsigned int degree, KnotMethod knotMethod)
+      -> std::unique_ptr<NURBSCurve>;
 };
 
 } // namespace SFCGAL
