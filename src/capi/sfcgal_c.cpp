@@ -2333,6 +2333,20 @@ sfcgal_primitive_delete(sfcgal_primitive_t *primitive) -> void
 }
 
 extern "C" auto
+sfcgal_primitive_is_equals(const sfcgal_primitive_t *prim1,
+                           const sfcgal_primitive_t *prim2) -> int
+{
+  int returnValue = 0;
+
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto *primitive1Cast = reinterpret_cast<const SFCGAL::Primitive *>(prim1);
+      auto *primitive2Cast = reinterpret_cast<const SFCGAL::Primitive *>(prim2);
+
+      returnValue = (*primitive1Cast) == (*primitive2Cast);
+      return returnValue;);
+}
+
+extern "C" auto
 sfcgal_primitive_parameter_double(const sfcgal_primitive_t *primitive,
                                   const char               *name) -> double
 {

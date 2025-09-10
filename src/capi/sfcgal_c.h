@@ -2286,6 +2286,18 @@ SFCGAL_API void
 sfcgal_primitive_delete(sfcgal_primitive_t *primitive);
 
 /**
+ * Returns true if prim1 is equals to prim2.
+ *
+ * Checks for primitive type and parameters equality.
+ * @param prim1 Pointer to the first primitive.
+ * @param prim2 Pointer to the second primitive.
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_primitive_is_equals(const sfcgal_primitive_t *prim1,
+                           const sfcgal_primitive_t *prim2);
+
+/**
  * @brief Retrieves the value of a primitive parameter as a double.
  * @param primitive Pointer to the primitive.
  * @param name Name of the parameter to retrieve.

@@ -103,4 +103,11 @@ Primitive::invalidateCache()
   m_polyhedral_surface.reset();
 }
 
+auto
+operator==(const Primitive &pa, const Primitive &pb) -> bool
+{
+  return pa.primitiveTypeId() == pb.primitiveTypeId() &&
+         pa.parameters() == pb.parameters();
+}
+
 } // namespace SFCGAL

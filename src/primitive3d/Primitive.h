@@ -174,6 +174,14 @@ protected:
   mutable std::optional<PolyhedralSurface>            m_polyhedral_surface;
 };
 
+/**
+ * Equality operator
+ * @todo only compare coordinate points
+ * @pre the two geometries must be valid
+ */
+SFCGAL_API bool
+operator==(const Primitive &, const Primitive &);
+
 } // namespace SFCGAL
 
 #endif // SFCGAL_PRIMITIVE_H_
