@@ -14,7 +14,7 @@
 namespace SFCGAL {
 
 /**
- * @brief Non-Uniform Rational B-Spline (NURBS) curve implementation
+ * @brief Non-Uniform Rational B-Spline (NURbS) curve implementation
  *
  * Complete OGC/SQL-MM compliant implementation supporting XY, Z, M, ZM
  * dimensions. Weights affect XYZ coordinates in homogeneous space (x*w, y*w,
