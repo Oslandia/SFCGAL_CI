@@ -210,7 +210,8 @@ auto
 weightedCentroid(const Curve &g, bool enable3DComputation) -> WeightedCentroid
 {
   // Convert curve to LineString approximation for centroid calculation
-  auto lineString = g.toLineString(64); // Use 64 segments for good approximation
+  auto lineString =
+      g.toLineString(64); // Use 64 segments for good approximation
   return weightedCentroid(*lineString, enable3DComputation);
 }
 

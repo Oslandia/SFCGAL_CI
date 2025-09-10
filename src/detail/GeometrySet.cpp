@@ -501,7 +501,7 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
     auto lineString = g.as<Curve>().toLineString(64);
     for (size_t i = 0; i < lineString->numPoints() - 1; ++i) {
       typename TypeForDimension<Dim>::Segment const seg(
-          lineString->pointN(i).toPoint_d<Dim>(), 
+          lineString->pointN(i).toPoint_d<Dim>(),
           lineString->pointN(i + 1).toPoint_d<Dim>());
       _segments.insert(seg);
     }

@@ -37,8 +37,9 @@ using namespace boost::unit_test;
 BOOST_AUTO_TEST_SUITE(SFCGAL_NURBSCurveTest)
 
 //-- Helper functions
-std::vector<NURBSCurve::FT>
+auto
 convertWeights(const std::vector<double> &doubleWeights)
+    -> std::vector<NURBSCurve::FT>
 {
   std::vector<NURBSCurve::FT> weights;
   weights.reserve(doubleWeights.size());
@@ -48,8 +49,9 @@ convertWeights(const std::vector<double> &doubleWeights)
   return weights;
 }
 
-std::vector<NURBSCurve::Knot>
+auto
 convertKnots(const std::vector<double> &doubleKnots)
+    -> std::vector<NURBSCurve::Knot>
 {
   std::vector<NURBSCurve::Knot> knots;
   knots.reserve(doubleKnots.size());
@@ -59,22 +61,23 @@ convertKnots(const std::vector<double> &doubleKnots)
   return knots;
 }
 
-bool
-isNearlyEqual(double valueA, double valueB, double tolerance = 1e-10)
+auto
+isNearlyEqual(double valueA, double valueB, double tolerance = 1e-10) -> bool
 {
   return std::abs(valueA - valueB) < tolerance;
 }
 
-bool
+auto
 isNearlyEqual(const Point &firstPoint, const Point &secondPoint,
-              double tolerance = 1e-10)
+              double tolerance = 1e-10) -> bool
 {
   return algorithm::distance(firstPoint, secondPoint) <
          NURBSCurve::FT(tolerance);
 }
 
-std::vector<Point>
+auto
 createTestPoints(bool is3D = false, bool isMeasured = false)
+    -> std::vector<Point>
 {
   std::vector<Point> points;
 
@@ -111,8 +114,8 @@ createTestPoints(bool is3D = false, bool isMeasured = false)
   return points;
 }
 
-std::vector<Point>
-createTestCurvePoints()
+auto
+createTestCurvePoints() -> std::vector<Point>
 {
   std::vector<Point> points;
   points.emplace_back(0.0, 0.0);
@@ -122,28 +125,30 @@ createTestCurvePoints()
   return points;
 }
 
-std::vector<Point>
-createCircularPoints(double radius = 1.0, size_t numPoints = 8)
+auto
+createCircularPoints(const double radius = 1.0, const size_t numPoints = 8)
+    -> std::vector<Point>
 {
   std::vector<Point> points;
   for (size_t pointIdx = 0; pointIdx < numPoints; ++pointIdx) {
-    double angle = 2.0 * M_PI * pointIdx / numPoints;
+    double angle = 2.0 * M_PI * static_cast<double>(pointIdx) /
+                   static_cast<double>(numPoints);
     points.emplace_back(radius * std::cos(angle), radius * std::sin(angle));
   }
   return points;
 }
 
-void
+auto
 checkControlPointsEqual(const NURBSCurve &curve1, const NURBSCurve &curve2,
-                        double tolerance = 1e-10)
+                        double tolerance = 1e-10) -> void
 {
   BOOST_REQUIRE_EQUAL(curve1.numControlPoints(), curve2.numControlPoints());
 
   for (size_t idx = 0; idx < curve1.numControlPoints(); ++idx) {
-    const Point &p1 = curve1.controlPointN(idx);
-    const Point &p2 = curve2.controlPointN(idx);
+    const Point &point1 = curve1.controlPointN(idx);
+    const Point &point2 = curve2.controlPointN(idx);
 
-    BOOST_CHECK(isNearlyEqual(p1, p2, tolerance));
+    BOOST_CHECK(isNearlyEqual(point1, point2, tolerance));
   }
 }
 
@@ -937,19 +942,84 @@ public:
   std::string lastVisited;
   size_t      visitCount = 0;
 
-  void visit(Point &geom) override { lastVisited = "Point"; visitCount++; }
-  void visit(LineString &geom) override { lastVisited = "LineString"; visitCount++; }
-  void visit(Polygon &geom) override { lastVisited = "Polygon"; visitCount++; }
-  void visit(Triangle &geom) override { lastVisited = "Triangle"; visitCount++; }
-  void visit(Solid &geom) override { lastVisited = "Solid"; visitCount++; }
-  void visit(MultiPoint &geom) override { lastVisited = "MultiPoint"; visitCount++; }
-  void visit(MultiLineString &geom) override { lastVisited = "MultiLineString"; visitCount++; }
-  void visit(MultiPolygon &geom) override { lastVisited = "MultiPolygon"; visitCount++; }
-  void visit(MultiSolid &geom) override { lastVisited = "MultiSolid"; visitCount++; }
-  void visit(GeometryCollection &geom) override { lastVisited = "GeometryCollection"; visitCount++; }
-  void visit(PolyhedralSurface &geom) override { lastVisited = "PolyhedralSurface"; visitCount++; }
-  void visit(TriangulatedSurface &geom) override { lastVisited = "TriangulatedSurface"; visitCount++; }
-  void visit(NURBSCurve &geom) override { lastVisited = "NURBSCurve"; visitCount++; }
+  void
+  visit(Point &geom) override
+  {
+    lastVisited = "Point";
+    visitCount++;
+  }
+  void
+  visit(LineString &geom) override
+  {
+    lastVisited = "LineString";
+    visitCount++;
+  }
+  void
+  visit(Polygon &geom) override
+  {
+    lastVisited = "Polygon";
+    visitCount++;
+  }
+  void
+  visit(Triangle &geom) override
+  {
+    lastVisited = "Triangle";
+    visitCount++;
+  }
+  void
+  visit(Solid &geom) override
+  {
+    lastVisited = "Solid";
+    visitCount++;
+  }
+  void
+  visit(MultiPoint &geom) override
+  {
+    lastVisited = "MultiPoint";
+    visitCount++;
+  }
+  void
+  visit(MultiLineString &geom) override
+  {
+    lastVisited = "MultiLineString";
+    visitCount++;
+  }
+  void
+  visit(MultiPolygon &geom) override
+  {
+    lastVisited = "MultiPolygon";
+    visitCount++;
+  }
+  void
+  visit(MultiSolid &geom) override
+  {
+    lastVisited = "MultiSolid";
+    visitCount++;
+  }
+  void
+  visit(GeometryCollection &geom) override
+  {
+    lastVisited = "GeometryCollection";
+    visitCount++;
+  }
+  void
+  visit(PolyhedralSurface &geom) override
+  {
+    lastVisited = "PolyhedralSurface";
+    visitCount++;
+  }
+  void
+  visit(TriangulatedSurface &geom) override
+  {
+    lastVisited = "TriangulatedSurface";
+    visitCount++;
+  }
+  void
+  visit(NURBSCurve &geom) override
+  {
+    lastVisited = "NURBSCurve";
+    visitCount++;
+  }
 };
 
 class TestConstGeometryVisitor : public ConstGeometryVisitor {
@@ -957,19 +1027,84 @@ public:
   std::string lastVisited;
   size_t      visitCount = 0;
 
-  void visit(const Point &geom) override { lastVisited = "Point"; visitCount++; }
-  void visit(const LineString &geom) override { lastVisited = "LineString"; visitCount++; }
-  void visit(const Polygon &geom) override { lastVisited = "Polygon"; visitCount++; }
-  void visit(const Triangle &geom) override { lastVisited = "Triangle"; visitCount++; }
-  void visit(const Solid &geom) override { lastVisited = "Solid"; visitCount++; }
-  void visit(const MultiPoint &geom) override { lastVisited = "MultiPoint"; visitCount++; }
-  void visit(const MultiLineString &geom) override { lastVisited = "MultiLineString"; visitCount++; }
-  void visit(const MultiPolygon &geom) override { lastVisited = "MultiPolygon"; visitCount++; }
-  void visit(const MultiSolid &geom) override { lastVisited = "MultiSolid"; visitCount++; }
-  void visit(const GeometryCollection &geom) override { lastVisited = "GeometryCollection"; visitCount++; }
-  void visit(const PolyhedralSurface &geom) override { lastVisited = "PolyhedralSurface"; visitCount++; }
-  void visit(const TriangulatedSurface &geom) override { lastVisited = "TriangulatedSurface"; visitCount++; }
-  void visit(const NURBSCurve &geom) override { lastVisited = "NURBSCurve"; visitCount++; }
+  void
+  visit(const Point &geom) override
+  {
+    lastVisited = "Point";
+    visitCount++;
+  }
+  void
+  visit(const LineString &geom) override
+  {
+    lastVisited = "LineString";
+    visitCount++;
+  }
+  void
+  visit(const Polygon &geom) override
+  {
+    lastVisited = "Polygon";
+    visitCount++;
+  }
+  void
+  visit(const Triangle &geom) override
+  {
+    lastVisited = "Triangle";
+    visitCount++;
+  }
+  void
+  visit(const Solid &geom) override
+  {
+    lastVisited = "Solid";
+    visitCount++;
+  }
+  void
+  visit(const MultiPoint &geom) override
+  {
+    lastVisited = "MultiPoint";
+    visitCount++;
+  }
+  void
+  visit(const MultiLineString &geom) override
+  {
+    lastVisited = "MultiLineString";
+    visitCount++;
+  }
+  void
+  visit(const MultiPolygon &geom) override
+  {
+    lastVisited = "MultiPolygon";
+    visitCount++;
+  }
+  void
+  visit(const MultiSolid &geom) override
+  {
+    lastVisited = "MultiSolid";
+    visitCount++;
+  }
+  void
+  visit(const GeometryCollection &geom) override
+  {
+    lastVisited = "GeometryCollection";
+    visitCount++;
+  }
+  void
+  visit(const PolyhedralSurface &geom) override
+  {
+    lastVisited = "PolyhedralSurface";
+    visitCount++;
+  }
+  void
+  visit(const TriangulatedSurface &geom) override
+  {
+    lastVisited = "TriangulatedSurface";
+    visitCount++;
+  }
+  void
+  visit(const NURBSCurve &geom) override
+  {
+    lastVisited = "NURBSCurve";
+    visitCount++;
+  }
 };
 
 BOOST_AUTO_TEST_CASE(testGeometryVisitorIntegration)
@@ -1031,8 +1166,8 @@ BOOST_AUTO_TEST_CASE(testTransformNURBSCurve2D)
 
   // Check that all control points were translated
   for (size_t idx = 0; idx < originalCurve.numControlPoints(); ++idx) {
-    Point original    = originalCurve.controlPointN(idx);
-    Point transformed = transformedCurve.controlPointN(idx);
+    const Point &original    = originalCurve.controlPointN(idx);
+    const Point &transformed = transformedCurve.controlPointN(idx);
 
     BOOST_CHECK_CLOSE(CGAL::to_double(transformed.x()),
                       CGAL::to_double(original.x()) + 5.0, 1e-10);
@@ -1068,8 +1203,8 @@ BOOST_AUTO_TEST_CASE(testTransformNURBSCurve3D)
   BOOST_CHECK(transformedCurve.isRational());
 
   // Check first control point transformation
-  Point original    = originalCurve.controlPointN(0);
-  Point transformed = transformedCurve.controlPointN(0);
+  const Point &original    = originalCurve.controlPointN(0);
+  const Point &transformed = transformedCurve.controlPointN(0);
 
   // For point (0,0,0), rotation should still give (0,0,0)
   BOOST_CHECK_SMALL(CGAL::to_double(transformed.x()), 1e-10);
@@ -1183,63 +1318,63 @@ BOOST_AUTO_TEST_CASE(testIsValidAlgorithm)
 BOOST_AUTO_TEST_CASE(testBasicAlgorithmsOnNURBS)
 {
   // Create a simple NURBS curve
-  std::vector<Point> points = {
-    Point(0.0, 0.0),
-    Point(1.0, 1.0),
-    Point(2.0, 0.0),
-    Point(3.0, 1.0)
-  };
-  
-  auto curve = NURBSCurve::interpolateCurve(points, 2, 
+  std::vector<Point> points = {Point(0.0, 0.0), Point(1.0, 1.0),
+                               Point(2.0, 0.0), Point(3.0, 1.0)};
+
+  auto curve = NURBSCurve::interpolateCurve(points, 2,
                                             NURBSCurve::KnotMethod::CENTRIPETAL,
                                             NURBSCurve::EndCondition::CLAMPED);
-  
+
   // Ensure curve was created successfully
   BOOST_REQUIRE(curve != nullptr);
   BOOST_REQUIRE(!curve->isEmpty());
-  
+
   // Test area (should return 0 for curves)
   double area = algorithm::area(*curve);
   BOOST_CHECK_EQUAL(area, 0.0);
-  
+
   // Test volume (should return 0 for curves)
   auto vol = algorithm::volume(*curve);
   BOOST_CHECK_EQUAL(vol, 0.0);
-  
+
   // Test length (should return positive value)
   double length = algorithm::length(*curve);
   BOOST_CHECK(length > 0.0);
-  
-  // Test centroid (should return a point) - DISABLED due to memory access violation
-  // TODO: Investigate why algorithm::centroid causes memory access violation with NURBS curves
-  // auto centroidPoint = algorithm::centroid(*curve);
+
+  // Test centroid (should return a point) - DISABLED due to memory access
+  // violation
+  // TODO: Investigate why algorithm::centroid causes memory access violation
+  // with NURBS curves auto centroidPoint = algorithm::centroid(*curve);
   // BOOST_CHECK(centroidPoint != nullptr);
-  
-  // Test convex hull (should work via GetPointsVisitor) - DISABLED due to potential memory issues
-  // TODO: Investigate why algorithm::convexHull causes memory access violation with NURBS curves
-  // auto hull = algorithm::convexHull(*curve);
+
+  // Test convex hull (should work via GetPointsVisitor) - DISABLED due to
+  // potential memory issues
+  // TODO: Investigate why algorithm::convexHull causes memory access violation
+  // with NURBS curves auto hull = algorithm::convexHull(*curve);
   // BOOST_CHECK(hull != nullptr);
 }
 
 BOOST_AUTO_TEST_CASE(testDistanceAlgorithmsOnNURBS)
 {
-  std::vector<Point> points1 = {Point(0.0, 0.0), Point(1.0, 0.0), Point(2.0, 0.0)};
-  std::vector<Point> points2 = {Point(0.0, 1.0), Point(1.0, 1.0), Point(2.0, 1.0)};
-  
+  std::vector<Point> points1 = {Point(0.0, 0.0), Point(1.0, 0.0),
+                                Point(2.0, 0.0)};
+  std::vector<Point> points2 = {Point(0.0, 1.0), Point(1.0, 1.0),
+                                Point(2.0, 1.0)};
+
   auto curve1 = NURBSCurve::interpolateCurve(points1, 2);
   auto curve2 = NURBSCurve::interpolateCurve(points2, 2);
-  
+
   // Ensure curves were created successfully
   BOOST_REQUIRE(curve1 != nullptr);
   BOOST_REQUIRE(curve2 != nullptr);
   BOOST_REQUIRE(!curve1->isEmpty());
   BOOST_REQUIRE(!curve2->isEmpty());
-  
+
   // Test 2D distance
   double dist2d = algorithm::distance(*curve1, *curve2);
   BOOST_CHECK(dist2d >= 0.0);
   BOOST_CHECK(dist2d <= 1.1); // Should be approximately 1.0
-  
+
   // Test 3D distance
   double dist3d = algorithm::distance3D(*curve1, *curve2);
   BOOST_CHECK(dist3d >= 0.0);
@@ -1251,20 +1386,20 @@ BOOST_AUTO_TEST_CASE(testIntersectionAlgorithmsOnNURBS)
   // Create two intersecting curves
   std::vector<Point> points1 = {Point(0.0, 0.0), Point(2.0, 2.0)};
   std::vector<Point> points2 = {Point(0.0, 2.0), Point(2.0, 0.0)};
-  
+
   auto curve1 = NURBSCurve::interpolateCurve(points1, 1);
   auto curve2 = NURBSCurve::interpolateCurve(points2, 1);
-  
+
   // Ensure curves were created successfully
   BOOST_REQUIRE(curve1 != nullptr);
   BOOST_REQUIRE(curve2 != nullptr);
   BOOST_REQUIRE(!curve1->isEmpty());
   BOOST_REQUIRE(!curve2->isEmpty());
-  
+
   // Test intersects
   bool intersect = algorithm::intersects(*curve1, *curve2);
   BOOST_CHECK(intersect == true);
-  
+
   // Test intersection (should return non-empty geometry)
   auto result = algorithm::intersection(*curve1, *curve2);
   BOOST_CHECK(result != nullptr);
@@ -1502,9 +1637,8 @@ BOOST_AUTO_TEST_CASE(testWKTWithScientificNotation)
   // Check scientific notation parsing
   BOOST_CHECK(
       isNearlyEqual(CGAL::to_double(curve.controlPointN(1).x()), 100.0)); // 1e2
-  BOOST_CHECK(isNearlyEqual(
-      CGAL::to_double(curve.controlPointN(1).y()),
-      0.15)); // 1.5e-1
+  BOOST_CHECK(isNearlyEqual(CGAL::to_double(curve.controlPointN(1).y()),
+                            0.15)); // 1.5e-1
   BOOST_CHECK(
       isNearlyEqual(CGAL::to_double(curve.controlPointN(2).x()), 2.0)); // 2e0
 
