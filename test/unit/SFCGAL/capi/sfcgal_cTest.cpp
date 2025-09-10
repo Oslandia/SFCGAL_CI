@@ -1741,7 +1741,28 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   double newNumRadial = sfcgal_primitive_parameter_int(cylinder, "num_radial");
   BOOST_CHECK_EQUAL(newNumRadial, 36);
 
+  // polyhedral surface generation
+  sfcgal_geometry_t *polySurface =
+      sfcgal_primitive_as_polyhedral_surface(cylinder);
   sfcgal_primitive_delete(cylinder);
+
+  BOOST_REQUIRE(sfcgal_geometry_is_valid(polySurface));
+
+  char  *wktApi;
+  size_t wkbLen;
+  sfcgal_geometry_as_text_decim(polySurface, 2, &wktApi, &wkbLen);
+  const std::string strApi(wktApi, wkbLen);
+  sfcgal_free_buffer(wktApi);
+
+  std::string expectedWkt(SFCGAL_TEST_DIRECTORY);
+  expectedWkt += "/data/cylinder_expected.wkt";
+  std::ifstream efs(expectedWkt.c_str());
+  BOOST_REQUIRE(efs.good());
+  std::getline(efs, expectedWkt);
+
+  BOOST_CHECK_EQUAL(strApi, expectedWkt);
+
+  sfcgal_geometry_delete(polySurface);
 }
 
 BOOST_AUTO_TEST_CASE(testTorusTest)

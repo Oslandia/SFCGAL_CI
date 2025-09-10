@@ -2443,3 +2443,13 @@ sfcgal_primitive_set_parameter_vector(sfcgal_primitive_t *primitive,
   primitive_set_parameter_array<SFCGAL::Kernel::Vector_3>(primitive, name,
                                                           vector);
 }
+
+extern "C" auto
+sfcgal_primitive_as_polyhedral_surface(sfcgal_primitive_t *primitive)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      return static_cast<SFCGAL::Geometry *>(new SFCGAL::PolyhedralSurface(
+          primitiveCast->generatePolyhedralSurface()));)
+}

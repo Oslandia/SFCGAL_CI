@@ -2048,6 +2048,16 @@ SFCGAL_API void
 sfcgal_primitive_set_parameter_vector(sfcgal_primitive_t *primitive,
                                       const char *name, const double *vector);
 
+/**
+ * @brief Generates a polyhedral surface representation of the primitive
+ * @param primitive Pointer to the primitive.
+ * @post The returned geometry must be deallocated by the caller with @ref
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_primitive_as_polyhedral_surface(sfcgal_primitive_t *primitive);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Error handling
