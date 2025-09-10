@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/distance.h"
 
+#include "SFCGAL/Curve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/Point.h"
@@ -37,6 +38,11 @@ distance(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
 
   case TYPE_LINESTRING:
     return distanceLineStringGeometry(gA.as<LineString>(), gB);
+
+  case TYPE_NURBSCURVE: {
+    auto lineString = gA.as<Curve>().toLineString(64);
+    return distanceLineStringGeometry(*lineString, gB);
+  }
 
   case TYPE_POLYGON:
     return distancePolygonGeometry(gA.as<Polygon>(), gB);
@@ -81,6 +87,11 @@ distancePointGeometry(const Point &gA, const Geometry &gB) -> double
 
   case TYPE_LINESTRING:
     return distancePointLineString(gA, gB.as<LineString>());
+
+  case TYPE_NURBSCURVE: {
+    auto lineString = gB.as<Curve>().toLineString(64);
+    return distancePointLineString(gA, *lineString);
+  }
 
   case TYPE_POLYGON:
     return distancePointPolygon(gA, gB.as<Polygon>());
@@ -187,6 +198,11 @@ distanceLineStringGeometry(const LineString &gA, const Geometry &gB) -> double
   case TYPE_LINESTRING:
     return distanceLineStringLineString(gA, gB.as<LineString>());
 
+  case TYPE_NURBSCURVE: {
+    auto lineString = gB.as<Curve>().toLineString(64);
+    return distanceLineStringLineString(gA, *lineString);
+  }
+
   case TYPE_POLYGON:
     return distanceLineStringPolygon(gA, gB.as<Polygon>());
 
@@ -281,6 +297,11 @@ distancePolygonGeometry(const Polygon &gA, const Geometry &gB) -> double
 
   case TYPE_LINESTRING:
     return distanceLineStringPolygon(gB.as<LineString>(), gA); // symetric
+
+  case TYPE_NURBSCURVE: {
+    auto lineString = gB.as<Curve>().toLineString(64);
+    return distanceLineStringPolygon(*lineString, gA); // symetric
+  }
 
   case TYPE_POLYGON:
     return distancePolygonPolygon(gA, gB.as<Polygon>());

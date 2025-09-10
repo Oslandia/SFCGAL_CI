@@ -72,6 +72,7 @@ volume(const Geometry &g) -> Kernel::FT
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
   case TYPE_LINESTRING:
+  case TYPE_NURBSCURVE:
   case TYPE_POLYGON:
   case TYPE_TRIANGLE:
   case TYPE_MULTIPOINT:

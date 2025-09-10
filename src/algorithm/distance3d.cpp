@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/distance3d.h"
 
+#include "SFCGAL/Curve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/Point.h"
@@ -48,6 +49,11 @@ distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
 
   case TYPE_LINESTRING:
     return distanceLineStringGeometry3D(gA.as<LineString>(), gB);
+
+  case TYPE_NURBSCURVE: {
+    auto lineString = gA.as<Curve>().toLineString(64);
+    return distanceLineStringGeometry3D(*lineString, gB);
+  }
 
   case TYPE_POLYGON:
     // SFCGAL_DEBUG( boost::format("gA is a Polygon (%s)") % gA.geometryTypeId()
@@ -104,6 +110,11 @@ distancePointGeometry3D(const Point &gA, const Geometry &gB) -> double
 
   case TYPE_LINESTRING:
     return distancePointLineString3D(gA, gB.as<LineString>());
+
+  case TYPE_NURBSCURVE: {
+    auto lineString = gB.as<Curve>().toLineString(64);
+    return distancePointLineString3D(gA, *lineString);
+  }
 
   case TYPE_TRIANGLE:
     return distancePointTriangle3D(gA, gB.as<Triangle>());
@@ -262,6 +273,11 @@ distanceLineStringGeometry3D(const LineString &gA, const Geometry &gB) -> double
 
   case TYPE_LINESTRING:
     return distanceLineStringLineString3D(gA, gB.as<LineString>());
+
+  case TYPE_NURBSCURVE: {
+    auto lineString = gB.as<Curve>().toLineString(64);
+    return distanceLineStringLineString3D(gA, *lineString);
+  }
 
   case TYPE_TRIANGLE:
     return distanceLineStringTriangle3D(gA, gB.as<Triangle>());
@@ -431,6 +447,11 @@ distanceTriangleGeometry3D(const Triangle &gA, const Geometry &gB) -> double
   case TYPE_LINESTRING:
     return distanceLineStringTriangle3D(gB.as<LineString>(), gA); // symetric
 
+  case TYPE_NURBSCURVE: {
+    auto lineString = gB.as<Curve>().toLineString(64);
+    return distanceLineStringTriangle3D(*lineString, gA); // symetric
+  }
+
   case TYPE_TRIANGLE:
     return distanceTriangleTriangle3D(gA, gB.as<Triangle>());
 
@@ -598,6 +619,11 @@ distanceSolidGeometry3D(const Solid &gA, const Geometry &gB) -> double
 
   case TYPE_LINESTRING:
     return distanceLineStringSolid3D(gB.as<LineString>(), gA); // symetric
+
+  case TYPE_NURBSCURVE: {
+    auto lineString = gB.as<Curve>().toLineString(64);
+    return distanceLineStringSolid3D(*lineString, gA); // symetric
+  }
 
   case TYPE_TRIANGLE:
     return distanceTriangleSolid3D(gB.as<Triangle>(), gA); // symetric

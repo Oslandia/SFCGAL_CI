@@ -19,6 +19,7 @@ tesselate(const Geometry &g, NoValidityCheck /*unused*/)
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
   case TYPE_LINESTRING:
+  case TYPE_NURBSCURVE:
   case TYPE_TRIANGLE:
   case TYPE_MULTIPOINT:
   case TYPE_MULTILINESTRING:

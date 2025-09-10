@@ -6,6 +6,7 @@
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
+#include "SFCGAL/algorithm/isValid.h"
 
 using namespace SFCGAL;
 
@@ -21,7 +22,7 @@ BOOST_AUTO_TEST_CASE(testClampedEndCondition)
                                             NURBSCurve::EndCondition::CLAMPED);
 
   BOOST_CHECK(!curve->isEmpty());
-  BOOST_CHECK_EQUAL(curve->numPoints(), points.size());
+  BOOST_CHECK_EQUAL(curve->numControlPoints(), points.size());
 }
 
 BOOST_AUTO_TEST_CASE(testNaturalEndCondition)
@@ -36,8 +37,8 @@ BOOST_AUTO_TEST_CASE(testNaturalEndCondition)
                                             NURBSCurve::EndCondition::NATURAL);
 
   BOOST_CHECK(!curve->isEmpty());
-  BOOST_CHECK_EQUAL(curve->numPoints(), points.size());
-  BOOST_CHECK(curve->isValid());
+  BOOST_CHECK_EQUAL(curve->numControlPoints(), points.size());
+  BOOST_CHECK(algorithm::isValid(*curve).valid());
 }
 
 BOOST_AUTO_TEST_CASE(testPeriodicEndCondition)
@@ -52,7 +53,7 @@ BOOST_AUTO_TEST_CASE(testPeriodicEndCondition)
                                    NURBSCurve::EndCondition::PERIODIC);
 
   BOOST_CHECK(!curve->isEmpty());
-  BOOST_CHECK(curve->isValid());
+  BOOST_CHECK(algorithm::isValid(*curve).valid());
 }
 
 BOOST_AUTO_TEST_CASE(testPeriodicEndConditionNotClosed)
@@ -78,7 +79,7 @@ BOOST_AUTO_TEST_CASE(testTangentEndConditionFallback)
                                             NURBSCurve::EndCondition::TANGENT);
 
   BOOST_CHECK(!curve->isEmpty());
-  BOOST_CHECK_EQUAL(curve->numPoints(), points.size());
+  BOOST_CHECK_EQUAL(curve->numControlPoints(), points.size());
 }
 
 BOOST_AUTO_TEST_CASE(testFitMethodInterface)
@@ -111,15 +112,15 @@ BOOST_AUTO_TEST_CASE(testKnotMethodConsistency)
   // All knot methods should produce valid curves
   auto uniformCurve =
       NURBSCurve::interpolateCurve(points, 3, NURBSCurve::KnotMethod::UNIFORM);
-  BOOST_CHECK(uniformCurve->isValid());
+  BOOST_CHECK(algorithm::isValid(*uniformCurve).valid());
 
   auto chordCurve = NURBSCurve::interpolateCurve(
       points, 3, NURBSCurve::KnotMethod::CHORD_LENGTH);
-  BOOST_CHECK(chordCurve->isValid());
+  BOOST_CHECK(algorithm::isValid(*chordCurve).valid());
 
   auto centripetalCurve = NURBSCurve::interpolateCurve(
       points, 3, NURBSCurve::KnotMethod::CENTRIPETAL);
-  BOOST_CHECK(centripetalCurve->isValid());
+  BOOST_CHECK(algorithm::isValid(*centripetalCurve).valid());
 }
 
 BOOST_AUTO_TEST_CASE(testNaturalVsClampedDifference)
@@ -137,9 +138,9 @@ BOOST_AUTO_TEST_CASE(testNaturalVsClampedDifference)
       NURBSCurve::EndCondition::NATURAL);
 
   // Both should be valid but potentially different
-  BOOST_CHECK(clampedCurve->isValid());
-  BOOST_CHECK(naturalCurve->isValid());
-  BOOST_CHECK_EQUAL(clampedCurve->numPoints(), naturalCurve->numPoints());
+  BOOST_CHECK(algorithm::isValid(*clampedCurve).valid());
+  BOOST_CHECK(algorithm::isValid(*naturalCurve).valid());
+  BOOST_CHECK_EQUAL(clampedCurve->numControlPoints(), naturalCurve->numControlPoints());
 }
 
 BOOST_AUTO_TEST_CASE(testBackwardCompatibility)

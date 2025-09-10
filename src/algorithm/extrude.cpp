@@ -301,6 +301,10 @@ extrude(const Geometry &g, const Kernel::Vector_3 &v)
   case TYPE_LINESTRING:
     return std::unique_ptr<Geometry>(extrude(g.as<LineString>(), v));
 
+  case TYPE_NURBSCURVE:
+    BOOST_THROW_EXCEPTION(
+        Exception("extrude() not implemented for NURBSCurve"));
+
   case TYPE_POLYGON:
     return std::unique_ptr<Geometry>(extrude(g.as<Polygon>(), v));
 

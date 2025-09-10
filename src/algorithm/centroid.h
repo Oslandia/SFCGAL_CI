@@ -10,6 +10,10 @@
 #include "SFCGAL/Kernel.h"
 
 namespace SFCGAL {
+class Curve;
+}
+
+namespace SFCGAL {
 namespace algorithm {
 
 /**
@@ -84,6 +88,13 @@ weightedCentroid(const Triangle &g, bool enable3DComputation = false);
 SFCGAL_API WeightedCentroid
 weightedCentroid(const Point &a, const Point &b, const Point &c,
                  bool enable3DComputation = false);
+
+/**
+ * Returns the weighted centroid for a Curve
+ * @ingroup detail
+ */
+SFCGAL_API WeightedCentroid
+weightedCentroid(const Curve &g, bool enable3DComputation = false);
 
 /**
  * Returns the weighted centroid for a LineString

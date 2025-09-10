@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/offset.h"
 
+#include "SFCGAL/Curve.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/Polygon.h"
@@ -315,6 +316,12 @@ offset(const Geometry &g, const double &radius,
 
   case TYPE_LINESTRING:
     return offset(g.as<LineString>(), radius, polygonSet);
+
+  case TYPE_NURBSCURVE: {
+    // Convert NURBS curve to LineString and apply offset
+    auto lineString = g.as<Curve>().toLineString(64);
+    return offset(*lineString, radius, polygonSet);
+  }
 
   case TYPE_POLYGON:
     return offset(g.as<Polygon>(), radius, polygonSet);

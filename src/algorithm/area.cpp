@@ -35,6 +35,7 @@ area(const Geometry &g, NoValidityCheck /*unused*/) -> double
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
   case TYPE_LINESTRING:
+  case TYPE_NURBSCURVE:
     return 0;
 
   case TYPE_POLYGON:
@@ -159,6 +160,7 @@ area3D(const Geometry &g, NoValidityCheck /*unused*/) -> double
   switch (g.geometryTypeId()) {
   case TYPE_POINT:
   case TYPE_LINESTRING:
+  case TYPE_NURBSCURVE:
     return 0;
 
   case TYPE_POLYGON:

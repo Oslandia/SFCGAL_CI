@@ -5,6 +5,7 @@
 
 #include "SFCGAL/detail/GeometrySet.h"
 
+#include "SFCGAL/Curve.h"
 #include "SFCGAL/Envelope.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -492,6 +493,18 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
       _segments.insert(seg);
     }
 
+    break;
+  }
+
+  case TYPE_NURBSCURVE: {
+    // Convert NURBS curve to LineString approximation
+    auto lineString = g.as<Curve>().toLineString(64);
+    for (size_t i = 0; i < lineString->numPoints() - 1; ++i) {
+      typename TypeForDimension<Dim>::Segment const seg(
+          lineString->pointN(i).toPoint_d<Dim>(), 
+          lineString->pointN(i + 1).toPoint_d<Dim>());
+      _segments.insert(seg);
+    }
     break;
   }
 

@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/centroid.h"
 
+#include "SFCGAL/Curve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/Point.h"
@@ -126,6 +127,10 @@ weightedCentroid(const Geometry &g, bool enable3DComputation)
     wCent = weightedCentroid(g.as<LineString>(), enable3DComputation);
     break;
 
+  case TYPE_NURBSCURVE:
+    wCent = weightedCentroid(g.as<Curve>(), enable3DComputation);
+    break;
+
   case TYPE_POLYGON:
     wCent = weightedCentroid(g.as<Polygon>(), enable3DComputation);
     break;
@@ -199,6 +204,14 @@ weightedCentroid(const Point &a, const Point &b, const Point &c,
   }
 
   return {area, out, m};
+}
+
+auto
+weightedCentroid(const Curve &g, bool enable3DComputation) -> WeightedCentroid
+{
+  // Convert curve to LineString approximation for centroid calculation
+  auto lineString = g.toLineString(64); // Use 64 segments for good approximation
+  return weightedCentroid(*lineString, enable3DComputation);
 }
 
 auto
