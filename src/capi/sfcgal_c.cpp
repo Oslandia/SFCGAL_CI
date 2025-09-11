@@ -1297,17 +1297,17 @@ SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(area_3d, SFCGAL::algorithm::area3D)
 /// @publicsection
 
 extern "C" auto
-sfcgal_geometry_volume(const sfcgal_geometry_t *ga) -> double
+sfcgal_geometry_volume(const sfcgal_geometry_t *geom) -> double
 {
   double r = std::numeric_limits<double>::quiet_NaN();
 
   try {
     r = CGAL::to_double(
-        SFCGAL::algorithm::volume(*(const SFCGAL::Geometry *)(ga)));
+        SFCGAL::algorithm::volume(*(const SFCGAL::Geometry *)(geom)));
   } catch (std::exception &e) {
     SFCGAL_WARNING("During volume(A) :");
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return -1.0;
   }
@@ -1341,7 +1341,7 @@ sfcgal_geometry_is_planar(const sfcgal_geometry_t *ga) -> int
   return r ? 1 : 0;
 }
 
-/**
+/*
  * Get geometry orientation.
  * Returns:
  * -1 for a counter clock wise orientation,
