@@ -2397,7 +2397,6 @@ primitive_parameter_array(sfcgal_primitive_t *primitive, const char *name,
 #endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
 /// @} end of private section
 /// @publicsection
-/// @publicsection
 
 template <class T>
 auto
