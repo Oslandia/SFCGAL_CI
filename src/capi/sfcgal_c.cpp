@@ -81,6 +81,8 @@
 #include "SFCGAL/detail/transform/RoundTransform.h"
 #include <cmath>
 
+#include <boost/json.hpp>
+
 //
 // Note about sfcgal_geometry_t pointers: they are basically void* pointers that
 // represent pointers to a SFCGAL::Geometry. In order to support multiple
@@ -2357,6 +2359,26 @@ sfcgal_primitive_is_equals(const sfcgal_primitive_t *prim1,
 
       returnValue = (*primitive1Cast) == (*primitive2Cast);
       return returnValue;);
+}
+
+extern "C" auto
+sfcgal_primitive_parameters(const sfcgal_primitive_t *primitive, char **buffer,
+                            size_t *len) -> void
+{
+
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      const auto *primitiveCast =
+          reinterpret_cast<const SFCGAL::Primitive *>(primitive);
+      boost::json::array keys;
+      for (const auto &[key, value] : primitiveCast->parameters()) {
+        keys.emplace_back(key);
+      }
+
+      std::string keysStr = serialize(keys);
+      alloc_and_copy(keysStr, buffer, len); //
+  )
+
+  return;
 }
 
 extern "C" auto

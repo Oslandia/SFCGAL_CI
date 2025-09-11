@@ -1567,6 +1567,15 @@ BOOST_AUTO_TEST_CASE(testSphereTest)
 
   sfcgal_primitive_t *sphere = sfcgal_primitive_create(SFCGAL_TYPE_SPHERE);
 
+  // checks parameter list
+  char  *params;
+  size_t paramsLen;
+  sfcgal_primitive_parameters(sphere, &params, &paramsLen);
+  std::string paramsStr(params, paramsLen);
+  BOOST_CHECK_EQUAL(paramsStr, "[\"center\",\"direction\",\"num_horizontal\","
+                               "\"num_vertical\",\"radius\"]");
+  sfcgal_free_buffer(params);
+
   // radius parameter
   double radius = sfcgal_primitive_parameter_double(sphere, "radius");
   BOOST_CHECK_CLOSE(radius, 1.0, 1e-6);
@@ -1693,6 +1702,16 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
 
   sfcgal_primitive_t *cylinder = sfcgal_primitive_create(SFCGAL_TYPE_CYLINDER);
 
+  // checks parameter list
+  char  *params;
+  size_t paramsLen;
+  sfcgal_primitive_parameters(cylinder, &params, &paramsLen);
+  std::string paramsStr(params, paramsLen);
+  BOOST_CHECK_EQUAL(
+      paramsStr,
+      "[\"num_radial\",\"height\",\"radius\",\"axis\",\"base_center\"]");
+  sfcgal_free_buffer(params);
+
   // base_center parameter
   double *baseCenter =
       sfcgal_primitive_parameter_point(cylinder, "base_center");
@@ -1810,6 +1829,15 @@ BOOST_AUTO_TEST_CASE(testTorusTest)
 
   sfcgal_primitive_t *torus = sfcgal_primitive_create(SFCGAL_TYPE_TORUS);
 
+  // checks parameter list
+  char  *params;
+  size_t paramsLen;
+  sfcgal_primitive_parameters(torus, &params, &paramsLen);
+  std::string paramsStr(params, paramsLen);
+  BOOST_CHECK_EQUAL(paramsStr, "[\"tube_num_radial\",\"main_num_radial\","
+                               "\"tube_radius\",\"main_radius\"]");
+  sfcgal_free_buffer(params);
+
   // main_radius parameter
   double mainRadius = sfcgal_primitive_parameter_double(torus, "main_radius");
   BOOST_CHECK_CLOSE(mainRadius, 10.0, 1e-6);
@@ -1896,6 +1924,14 @@ BOOST_AUTO_TEST_CASE(testBoxTest)
 
   sfcgal_primitive_t *box = sfcgal_primitive_create(SFCGAL_TYPE_BOX);
 
+  // checks parameter list
+  char  *params;
+  size_t paramsLen;
+  sfcgal_primitive_parameters(box, &params, &paramsLen);
+  std::string paramsStr(params, paramsLen);
+  BOOST_CHECK_EQUAL(paramsStr, "[\"z_extent\",\"y_extent\",\"x_extent\"]");
+  sfcgal_free_buffer(params);
+
   // x_extent parameter
   double xExtent = sfcgal_primitive_parameter_double(box, "x_extent");
   BOOST_CHECK_CLOSE(xExtent, 1.0, 1e-6);
@@ -1960,6 +1996,14 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
 
   sfcgal_primitive_t *cube = sfcgal_primitive_create(SFCGAL_TYPE_CUBE);
 
+  // checks parameter list
+  char  *params;
+  size_t paramsLen;
+  sfcgal_primitive_parameters(cube, &params, &paramsLen);
+  std::string paramsStr(params, paramsLen);
+  BOOST_CHECK_EQUAL(paramsStr, "[\"size\"]");
+  sfcgal_free_buffer(params);
+
   // size parameter
   double size = sfcgal_primitive_parameter_double(cube, "size");
   BOOST_CHECK_CLOSE(size, 1.0, 1e-6);
@@ -2014,6 +2058,16 @@ BOOST_AUTO_TEST_CASE(testConeTest)
   sfcgal_set_error_handlers(printf, on_error);
 
   sfcgal_primitive_t *cone = sfcgal_primitive_create(SFCGAL_TYPE_CONE);
+
+  // checks parameter list
+  char  *params;
+  size_t paramsLen;
+  sfcgal_primitive_parameters(cone, &params, &paramsLen);
+  std::string paramsStr(params, paramsLen);
+  BOOST_CHECK_EQUAL(
+      paramsStr,
+      "[\"num_radial\",\"height\",\"top_radius\",\"bottom_radius\"]");
+  sfcgal_free_buffer(params);
 
   // bottom_radius parameter
   double bottomRadius =

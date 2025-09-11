@@ -2,7 +2,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install --yes \
     cmake libboost-chrono-dev libboost-program-options-dev libboost-timer-dev \
-    libboost-test-dev libboost-thread-dev \
+    libboost-test-dev libboost-thread-dev libboost-json-dev \
     libboost-system-dev libboost-serialization-dev \
     libmpfr-dev libgmp-dev \
     xz-utils
