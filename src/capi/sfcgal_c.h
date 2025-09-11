@@ -287,8 +287,10 @@ sfcgal_geometry_num_geometries(const sfcgal_geometry_t *geometryCollection);
 /**
  * Returns a WKT representation of the given geometry using CGAL exact integer
  * fractions as coordinate values
- * @post buffer is returned allocated and must be freed by the caller with @ref
- * sfcgal_free_buffer
+ * @param[out] buffer the output buffer
+ * @param[out] len the size of the @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
@@ -298,9 +300,11 @@ sfcgal_geometry_as_text(const sfcgal_geometry_t *, char **buffer, size_t *len);
  * Returns a WKT representation of the given geometry using floating point
  * coordinate values. Floating point precision can be set via the numDecimals
  * parameter. Setting numDecimals to -1 yields the same result as
- * @ref sfcgal_geometry_as_text.
- * @post buffer is returned allocated and must be freed by the caller with @ref
- * sfcgal_free_buffer
+ * @ref sfcgal_geometry_as_text()
+ * @param[out] buffer the output buffer
+ * @param[out] len the size of the @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
@@ -309,8 +313,10 @@ sfcgal_geometry_as_text_decim(const sfcgal_geometry_t *, int numDecimals,
 
 /**
  * Returns a WKB representation of the given geometry
- * @post buffer is returned allocated and must be freed by the caller with @ref
- * sfcgal_free_buffer
+ * @param[out] buffer the output buffer
+ * @param[out] len the size of the @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
@@ -318,8 +324,10 @@ sfcgal_geometry_as_wkb(const sfcgal_geometry_t *, char **buffer, size_t *len);
 
 /**
  * Returns a WKB representation as hexadecimal of the given geometry
- * @post buffer is returned allocated and must be freed by the caller with @ref
- * sfcgal_free_buffer
+ * @param[out] buffer the output buffer
+ * @param[out] len the size of the @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
@@ -328,6 +336,10 @@ sfcgal_geometry_as_hexwkb(const sfcgal_geometry_t *, char **buffer,
 
 /**
  * Creates a VTK string of the given geometry
+ * @param[out] buffer the output buffer
+ * @param[out] len the size of the @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
@@ -357,8 +369,8 @@ sfcgal_geometry_as_obj_file(const sfcgal_geometry_t *pgeom,
  * @param[in] pgeom the input geometry
  * @param[out] buffer the OBJ buffer
  * @param[out] len the size of @p buffer
- * @post buffer is returned allocated and must be freed by the caller with @ref
- * sfcgal_free_buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
@@ -371,6 +383,8 @@ sfcgal_geometry_as_obj(const sfcgal_geometry_t *pgeom, char **buffer,
  * @param[in] pgeom the input geometry
  * @param[out] buffer the STL buffer
  * @param[out] len the size of @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
@@ -1037,11 +1051,11 @@ sfcgal_prepared_geometry_set_srid(sfcgal_prepared_geometry_t *prepared, srid_t);
  * Returns an EWKT representation of the given PreparedGeometry
  * @param[in] prepared the input geometry
  * @param[in] num_decimals number of decimals. -2 for a variable number of
- * decimals.
- * @param[out] buffer the EWKT buffer
- * @param[out] len the size of @p buffer
- * @post buffer is returned allocated and must be freed by the caller with @ref
- * sfcgal_free_buffer
+ *            decimals.
+ * @param[out] buffer the output buffer
+ * @param[out] len the size of the @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
@@ -1105,8 +1119,8 @@ sfcgal_io_read_wkb(const char *str, size_t len);
  * @param[in] geom the prepared geometry
  * @param[out] buffer The binary buffer
  * @param[out] len The size of @p buffer
- * @post buffer is returned allocated and must be freed by the caller with @ref
- * sfcgal_free_buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
