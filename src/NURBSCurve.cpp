@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/NURBSCurve.h"
+#include "SFCGAL/Envelope.h"
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryVisitor.h"
 #include "SFCGAL/algorithm/distance.h"
 #include "SFCGAL/algorithm/offset.h"
 #include "SFCGAL/detail/EnvelopeVisitor.h"
-#include "SFCGAL/Envelope.h"
 #include "SFCGAL/detail/ublas.h"
 #include <CGAL/Bbox_3.h>
 #include <algorithm>

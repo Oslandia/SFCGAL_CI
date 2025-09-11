@@ -1646,70 +1646,80 @@ BOOST_AUTO_TEST_CASE(testWKTWithScientificNotation)
 }
 
 namespace {
-  std::string controlPointsWKT(const std::vector<Point>& pts) {
-    std::ostringstream oss;
-    oss << "MULTIPOINT(";
-    for (std::size_t i = 0; i < pts.size(); i++) {
-      if (i > 0) oss << ",";
-      oss << "(" << CGAL::to_double(pts[i].x())
-          << " " << CGAL::to_double(pts[i].y());
-      if (pts[i].dimension() > 2) {
-        oss << " " << CGAL::to_double(pts[i].z());
-      }
-      oss << ")";
+std::string
+controlPointsWKT(const std::vector<Point> &pts)
+{
+  std::ostringstream oss;
+  oss << "MULTIPOINT(";
+  for (std::size_t i = 0; i < pts.size(); i++) {
+    if (i > 0)
+      oss << ",";
+    oss << "(" << CGAL::to_double(pts[i].x()) << " "
+        << CGAL::to_double(pts[i].y());
+    if (pts[i].dimension() > 2) {
+      oss << " " << CGAL::to_double(pts[i].z());
     }
     oss << ")";
-    return oss.str();
   }
-
-  void dumpCurve(const std::string& name, const NURBSCurve& curve, const std::vector<Point>& ctrlPts) {
-    std::cout << name << "\n";
-    std::cout << "Control points: " << controlPointsWKT(ctrlPts) << "\n";
-    std::cout << "LineString: " << curve.toLineString(10)->asText(3) << "\n";
-    std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
-  }
+  oss << ")";
+  return oss.str();
 }
+
+void
+dumpCurve(const std::string &name, const NURBSCurve &curve,
+          const std::vector<Point> &ctrlPts)
+{
+  std::cout << name << "\n";
+  std::cout << "Control points: " << controlPointsWKT(ctrlPts) << "\n";
+  std::cout << "LineString: " << curve.toLineString(10)->asText(3) << "\n";
+  std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
+}
+} // namespace
 
 BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
 {
   // 1. Cas 1 - Quadratique simple: NURBSCURVE((0 0, 5 10, 10 0), 2)
   {
-    std::vector<Point> pts = { Point(0,0), Point(5,10), Point(10,0) };
-    NURBSCurve curve(pts, 2);
+    std::vector<Point> pts = {Point(0, 0), Point(5, 10), Point(10, 0)};
+    NURBSCurve         curve(pts, 2);
     std::cout << "Cas 1 - Quadratique simple\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
     std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
   }
 
-  // 2. Cas 2 - Quadratique pondérée: NURBSCURVE((0 0, 5 10, 10 0), (1, 2, 1), 2)
+  // 2. Cas 2 - Quadratique pondérée: NURBSCURVE((0 0, 5 10, 10 0), (1, 2, 1),
+  // 2)
   {
-    std::vector<Point> pts = { Point(0,0), Point(5,10), Point(10,0) };
-    std::vector<NURBSCurve::FT> w = {1,2,1};
-    NURBSCurve curve(pts, w, 2);
+    std::vector<Point>          pts = {Point(0, 0), Point(5, 10), Point(10, 0)};
+    std::vector<NURBSCurve::FT> w   = {1, 2, 1};
+    NURBSCurve                  curve(pts, w, 2);
     std::cout << "Cas 2 - Quadratique pondérée\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
     std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
   }
 
-  // 3. Cas 3 - Quadratique avec nœuds explicites: NURBSCURVE((0 0, 3 6, 6 3, 9 0), (1,1,1,1), (0,0,0,0.5,1,1,1), 2)
+  // 3. Cas 3 - Quadratique avec nœuds explicites: NURBSCURVE((0 0, 3 6, 6 3, 9
+  // 0), (1,1,1,1), (0,0,0,0.5,1,1,1), 2)
   {
-    std::vector<Point> pts = { Point(0,0), Point(3,6), Point(6,3), Point(9,0) };
-    std::vector<NURBSCurve::FT> w = {1,1,1,1};
-    std::vector<NURBSCurve::Knot> k = {0,0,0,0.5,1,1,1};
-    NURBSCurve curve(pts, w, 2, k);
+    std::vector<Point>            pts = {Point(0, 0), Point(3, 6), Point(6, 3),
+                                         Point(9, 0)};
+    std::vector<NURBSCurve::FT>   w   = {1, 1, 1, 1};
+    std::vector<NURBSCurve::Knot> k   = {0, 0, 0, 0.5, 1, 1, 1};
+    NURBSCurve                    curve(pts, w, 2, k);
     std::cout << "Cas 3 - Quadratique avec nœuds explicites\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
     std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
   }
 
-  // 4. Cas 4 - Quadratique en 3D: (0, 0, 0), (5, 10, 5), (10, 0, 0) avec poids (1, 2, 1)
+  // 4. Cas 4 - Quadratique en 3D: (0, 0, 0), (5, 10, 5), (10, 0, 0) avec poids
+  // (1, 2, 1)
   {
-    std::vector<Point> pts = { Point(0,0,0), Point(5,10,5), Point(10,0,0) };
-    std::vector<NURBSCurve::FT> w = {1,2,1};
-    NURBSCurve curve(pts, w, 2);
+    std::vector<Point> pts = {Point(0, 0, 0), Point(5, 10, 5), Point(10, 0, 0)};
+    std::vector<NURBSCurve::FT> w = {1, 2, 1};
+    NURBSCurve                  curve(pts, w, 2);
     std::cout << "Cas 4 - Quadratique en 3D\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
@@ -1718,24 +1728,24 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
 
   // 5. Cas 5 - Quart de cercle: (1,0), (1,1), (0,1) avec poids (1, √2/2, 1)
   {
-    std::vector<Point> pts = { Point(1,0), Point(1,1), Point(0,1) };
-    std::vector<NURBSCurve::FT> w = {1, NURBSCurve::FT(std::sqrt(2.0)/2.0), 1};
-    std::vector<NURBSCurve::Knot> k = {0,0,0,1,1,1};
-    NURBSCurve curve(pts, w, 2, k);
+    std::vector<Point>            pts = {Point(1, 0), Point(1, 1), Point(0, 1)};
+    std::vector<NURBSCurve::FT>   w = {1, NURBSCurve::FT(std::sqrt(2.0) / 2.0),
+                                       1};
+    std::vector<NURBSCurve::Knot> k = {0, 0, 0, 1, 1, 1};
+    NURBSCurve                    curve(pts, w, 2, k);
     std::cout << "Cas 5 - Quart de cercle\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(3) << "\n";
-    std::cout << "Length: " << CGAL::to_double(curve.length()) 
-              << " (théorique ~" << M_PI/2.0 << ")\n\n";
+    std::cout << "Length: " << CGAL::to_double(curve.length())
+              << " (théorique ~" << M_PI / 2.0 << ")\n\n";
   }
 
   // 6. Cas 6 - S couché: degré 3, 7 points de contrôle
   {
-    std::vector<Point> pts = {
-      Point(0,0), Point(3,2), Point(6,-2), Point(9,0),
-      Point(12,2), Point(15,-2), Point(18,0)
-    };
-    NURBSCurve curve(pts, 3);
+    std::vector<Point> pts = {Point(0, 0), Point(3, 2),  Point(6, -2),
+                              Point(9, 0), Point(12, 2), Point(15, -2),
+                              Point(18, 0)};
+    NURBSCurve         curve(pts, 3);
     std::cout << "Cas 6 - S couché\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
@@ -1746,124 +1756,128 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
   {
     // Tous les points de contrôle des 4 quadrants comme dans geomdl
     std::vector<Point> allControlPts = {
-      Point(5,0), Point(5,5), Point(0,5),    // Q1
-      Point(0,5), Point(-5,5), Point(-5,0),  // Q2  
-      Point(-5,0), Point(-5,-5), Point(0,-5), // Q3
-      Point(0,-5), Point(5,-5), Point(5,0)   // Q4
+        Point(5, 0),  Point(5, 5),   Point(0, 5),  // Q1
+        Point(0, 5),  Point(-5, 5),  Point(-5, 0), // Q2
+        Point(-5, 0), Point(-5, -5), Point(0, -5), // Q3
+        Point(0, -5), Point(5, -5),  Point(5, 0)   // Q4
     };
-    
+
     // Créer une LineString composée en concaténant les 4 quadrants
-    std::vector<Point> allPoints;
-    std::vector<NURBSCurve::FT> w = {1, NURBSCurve::FT(std::sqrt(2.0)/2.0), 1};
-    std::vector<NURBSCurve::Knot> k = {0,0,0,1,1,1};
-    
+    std::vector<Point>            allPoints;
+    std::vector<NURBSCurve::FT>   w = {1, NURBSCurve::FT(std::sqrt(2.0) / 2.0),
+                                       1};
+    std::vector<NURBSCurve::Knot> k = {0, 0, 0, 1, 1, 1};
+
     // Q1: (5,0) -> (0,5)
-    std::vector<Point> pts1 = { Point(5,0), Point(5,5), Point(0,5) };
-    NURBSCurve curve1(pts1, w, 2, k);
-    auto ls1 = curve1.toLineString(50);
-    for (const auto& pt : ls1->points()) {
+    std::vector<Point> pts1 = {Point(5, 0), Point(5, 5), Point(0, 5)};
+    NURBSCurve         curve1(pts1, w, 2, k);
+    auto               ls1 = curve1.toLineString(50);
+    for (const auto &pt : ls1->points()) {
       allPoints.push_back(pt);
     }
-    
-    // Q2: (0,5) -> (-5,0)  
-    std::vector<Point> pts2 = { Point(0,5), Point(-5,5), Point(-5,0) };
-    NURBSCurve curve2(pts2, w, 2, k);
-    auto ls2 = curve2.toLineString(50);
-    for (size_t i = 1; i < ls2->numPoints(); ++i) { // Skip first point to avoid duplication
+
+    // Q2: (0,5) -> (-5,0)
+    std::vector<Point> pts2 = {Point(0, 5), Point(-5, 5), Point(-5, 0)};
+    NURBSCurve         curve2(pts2, w, 2, k);
+    auto               ls2 = curve2.toLineString(50);
+    for (size_t i = 1; i < ls2->numPoints();
+         ++i) { // Skip first point to avoid duplication
       allPoints.push_back(ls2->pointN(i));
     }
-    
+
     // Q3: (-5,0) -> (0,-5)
-    std::vector<Point> pts3 = { Point(-5,0), Point(-5,-5), Point(0,-5) };
-    NURBSCurve curve3(pts3, w, 2, k);
-    auto ls3 = curve3.toLineString(50);
+    std::vector<Point> pts3 = {Point(-5, 0), Point(-5, -5), Point(0, -5)};
+    NURBSCurve         curve3(pts3, w, 2, k);
+    auto               ls3 = curve3.toLineString(50);
     for (size_t i = 1; i < ls3->numPoints(); ++i) {
       allPoints.push_back(ls3->pointN(i));
     }
-    
+
     // Q4: (0,-5) -> (5,0)
-    std::vector<Point> pts4 = { Point(0,-5), Point(5,-5), Point(5,0) };
-    NURBSCurve curve4(pts4, w, 2, k);
-    auto ls4 = curve4.toLineString(50);
+    std::vector<Point> pts4 = {Point(0, -5), Point(5, -5), Point(5, 0)};
+    NURBSCurve         curve4(pts4, w, 2, k);
+    auto               ls4 = curve4.toLineString(50);
     for (size_t i = 1; i < ls4->numPoints(); ++i) {
       allPoints.push_back(ls4->pointN(i));
     }
-    
-    LineString fullCircle(allPoints);
-    NURBSCurve::FT totalLength = curve1.length() + curve2.length() + curve3.length() + curve4.length();
-    
+
+    LineString     fullCircle(allPoints);
+    NURBSCurve::FT totalLength =
+        curve1.length() + curve2.length() + curve3.length() + curve4.length();
+
     std::cout << "Cas 7 - Cercle\n";
     std::cout << controlPointsWKT(allControlPts) << "\n";
     std::cout << fullCircle.asText(2) << "\n";
-    std::cout << "Length: " << CGAL::to_double(totalLength)
-              << " (théorique ~" << 2*M_PI*5 << ")\n\n";
+    std::cout << "Length: " << CGAL::to_double(totalLength) << " (théorique ~"
+              << 2 * M_PI * 5 << ")\n\n";
   }
 
   // 8. Cas 8 - Ellipse (approximation via scaling des points de cercle)
   {
     // Tous les points de contrôle des 4 quadrants comme dans geomdl
     std::vector<Point> allControlPts = {
-      Point(8,0), Point(8,4), Point(0,4),    // Q1
-      Point(0,4), Point(-8,4), Point(-8,0),  // Q2
-      Point(-8,0), Point(-8,-4), Point(0,-4), // Q3
-      Point(0,-4), Point(8,-4), Point(8,0)   // Q4
+        Point(8, 0),  Point(8, 4),   Point(0, 4),  // Q1
+        Point(0, 4),  Point(-8, 4),  Point(-8, 0), // Q2
+        Point(-8, 0), Point(-8, -4), Point(0, -4), // Q3
+        Point(0, -4), Point(8, -4),  Point(8, 0)   // Q4
     };
-    
+
     // Créer une LineString composée en concaténant les 4 quadrants
-    std::vector<Point> allPoints;
-    std::vector<NURBSCurve::FT> w = {1, NURBSCurve::FT(std::sqrt(2.0)/2.0), 1};
-    std::vector<NURBSCurve::Knot> k = {0,0,0,1,1,1};
-    
+    std::vector<Point>            allPoints;
+    std::vector<NURBSCurve::FT>   w = {1, NURBSCurve::FT(std::sqrt(2.0) / 2.0),
+                                       1};
+    std::vector<NURBSCurve::Knot> k = {0, 0, 0, 1, 1, 1};
+
     // Q1: (8,0) -> (0,4)
-    std::vector<Point> pts1 = { Point(8,0), Point(8,4), Point(0,4) };
-    NURBSCurve curve1(pts1, w, 2, k);
-    auto ls1 = curve1.toLineString(50);
-    for (const auto& pt : ls1->points()) {
+    std::vector<Point> pts1 = {Point(8, 0), Point(8, 4), Point(0, 4)};
+    NURBSCurve         curve1(pts1, w, 2, k);
+    auto               ls1 = curve1.toLineString(50);
+    for (const auto &pt : ls1->points()) {
       allPoints.push_back(pt);
     }
-    
+
     // Q2: (0,4) -> (-8,0)
-    std::vector<Point> pts2 = { Point(0,4), Point(-8,4), Point(-8,0) };
-    NURBSCurve curve2(pts2, w, 2, k);
-    auto ls2 = curve2.toLineString(50);
+    std::vector<Point> pts2 = {Point(0, 4), Point(-8, 4), Point(-8, 0)};
+    NURBSCurve         curve2(pts2, w, 2, k);
+    auto               ls2 = curve2.toLineString(50);
     for (size_t i = 1; i < ls2->numPoints(); ++i) {
       allPoints.push_back(ls2->pointN(i));
     }
-    
+
     // Q3: (-8,0) -> (0,-4)
-    std::vector<Point> pts3 = { Point(-8,0), Point(-8,-4), Point(0,-4) };
-    NURBSCurve curve3(pts3, w, 2, k);
-    auto ls3 = curve3.toLineString(50);
+    std::vector<Point> pts3 = {Point(-8, 0), Point(-8, -4), Point(0, -4)};
+    NURBSCurve         curve3(pts3, w, 2, k);
+    auto               ls3 = curve3.toLineString(50);
     for (size_t i = 1; i < ls3->numPoints(); ++i) {
       allPoints.push_back(ls3->pointN(i));
     }
-    
+
     // Q4: (0,-4) -> (8,0)
-    std::vector<Point> pts4 = { Point(0,-4), Point(8,-4), Point(8,0) };
-    NURBSCurve curve4(pts4, w, 2, k);
-    auto ls4 = curve4.toLineString(50);
+    std::vector<Point> pts4 = {Point(0, -4), Point(8, -4), Point(8, 0)};
+    NURBSCurve         curve4(pts4, w, 2, k);
+    auto               ls4 = curve4.toLineString(50);
     for (size_t i = 1; i < ls4->numPoints(); ++i) {
       allPoints.push_back(ls4->pointN(i));
     }
-    
-    LineString fullEllipse(allPoints);
-    NURBSCurve::FT totalLength = curve1.length() + curve2.length() + curve3.length() + curve4.length();
-    
+
+    LineString     fullEllipse(allPoints);
+    NURBSCurve::FT totalLength =
+        curve1.length() + curve2.length() + curve3.length() + curve4.length();
+
     std::cout << "Cas 8 - Ellipse\n";
     std::cout << controlPointsWKT(allControlPts) << "\n";
-    std::cout << fullEllipse.asText(2) << "\n";  
+    std::cout << fullEllipse.asText(2) << "\n";
     std::cout << "Length: " << CGAL::to_double(totalLength) << "\n\n";
   }
 
   // 9. Cas 9 - Cœur stylisé: 13 points de contrôle, degré 3
   {
-    std::vector<Point> pts = {
-      Point(0,2), Point(2,4), Point(4,4), Point(5,2),
-      Point(5,0), Point(2.5,-3), Point(0,-5),
-      Point(-2.5,-3), Point(-5,0), Point(-5,2),
-      Point(-4,4), Point(-2,4), Point(0,2)
-    };
-    NURBSCurve curve(pts, 3);
+    std::vector<Point> pts = {Point(0, 2),  Point(2, 4),     Point(4, 4),
+                              Point(5, 2),  Point(5, 0),     Point(2.5, -3),
+                              Point(0, -5), Point(-2.5, -3), Point(-5, 0),
+                              Point(-5, 2), Point(-4, 4),    Point(-2, 4),
+                              Point(0, 2)};
+    NURBSCurve         curve(pts, 3);
     std::cout << "Cas 9 - Cœur\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(300)->asText(2) << "\n";
