@@ -39,6 +39,25 @@ enum class PrimitiveType : std::int8_t {
 using PrimitiveParameter =
     std::variant<Kernel::FT, Kernel::Point_3, Kernel::Vector_3, unsigned int>;
 
+/**
+ * @brief Abstract base class for primitive object (Cube, Cylinder, Cone, etc.)
+ *
+ * This class provides generic parameter functions to set, get, list member
+ * fields. All parameters needed by inherited classes must be declared in the
+ * constructor:
+ *
+ * \code{.cpp}
+ * SubClass::SubClass(const Kernel::FT &radius, const Kernel::FT &height,
+ *                    unsigned int num)
+ * {
+ *   m_parameters["radius"] = radius;
+ *   m_parameters["height"] = height;
+ *   m_parameters["num"]    = num;
+ *
+ *   SubClass::validateParameters(m_parameters);
+ * }
+ * \endcode
+ */
 class SFCGAL_API Primitive {
 
 public:
