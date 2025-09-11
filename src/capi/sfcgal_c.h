@@ -2286,6 +2286,16 @@ SFCGAL_API void
 sfcgal_primitive_delete(sfcgal_primitive_t *primitive);
 
 /**
+ * Returns a deep clone of the given primitive
+ * @param primitive Pointer to the primitive.
+ * @post returns a pointer to an allocated primitive that must be deallocated by
+ * sfcgal_primitive_delete()
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_primitive_t *
+sfcgal_primitive_clone(const sfcgal_primitive_t *primitive);
+
+/**
  * Returns true if prim1 is equals to prim2.
  *
  * Checks for primitive type and parameters equality.

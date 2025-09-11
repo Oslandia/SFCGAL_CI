@@ -2333,6 +2333,19 @@ sfcgal_primitive_delete(sfcgal_primitive_t *primitive) -> void
 }
 
 extern "C" auto
+sfcgal_primitive_clone(const sfcgal_primitive_t *prim) -> sfcgal_primitive_t *
+{
+  auto *primitive1Cast    = reinterpret_cast<const SFCGAL::Primitive *>(prim);
+  sfcgal_primitive_t *out = sfcgal_primitive_create(
+      static_cast<sfcgal_primitive_type_t>(primitive1Cast->primitiveTypeId()));
+
+  auto *outCast = reinterpret_cast<SFCGAL::Primitive *>(out);
+  outCast->operator=(*primitive1Cast);
+
+  return out;
+}
+
+extern "C" auto
 sfcgal_primitive_is_equals(const sfcgal_primitive_t *prim1,
                            const sfcgal_primitive_t *prim2) -> int
 {

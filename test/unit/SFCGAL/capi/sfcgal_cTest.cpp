@@ -1650,6 +1650,11 @@ BOOST_AUTO_TEST_CASE(testSphereTest)
   BOOST_CHECK_CLOSE(newDirection[2], expectedDirection[2], 1e-6);
   sfcgal_free_buffer(newDirection);
 
+  // check clone
+  sfcgal_primitive_t *sphere2 = sfcgal_primitive_clone(sphere);
+  BOOST_CHECK(sfcgal_primitive_is_equals(sphere, sphere2));
+  sfcgal_primitive_delete(sphere2);
+
   // check polyhedral conversion
   sfcgal_primitive_set_parameter_int(sphere, "num_vertical", 4);
   sfcgal_primitive_set_parameter_int(sphere, "num_horizontal", 4);
@@ -1770,6 +1775,11 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   double newNumRadial = sfcgal_primitive_parameter_int(cylinder, "num_radial");
   BOOST_CHECK_EQUAL(newNumRadial, 36);
 
+  // check clone
+  sfcgal_primitive_t *cylinder2 = sfcgal_primitive_clone(cylinder);
+  BOOST_CHECK(sfcgal_primitive_is_equals(cylinder, cylinder2));
+  sfcgal_primitive_delete(cylinder2);
+
   // polyhedral surface generation
   sfcgal_geometry_t *polySurface =
       sfcgal_primitive_as_polyhedral_surface(cylinder);
@@ -1848,6 +1858,11 @@ BOOST_AUTO_TEST_CASE(testTorusTest)
       sfcgal_primitive_parameter_int(torus, "tube_num_radial");
   BOOST_CHECK_EQUAL(newTubeNumRadial, 18);
 
+  // check clone
+  sfcgal_primitive_t *torus2 = sfcgal_primitive_clone(torus);
+  BOOST_CHECK(sfcgal_primitive_is_equals(torus, torus2));
+  sfcgal_primitive_delete(torus2);
+
   // check polyhedral conversion
   sfcgal_primitive_set_parameter_int(torus, "main_num_radial", 4);
   sfcgal_primitive_set_parameter_int(torus, "tube_num_radial", 4);
@@ -1915,6 +1930,11 @@ BOOST_AUTO_TEST_CASE(testBoxTest)
   BOOST_CHECK(hasError);
   hasError = false;
 
+  // check clone
+  sfcgal_primitive_t *box2 = sfcgal_primitive_clone(box);
+  BOOST_CHECK(sfcgal_primitive_is_equals(box, box2));
+  sfcgal_primitive_delete(box2);
+
   // check polyhedral conversion
   sfcgal_geometry_t *poly = sfcgal_primitive_as_polyhedral_surface(box);
   char              *wkbApi;
@@ -1962,6 +1982,11 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
   sfcgal_primitive_set_parameter_double(cube, "size", -2.2);
   BOOST_CHECK(hasError);
   hasError = false;
+
+  // check clone
+  sfcgal_primitive_t *cube2 = sfcgal_primitive_clone(cube);
+  BOOST_CHECK(sfcgal_primitive_is_equals(cube, cube2));
+  sfcgal_primitive_delete(cube2);
 
   // check polyhedral conversion
   sfcgal_primitive_set_parameter_double(cube, "size", 2.0);
@@ -2030,6 +2055,11 @@ BOOST_AUTO_TEST_CASE(testConeTest)
 
   double newNumRadial = sfcgal_primitive_parameter_int(cone, "num_radial");
   BOOST_CHECK_EQUAL(newNumRadial, 36);
+
+  // check clone
+  sfcgal_primitive_t *cone2 = sfcgal_primitive_clone(cone);
+  BOOST_CHECK(sfcgal_primitive_is_equals(cone, cone2));
+  sfcgal_primitive_delete(cone2);
 
   // check polyhedral conversion
   sfcgal_primitive_set_parameter_int(cone, "num_radial", 4);
