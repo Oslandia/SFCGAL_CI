@@ -16,6 +16,8 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/NURBSCurve.h"
+#include "SFCGAL/algorithm/distance.h"
 
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/boost/graph/helpers.h>
@@ -182,6 +184,36 @@ isClosedMultiSolid(const MultiSolid &msolid) -> Closure
   return Closure::closed();
 }
 
+auto
+isClosedNURBSCurve(const NURBSCurve &nurbsCurve) -> Closure
+{
+  if (nurbsCurve.isEmpty()) {
+    return Closure::closed();
+  }
+
+  if (nurbsCurve.numControlPoints() < 2) {
+    return Closure::closed();
+  }
+
+  // A NURBS curve is closed if its first and last evaluated points are identical
+  auto bounds = nurbsCurve.parameterBounds();
+  Point startPoint = nurbsCurve.evaluate(bounds.first);
+  Point endPoint = nurbsCurve.evaluate(bounds.second);
+
+  // Use tolerance for comparison  
+  const auto tolerance = NURBSCurve::FT(1e-10);
+  auto distance = SFCGAL::algorithm::distance(startPoint, endPoint);
+  
+  if (distance <= tolerance) {
+    return Closure::closed();
+  }
+  
+  return Closure::open(
+      (boost::format("NURBS curve endpoints are not coincident (distance: %g)") %
+       CGAL::to_double(distance))
+          .str());
+}
+
 } // namespace detail
 
 // ----------------------------------------------------------------------------------
@@ -216,6 +248,9 @@ isClosed(const Geometry &g) -> Closure
 
   case TYPE_MULTISOLID:
     return detail::isClosedMultiSolid(g.as<MultiSolid>());
+
+  case TYPE_NURBSCURVE:
+    return detail::isClosedNURBSCurve(g.as<NURBSCurve>());
 
   case TYPE_GEOMETRYCOLLECTION: {
     const auto &collection = g.as<GeometryCollection>();

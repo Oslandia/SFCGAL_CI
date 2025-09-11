@@ -182,13 +182,6 @@ public:
   parameterBounds() const -> std::pair<Parameter, Parameter> = 0;
 
   /**
-   * @brief Check if the curve is closed (start point = end point)
-   * @return true if curve forms a closed loop
-   */
-  [[nodiscard]] virtual auto
-  isClosed() const -> bool = 0;
-
-  /**
    * @brief Check if the curve is periodic
    * @return true if curve has periodic parameterization
    */
@@ -282,14 +275,6 @@ public:
        FT tolerance = FT(1e-6)) const -> std::unique_ptr<Curve> = 0;
 
   /**
-   * @brief Offset curve by distance (2D curves only)
-   * @param distance Offset distance (positive = left, negative = right)
-   * @return Offset curve
-   */
-  [[nodiscard]] virtual auto
-  offset(FT distance) const -> std::unique_ptr<Curve> = 0;
-
-  /**
    * @brief Project point onto curve
    * @param point Point to project
    * @param parameter Output parameter at closest point
@@ -298,40 +283,6 @@ public:
   [[nodiscard]] virtual auto
   closestPoint(const Point &point, Parameter *parameter = nullptr) const
       -> Point = 0;
-
-  /**
-   * @brief Compute distance from point to curve
-   * @param point Query point
-   * @return Minimum distance to curve
-   */
-  [[nodiscard]] virtual auto
-  distance(const Point &point) const -> FT = 0;
-
-  /**
-   * @brief Check if curve self-intersects
-   * @param intersections Output list of intersection parameters
-   * @return true if curve has self-intersections
-   */
-  [[nodiscard]] virtual auto
-  hasSelfIntersections(std::vector<std::pair<Parameter, Parameter>>
-                           *intersections = nullptr) const -> bool = 0;
-
-  /**
-   * @brief Find intersections with another curve
-   * @param other Other curve
-   * @param tolerance Intersection tolerance
-   * @return List of intersection points and parameters
-   */
-  [[nodiscard]] virtual auto
-  intersect(const Curve &other, FT tolerance = FT(1e-6)) const
-      -> std::vector<std::tuple<Point, Parameter, Parameter>> = 0;
-
-  /**
-   * @brief Get bounding box of curve
-   * @return Axis-aligned bounding box
-   */
-  [[nodiscard]] virtual auto
-  boundingBox() const -> std::pair<Point, Point> = 0;
 
   // NURBS-specific interface methods (virtual with default implementations)
 

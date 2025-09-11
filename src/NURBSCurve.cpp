@@ -5,6 +5,9 @@
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryVisitor.h"
 #include "SFCGAL/algorithm/distance.h"
+#include "SFCGAL/algorithm/offset.h"
+#include "SFCGAL/detail/EnvelopeVisitor.h"
+#include "SFCGAL/Envelope.h"
 #include "SFCGAL/detail/ublas.h"
 #include <CGAL/Bbox_3.h>
 #include <algorithm>
@@ -15,6 +18,22 @@
 #include <numeric>
 
 namespace SFCGAL {
+
+/*
+ * NURBS Curve Implementation Notes:
+ *
+ * This implementation follows algorithms from "The NURBS Book" by Piegl &
+ * Tiller and provides full support for rational B-splines with XYZM
+ * coordinates.
+ *
+ * Key Features:
+ * - Exact evaluation using CGAL's exact arithmetic types
+ * - Support for all coordinate types (XY, XYZ, XYM, XYZM)
+ * - Rational weights handled in homogeneous space
+ * - Multiple end conditions for curve fitting
+ * - Parameter generation methods for stability
+ *
+ */
 
 // Type aliases for convenience in static helper functions
 using FT = NURBSCurve::FT;
@@ -1132,19 +1151,6 @@ NURBSCurve::parameterBounds() const -> std::pair<Parameter, Parameter>
 }
 
 auto
-NURBSCurve::isClosed() const -> bool
-{
-  if (_controlPoints.size() < 2) {
-    return false;
-  }
-
-  const Point &startPoint = _controlPoints.front();
-  const Point &endPoint   = _controlPoints.back();
-
-  return algorithm::distance(startPoint, endPoint) < FT(1e-10);
-}
-
-auto
 NURBSCurve::isPeriodic() const -> bool
 {
   if (_controlPoints.size() < 2 || _degree == 0) {
@@ -1547,38 +1553,6 @@ NURBSCurve::join(const Curve &other, Continuity continuity, FT tolerance) const
 }
 
 auto
-NURBSCurve::offset(FT distance) const -> std::unique_ptr<Curve>
-{
-  if (is3D()) {
-    BOOST_THROW_EXCEPTION(Exception("Offset not implemented for 3D curves"));
-  }
-
-  if (distance == FT(0)) {
-    return std::unique_ptr<NURBSCurve>(clone());
-  }
-
-  auto               lineString = toLineString(64);
-  std::vector<Point> offsetPoints;
-  offsetPoints.reserve(lineString->numPoints());
-
-  auto bounds     = parameterBounds();
-  FT   paramRange = bounds.second - bounds.first;
-
-  for (size_t ptIdx = 0; ptIdx < lineString->numPoints(); ++ptIdx) {
-    Parameter param =
-        bounds.first +
-        (FT(ptIdx) / FT(lineString->numPoints() - 1)) * paramRange;
-    Point normalVec = normal(param);
-    Point original  = lineString->pointN(ptIdx);
-
-    offsetPoints.emplace_back(original.x() + distance * normalVec.x(),
-                              original.y() + distance * normalVec.y());
-  }
-
-  return std::make_unique<NURBSCurve>(offsetPoints, _degree);
-}
-
-auto
 NURBSCurve::closestPoint(const Point &point, Parameter *outParameter) const
     -> Point
 {
@@ -1594,157 +1568,6 @@ NURBSCurve::closestPoint(const Point &point, Parameter *outParameter) const
   }
 
   return closestPt;
-}
-
-auto
-NURBSCurve::distance(const Point &point) const -> FT
-{
-  Point closest = closestPoint(point);
-  return algorithm::distance(point, closest);
-}
-
-auto
-NURBSCurve::hasSelfIntersections(
-    std::vector<std::pair<Parameter, Parameter>> *intersections) const -> bool
-{
-  auto lineString = toLineString(100);
-
-  if (intersections) {
-    intersections->clear();
-  }
-
-  for (size_t firstIdx = 0; firstIdx < lineString->numPoints() - 3;
-       ++firstIdx) {
-    for (size_t secondIdx = firstIdx + 2;
-         secondIdx < lineString->numPoints() - 1; ++secondIdx) {
-      if (secondIdx <= firstIdx + 2)
-        continue;
-
-      Point segment1Start = lineString->pointN(firstIdx);
-      Point segment1End   = lineString->pointN(firstIdx + 1);
-      Point segment2Start = lineString->pointN(secondIdx);
-      Point segment2End   = lineString->pointN(secondIdx + 1);
-
-      if (algorithm::distance(segment1Start, segment2Start) < FT(1e-6) ||
-          algorithm::distance(segment1End, segment2End) < FT(1e-6)) {
-        if (intersections) {
-          auto bounds     = parameterBounds();
-          FT   paramRange = bounds.second - bounds.first;
-
-          Parameter param1 =
-              bounds.first +
-              (FT(firstIdx) / FT(lineString->numPoints() - 1)) * paramRange;
-          Parameter param2 =
-              bounds.first +
-              (FT(secondIdx) / FT(lineString->numPoints() - 1)) * paramRange;
-
-          intersections->emplace_back(param1, param2);
-        }
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-auto
-NURBSCurve::intersect(const Curve &other, FT tolerance) const
-    -> std::vector<std::tuple<Point, Parameter, Parameter>>
-{
-  const auto *otherNurbs = dynamic_cast<const NURBSCurve *>(&other);
-  if (!otherNurbs) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Intersection only implemented between NURBS curves"));
-  }
-
-  std::vector<std::tuple<Point, Parameter, Parameter>> result;
-
-  auto thisLineString  = toLineString(50);
-  auto otherLineString = otherNurbs->toLineString(50);
-
-  auto thisBounds  = parameterBounds();
-  auto otherBounds = otherNurbs->parameterBounds();
-
-  FT thisParamRange  = thisBounds.second - thisBounds.first;
-  FT otherParamRange = otherBounds.second - otherBounds.first;
-
-  for (size_t thisIdx = 0; thisIdx < thisLineString->numPoints(); ++thisIdx) {
-    Point thisPoint = thisLineString->pointN(thisIdx);
-
-    for (size_t otherIdx = 0; otherIdx < otherLineString->numPoints();
-         ++otherIdx) {
-      Point otherPoint = otherLineString->pointN(otherIdx);
-
-      if (algorithm::distance(thisPoint, otherPoint) <= tolerance) {
-        Parameter thisParam =
-            thisBounds.first +
-            (FT(thisIdx) / FT(thisLineString->numPoints() - 1)) *
-                thisParamRange;
-        Parameter otherParam =
-            otherBounds.first +
-            (FT(otherIdx) / FT(otherLineString->numPoints() - 1)) *
-                otherParamRange;
-
-        Point intersectionPoint =
-            Point((thisPoint.x() + otherPoint.x()) / FT(2),
-                  (thisPoint.y() + otherPoint.y()) / FT(2),
-                  thisPoint.is3D() ? (thisPoint.z() + otherPoint.z()) / FT(2)
-                                   : FT(0));
-
-        result.emplace_back(intersectionPoint, thisParam, otherParam);
-      }
-    }
-  }
-
-  return result;
-}
-
-auto
-NURBSCurve::boundingBox() const -> std::pair<Point, Point>
-{
-  if (_controlPoints.empty()) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Cannot compute bounding box of empty curve"));
-  }
-
-  FT minX = _controlPoints[0].x(), maxX = _controlPoints[0].x();
-  FT minY = _controlPoints[0].y(), maxY = _controlPoints[0].y();
-  FT minZ = _controlPoints[0].is3D() ? _controlPoints[0].z() : FT(0);
-  FT maxZ = minZ;
-
-  for (const auto &point : _controlPoints) {
-    minX = std::min(minX, point.x());
-    maxX = std::max(maxX, point.x());
-    minY = std::min(minY, point.y());
-    maxY = std::max(maxY, point.y());
-
-    if (point.is3D()) {
-      minZ = std::min(minZ, point.z());
-      maxZ = std::max(maxZ, point.z());
-    }
-  }
-
-  auto lineString = toLineString(32);
-  for (size_t ptIdx = 0; ptIdx < lineString->numPoints(); ++ptIdx) {
-    const Point &point = lineString->pointN(ptIdx);
-
-    minX = std::min(minX, point.x());
-    maxX = std::max(maxX, point.x());
-    minY = std::min(minY, point.y());
-    maxY = std::max(maxY, point.y());
-
-    if (point.is3D()) {
-      minZ = std::min(minZ, point.z());
-      maxZ = std::max(maxZ, point.z());
-    }
-  }
-
-  if (is3D()) {
-    return std::make_pair(Point(minX, minY, minZ), Point(maxX, maxY, maxZ));
-  } else {
-    return std::make_pair(Point(minX, minY), Point(maxX, maxY));
-  }
 }
 
 //-- NURBS-specific data access and manipulation
@@ -1944,33 +1767,38 @@ auto
 NURBSCurve::insertKnot(Knot parameter, unsigned int times) const
     -> std::unique_ptr<NURBSCurve>
 {
-  return std::unique_ptr<NURBSCurve>(clone());
+  BOOST_THROW_EXCEPTION(
+      Exception("insertKnot: NURBS knot insertion not yet implemented"));
 }
 
 auto
 NURBSCurve::refineKnotVector(const std::vector<Knot> &newKnots) const
     -> std::unique_ptr<NURBSCurve>
 {
-  return std::unique_ptr<NURBSCurve>(clone());
+  BOOST_THROW_EXCEPTION(Exception(
+      "refineKnotVector: NURBS knot vector refinement not yet implemented"));
 }
 
 auto
 NURBSCurve::elevateDegree(unsigned int times) const
     -> std::unique_ptr<NURBSCurve>
 {
-  return std::unique_ptr<NURBSCurve>(clone());
+  BOOST_THROW_EXCEPTION(
+      Exception("elevateDegree: NURBS degree elevation not yet implemented"));
 }
 
 auto
 NURBSCurve::reduceDegree(FT tolerance) const -> std::unique_ptr<NURBSCurve>
 {
-  return std::unique_ptr<NURBSCurve>(clone());
+  BOOST_THROW_EXCEPTION(
+      Exception("reduceDegree: NURBS degree reduction not yet implemented"));
 }
 
 auto
 NURBSCurve::removeKnots(FT tolerance) const -> std::unique_ptr<NURBSCurve>
 {
-  return std::unique_ptr<NURBSCurve>(clone());
+  BOOST_THROW_EXCEPTION(
+      Exception("removeKnots: NURBS knot removal not yet implemented"));
 }
 
 //-- Validation and utility methods
@@ -2051,7 +1879,6 @@ NURBSCurve::getCurveStatistics() const -> std::map<std::string, double>
   stats["num_knots"]          = static_cast<double>(_knotVector.size());
   stats["is_rational"]        = isRational() ? 1.0 : 0.0;
   stats["is_bezier"]          = isBezier() ? 1.0 : 0.0;
-  stats["is_closed"]          = isClosed() ? 1.0 : 0.0;
   stats["is_3d"]              = is3D() ? 1.0 : 0.0;
   stats["is_measured"]        = isMeasured() ? 1.0 : 0.0;
 
@@ -2071,16 +1898,23 @@ NURBSCurve::getCurveStatistics() const -> std::map<std::string, double>
 auto
 NURBSCurve::findSpan(Parameter parameter) const -> size_t
 {
+  // Binary search algorithm to find knot span containing parameter
+  // Based on Algorithm A2.1 from "The NURBS Book" by Piegl & Tiller
+  // Returns index i such that t_i <= parameter < t_{i+1}
+
   size_t numControlPoints = _controlPoints.size();
 
+  // Handle boundary cases - parameter at or beyond curve end
   if (parameter >= _knotVector[numControlPoints]) {
     return numControlPoints - 1;
   }
 
+  // Handle boundary cases - parameter at or before curve start
   if (parameter <= _knotVector[_degree]) {
     return _degree;
   }
 
+  // Binary search for the knot span
   size_t low  = _degree;
   size_t high = numControlPoints;
   size_t mid  = (low + high) / 2;
@@ -2100,6 +1934,9 @@ NURBSCurve::findSpan(Parameter parameter) const -> size_t
 auto
 NURBSCurve::deBoorRational(size_t span, Parameter parameter) const -> Point
 {
+  // De Boor's algorithm for rational B-spline evaluation
+  // Modified to handle weights and XYZM coordinates properly
+  // Based on Algorithm A4.1 from "The NURBS Book"
   struct HomogeneousPoint {
     FT     weightedX, weightedY, weightedZ, weight;
     double measure;

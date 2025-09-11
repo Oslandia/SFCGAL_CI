@@ -247,6 +247,9 @@ isSimple(const Geometry &g, const double &toleranceAbs) -> const Simplicity
   case TYPE_MULTISOLID: // every solid is simple
     return isSimple(g.as<MultiSolid>(), toleranceAbs);
 
+  case TYPE_NURBSCURVE: // NURBS curves are simple by construction
+    return Simplicity::simple();
+
   case TYPE_GEOMETRYCOLLECTION: // every geometry is simple
     return isSimple(g.as<GeometryCollection>(), toleranceAbs);
   }

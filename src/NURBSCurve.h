@@ -324,9 +324,6 @@ public:
   parameterBounds() const -> std::pair<Parameter, Parameter> override;
 
   [[nodiscard]] auto
-  isClosed() const -> bool override;
-
-  [[nodiscard]] auto
   isPeriodic() const -> bool override;
 
   [[nodiscard]] auto
@@ -368,25 +365,8 @@ public:
        FT tolerance = FT(1e-6)) const -> std::unique_ptr<Curve> override;
 
   [[nodiscard]] auto
-  offset(FT distance) const -> std::unique_ptr<Curve> override;
-
-  [[nodiscard]] auto
   closestPoint(const Point &point, Parameter *outParameter = nullptr) const
       -> Point override;
-
-  [[nodiscard]] auto
-  distance(const Point &point) const -> FT override;
-
-  [[nodiscard]] auto
-  hasSelfIntersections(std::vector<std::pair<Parameter, Parameter>>
-                           *intersections = nullptr) const -> bool override;
-
-  [[nodiscard]] auto
-  intersect(const Curve &other, FT tolerance = FT(1e-6)) const
-      -> std::vector<std::tuple<Point, Parameter, Parameter>> override;
-
-  [[nodiscard]] auto
-  boundingBox() const -> std::pair<Point, Point> override;
 
   // NURBS-specific access and manipulation methods
 

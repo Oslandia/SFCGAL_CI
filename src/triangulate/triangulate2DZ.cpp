@@ -6,6 +6,7 @@
 #include "SFCGAL/triangulate/triangulate2DZ.h"
 
 #include "SFCGAL/LineString.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/Triangle.h"
@@ -127,6 +128,11 @@ triangulate2DZ(const Geometry                  &g,
     triangulateCollection2DZ(g, triangulation);
     return;
 
+  case TYPE_NURBSCURVE: {
+    auto linestring = g.as<NURBSCurve>().toLineString();
+    triangulate2DZ(*linestring, triangulation);
+    return;
+  }
   case TYPE_SOLID:
   case TYPE_MULTISOLID:
     // note: we can't have a valid geom in 2D that comes from a solid
