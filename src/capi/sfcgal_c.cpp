@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -2442,4 +2443,402 @@ sfcgal_primitive_set_parameter_vector(sfcgal_primitive_t *primitive,
 {
   primitive_set_parameter_array<SFCGAL::Kernel::Vector_3>(primitive, name,
                                                           vector);
+}
+
+/*--------------------------------------------------------------------------------------*
+ *
+ * NURBSCurve support
+ *
+ *--------------------------------------------------------------------------------------*/
+
+// Helper functions for enum conversion
+namespace {
+auto
+cKnotMethodToCpp(sfcgal_knot_method_t method) -> SFCGAL::NURBSCurve::KnotMethod
+{
+  switch (method) {
+  case SFCGAL_KNOT_METHOD_UNIFORM:
+    return SFCGAL::NURBSCurve::KnotMethod::UNIFORM;
+  case SFCGAL_KNOT_METHOD_CHORD_LENGTH:
+    return SFCGAL::NURBSCurve::KnotMethod::CHORD_LENGTH;
+  case SFCGAL_KNOT_METHOD_CENTRIPETAL:
+    return SFCGAL::NURBSCurve::KnotMethod::CENTRIPETAL;
+  default:
+    return SFCGAL::NURBSCurve::KnotMethod::CENTRIPETAL;
+  }
+}
+
+auto
+cEndConditionToCpp(sfcgal_end_condition_t condition)
+    -> SFCGAL::NURBSCurve::EndCondition
+{
+  switch (condition) {
+  case SFCGAL_END_CONDITION_CLAMPED:
+    return SFCGAL::NURBSCurve::EndCondition::CLAMPED;
+  case SFCGAL_END_CONDITION_NATURAL:
+    return SFCGAL::NURBSCurve::EndCondition::NATURAL;
+  case SFCGAL_END_CONDITION_PERIODIC:
+    return SFCGAL::NURBSCurve::EndCondition::PERIODIC;
+  case SFCGAL_END_CONDITION_TANGENT:
+    return SFCGAL::NURBSCurve::EndCondition::TANGENT;
+  default:
+    return SFCGAL::NURBSCurve::EndCondition::CLAMPED;
+  }
+}
+
+auto
+cFitMethodToCpp(sfcgal_fit_method_t method) -> SFCGAL::NURBSCurve::FitMethod
+{
+  switch (method) {
+  case SFCGAL_FIT_METHOD_INTERPOLATE:
+    return SFCGAL::NURBSCurve::FitMethod::INTERPOLATE;
+  case SFCGAL_FIT_METHOD_APPROXIMATE:
+    return SFCGAL::NURBSCurve::FitMethod::APPROXIMATE;
+  default:
+    return SFCGAL::NURBSCurve::FitMethod::INTERPOLATE;
+  }
+}
+
+auto
+convertPointArray(const sfcgal_geometry_t **points, size_t num_points)
+    -> std::vector<SFCGAL::Point>
+{
+  std::vector<SFCGAL::Point> result;
+  result.reserve(num_points);
+  for (size_t i = 0; i < num_points; ++i) {
+    const auto *point = static_cast<const SFCGAL::Point *>(
+        reinterpret_cast<const SFCGAL::Geometry *>(points[i]));
+    result.push_back(*point);
+  }
+  return result;
+}
+
+auto
+convertWeightArray(const double *weights, size_t num_weights)
+    -> std::vector<SFCGAL::NURBSCurve::FT>
+{
+  std::vector<SFCGAL::NURBSCurve::FT> result;
+  if (weights != nullptr) {
+    result.reserve(num_weights);
+    for (size_t i = 0; i < num_weights; ++i) {
+      result.emplace_back(weights[i]);
+    }
+  }
+  return result;
+}
+
+auto
+convertKnotArray(const double *knots, size_t num_knots)
+    -> std::vector<SFCGAL::NURBSCurve::Knot>
+{
+  std::vector<SFCGAL::NURBSCurve::Knot> result;
+  result.reserve(num_knots);
+  for (size_t i = 0; i < num_knots; ++i) {
+    result.emplace_back(knots[i]);
+  }
+  return result;
+}
+
+} // anonymous namespace
+
+extern "C" auto
+sfcgal_nurbs_curve_create() -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return static_cast<SFCGAL::Geometry *>(new SFCGAL::NURBSCurve());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_from_points(const sfcgal_geometry_t **points,
+                                       size_t                   num_points,
+                                       unsigned int             degree,
+                                       sfcgal_knot_method_t     knot_method)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = std::make_unique<SFCGAL::NURBSCurve>(
+          pointVec, degree, cKnotMethodToCpp(knot_method));
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_from_points_and_weights(
+    const sfcgal_geometry_t **points, const double *weights, size_t num_points,
+    unsigned int degree, sfcgal_knot_method_t knot_method) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec  = convertPointArray(points, num_points);
+      auto weightVec = convertWeightArray(weights, num_points);
+      auto curve     = std::make_unique<SFCGAL::NURBSCurve>(
+          pointVec, weightVec, degree, cKnotMethodToCpp(knot_method));
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_from_full_data(const sfcgal_geometry_t **points,
+                                          const double             *weights,
+                                          size_t                   num_points,
+                                          unsigned int             degree,
+                                          const double             *knots,
+                                          size_t num_knots) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto weightVec = convertWeightArray(weights, num_points);
+      auto knotVec   = convertKnotArray(knots, num_knots);
+      auto curve = std::make_unique<SFCGAL::NURBSCurve>(pointVec, weightVec,
+                                                         degree, knotVec);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_bezier(const sfcgal_geometry_t **points,
+                                  size_t num_points) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::fromBezier(pointVec);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_bspline(const sfcgal_geometry_t **points,
+                                   size_t                   num_points,
+                                   unsigned int             degree)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::createBSpline(pointVec, degree);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_circular_arc(const sfcgal_geometry_t *center,
+                                        double                   radius,
+                                        double                   start_angle,
+                                        double                   end_angle,
+                                        const sfcgal_geometry_t *normal)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *centerPoint = static_cast<const SFCGAL::Point *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(center));
+      const auto *normalPoint =
+          normal ? static_cast<const SFCGAL::Point *>(
+                       reinterpret_cast<const SFCGAL::Geometry *>(normal))
+                 : nullptr;
+
+      SFCGAL::Point normalVec(0, 0, 1);
+      if (normalPoint != nullptr) { normalVec = *normalPoint; }
+
+      auto curve = SFCGAL::NURBSCurve::createCircularArc(
+          *centerPoint, SFCGAL::NURBSCurve::FT(radius),
+          SFCGAL::NURBSCurve::FT(start_angle),
+          SFCGAL::NURBSCurve::FT(end_angle), normalVec);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_interpolate(const sfcgal_geometry_t **points,
+                                size_t                   num_points,
+                                unsigned int             degree,
+                                sfcgal_knot_method_t     knot_method,
+                                sfcgal_end_condition_t end_condition)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::interpolateCurve(
+          pointVec, degree, cKnotMethodToCpp(knot_method),
+          cEndConditionToCpp(end_condition));
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_approximate(const sfcgal_geometry_t **points,
+                                size_t                   num_points,
+                                unsigned int             degree,
+                                double                   tolerance,
+                                size_t max_control_points) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::approximateCurve(
+          pointVec, degree, SFCGAL::NURBSCurve::FT(tolerance),
+          max_control_points);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_fit(const sfcgal_geometry_t **points, size_t num_points,
+                       unsigned int degree, sfcgal_fit_method_t fit_method,
+                       sfcgal_knot_method_t   knot_method,
+                       sfcgal_end_condition_t end_condition, double tolerance,
+                       size_t max_control_points) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::fitCurve(
+          pointVec, degree, cFitMethodToCpp(fit_method),
+          cKnotMethodToCpp(knot_method), cEndConditionToCpp(end_condition),
+          SFCGAL::NURBSCurve::FT(tolerance), max_control_points);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_num_control_points(const sfcgal_geometry_t *curve) -> size_t
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      return nurbsCurve->numControlPoints();)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_control_point_n(const sfcgal_geometry_t *curve, size_t i)
+    -> const sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      const auto &controlPoint = nurbsCurve->controlPointN(i);
+      return static_cast<const SFCGAL::Geometry *>(&controlPoint);)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_set_control_point_n(sfcgal_geometry_t       *curve, size_t i,
+                                        const sfcgal_geometry_t *point) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      auto *nurbsCurve = static_cast<SFCGAL::NURBSCurve *>(
+          reinterpret_cast<SFCGAL::Geometry *>(curve));
+      const auto *pointPtr = static_cast<const SFCGAL::Point *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(point));
+      nurbsCurve->setControlPoint(i, *pointPtr);)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_weight_n(const sfcgal_geometry_t *curve, size_t i) -> double
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      auto weight = nurbsCurve->weight(i);
+      return CGAL::to_double(weight);)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_set_weight_n(sfcgal_geometry_t *curve, size_t i,
+                                 double weight) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      auto *nurbsCurve = static_cast<SFCGAL::NURBSCurve *>(
+          reinterpret_cast<SFCGAL::Geometry *>(curve));
+      nurbsCurve->setWeight(i, SFCGAL::NURBSCurve::FT(weight));)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_degree(const sfcgal_geometry_t *curve) -> unsigned int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      return nurbsCurve->degree();)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_num_knots(const sfcgal_geometry_t *curve) -> size_t
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      return nurbsCurve->numKnots();)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_knot_n(const sfcgal_geometry_t *curve, size_t i) -> double
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      auto knot = nurbsCurve->knot(i);
+      return CGAL::to_double(knot);)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_is_rational(const sfcgal_geometry_t *curve) -> int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      return nurbsCurve->isRational() ? 1 : 0;)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_is_bezier(const sfcgal_geometry_t *curve) -> int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      return nurbsCurve->isBezier() ? 1 : 0;)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_is_bspline(const sfcgal_geometry_t *curve) -> int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      return nurbsCurve->isBSpline() ? 1 : 0;)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_evaluate(const sfcgal_geometry_t *curve, double parameter)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      auto point = nurbsCurve->evaluate(SFCGAL::NURBSCurve::Parameter(parameter));
+      return static_cast<SFCGAL::Geometry *>(new SFCGAL::Point(point));)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_derivative(const sfcgal_geometry_t *curve, double parameter,
+                               unsigned int order) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      auto derivative = nurbsCurve->derivative(
+          SFCGAL::NURBSCurve::Parameter(parameter), order);
+      return static_cast<SFCGAL::Geometry *>(new SFCGAL::Point(derivative));)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_to_linestring(const sfcgal_geometry_t *curve,
+                                  unsigned int num_segments) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      auto lineString = nurbsCurve->toLineString(num_segments);
+      return static_cast<SFCGAL::Geometry *>(lineString.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_to_linestring_adaptive(const sfcgal_geometry_t *curve,
+                                           double       tolerance,
+                                           unsigned int min_segments,
+                                           unsigned int max_segments)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = static_cast<const SFCGAL::NURBSCurve *>(
+          reinterpret_cast<const SFCGAL::Geometry *>(curve));
+      auto lineString = nurbsCurve->toLineStringAdaptive(
+          SFCGAL::NURBSCurve::FT(tolerance), min_segments, max_segments);
+      return static_cast<SFCGAL::Geometry *>(lineString.release());)
 }
