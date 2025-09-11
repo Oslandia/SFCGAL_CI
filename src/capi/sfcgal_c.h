@@ -342,31 +342,51 @@ sfcgal_geometry_as_vtk_file(const sfcgal_geometry_t *, const char *filename);
 
 /**
  * Creates a OBJ file of the given geometry
+ * The generated OBJ file uses the Z-up convention.
+ * @param pgeom the input geometry
+ * @param filename OBJ filename
  * @ingroup capi
  */
 SFCGAL_API void
-sfcgal_geometry_as_obj_file(const sfcgal_geometry_t *, const char *filename);
+sfcgal_geometry_as_obj_file(const sfcgal_geometry_t *pgeom,
+                            const char              *filename);
 
 /**
  * Creates a OBJ string of the given geometry
+ * The generated OBJ string uses the Z-up convention.
+ * @param[in] pgeom the input geometry
+ * @param[out] buffer the OBJ buffer
+ * @param[out] len the size of @p buffer
+ * @post buffer is returned allocated and must be freed by the caller with @ref
+ * sfcgal_free_buffer
  * @ingroup capi
  */
 SFCGAL_API void
-sfcgal_geometry_as_obj(const sfcgal_geometry_t *, char **buffer, size_t *len);
+sfcgal_geometry_as_obj(const sfcgal_geometry_t *pgeom, char **buffer,
+                       size_t *len);
 
 /**
  * Creates a STL string of the given geometry
+ * The generated STL string uses the Z-up convention.
+ * @param[in] pgeom the input geometry
+ * @param[out] buffer the STL buffer
+ * @param[out] len the size of @p buffer
  * @ingroup capi
  */
 SFCGAL_API void
-sfcgal_geometry_as_stl(const sfcgal_geometry_t *, char **buffer, size_t *len);
+sfcgal_geometry_as_stl(const sfcgal_geometry_t *pgeom, char **buffer,
+                       size_t *len);
 
 /**
  * Creates a STL file of the given geometry
+ * The generated STL file uses the Z-up convention.
+ * @param pgeom the input geometry
+ * @param filename STL filename
  * @ingroup capi
  */
 SFCGAL_API void
-sfcgal_geometry_as_stl_file(const sfcgal_geometry_t *, const char *filename);
+sfcgal_geometry_as_stl_file(const sfcgal_geometry_t *pgeom,
+                            const char              *filename);
 
 /**
  * Creates an empty point
