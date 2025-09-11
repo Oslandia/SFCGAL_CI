@@ -18,6 +18,7 @@
 #include "SFCGAL/algorithm/distance.h"
 #include "SFCGAL/algorithm/distance3d.h"
 #include "SFCGAL/algorithm/intersection.h"
+#include <iomanip>
 #include "SFCGAL/algorithm/intersects.h"
 #include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/algorithm/length.h"
@@ -1683,6 +1684,7 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
     std::vector<Point> pts = {Point(0, 0), Point(5, 10), Point(10, 0)};
     NURBSCurve         curve(pts, 2);
     std::cout << "Cas 1 - Quadratique simple\n";
+    std::cout << curve.asText(2) << "\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
     std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
@@ -1695,6 +1697,7 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
     std::vector<NURBSCurve::FT> w   = {1, 2, 1};
     NURBSCurve                  curve(pts, w, 2);
     std::cout << "Cas 2 - Quadratique pondérée\n";
+    std::cout << curve.asText(2) << "\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
     std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
@@ -1709,6 +1712,7 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
     std::vector<NURBSCurve::Knot> k   = {0, 0, 0, 0.5, 1, 1, 1};
     NURBSCurve                    curve(pts, w, 2, k);
     std::cout << "Cas 3 - Quadratique avec nœuds explicites\n";
+    std::cout << curve.asText(2) << "\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
     std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
@@ -1721,6 +1725,7 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
     std::vector<NURBSCurve::FT> w = {1, 2, 1};
     NURBSCurve                  curve(pts, w, 2);
     std::cout << "Cas 4 - Quadratique en 3D\n";
+    std::cout << curve.asText(2) << "\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
     std::cout << "Length (3D): " << CGAL::to_double(curve.length()) << "\n\n";
@@ -1734,6 +1739,7 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
     std::vector<NURBSCurve::Knot> k = {0, 0, 0, 1, 1, 1};
     NURBSCurve                    curve(pts, w, 2, k);
     std::cout << "Cas 5 - Quart de cercle\n";
+    std::cout << curve.asText(2) << "\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(3) << "\n";
     std::cout << "Length: " << CGAL::to_double(curve.length())
@@ -1747,6 +1753,7 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
                               Point(18, 0)};
     NURBSCurve         curve(pts, 3);
     std::cout << "Cas 6 - S couché\n";
+    std::cout << curve.asText(2) << "\n";
     std::cout << controlPointsWKT(pts) << "\n";
     std::cout << curve.toLineString(200)->asText(2) << "\n";
     std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
@@ -1772,8 +1779,8 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
     std::vector<Point> pts1 = {Point(5, 0), Point(5, 5), Point(0, 5)};
     NURBSCurve         curve1(pts1, w, 2, k);
     auto               ls1 = curve1.toLineString(50);
-    for (const auto &pt : ls1->points()) {
-      allPoints.push_back(pt);
+    for (size_t i = 0; i < ls1->numPoints(); ++i) {
+      allPoints.push_back(ls1->pointN(i));
     }
 
     // Q2: (0,5) -> (-5,0)
@@ -1832,8 +1839,8 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
     std::vector<Point> pts1 = {Point(8, 0), Point(8, 4), Point(0, 4)};
     NURBSCurve         curve1(pts1, w, 2, k);
     auto               ls1 = curve1.toLineString(50);
-    for (const auto &pt : ls1->points()) {
-      allPoints.push_back(pt);
+    for (size_t i = 0; i < ls1->numPoints(); ++i) {
+      allPoints.push_back(ls1->pointN(i));
     }
 
     // Q2: (0,4) -> (-8,0)
@@ -1877,12 +1884,150 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
                               Point(0, -5), Point(-2.5, -3), Point(-5, 0),
                               Point(-5, 2), Point(-4, 4),    Point(-2, 4),
                               Point(0, 2)};
-    NURBSCurve         curve(pts, 3);
+    
     std::cout << "Cas 9 - Cœur\n";
     std::cout << controlPointsWKT(pts) << "\n";
-    std::cout << curve.toLineString(300)->asText(2) << "\n";
-    std::cout << "Length: " << CGAL::to_double(curve.length()) << "\n\n";
+    
+    // Test différentes méthodes de paramétrage
+    NURBSCurve curveChord(pts, 3, NURBSCurve::KnotMethod::CHORD_LENGTH);
+    std::cout << "=== CHORD_LENGTH (défaut SFCGAL) ===\n";
+    std::cout << curveChord.toLineString(50)->asText(2) << "\n";
+    
+    NURBSCurve curveUniform(pts, 3, NURBSCurve::KnotMethod::UNIFORM);  
+    std::cout << "=== UNIFORM ===\n";
+    std::cout << curveUniform.toLineString(50)->asText(2) << "\n";
+    
+    NURBSCurve curveCentripetal(pts, 3, NURBSCurve::KnotMethod::CENTRIPETAL);
+    std::cout << "=== CENTRIPETAL (probablement geomdl) ===\n";
+    std::cout << curveCentripetal.toLineString(50)->asText(2) << "\n";
+    
+    std::cout << "Length CHORD_LENGTH: " << CGAL::to_double(curveChord.length()) << "\n";
+    std::cout << "Length UNIFORM: " << CGAL::to_double(curveUniform.length()) << "\n";
+    std::cout << "Length CENTRIPETAL: " << CGAL::to_double(curveCentripetal.length()) << "\n\n";
   }
+}
+
+BOOST_AUTO_TEST_CASE(testHeartParameterizationComparison)
+{
+  std::cout << "\n=== HEART PARAMETERIZATION METHODS COMPARISON ===" << std::endl;
+  std::cout << "Testing different knot vector generation methods on heart shape" << std::endl;
+  std::cout << "This helps identify which method gives results closest to geomdl\n" << std::endl;
+  
+  // Heart control points (13 points including closure, degree 3)
+  std::vector<Point> heartPts = {Point(0, 2),  Point(2, 4),     Point(4, 4),
+                                 Point(5, 2),  Point(5, 0),     Point(2.5, -3),
+                                 Point(0, -5), Point(-2.5, -3), Point(-5, 0),
+                                 Point(-5, 2), Point(-4, 4),    Point(-2, 4),
+                                 Point(0, 2)};
+  
+  std::cout << "Control Points (13 points, closed curve):" << std::endl;
+  std::cout << controlPointsWKT(heartPts) << "\n" << std::endl;
+  
+  const int resolution = 50; // Good resolution for visualization
+  
+  // Create curves with different parameterization methods
+  NURBSCurve curveChord(heartPts, 3, NURBSCurve::KnotMethod::CHORD_LENGTH);
+  NURBSCurve curveUniform(heartPts, 3, NURBSCurve::KnotMethod::UNIFORM);
+  NURBSCurve curveCentripetal(heartPts, 3, NURBSCurve::KnotMethod::CENTRIPETAL);
+  std::cout << curveChord.asText(1) << std::endl;
+  std::cout << curveUniform.asText(1) << std::endl;
+  std::cout << curveCentripetal.asText(1) << std::endl;
+  
+  // Generate geometries
+  auto lsChord = curveChord.toLineString(resolution);
+  auto lsUniform = curveUniform.toLineString(resolution);
+  auto lsCentripetal = curveCentripetal.toLineString(resolution);
+  
+  // Method 1: CHORD_LENGTH (SFCGAL default)
+  std::cout << "=== METHOD 1: CHORD_LENGTH (SFCGAL Default) ===" << std::endl;
+  std::cout << "Based on Euclidean distances between control points" << std::endl;
+  std::cout << "Geometry:" << std::endl;
+  std::cout << lsChord->asText(3) << std::endl;
+  std::cout << "Length: " << CGAL::to_double(curveChord.length()) << std::endl;
+  
+  // Find Y extremes for comparison
+  double maxY_chord = -1000, minY_chord = 1000;
+  for (size_t i = 0; i < lsChord->numPoints(); ++i) {
+    double y = CGAL::to_double(lsChord->pointN(i).y());
+    maxY_chord = std::max(maxY_chord, y);
+    minY_chord = std::min(minY_chord, y);
+  }
+  std::cout << "Y range: [" << minY_chord << ", " << maxY_chord << "], height: " << (maxY_chord - minY_chord) << "\n" << std::endl;
+  
+  // Method 2: UNIFORM
+  std::cout << "=== METHOD 2: UNIFORM ===" << std::endl;
+  std::cout << "Equal spacing in parameter domain" << std::endl;
+  std::cout << "Geometry:" << std::endl;
+  std::cout << lsUniform->asText(3) << std::endl;
+  std::cout << "Length: " << CGAL::to_double(curveUniform.length()) << std::endl;
+  
+  double maxY_uniform = -1000, minY_uniform = 1000;
+  for (size_t i = 0; i < lsUniform->numPoints(); ++i) {
+    double y = CGAL::to_double(lsUniform->pointN(i).y());
+    maxY_uniform = std::max(maxY_uniform, y);
+    minY_uniform = std::min(minY_uniform, y);
+  }
+  std::cout << "Y range: [" << minY_uniform << ", " << maxY_uniform << "], height: " << (maxY_uniform - minY_uniform) << "\n" << std::endl;
+  
+  // Method 3: CENTRIPETAL (likely geomdl's choice)
+  std::cout << "=== METHOD 3: CENTRIPETAL (Likely geomdl method) ===" << std::endl;
+  std::cout << "Based on square root of distances (often preferred in CAD)" << std::endl;
+  std::cout << "Geometry:" << std::endl;
+  std::cout << lsCentripetal->asText(3) << std::endl;
+  std::cout << "Length: " << CGAL::to_double(curveCentripetal.length()) << std::endl;
+  
+  double maxY_centripetal = -1000, minY_centripetal = 1000;
+  for (size_t i = 0; i < lsCentripetal->numPoints(); ++i) {
+    double y = CGAL::to_double(lsCentripetal->pointN(i).y());
+    maxY_centripetal = std::max(maxY_centripetal, y);
+    minY_centripetal = std::min(minY_centripetal, y);
+  }
+  std::cout << "Y range: [" << minY_centripetal << ", " << maxY_centripetal << "], height: " << (maxY_centripetal - minY_centripetal) << "\n" << std::endl;
+  
+  // Comparative summary
+  std::cout << "=== COMPARATIVE SUMMARY ===" << std::endl;
+  std::cout << "Method          | Length    | Max Y     | Min Y     | Height    | Notes" << std::endl;
+  std::cout << "----------------|-----------|-----------|-----------|-----------|-------------" << std::endl;
+  
+  std::cout << std::left << std::setw(15) << "CHORD_LENGTH" << " | "
+            << std::fixed << std::setprecision(4) << std::setw(9) << CGAL::to_double(curveChord.length()) << " | "
+            << std::setw(9) << maxY_chord << " | "
+            << std::setw(9) << minY_chord << " | "
+            << std::setw(9) << (maxY_chord - minY_chord) << " | SFCGAL default" << std::endl;
+            
+  std::cout << std::left << std::setw(15) << "UNIFORM" << " | "
+            << std::fixed << std::setprecision(4) << std::setw(9) << CGAL::to_double(curveUniform.length()) << " | "
+            << std::setw(9) << maxY_uniform << " | "
+            << std::setw(9) << minY_uniform << " | "
+            << std::setw(9) << (maxY_uniform - minY_uniform) << " | Equal spacing" << std::endl;
+            
+  std::cout << std::left << std::setw(15) << "CENTRIPETAL" << " | "
+            << std::fixed << std::setprecision(4) << std::setw(9) << CGAL::to_double(curveCentripetal.length()) << " | "
+            << std::setw(9) << maxY_centripetal << " | "
+            << std::setw(9) << minY_centripetal << " | "
+            << std::setw(9) << (maxY_centripetal - minY_centripetal) << " | Likely geomdl" << std::endl;
+  
+  // Key differences analysis
+  std::cout << "\n=== KEY DIFFERENCES ANALYSIS ===" << std::endl;
+  
+  double lengthDiff_UC = CGAL::to_double(curveUniform.length()) - CGAL::to_double(curveChord.length());
+  double lengthDiff_CC = CGAL::to_double(curveCentripetal.length()) - CGAL::to_double(curveChord.length());
+  
+  std::cout << "Length differences vs CHORD_LENGTH:" << std::endl;
+  std::cout << "  UNIFORM:     " << std::showpos << lengthDiff_UC << " (" 
+            << (lengthDiff_UC/CGAL::to_double(curveChord.length())*100) << "%)" << std::endl;
+  std::cout << "  CENTRIPETAL: " << std::showpos << lengthDiff_CC << " (" 
+            << (lengthDiff_CC/CGAL::to_double(curveChord.length())*100) << "%)" << std::noshowpos << std::endl;
+  
+  std::cout << "Height differences vs CHORD_LENGTH:" << std::endl;
+  double heightChord = maxY_chord - minY_chord;
+  std::cout << "  UNIFORM:     " << std::showpos << ((maxY_uniform - minY_uniform) - heightChord) << std::endl;
+  std::cout << "  CENTRIPETAL: " << std::showpos << ((maxY_centripetal - minY_centripetal) - heightChord) << std::noshowpos << std::endl;
+  
+  std::cout << "\n=== RECOMMENDATION ===" << std::endl;
+  std::cout << "For closest match to geomdl, use: NURBSCurve(points, degree, NURBSCurve::KnotMethod::CENTRIPETAL)" << std::endl;
+  std::cout << "The CENTRIPETAL method typically produces the most visually pleasing curves" << std::endl;
+  std::cout << "and is commonly used in CAD applications like geomdl.\n" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

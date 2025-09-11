@@ -320,6 +320,15 @@ public:
                        unsigned int maxSegments = 256) const
       -> std::unique_ptr<LineString> override;
 
+  /**
+   * @brief Convert curve to LineString using arc-length-based sampling
+   * @param numSegments Number of line segments to use
+   * @return LineString with points sampled uniformly in arc-length space
+   */
+  [[nodiscard]] auto
+  toLineStringArcLength(unsigned int numSegments = 32) const
+      -> std::unique_ptr<LineString>;
+
   [[nodiscard]] auto
   parameterBounds() const -> std::pair<Parameter, Parameter> override;
 
@@ -745,7 +754,7 @@ protected:
   // Advanced mathematical operations
 
   /**
-   * @brief Compute arc length using adaptive quadrature
+   * @brief Compute arc length using adaptive Simpson quadrature
    * @param startParam Start parameter
    * @param endParam End parameter
    * @param tolerance Integration tolerance
@@ -754,6 +763,35 @@ protected:
   [[nodiscard]] auto
   computeArcLength(Parameter startParam, Parameter endParam, FT tolerance) const
       -> FT;
+
+  /**
+   * @brief Compute speed function ||C'(t)|| for arc length integration
+   * @param t Parameter value
+   * @return Magnitude of derivative vector at parameter t
+   */
+  [[nodiscard]] auto
+  speedFunction(Parameter t) const -> FT;
+
+  /**
+   * @brief Apply Simpson's rule over interval [a,b]
+   * @param a Start parameter
+   * @param b End parameter  
+   * @return Simpson approximation of integral
+   */
+  [[nodiscard]] auto
+  simpsonRule(Parameter a, Parameter b) const -> FT;
+
+  /**
+   * @brief Adaptive Simpson quadrature for arc length computation
+   * @param a Start parameter
+   * @param b End parameter
+   * @param tolerance Integration tolerance
+   * @param maxDepth Maximum recursion depth (default 20)
+   * @return Accurate arc length using adaptive subdivision
+   */
+  [[nodiscard]] auto
+  adaptiveSimpsonArcLength(Parameter a, Parameter b, FT tolerance,
+                          unsigned int maxDepth = 20) const -> FT;
 
   /**
    * @brief Find parameter corresponding to arc length using Newton-Raphson

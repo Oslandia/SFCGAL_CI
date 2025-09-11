@@ -1086,6 +1086,83 @@ NURBSCurve::toLineString(unsigned int numSegments) const
 }
 
 auto
+NURBSCurve::toLineStringArcLength(unsigned int numSegments) const
+    -> std::unique_ptr<LineString>
+{
+  auto lineString = std::make_unique<LineString>();
+  if (_controlPoints.empty()) {
+    return lineString;
+  }
+
+  if (numSegments == 0) {
+    numSegments = 32;
+  }
+
+  // For performance reasons, limit the number of segments for arc-length sampling
+  if (numSegments > 100) {
+    // Fall back to parameter-based sampling for very high segment counts
+    return toLineString(numSegments);
+  }
+
+  // Calculate total arc length
+  FT totalLength = length();
+  if (totalLength <= FT(1e-12)) {
+    // Degenerate curve, fall back to parameter sampling
+    return toLineString(numSegments);
+  }
+
+  auto bounds = parameterBounds();
+  
+  // Build a lookup table of parameter values vs cumulative arc lengths
+  // Use more samples than requested to build accurate inverse mapping
+  const unsigned int lookupSamples = std::max(numSegments * 2, 64u);
+  std::vector<Parameter> lookupParams;
+  std::vector<FT> lookupLengths;
+  lookupParams.reserve(lookupSamples + 1);
+  lookupLengths.reserve(lookupSamples + 1);
+  
+  FT paramStep = (bounds.second - bounds.first) / FT(lookupSamples);
+  lookupParams.push_back(bounds.first);
+  lookupLengths.push_back(FT(0));
+  
+  for (unsigned int i = 1; i <= lookupSamples; ++i) {
+    Parameter param = bounds.first + FT(i) * paramStep;
+    FT cumulativeLength = computeArcLength(bounds.first, param, FT(1e-6));
+    lookupParams.push_back(param);
+    lookupLengths.push_back(cumulativeLength);
+  }
+
+  // Now sample points uniformly in arc-length space using interpolation
+  lineString->addPoint(evaluate(bounds.first));
+  
+  for (unsigned int segIdx = 1; segIdx <= numSegments; ++segIdx) {
+    FT targetArcLength = (FT(segIdx) / FT(numSegments)) * totalLength;
+    
+    // Find the parameter by linear interpolation in the lookup table
+    Parameter param = bounds.first;
+    
+    // Find bracketing indices in lookup table
+    for (size_t j = 0; j < lookupLengths.size() - 1; ++j) {
+      if (targetArcLength >= lookupLengths[j] && targetArcLength <= lookupLengths[j + 1]) {
+        // Linear interpolation
+        FT lengthRange = lookupLengths[j + 1] - lookupLengths[j];
+        if (lengthRange > FT(1e-12)) {
+          FT ratio = (targetArcLength - lookupLengths[j]) / lengthRange;
+          param = lookupParams[j] + ratio * (lookupParams[j + 1] - lookupParams[j]);
+        } else {
+          param = lookupParams[j];
+        }
+        break;
+      }
+    }
+    
+    lineString->addPoint(evaluate(param));
+  }
+
+  return lineString;
+}
+
+auto
 NURBSCurve::toLineStringAdaptive(FT tolerance, unsigned int minSegments,
                                  unsigned int maxSegments) const
     -> std::unique_ptr<LineString>
@@ -2238,25 +2315,76 @@ NURBSCurve::computeArcLength(Parameter startParam, Parameter endParam,
     return FT(0);
   }
 
-  // Use simple trapezoidal rule with fixed subdivision
-  const unsigned int numSegments = 32; // Fixed number of segments for stability
+  // Use adaptive Simpson's rule for arc length integration
+  // This integrates ||C'(t)|| dt over [startParam, endParam]
+  return adaptiveSimpsonArcLength(startParam, endParam, tolerance);
+}
 
-  FT paramStep   = (endParam - startParam) / FT(numSegments);
-  FT totalLength = FT(0);
+//-- Private helper methods for adaptive Simpson integration
 
-  Point prevPoint = evaluate(startParam);
+auto
+NURBSCurve::speedFunction(Parameter t) const -> FT
+{
+  // Compute ||C'(t)|| - the magnitude of the derivative
+  Point derivative = this->derivative(t, 1);
+  
+  if (is3D()) {
+    FT dx = derivative.x();
+    FT dy = derivative.y(); 
+    FT dz = derivative.z();
+    // Use CGAL::to_double for sqrt calculation, then convert back to FT
+    double magnitude = std::sqrt(CGAL::to_double(dx*dx + dy*dy + dz*dz));
+    return FT(magnitude);
+  } else {
+    FT dx = derivative.x();
+    FT dy = derivative.y();
+    // Use CGAL::to_double for sqrt calculation, then convert back to FT
+    double magnitude = std::sqrt(CGAL::to_double(dx*dx + dy*dy));
+    return FT(magnitude);
+  }
+}
 
-  for (unsigned int segIdx = 1; segIdx <= numSegments; ++segIdx) {
-    Parameter currentParam = startParam + FT(segIdx) * paramStep;
-    Point     currentPoint = evaluate(currentParam);
+auto
+NURBSCurve::simpsonRule(Parameter a, Parameter b) const -> FT
+{
+  // Basic Simpson's rule: (b-a)/6 * [f(a) + 4*f((a+b)/2) + f(b)]
+  Parameter mid = (a + b) / FT(2);
+  FT fa = speedFunction(a);
+  FT fmid = speedFunction(mid);
+  FT fb = speedFunction(b);
+  
+  return (b - a) / FT(6) * (fa + FT(4) * fmid + fb);
+}
 
-    FT segmentLength = algorithm::distance(prevPoint, currentPoint);
-    totalLength += segmentLength;
-
-    prevPoint = currentPoint;
+auto
+NURBSCurve::adaptiveSimpsonArcLength(Parameter a, Parameter b, FT tolerance,
+                                     unsigned int maxDepth) const -> FT
+{
+  if (maxDepth == 0) {
+    // Fallback to basic Simpson's rule when max recursion reached
+    return simpsonRule(a, b);
   }
 
-  return totalLength;
+  Parameter mid = (a + b) / FT(2);
+  
+  // Compute Simpson's rule for whole interval and two halves
+  FT wholeInterval = simpsonRule(a, b);
+  FT leftHalf = simpsonRule(a, mid);
+  FT rightHalf = simpsonRule(mid, b);
+  FT twoHalves = leftHalf + rightHalf;
+  
+  // Error estimate: |S(a,b) - S(a,m) - S(m,b)| / 15
+  FT error = CGAL::abs(wholeInterval - twoHalves) / FT(15);
+  
+  if (error <= tolerance) {
+    // Richardson extrapolation: more accurate result
+    return twoHalves + (twoHalves - wholeInterval) / FT(15);
+  } else {
+    // Recursively subdivide with tighter tolerance
+    FT halfTolerance = tolerance / FT(2);
+    return adaptiveSimpsonArcLength(a, mid, halfTolerance, maxDepth - 1) +
+           adaptiveSimpsonArcLength(mid, b, halfTolerance, maxDepth - 1);
+  }
 }
 
 auto
