@@ -117,7 +117,7 @@ sfcgal_geometry_type_id(const sfcgal_geometry_t *geom);
  * @param geom the input geometry
  * @param[out] type the output buffer
  * @param[out] typeLen the size of the buffer
- * @post type is returned allocated and must be freed by the caller with @ref
+ * @post type is returned allocated and must be freed by the caller with
  * sfcgal_free_buffer
  * @ingroup capi
  */
@@ -158,7 +158,7 @@ sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
                                 sfcgal_geometry_t      **invalidity_location);
 
 /**
- * @deprecated Use @ref sfcgal_geometry_is_valid_detail instead.
+ * @deprecated Use sfcgal_geometry_is_valid_detail instead.
  * @param[in] geom the input geometry
  * @param[out] invalidity_reason invalidity reason
  * @param[out] invalidity_location invalidity location
@@ -278,7 +278,7 @@ sfcgal_geometry_swap_xy(sfcgal_geometry_t *geom);
  * Returns a deep clone of the given geometry
  * @param geom the input geometry
  * @post returns a pointer to an allocated geometry that must be deallocated by
- * @ref sfcgal_geometry_delete
+ * sfcgal_geometry_delete
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -323,7 +323,7 @@ sfcgal_geometry_as_text(const sfcgal_geometry_t *geom, char **buffer,
  * Returns a WKT representation of the given geometry using floating point
  * coordinate values. Floating point precision can be set via the numDecimals
  * parameter. Setting numDecimals to -1 yields the same result as
- * @ref sfcgal_geometry_as_text()
+ * sfcgal_geometry_as_text()
  * @param geom the input geometry
  * @param numDecimals decimal precision
  * @param[out] buffer the output buffer
@@ -712,7 +712,7 @@ sfcgal_geometry_collection_create();
  * Returns the number of geometries of a given GeometryCollection
  * @param collection the input geometry
  * @pre collection is a GeometryCollection
- * @deprecated Use @ref sfcgal_geometry_num_geometries instead
+ * @deprecated Use sfcgal_geometry_num_geometries instead
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_geometry_num_geometries instead.")
@@ -810,7 +810,7 @@ sfcgal_polyhedral_surface_num_patches(const sfcgal_geometry_t *polyhedral);
  * Returns the number of polygons of a given PolyhedralSurface
  * @param polyhedral the input geometry
  * @pre polyhedral must be a PolyhedralSurface
- * @deprecated Use @ref sfcgal_polyhedral_surface_num_patches instead.
+ * @deprecated Use sfcgal_polyhedral_surface_num_patches instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_polyhedral_surface_num_patches instead.")
@@ -839,7 +839,7 @@ sfcgal_polyhedral_surface_patch_n(const sfcgal_geometry_t *polyhedral,
  * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_patches(polyhedral)
  * @post the returned Polygon is not writable and must not be deallocated by the
  * caller
- * @deprecated Use @ref sfcgal_polyhedral_surface_patch_n instead
+ * @deprecated Use sfcgal_polyhedral_surface_patch_n instead
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_polyhedral_surface_patch_n instead.")
@@ -885,7 +885,7 @@ sfcgal_polyhedral_surface_set_patch_n(sfcgal_geometry_t *polyhedral,
  * @pre polygon must be a Polygon
  * @post the ownership of the Polygon is taken. The caller is not responsible
  * anymore of its deallocation
- * @deprecated Use @ref sfcgal_polyhedral_surface_add_patch instead.
+ * @deprecated Use sfcgal_polyhedral_surface_add_patch instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_polyhedral_surface_add_patch instead.")
@@ -913,7 +913,7 @@ sfcgal_triangulated_surface_num_patches(const sfcgal_geometry_t *tin);
  * Returns the number of triangles of a given TriangulatedSurface
  * @param tin the input geometry
  * @pre tin must be a TriangulatedSurface
- * @deprecated Use @ref sfcgal_triangulated_surface_num_patches instead.
+ * @deprecated Use sfcgal_triangulated_surface_num_patches instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_triangulated_surface_num_patches instead.")
@@ -941,7 +941,7 @@ sfcgal_triangulated_surface_patch_n(const sfcgal_geometry_t *tin, size_t i);
  * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patches( tin )
  * @post the returned Triangle is not writable and must not be deallocated by
  * the caller
- * @deprecated Use @ref sfcgal_triangulated_surface_patch_n instead.
+ * @deprecated Use sfcgal_triangulated_surface_patch_n instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_triangulated_surface_patch_n instead.")
@@ -986,7 +986,7 @@ sfcgal_triangulated_surface_add_patch(sfcgal_geometry_t *tin,
  * @pre triangle must be a Triangle
  * @post the ownership of the Triangle is taken. The caller is not responsible
  * anymore of its deallocation
- * @deprecated Use @ref sfcgal_triangulated_surface_add_patch instead.
+ * @deprecated Use sfcgal_triangulated_surface_add_patch instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_triangulated_surface_add_patch instead.")
@@ -1193,7 +1193,7 @@ sfcgal_prepared_geometry_as_ewkt(const sfcgal_prepared_geometry_t *prepared,
  * Parse a Well-Known Text (WKT) representation into a Geometry.
  * @param str The Well-Known Text (WKT) string representing the geometry.
  * @param len The size of @p str
- * @post The returned geometry must be deallocated by the caller with @ref
+ * @post The returned geometry must be deallocated by the caller with
  * sfcgal_geometry_delete
  * @ingroup capi
  */
@@ -1220,7 +1220,7 @@ sfcgal_io_read_ewkt(const char *str, size_t len);
  * Parse a Well-Known Binary (WKB) representation into a Geometry.
  * @param str The Well-Known Text (WKB) string representing the geometry.
  * @param len The size of @p str
- * @post The returned geometry must be deallocated by the caller with @ref
+ * @post The returned geometry must be deallocated by the caller with
  * sfcgal_geometry_delete
  * @ingroup capi
  */
@@ -1249,7 +1249,7 @@ sfcgal_io_write_binary_prepared(const sfcgal_prepared_geometry_t *geom,
  * @param str The string representing the geometry.
  * @param len The size of @p str
  * @post The returned prepared geometry must be deallocated by the caller with
- * @ref sfcgal_prepared_geometry_delete
+ * sfcgal_prepared_geometry_delete
  * @ingroup capi
  */
 SFCGAL_API sfcgal_prepared_geometry_t *
@@ -1917,7 +1917,7 @@ typedef enum {
  * @pre radius > 0
  * @pre segments > 3
  * @post isValid(return) == true
- * @post The returned geometry must be deallocated by the caller with @ref
+ * @post The returned geometry must be deallocated by the caller with
  * sfcgal_geometry_delete
  * @ingroup capi
  */
@@ -2122,8 +2122,8 @@ typedef enum {
 /**
  * @brief Creates a new primitive of the specified type with default parameters.
  * @param primitive_type The type of primitive to create.
- * @return A pointer to an allocated @ref sfcgal_primitive_t object. The
- * returned object must be freed by calling @ref sfcgal_primitive_delete.
+ * @return A pointer to an allocated sfcgal_primitive_t object. The
+ * returned object must be freed by calling sfcgal_primitive_delete.
  * @post The returned pointer is non-NULL if allocation succeeds.
  * @ingroup capi
  */
@@ -2134,7 +2134,7 @@ sfcgal_primitive_create(sfcgal_primitive_type_t primitive_type);
  * @brief Deletes a previously allocated primitive.
  * @param primitive Pointer to the primitive to delete.
  * @pre @p primitive must be a valid pointer returned by a creation function
- * (e.g. @ref sfcgal_primitive_create).
+ * (e.g. sfcgal_primitive_create).
  * @post After this call, the pointer is invalid and must not be used.
  * @ingroup capi
  */
@@ -2199,7 +2199,7 @@ sfcgal_primitive_set_parameter_int(sfcgal_primitive_t *primitive,
  * @return A newly allocated array of three doubles representing the 3D point on
  * success, or a nullptr if the operation failed.
  * @pre The parameter identified by @p name must exist and be of type 3D point.
- * @post The returned array must be deallocated by calling @ref
+ * @post The returned array must be deallocated by calling
  * sfcgal_free_buffer.
  * @ingroup capi
  */
@@ -2229,7 +2229,7 @@ sfcgal_primitive_set_parameter_point(sfcgal_primitive_t *primitive,
  * @return A newly allocated array of three doubles representing the 3D vector
  * on success, or a nullptr if the operation failed.
  * @pre The parameter identified by @p name must exist and be of type 3D vector.
- * @post The returned array must be deallocated by calling @ref
+ * @post The returned array must be deallocated by calling
  * sfcgal_free_buffer.
  * @ingroup capi
  */
