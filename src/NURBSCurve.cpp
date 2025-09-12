@@ -859,6 +859,45 @@ NURBSCurve::interpolateCurve(const std::vector<Point> &points,
 }
 
 auto
+NURBSCurve::generateApproximationKnotVector(const std::vector<Parameter> &parameters,
+                                           unsigned int degree, size_t numControlPoints)
+    -> std::vector<Knot>
+{
+  // Generate knot vector for approximation (Piegl & Tiller, "The NURBS Book", Algorithm A9.1)
+  size_t n = parameters.size() - 1;  // Number of data points - 1
+  size_t m = numControlPoints - 1;   // Number of control points - 1
+
+  std::vector<Knot> knots;
+  knots.reserve(m + degree + 2);     // Correct size: m + p + 1 + 1
+
+  // First degree+1 knots are 0
+  for (unsigned int i = 0; i <= degree; ++i) {
+    knots.push_back(FT(0));
+  }
+
+  // Internal knots (Piegl & Tiller averaging method)
+  // We need exactly (m - degree + 1) internal knots for proper size
+  for (size_t j = 1; j <= m - degree + 1; ++j) {
+    FT sum = FT(0);
+    for (unsigned int k = 0; k < degree; ++k) {
+      // Use direct indexing into parameter array (Piegl & Tiller, Equation 9.8)
+      size_t dataIdx = j + k;
+      if (dataIdx < parameters.size()) {
+        sum += parameters[dataIdx];
+      }
+    }
+    knots.push_back(sum / FT(degree));
+  }
+
+  // Last degree+1 knots are 1
+  for (unsigned int i = 0; i <= degree; ++i) {
+    knots.push_back(FT(1));
+  }
+
+  return knots;
+}
+
+auto
 NURBSCurve::approximateCurve(const std::vector<Point> &points,
                              unsigned int degree, FT tolerance,
                              size_t maxControlPoints)
@@ -869,21 +908,163 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
         Exception("Need at least 2 points for approximation"));
   }
 
+  if (degree < 1) {
+    BOOST_THROW_EXCEPTION(Exception("Degree must be at least 1"));
+  }
+
+  // Ensure we have enough control points for the degree
+  size_t minControlPoints = degree + 1;
   size_t numControlPoints = std::min(maxControlPoints, points.size());
+  numControlPoints = std::max(numControlPoints, minControlPoints);
+  
+  if (numControlPoints >= points.size()) {
+    // If we need as many control points as data points, use interpolation instead
+    return interpolateCurve(points, degree, KnotMethod::CHORD_LENGTH, EndCondition::CLAMPED);
+  }
+
+  // NURBS Curve Approximation Algorithm (Piegl & Tiller, "The NURBS Book", Chapter 9)
+  // This implements true least-squares approximation, NOT sampling
+
+  using namespace detail::ublas;
+  
+  size_t n = points.size() - 1;  // Number of data points - 1 (index range)
+  size_t m = numControlPoints - 1;  // Number of control points - 1
+
+  // Step 1: Compute parameter values for data points (chord length parameterization)
+  std::vector<Parameter> parameters = computeParameters(points, KnotMethod::CHORD_LENGTH);
+
+  // Step 2: Generate knot vector for approximation
+  std::vector<Knot> knots = generateApproximationKnotVector(parameters, degree, m);
+
+  // Step 3: Set up the least-squares system N^T * N * P = N^T * Q
+  // where N is the basis function matrix, P are control points, Q are data points
+
+  matrix<double> N(n + 1, m + 1);  // Basis function matrix
+  
+  // Fill basis function matrix
+  for (size_t i = 0; i <= n; ++i) {
+    Parameter t = parameters[i];
+    
+    // Find knot span
+    size_t span = findKnotSpan(t, degree, knots);
+    
+    // Compute non-zero basis functions
+    auto basis = computeBasisFunctions(span, t, degree, knots);
+    
+    // Initialize row to zero
+    for (size_t j = 0; j <= m; ++j) {
+      N(i, j) = 0.0;
+    }
+    
+    // Fill non-zero basis functions
+    size_t baseIdx = span - degree;
+    for (unsigned int k = 0; k <= degree && baseIdx + k <= m; ++k) {
+      N(i, baseIdx + k) = CGAL::to_double(basis[k]);
+    }
+  }
+
+  // Step 4: Compute N^T * N (normal matrix)
+  matrix<double> NTN = prod(trans(N), N);
+
+  // Step 5: Solve for control points in each coordinate dimension
   std::vector<Point> controlPoints;
-  controlPoints.reserve(numControlPoints);
+  controlPoints.reserve(m + 1);
 
-  for (size_t idx = 0; idx < numControlPoints; ++idx) {
-    size_t pointIndex = (idx * (points.size() - 1)) / (numControlPoints - 1);
-    controlPoints.push_back(points[pointIndex]);
+  // Determine coordinate dimensions
+  bool is3D = points.front().is3D();
+  bool isMeasured = points.front().isMeasured();
+
+  try {
+    // Solve for X coordinates
+    vector<double> qx(n + 1);
+    for (size_t i = 0; i <= n; ++i) {
+      qx(i) = CGAL::to_double(points[i].x());
+    }
+    vector<double> ntqx = prod(trans(N), qx);  // N^T * Q_x
+    
+    // Solve NTN * px = ntqx
+    permutation_matrix<std::size_t> pm(m + 1);
+    matrix<double> NTN_copy = NTN;
+    lu_factorize(NTN_copy, pm);
+    lu_substitute(NTN_copy, pm, ntqx);
+    vector<double> px = ntqx;
+
+    // Solve for Y coordinates
+    vector<double> qy(n + 1);
+    for (size_t i = 0; i <= n; ++i) {
+      qy(i) = CGAL::to_double(points[i].y());
+    }
+    vector<double> ntqy = prod(trans(N), qy);  // N^T * Q_y
+    
+    NTN_copy = NTN;
+    lu_factorize(NTN_copy, pm);
+    lu_substitute(NTN_copy, pm, ntqy);
+    vector<double> py = ntqy;
+
+    // Solve for Z coordinates if 3D
+    vector<double> pz(m + 1, 0.0);
+    if (is3D) {
+      vector<double> qz(n + 1);
+      for (size_t i = 0; i <= n; ++i) {
+        qz(i) = CGAL::to_double(points[i].z());
+      }
+      vector<double> ntqz = prod(trans(N), qz);  // N^T * Q_z
+      
+      NTN_copy = NTN;
+      lu_factorize(NTN_copy, pm);
+      lu_substitute(NTN_copy, pm, ntqz);
+      pz = ntqz;
+    }
+
+    // Solve for M coordinates if measured
+    vector<double> pm_coord(m + 1, 0.0);
+    if (isMeasured) {
+      vector<double> qm(n + 1);
+      for (size_t i = 0; i <= n; ++i) {
+        qm(i) = CGAL::to_double(points[i].m());
+      }
+      vector<double> ntqm = prod(trans(N), qm);  // N^T * Q_m
+      
+      NTN_copy = NTN;
+      lu_factorize(NTN_copy, pm);
+      lu_substitute(NTN_copy, pm, ntqm);
+      pm_coord = ntqm;
+    }
+
+    // Build control points from solved coordinates
+    for (size_t i = 0; i <= m; ++i) {
+      FT x = FT(px(i));
+      FT y = FT(py(i));
+      
+      if (is3D && isMeasured) {
+        FT z = FT(pz(i));
+        double m_val = pm_coord(i);
+        controlPoints.emplace_back(x, y, z, m_val);
+      } else if (is3D) {
+        FT z = FT(pz(i));
+        controlPoints.emplace_back(x, y, z);
+      } else if (isMeasured) {
+        double x_d = CGAL::to_double(x);
+        double y_d = CGAL::to_double(y);
+        double m_val = pm_coord(i);
+        controlPoints.emplace_back(x_d, y_d, 0.0, m_val, COORDINATE_XYM);
+      } else {
+        controlPoints.emplace_back(x, y);
+      }
+    }
+
+  } catch (const std::exception &e) {
+    BOOST_THROW_EXCEPTION(
+        Exception("Failed to solve least-squares approximation system: " + std::string(e.what())));
   }
 
-  if (degree >= controlPoints.size()) {
-    degree = static_cast<unsigned int>(controlPoints.size() - 1);
-  }
-
-  auto curve           = std::make_unique<NURBSCurve>(controlPoints, degree);
-  curve->_fitPoints    = points;
+  // Create the approximating curve
+  auto curve = std::make_unique<NURBSCurve>(
+      controlPoints, std::vector<FT>(controlPoints.size(), FT(1)), 
+      degree, knots);
+  
+  // Store fit information
+  curve->_fitPoints = points;
   curve->_fitTolerance = tolerance;
 
   return curve;

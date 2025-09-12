@@ -841,6 +841,18 @@ protected:
       -> std::vector<Knot>;
 
   /**
+   * @brief Generate knot vector for least-squares approximation
+   * @param parameters Parameter values for data points
+   * @param degree Curve degree  
+   * @param numControlPoints Number of control points (m in Piegl & Tiller)
+   * @return Knot vector optimized for approximation
+   */
+  static auto
+  generateApproximationKnotVector(const std::vector<Parameter> &parameters,
+                                 unsigned int degree, size_t numControlPoints)
+      -> std::vector<Knot>;
+
+  /**
    * @brief Interpolate with clamped end conditions (original behavior)
    */
   static auto
