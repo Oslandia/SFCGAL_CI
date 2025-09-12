@@ -1661,7 +1661,7 @@ BOOST_AUTO_TEST_CASE(testSphereTest)
 
   // check clone
   sfcgal_primitive_t *sphere2 = sfcgal_primitive_clone(sphere);
-  BOOST_CHECK(sfcgal_primitive_is_equals(sphere, sphere2));
+  BOOST_CHECK(sfcgal_primitive_is_almost_equals(sphere, sphere2, 0.0));
   sfcgal_primitive_delete(sphere2);
 
   // check polyhedral conversion
@@ -1796,7 +1796,7 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
 
   // check clone
   sfcgal_primitive_t *cylinder2 = sfcgal_primitive_clone(cylinder);
-  BOOST_CHECK(sfcgal_primitive_is_equals(cylinder, cylinder2));
+  BOOST_CHECK(sfcgal_primitive_is_almost_equals(cylinder, cylinder2, 0.0));
   sfcgal_primitive_delete(cylinder2);
 
   // polyhedral surface generation
@@ -1888,7 +1888,7 @@ BOOST_AUTO_TEST_CASE(testTorusTest)
 
   // check clone
   sfcgal_primitive_t *torus2 = sfcgal_primitive_clone(torus);
-  BOOST_CHECK(sfcgal_primitive_is_equals(torus, torus2));
+  BOOST_CHECK(sfcgal_primitive_is_almost_equals(torus, torus2, 0.0));
   sfcgal_primitive_delete(torus2);
 
   // check polyhedral conversion
@@ -1968,7 +1968,7 @@ BOOST_AUTO_TEST_CASE(testBoxTest)
 
   // check clone
   sfcgal_primitive_t *box2 = sfcgal_primitive_clone(box);
-  BOOST_CHECK(sfcgal_primitive_is_equals(box, box2));
+  BOOST_CHECK(sfcgal_primitive_is_almost_equals(box, box2, 0.0));
   sfcgal_primitive_delete(box2);
 
   // check polyhedral conversion
@@ -2029,7 +2029,7 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
 
   // check clone
   sfcgal_primitive_t *cube2 = sfcgal_primitive_clone(cube);
-  BOOST_CHECK(sfcgal_primitive_is_equals(cube, cube2));
+  BOOST_CHECK(sfcgal_primitive_is_almost_equals(cube, cube2, 0.0));
   sfcgal_primitive_delete(cube2);
 
   // check polyhedral conversion
@@ -2112,7 +2112,7 @@ BOOST_AUTO_TEST_CASE(testConeTest)
 
   // check clone
   sfcgal_primitive_t *cone2 = sfcgal_primitive_clone(cone);
-  BOOST_CHECK(sfcgal_primitive_is_equals(cone, cone2));
+  BOOST_CHECK(sfcgal_primitive_is_almost_equals(cone, cone2, 0.0));
   sfcgal_primitive_delete(cone2);
 
   // check polyhedral conversion

@@ -2301,11 +2301,13 @@ sfcgal_primitive_clone(const sfcgal_primitive_t *primitive);
  * Checks for primitive type and parameters equality.
  * @param prim1 Pointer to the first primitive.
  * @param prim2 Pointer to the second primitive.
+ * @param tolerance the tolerance
  * @ingroup capi
  */
 SFCGAL_API int
-sfcgal_primitive_is_equals(const sfcgal_primitive_t *prim1,
-                           const sfcgal_primitive_t *prim2);
+sfcgal_primitive_is_almost_equals(const sfcgal_primitive_t *prim1,
+                                  const sfcgal_primitive_t *prim2,
+                                  double                    tolerance);
 
 /**
  * @brief Retrieves the list of primitive parameters as JSON array.

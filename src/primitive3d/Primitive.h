@@ -127,6 +127,14 @@ public:
   [[nodiscard]] auto
   parameters() const -> std::unordered_map<std::string, PrimitiveParameter>;
 
+  /**
+   * Equality operator
+   * @param other other geometry to compare to
+   * @param epsilon allowed tolerance
+   */
+  [[nodiscard]] auto
+  almostEqual(const Primitive &other, double epsilon) const -> bool;
+
 protected:
   /**
    * @brief Invalidates the cached geometries
@@ -179,8 +187,8 @@ protected:
  * @todo only compare coordinate points
  * @pre the two geometries must be valid
  */
-SFCGAL_API bool
-operator==(const Primitive &, const Primitive &);
+SFCGAL_API auto
+operator==(const Primitive &, const Primitive &) -> bool;
 
 } // namespace SFCGAL
 

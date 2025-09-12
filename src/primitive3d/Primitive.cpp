@@ -97,6 +97,59 @@ Primitive::parameters() const
   return m_parameters;
 }
 
+auto
+Primitive::almostEqual(const Primitive &other, double epsilon) const -> bool
+{
+  using FT       = Kernel::FT;
+  using Point_3  = Kernel::Point_3;
+  using Vector_3 = Kernel::Vector_3;
+
+  if (primitiveTypeId() != other.primitiveTypeId()) {
+    return false;
+  }
+
+  if (epsilon <= 0.0) {
+    return (*this) == other;
+  }
+
+  for (const auto &[key, value] : other.parameters()) {
+    PrimitiveParameter primValue1 = parameter(key);
+    PrimitiveParameter primValue2 = other.parameter(key);
+
+    bool equal = std::visit(
+        [&](auto &&value1) -> bool {
+          using T = std::decay_t<decltype(value1)>;
+
+          if (!std::holds_alternative<T>(primValue2)) {
+            return false;
+          }
+          const T &value2 = std::get<T>(primValue2);
+
+          if constexpr (std::is_same_v<T, FT> ||
+                        std::is_same_v<T, unsigned int>) {
+            return SFCGAL::almostEqual(value1, value2, epsilon);
+          } else if constexpr (std::is_same_v<T, Point_3>) {
+            return SFCGAL::almostEqual(value1.x(), value2.x(), epsilon) &&
+                   SFCGAL::almostEqual(value1.y(), value2.y(), epsilon) &&
+                   SFCGAL::almostEqual(value1.z(), value2.z(), epsilon);
+          } else if constexpr (std::is_same_v<T, Vector_3>) {
+            return SFCGAL::almostEqual(value1.x(), value2.x(), epsilon) &&
+                   SFCGAL::almostEqual(value1.y(), value2.y(), epsilon) &&
+                   SFCGAL::almostEqual(value1.z(), value2.z(), epsilon);
+          } else {
+            return value1 == value2; // fallback
+          }
+        },
+        primValue1);
+
+    if (!equal) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void
 Primitive::invalidateCache()
 {
@@ -104,10 +157,10 @@ Primitive::invalidateCache()
 }
 
 auto
-operator==(const Primitive &pa, const Primitive &pb) -> bool
+operator==(const Primitive &prim1, const Primitive &prim2) -> bool
 {
-  return pa.primitiveTypeId() == pb.primitiveTypeId() &&
-         pa.parameters() == pb.parameters();
+  return prim1.primitiveTypeId() == prim2.primitiveTypeId() &&
+         prim1.parameters() == prim2.parameters();
 }
 
 } // namespace SFCGAL

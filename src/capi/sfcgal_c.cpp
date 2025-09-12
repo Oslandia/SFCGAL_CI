@@ -2348,24 +2348,31 @@ sfcgal_primitive_clone(const sfcgal_primitive_t *prim) -> sfcgal_primitive_t *
 }
 
 extern "C" auto
-sfcgal_primitive_is_equals(const sfcgal_primitive_t *prim1,
-                           const sfcgal_primitive_t *prim2) -> int
+sfcgal_primitive_is_almost_equals(const sfcgal_primitive_t *prim1,
+                                  const sfcgal_primitive_t *prim2,
+                                  double                    tolerance) -> int
 {
-  int returnValue = 0;
+  const auto *p1 = reinterpret_cast<const SFCGAL::Geometry *>(prim1);
+  const auto *p2 = reinterpret_cast<const SFCGAL::Geometry *>(prim2);
 
-  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
-      auto *primitive1Cast = reinterpret_cast<const SFCGAL::Primitive *>(prim1);
-      auto *primitive2Cast = reinterpret_cast<const SFCGAL::Primitive *>(prim2);
+  bool result;
+  try {
+    result = p1->almostEqual(*p2, tolerance);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During primitive_is_almost_equals(A, B, %g):", tolerance);
+    SFCGAL_WARNING("  with A: %s", p1->asText().c_str());
+    SFCGAL_WARNING("  with B: %s", p2->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    result = false;
+  }
 
-      returnValue = (*primitive1Cast) == (*primitive2Cast);
-      return returnValue;);
+  return static_cast<int>(result);
 }
 
 extern "C" auto
 sfcgal_primitive_parameters(const sfcgal_primitive_t *primitive, char **buffer,
                             size_t *len) -> void
 {
-
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       const auto *primitiveCast =
           reinterpret_cast<const SFCGAL::Primitive *>(primitive);
@@ -2458,7 +2465,8 @@ primitive_parameter_array(const sfcgal_primitive_t *primitive, const char *name,
           reinterpret_cast<const SFCGAL::Primitive *>(primitive);
       SFCGAL::PrimitiveParameter parameter =
           primitiveCast->parameter(std::string(name));
-      const T *array = std::get_if<T>(&parameter); if (array != nullptr) {
+      const T *array = std::get_if<T>(&parameter); //
+      if (array != nullptr) {
         returnArray =
             static_cast<double *>(sfcgal_alloc_handler(3 * sizeof(double)));
         returnArray[0] = CGAL::to_double(array->x());
@@ -2466,7 +2474,9 @@ primitive_parameter_array(const sfcgal_primitive_t *primitive, const char *name,
         returnArray[2] = CGAL::to_double(array->z());
       } else {
         SFCGAL_ERROR("Parameter %s is not a %s", name, parameter_type);
-      } return returnArray;);
+      } //
+      return returnArray; //
+  );
 }
 
 #endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
