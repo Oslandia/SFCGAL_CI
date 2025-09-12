@@ -101,7 +101,7 @@ public:
    * @brief Sets the value of a primitive parameter.
    * Assigns a new value to the parameter identified by @p name.
    * @param name The name of the parameter to set.
-   * @param parameter The new parameter value as a @ref PrimitiveParameter.
+   * @param parameter The new parameter value as a ::PrimitiveParameter.
    * @pre The parameter identified by @p name must exist and accept the provided
    * variant type.
    * @throws SFCGAL::Exception if the parameter does not exist or if the
@@ -113,7 +113,7 @@ public:
   /**
    * @brief Retrieves the value of a primitive parameter based ont its @p name.
    * @param name The name of the parameter to retrieve.
-   * @return The parameter value as a @ref PrimitiveParameter variant.
+   * @return The parameter value as a ::PrimitiveParameter variant.
    * @pre The parameter identified by @p name must exist.
    * @throws SFCGAL::Exception if the parameter does not exist or if the
    * provided variant type is not compatible with the parameter.
