@@ -6,7 +6,7 @@
 #ifndef SFCGAL_TRIANGULATE_CONSTRAINTDELAUNAYTRIANGULATION_H_
 #define SFCGAL_TRIANGULATE_CONSTRAINTDELAUNAYTRIANGULATION_H_
 
-#include <boost/optional.hpp>
+#include <optional>
 
 #include "SFCGAL/Coordinate.h"
 #include "SFCGAL/config.h"
@@ -108,7 +108,7 @@ public:
   inline bool
   hasProjectionPlane() const
   {
-    return _projectionPlane.is_initialized();
+    return _projectionPlane.has_value();
   }
   /**
    * @brief define projection plane
@@ -215,7 +215,7 @@ private:
   /**
    * @brief plan in which the triangulation is done
    */
-  boost::optional<Kernel::Plane_3> _projectionPlane;
+  std::optional<Kernel::Plane_3> _projectionPlane;
 };
 
 } // namespace triangulate
