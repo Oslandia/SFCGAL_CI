@@ -2030,4 +2030,96 @@ BOOST_AUTO_TEST_CASE(testHeartParameterizationComparison)
   std::cout << "and is commonly used in CAD applications like geomdl.\n" << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(testFitPointsVsControlPoints)
+{
+  std::cout << "\n=== FIT POINTS vs CONTROL POINTS COMPARISON ===" << std::endl;
+  std::cout << "Comparing AutoCAD-style Fit Points (interpolation) vs Control Points\n" << std::endl;
+  
+  // Simple test points for clear comparison
+  std::vector<Point> testPoints = {
+    Point(0, 0), Point(1, 2), Point(2, 1), Point(3, 3), Point(4, 0)
+  };
+  
+  std::cout << "Test Points (should be traversed exactly by Fit Points method):" << std::endl;
+  for (size_t i = 0; i < testPoints.size(); ++i) {
+    std::cout << "  P" << i << ": (" << CGAL::to_double(testPoints[i].x()) 
+              << ", " << CGAL::to_double(testPoints[i].y()) << ")" << std::endl;
+  }
+  std::cout << std::endl;
+  
+  try {
+    // Method 1: Control Points (traditional NURBS - curve influenced by points)
+    NURBSCurve controlCurve(testPoints, 3, NURBSCurve::KnotMethod::UNIFORM);
+    auto controlLS = controlCurve.toLineString(50);
+    
+    std::cout << "=== METHOD 1: CONTROL POINTS (Traditional NURBS) ===" << std::endl;
+    std::cout << "Curve is INFLUENCED by points but doesn't pass through them" << std::endl;
+    std::cout << "Geometry: " << controlLS->asText(3) << std::endl;
+    std::cout << "Length: " << CGAL::to_double(controlCurve.length()) << std::endl;
+    
+    // Check if curve passes through original points
+    std::cout << "Distance from curve to original points:" << std::endl;
+    for (size_t i = 0; i < testPoints.size(); ++i) {
+      // Find parameter closest to this point (simplified check)
+      auto bounds = controlCurve.parameterBounds();
+      double minDist = 1000.0;
+      for (int j = 0; j <= 100; ++j) {
+        double t = j / 100.0;
+        auto param = bounds.first + NURBSCurve::FT(t) * (bounds.second - bounds.first);
+        auto curvePoint = controlCurve.evaluate(param);
+        double dist = std::sqrt(
+          std::pow(CGAL::to_double(curvePoint.x() - testPoints[i].x()), 2) +
+          std::pow(CGAL::to_double(curvePoint.y() - testPoints[i].y()), 2)
+        );
+        minDist = std::min(minDist, dist);
+      }
+      std::cout << "  P" << i << " distance: " << std::setprecision(4) << minDist << std::endl;
+    }
+    
+    // Method 2: Fit Points (interpolation - curve passes through points)
+    std::cout << "\n=== METHOD 2: FIT POINTS (AutoCAD-style Interpolation) ===" << std::endl;
+    std::cout << "Curve passes EXACTLY through all given points" << std::endl;
+    
+    auto fitCurve = NURBSCurve::interpolateCurve(
+      testPoints, 3, NURBSCurve::KnotMethod::UNIFORM, NURBSCurve::EndCondition::CLAMPED);
+    
+    if (fitCurve) {
+      auto fitLS = fitCurve->toLineString(50);
+      std::cout << "Geometry: " << fitLS->asText(3) << std::endl;
+      std::cout << "Length: " << CGAL::to_double(fitCurve->length()) << std::endl;
+      
+      // Verify interpolation by checking distances to curve
+      std::cout << "Verification - minimum distance from points to curve:" << std::endl;
+      auto bounds = fitCurve->parameterBounds();
+      for (size_t i = 0; i < testPoints.size(); ++i) {
+        double minDist = 1000.0;
+        // Sample densely to find minimum distance
+        for (int j = 0; j <= 200; ++j) {
+          double t = j / 200.0;
+          auto param = bounds.first + NURBSCurve::FT(t) * (bounds.second - bounds.first);
+          auto curvePoint = fitCurve->evaluate(param);
+          double dist = std::sqrt(
+            std::pow(CGAL::to_double(curvePoint.x() - testPoints[i].x()), 2) +
+            std::pow(CGAL::to_double(curvePoint.y() - testPoints[i].y()), 2)
+          );
+          minDist = std::min(minDist, dist);
+        }
+        std::cout << "  P" << i << " min distance: " << std::setprecision(8) << minDist 
+                  << " (should be ~0 for interpolation)" << std::endl;
+      }
+    } else {
+      std::cout << "ERROR: Could not create interpolating curve" << std::endl;
+    }
+    
+    std::cout << "\n=== SUMMARY ===" << std::endl;
+    std::cout << "Control Points: Curve influenced by points (traditional CAD workflow)" << std::endl;
+    std::cout << "Fit Points: Curve passes through points (AutoCAD SPLINE with F option)" << std::endl;
+    std::cout << "For geomdl compatibility: Use Control Points with UNIFORM method" << std::endl;
+    std::cout << "For AutoCAD SPLINE compatibility: Use interpolateCurve() method" << std::endl;
+    
+  } catch (const std::exception& e) {
+    std::cerr << "Error in test: " << e.what() << std::endl;
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

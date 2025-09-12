@@ -441,8 +441,131 @@ NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
                                     const std::vector<Knot>      &knots)
     -> std::vector<Point>
 {
-  // This is the original simple implementation - control points = data points
-  return points;
+  using namespace detail::ublas;
+
+  size_t n = points.size();
+  if (n < degree + 1) {
+    BOOST_THROW_EXCEPTION(
+        Exception("Not enough points for clamped interpolation"));
+  }
+
+  // For clamped interpolation, we solve the system N * P = Q
+  // where N is the basis function matrix, P are control points, Q are data points
+  // The clamped condition ensures the curve passes exactly through endpoints
+
+  matrix<double> N(n, n);
+
+  // Fill basis function matrix
+  for (size_t i = 0; i < n; ++i) {
+    FT parameter = parameters[i];
+
+    // Find knot span
+    size_t span = findKnotSpan(parameter, degree, knots);
+
+    // Compute basis functions at this parameter
+    auto basis = computeBasisFunctions(span, parameter, degree, knots);
+
+    // Initialize row to zero
+    std::fill(N.data().begin() + i * n, N.data().begin() + (i + 1) * n, 0.0);
+
+    // Fill non-zero entries in this row
+    size_t baseIdx = span - degree;
+    for (unsigned int j = 0; j <= degree && baseIdx + j < n; ++j) {
+      N(i, baseIdx + j) = CGAL::to_double(basis[j]);
+    }
+  }
+
+  // Solve the system for each coordinate dimension
+  std::vector<Point> controlPoints;
+  controlPoints.reserve(n);
+
+  // Determine coordinate dimensions
+  bool is3D = points.front().is3D();
+  bool isMeasured = points.front().isMeasured();
+
+  try {
+    // Solve system using LU decomposition for each coordinate
+    permutation_matrix<std::size_t> pm(n);
+    matrix<double> NCopy;
+
+    // Solve for X coordinates
+    vector<double> qx(n);
+    for (size_t i = 0; i < n; ++i) {
+      qx(i) = CGAL::to_double(points[i].x());
+    }
+    
+    NCopy = N;
+    lu_factorize(NCopy, pm);
+    lu_substitute(NCopy, pm, qx);
+    vector<double> px = qx;
+
+    // Solve for Y coordinates
+    vector<double> qy(n);
+    for (size_t i = 0; i < n; ++i) {
+      qy(i) = CGAL::to_double(points[i].y());
+    }
+    
+    NCopy = N;
+    lu_factorize(NCopy, pm);
+    lu_substitute(NCopy, pm, qy);
+    vector<double> py = qy;
+
+    // Solve for Z coordinates if 3D
+    vector<double> pz(n);
+    if (is3D) {
+      vector<double> qz(n);
+      for (size_t i = 0; i < n; ++i) {
+        qz(i) = CGAL::to_double(points[i].z());
+      }
+      
+      NCopy = N;
+      lu_factorize(NCopy, pm);
+      lu_substitute(NCopy, pm, qz);
+      pz = qz;
+    }
+
+    // Solve for M coordinates if measured
+    vector<double> pm_coord(n);
+    if (isMeasured) {
+      vector<double> qm(n);
+      for (size_t i = 0; i < n; ++i) {
+        qm(i) = CGAL::to_double(points[i].m());
+      }
+      
+      NCopy = N;
+      lu_factorize(NCopy, pm);
+      lu_substitute(NCopy, pm, qm);
+      pm_coord = qm;
+    }
+
+    // Build control points
+    for (size_t i = 0; i < n; ++i) {
+      FT x = FT(px(i));
+      FT y = FT(py(i));
+      
+      if (is3D && isMeasured) {
+        FT z = FT(pz(i));
+        double m = pm_coord(i);
+        controlPoints.emplace_back(x, y, z, m);  // Uses (FT, FT, FT, double) constructor
+      } else if (is3D) {
+        FT z = FT(pz(i));
+        controlPoints.emplace_back(x, y, z);
+      } else if (isMeasured) {
+        double x_d = CGAL::to_double(x);
+        double y_d = CGAL::to_double(y);
+        double m = pm_coord(i);
+        controlPoints.emplace_back(x_d, y_d, 0.0, m, COORDINATE_XYM);  // Use explicit constructor with CoordinateType
+      } else {
+        controlPoints.emplace_back(x, y);
+      }
+    }
+
+  } catch (const std::exception &e) {
+    BOOST_THROW_EXCEPTION(
+        Exception("Failed to solve clamped interpolation system: " + std::string(e.what())));
+  }
+
+  return controlPoints;
 }
 
 auto
