@@ -18,7 +18,6 @@
 #include "SFCGAL/algorithm/distance.h"
 #include "SFCGAL/algorithm/distance3d.h"
 #include "SFCGAL/algorithm/intersection.h"
-#include <iomanip>
 #include "SFCGAL/algorithm/intersects.h"
 #include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/algorithm/length.h"
@@ -29,6 +28,7 @@
 #include <CGAL/Aff_transformation_2.h>
 #include <CGAL/Aff_transformation_3.h>
 #include <cmath>
+#include <iomanip>
 #include <memory>
 #include <sstream>
 
@@ -1884,47 +1884,53 @@ BOOST_AUTO_TEST_CASE(testWKTComparisonGeomdl)
                               Point(0, -5), Point(-2.5, -3), Point(-5, 0),
                               Point(-5, 2), Point(-4, 4),    Point(-2, 4),
                               Point(0, 2)};
-    
+
     std::cout << "Cas 9 - Cœur\n";
     std::cout << controlPointsWKT(pts) << "\n";
-    
+
     // Test différentes méthodes de paramétrage
     NURBSCurve curveChord(pts, 3, NURBSCurve::KnotMethod::CHORD_LENGTH);
     std::cout << "=== CHORD_LENGTH (défaut SFCGAL) ===\n";
     std::cout << curveChord.toLineString(50)->asText(2) << "\n";
-    
-    NURBSCurve curveUniform(pts, 3, NURBSCurve::KnotMethod::UNIFORM);  
+
+    NURBSCurve curveUniform(pts, 3, NURBSCurve::KnotMethod::UNIFORM);
     std::cout << "=== UNIFORM ===\n";
     std::cout << curveUniform.toLineString(50)->asText(2) << "\n";
-    
+
     NURBSCurve curveCentripetal(pts, 3, NURBSCurve::KnotMethod::CENTRIPETAL);
     std::cout << "=== CENTRIPETAL (probablement geomdl) ===\n";
     std::cout << curveCentripetal.toLineString(50)->asText(2) << "\n";
-    
-    std::cout << "Length CHORD_LENGTH: " << CGAL::to_double(curveChord.length()) << "\n";
-    std::cout << "Length UNIFORM: " << CGAL::to_double(curveUniform.length()) << "\n";
-    std::cout << "Length CENTRIPETAL: " << CGAL::to_double(curveCentripetal.length()) << "\n\n";
+
+    std::cout << "Length CHORD_LENGTH: " << CGAL::to_double(curveChord.length())
+              << "\n";
+    std::cout << "Length UNIFORM: " << CGAL::to_double(curveUniform.length())
+              << "\n";
+    std::cout << "Length CENTRIPETAL: "
+              << CGAL::to_double(curveCentripetal.length()) << "\n\n";
   }
 }
 
 BOOST_AUTO_TEST_CASE(testHeartParameterizationComparison)
 {
-  std::cout << "\n=== HEART PARAMETERIZATION METHODS COMPARISON ===" << std::endl;
-  std::cout << "Testing different knot vector generation methods on heart shape" << std::endl;
-  std::cout << "This helps identify which method gives results closest to geomdl\n" << std::endl;
-  
+  std::cout << "\n=== HEART PARAMETERIZATION METHODS COMPARISON ==="
+            << std::endl;
+  std::cout << "Testing different knot vector generation methods on heart shape"
+            << std::endl;
+  std::cout
+      << "This helps identify which method gives results closest to geomdl\n"
+      << std::endl;
+
   // Heart control points (13 points including closure, degree 3)
-  std::vector<Point> heartPts = {Point(0, 2),  Point(2, 4),     Point(4, 4),
-                                 Point(5, 2),  Point(5, 0),     Point(2.5, -3),
-                                 Point(0, -5), Point(-2.5, -3), Point(-5, 0),
-                                 Point(-5, 2), Point(-4, 4),    Point(-2, 4),
-                                 Point(0, 2)};
-  
+  std::vector<Point> heartPts = {
+      Point(0, 2),    Point(2, 4),  Point(4, 4),     Point(5, 2),  Point(5, 0),
+      Point(2.5, -3), Point(0, -5), Point(-2.5, -3), Point(-5, 0), Point(-5, 2),
+      Point(-4, 4),   Point(-2, 4), Point(0, 2)};
+
   std::cout << "Control Points (13 points, closed curve):" << std::endl;
   std::cout << controlPointsWKT(heartPts) << "\n" << std::endl;
-  
+
   const int resolution = 50; // Good resolution for visualization
-  
+
   // Create curves with different parameterization methods
   NURBSCurve curveChord(heartPts, 3, NURBSCurve::KnotMethod::CHORD_LENGTH);
   NURBSCurve curveUniform(heartPts, 3, NURBSCurve::KnotMethod::UNIFORM);
@@ -1932,294 +1938,359 @@ BOOST_AUTO_TEST_CASE(testHeartParameterizationComparison)
   std::cout << curveChord.asText(1) << std::endl;
   std::cout << curveUniform.asText(1) << std::endl;
   std::cout << curveCentripetal.asText(1) << std::endl;
-  
+
   // Generate geometries
-  auto lsChord = curveChord.toLineString(resolution);
-  auto lsUniform = curveUniform.toLineString(resolution);
+  auto lsChord       = curveChord.toLineString(resolution);
+  auto lsUniform     = curveUniform.toLineString(resolution);
   auto lsCentripetal = curveCentripetal.toLineString(resolution);
-  
+
   // Method 1: CHORD_LENGTH (SFCGAL default)
   std::cout << "=== METHOD 1: CHORD_LENGTH (SFCGAL Default) ===" << std::endl;
-  std::cout << "Based on Euclidean distances between control points" << std::endl;
+  std::cout << "Based on Euclidean distances between control points"
+            << std::endl;
   std::cout << "Geometry:" << std::endl;
   std::cout << lsChord->asText(3) << std::endl;
   std::cout << "Length: " << CGAL::to_double(curveChord.length()) << std::endl;
-  
+
   // Find Y extremes for comparison
   double maxY_chord = -1000, minY_chord = 1000;
   for (size_t i = 0; i < lsChord->numPoints(); ++i) {
-    double y = CGAL::to_double(lsChord->pointN(i).y());
+    double y   = CGAL::to_double(lsChord->pointN(i).y());
     maxY_chord = std::max(maxY_chord, y);
     minY_chord = std::min(minY_chord, y);
   }
-  std::cout << "Y range: [" << minY_chord << ", " << maxY_chord << "], height: " << (maxY_chord - minY_chord) << "\n" << std::endl;
-  
+  std::cout << "Y range: [" << minY_chord << ", " << maxY_chord
+            << "], height: " << (maxY_chord - minY_chord) << "\n"
+            << std::endl;
+
   // Method 2: UNIFORM
   std::cout << "=== METHOD 2: UNIFORM ===" << std::endl;
   std::cout << "Equal spacing in parameter domain" << std::endl;
   std::cout << "Geometry:" << std::endl;
   std::cout << lsUniform->asText(3) << std::endl;
-  std::cout << "Length: " << CGAL::to_double(curveUniform.length()) << std::endl;
-  
+  std::cout << "Length: " << CGAL::to_double(curveUniform.length())
+            << std::endl;
+
   double maxY_uniform = -1000, minY_uniform = 1000;
   for (size_t i = 0; i < lsUniform->numPoints(); ++i) {
-    double y = CGAL::to_double(lsUniform->pointN(i).y());
+    double y     = CGAL::to_double(lsUniform->pointN(i).y());
     maxY_uniform = std::max(maxY_uniform, y);
     minY_uniform = std::min(minY_uniform, y);
   }
-  std::cout << "Y range: [" << minY_uniform << ", " << maxY_uniform << "], height: " << (maxY_uniform - minY_uniform) << "\n" << std::endl;
-  
+  std::cout << "Y range: [" << minY_uniform << ", " << maxY_uniform
+            << "], height: " << (maxY_uniform - minY_uniform) << "\n"
+            << std::endl;
+
   // Method 3: CENTRIPETAL (likely geomdl's choice)
-  std::cout << "=== METHOD 3: CENTRIPETAL (Likely geomdl method) ===" << std::endl;
-  std::cout << "Based on square root of distances (often preferred in CAD)" << std::endl;
+  std::cout << "=== METHOD 3: CENTRIPETAL (Likely geomdl method) ==="
+            << std::endl;
+  std::cout << "Based on square root of distances (often preferred in CAD)"
+            << std::endl;
   std::cout << "Geometry:" << std::endl;
   std::cout << lsCentripetal->asText(3) << std::endl;
-  std::cout << "Length: " << CGAL::to_double(curveCentripetal.length()) << std::endl;
-  
+  std::cout << "Length: " << CGAL::to_double(curveCentripetal.length())
+            << std::endl;
+
   double maxY_centripetal = -1000, minY_centripetal = 1000;
   for (size_t i = 0; i < lsCentripetal->numPoints(); ++i) {
-    double y = CGAL::to_double(lsCentripetal->pointN(i).y());
+    double y         = CGAL::to_double(lsCentripetal->pointN(i).y());
     maxY_centripetal = std::max(maxY_centripetal, y);
     minY_centripetal = std::min(minY_centripetal, y);
   }
-  std::cout << "Y range: [" << minY_centripetal << ", " << maxY_centripetal << "], height: " << (maxY_centripetal - minY_centripetal) << "\n" << std::endl;
-  
+  std::cout << "Y range: [" << minY_centripetal << ", " << maxY_centripetal
+            << "], height: " << (maxY_centripetal - minY_centripetal) << "\n"
+            << std::endl;
+
   // Comparative summary
   std::cout << "=== COMPARATIVE SUMMARY ===" << std::endl;
-  std::cout << "Method          | Length    | Max Y     | Min Y     | Height    | Notes" << std::endl;
-  std::cout << "----------------|-----------|-----------|-----------|-----------|-------------" << std::endl;
-  
+  std::cout << "Method          | Length    | Max Y     | Min Y     | Height   "
+               " | Notes"
+            << std::endl;
+  std::cout << "----------------|-----------|-----------|-----------|----------"
+               "-|-------------"
+            << std::endl;
+
   std::cout << std::left << std::setw(15) << "CHORD_LENGTH" << " | "
-            << std::fixed << std::setprecision(4) << std::setw(9) << CGAL::to_double(curveChord.length()) << " | "
-            << std::setw(9) << maxY_chord << " | "
-            << std::setw(9) << minY_chord << " | "
-            << std::setw(9) << (maxY_chord - minY_chord) << " | SFCGAL default" << std::endl;
-            
-  std::cout << std::left << std::setw(15) << "UNIFORM" << " | "
-            << std::fixed << std::setprecision(4) << std::setw(9) << CGAL::to_double(curveUniform.length()) << " | "
-            << std::setw(9) << maxY_uniform << " | "
-            << std::setw(9) << minY_uniform << " | "
-            << std::setw(9) << (maxY_uniform - minY_uniform) << " | Equal spacing" << std::endl;
-            
+            << std::fixed << std::setprecision(4) << std::setw(9)
+            << CGAL::to_double(curveChord.length()) << " | " << std::setw(9)
+            << maxY_chord << " | " << std::setw(9) << minY_chord << " | "
+            << std::setw(9) << (maxY_chord - minY_chord) << " | SFCGAL default"
+            << std::endl;
+
+  std::cout << std::left << std::setw(15) << "UNIFORM" << " | " << std::fixed
+            << std::setprecision(4) << std::setw(9)
+            << CGAL::to_double(curveUniform.length()) << " | " << std::setw(9)
+            << maxY_uniform << " | " << std::setw(9) << minY_uniform << " | "
+            << std::setw(9) << (maxY_uniform - minY_uniform)
+            << " | Equal spacing" << std::endl;
+
   std::cout << std::left << std::setw(15) << "CENTRIPETAL" << " | "
-            << std::fixed << std::setprecision(4) << std::setw(9) << CGAL::to_double(curveCentripetal.length()) << " | "
-            << std::setw(9) << maxY_centripetal << " | "
-            << std::setw(9) << minY_centripetal << " | "
-            << std::setw(9) << (maxY_centripetal - minY_centripetal) << " | Likely geomdl" << std::endl;
-  
+            << std::fixed << std::setprecision(4) << std::setw(9)
+            << CGAL::to_double(curveCentripetal.length()) << " | "
+            << std::setw(9) << maxY_centripetal << " | " << std::setw(9)
+            << minY_centripetal << " | " << std::setw(9)
+            << (maxY_centripetal - minY_centripetal) << " | Likely geomdl"
+            << std::endl;
+
   // Key differences analysis
   std::cout << "\n=== KEY DIFFERENCES ANALYSIS ===" << std::endl;
-  
-  double lengthDiff_UC = CGAL::to_double(curveUniform.length()) - CGAL::to_double(curveChord.length());
-  double lengthDiff_CC = CGAL::to_double(curveCentripetal.length()) - CGAL::to_double(curveChord.length());
-  
+
+  double lengthDiff_UC = CGAL::to_double(curveUniform.length()) -
+                         CGAL::to_double(curveChord.length());
+  double lengthDiff_CC = CGAL::to_double(curveCentripetal.length()) -
+                         CGAL::to_double(curveChord.length());
+
   std::cout << "Length differences vs CHORD_LENGTH:" << std::endl;
-  std::cout << "  UNIFORM:     " << std::showpos << lengthDiff_UC << " (" 
-            << (lengthDiff_UC/CGAL::to_double(curveChord.length())*100) << "%)" << std::endl;
-  std::cout << "  CENTRIPETAL: " << std::showpos << lengthDiff_CC << " (" 
-            << (lengthDiff_CC/CGAL::to_double(curveChord.length())*100) << "%)" << std::noshowpos << std::endl;
-  
+  std::cout << "  UNIFORM:     " << std::showpos << lengthDiff_UC << " ("
+            << (lengthDiff_UC / CGAL::to_double(curveChord.length()) * 100)
+            << "%)" << std::endl;
+  std::cout << "  CENTRIPETAL: " << std::showpos << lengthDiff_CC << " ("
+            << (lengthDiff_CC / CGAL::to_double(curveChord.length()) * 100)
+            << "%)" << std::noshowpos << std::endl;
+
   std::cout << "Height differences vs CHORD_LENGTH:" << std::endl;
   double heightChord = maxY_chord - minY_chord;
-  std::cout << "  UNIFORM:     " << std::showpos << ((maxY_uniform - minY_uniform) - heightChord) << std::endl;
-  std::cout << "  CENTRIPETAL: " << std::showpos << ((maxY_centripetal - minY_centripetal) - heightChord) << std::noshowpos << std::endl;
-  
+  std::cout << "  UNIFORM:     " << std::showpos
+            << ((maxY_uniform - minY_uniform) - heightChord) << std::endl;
+  std::cout << "  CENTRIPETAL: " << std::showpos
+            << ((maxY_centripetal - minY_centripetal) - heightChord)
+            << std::noshowpos << std::endl;
+
   std::cout << "\n=== RECOMMENDATION ===" << std::endl;
-  std::cout << "For closest match to geomdl, use: NURBSCurve(points, degree, NURBSCurve::KnotMethod::CENTRIPETAL)" << std::endl;
-  std::cout << "The CENTRIPETAL method typically produces the most visually pleasing curves" << std::endl;
-  std::cout << "and is commonly used in CAD applications like geomdl.\n" << std::endl;
+  std::cout << "For closest match to geomdl, use: NURBSCurve(points, degree, "
+               "NURBSCurve::KnotMethod::CENTRIPETAL)"
+            << std::endl;
+  std::cout << "The CENTRIPETAL method typically produces the most visually "
+               "pleasing curves"
+            << std::endl;
+  std::cout << "and is commonly used in CAD applications like geomdl.\n"
+            << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(testFitPointsVsControlPoints)
 {
   std::cout << "\n=== FIT POINTS vs CONTROL POINTS COMPARISON ===" << std::endl;
-  std::cout << "Comparing AutoCAD-style Fit Points (interpolation) vs Control Points\n" << std::endl;
-  
+  std::cout << "Comparing AutoCAD-style Fit Points (interpolation) vs Control "
+               "Points\n"
+            << std::endl;
+
   // Simple test points for clear comparison
-  std::vector<Point> testPoints = {
-    Point(0, 0), Point(1, 2), Point(2, 1), Point(3, 3), Point(4, 0)
-  };
-  
-  std::cout << "Test Points (should be traversed exactly by Fit Points method):" << std::endl;
+  std::vector<Point> testPoints = {Point(0, 0), Point(1, 2), Point(2, 1),
+                                   Point(3, 3), Point(4, 0)};
+
+  std::cout << "Test Points (should be traversed exactly by Fit Points method):"
+            << std::endl;
   for (size_t i = 0; i < testPoints.size(); ++i) {
-    std::cout << "  P" << i << ": (" << CGAL::to_double(testPoints[i].x()) 
+    std::cout << "  P" << i << ": (" << CGAL::to_double(testPoints[i].x())
               << ", " << CGAL::to_double(testPoints[i].y()) << ")" << std::endl;
   }
   std::cout << std::endl;
-  
+
   try {
     // Method 1: Control Points (traditional NURBS - curve influenced by points)
     NURBSCurve controlCurve(testPoints, 3, NURBSCurve::KnotMethod::UNIFORM);
-    auto controlLS = controlCurve.toLineString(50);
-    
-    std::cout << "=== METHOD 1: CONTROL POINTS (Traditional NURBS) ===" << std::endl;
-    std::cout << "Curve is INFLUENCED by points but doesn't pass through them" << std::endl;
+    auto       controlLS = controlCurve.toLineString(50);
+
+    std::cout << "=== METHOD 1: CONTROL POINTS (Traditional NURBS) ==="
+              << std::endl;
+    std::cout << "Curve is INFLUENCED by points but doesn't pass through them"
+              << std::endl;
     std::cout << "Geometry: " << controlLS->asText(3) << std::endl;
-    std::cout << "Length: " << CGAL::to_double(controlCurve.length()) << std::endl;
-    
+    std::cout << "Length: " << CGAL::to_double(controlCurve.length())
+              << std::endl;
+
     // Check if curve passes through original points
     std::cout << "Distance from curve to original points:" << std::endl;
     for (size_t i = 0; i < testPoints.size(); ++i) {
       // Find parameter closest to this point (simplified check)
-      auto bounds = controlCurve.parameterBounds();
+      auto   bounds  = controlCurve.parameterBounds();
       double minDist = 1000.0;
       for (int j = 0; j <= 100; ++j) {
         double t = j / 100.0;
-        auto param = bounds.first + NURBSCurve::FT(t) * (bounds.second - bounds.first);
-        auto curvePoint = controlCurve.evaluate(param);
-        double dist = std::sqrt(
-          std::pow(CGAL::to_double(curvePoint.x() - testPoints[i].x()), 2) +
-          std::pow(CGAL::to_double(curvePoint.y() - testPoints[i].y()), 2)
-        );
+        auto   param =
+            bounds.first + NURBSCurve::FT(t) * (bounds.second - bounds.first);
+        auto   curvePoint = controlCurve.evaluate(param);
+        double dist       = std::sqrt(
+            std::pow(CGAL::to_double(curvePoint.x() - testPoints[i].x()), 2) +
+            std::pow(CGAL::to_double(curvePoint.y() - testPoints[i].y()), 2));
         minDist = std::min(minDist, dist);
       }
-      std::cout << "  P" << i << " distance: " << std::setprecision(4) << minDist << std::endl;
+      std::cout << "  P" << i << " distance: " << std::setprecision(4)
+                << minDist << std::endl;
     }
-    
+
     // Method 2: Fit Points (interpolation - curve passes through points)
-    std::cout << "\n=== METHOD 2: FIT POINTS (AutoCAD-style Interpolation) ===" << std::endl;
+    std::cout << "\n=== METHOD 2: FIT POINTS (AutoCAD-style Interpolation) ==="
+              << std::endl;
     std::cout << "Curve passes EXACTLY through all given points" << std::endl;
-    
+
     auto fitCurve = NURBSCurve::interpolateCurve(
-      testPoints, 3, NURBSCurve::KnotMethod::UNIFORM, NURBSCurve::EndCondition::CLAMPED);
-    
+        testPoints, 3, NURBSCurve::KnotMethod::UNIFORM,
+        NURBSCurve::EndCondition::CLAMPED);
+
     if (fitCurve) {
       auto fitLS = fitCurve->toLineString(50);
       std::cout << "Geometry: " << fitLS->asText(3) << std::endl;
-      std::cout << "Length: " << CGAL::to_double(fitCurve->length()) << std::endl;
-      
+      std::cout << "Length: " << CGAL::to_double(fitCurve->length())
+                << std::endl;
+
       // Verify interpolation by checking distances to curve
-      std::cout << "Verification - minimum distance from points to curve:" << std::endl;
+      std::cout << "Verification - minimum distance from points to curve:"
+                << std::endl;
       auto bounds = fitCurve->parameterBounds();
       for (size_t i = 0; i < testPoints.size(); ++i) {
         double minDist = 1000.0;
         // Sample densely to find minimum distance
         for (int j = 0; j <= 200; ++j) {
           double t = j / 200.0;
-          auto param = bounds.first + NURBSCurve::FT(t) * (bounds.second - bounds.first);
-          auto curvePoint = fitCurve->evaluate(param);
-          double dist = std::sqrt(
-            std::pow(CGAL::to_double(curvePoint.x() - testPoints[i].x()), 2) +
-            std::pow(CGAL::to_double(curvePoint.y() - testPoints[i].y()), 2)
-          );
+          auto   param =
+              bounds.first + NURBSCurve::FT(t) * (bounds.second - bounds.first);
+          auto   curvePoint = fitCurve->evaluate(param);
+          double dist       = std::sqrt(
+              std::pow(CGAL::to_double(curvePoint.x() - testPoints[i].x()), 2) +
+              std::pow(CGAL::to_double(curvePoint.y() - testPoints[i].y()), 2));
           minDist = std::min(minDist, dist);
         }
-        std::cout << "  P" << i << " min distance: " << std::setprecision(8) << minDist 
-                  << " (should be ~0 for interpolation)" << std::endl;
+        std::cout << "  P" << i << " min distance: " << std::setprecision(8)
+                  << minDist << " (should be ~0 for interpolation)"
+                  << std::endl;
       }
     } else {
       std::cout << "ERROR: Could not create interpolating curve" << std::endl;
     }
-    
+
     std::cout << "\n=== SUMMARY ===" << std::endl;
-    std::cout << "Control Points: Curve influenced by points (traditional CAD workflow)" << std::endl;
-    std::cout << "Fit Points: Curve passes through points (AutoCAD SPLINE with F option)" << std::endl;
-    std::cout << "For geomdl compatibility: Use Control Points with UNIFORM method" << std::endl;
-    std::cout << "For AutoCAD SPLINE compatibility: Use interpolateCurve() method" << std::endl;
-    
-  } catch (const std::exception& e) {
+    std::cout << "Control Points: Curve influenced by points (traditional CAD "
+                 "workflow)"
+              << std::endl;
+    std::cout << "Fit Points: Curve passes through points (AutoCAD SPLINE with "
+                 "F option)"
+              << std::endl;
+    std::cout
+        << "For geomdl compatibility: Use Control Points with UNIFORM method"
+        << std::endl;
+    std::cout
+        << "For AutoCAD SPLINE compatibility: Use interpolateCurve() method"
+        << std::endl;
+
+  } catch (const std::exception &e) {
     std::cerr << "Error in test: " << e.what() << std::endl;
   }
 }
 
 BOOST_AUTO_TEST_CASE(testApproximationVsGeomdl)
 {
-  std::cout << "\n=== SFCGAL NURBS APPROXIMATION (geomdl equivalent) ===" << std::endl;
-  std::cout << "Testing SFCGAL's approximateCurve() against geomdl's approximate_curve()\n" << std::endl;
-  
+  std::cout << "\n=== SFCGAL NURBS APPROXIMATION (geomdl equivalent) ==="
+            << std::endl;
+  std::cout << "Testing SFCGAL's approximateCurve() against geomdl's "
+               "approximate_curve()\n"
+            << std::endl;
+
   // Parameters matching your geomdl script
-  const int nb_points = 50;        // Input data points
-  const int degree = 3;            // NURBS degree  
-  const int nb_ctrlpts = 10;       // Number of control points
-  
+  const int nb_points  = 50; // Input data points
+  const int degree     = 3;  // NURBS degree
+  const int nb_ctrlpts = 10; // Number of control points
+
   std::cout << "Parameters:" << std::endl;
   std::cout << "  Input points: " << nb_points << std::endl;
   std::cout << "  NURBS degree: " << degree << std::endl;
   std::cout << "  Control points: " << nb_ctrlpts << std::endl;
   std::cout << std::endl;
-  
+
   // Generate sine wave data points (same as geomdl script)
   std::vector<Point> dataPoints;
   for (int i = 0; i < nb_points; ++i) {
-    double x = (2.0 * M_PI * i) / (nb_points - 1);  // 0 to 2π
+    double x = (2.0 * M_PI * i) / (nb_points - 1); // 0 to 2π
     double y = std::sin(x);
     dataPoints.emplace_back(x, y);
   }
-  
-  std::cout << "Generated " << dataPoints.size() << " data points from sine wave" << std::endl;
-  std::cout << "X range: [0, " << 2.0 * M_PI << "], Y range: [-1, 1]" << std::endl;
+
+  std::cout << "Generated " << dataPoints.size()
+            << " data points from sine wave" << std::endl;
+  std::cout << "X range: [0, " << 2.0 * M_PI << "], Y range: [-1, 1]"
+            << std::endl;
   std::cout << std::endl;
-  
+
   try {
     // SFCGAL NURBS approximation (equivalent to geomdl's approximate_curve)
     std::cout << "=== SFCGAL APPROXIMATION ===" << std::endl;
-    
-    auto approximatedCurve = NURBSCurve::approximateCurve(
-      dataPoints,                    // Input data points
-      degree,                        // Degree
-      NURBSCurve::FT(1e-6),         // Tolerance
-      nb_ctrlpts                     // Maximum control points
-    );
-    
+
+    auto approximatedCurve =
+        NURBSCurve::approximateCurve(dataPoints,           // Input data points
+                                     degree,               // Degree
+                                     NURBSCurve::FT(1e-6), // Tolerance
+                                     nb_ctrlpts // Maximum control points
+        );
+
     if (approximatedCurve) {
-      std::cout << "✓ Successfully created approximated NURBS curve!" << std::endl;
-      
-      // Get results (equivalent to geomdl's curve.ctrlpts, curve.knotvector, etc.)
+      std::cout << "✓ Successfully created approximated NURBS curve!"
+                << std::endl;
+
+      // Get results (equivalent to geomdl's curve.ctrlpts, curve.knotvector,
+      // etc.)
       auto controlPoints = approximatedCurve->controlPoints();
-      auto knotVector = approximatedCurve->knotVector();
-      auto weights = approximatedCurve->weights();
-      
+      auto knotVector    = approximatedCurve->knotVector();
+      auto weights       = approximatedCurve->weights();
+
       std::cout << "\n=== RESULTS (geomdl equivalent) ===" << std::endl;
-      
+
       // Control points (like geomdl's curve.ctrlpts)
-      std::cout << "Control points (" << controlPoints.size() << " points):" << std::endl;
+      std::cout << "Control points (" << controlPoints.size()
+                << " points):" << std::endl;
       for (size_t i = 0; i < std::min(size_t(5), controlPoints.size()); ++i) {
-        std::cout << "  P" << i << ": (" 
-                  << std::setprecision(6) << std::fixed
+        std::cout << "  P" << i << ": (" << std::setprecision(6) << std::fixed
                   << CGAL::to_double(controlPoints[i].x()) << ", "
                   << CGAL::to_double(controlPoints[i].y()) << ")" << std::endl;
       }
       if (controlPoints.size() > 5) {
-        std::cout << "  ... and " << (controlPoints.size() - 5) << " more points" << std::endl;
+        std::cout << "  ... and " << (controlPoints.size() - 5)
+                  << " more points" << std::endl;
       }
-      
+
       // Knot vector (like geomdl's curve.knotvector)
-      std::cout << "\nKnot vector (" << knotVector.size() << " knots):" << std::endl;
+      std::cout << "\nKnot vector (" << knotVector.size()
+                << " knots):" << std::endl;
       std::cout << "[";
       for (size_t i = 0; i < std::min(size_t(10), knotVector.size()); ++i) {
-        if (i > 0) std::cout << ", ";
-        std::cout << std::setprecision(4) << std::fixed << CGAL::to_double(knotVector[i]);
+        if (i > 0)
+          std::cout << ", ";
+        std::cout << std::setprecision(4) << std::fixed
+                  << CGAL::to_double(knotVector[i]);
       }
-      if (knotVector.size() > 10) std::cout << ", ...";
+      if (knotVector.size() > 10)
+        std::cout << ", ...";
       std::cout << "]" << std::endl;
-      
+
       // Curve evaluation (like geomdl's curve.evaluate())
-      std::cout << "\n=== CURVE EVALUATION (geomdl equivalent) ===" << std::endl;
-      const int sample_size = 100;  // Like geomdl's curve.sample_size = 100
-      auto evaluatedCurve = approximatedCurve->toLineString(sample_size);
-      
-      std::cout << "✓ Evaluated curve with " << sample_size << " samples" << std::endl;
-      std::cout << "✓ Generated " << evaluatedCurve->numPoints() << " evaluated points" << std::endl;
-      std::cout << "✓ Curve length: " << std::setprecision(6) << CGAL::to_double(approximatedCurve->length()) << std::endl;
-      
+      std::cout << "\n=== CURVE EVALUATION (geomdl equivalent) ==="
+                << std::endl;
+      const int sample_size    = 100; // Like geomdl's curve.sample_size = 100
+      auto      evaluatedCurve = approximatedCurve->toLineString(sample_size);
+
+      std::cout << "✓ Evaluated curve with " << sample_size << " samples"
+                << std::endl;
+      std::cout << "✓ Generated " << evaluatedCurve->numPoints()
+                << " evaluated points" << std::endl;
+      std::cout << "✓ Curve length: " << std::setprecision(6)
+                << CGAL::to_double(approximatedCurve->length()) << std::endl;
+
       // Calculate approximation quality
       std::cout << "\n=== APPROXIMATION QUALITY ===" << std::endl;
-      double maxError = 0.0;
-      double avgError = 0.0;
-      int errorCount = 0;
-      
+      double maxError   = 0.0;
+      double avgError   = 0.0;
+      int    errorCount = 0;
+
       // Sample every 5th input point for error calculation
       for (size_t i = 0; i < dataPoints.size(); i += 5) {
-        const auto& dataPoint = dataPoints[i];
-        double minDist = 1000.0;
-        
+        const auto &dataPoint = dataPoints[i];
+        double      minDist   = 1000.0;
+
         // Find closest point on curve
         for (size_t j = 0; j < evaluatedCurve->numPoints(); ++j) {
-          auto curvePoint = evaluatedCurve->pointN(j);
-          double dist = std::sqrt(
-            std::pow(CGAL::to_double(curvePoint.x() - dataPoint.x()), 2) +
-            std::pow(CGAL::to_double(curvePoint.y() - dataPoint.y()), 2)
-          );
+          auto   curvePoint = evaluatedCurve->pointN(j);
+          double dist       = std::sqrt(
+              std::pow(CGAL::to_double(curvePoint.x() - dataPoint.x()), 2) +
+              std::pow(CGAL::to_double(curvePoint.y() - dataPoint.y()), 2));
           minDist = std::min(minDist, dist);
         }
         maxError = std::max(maxError, minDist);
@@ -2227,121 +2298,163 @@ BOOST_AUTO_TEST_CASE(testApproximationVsGeomdl)
         errorCount++;
       }
       avgError /= errorCount;
-      
-      std::cout << "✓ Maximum approximation error: " << std::setprecision(8) << maxError << std::endl;
-      std::cout << "✓ Average approximation error: " << std::setprecision(8) << avgError << std::endl;
-      
+
+      std::cout << "✓ Maximum approximation error: " << std::setprecision(8)
+                << maxError << std::endl;
+      std::cout << "✓ Average approximation error: " << std::setprecision(8)
+                << avgError << std::endl;
+
       std::cout << "\n=== GEOMDL COMPATIBILITY ===" << std::endl;
-      std::cout << "✓ SFCGAL provides equivalent functionality to geomdl:" << std::endl;
-      std::cout << "  • approximate_curve() → NURBSCurve::approximateCurve()" << std::endl;
+      std::cout << "✓ SFCGAL provides equivalent functionality to geomdl:"
+                << std::endl;
+      std::cout << "  • approximate_curve() → NURBSCurve::approximateCurve()"
+                << std::endl;
       std::cout << "  • curve.ctrlpts → curve->controlPoints()" << std::endl;
       std::cout << "  • curve.knotvector → curve->knotVector()" << std::endl;
       std::cout << "  • curve.evaluate() → curve->toLineString()" << std::endl;
       std::cout << "  • curve.sample_size → toLineString(N)" << std::endl;
-      
+
     } else {
       std::cout << "✗ ERROR: Failed to create approximated curve" << std::endl;
     }
-    
-  } catch (const std::exception& e) {
+
+  } catch (const std::exception &e) {
     std::cerr << "✗ Error: " << e.what() << std::endl;
   }
 }
 
 BOOST_AUTO_TEST_CASE(testApproximationVsTrueControlPoints)
 {
-  std::cout << "\n=== SFCGAL vs TRUE NURBS APPROXIMATION ANALYSIS ===" << std::endl;
-  std::cout << "Demonstrating the difference between SFCGAL and geomdl approaches\n" << std::endl;
-  
+  std::cout << "\n=== SFCGAL vs TRUE NURBS APPROXIMATION ANALYSIS ==="
+            << std::endl;
+  std::cout
+      << "Demonstrating the difference between SFCGAL and geomdl approaches\n"
+      << std::endl;
+
   // Create a simple test case: 5 points on a parabola
-  std::vector<Point> dataPoints = {
-    Point(0, 0),    // y = x^2
-    Point(1, 1),
-    Point(2, 4), 
-    Point(3, 9),
-    Point(4, 16)
-  };
-  
+  std::vector<Point> dataPoints = {Point(0, 0), // y = x^2
+                                   Point(1, 1), Point(2, 4), Point(3, 9),
+                                   Point(4, 16)};
+
   std::cout << "Input data points (y = x^2):" << std::endl;
   for (size_t i = 0; i < dataPoints.size(); ++i) {
-    std::cout << "  Data[" << i << "]: (" << CGAL::to_double(dataPoints[i].x()) 
+    std::cout << "  Data[" << i << "]: (" << CGAL::to_double(dataPoints[i].x())
               << ", " << CGAL::to_double(dataPoints[i].y()) << ")" << std::endl;
   }
-  
+
   try {
     // SFCGAL current approximation (problematic)
     std::cout << "\n=== SFCGAL CURRENT APPROXIMATION ===" << std::endl;
-    auto sfcgalCurve = NURBSCurve::approximateCurve(dataPoints, 3, NURBSCurve::FT(1e-6), 3);
-    
+    auto sfcgalCurve =
+        NURBSCurve::approximateCurve(dataPoints, 3, NURBSCurve::FT(1e-6), 3);
+
     if (sfcgalCurve) {
       auto sfcgalControlPoints = sfcgalCurve->controlPoints();
-      
-      std::cout << "SFCGAL 'control' points (" << sfcgalControlPoints.size() << " points):" << std::endl;
+
+      std::cout << "SFCGAL 'control' points (" << sfcgalControlPoints.size()
+                << " points):" << std::endl;
       for (size_t i = 0; i < sfcgalControlPoints.size(); ++i) {
-        std::cout << "  Ctrl[" << i << "]: (" << CGAL::to_double(sfcgalControlPoints[i].x()) 
-                  << ", " << CGAL::to_double(sfcgalControlPoints[i].y()) << ")" << std::endl;
+        std::cout << "  Ctrl[" << i << "]: ("
+                  << CGAL::to_double(sfcgalControlPoints[i].x()) << ", "
+                  << CGAL::to_double(sfcgalControlPoints[i].y()) << ")"
+                  << std::endl;
       }
-      
+
       // Check if control points are ON the input data
-      std::cout << "\nAnalysis: Are SFCGAL 'control points' on input data?" << std::endl;
+      std::cout << "\nAnalysis: Are SFCGAL 'control points' on input data?"
+                << std::endl;
       for (size_t i = 0; i < sfcgalControlPoints.size(); ++i) {
         bool foundMatch = false;
         for (size_t j = 0; j < dataPoints.size(); ++j) {
-          double dx = CGAL::to_double(sfcgalControlPoints[i].x() - dataPoints[j].x());
-          double dy = CGAL::to_double(sfcgalControlPoints[i].y() - dataPoints[j].y());
+          double dx =
+              CGAL::to_double(sfcgalControlPoints[i].x() - dataPoints[j].x());
+          double dy =
+              CGAL::to_double(sfcgalControlPoints[i].y() - dataPoints[j].y());
           if (std::abs(dx) < 1e-10 && std::abs(dy) < 1e-10) {
-            std::cout << "  ✓ Ctrl[" << i << "] matches Data[" << j << "] exactly" << std::endl;
+            std::cout << "  ✓ Ctrl[" << i << "] matches Data[" << j
+                      << "] exactly" << std::endl;
             foundMatch = true;
             break;
           }
         }
         if (!foundMatch) {
-          std::cout << "  ✗ Ctrl[" << i << "] is NOT on input data (this would be correct for true approximation)" << std::endl;
+          std::cout << "  ✗ Ctrl[" << i
+                    << "] is NOT on input data (this would be correct for true "
+                       "approximation)"
+                    << std::endl;
         }
       }
-      
+
       // Evaluate the curve
       auto evaluatedCurve = sfcgalCurve->toLineString(20);
-      std::cout << "\nSFCGAL curve evaluation (" << evaluatedCurve->numPoints() << " points):" << std::endl;
-      std::cout << "  First point: (" << CGAL::to_double(evaluatedCurve->pointN(0).x()) 
-                << ", " << CGAL::to_double(evaluatedCurve->pointN(0).y()) << ")" << std::endl;
-      std::cout << "  Last point: (" << CGAL::to_double(evaluatedCurve->pointN(evaluatedCurve->numPoints()-1).x()) 
-                << ", " << CGAL::to_double(evaluatedCurve->pointN(evaluatedCurve->numPoints()-1).y()) << ")" << std::endl;
+      std::cout << "\nSFCGAL curve evaluation (" << evaluatedCurve->numPoints()
+                << " points):" << std::endl;
+      std::cout << "  First point: ("
+                << CGAL::to_double(evaluatedCurve->pointN(0).x()) << ", "
+                << CGAL::to_double(evaluatedCurve->pointN(0).y()) << ")"
+                << std::endl;
+      std::cout
+          << "  Last point: ("
+          << CGAL::to_double(
+                 evaluatedCurve->pointN(evaluatedCurve->numPoints() - 1).x())
+          << ", "
+          << CGAL::to_double(
+                 evaluatedCurve->pointN(evaluatedCurve->numPoints() - 1).y())
+          << ")" << std::endl;
     }
-    
+
     // Demonstrate TRUE control point approximation concept
     std::cout << "\n=== TRUE NURBS APPROXIMATION (Conceptual) ===" << std::endl;
-    std::cout << "What geomdl would do with least-squares approximation:" << std::endl;
+    std::cout << "What geomdl would do with least-squares approximation:"
+              << std::endl;
     std::cout << "Input: 5 data points on parabola y = x^2" << std::endl;
-    std::cout << "Goal: Find 3 control points that create NURBS approximating the data" << std::endl;
+    std::cout << "Goal: Find 3 control points that create NURBS approximating "
+                 "the data"
+              << std::endl;
     std::cout << "" << std::endl;
-    
+
     // Manual example of what true approximation should produce
-    std::cout << "Expected TRUE control points (computed by least-squares):" << std::endl;
-    std::cout << "  True_Ctrl[0]: (~0.0, ~-1.5)  # NOT on input data!" << std::endl;
-    std::cout << "  True_Ctrl[1]: (~2.0, ~8.5)   # NOT on input data!" << std::endl; 
-    std::cout << "  True_Ctrl[2]: (~4.0, ~18.5)  # NOT on input data!" << std::endl;
+    std::cout << "Expected TRUE control points (computed by least-squares):"
+              << std::endl;
+    std::cout << "  True_Ctrl[0]: (~0.0, ~-1.5)  # NOT on input data!"
+              << std::endl;
+    std::cout << "  True_Ctrl[1]: (~2.0, ~8.5)   # NOT on input data!"
+              << std::endl;
+    std::cout << "  True_Ctrl[2]: (~4.0, ~18.5)  # NOT on input data!"
+              << std::endl;
     std::cout << "" << std::endl;
-    std::cout << "These control points would create a NURBS curve that:" << std::endl;
+    std::cout << "These control points would create a NURBS curve that:"
+              << std::endl;
     std::cout << "  ✓ Passes NEAR the input data points" << std::endl;
     std::cout << "  ✓ Minimizes approximation error" << std::endl;
     std::cout << "  ✗ Control points are NOT on the input data" << std::endl;
-    
+
     std::cout << "\n=== KEY DIFFERENCE SUMMARY ===" << std::endl;
     std::cout << "CURRENT SFCGAL approach:" << std::endl;
-    std::cout << "  • approximateCurve() selects subset of input points as 'control points'" << std::endl;
-    std::cout << "  • Result: Control points ARE on the input data" << std::endl;
-    std::cout << "  • This is actually SAMPLING, not true approximation" << std::endl;
+    std::cout << "  • approximateCurve() selects subset of input points as "
+                 "'control points'"
+              << std::endl;
+    std::cout << "  • Result: Control points ARE on the input data"
+              << std::endl;
+    std::cout << "  • This is actually SAMPLING, not true approximation"
+              << std::endl;
     std::cout << "" << std::endl;
     std::cout << "GEOMDL/TRUE approximation approach:" << std::endl;
-    std::cout << "  • approximate_curve() computes optimal control points via least-squares" << std::endl;
-    std::cout << "  • Result: Control points are NOT on input data" << std::endl;
-    std::cout << "  • Control points create curve that best approximates input data" << std::endl;
+    std::cout << "  • approximate_curve() computes optimal control points via "
+                 "least-squares"
+              << std::endl;
+    std::cout << "  • Result: Control points are NOT on input data"
+              << std::endl;
+    std::cout
+        << "  • Control points create curve that best approximates input data"
+        << std::endl;
     std::cout << "" << std::endl;
-    std::cout << "CONCLUSION: SFCGAL needs a true least-squares approximation algorithm" << std::endl;
+    std::cout << "CONCLUSION: SFCGAL needs a true least-squares approximation "
+                 "algorithm"
+              << std::endl;
     std::cout << "to match geomdl's behavior!" << std::endl;
-    
-  } catch (const std::exception& e) {
+
+  } catch (const std::exception &e) {
     std::cerr << "Error: " << e.what() << std::endl;
   }
 }

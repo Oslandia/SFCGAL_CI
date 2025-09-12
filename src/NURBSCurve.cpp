@@ -286,6 +286,16 @@ findKnotSpan(FT parameter, unsigned int degree, const std::vector<FT> &knots)
   return mid;
 }
 
+/**
+ * Compute NURBS basis functions using Cox-de Boor recursion formula.
+ * 
+ * From Piegl & Tiller Algorithm A2.2:
+ * N_{i,0}(u) = 1 if u_i ≤ u < u_{i+1}, 0 otherwise
+ * N_{i,p}(u) = [(u-u_i)/(u_{i+p}-u_i)] * N_{i,p-1}(u) 
+ *            + [(u_{i+p+1}-u)/(u_{i+p+1}-u_{i+1})] * N_{i+1,p-1}(u)
+ * 
+ * Returns degree+1 non-zero basis function values at given parameter.
+ */
 static auto
 computeBasisFunctions(size_t span, FT parameter, unsigned int degree,
                       const std::vector<FT> &knots) -> std::vector<FT>
@@ -450,8 +460,9 @@ NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
   }
 
   // For clamped interpolation, we solve the system N * P = Q
-  // where N is the basis function matrix, P are control points, Q are data points
-  // The clamped condition ensures the curve passes exactly through endpoints
+  // where N is the basis function matrix, P are control points, Q are data
+  // points The clamped condition ensures the curve passes exactly through
+  // endpoints
 
   matrix<double> N(n, n);
 
@@ -480,20 +491,20 @@ NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
   controlPoints.reserve(n);
 
   // Determine coordinate dimensions
-  bool is3D = points.front().is3D();
+  bool is3D       = points.front().is3D();
   bool isMeasured = points.front().isMeasured();
 
   try {
     // Solve system using LU decomposition for each coordinate
     permutation_matrix<std::size_t> pm(n);
-    matrix<double> NCopy;
+    matrix<double>                  NCopy;
 
     // Solve for X coordinates
     vector<double> qx(n);
     for (size_t i = 0; i < n; ++i) {
       qx(i) = CGAL::to_double(points[i].x());
     }
-    
+
     NCopy = N;
     lu_factorize(NCopy, pm);
     lu_substitute(NCopy, pm, qx);
@@ -504,7 +515,7 @@ NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
     for (size_t i = 0; i < n; ++i) {
       qy(i) = CGAL::to_double(points[i].y());
     }
-    
+
     NCopy = N;
     lu_factorize(NCopy, pm);
     lu_substitute(NCopy, pm, qy);
@@ -517,7 +528,7 @@ NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
       for (size_t i = 0; i < n; ++i) {
         qz(i) = CGAL::to_double(points[i].z());
       }
-      
+
       NCopy = N;
       lu_factorize(NCopy, pm);
       lu_substitute(NCopy, pm, qz);
@@ -531,7 +542,7 @@ NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
       for (size_t i = 0; i < n; ++i) {
         qm(i) = CGAL::to_double(points[i].m());
       }
-      
+
       NCopy = N;
       lu_factorize(NCopy, pm);
       lu_substitute(NCopy, pm, qm);
@@ -542,19 +553,22 @@ NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
     for (size_t i = 0; i < n; ++i) {
       FT x = FT(px(i));
       FT y = FT(py(i));
-      
+
       if (is3D && isMeasured) {
-        FT z = FT(pz(i));
+        FT     z = FT(pz(i));
         double m = pm_coord(i);
-        controlPoints.emplace_back(x, y, z, m);  // Uses (FT, FT, FT, double) constructor
+        controlPoints.emplace_back(x, y, z,
+                                   m); // Uses (FT, FT, FT, double) constructor
       } else if (is3D) {
         FT z = FT(pz(i));
         controlPoints.emplace_back(x, y, z);
       } else if (isMeasured) {
         double x_d = CGAL::to_double(x);
         double y_d = CGAL::to_double(y);
-        double m = pm_coord(i);
-        controlPoints.emplace_back(x_d, y_d, 0.0, m, COORDINATE_XYM);  // Use explicit constructor with CoordinateType
+        double m   = pm_coord(i);
+        controlPoints.emplace_back(
+            x_d, y_d, 0.0, m,
+            COORDINATE_XYM); // Use explicit constructor with CoordinateType
       } else {
         controlPoints.emplace_back(x, y);
       }
@@ -562,7 +576,8 @@ NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
 
   } catch (const std::exception &e) {
     BOOST_THROW_EXCEPTION(
-        Exception("Failed to solve clamped interpolation system: " + std::string(e.what())));
+        Exception("Failed to solve clamped interpolation system: " +
+                  std::string(e.what())));
   }
 
   return controlPoints;
@@ -859,16 +874,25 @@ NURBSCurve::interpolateCurve(const std::vector<Point> &points,
 }
 
 auto
-NURBSCurve::generateApproximationKnotVector(const std::vector<Parameter> &parameters,
-                                           unsigned int degree, size_t numControlPoints)
-    -> std::vector<Knot>
+NURBSCurve::generateApproximationKnotVector(
+    const std::vector<Parameter> &parameters, unsigned int degree,
+    size_t numControlPoints) -> std::vector<Knot>
 {
-  // Generate knot vector for approximation (Piegl & Tiller, "The NURBS Book", Algorithm A9.1)
-  size_t n = parameters.size() - 1;  // Number of data points - 1
-  size_t m = numControlPoints - 1;   // Number of control points - 1
+  /**
+   * Generate knot vector for NURBS approximation using averaging method.
+   * 
+   * From Piegl & Tiller "The NURBS Book", Equation 9.8:
+   * Internal knots are computed as:
+   * u_{j+p} = (1/p) * Σ_{k=1}^{p-1} û_k   for j = 1,...,m-p
+   * 
+   * where û_k are the normalized parameter values of data points.
+   * This ensures proper knot spacing for least-squares approximation.
+   */
+  size_t n = parameters.size() - 1; // Number of data points - 1
+  size_t m = numControlPoints - 1;  // Number of control points - 1
 
   std::vector<Knot> knots;
-  knots.reserve(m + degree + 2);     // Correct size: m + p + 1 + 1
+  knots.reserve(m + degree + 2); // Correct size: m + p + 1 + 1
 
   // First degree+1 knots are 0
   for (unsigned int i = 0; i <= degree; ++i) {
@@ -915,47 +939,65 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
   // Ensure we have enough control points for the degree
   size_t minControlPoints = degree + 1;
   size_t numControlPoints = std::min(maxControlPoints, points.size());
-  numControlPoints = std::max(numControlPoints, minControlPoints);
-  
+  numControlPoints        = std::max(numControlPoints, minControlPoints);
+
   if (numControlPoints >= points.size()) {
-    // If we need as many control points as data points, use interpolation instead
-    return interpolateCurve(points, degree, KnotMethod::CHORD_LENGTH, EndCondition::CLAMPED);
+    // If we need as many control points as data points, use interpolation
+    // instead
+    return interpolateCurve(points, degree, KnotMethod::CHORD_LENGTH,
+                            EndCondition::CLAMPED);
   }
 
-  // NURBS Curve Approximation Algorithm (Piegl & Tiller, "The NURBS Book", Chapter 9)
-  // This implements true least-squares approximation, NOT sampling
+  /**
+   * NURBS Curve Approximation - Piegl & Tiller Algorithm A9.1
+   * 
+   * This implements true least-squares approximation, generating control points
+   * that minimize the sum of squared distances to input data points.
+   * 
+   * Mathematical Foundation:
+   * - Given: n+1 data points Q_k, k = 0,...,n
+   * - Find: m+1 control points P_j that minimize ||C(u_k) - Q_k||²
+   * - Where: C(u) = Σ_{j=0}^m N_{j,p}(u) * P_j (NURBS curve)
+   * 
+   * The least-squares problem becomes: N^T * N * P = N^T * Q
+   * where N_{i,j} = N_{j,p}(u_i) are the basis function values
+   */
 
   using namespace detail::ublas;
-  
-  size_t n = points.size() - 1;  // Number of data points - 1 (index range)
-  size_t m = numControlPoints - 1;  // Number of control points - 1
 
-  // Step 1: Compute parameter values for data points (chord length parameterization)
-  std::vector<Parameter> parameters = computeParameters(points, KnotMethod::CHORD_LENGTH);
+  size_t n = points.size() - 1;    // Number of data points - 1 (index range)
+  size_t m = numControlPoints - 1; // Number of control points - 1
+
+  // Step 1: Compute parameter values for data points (chord length
+  // parameterization)
+  std::vector<Parameter> parameters =
+      computeParameters(points, KnotMethod::CHORD_LENGTH);
 
   // Step 2: Generate knot vector for approximation
-  std::vector<Knot> knots = generateApproximationKnotVector(parameters, degree, m);
+  std::vector<Knot> knots =
+      generateApproximationKnotVector(parameters, degree, m);
 
   // Step 3: Set up the least-squares system N^T * N * P = N^T * Q
-  // where N is the basis function matrix, P are control points, Q are data points
+  // where N is the basis function matrix, P are control points, Q are data
+  // points
 
-  matrix<double> N(n + 1, m + 1);  // Basis function matrix
-  
+  matrix<double> N(n + 1, m + 1); // Basis function matrix
+
   // Fill basis function matrix
   for (size_t i = 0; i <= n; ++i) {
     Parameter t = parameters[i];
-    
+
     // Find knot span
     size_t span = findKnotSpan(t, degree, knots);
-    
+
     // Compute non-zero basis functions
     auto basis = computeBasisFunctions(span, t, degree, knots);
-    
+
     // Initialize row to zero
     for (size_t j = 0; j <= m; ++j) {
       N(i, j) = 0.0;
     }
-    
+
     // Fill non-zero basis functions
     size_t baseIdx = span - degree;
     for (unsigned int k = 0; k <= degree && baseIdx + k <= m; ++k) {
@@ -971,7 +1013,7 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
   controlPoints.reserve(m + 1);
 
   // Determine coordinate dimensions
-  bool is3D = points.front().is3D();
+  bool is3D       = points.front().is3D();
   bool isMeasured = points.front().isMeasured();
 
   try {
@@ -980,11 +1022,11 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
     for (size_t i = 0; i <= n; ++i) {
       qx(i) = CGAL::to_double(points[i].x());
     }
-    vector<double> ntqx = prod(trans(N), qx);  // N^T * Q_x
-    
+    vector<double> ntqx = prod(trans(N), qx); // N^T * Q_x
+
     // Solve NTN * px = ntqx
     permutation_matrix<std::size_t> pm(m + 1);
-    matrix<double> NTN_copy = NTN;
+    matrix<double>                  NTN_copy = NTN;
     lu_factorize(NTN_copy, pm);
     lu_substitute(NTN_copy, pm, ntqx);
     vector<double> px = ntqx;
@@ -994,8 +1036,8 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
     for (size_t i = 0; i <= n; ++i) {
       qy(i) = CGAL::to_double(points[i].y());
     }
-    vector<double> ntqy = prod(trans(N), qy);  // N^T * Q_y
-    
+    vector<double> ntqy = prod(trans(N), qy); // N^T * Q_y
+
     NTN_copy = NTN;
     lu_factorize(NTN_copy, pm);
     lu_substitute(NTN_copy, pm, ntqy);
@@ -1008,8 +1050,8 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
       for (size_t i = 0; i <= n; ++i) {
         qz(i) = CGAL::to_double(points[i].z());
       }
-      vector<double> ntqz = prod(trans(N), qz);  // N^T * Q_z
-      
+      vector<double> ntqz = prod(trans(N), qz); // N^T * Q_z
+
       NTN_copy = NTN;
       lu_factorize(NTN_copy, pm);
       lu_substitute(NTN_copy, pm, ntqz);
@@ -1023,8 +1065,8 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
       for (size_t i = 0; i <= n; ++i) {
         qm(i) = CGAL::to_double(points[i].m());
       }
-      vector<double> ntqm = prod(trans(N), qm);  // N^T * Q_m
-      
+      vector<double> ntqm = prod(trans(N), qm); // N^T * Q_m
+
       NTN_copy = NTN;
       lu_factorize(NTN_copy, pm);
       lu_substitute(NTN_copy, pm, ntqm);
@@ -1035,17 +1077,17 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
     for (size_t i = 0; i <= m; ++i) {
       FT x = FT(px(i));
       FT y = FT(py(i));
-      
+
       if (is3D && isMeasured) {
-        FT z = FT(pz(i));
+        FT     z     = FT(pz(i));
         double m_val = pm_coord(i);
         controlPoints.emplace_back(x, y, z, m_val);
       } else if (is3D) {
         FT z = FT(pz(i));
         controlPoints.emplace_back(x, y, z);
       } else if (isMeasured) {
-        double x_d = CGAL::to_double(x);
-        double y_d = CGAL::to_double(y);
+        double x_d   = CGAL::to_double(x);
+        double y_d   = CGAL::to_double(y);
         double m_val = pm_coord(i);
         controlPoints.emplace_back(x_d, y_d, 0.0, m_val, COORDINATE_XYM);
       } else {
@@ -1055,16 +1097,17 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
 
   } catch (const std::exception &e) {
     BOOST_THROW_EXCEPTION(
-        Exception("Failed to solve least-squares approximation system: " + std::string(e.what())));
+        Exception("Failed to solve least-squares approximation system: " +
+                  std::string(e.what())));
   }
 
   // Create the approximating curve
   auto curve = std::make_unique<NURBSCurve>(
-      controlPoints, std::vector<FT>(controlPoints.size(), FT(1)), 
-      degree, knots);
-  
+      controlPoints, std::vector<FT>(controlPoints.size(), FT(1)), degree,
+      knots);
+
   // Store fit information
-  curve->_fitPoints = points;
+  curve->_fitPoints    = points;
   curve->_fitTolerance = tolerance;
 
   return curve;
@@ -1402,7 +1445,8 @@ NURBSCurve::toLineStringArcLength(unsigned int numSegments) const
     numSegments = 32;
   }
 
-  // For performance reasons, limit the number of segments for arc-length sampling
+  // For performance reasons, limit the number of segments for arc-length
+  // sampling
   if (numSegments > 100) {
     // Fall back to parameter-based sampling for very high segment counts
     return toLineString(numSegments);
@@ -1416,21 +1460,21 @@ NURBSCurve::toLineStringArcLength(unsigned int numSegments) const
   }
 
   auto bounds = parameterBounds();
-  
+
   // Build a lookup table of parameter values vs cumulative arc lengths
   // Use more samples than requested to build accurate inverse mapping
-  const unsigned int lookupSamples = std::max(numSegments * 2, 64u);
+  const unsigned int     lookupSamples = std::max(numSegments * 2, 64u);
   std::vector<Parameter> lookupParams;
-  std::vector<FT> lookupLengths;
+  std::vector<FT>        lookupLengths;
   lookupParams.reserve(lookupSamples + 1);
   lookupLengths.reserve(lookupSamples + 1);
-  
+
   FT paramStep = (bounds.second - bounds.first) / FT(lookupSamples);
   lookupParams.push_back(bounds.first);
   lookupLengths.push_back(FT(0));
-  
+
   for (unsigned int i = 1; i <= lookupSamples; ++i) {
-    Parameter param = bounds.first + FT(i) * paramStep;
+    Parameter param     = bounds.first + FT(i) * paramStep;
     FT cumulativeLength = computeArcLength(bounds.first, param, FT(1e-6));
     lookupParams.push_back(param);
     lookupLengths.push_back(cumulativeLength);
@@ -1438,28 +1482,30 @@ NURBSCurve::toLineStringArcLength(unsigned int numSegments) const
 
   // Now sample points uniformly in arc-length space using interpolation
   lineString->addPoint(evaluate(bounds.first));
-  
+
   for (unsigned int segIdx = 1; segIdx <= numSegments; ++segIdx) {
     FT targetArcLength = (FT(segIdx) / FT(numSegments)) * totalLength;
-    
+
     // Find the parameter by linear interpolation in the lookup table
     Parameter param = bounds.first;
-    
+
     // Find bracketing indices in lookup table
     for (size_t j = 0; j < lookupLengths.size() - 1; ++j) {
-      if (targetArcLength >= lookupLengths[j] && targetArcLength <= lookupLengths[j + 1]) {
+      if (targetArcLength >= lookupLengths[j] &&
+          targetArcLength <= lookupLengths[j + 1]) {
         // Linear interpolation
         FT lengthRange = lookupLengths[j + 1] - lookupLengths[j];
         if (lengthRange > FT(1e-12)) {
           FT ratio = (targetArcLength - lookupLengths[j]) / lengthRange;
-          param = lookupParams[j] + ratio * (lookupParams[j + 1] - lookupParams[j]);
+          param =
+              lookupParams[j] + ratio * (lookupParams[j + 1] - lookupParams[j]);
         } else {
           param = lookupParams[j];
         }
         break;
       }
     }
-    
+
     lineString->addPoint(evaluate(param));
   }
 
@@ -2619,8 +2665,16 @@ NURBSCurve::computeArcLength(Parameter startParam, Parameter endParam,
     return FT(0);
   }
 
-  // Use adaptive Simpson's rule for arc length integration
-  // This integrates ||C'(t)|| dt over [startParam, endParam]
+  /**
+   * Arc length computation using adaptive Simpson quadrature.
+   * 
+   * Integrates the speed function ||C'(t)|| over [startParam, endParam]:
+   * L = ∫[a,b] ||dC/dt|| dt
+   * 
+   * The adaptive approach subdivides intervals where Simpson's rule
+   * and its halving disagree by more than 15*tolerance, ensuring
+   * accurate results for curves with varying curvature.
+   */
   return adaptiveSimpsonArcLength(startParam, endParam, tolerance);
 }
 
@@ -2631,19 +2685,19 @@ NURBSCurve::speedFunction(Parameter t) const -> FT
 {
   // Compute ||C'(t)|| - the magnitude of the derivative
   Point derivative = this->derivative(t, 1);
-  
+
   if (is3D()) {
     FT dx = derivative.x();
-    FT dy = derivative.y(); 
+    FT dy = derivative.y();
     FT dz = derivative.z();
     // Use CGAL::to_double for sqrt calculation, then convert back to FT
-    double magnitude = std::sqrt(CGAL::to_double(dx*dx + dy*dy + dz*dz));
+    double magnitude = std::sqrt(CGAL::to_double(dx * dx + dy * dy + dz * dz));
     return FT(magnitude);
   } else {
     FT dx = derivative.x();
     FT dy = derivative.y();
     // Use CGAL::to_double for sqrt calculation, then convert back to FT
-    double magnitude = std::sqrt(CGAL::to_double(dx*dx + dy*dy));
+    double magnitude = std::sqrt(CGAL::to_double(dx * dx + dy * dy));
     return FT(magnitude);
   }
 }
@@ -2652,11 +2706,11 @@ auto
 NURBSCurve::simpsonRule(Parameter a, Parameter b) const -> FT
 {
   // Basic Simpson's rule: (b-a)/6 * [f(a) + 4*f((a+b)/2) + f(b)]
-  Parameter mid = (a + b) / FT(2);
-  FT fa = speedFunction(a);
-  FT fmid = speedFunction(mid);
-  FT fb = speedFunction(b);
-  
+  Parameter mid  = (a + b) / FT(2);
+  FT        fa   = speedFunction(a);
+  FT        fmid = speedFunction(mid);
+  FT        fb   = speedFunction(b);
+
   return (b - a) / FT(6) * (fa + FT(4) * fmid + fb);
 }
 
@@ -2670,16 +2724,16 @@ NURBSCurve::adaptiveSimpsonArcLength(Parameter a, Parameter b, FT tolerance,
   }
 
   Parameter mid = (a + b) / FT(2);
-  
+
   // Compute Simpson's rule for whole interval and two halves
   FT wholeInterval = simpsonRule(a, b);
-  FT leftHalf = simpsonRule(a, mid);
-  FT rightHalf = simpsonRule(mid, b);
-  FT twoHalves = leftHalf + rightHalf;
-  
+  FT leftHalf      = simpsonRule(a, mid);
+  FT rightHalf     = simpsonRule(mid, b);
+  FT twoHalves     = leftHalf + rightHalf;
+
   // Error estimate: |S(a,b) - S(a,m) - S(m,b)| / 15
   FT error = CGAL::abs(wholeInterval - twoHalves) / FT(15);
-  
+
   if (error <= tolerance) {
     // Richardson extrapolation: more accurate result
     return twoHalves + (twoHalves - wholeInterval) / FT(15);

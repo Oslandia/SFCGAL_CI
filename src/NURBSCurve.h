@@ -775,7 +775,7 @@ protected:
   /**
    * @brief Apply Simpson's rule over interval [a,b]
    * @param a Start parameter
-   * @param b End parameter  
+   * @param b End parameter
    * @return Simpson approximation of integral
    */
   [[nodiscard]] auto
@@ -791,7 +791,7 @@ protected:
    */
   [[nodiscard]] auto
   adaptiveSimpsonArcLength(Parameter a, Parameter b, FT tolerance,
-                          unsigned int maxDepth = 20) const -> FT;
+                           unsigned int maxDepth = 20) const -> FT;
 
   /**
    * @brief Find parameter corresponding to arc length using Newton-Raphson
@@ -843,13 +843,13 @@ protected:
   /**
    * @brief Generate knot vector for least-squares approximation
    * @param parameters Parameter values for data points
-   * @param degree Curve degree  
+   * @param degree Curve degree
    * @param numControlPoints Number of control points (m in Piegl & Tiller)
    * @return Knot vector optimized for approximation
    */
   static auto
   generateApproximationKnotVector(const std::vector<Parameter> &parameters,
-                                 unsigned int degree, size_t numControlPoints)
+                                  unsigned int degree, size_t numControlPoints)
       -> std::vector<Knot>;
 
   /**
