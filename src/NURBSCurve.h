@@ -653,6 +653,36 @@ public:
   [[nodiscard]] auto
   getCurveStatistics() const -> std::map<std::string, double>;
 
+  // ISO 19107 / SQL-MM mandatory methods for ST_NURBSCurve
+
+  /**
+   * @brief Get start measure value (ISO/SQL-MM ST_StartM)
+   * @return Optional start measure value
+   */
+  [[nodiscard]] auto
+  startM() const -> std::optional<double>;
+
+  /**
+   * @brief Set start measure value (ISO/SQL-MM ST_StartM)
+   * @param startMeasure New start measure value
+   */
+  void
+  setStartM(const std::optional<double> &startMeasure);
+
+  /**
+   * @brief Get end measure value (ISO/SQL-MM ST_EndM)
+   * @return Optional end measure value
+   */
+  [[nodiscard]] auto
+  endM() const -> std::optional<double>;
+
+  /**
+   * @brief Set end measure value (ISO/SQL-MM ST_EndM)
+   * @param endMeasure New end measure value
+   */
+  void
+  setEndM(const std::optional<double> &endMeasure);
+
 protected:
   // Core NURBS data with proper encapsulation
   std::vector<Point> _controlPoints; ///< Control points in curve space
@@ -665,6 +695,10 @@ protected:
   FT                   _fitTolerance{FT(0)}; ///< Fitting tolerance used
   std::optional<Point> _startTangent;        ///< Start tangent constraint
   std::optional<Point> _endTangent;          ///< End tangent constraint
+
+  // ISO 19107 / SQL-MM optional measure values
+  std::optional<double> _startM; ///< Start measure value
+  std::optional<double> _endM;   ///< End measure value
 
   // Core algorithmic methods
 

@@ -103,6 +103,12 @@ protected:
   void
   writeInner(const NURBSCurve &g);
 
+  /**
+   * Generate uniform knot vector for comparison
+   */
+  std::vector<Kernel::FT>
+  generateUniformKnots(size_t numControlPoints, unsigned int degree) const;
+
   // for recursive call use
   void
   writeRec(const Geometry &g);

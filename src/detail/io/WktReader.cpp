@@ -577,16 +577,23 @@ WktReader::readInnerNURBSCurve(NURBSCurve &geometry)
     return;
   }
 
-  // Read control points - always present
+  // NEW FORMAT: Read degree first (ISO compliant)
   if (!_reader.match('(')) {
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
+  }
+
+  unsigned int degree = readDegree();
+
+  if (!_reader.match(',')) {
+    BOOST_THROW_EXCEPTION(WktParseException("Expected comma after degree"));
+  }
+
+  // Read control points - always present after degree
+  if (!_reader.match('(')) {
+    BOOST_THROW_EXCEPTION(WktParseException("Expected control points list"));
   }
 
   std::vector<Point> controlPoints;
-  if (!_reader.match('(')) {
-    BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
-  }
-
   while (!_reader.eof()) {
     Point point;
     readPointCoordinate(point);
@@ -606,13 +613,15 @@ WktReader::readInnerNURBSCurve(NURBSCurve &geometry)
         WktParseException("NURBS curve must have at least one control point"));
   }
 
-  // Parse optional elements after control points
+  // Validate degree
+  if (degree >= controlPoints.size()) {
+    BOOST_THROW_EXCEPTION(WktParseException(
+        "NURBS degree must be less than number of control points"));
+  }
+
+  // Parse optional elements after control points: weights and/or knots
   std::vector<Kernel::FT> weights;
   std::vector<Kernel::FT> knots;
-  unsigned int            degree =
-      controlPoints.empty()
-                     ? 0
-                     : static_cast<unsigned int>(controlPoints.size() - 1);
 
   if (_reader.match(',')) {
     // Look ahead to determine what comes next
@@ -632,35 +641,25 @@ WktReader::readInnerNURBSCurve(NURBSCurve &geometry)
           // First was weights, second is knots
           weights = firstVector;
           knots   = readKnotsVector();
-
-          if (_reader.match(',')) {
-            degree = readDegree();
-          }
         } else {
           _reader.rollback(); // Restore position
-          // First was weights, next is degree
+          // Only weights provided (knot can be a scalar)
           weights = firstVector;
-          degree  = readDegree();
         }
       } else {
-        // Only one vector provided - assume it's weights
-        weights = firstVector;
+        // Only one vector provided - could be weights or knots
+        // Assume weights if size matches control points, otherwise knots
+        if (firstVector.size() == controlPoints.size()) {
+          weights = firstVector;
+        } else {
+          knots = firstVector;
+        }
       }
-    } else {
-      _reader.rollback(); // Restore position
-      // Direct degree
-      degree = readDegree();
     }
   }
 
   if (!_reader.match(')')) {
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
-  }
-
-  // Validate degree
-  if (degree >= controlPoints.size()) {
-    BOOST_THROW_EXCEPTION(WktParseException(
-        "NURBS degree must be less than number of control points"));
   }
 
   // Validate weights if provided

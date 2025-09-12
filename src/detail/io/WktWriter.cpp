@@ -501,8 +501,11 @@ WktWriter::writeInner(const NURBSCurve &g)
 {
   _s << "(";
 
+  // NEW FORMAT: Always write degree first (ISO compliant)
+  _s << g.degree();
+
   // Write control points
-  _s << "(";
+  _s << ",(";
   for (size_t i = 0; i < g.numControlPoints(); i++) {
     if (i != 0) {
       _s << ",";
@@ -517,13 +520,62 @@ WktWriter::writeInner(const NURBSCurve &g)
     writeWeights(g.weights());
   }
 
-  // For now, don't write knot vectors to keep it simple
-  // This matches the PostGIS examples which rarely use custom knots
+  // Write knot vector if available and different from uniform
+  const auto &knots = g.knotVector();
+  if (!knots.empty()) {
+    // Check if knots are significantly different from uniform
+    bool isNonUniform = false;
+    if (knots.size() > 2) {
+      auto uniformKnots =
+          generateUniformKnots(g.numControlPoints(), g.degree());
+      if (knots.size() == uniformKnots.size()) {
+        for (size_t i = 0; i < knots.size(); ++i) {
+          if (CGAL::abs(knots[i] - uniformKnots[i]) > Kernel::FT(1e-10)) {
+            isNonUniform = true;
+            break;
+          }
+        }
+      } else {
+        isNonUniform = true;
+      }
+    }
 
-  // Always write degree
-  _s << "," << g.degree();
+    if (isNonUniform) {
+      _s << ",";
+      writeKnots(knots);
+    }
+  }
 
   _s << ")";
+}
+
+std::vector<Kernel::FT>
+WktWriter::generateUniformKnots(size_t       numControlPoints,
+                                unsigned int degree) const
+{
+  if (numControlPoints == 0 || degree >= numControlPoints) {
+    return {};
+  }
+
+  std::vector<Kernel::FT> knots;
+  size_t                  knotCount = numControlPoints + degree + 1;
+  knots.reserve(knotCount);
+
+  // Clamped uniform knots: [0, 0, ..., 0, 1/(n-p), 2/(n-p), ..., 1, 1, ..., 1]
+  for (unsigned int i = 0; i <= degree; ++i) {
+    knots.push_back(Kernel::FT(0));
+  }
+
+  size_t numInternal = knotCount - 2 * (degree + 1);
+  for (size_t i = 1; i <= numInternal; ++i) {
+    knots.push_back(Kernel::FT(i) / Kernel::FT(numInternal + 1));
+  }
+
+  for (unsigned int i = 0; i <= degree; ++i) {
+    knots.push_back(Kernel::FT(1));
+  }
+
+  return knots;
 }
 
 void

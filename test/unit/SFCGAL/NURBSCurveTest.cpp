@@ -24,6 +24,7 @@
 #include "SFCGAL/algorithm/volume.h"
 #include "SFCGAL/detail/transform/AffineTransform2.h"
 #include "SFCGAL/detail/transform/AffineTransform3.h"
+#include "SFCGAL/io/wkb.h"
 #include "SFCGAL/io/wkt.h"
 #include <CGAL/Aff_transformation_2.h>
 #include <CGAL/Aff_transformation_3.h>
@@ -752,7 +753,7 @@ BOOST_AUTO_TEST_CASE(testWktEmpty)
 /// WKT reading of basic NURBS curve (points + degree only)
 BOOST_AUTO_TEST_CASE(testReadBasicNURBSWkt)
 {
-  std::string const wkt  = "NURBSCURVE((0 0, 5 10, 10 0), 2)";
+  std::string const wkt  = "NURBSCURVE(2, (0 0, 5 10, 10 0))";
   auto              geom = SFCGAL::io::readWkt(wkt);
 
   BOOST_REQUIRE(geom->is<NURBSCurve>());
@@ -765,7 +766,7 @@ BOOST_AUTO_TEST_CASE(testReadBasicNURBSWkt)
 /// WKT reading with explicit weights
 BOOST_AUTO_TEST_CASE(testReadWeightedNURBSWkt)
 {
-  std::string const wkt  = "NURBSCURVE((0 0, 5 10, 10 0), (1, 2, 1), 2)";
+  std::string const wkt  = "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 2, 1))";
   auto              geom = SFCGAL::io::readWkt(wkt);
 
   BOOST_REQUIRE(geom->is<NURBSCurve>());
@@ -777,10 +778,11 @@ BOOST_AUTO_TEST_CASE(testReadWeightedNURBSWkt)
 /// WKT reading with complete knot vector
 BOOST_AUTO_TEST_CASE(testReadFullNURBSWkt)
 {
-  // 4 points, degree 2 → needs 4+2+1=7 knots
-  std::string const wkt  = "NURBSCURVE((0 0, 3 6, 6 3, 9 0), (1, 1, 1, 1), (0, "
-                           "0, 0, 0.5, 1, 1, 1), 2)";
-  auto              geom = SFCGAL::io::readWkt(wkt);
+  // 4 points, degree 2 → needs 4+2+1=7 knots (corrected)
+  std::string const wkt =
+      "NURBSCURVE(2, (0 0, 3 6, 6 3, 9 0), (1, 1, 1, 1), (0, "
+      "0, 0, 0.5, 1, 1, 1))";
+  auto geom = SFCGAL::io::readWkt(wkt);
 
   BOOST_REQUIRE(geom->is<NURBSCurve>());
   auto const &curve = geom->as<NURBSCurve>();
@@ -792,7 +794,7 @@ BOOST_AUTO_TEST_CASE(testReadFullNURBSWkt)
 /// WKT reading of 3D NURBS curve
 BOOST_AUTO_TEST_CASE(testRead3DNURBSWkt)
 {
-  std::string const wkt  = "NURBSCURVE Z ((0 0 0, 5 5 10, 10 0 0), 2)";
+  std::string const wkt  = "NURBSCURVE Z (2, (0 0 0, 5 5 10, 10 0 0))";
   auto              geom = SFCGAL::io::readWkt(wkt);
 
   BOOST_REQUIRE(geom->is<NURBSCurve>());
@@ -804,7 +806,7 @@ BOOST_AUTO_TEST_CASE(testRead3DNURBSWkt)
 /// WKT reading with measured coordinates
 BOOST_AUTO_TEST_CASE(testReadMeasuredNURBSWkt)
 {
-  std::string const wkt  = "NURBSCURVE M ((0 0 5, 5 5 15, 10 0 25), 2)";
+  std::string const wkt  = "NURBSCURVE M (2, (0 0 5, 5 5 15, 10 0 25))";
   auto              geom = SFCGAL::io::readWkt(wkt);
 
   BOOST_REQUIRE(geom->is<NURBSCurve>());
@@ -834,7 +836,7 @@ BOOST_AUTO_TEST_CASE(testWriteBasicNURBSWkt)
   NURBSCurve  curve(controlPoints, 2);
   std::string result = curve.asText(0);
 
-  BOOST_CHECK_EQUAL(result, "NURBSCURVE ((0 0,5 10,10 0),2)");
+  BOOST_CHECK_EQUAL(result, "NURBSCURVE (2,(0 0,5 10,10 0))");
 }
 
 /// WKT writing of weighted NURBS curve
@@ -849,7 +851,7 @@ BOOST_AUTO_TEST_CASE(testWriteWeightedNURBSWkt)
   NURBSCurve  curve(controlPoints, weights, 2);
   std::string result = curve.asText(0);
 
-  BOOST_CHECK_EQUAL(result, "NURBSCURVE ((0 0,5 10,10 0),(1,2,1),2)");
+  BOOST_CHECK_EQUAL(result, "NURBSCURVE (2,(0 0,5 10,10 0),(1,2,1))");
 }
 
 /// WKT writing of 3D NURBS curve
@@ -863,7 +865,7 @@ BOOST_AUTO_TEST_CASE(testWrite3DNURBSWkt)
   NURBSCurve  curve(controlPoints, 2);
   std::string result = curve.asText(0);
 
-  BOOST_CHECK_EQUAL(result, "NURBSCURVE Z ((0 0 0,5 5 10,10 0 0),2)");
+  BOOST_CHECK_EQUAL(result, "NURBSCURVE Z (2,(0 0 0,5 5 10,10 0 0))");
 }
 
 /// WKT writing of empty NURBS curve
@@ -878,11 +880,11 @@ BOOST_AUTO_TEST_CASE(testWriteEmptyNURBSWkt)
 /// Round-trip WKT conversion preserves structure
 BOOST_AUTO_TEST_CASE(testRoundTripNURBSWkt)
 {
-  std::string const originalWkt = "NURBSCURVE((0 0, 5 10, 10 0), (1, 2, 1), 2)";
+  std::string const originalWkt = "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 2, 1))";
   auto              geom        = SFCGAL::io::readWkt(originalWkt);
   std::string       result      = geom->asText(0);
 
-  BOOST_CHECK_EQUAL(result, "NURBSCURVE ((0 0,5 10,10 0),(1,2,1),2)");
+  BOOST_CHECK_EQUAL(result, "NURBSCURVE (2,(0 0,5 10,10 0),(1,2,1))");
 
   // Verify re-reading produces identical geometry
   auto geom2 = SFCGAL::io::readWkt(result);
@@ -895,10 +897,10 @@ BOOST_AUTO_TEST_CASE(testRoundTripNURBSWkt)
 BOOST_AUTO_TEST_CASE(testPostGISCompatibilityWkt)
 {
   std::vector<std::string> postgisSamples = {
-      "NURBSCURVE((0 0, 10 0, 20 0), 1)", "NURBSCURVE((0 0, 5 10, 10 0), 2)",
-      "NURBSCURVE((0 0, 3 7, 7 7, 10 0), 3)",
-      "NURBSCURVE((0 0, 5 10, 10 0), (1, 3, 1), 2)",
-      "NURBSCURVE Z ((0 0 0, 5 5 10, 10 0 0), (1, 2, 1), 2)"};
+      "NURBSCURVE(1, (0 0, 10 0, 20 0))", "NURBSCURVE(2, (0 0, 5 10, 10 0))",
+      "NURBSCURVE(3, (0 0, 3 7, 7 7, 10 0))",
+      "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 3, 1))",
+      "NURBSCURVE Z (2, (0 0 0, 5 5 10, 10 0 0), (1, 2, 1))"};
 
   for (auto const &wkt : postgisSamples) {
     BOOST_CHECK_NO_THROW(auto geom = SFCGAL::io::readWkt(wkt));
@@ -910,14 +912,14 @@ BOOST_AUTO_TEST_CASE(testPostGISCompatibilityWkt)
 /// Error handling for mismatched weight count
 BOOST_AUTO_TEST_CASE(testWktErrorMismatchedWeights)
 {
-  std::string const wkt = "NURBSCURVE((0 0, 5 5, 10 0), (1, 2), 2)";
+  std::string const wkt = "NURBSCURVE(2, (0 0, 5 5, 10 0), (1, 2))";
   BOOST_CHECK_THROW(auto geom = SFCGAL::io::readWkt(wkt), Exception);
 }
 
 /// Error handling for negative weights
 BOOST_AUTO_TEST_CASE(testWktErrorNegativeWeight)
 {
-  std::string const wkt = "NURBSCURVE((0 0, 5 5, 10 0), (1, -0.5, 1), 2)";
+  std::string const wkt = "NURBSCURVE(2, (0 0, 5 5, 10 0), (1, -0.5, 1))";
   BOOST_CHECK_THROW(auto geom = SFCGAL::io::readWkt(wkt), Exception);
 }
 
@@ -1627,7 +1629,7 @@ BOOST_AUTO_TEST_CASE(testPeriodicEndConditionNotClosed)
 
 BOOST_AUTO_TEST_CASE(testWKTWithScientificNotation)
 {
-  std::string wkt = "NURBSCURVE((0 0,1e2 1.5e-1,2e0 0),(1e0,2.5e0,1e0),2)";
+  std::string wkt = "NURBSCURVE(2, (0 0,1e2 1.5e-1,2e0 0),(1e0,2.5e0,1e0))";
 
   auto geometry = io::readWkt(wkt);
   BOOST_REQUIRE(geometry->is<NURBSCurve>());
@@ -2456,6 +2458,432 @@ BOOST_AUTO_TEST_CASE(testApproximationVsTrueControlPoints)
 
   } catch (const std::exception &e) {
     std::cerr << "Error: " << e.what() << std::endl;
+  }
+}
+
+/// WKT/WKB Round-trip tests
+BOOST_AUTO_TEST_CASE(testWktWkbRoundTripBasic)
+{
+  // Create basic NURBS curve
+  std::vector<Point> controlPoints;
+  controlPoints.emplace_back(0.0, 0.0);
+  controlPoints.emplace_back(5.0, 10.0);
+  controlPoints.emplace_back(10.0, 0.0);
+
+  NURBSCurve originalCurve(controlPoints, 2);
+
+  // Test WKT round-trip
+  std::string wktString = originalCurve.asText(0);
+  BOOST_CHECK_EQUAL(wktString, "NURBSCURVE (2,(0 0,5 10,10 0))");
+
+  auto wktGeom = SFCGAL::io::readWkt(wktString);
+  BOOST_REQUIRE(wktGeom->is<NURBSCurve>());
+  auto const &wktCurve = wktGeom->as<NURBSCurve>();
+
+  // Verify WKT round-trip preserves data
+  BOOST_CHECK_EQUAL(wktCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wktCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+
+  // Test WKB round-trip
+  std::string wkbString = originalCurve.asWkb();
+  auto        wkbGeom   = SFCGAL::io::readWkb(wkbString);
+  BOOST_REQUIRE(wkbGeom->is<NURBSCurve>());
+  auto const &wkbCurve = wkbGeom->as<NURBSCurve>();
+
+  // Verify WKB round-trip preserves data
+  BOOST_CHECK_EQUAL(wkbCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wkbCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+  for (size_t i = 0; i < wkbCurve.numControlPoints(); ++i) {
+    BOOST_CHECK(wkbCurve.controlPointN(i).almostEqual(
+        originalCurve.controlPointN(i), 1e-10));
+  }
+}
+
+/// WKT/WKB Round-trip test with weights
+BOOST_AUTO_TEST_CASE(testWktWkbRoundTripWeighted)
+{
+  std::vector<Point> controlPoints;
+  controlPoints.emplace_back(0.0, 0.0);
+  controlPoints.emplace_back(5.0, 10.0);
+  controlPoints.emplace_back(10.0, 0.0);
+
+  auto       weights = convertWeights({1.0, 2.0, 1.0});
+  NURBSCurve originalCurve(controlPoints, weights, 2);
+
+  // Test WKT round-trip
+  std::string wktString = originalCurve.asText(0);
+  BOOST_CHECK_EQUAL(wktString, "NURBSCURVE (2,(0 0,5 10,10 0),(1,2,1))");
+
+  auto wktGeom = SFCGAL::io::readWkt(wktString);
+  BOOST_REQUIRE(wktGeom->is<NURBSCurve>());
+  auto const &wktCurve = wktGeom->as<NURBSCurve>();
+
+  BOOST_CHECK_EQUAL(wktCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wktCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+  BOOST_CHECK(wktCurve.isRational());
+
+  // Test WKB round-trip
+  std::string wkbString = originalCurve.asWkb();
+  auto        wkbGeom   = SFCGAL::io::readWkb(wkbString);
+  BOOST_REQUIRE(wkbGeom->is<NURBSCurve>());
+  auto const &wkbCurve = wkbGeom->as<NURBSCurve>();
+
+  BOOST_CHECK_EQUAL(wkbCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wkbCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+  BOOST_CHECK(wkbCurve.isRational());
+
+  // Verify weights are preserved
+  for (size_t i = 0; i < wkbCurve.numControlPoints(); ++i) {
+    auto originalWeight = CGAL::to_double(originalCurve.weight(i));
+    auto wkbWeight      = CGAL::to_double(wkbCurve.weight(i));
+    BOOST_CHECK_CLOSE(wkbWeight, originalWeight, 1e-10);
+  }
+}
+
+/// WKT/WKB Round-trip test with 3D coordinates
+BOOST_AUTO_TEST_CASE(testWktWkbRoundTrip3D)
+{
+  std::vector<Point> controlPoints;
+  controlPoints.emplace_back(0.0, 0.0, 0.0);
+  controlPoints.emplace_back(5.0, 5.0, 10.0);
+  controlPoints.emplace_back(10.0, 0.0, 0.0);
+
+  NURBSCurve originalCurve(controlPoints, 2);
+
+  // Test WKT round-trip
+  std::string wktString = originalCurve.asText(0);
+  BOOST_CHECK_EQUAL(wktString, "NURBSCURVE Z (2,(0 0 0,5 5 10,10 0 0))");
+
+  auto wktGeom = SFCGAL::io::readWkt(wktString);
+  BOOST_REQUIRE(wktGeom->is<NURBSCurve>());
+  auto const &wktCurve = wktGeom->as<NURBSCurve>();
+
+  BOOST_CHECK(wktCurve.is3D());
+  BOOST_CHECK_EQUAL(wktCurve.degree(), originalCurve.degree());
+
+  // Test WKB round-trip
+  std::string wkbString = originalCurve.asWkb();
+  auto        wkbGeom   = SFCGAL::io::readWkb(wkbString);
+  BOOST_REQUIRE(wkbGeom->is<NURBSCurve>());
+  auto const &wkbCurve = wkbGeom->as<NURBSCurve>();
+
+  BOOST_CHECK(wkbCurve.is3D());
+  BOOST_CHECK_EQUAL(wkbCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wkbCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+}
+
+/// WKT/WKB Round-trip test with measured coordinates
+BOOST_AUTO_TEST_CASE(testWktWkbRoundTripMeasured)
+{
+  std::vector<Point> controlPoints;
+  Point              p1(0.0, 0.0);
+  p1.setM(5.0);
+  Point p2(5.0, 5.0);
+  p2.setM(15.0);
+  Point p3(10.0, 0.0);
+  p3.setM(25.0);
+  controlPoints.push_back(p1);
+  controlPoints.push_back(p2);
+  controlPoints.push_back(p3);
+
+  NURBSCurve originalCurve(controlPoints, 2);
+
+  // Test WKT round-trip
+  std::string wktString = originalCurve.asText(0);
+  BOOST_CHECK_EQUAL(wktString, "NURBSCURVE M (2,(0 0 5,5 5 15,10 0 25))");
+
+  auto wktGeom = SFCGAL::io::readWkt(wktString);
+  BOOST_REQUIRE(wktGeom->is<NURBSCurve>());
+  auto const &wktCurve = wktGeom->as<NURBSCurve>();
+
+  BOOST_CHECK(wktCurve.isMeasured());
+  BOOST_CHECK_EQUAL(wktCurve.degree(), originalCurve.degree());
+
+  // Test WKB round-trip
+  std::string wkbString = originalCurve.asWkb();
+  auto        wkbGeom   = SFCGAL::io::readWkb(wkbString);
+  BOOST_REQUIRE(wkbGeom->is<NURBSCurve>());
+  auto const &wkbCurve = wkbGeom->as<NURBSCurve>();
+
+  BOOST_CHECK(wkbCurve.isMeasured());
+  BOOST_CHECK_EQUAL(wkbCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wkbCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+
+  // Verify M coordinates are preserved
+  for (size_t i = 0; i < wkbCurve.numControlPoints(); ++i) {
+    BOOST_CHECK_CLOSE(wkbCurve.controlPointN(i).m(),
+                      originalCurve.controlPointN(i).m(), 1e-10);
+  }
+}
+
+/// Test WKB with custom knot vector
+BOOST_AUTO_TEST_CASE(testWkbRoundTripCustomKnots)
+{
+  std::vector<Point> controlPoints;
+  controlPoints.emplace_back(0.0, 0.0);
+  controlPoints.emplace_back(3.0, 6.0);
+  controlPoints.emplace_back(6.0, 3.0);
+  controlPoints.emplace_back(9.0, 0.0);
+
+  std::vector<NURBSCurve::FT> knots = {0.0, 0.0, 0.0, 0.5, 1.0, 1.0, 1.0};
+  std::vector<NURBSCurve::FT> weights(controlPoints.size(),
+                                      1.0); // uniform weights
+  NURBSCurve                  originalCurve(controlPoints, weights, 2, knots);
+
+  // Test WKB round-trip
+  std::string wkbString = originalCurve.asWkb();
+  auto        wkbGeom   = SFCGAL::io::readWkb(wkbString);
+  BOOST_REQUIRE(wkbGeom->is<NURBSCurve>());
+  auto const &wkbCurve = wkbGeom->as<NURBSCurve>();
+
+  BOOST_CHECK_EQUAL(wkbCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wkbCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+
+  // Verify knot vector is preserved
+  auto originalKnots = originalCurve.knotVector();
+  auto wkbKnots      = wkbCurve.knotVector();
+  BOOST_CHECK_EQUAL(wkbKnots.size(), originalKnots.size());
+
+  for (size_t i = 0; i < wkbKnots.size(); ++i) {
+    auto originalKnot = CGAL::to_double(originalKnots[i]);
+    auto wkbKnot      = CGAL::to_double(wkbKnots[i]);
+    BOOST_CHECK_CLOSE(wkbKnot, originalKnot, 1e-10);
+  }
+}
+
+/// Test WKB with start/end measures (ISO/SQL-MM compliance)
+BOOST_AUTO_TEST_CASE(testWkbRoundTripStartEndMeasures)
+{
+  std::vector<Point> controlPoints;
+  controlPoints.emplace_back(0.0, 0.0);
+  controlPoints.emplace_back(5.0, 10.0);
+  controlPoints.emplace_back(10.0, 0.0);
+
+  NURBSCurve originalCurve(controlPoints, 2);
+
+  // Set start and end measures (ISO/SQL-MM feature)
+  originalCurve.setStartM(std::optional<double>(0.5));
+  originalCurve.setEndM(std::optional<double>(9.5));
+
+  // Test WKB round-trip
+  std::string wkbString = originalCurve.asWkb();
+  auto        wkbGeom   = SFCGAL::io::readWkb(wkbString);
+  BOOST_REQUIRE(wkbGeom->is<NURBSCurve>());
+  auto const &wkbCurve = wkbGeom->as<NURBSCurve>();
+
+  BOOST_CHECK_EQUAL(wkbCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wkbCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+
+  // Verify start/end measures are preserved
+  auto originalStartM = originalCurve.startM();
+  auto originalEndM   = originalCurve.endM();
+  auto wkbStartM      = wkbCurve.startM();
+  auto wkbEndM        = wkbCurve.endM();
+
+  BOOST_CHECK(originalStartM.has_value());
+  BOOST_CHECK(originalEndM.has_value());
+  BOOST_CHECK(wkbStartM.has_value());
+  BOOST_CHECK(wkbEndM.has_value());
+
+  BOOST_CHECK_CLOSE(wkbStartM.value(), originalStartM.value(), 1e-10);
+  BOOST_CHECK_CLOSE(wkbEndM.value(), originalEndM.value(), 1e-10);
+}
+
+/// Test complex WKT/WKB with all features
+BOOST_AUTO_TEST_CASE(testWktWkbRoundTripComplete)
+{
+  // Create complex 3D rational NURBS with custom knots
+  std::vector<Point> controlPoints;
+  controlPoints.emplace_back(0.0, 0.0, 1.0);
+  controlPoints.emplace_back(2.0, 4.0, 2.0);
+  controlPoints.emplace_back(4.0, 4.0, 3.0);
+  controlPoints.emplace_back(6.0, 0.0, 2.0);
+
+  auto                        weights = convertWeights({1.0, 0.7, 1.2, 1.0});
+  std::vector<NURBSCurve::FT> knots   = {0.0, 0.0, 0.0, 0.3, 1.0, 1.0, 1.0};
+
+  NURBSCurve originalCurve(controlPoints, weights, 2, knots);
+  originalCurve.setStartM(std::optional<double>(1.5));
+  originalCurve.setEndM(std::optional<double>(8.5));
+
+  // Test WKT round-trip
+  std::string wktString = originalCurve.asText(0);
+  auto        wktGeom   = SFCGAL::io::readWkt(wktString);
+  BOOST_REQUIRE(wktGeom->is<NURBSCurve>());
+  auto const &wktCurve = wktGeom->as<NURBSCurve>();
+
+  BOOST_CHECK(wktCurve.is3D());
+  // Note: WKT may not preserve all rational info if uniform knots are generated
+  BOOST_CHECK_EQUAL(wktCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wktCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+
+  // Test WKB round-trip
+  std::string wkbString = originalCurve.asWkb();
+  auto        wkbGeom   = SFCGAL::io::readWkb(wkbString);
+  BOOST_REQUIRE(wkbGeom->is<NURBSCurve>());
+  auto const &wkbCurve = wkbGeom->as<NURBSCurve>();
+
+  BOOST_CHECK(wkbCurve.is3D());
+  BOOST_CHECK(wkbCurve.isRational());
+  BOOST_CHECK_EQUAL(wkbCurve.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(wkbCurve.numControlPoints(),
+                    originalCurve.numControlPoints());
+
+  // Verify all control points
+  for (size_t i = 0; i < wkbCurve.numControlPoints(); ++i) {
+    BOOST_CHECK(wkbCurve.controlPointN(i).almostEqual(
+        originalCurve.controlPointN(i), 1e-10));
+    auto originalWeight = CGAL::to_double(originalCurve.weight(i));
+    auto wkbWeight      = CGAL::to_double(wkbCurve.weight(i));
+    BOOST_CHECK_CLOSE(wkbWeight, originalWeight, 1e-10);
+  }
+
+  // Verify knot vector
+  auto originalKnots = originalCurve.knotVector();
+  auto wkbKnots      = wkbCurve.knotVector();
+  BOOST_CHECK_EQUAL(wkbKnots.size(), originalKnots.size());
+
+  // Verify start/end measures
+  auto originalStartM = originalCurve.startM();
+  auto originalEndM   = originalCurve.endM();
+  auto wkbStartM      = wkbCurve.startM();
+  auto wkbEndM        = wkbCurve.endM();
+
+  BOOST_CHECK(wkbStartM.has_value());
+  BOOST_CHECK(wkbEndM.has_value());
+  BOOST_CHECK_CLOSE(wkbStartM.value(), originalStartM.value(), 1e-10);
+  BOOST_CHECK_CLOSE(wkbEndM.value(), originalEndM.value(), 1e-10);
+}
+
+/// Test WKT format validation with new degree-first syntax
+BOOST_AUTO_TEST_CASE(testWktNewFormatValidation)
+{
+  // Test all valid new format variations
+  std::vector<std::string> validWktStrings = {
+      "NURBSCURVE(1, (0 0, 10 0, 20 0))",
+      "NURBSCURVE(2, (0 0, 5 10, 10 0))",
+      "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 2, 1))",
+      "NURBSCURVE Z (2, (0 0 0, 5 5 10, 10 0 0))",
+      "NURBSCURVE M (2, (0 0 5, 5 5 15, 10 0 25))",
+      "NURBSCURVE Z (2, (0 0 0, 5 5 10, 10 0 0), (1, 2, 1))",
+      "NURBSCURVE(3, (0 0, 3 7, 7 7, 10 0))"};
+
+  for (const auto &wktString : validWktStrings) {
+    BOOST_CHECK_NO_THROW(auto geom = SFCGAL::io::readWkt(wktString));
+    auto geom = SFCGAL::io::readWkt(wktString);
+    BOOST_REQUIRE(geom->is<NURBSCurve>());
+
+    // Verify round-trip produces similar format
+    std::string roundTripWkt = geom->asText(0);
+    auto        geom2        = SFCGAL::io::readWkt(roundTripWkt);
+    BOOST_REQUIRE(geom2->is<NURBSCurve>());
+  }
+}
+
+/// Test WKB format compatibility (native endianness only)
+BOOST_AUTO_TEST_CASE(testWkbFormatCompatibility)
+{
+  std::vector<Point> controlPoints;
+  controlPoints.emplace_back(0.0, 0.0);
+  controlPoints.emplace_back(5.0, 10.0);
+  controlPoints.emplace_back(10.0, 0.0);
+
+  auto       weights = convertWeights({1.0, 1.5, 1.0});
+  NURBSCurve originalCurve(controlPoints, weights, 2);
+
+  // Test native endianness (safest)
+  std::string wkbNative = originalCurve.asWkb(boost::endian::order::native);
+
+  // Should be readable with native endianness
+  auto geomNative = SFCGAL::io::readWkb(wkbNative);
+
+  BOOST_REQUIRE(geomNative->is<NURBSCurve>());
+
+  // Should produce equivalent curve
+  auto const &curveNative = geomNative->as<NURBSCurve>();
+
+  BOOST_CHECK_EQUAL(curveNative.degree(), originalCurve.degree());
+  BOOST_CHECK_EQUAL(curveNative.numControlPoints(),
+                    originalCurve.numControlPoints());
+  BOOST_CHECK(curveNative.isRational());
+}
+
+BOOST_AUTO_TEST_CASE(testWktQGIS)
+{
+  std::vector<std::string> wkts = {
+      "NURBSCURVE(1, (0 0, 10 10))",
+      "NURBSCURVE(1, (0 0, 5 5, 10 0))",
+      "NURBSCURVE(1, (0 0, 10 10), (1, 1))",
+      "NURBSCURVE(1, (0 0, 10 10), (0.5, 2.0))",
+      "NURBSCURVE(1, (0 0, 5 5, 10 0), (1, 1.5, 1))",
+      "NURBSCURVE(1, (0 0, 10 10), (1, 1), (0, 0, 1, 1))",
+      "NURBSCURVE(1, (0 0, 5 5, 10 0), (1, 1, 1), (0, 0, 0.5, 1, 1))",
+      "NURBSCURVE(2, (0 0, 5 10, 10 0))",
+      "NURBSCURVE(2, (1 0, 1 1, 0 1))",
+      "NURBSCURVE(2, (-5 -5, 0 10, 5 -5))",
+      "NURBSCURVE(2, (0 0, 2 8, 8 2, 10 10))",
+      "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 1, 1))",
+      "NURBSCURVE(2, (1 0, 1 1, 0 1), (1, 0.707107, 1))",
+      "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 3, 1))",
+      "NURBSCURVE(2, (0 0, 5 10, 10 0), (0.5, 1, 0.5))",
+      "NURBSCURVE(2, (0.5 0.25, 2.75 5.5, 5.0 0.25), (1, 1.5, 1))",
+      "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 1, 1), (0, 0, 0, 1, 1, 1))",
+      "NURBSCURVE(2, (1 0, 1 1, 0 1), (1, 0.707107, 1), (0, 0, 0, 1, 1, 1))",
+      "NURBSCURVE(3, (0 0, 3 10, 7 10, 10 0))",
+      "NURBSCURVE(3, (0 0, 2 8, 5 12, 8 8, 10 0))",
+      "NURBSCURVE(3, (5 0, 10 2.5, 10 7.5, 5 10, 0 7.5, 0 2.5, 5 0))",
+      "NURBSCURVE(3, (0 0, 5 5, 10 0, 15 -5, 20 0))",
+      "NURBSCURVE(3, (0 0, 3 10, 7 10, 10 0), (1, 1, 1, 1))",
+      "NURBSCURVE(3, (0 0, 3 10, 7 10, 10 0), (1, 2, 2, 1))",
+      "NURBSCURVE(3, (0 0, 3 10, 7 10, 10 0), (0.5, 1.5, 2.0, 0.8))",
+      "NURBSCURVE(3, (0 0, 2 8, 5 12, 8 8, 10 0), (1, 3, 5, 3, 1))",
+      "NURBSCURVE(3, (0 0, 3 10, 7 10, 10 0), (1, 1, 1, 1), (0, 0, 0, 0, 1, 1, "
+      "1, 1))",
+      "NURBSCURVE(3, (0 0, 3 10, 7 10, 10 0), (1, 2, 2, 1), (0, 0, 0, 0, 1, 1, "
+      "1, 1))",
+      "NURBSCURVE(3, (0 0, 3 10, 7 10, 10 0), (1, 1, 1, 1), (0, 0, 0, 0, 0.3, "
+      "0.7, 1, 1))",
+      "NURBSCURVE(4, (0 0, 2 8, 5 12, 8 8, 10 0))",
+      "NURBSCURVE(4, (0 0, 1 5, 3 8, 7 6, 10 10, 12 0))",
+      "NURBSCURVE(4, (0 0, 2 8, 5 12, 8 8, 10 0), (1, 1.5, 2, 1.5, 1))",
+      "NURBSCURVE(4, (0 0, 2 8, 5 12, 8 8, 10 0), (1, 1, 1, 1, 1), (0, 0, 0, "
+      "0, 0, 1, 1, 1, 1, 1))",
+      "NURBSCURVE(5, (0 0, 1 2, 3 4, 5 6, 7 4, 8 2, 10 0), (1, 1, 1, 1, 1, 1, "
+      "1))",
+      "NURBSCURVE Z(1, (0 0 0, 10 10 5))",
+      "NURBSCURVE Z(2, (0 0 0, 5 10 5, 10 0 0))",
+      "NURBSCURVE Z(2, (0 0 0, 5 10 5, 10 0 0), (1, 2, 1))",
+      "NURBSCURVE Z(3, (0 0 0, 3 10 3, 7 10 7, 10 0 10))",
+      "NURBSCURVE Z(3, (0 0 0, 3 10 3, 7 10 7, 10 0 10), (1, 1.5, 1.5, 1), (0, "
+      "0, 0, 0, 1, 1, 1, 1))",
+      "NURBSCURVE M(1, (0 0 0, 10 10 3600))",
+      "NURBSCURVE M(2, (0 0 0, 5 10 1800, 10 0 3600))",
+      "NURBSCURVE M(2, (0 0 0, 5 10 1800, 10 0 3600), (1, 2, 1))",
+      "NURBSCURVE ZM(1, (0 0 0 0, 10 10 5 3600))",
+      "NURBSCURVE ZM(2, (0 0 0 0, 5 10 5 1800, 10 0 0 3600))",
+      "NURBSCURVE ZM(2, (0 0 0 0, 5 10 5 1800, 10 0 0 3600), (1, 2, 1))",
+      "NURBSCURVE ZM(3, (0 0 0 0, 3 10 3 1200, 7 10 7 2400, 10 0 10 3600), (1, "
+      "1.5, 1.5, 1), (0, 0, 0, 0, 1, 1, 1, 1))",
+      "NURBSCURVE(2, (1 0, 1 1, 0 1), (1, 0.707107, 1), (0, 0, 0, 1, 1, 1))",
+      "NURBSCURVE(2, (2 0, 2 1, 0 1), (1, 0.707107, 1), (0, 0, 0, 1, 1, 1))",
+      "NURBSCURVE(2, (0 0, 1 1, 2 0), (1, 1, 1), (0, 0, 0, 1, 1, 1))",
+      "NURBSCURVE(2, (0 0, 5 5, 10 0))",
+      "NURBSCURVE(2, (0 0, 1 2, 2 1, 3 3, 4 2, 5 4, 6 3, 7 5, 8 4, 9 6, 10 "
+      "5))"};
+  for (const auto &wktString : wkts) {
+    BOOST_CHECK_NO_THROW(auto geom = SFCGAL::io::readWkt(wktString));
+    auto geom = SFCGAL::io::readWkt(wktString);
+    std::cout << wktString << "|"
+              << geom->asWkb(boost::endian::order::native, true) << std::endl;
   }
 }
 

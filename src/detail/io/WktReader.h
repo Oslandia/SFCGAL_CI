@@ -135,9 +135,10 @@ public:
   readInnerMultiSolid(MultiSolid &g);
 
   /**
-   * Read NURBSCurve content from wkt
-   * Supports syntax: NURBSCURVE((points), (weights), degree)
-   *                 NURBSCURVE((points), (weights), (knots), degree)
+   * Read NURBSCurve content from wkt (NEW ISO FORMAT)
+   * Supports syntax: NURBSCURVE(degree, (points))
+   *                 NURBSCURVE(degree, (points), (weights))
+   *                 NURBSCURVE(degree, (points), (weights), (knots))
    */
   void
   readInnerNURBSCurve(NURBSCurve &g);

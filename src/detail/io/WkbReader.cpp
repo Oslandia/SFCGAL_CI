@@ -221,4 +221,94 @@ WkbReader::readInnerPolyhedralSurface() -> PolyhedralSurface
   return result;
 }
 
+auto
+WkbReader::readInnerNURBSCurve() -> NURBSCurve
+{
+  try {
+    // Read degree (ISO/SQL-MM format)
+    uint32_t degree = read<uint32_t>();
+
+    // Read number of control points
+    uint32_t numControlPoints = read<uint32_t>();
+
+    std::vector<Point>          controlPoints;
+    std::vector<NURBSCurve::FT> weights;
+
+    controlPoints.reserve(numControlPoints);
+    weights.reserve(numControlPoints);
+
+    // Read each control point with ISO WKB standard structure: [byte
+    // order][coordinates][flag][weight?]
+    for (uint32_t i = 0; i < numControlPoints; i++) {
+      // Read byte order for this control point (required by ISO/IEC
+      // 13249-3:2016)
+      std::byte pointByteOrder = read<std::byte>();
+      // Store current swap state and temporarily switch if needed
+      bool savedSwapEndian = _swapEndian;
+      _swapEndian =
+          boost::endian::order::native == boost::endian::order(pointByteOrder);
+
+      // Read coordinates
+      double x = read<double>();
+      double y = read<double>();
+
+      Point controlPoint;
+      if (_is3D && _isMeasured) {
+        double z = read<double>();
+        double m = read<double>();
+        controlPoint =
+            Point(NURBSCurve::FT(x), NURBSCurve::FT(y), NURBSCurve::FT(z));
+        controlPoint.setM(m);
+      } else if (_is3D) {
+        double z = read<double>();
+        controlPoint =
+            Point(NURBSCurve::FT(x), NURBSCurve::FT(y), NURBSCurve::FT(z));
+      } else if (_isMeasured) {
+        double m     = read<double>();
+        controlPoint = Point(NURBSCurve::FT(x), NURBSCurve::FT(y));
+        controlPoint.setM(m);
+      } else {
+        controlPoint = Point(NURBSCurve::FT(x), NURBSCurve::FT(y));
+      }
+
+      controlPoints.push_back(controlPoint);
+
+      // Read weight flag
+      uint8_t hasWeight = read<uint8_t>();
+
+      // Read weight if flag indicates custom weight
+      if (hasWeight != 0) {
+        double weight = read<double>();
+        weights.push_back(NURBSCurve::FT(weight));
+      } else {
+        // Default weight is 1.0
+        weights.push_back(NURBSCurve::FT(1.0));
+      }
+
+      // Restore original swap state
+      _swapEndian = savedSwapEndian;
+    }
+
+    // Read knot vector
+    uint32_t                      numKnots = read<uint32_t>();
+    std::vector<NURBSCurve::Knot> knots;
+    knots.reserve(numKnots);
+
+    for (uint32_t i = 0; i < numKnots; i++) {
+      double knot = read<double>();
+      knots.push_back(NURBSCurve::FT(knot));
+    }
+
+    // Create the NURBS curve
+    NURBSCurve curve(controlPoints, weights, degree, knots);
+
+    return curve;
+
+  } catch (std::exception &e) {
+    std::cerr << "WkbReader::readInnerNURBSCurve error: " << e.what()
+              << std::endl;
+    return NURBSCurve{};
+  }
+}
+
 } // namespace SFCGAL::detail::io

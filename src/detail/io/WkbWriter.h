@@ -115,6 +115,13 @@ private:
              boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**
+   * Dedicated method to write NURBSCurve into _wkb data
+   */
+  void
+  writeInner(const NURBSCurve    &g,
+             boost::endian::order wkbOrder = boost::endian::order::native);
+
+  /**
    * Dedicated method to write Point into _wkb data
    */
   void

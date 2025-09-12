@@ -288,12 +288,12 @@ findKnotSpan(FT parameter, unsigned int degree, const std::vector<FT> &knots)
 
 /**
  * Compute NURBS basis functions using Cox-de Boor recursion formula.
- * 
+ *
  * From Piegl & Tiller Algorithm A2.2:
  * N_{i,0}(u) = 1 if u_i ≤ u < u_{i+1}, 0 otherwise
- * N_{i,p}(u) = [(u-u_i)/(u_{i+p}-u_i)] * N_{i,p-1}(u) 
+ * N_{i,p}(u) = [(u-u_i)/(u_{i+p}-u_i)] * N_{i,p-1}(u)
  *            + [(u_{i+p+1}-u)/(u_{i+p+1}-u_{i+1})] * N_{i+1,p-1}(u)
- * 
+ *
  * Returns degree+1 non-zero basis function values at given parameter.
  */
 static auto
@@ -880,11 +880,11 @@ NURBSCurve::generateApproximationKnotVector(
 {
   /**
    * Generate knot vector for NURBS approximation using averaging method.
-   * 
+   *
    * From Piegl & Tiller "The NURBS Book", Equation 9.8:
    * Internal knots are computed as:
    * u_{j+p} = (1/p) * Σ_{k=1}^{p-1} û_k   for j = 1,...,m-p
-   * 
+   *
    * where û_k are the normalized parameter values of data points.
    * This ensures proper knot spacing for least-squares approximation.
    */
@@ -950,15 +950,15 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
 
   /**
    * NURBS Curve Approximation - Piegl & Tiller Algorithm A9.1
-   * 
+   *
    * This implements true least-squares approximation, generating control points
    * that minimize the sum of squared distances to input data points.
-   * 
+   *
    * Mathematical Foundation:
    * - Given: n+1 data points Q_k, k = 0,...,n
    * - Find: m+1 control points P_j that minimize ||C(u_k) - Q_k||²
    * - Where: C(u) = Σ_{j=0}^m N_{j,p}(u) * P_j (NURBS curve)
-   * 
+   *
    * The least-squares problem becomes: N^T * N * P = N^T * Q
    * where N_{i,j} = N_{j,p}(u_i) are the basis function values
    */
@@ -2667,10 +2667,10 @@ NURBSCurve::computeArcLength(Parameter startParam, Parameter endParam,
 
   /**
    * Arc length computation using adaptive Simpson quadrature.
-   * 
+   *
    * Integrates the speed function ||C'(t)|| over [startParam, endParam]:
    * L = ∫[a,b] ||dC/dt|| dt
-   * 
+   *
    * The adaptive approach subdivides intervals where Simpson's rule
    * and its halving disagree by more than 15*tolerance, ensuring
    * accurate results for curves with varying curvature.
@@ -2856,6 +2856,34 @@ NURBSCurve::clearOptionalData()
   _fitPoints.shrink_to_fit();
   _startTangent.reset();
   _endTangent.reset();
+  _startM.reset();
+  _endM.reset();
+}
+
+//-- ISO 19107 / SQL-MM mandatory methods
+
+auto
+NURBSCurve::startM() const -> std::optional<double>
+{
+  return _startM;
+}
+
+void
+NURBSCurve::setStartM(const std::optional<double> &startMeasure)
+{
+  _startM = startMeasure;
+}
+
+auto
+NURBSCurve::endM() const -> std::optional<double>
+{
+  return _endM;
+}
+
+void
+NURBSCurve::setEndM(const std::optional<double> &endMeasure)
+{
+  _endM = endMeasure;
 }
 
 } // namespace SFCGAL
