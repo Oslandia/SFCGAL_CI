@@ -2276,7 +2276,7 @@ sfcgal_primitive_set_parameter_vector(sfcgal_primitive_t *primitive,
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
-sfcgal_primitive_as_polyhedral_surface(sfcgal_primitive_t *primitive);
+sfcgal_primitive_as_polyhedral_surface(const sfcgal_primitive_t *primitive);
 
 /*--------------------------------------------------------------------------------------*
  *

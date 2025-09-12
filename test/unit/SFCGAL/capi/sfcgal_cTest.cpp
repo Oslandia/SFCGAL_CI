@@ -1650,6 +1650,35 @@ BOOST_AUTO_TEST_CASE(testSphereTest)
   BOOST_CHECK_CLOSE(newDirection[2], expectedDirection[2], 1e-6);
   sfcgal_free_buffer(newDirection);
 
+  // check polyhedral conversion
+  sfcgal_primitive_set_parameter_int(sphere, "num_vertical", 4);
+  sfcgal_primitive_set_parameter_int(sphere, "num_horizontal", 4);
+  sfcgal_geometry_t *poly = sfcgal_primitive_as_polyhedral_surface(sphere);
+  char              *wkbApi;
+  size_t             wkbLen;
+  sfcgal_geometry_as_text_decim(poly, 0, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+  sfcgal_geometry_delete(poly);
+
+  BOOST_CHECK_EQUAL(
+      "POLYHEDRALSURFACE Z (((8 15 22,0 0 27,-9 19 17,8 15 22)),((8 15 22,21 3 "
+      "17,0 0 27,8 15 22)),((8 15 22,12 23 6,21 3 17,8 15 22)),((8 15 22,-9 19 "
+      "17,12 23 6,8 15 22)),((-9 19 17,0 0 27,-8 -15 18,-9 19 17)),((-9 19 "
+      "17,-8 -15 18,-20 13 3,-9 19 17)),((0 0 27,21 3 17,22 -9 3,0 0 27)),((0 "
+      "0 27,22 -9 3,-8 -15 18,0 0 27)),((21 3 17,12 23 6,10 19 -12,21 3 "
+      "17)),((21 3 17,10 19 -12,22 -9 3,21 3 17)),((12 23 6,-9 19 17,-20 13 "
+      "3,12 23 6)),((12 23 6,-20 13 3,10 19 -12,12 23 6)),((-20 13 3,-8 -15 "
+      "18,-10 -19 0,-20 13 3)),((-20 13 3,-10 -19 0,-19 0 -11,-20 13 3)),((-8 "
+      "-15 18,22 -9 3,11 -15 -11,-8 -15 18)),((-8 -15 18,11 -15 -11,-10 -19 "
+      "0,-8 -15 18)),((22 -9 3,10 19 -12,2 5 -21,22 -9 3)),((22 -9 3,2 5 "
+      "-21,11 -15 -11,22 -9 3)),((10 19 -12,-20 13 3,-19 0 -11,10 19 "
+      "-12)),((10 19 -12,-19 0 -11,2 5 -21,10 19 -12)),((-6 -11 -16,-19 0 "
+      "-11,-10 -19 0,-6 -11 -16)),((-6 -11 -16,-10 -19 0,11 -15 -11,-6 -11 "
+      "-16)),((-6 -11 -16,11 -15 -11,2 5 -21,-6 -11 -16)),((-6 -11 -16,2 5 "
+      "-21,-19 0 -11,-6 -11 -16)))",
+      strApi);
+  sfcgal_free_buffer(wkbApi);
+
   sfcgal_primitive_delete(sphere);
 }
 
@@ -1819,6 +1848,30 @@ BOOST_AUTO_TEST_CASE(testTorusTest)
       sfcgal_primitive_parameter_int(torus, "tube_num_radial");
   BOOST_CHECK_EQUAL(newTubeNumRadial, 18);
 
+  // check polyhedral conversion
+  sfcgal_primitive_set_parameter_int(torus, "main_num_radial", 4);
+  sfcgal_primitive_set_parameter_int(torus, "tube_num_radial", 4);
+  sfcgal_geometry_t *poly = sfcgal_primitive_as_polyhedral_surface(torus);
+  char              *wkbApi;
+  size_t             wkbLen;
+  sfcgal_geometry_as_text_decim(poly, 0, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+  sfcgal_geometry_delete(poly);
+
+  BOOST_CHECK_EQUAL(
+      "POLYHEDRALSURFACE Z (((16 0 0,0 16 0,0 11 5,11 0 5,16 0 0)),((11 0 5,0 "
+      "11 5,0 6 0,6 0 0,11 0 5)),((6 0 0,0 6 0,0 11 -5,11 0 -5,6 0 0)),((11 0 "
+      "-5,0 11 -5,0 16 0,16 0 0,11 0 -5)),((0 16 0,-16 0 0,-11 0 5,0 11 5,0 16 "
+      "0)),((0 11 5,-11 0 5,-6 0 0,0 6 0,0 11 5)),((0 6 0,-6 0 0,-11 0 -5,0 11 "
+      "-5,0 6 0)),((0 11 -5,-11 0 -5,-16 0 0,0 16 0,0 11 -5)),((-16 0 0,0 -16 "
+      "0,0 -11 5,-11 0 5,-16 0 0)),((-11 0 5,0 -11 5,0 -6 0,-6 0 0,-11 0 "
+      "5)),((-6 0 0,0 -6 0,0 -11 -5,-11 0 -5,-6 0 0)),((-11 0 -5,0 -11 -5,0 "
+      "-16 0,-16 0 0,-11 0 -5)),((0 -16 0,16 0 0,11 0 5,0 -11 5,0 -16 0)),((0 "
+      "-11 5,11 0 5,6 0 0,0 -6 0,0 -11 5)),((0 -6 0,6 0 0,11 0 -5,0 -11 -5,0 "
+      "-6 0)),((0 -11 -5,11 0 -5,16 0 0,0 -16 0,0 -11 -5)))",
+      strApi);
+  sfcgal_free_buffer(wkbApi);
+
   sfcgal_primitive_delete(torus);
 }
 
@@ -1862,6 +1915,22 @@ BOOST_AUTO_TEST_CASE(testBoxTest)
   BOOST_CHECK(hasError);
   hasError = false;
 
+  // check polyhedral conversion
+  sfcgal_geometry_t *poly = sfcgal_primitive_as_polyhedral_surface(box);
+  char              *wkbApi;
+  size_t             wkbLen;
+  sfcgal_geometry_as_text_decim(poly, 0, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+  sfcgal_geometry_delete(poly);
+
+  BOOST_CHECK_EQUAL(
+      "POLYHEDRALSURFACE Z (((0 0 0,0 5 0,11 5 0,11 0 0,0 0 0)),((0 0 1,11 0 "
+      "1,11 5 1,0 5 1,0 0 1)),((0 0 0,11 0 0,11 0 1,0 0 1,0 0 0)),((0 5 0,0 5 "
+      "1,11 5 1,11 5 0,0 5 0)),((11 0 0,11 5 0,11 5 1,11 0 1,11 0 0)),((0 0 "
+      "0,0 0 1,0 5 1,0 5 0,0 0 0)))",
+      strApi);
+  sfcgal_free_buffer(wkbApi);
+
   sfcgal_primitive_delete(box);
 }
 
@@ -1893,6 +1962,22 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
   sfcgal_primitive_set_parameter_double(cube, "size", -2.2);
   BOOST_CHECK(hasError);
   hasError = false;
+
+  // check polyhedral conversion
+  sfcgal_geometry_t *poly = sfcgal_primitive_as_polyhedral_surface(cube);
+  char              *wkbApi;
+  size_t             wkbLen;
+  sfcgal_geometry_as_text_decim(poly, 0, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+  sfcgal_geometry_delete(poly);
+
+  BOOST_CHECK_EQUAL(
+      "POLYHEDRALSURFACE Z (((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((0 0 1,1 0 1,1 "
+      "1 1,0 1 1,0 0 1)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),((0 1 0,0 1 1,1 1 "
+      "1,1 1 0,0 1 0)),((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),((0 0 0,0 0 1,0 1 1,0 "
+      "1 0,0 0 0)))",
+      strApi);
+  sfcgal_free_buffer(wkbApi);
 
   sfcgal_primitive_delete(cube);
 }
@@ -1943,6 +2028,24 @@ BOOST_AUTO_TEST_CASE(testConeTest)
 
   double newNumRadial = sfcgal_primitive_parameter_int(cone, "num_radial");
   BOOST_CHECK_EQUAL(newNumRadial, 36);
+
+  // check polyhedral conversion
+  sfcgal_primitive_set_parameter_int(cone, "num_radial", 4);
+  sfcgal_geometry_t *poly = sfcgal_primitive_as_polyhedral_surface(cone);
+  char              *wkbApi;
+  size_t             wkbLen;
+  sfcgal_geometry_as_text_decim(poly, 0, &wkbApi, &wkbLen);
+  std::string strApi(wkbApi, wkbLen);
+  sfcgal_geometry_delete(poly);
+
+  // check
+  BOOST_CHECK_EQUAL(
+      "POLYHEDRALSURFACE Z (((14 0 0,0 -14 0,-14 0 0,0 14 0,14 0 0)),((0 0 1,0 "
+      "0 1,0 0 1,0 0 1,0 0 1)),((14 0 0,0 0 1,0 0 1,0 -14 0,14 0 0)),((0 -14 "
+      "0,0 0 1,0 0 1,-14 0 0,0 -14 0)),((-14 0 0,0 0 1,0 0 1,0 14 0,-14 0 "
+      "0)),((0 14 0,0 0 1,0 0 1,14 0 0,0 14 0)))",
+      strApi);
+  sfcgal_free_buffer(wkbApi);
 
   sfcgal_primitive_delete(cone);
 }
