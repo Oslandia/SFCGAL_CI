@@ -118,7 +118,7 @@ sfcgal_geometry_type_id(const sfcgal_geometry_t *geom);
  * @param[out] type the output buffer
  * @param[out] typeLen the size of the buffer
  * @post type is returned allocated and must be freed by the caller with
- * sfcgal_free_buffer
+ * sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API void
@@ -158,7 +158,7 @@ sfcgal_geometry_is_valid_detail(const sfcgal_geometry_t *geom,
                                 sfcgal_geometry_t      **invalidity_location);
 
 /**
- * @deprecated Use sfcgal_geometry_is_valid_detail instead.
+ * @deprecated Use sfcgal_geometry_is_valid_detail() instead.
  * @param[in] geom the input geometry
  * @param[out] invalidity_reason invalidity reason
  * @param[out] invalidity_location invalidity location
@@ -278,7 +278,7 @@ sfcgal_geometry_swap_xy(sfcgal_geometry_t *geom);
  * Returns a deep clone of the given geometry
  * @param geom the input geometry
  * @post returns a pointer to an allocated geometry that must be deallocated by
- * sfcgal_geometry_delete
+ * sfcgal_geometry_delete()
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -513,26 +513,26 @@ SFCGAL_API double
 sfcgal_point_m(const sfcgal_geometry_t *geom);
 
 /**
- * Creates an empty LineString
+ * Creates an empty SFCGAL::LineString
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_linestring_create();
 
 /**
- * Returns the number of points of the given LineString
+ * Returns the number of points of the given SFCGAL::LineString
  * @param linestring the input geometry
- * @pre linestring must be a LineString
+ * @pre linestring must be a SFCGAL::LineString
  * @ingroup capi
  */
 SFCGAL_API size_t
 sfcgal_linestring_num_points(const sfcgal_geometry_t *linestring);
 
 /**
- * Returns the ith point of a given LineString
- * @param linestring the input LineString
- * @param i is the point index in the LineString
- * @pre linestring must be a LineString
+ * Returns the ith point of a given SFCGAL::LineString
+ * @param linestring the input SFCGAL::LineString
+ * @param i is the point index in the SFCGAL::LineString
+ * @pre linestring must be a SFCGAL::LineString
  * @pre i >= and i < sfcgal_linestring_num_points
  * @post the returned Point is not writable and must not be deallocated by the
  * caller
@@ -542,9 +542,10 @@ SFCGAL_API const sfcgal_geometry_t *
 sfcgal_linestring_point_n(const sfcgal_geometry_t *linestring, size_t i);
 
 /**
- * Adds a point to a LineString
- * @param linestring is the LineString where the Point has to be added to
- * @param point is the Point to add to the given LineString
+ * Adds a point to a SFCGAL::LineString
+ * @param linestring is the SFCGAL::LineString where the Point has to be added
+ * to
+ * @param point is the Point to add to the given SFCGAL::LineString
  * @pre i >= and i < sfcgal_linestring_num_points
  * @post the ownership of Point is taken by the function
  * @ingroup capi
@@ -554,20 +555,20 @@ sfcgal_linestring_add_point(sfcgal_geometry_t *linestring,
                             sfcgal_geometry_t *point);
 
 /**
- * Creates an empty Triangle
+ * Creates an empty SFCGAL::Triangle
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_triangle_create();
 
 /**
- * Creates a Triangle from three given Point
+ * Creates a SFCGAL::Triangle from three given Point
  * @param pta first input point
  * @param ptb second input point
  * @param ptc third input point
- * @pre pta must be a Triangle
- * @pre ptb must be a Triangle
- * @pre ptc must be a Triangle
+ * @pre pta must be a SFCGAL::Point
+ * @pre ptb must be a SFCGAL::Point
+ * @pre ptc must be a SFCGAL::Point
  * @post the ownership of the three points are not taken. The caller is still
  * responsible of their deallocation
  * @ingroup capi
@@ -578,10 +579,10 @@ sfcgal_triangle_create_from_points(const sfcgal_geometry_t *pta,
                                    const sfcgal_geometry_t *ptc);
 
 /**
- * Returns one the Triangle's vertex as a Point
+ * Returns one the SFCGAL::Triangle's vertex as a Point
  * @param triangle the input geometry
  * @param i index of the vertex in the triangle
- * @pre triangle must be a Triangle
+ * @pre triangle must be a SFCGAL::Triangle
  * @pre i >= 0 and i < 3
  * @post returns a pointer to one of the vertices as a Point. This pointer is
  * not writable and must not be deallocated by the caller
@@ -591,11 +592,11 @@ SFCGAL_API const sfcgal_geometry_t *
 sfcgal_triangle_vertex(const sfcgal_geometry_t *triangle, int i);
 
 /**
- * Sets one vertex of a Triangle
+ * Sets one vertex of a SFCGAL::Triangle
  * @param triangle the input geometry
  * @param i index of the vertex in the triangle
  * @param vertex new point
- * @pre triangle must be a Triangle
+ * @pre triangle must be a SFCGAL::Triangle
  * @pre vertex must be a Point
  * @pre i >= 0 and i < 3
  * @post the ownership of the vertex is not taken. The caller is still
@@ -607,12 +608,12 @@ sfcgal_triangle_set_vertex(sfcgal_geometry_t *triangle, int i,
                            const sfcgal_geometry_t *vertex);
 
 /**
- * Sets one vertex of a Triangle from two coordinates
+ * Sets one vertex of a SFCGAL::Triangle from two coordinates
  * @param triangle the input geometry
  * @param i index of the vertex in the triangle
  * @param x new point x
  * @param y new point y
- * @pre triangle must be a Triangle
+ * @pre triangle must be a SFCGAL::Triangle
  * @pre i >= 0 and i < 3
  * @ingroup capi
  */
@@ -621,13 +622,13 @@ sfcgal_triangle_set_vertex_from_xy(sfcgal_geometry_t *triangle, int i, double x,
                                    double y);
 
 /**
- * Sets one vertex of a Triangle from three coordinates
+ * Sets one vertex of a SFCGAL::Triangle from three coordinates
  * @param triangle the input geometry
  * @param i index of the vertex in the triangle
  * @param x new point x
  * @param y new point y
  * @param z new point z
- * @pre triangle must be a Triangle
+ * @pre triangle must be a SFCGAL::Triangle
  * @pre i >= 0 and i < 3
  * @ingroup capi
  */
@@ -636,16 +637,16 @@ sfcgal_triangle_set_vertex_from_xyz(sfcgal_geometry_t *triangle, int i,
                                     double x, double y, double z);
 
 /**
- * Creates an empty Polygon
+ * Creates an empty SFCGAL::Polygon
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_polygon_create();
 
 /**
- * Creates an empty Polygon from an extrior ring
+ * Creates an empty SFCGAL::Polygon from an extrior ring
  * @param ring the input geometry
- * @pre ring must be a LineString
+ * @pre ring must be a SFCGAL::LineString
  * @post the ownership of the given ring is taken. The caller is not responsible
  * anymore of its deallocation
  * @ingroup capi
@@ -654,45 +655,45 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_polygon_create_from_exterior_ring(sfcgal_geometry_t *ring);
 
 /**
- * Returns the exterior ring of a given Polygon
+ * Returns the exterior ring of a given SFCGAL::Polygon
  * @param polygon the input geometry
- * @pre polygon must be a Polygon
+ * @pre polygon must be a SFCGAL::Polygon
  * @pre polygon must not be empty
- * @post the returned ring is a LineString, is not writable and must not be
- * deallocated by the caller
+ * @post the returned ring is a SFCGAL::LineString, is not writable and must not
+ * be deallocated by the caller
  * @ingroup capi
  */
 SFCGAL_API const sfcgal_geometry_t *
 sfcgal_polygon_exterior_ring(const sfcgal_geometry_t *polygon);
 
 /**
- * Returns the number of interior rings of a given Polygon
+ * Returns the number of interior rings of a given SFCGAL::Polygon
  * @param polygon the input geometry
- * @pre polygon must be a Polygon
+ * @pre polygon must be a SFCGAL::Polygon
  * @ingroup capi
  */
 SFCGAL_API size_t
 sfcgal_polygon_num_interior_rings(const sfcgal_geometry_t *polygon);
 
 /**
- * Returns the ith interior ring of a given Polygon
+ * Returns the ith interior ring of a given SFCGAL::Polygon
  * @param polygon the input geometry
  * @param i index of the ring in the polygon
- * @pre polygon must be a Polygon
+ * @pre polygon must be a SFCGAL::Polygon
  * @pre i >= 0 and i < sfcgal_polygon_num_interior_rings
- * @post the returned ring is a LineString, is not writable and must not be
- * deallocated by the caller
+ * @post the returned ring is a SFCGAL::LineString, is not writable and must not
+ * be deallocated by the caller
  * @ingroup capi
  */
 SFCGAL_API const sfcgal_geometry_t *
 sfcgal_polygon_interior_ring_n(const sfcgal_geometry_t *polygon, size_t i);
 
 /**
- * Adds an interior ring to a given Polygon
+ * Adds an interior ring to a given SFCGAL::Polygon
  * @param polygon the input geometry
  * @param ring the new ring
- * @pre polygon must be a Polygon
- * @pre ring must be a LineString
+ * @pre polygon must be a SFCGAL::Polygon
+ * @pre ring must be a SFCGAL::LineString
  * @post the ownership of the given ring is taken. The caller is not responsible
  * anymore of its deallocation
  * @ingroup capi
@@ -712,7 +713,7 @@ sfcgal_geometry_collection_create();
  * Returns the number of geometries of a given GeometryCollection
  * @param collection the input geometry
  * @pre collection is a GeometryCollection
- * @deprecated Use sfcgal_geometry_num_geometries instead
+ * @deprecated Use sfcgal_geometry_num_geometries() instead
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_geometry_num_geometries instead.")
@@ -791,26 +792,26 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_multi_solid_create();
 
 /**
- * Creates an empty PolyhedralSurface
+ * Creates an empty SFCGAL::PolyhedralSurface
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_polyhedral_surface_create();
 
 /**
- * Returns the number of patches of a given PolyhedralSurface
+ * Returns the number of patches of a given SFCGAL::PolyhedralSurface
  * @param polyhedral the input geometry
- * @pre polyhedral must be a PolyhedralSurface
+ * @pre polyhedral must be a SFCGAL::PolyhedralSurface
  * @ingroup capi
  */
 SFCGAL_API size_t
 sfcgal_polyhedral_surface_num_patches(const sfcgal_geometry_t *polyhedral);
 
 /**
- * Returns the number of polygons of a given PolyhedralSurface
+ * Returns the number of polygons of a given SFCGAL::PolyhedralSurface
  * @param polyhedral the input geometry
- * @pre polyhedral must be a PolyhedralSurface
- * @deprecated Use sfcgal_polyhedral_surface_num_patches instead.
+ * @pre polyhedral must be a SFCGAL::PolyhedralSurface
+ * @deprecated Use sfcgal_polyhedral_surface_num_patches() instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_polyhedral_surface_num_patches instead.")
@@ -818,13 +819,13 @@ SFCGAL_API size_t
 sfcgal_polyhedral_surface_num_polygons(const sfcgal_geometry_t *polyhedral);
 
 /**
- * Returns the ith patch of a given PolyhedralSurface
+ * Returns the ith patch of a given SFCGAL::PolyhedralSurface
  * @param polyhedral the input geometry
  * @param i index of the patch in the polyhedral
- * @pre polyhedral must be a PolyhedralSurface
+ * @pre polyhedral must be a SFCGAL::PolyhedralSurface
  * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_patches(polyhedral)
- * @post the returned Polygon is not writable and must not be deallocated by the
- * caller
+ * @post the returned SFCGAL::Polygon is not writable and must not be
+ * deallocated by the caller
  * @ingroup capi
  */
 SFCGAL_API const sfcgal_geometry_t *
@@ -832,14 +833,14 @@ sfcgal_polyhedral_surface_patch_n(const sfcgal_geometry_t *polyhedral,
                                   size_t                   i);
 
 /**
- * Returns the ith polygon of a given PolyhedralSurface
+ * Returns the ith polygon of a given SFCGAL::PolyhedralSurface
  * @param polyhedral the input geometry
  * @param i index of the patch in the polyhedral
- * @pre polyhedral must be a PolyhedralSurface
+ * @pre polyhedral must be a SFCGAL::PolyhedralSurface
  * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_patches(polyhedral)
- * @post the returned Polygon is not writable and must not be deallocated by the
- * caller
- * @deprecated Use sfcgal_polyhedral_surface_patch_n instead
+ * @post the returned SFCGAL::Polygon is not writable and must not be
+ * deallocated by the caller
+ * @deprecated Use sfcgal_polyhedral_surface_patch_n() instead
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_polyhedral_surface_patch_n instead.")
@@ -848,13 +849,13 @@ sfcgal_polyhedral_surface_polygon_n(const sfcgal_geometry_t *polyhedral,
                                     size_t                   i);
 
 /**
- * Adds a Patch to a given PolyhedralSurface
+ * Adds a patch to a given SFCGAL::PolyhedralSurface
  * @param polyhedral the input geometry
  * @param patch the new patch
- * @pre polyhedral must be a PolyhedralSurface
- * @pre patch must be a Polygon
- * @post the ownership of the Polygon is taken. The caller is not responsible
- * anymore of its deallocation
+ * @pre polyhedral must be a SFCGAL::PolyhedralSurface
+ * @pre patch must be a SFCGAL::Polygon
+ * @post the ownership of the SFCGAL::Polygon is taken. The caller is not
+ * responsible anymore of its deallocation
  * @ingroup capi
  */
 SFCGAL_API void
@@ -862,12 +863,12 @@ sfcgal_polyhedral_surface_add_patch(sfcgal_geometry_t *polyhedral,
                                     sfcgal_geometry_t *patch);
 
 /**
- * Set the ith patch of a given PolyhedralSurface
+ * Set the ith patch of a given SFCGAL::PolyhedralSurface
  * @param polyhedral the input geometry
  * @param patch the new patch
  * @param i index of the patch in the polyhedral
- * @pre polyhedral must be a PolyhedralSurface.
- * @pre patch must be a Polygon.
+ * @pre polyhedral must be a SFCGAL::PolyhedralSurface.
+ * @pre patch must be a SFCGAL::Polygon.
  * @pre i >= 0 and i < sfcgal_polyhedral_surface_num_patches(polyhedral)
  * @post The ownership of the polygon is taken. The caller is not responsible
  * anymore of its deallocation.
@@ -878,14 +879,14 @@ sfcgal_polyhedral_surface_set_patch_n(sfcgal_geometry_t *polyhedral,
                                       sfcgal_geometry_t *patch, size_t i);
 
 /**
- * Adds a Polygon to a given PolyhedralSurface
+ * Adds a SFCGAL::Polygon to a given SFCGAL::PolyhedralSurface
  * @param polyhedral the input geometry
  * @param polygon the new polygon
- * @pre polyhedral must be a PolyhedralSurface
- * @pre polygon must be a Polygon
- * @post the ownership of the Polygon is taken. The caller is not responsible
- * anymore of its deallocation
- * @deprecated Use sfcgal_polyhedral_surface_add_patch instead.
+ * @pre polyhedral must be a SFCGAL::PolyhedralSurface
+ * @pre polygon must be a SFCGAL::Polygon
+ * @post the ownership of the SFCGAL::Polygon is taken. The caller is not
+ * responsible anymore of its deallocation
+ * @deprecated Use sfcgal_polyhedral_surface_add_patch() instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_polyhedral_surface_add_patch instead.")
@@ -894,26 +895,26 @@ sfcgal_polyhedral_surface_add_polygon(sfcgal_geometry_t *polyhedral,
                                       sfcgal_geometry_t *polygon);
 
 /**
- * Creates an empty TriangulatedSurface
+ * Creates an empty SFCGAL::TriangulatedSurface
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_triangulated_surface_create();
 
 /**
- * Returns the number of patches of a given TriangulatedSurface
+ * Returns the number of patches of a given SFCGAL::TriangulatedSurface
  * @param tin the input geometry
- * @pre tin must be a TriangulatedSurface
+ * @pre tin must be a SFCGAL::TriangulatedSurface
  * @ingroup capi
  */
 SFCGAL_API size_t
 sfcgal_triangulated_surface_num_patches(const sfcgal_geometry_t *tin);
 
 /**
- * Returns the number of triangles of a given TriangulatedSurface
+ * Returns the number of triangles of a given SFCGAL::TriangulatedSurface
  * @param tin the input geometry
- * @pre tin must be a TriangulatedSurface
- * @deprecated Use sfcgal_triangulated_surface_num_patches instead.
+ * @pre tin must be a SFCGAL::TriangulatedSurface
+ * @deprecated Use sfcgal_triangulated_surface_num_patches() instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_triangulated_surface_num_patches instead.")
@@ -921,27 +922,28 @@ SFCGAL_API size_t
 sfcgal_triangulated_surface_num_triangles(const sfcgal_geometry_t *tin);
 
 /**
- * Returns the ith Patch of a given TriangulatedSurface
+ * Returns the ith patch of a given
+ * SFCGAL::TriangulatedSurface
  * @param tin the input geometry
  * @param i index of the patch in the tin
- * @pre tin must be a TriangulatedSurface
+ * @pre tin must be a SFCGAL::TriangulatedSurface
  * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patches( tin )
- * @post the returned Triangle is not writable and must not be deallocated by
- * the caller
+ * @post the returned SFCGAL::Triangle is not writable and must not be
+ * deallocated by the caller
  * @ingroup capi
  */
 SFCGAL_API const sfcgal_geometry_t *
 sfcgal_triangulated_surface_patch_n(const sfcgal_geometry_t *tin, size_t i);
 
 /**
- * Returns the ith Triangle of a given TriangulatedSurface
+ * Returns the ith SFCGAL::Triangle of a given SFCGAL::TriangulatedSurface
  * @param tin the input geometry
  * @param i index of the patch in the tin
- * @pre tin must be a TriangulatedSurface
+ * @pre tin must be a SFCGAL::TriangulatedSurface
  * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patches( tin )
- * @post the returned Triangle is not writable and must not be deallocated by
- * the caller
- * @deprecated Use sfcgal_triangulated_surface_patch_n instead.
+ * @post the returned SFCGAL::Triangle is not writable and must not be
+ * deallocated by the caller
+ * @deprecated Use sfcgal_triangulated_surface_patch_n() instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_triangulated_surface_patch_n instead.")
@@ -949,12 +951,12 @@ SFCGAL_API const sfcgal_geometry_t *
 sfcgal_triangulated_surface_triangle_n(const sfcgal_geometry_t *tin, size_t i);
 
 /**
- * Set the ith patch of a given TriangulatedSurface
+ * Set the ith patch of a given SFCGAL::TriangulatedSurface
  * @param tin the input geometry
  * @param patch the new patch
  * @param i index of the patch in the tin
- * @pre tin must be a TriangulatedSurface
- * @pre patch must be a Triangle.
+ * @pre tin must be a SFCGAL::TriangulatedSurface
+ * @pre patch must be a SFCGAL::Triangle.
  * @pre i >= 0 and i < sfcgal_triangulated_surface_num_patches( tin )
  * @post The ownership of the triangle is taken. The caller is not responsible
  * anymore of its deallocation.
@@ -965,13 +967,13 @@ sfcgal_triangulated_surface_set_patch_n(sfcgal_geometry_t *tin,
                                         sfcgal_geometry_t *patch, size_t i);
 
 /**
- * Adds a Patch to a given TriangulatedSurface
+ * Adds a patch to a given SFCGAL::TriangulatedSurface
  * @param tin the input geometry
  * @param patch the new patch
- * @pre tin must be a TriangulatedSurface
- * @pre patch must be a Triangle
- * @post the ownership of the Triangle is taken. The caller is not responsible
- * anymore of its deallocation
+ * @pre tin must be a SFCGAL::TriangulatedSurface
+ * @pre patch must be a SFCGAL::Triangle
+ * @post the ownership of the SFCGAL::Triangle is taken. The caller is not
+ * responsible anymore of its deallocation
  * @ingroup capi
  */
 SFCGAL_API void
@@ -979,14 +981,14 @@ sfcgal_triangulated_surface_add_patch(sfcgal_geometry_t *tin,
                                       sfcgal_geometry_t *patch);
 
 /**
- * Adds a Triangle to a given TriangulatedSurface
+ * Adds a SFCGAL::Triangle to a given SFCGAL::TriangulatedSurface
  * @param tin the input geometry
  * @param triangle the new triangle
- * @pre tin must be a TriangulatedSurface
- * @pre triangle must be a Triangle
- * @post the ownership of the Triangle is taken. The caller is not responsible
- * anymore of its deallocation
- * @deprecated Use sfcgal_triangulated_surface_add_patch instead.
+ * @pre tin must be a SFCGAL::TriangulatedSurface
+ * @pre triangle must be a SFCGAL::Triangle
+ * @post the ownership of the SFCGAL::Triangle is taken. The caller is not
+ * responsible anymore of its deallocation
+ * @deprecated Use sfcgal_triangulated_surface_add_patch() instead.
  * @ingroup capi
  */
 SFCGAL_DEPRECATED("Use sfcgal_triangulated_surface_add_patch instead.")
@@ -995,16 +997,16 @@ sfcgal_triangulated_surface_add_triangle(sfcgal_geometry_t *tin,
                                          sfcgal_geometry_t *triangle);
 
 /**
- * Creates an empty Solid
+ * Creates an empty SFCGAL::Solid
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_solid_create();
 
 /**
- * Creates a Solid from an exterior shell
+ * Creates a SFCGAL::Solid from an exterior shell
  * @param shell the input geometry
- * @pre shell must be a Solid
+ * @pre shell must be a SFCGAL::Solid
  * @post the ownership of the given shell is taken. The caller is not
  * responsible anymore of its deallocation
  * @ingroup capi
@@ -1013,21 +1015,21 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_solid_create_from_exterior_shell(sfcgal_geometry_t *shell);
 
 /**
- * Returns the number of shells of a given Solid
+ * Returns the number of shells of a given SFCGAL::Solid
  * @param solid the input geometry
- * @pre solid must be a Solid
+ * @pre solid must be a SFCGAL::Solid
  * @ingroup capi
  */
 SFCGAL_API size_t
 sfcgal_solid_num_shells(const sfcgal_geometry_t *solid);
 
 /**
- * Returns the ith shell of a given Solid
+ * Returns the ith shell of a given SFCGAL::Solid
  * @param solid the input geometry
  * @param i index of the shell in the solid
- * @pre solid must be a Solid
+ * @pre solid must be a SFCGAL::Solid
  * @pre i >= 0 and i < sfcgal_solid_num_shells( tin )
- * @post the returned PolyhedralSurface is not writable and must not be
+ * @post the returned SFCGAL::PolyhedralSurface is not writable and must not be
  * deallocated by the caller
  * @ingroup capi
  */
@@ -1035,11 +1037,11 @@ SFCGAL_API const sfcgal_geometry_t *
 sfcgal_solid_shell_n(const sfcgal_geometry_t *solid, size_t i);
 
 /**
- * Adds a shell to a given Solid
+ * Adds a shell to a given SFCGAL::Solid
  * @param solid the input geometry
  * @param shell the new geometry
- * @pre solid must be a Solid
- * @pre shell must be a PolyhedralSurface
+ * @pre solid must be a SFCGAL::Solid
+ * @pre shell must be a SFCGAL::PolyhedralSurface
  * @post the ownership of the shell is taken. The caller is not responsible
  * anymore of its deallocation
  * @ingroup capi
@@ -1049,11 +1051,11 @@ sfcgal_solid_add_interior_shell(sfcgal_geometry_t *solid,
                                 sfcgal_geometry_t *shell);
 
 /**
- * Set the exterior shell of a given Solid
+ * Set the exterior shell of a given SFCGAL::Solid
  * @param solid the input geometry
  * @param shell the new geometry
- * @pre solid must be a Solid
- * @pre shell must be a PolyhedralSurface
+ * @pre solid must be a SFCGAL::Solid
+ * @pre shell must be a SFCGAL::PolyhedralSurface
  * @post the ownership of the shell is taken. The caller is not responsible
  * anymore of its deallocation
  * @ingroup capi
@@ -1194,7 +1196,7 @@ sfcgal_prepared_geometry_as_ewkt(const sfcgal_prepared_geometry_t *prepared,
  * @param str The Well-Known Text (WKT) string representing the geometry.
  * @param len The size of @p str
  * @post The returned geometry must be deallocated by the caller with
- * sfcgal_geometry_delete
+ * sfcgal_geometry_delete()
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -1221,7 +1223,7 @@ sfcgal_io_read_ewkt(const char *str, size_t len);
  * @param str The Well-Known Text (WKB) string representing the geometry.
  * @param len The size of @p str
  * @post The returned geometry must be deallocated by the caller with
- * sfcgal_geometry_delete
+ * sfcgal_geometry_delete()
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -1249,7 +1251,7 @@ sfcgal_io_write_binary_prepared(const sfcgal_prepared_geometry_t *geom,
  * @param str The string representing the geometry.
  * @param len The size of @p str
  * @post The returned prepared geometry must be deallocated by the caller with
- * sfcgal_prepared_geometry_delete
+ * sfcgal_prepared_geometry_delete()
  * @ingroup capi
  */
 SFCGAL_API sfcgal_prepared_geometry_t *
@@ -1420,12 +1422,12 @@ SFCGAL_API int
 sfcgal_geometry_is_planar(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the orientation of the given Polygon
+ * Returns the orientation of the given SFCGAL::Polygon
  * -1 for a counter clockwise orientation
  * 1 for a clockwise orientation
  * 0 for an invalid or undetermined orientation
  * @param geom the input geometry
- * @pre geom is a Polygon
+ * @pre geom is a SFCGAL::Polygon
  * @pre isValid(geom) == true
  * @ingroup capi
  */
@@ -1467,7 +1469,7 @@ sfcgal_geometry_extrude(const sfcgal_geometry_t *geom, double ex, double ey,
                         double ez);
 
 /**
- * Convert a PolyhedralSurface to a Solid
+ * Convert a SFCGAL::PolyhedralSurface to a SFCGAL::Solid
  * @param geom the input geometry
  * @pre isValid(geom) == true
  * @post isValid(return) == true
@@ -1577,10 +1579,10 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the extrude straight skeleton of the given Polygon
+ * Returns the extrude straight skeleton of the given SFCGAL::Polygon
  * @param geom the input geometry
  * @param height extrusion height
- * @pre geom must be a Polygon
+ * @pre geom must be a SFCGAL::Polygon
  * @pre isValid(geom) == true
  * @pre height != 0
  * @ingroup capi
@@ -1592,11 +1594,11 @@ sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom,
 /**
  * Returns the union of the polygon z-extrusion (with respect to
  * building_height) and the extrude straight skeleton (with respect to
- * roof_height) of the given Polygon
+ * roof_height) of the given SFCGAL::Polygon
  * @param geom the input geometry
  * @param building_height extrusion height of walls
  * @param roof_height extrusion height of roof
- * @pre geom must be a Polygon
+ * @pre geom must be a SFCGAL::Polygon
  * @pre isValid(geom) == true
  * @pre roof_height != 0
  * @ingroup capi
@@ -1607,7 +1609,7 @@ sfcgal_geometry_extrude_polygon_straight_skeleton(const sfcgal_geometry_t *geom,
                                                   double roof_height);
 
 /**
- * Returns the approximate medial axis for the given Polygon
+ * Returns the approximate medial axis for the given SFCGAL::Polygon
  * Approximate medial axis is based on straight skeleton
  * @param geom the input geometry
  * @pre isValid(geom) == true
@@ -1617,11 +1619,11 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_approximate_medial_axis(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the straight skeleton partition for the given Polygon
+ * Returns the straight skeleton partition for the given SFCGAL::Polygon
  * @param geom the input geometry
  * @param autoOrientation if 1 try to find the best orientation
  * @pre isValid(geom) == true
- * @pre geom must be a Polygon, Triangle or MultiPolygon
+ * @pre geom must be a SFCGAL::Polygon, SFCGAL::Triangle or MultiPolygon
  * @post isValid(return) == true
  * @ingroup capi
  */
@@ -1654,7 +1656,8 @@ sfcgal_geometry_covers_3d(const sfcgal_geometry_t *geom1,
                           const sfcgal_geometry_t *geom2);
 
 /**
- * Returns the substring of the given LineString between fractional distances
+ * Returns the substring of the given SFCGAL::LineString between fractional
+ * distances
  * @param geom the input geometry
  * @param start distance from start to begin extraction
  * @param end distance to end to end extraction
@@ -1717,7 +1720,7 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
  *  A large relative_offset parameter will tend to better preserve sharp
  * features as projection. If this parameter is equal to 0, it is computed from
  * the alpha parameter
- * @return A PolyhedralSurface representing the 3D alpha wrapping of the
+ * @return A SFCGAL::PolyhedralSurface representing the 3D alpha wrapping of the
  * geometry
  * @ingroup capi
  */
@@ -1868,7 +1871,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the visibility polygon of a Point inside a Polygon
+ * Returns the visibility polygon of a Point inside a SFCGAL::Polygon
  * @param polygon input geometry
  * @param point input geometry
  * @ingroup capi
@@ -1881,7 +1884,7 @@ sfcgal_geometry_visibility_point(const sfcgal_geometry_t *polygon,
 
 /**
  * @brief build the visibility polygon of the segment [pointA ; pointB] on a
- * Polygon
+ * SFCGAL::Polygon
  * @param polygon input geometry
  * @param pointA input geometry
  * @param pointB input geometry
@@ -1907,7 +1910,7 @@ typedef enum {
 
 /**
  * Computes a 3D buffer around a geometry
- * @param geom The input geometry (must be a Point or LineString)
+ * @param geom The input geometry (must be a Point or SFCGAL::LineString)
  * @param radius The buffer radius
  * @param segments The number of segments to use for approximating curved
  * surfaces
@@ -1918,7 +1921,7 @@ typedef enum {
  * @pre segments > 3
  * @post isValid(return) == true
  * @post The returned geometry must be deallocated by the caller with
- * sfcgal_geometry_delete
+ * sfcgal_geometry_delete()
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -2122,8 +2125,8 @@ typedef enum {
 /**
  * @brief Creates a new primitive of the specified type with default parameters.
  * @param primitive_type The type of primitive to create.
- * @return A pointer to an allocated sfcgal_primitive_t object. The
- * returned object must be freed by calling sfcgal_primitive_delete.
+ * @return A pointer to an allocated ::sfcgal_primitive_t object. The
+ * returned object must be freed by calling sfcgal_primitive_delete().
  * @post The returned pointer is non-NULL if allocation succeeds.
  * @ingroup capi
  */
@@ -2134,12 +2137,25 @@ sfcgal_primitive_create(sfcgal_primitive_type_t primitive_type);
  * @brief Deletes a previously allocated primitive.
  * @param primitive Pointer to the primitive to delete.
  * @pre @p primitive must be a valid pointer returned by a creation function
- * (e.g. sfcgal_primitive_create).
+ * ( e.g. sfcgal_primitive_create() ).
  * @post After this call, the pointer is invalid and must not be used.
  * @ingroup capi
  */
 SFCGAL_API void
 sfcgal_primitive_delete(sfcgal_primitive_t *primitive);
+
+/**
+ * @brief Retrieves the list of primitive parameters as JSON array.
+ * @param primitive Pointer to the primitive.
+ * @param[out] buffer the output buffer
+ * @param[out] len the size of the @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_primitive_parameters(sfcgal_primitive_t *primitive, char **buffer,
+                            size_t *len);
 
 /**
  * @brief Retrieves the value of a primitive parameter as a double.
@@ -2200,7 +2216,7 @@ sfcgal_primitive_set_parameter_int(sfcgal_primitive_t *primitive,
  * success, or a nullptr if the operation failed.
  * @pre The parameter identified by @p name must exist and be of type 3D point.
  * @post The returned array must be deallocated by calling
- * sfcgal_free_buffer.
+ * sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API double *
@@ -2230,7 +2246,7 @@ sfcgal_primitive_set_parameter_point(sfcgal_primitive_t *primitive,
  * on success, or a nullptr if the operation failed.
  * @pre The parameter identified by @p name must exist and be of type 3D vector.
  * @post The returned array must be deallocated by calling
- * sfcgal_free_buffer.
+ * sfcgal_free_buffer()
  * @ingroup capi
  */
 SFCGAL_API double *
@@ -2254,8 +2270,8 @@ sfcgal_primitive_set_parameter_vector(sfcgal_primitive_t *primitive,
 /**
  * @brief Generates a polyhedral surface representation of the primitive
  * @param primitive Pointer to the primitive.
- * @post The returned geometry must be deallocated by the caller with @ref
- * sfcgal_geometry_delete
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete()
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
