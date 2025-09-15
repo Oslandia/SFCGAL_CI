@@ -31,10 +31,10 @@ EOF
 if [ -n "$1" ]; then
     CHANGED_FILES="$*"
 elif [ -n "$CI_MERGE_REQUEST_DIFF_BASE_SHA" ]; then
-    CHANGED_FILES=$(git diff-tree --diff-filter=d --name-only -r $CI_MERGE_REQUEST_DIFF_BASE_SHA $CI_COMMIT_SHA 'src/***.cpp' 'src/***.hpp' 'src/***.c' 'src/***.h')
+    CHANGED_FILES=$(git diff-tree --diff-filter=d --name-only -r $CI_MERGE_REQUEST_DIFF_BASE_SHA $CI_COMMIT_SHA)
 
 else
-    CHANGED_FILES=$(git diff --diff-filter=AM --name-only $(git merge-base HEAD master) 'src/***.cpp' 'src/***.hpp' 'src/***.c' 'src/***.h')
+    CHANGED_FILES=$(git diff --diff-filter=AM --name-only $(git merge-base HEAD master))
 fi
 
 if [ "$?" != 0 ]; then
@@ -44,6 +44,16 @@ fi
 
 # remove empty lines
 CHANGED_FILES=$(echo $CHANGED_FILES | sed '/^[\s\n\r]*$/d')
+
+# filter by extensions
+NEW_FILES=""
+for f in $CHANGED_FILES;
+do
+    if [[ "$f" =~ \.cpp$ ]] || [[ "$f" =~ \.hpp$ ]] || [[ "$f" =~ \.c$ ]] || [[ "$f" =~ \.h$ ]]; then
+        NEW_FILES="$NEW_FILES $f"
+    fi
+done
+CHANGED_FILES=$NEW_FILES
 
 # exit if nothing to do
 if [ -z "$CHANGED_FILES" ]; then

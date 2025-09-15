@@ -6,6 +6,11 @@ exclude: "^\
   (third-party/.*)\
   "
 
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+  - pre-push
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -58,6 +63,15 @@ repos:
       - id: commitizen-branch
         stages: [push]
 
+  - repo: local
+    hooks:
+      - id: doxygen-check
+        name: doxygen-check
+        entry: ./script/doxygen-check.sh
+        language: system
+        pass_filenames: true
+        require_serial: true
+        stages: [commit]
 
   # - repo: https://github.com/pocc/pre-commit-hooks
   #   rev: v1.3.5
