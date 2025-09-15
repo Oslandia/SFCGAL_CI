@@ -165,7 +165,7 @@ endif()
 set( SFCGAL_Boost_COMPONENTS thread serialization )
 #-- program_options
 if ( SFCGAL_BUILD_TESTS OR SFCGAL_BUILD_EXAMPLES OR SFCGAL_BUILD_OSG )
-	set( SFCGAL_Boost_COMPONENTS chrono unit_test_framework filesystem program_options timer ${SFCGAL_Boost_COMPONENTS} )
+	set( SFCGAL_Boost_COMPONENTS chrono unit_test_framework program_options timer ${SFCGAL_Boost_COMPONENTS} )
 endif()
 find_package( Boost 1.69.0 COMPONENTS ${SFCGAL_Boost_COMPONENTS} REQUIRED )
 
