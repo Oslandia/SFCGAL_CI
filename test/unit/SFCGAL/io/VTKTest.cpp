@@ -3,10 +3,9 @@
 // Copyright (c) 2024-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
-#include <boost/filesystem.hpp>
-
 #include "SFCGAL/io/vtk.h"
 #include "SFCGAL/io/wkt.h"
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -17,7 +16,7 @@ using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(SFCGAL_io_VTKWriterTest)
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 auto
 compareFiles(const std::string &file1, const std::string &file2) -> bool
@@ -90,7 +89,7 @@ BOOST_AUTO_TEST_CASE(test_all_geometries)
       "0.0)))"};
 
   // Create a temporary directory for generated files
-  fs::path temp_dir = fs::temp_directory_path() / fs::unique_path();
+  fs::path temp_dir = fs::temp_directory_path() / random_string();
   fs::create_directories(temp_dir);
 
   for (const auto &wkt : wkt_examples) {
