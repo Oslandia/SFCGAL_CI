@@ -2337,7 +2337,8 @@ sfcgal_primitive_delete(sfcgal_primitive_t *primitive) -> void
 extern "C" auto
 sfcgal_primitive_clone(const sfcgal_primitive_t *prim) -> sfcgal_primitive_t *
 {
-  auto *primitive1Cast    = reinterpret_cast<const SFCGAL::Primitive *>(prim);
+  const auto *primitive1Cast =
+      reinterpret_cast<const SFCGAL::Primitive *>(prim);
   sfcgal_primitive_t *out = sfcgal_primitive_create(
       static_cast<sfcgal_primitive_type_t>(primitive1Cast->primitiveTypeId()));
 
@@ -2352,16 +2353,16 @@ sfcgal_primitive_is_almost_equals(const sfcgal_primitive_t *prim1,
                                   const sfcgal_primitive_t *prim2,
                                   double                    tolerance) -> int
 {
-  const auto *p1 = reinterpret_cast<const SFCGAL::Geometry *>(prim1);
-  const auto *p2 = reinterpret_cast<const SFCGAL::Geometry *>(prim2);
+  const auto *prim1Cast = reinterpret_cast<const SFCGAL::Geometry *>(prim1);
+  const auto *prim2Cast = reinterpret_cast<const SFCGAL::Geometry *>(prim2);
 
   bool result;
   try {
-    result = p1->almostEqual(*p2, tolerance);
+    result = prim1Cast->almostEqual(*prim2Cast, tolerance);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During primitive_is_almost_equals(A, B, %g):", tolerance);
-    SFCGAL_WARNING("  with A: %s", p1->asText().c_str());
-    SFCGAL_WARNING("  with B: %s", p2->asText().c_str());
+    SFCGAL_WARNING("  with A: %s", prim1Cast->asText().c_str());
+    SFCGAL_WARNING("  with B: %s", prim2Cast->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     result = false;
   }
@@ -2384,8 +2385,6 @@ sfcgal_primitive_parameters(const sfcgal_primitive_t *primitive, char **buffer,
       std::string keysStr = serialize(keys);
       alloc_and_copy(keysStr, buffer, len); //
   )
-
-  return;
 }
 
 extern "C" auto
