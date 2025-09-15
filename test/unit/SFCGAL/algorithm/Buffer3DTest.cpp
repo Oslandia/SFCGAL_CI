@@ -18,8 +18,8 @@
 #include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/io/OBJ.h"
 #include "SFCGAL/io/wkt.h"
-#include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -27,7 +27,7 @@
 #include "../../../test_config.h"
 
 using namespace SFCGAL;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 BOOST_AUTO_TEST_SUITE(SFCGAL_algorithm_Buffer3DTest)
 
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(testBuffer3D_Point)
   algorithm::Buffer3D buffer3d(point, radius, segments);
 
   // Create a temporary directory for generated files
-  fs::path temp_dir = fs::temp_directory_path() / fs::unique_path();
+  fs::path temp_dir = fs::temp_directory_path() / random_string();
   fs::create_directories(temp_dir);
 
   std::vector<algorithm::Buffer3D::BufferType> bufferTypes = {
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(testBuffer3D_LineString)
   algorithm::Buffer3D buffer3d(lineString, radius, segments);
 
   // Create a temporary directory for generated files
-  fs::path temp_dir = fs::temp_directory_path() / fs::unique_path();
+  fs::path temp_dir = fs::temp_directory_path() / random_string();
   fs::create_directories(temp_dir);
 
   std::vector<algorithm::Buffer3D::BufferType> bufferTypes = {

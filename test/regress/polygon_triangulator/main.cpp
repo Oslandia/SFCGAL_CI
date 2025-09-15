@@ -3,6 +3,7 @@
 // Copyright (c) 2024-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -32,8 +33,6 @@
 #include "SFCGAL/triangulate/triangulatePolygon.h"
 
 #include <boost/chrono.hpp>
-
-#include <boost/filesystem.hpp>
 
 using namespace SFCGAL;
 
@@ -242,7 +241,7 @@ main(int argc, char *argv[]) -> int
 
   if (numFailed == 0) {
     // delete empty error file
-    boost::filesystem::remove(error_filename);
+    std::filesystem::remove(error_filename);
     return EXIT_SUCCESS;
   }
   return EXIT_FAILURE;

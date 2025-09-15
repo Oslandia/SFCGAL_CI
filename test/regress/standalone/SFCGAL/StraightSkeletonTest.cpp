@@ -3,6 +3,7 @@
 // Copyright (c) 2024-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
+#include <filesystem>
 #include <fstream>
 
 #include "SFCGAL/GeometryCollection.h"
@@ -23,8 +24,6 @@
 
 #include "../../../test_config.h"
 
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <CGAL/version.h>
@@ -39,14 +38,14 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_StraightSkeletonTest)
 namespace {
 
 void
-runTest(const boost::filesystem::path::string_type &filename)
+runTest(const std::filesystem::path::string_type &filename)
 {
   std::ifstream ifs(filename.c_str());
   BOOST_REQUIRE(ifs.good());
 
   std::string       line;
   std::string const lbl_base =
-      boost::filesystem::path(filename).filename().string();
+      std::filesystem::path(filename).filename().string();
 
   int lineno = 0;
   while (std::getline(ifs, line)) {
@@ -181,7 +180,7 @@ BOOST_AUTO_TEST_CASE(testStraightSkeleton_issue133)
 BOOST_AUTO_TEST_CASE(testStraightSkeletonTestIssue)
 {
   using namespace boost;
-  using namespace boost::filesystem;
+  using namespace std::filesystem;
 
   std::string const testdir(SFCGAL_TEST_DIRECTORY);
   path const        dirname = testdir + "/data/StraightSkeletonTest";
