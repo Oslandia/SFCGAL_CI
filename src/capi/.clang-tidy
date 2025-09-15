@@ -1,2 +1,16 @@
 InheritParentConfig: true
-Checks: '-*,clang-analyzer-*,cert-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type,-modernize-use-using,performance-*,-performance-enum-size,portability-*,readability-*,-readability-magic-numbers,-header-filter=.*'
+Checks:
+  - '-*'
+  - 'clang-analyzer-*'
+  - 'cert-*'
+  - 'bugprone-*'
+  - 'modernize-*'
+  - '-modernize-use-trailing-return-type'
+  - '-modernize-use-using'
+  - 'performance-*'
+  - '-performance-enum-size'
+  - 'portability-*'
+  - 'readability-*'
+  - '-readability-magic-numbers'
+  - '-readability-inconsistent-declaration-parameter-name'
+  - '-bugprone-easily-swappable-parameters'
