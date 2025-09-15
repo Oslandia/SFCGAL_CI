@@ -7,6 +7,7 @@
 #define SFCGAL_CAPI_H_
 
 #include "SFCGAL/config.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

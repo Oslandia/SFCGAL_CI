@@ -132,10 +132,10 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
     extern "C" ret_type sfcgal_geometry_##name(const sfcgal_geometry_t *ga,    \
                                                const sfcgal_geometry_t *gb)    \
     {                                                                          \
-      cpp_type r;                                                              \
+      cpp_type result;                                                         \
       try {                                                                    \
-        r = sfcgal_function(*(const SFCGAL::Geometry *)(ga),                   \
-                            *(const SFCGAL::Geometry *)(gb));                  \
+        result = sfcgal_function(*(const SFCGAL::Geometry *)(ga),              \
+                                 *(const SFCGAL::Geometry *)(gb));             \
       } catch (std::exception & e) {                                           \
         SFCGAL_WARNING("During " #name "(A,B) :");                             \
         SFCGAL_WARNING("  with A: %s",                                         \
@@ -145,7 +145,7 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
         SFCGAL_ERROR("%s", e.what());                                          \
         return fail_value;                                                     \
       }                                                                        \
-      return r;                                                                \
+      return result;                                                           \
     }
 
   #define SFCGAL_GEOMETRY_FUNCTION_BINARY_PREDICATE(name, sfcgal_function)     \
@@ -195,9 +195,9 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
   #define SFCGAL_GEOMETRY_FUNCTION_UNARY_MEASURE(name, sfcgal_function)        \
     extern "C" double sfcgal_geometry_##name(const sfcgal_geometry_t *ga)      \
     {                                                                          \
-      double r;                                                                \
+      double result;                                                           \
       try {                                                                    \
-        r = sfcgal_function(*(const SFCGAL::Geometry *)(ga));                  \
+        result = sfcgal_function(*(const SFCGAL::Geometry *)(ga));             \
       } catch (std::exception & e) {                                           \
         SFCGAL_WARNING("During " #name "(A) :");                               \
         SFCGAL_WARNING("  with A: %s",                                         \
@@ -205,7 +205,7 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
         SFCGAL_ERROR("%s", e.what());                                          \
         return -1.0;                                                           \
       }                                                                        \
-      return r;                                                                \
+      return result;                                                           \
     }
 
 template <class T>
@@ -239,11 +239,11 @@ static sfcgal_alloc_handler_t sfcgal_alloc_handler = malloc;
 static sfcgal_free_handler_t  sfcgal_free_handler  = free;
 
 inline auto
-alloc_and_copy(const std::string str, char **buffer, size_t *len) -> void
+alloc_and_copy(const std::string &str, char **buffer, size_t *len) -> void
 {
   *len    = str.size();
   *buffer = (char *)sfcgal_alloc_handler(*len + 1);
-  if (*buffer) {
+  if (*buffer != nullptr) {
     memset(*buffer, 0, *len + 1);
     memcpy(*buffer, str.data(), *len);
   } else {
@@ -996,7 +996,7 @@ extern "C" void
 sfcgal_polyhedral_surface_add_polygon(sfcgal_geometry_t *geom,
                                       sfcgal_geometry_t *poly)
 {
-  return sfcgal_polyhedral_surface_add_patch(geom, poly);
+  sfcgal_polyhedral_surface_add_patch(geom, poly);
 }
 
 /**
@@ -1064,7 +1064,7 @@ extern "C" void
 sfcgal_triangulated_surface_add_triangle(sfcgal_geometry_t *geom,
                                          sfcgal_geometry_t *triangle)
 {
-  return sfcgal_triangulated_surface_add_patch(geom, triangle);
+  sfcgal_triangulated_surface_add_patch(geom, triangle);
 }
 
 /**
@@ -2129,8 +2129,9 @@ sfcgal_geometry_envelope_3d(const sfcgal_geometry_t *geom)
     return nullptr;
   }
 
-  if (result.is3D())
+  if (result.is3D()) {
     return result.toShell().release();
+  }
 
   return result.toPolygon().release();
 }
@@ -2259,7 +2260,8 @@ sfcgal_geometry_simplify(const sfcgal_geometry_t *geom, double threshold,
     result =
         SFCGAL::algorithm::simplify(*geometry, threshold, preserveTopology);
   } catch (std::exception &e) {
-    SFCGAL_WARNING("During simplify(A, %g, %d):", threshold, preserveTopology);
+    SFCGAL_WARNING("During simplify(A, %g, %d):", threshold,
+                   static_cast<int>(preserveTopology));
     SFCGAL_WARNING("  with A: %s", geometry->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
