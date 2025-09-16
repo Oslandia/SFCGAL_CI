@@ -6,6 +6,7 @@
 #ifndef SFCGAL_GEOMETRY_H_
 #define SFCGAL_GEOMETRY_H_
 
+#include "SFCGAL/algorithm/equality.h"
 #include "SFCGAL/config.h"
 
 #include <boost/endian/conversion.hpp>
@@ -301,13 +302,17 @@ public:
 
   /**
    * Equality operator
-   * @todo only compare coordinate points
    * @pre the two geometries must be valid
-   * @param other the other geometry to compare with
-   * @param tolerance allowed tolerance
+   * @param other geometry to compare with
+   * @param tolerance allowed distance between same points.
+   * @param strictOrder kind of order to respect. Default:
+   * algorithm::EqualityStrictness::pointNonOrdered()
    */
   [[nodiscard]] virtual auto
-  almostEqual(const Geometry &other, double tolerance) const -> bool;
+  almostEqual(const Geometry &other, double tolerance,
+              algorithm::EqualityStrictness strictOrder =
+                  algorithm::EqualityStrictness::pointNonOrdered()) const
+      -> bool;
 
   /**
    * @brief [OGC/SFA]Gets the number of geometries in a collection of geometries
@@ -464,8 +469,7 @@ private:
  *
  * @param[in] geomA The first Geometry object to compare.
  * @param[in] geomB The second Geometry object to compare.
- * @return true if the two Geometry objects have identical coordinate points,
- * false otherwise
+ * @return true according to algorithm::EqualityStrictness::pointNonOrdered()
  *
  * @pre Both Geometry objects must be valid.
  * @todo Extend comparison to include more than just coordinate points if

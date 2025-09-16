@@ -5,64 +5,170 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "SFCGAL/GeometryCollection.h"
-#include "SFCGAL/LineString.h"
-#include "SFCGAL/MultiLineString.h"
-#include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
-#include "SFCGAL/MultiSolid.h"
-#include "SFCGAL/Point.h"
-#include "SFCGAL/Polygon.h"
-#include "SFCGAL/PolyhedralSurface.h"
-#include "SFCGAL/Solid.h"
-#include "SFCGAL/Triangle.h"
-#include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/io/wkt.h"
 
 using namespace boost::unit_test;
 using namespace SFCGAL;
 
 BOOST_AUTO_TEST_SUITE(SFCGAL_GeometryTest)
 
-// virtual ~Geometry();
+BOOST_AUTO_TEST_CASE(testAlmostEqual)
+{
+  {
+    std::unique_ptr<Geometry> const gA(io::readWkt(
+        "TIN Z (((1/1 1/2 0/1,1/2 1/2 0/1,1/1 1/4 0/1,1/1 1/2 0/1)),"
+        "((1/2 0/1 0/1,1/1 0/1 0/1,1/1 1/4 0/1,1/2 0/1 0/1)),"
+        "((1/2 0/1 0/1,1/1 1/4 0/1,1/2 1/2 0/1,1/2 0/1 0/1)))"));
 
-// MAY BE TESTED IN SUBCLASSES
+    // sub geometry order change
+    std::unique_ptr<Geometry> const gB(io::readWkt(
+        "TIN Z (((1/2 1/2 0/1,1/1 1/4 0/1,1/1 1/2 0/1,1/2 1/2 0/1)),"
+        "((1/1 0/1 0/1,1/1 1/4 0/1,1/2 1/2 0/1,1/1 0/1 0/1)),"
+        "((1/2 1/2 0/1,1/2 0/1 0/1,1/1 0/1 0/1,1/2 1/2 0/1)))"));
 
-// virtual Geometry *   Geometry::clone() const = 0 ;
-// virtual Geometry*    Geometry::boundary() const ;
-// Envelope             Geometry::envelope() const ;
-// std::string          Geometry::asText( const int & numDecimals = -1 ) const ;
-// virtual std::string  Geometry::geometryType() const = 0 ;
-// virtual GeometryType Geometry::geometryTypeId() const = 0 ;
-// virtual int          Geometry::dimension() const = 0 ;
-// virtual int          Geometry::coordinateDimension() const = 0 ;
-// virtual bool         Geometry::isEmpty() const = 0 ;
-// virtual bool         Geometry::is3D() const = 0 ;
-// virtual bool         Geometry::isMeasured() const = 0 ;
-// virtual bool         Geometry::isSimple() const = 0 ;
-// template < typename Derived > inline bool Geometry::is() const
-// template < typename Derived > inline const Derived &  Geometry::as() const
-// template < typename Derived > inline Derived &        Geometry::as()
+    BOOST_CHECK(SFCGAL::algorithm::isValid(*gA.get()));
+    BOOST_CHECK(SFCGAL::algorithm::isValid(*gB.get()));
+    // not strict
+    BOOST_CHECK(gA->almostEqual(
+        *gB, 0.0, algorithm::EqualityStrictness::coverSubGeomNonOrdered()));
+  }
 
-// TODO
-// void round( const long & scale = 1 ) ;
+  std::unique_ptr<Geometry> const gA(io::readWkt(
+      "MULTIPOLYGON (((0.0 0.0, 5.0 -1.0, 6.0 0.0, 5.0 1.0, 0.0 0.0)), "
+      "((6.0 0.0, 15.0 -1.0, 16.0 0.0, 15.0 1.0, 6.0 0.0)))"));
 
-// TODO
-// virtual size_t             numGeometries() const ;
-// virtual const Geometry  &  geometryN( size_t const& n ) const ;
-// virtual Geometry &         geometryN( size_t const& n ) ;
+  // sub geometry order change
+  std::unique_ptr<Geometry> const gB(io::readWkt(
+      "MULTIPOLYGON (((6.0 0.0, 15.0 -1.0, 16.0 0.0, 15.0 1.0, 6.0 0.0)), "
+      "((0.0 0.0, 5.0 -1.0, 6.0 0.0, 5.0 1.0, 0.0 0.0)))"));
 
-//-- tested in distance
-// double distance( const Geometry & other ) const ;
-// double distance3D( const Geometry & other ) const ;
+  BOOST_CHECK(SFCGAL::algorithm::isValid(*gA.get()));
+  BOOST_CHECK(SFCGAL::algorithm::isValid(*gB.get()));
+  // not strict
+  BOOST_CHECK(gA->almostEqual(
+      *gB, 0.0, algorithm::EqualityStrictness::pointNonOrdered()));
+  // only internal point needed to be ordered
+  BOOST_CHECK(gA->almostEqual(
+      *gB, 0.0, algorithm::EqualityStrictness::InternalPointOrdered));
+  // strict, should fail
+  BOOST_CHECK(!gA->almostEqual(
+      *gB, 0.0, algorithm::EqualityStrictness::allPointOrdered()));
+  // not strict, 0.0 tolerance
+  BOOST_CHECK(*gA == *gB);
 
-//-- tested in geometry visitor test
-// virtual void accept( GeometryVisitor & visitor ) = 0 ;
-// virtual void accept( ConstGeometryVisitor & visitor ) const = 0 ;
+  // polygon point order change
+  std::unique_ptr<Geometry> const gC(io::readWkt(
+      "MULTIPOLYGON (((5.0 -1.0, 6.0 0.0, 5.0 1.0, 0.0 0.0, 5.0 -1.0)), "
+      "((6.0 0.0, 15.0 -1.0, 16.0 0.0, 15.0 1.0, 6.0 0.0)))"));
 
-// TODO
-// template <class Archive> void serialize( Archive& ar, const unsigned int
-// version )
+  BOOST_CHECK(SFCGAL::algorithm::isValid(*gC.get()));
+  // not strict
+  BOOST_CHECK(gA->almostEqual(
+      *gC, 0.0, algorithm::EqualityStrictness::pointNonOrdered()));
+  // shifted point allowed but sub part are ordered
+  BOOST_CHECK(
+      gA->almostEqual(*gC, 0.0,
+                      algorithm::EqualityStrictness() |
+                          algorithm::EqualityStrictness::InternalPointShifted |
+                          algorithm::EqualityStrictness::SubPartOrdered));
+  // strict
+  BOOST_CHECK(!gA->almostEqual(
+      *gC, 0.0, algorithm::EqualityStrictness::allPointOrdered()));
+  // not strict, 0.0 tolerance
+  BOOST_CHECK(*gA == *gC);
 
-BOOST_AUTO_TEST_CASE(getCoordinateType) {}
+  // not strict
+  BOOST_CHECK(gB->almostEqual(
+      *gC, 0.0, algorithm::EqualityStrictness::pointNonOrdered()));
+  // strict
+  BOOST_CHECK(gB->almostEqual(
+      *gC, 0.0, algorithm::EqualityStrictness::InternalPointShifted));
+  // strict
+  BOOST_CHECK(!gB->almostEqual(
+      *gC, 0.0, algorithm::EqualityStrictness::allPointOrdered()));
+  // not strict, 0.0 tolerance
+  BOOST_CHECK(*gB == *gC);
+
+  // slight change
+  std::unique_ptr<Geometry> const gD(io::readWkt(
+      "MULTIPOLYGON (((0.1 0.0, 5.0 -1.1, 6.1 0.0, 5.0 1.0, 0.1 0.0)), "
+      "((6.1 0.0, 15.0 -1.0, 16.0 0.1, 15.0 1.0, 6.1 0.0)))"));
+
+  BOOST_CHECK(SFCGAL::algorithm::isValid(*gD.get()));
+  // not strict, 0.0 tolerance, should fail
+  BOOST_CHECK(!gA->almostEqual(
+      *gD, 0.0, algorithm::EqualityStrictness::pointNonOrdered()));
+  // not strict, 0.1 tolerance
+  BOOST_CHECK(gA->almostEqual(
+      *gD, 0.1, algorithm::EqualityStrictness::pointNonOrdered()));
+  // strict, 0.1 tolerance
+  BOOST_CHECK(gA->almostEqual(
+      *gD, 0.1, algorithm::EqualityStrictness::allPointOrdered()));
+  // not strict, 0.0 tolerance, should fail
+  BOOST_CHECK(!(*gA == *gD));
+
+  // not strict, 0.1 tolerance
+  BOOST_CHECK(gB->almostEqual(
+      *gD, 0.1, algorithm::EqualityStrictness::pointNonOrdered()));
+  // 0.1 tolerance, only internal point needed to be ordered
+  BOOST_CHECK(gB->almostEqual(
+      *gD, 0.1, algorithm::EqualityStrictness::InternalPointOrdered));
+  // strict, 0.1 tolerance, should fail
+  BOOST_CHECK(!gB->almostEqual(
+      *gD, 0.1, algorithm::EqualityStrictness::allPointOrdered()));
+  // not strict, 0.0 tolerance, should fail
+  BOOST_CHECK(!(*gB == *gD));
+
+  // really not the same polygons
+  std::unique_ptr<Geometry> const gE(io::readWkt(
+      "MULTIPOLYGON (((-5.0 80.0, 0.0 0.0, 5.0 -1.0, 5.0 1.0, -5.0 80.0)), "
+      "((6.0 0.0, 15.0 -1.0, 16.0 0.0, 15.0 1.0, 6.0 0.0)))"));
+
+  BOOST_CHECK(SFCGAL::algorithm::isValid(*gE.get()));
+  // not strict, should fail
+  BOOST_CHECK(!gA->almostEqual(
+      *gE, 0.0, algorithm::EqualityStrictness::pointNonOrdered()));
+  // not strict (inverted caller), should fail
+  BOOST_CHECK(!gE->almostEqual(
+      *gA, 0.0, algorithm::EqualityStrictness::pointNonOrdered()));
+  // strict, should fail
+  BOOST_CHECK(!gA->almostEqual(
+      *gE, 0.0, algorithm::EqualityStrictness::allPointOrdered()));
+  // not strict, 0.0 tolerance, should fail
+  BOOST_CHECK(!(*gA == *gE));
+
+  // can be the same but not exactly
+  std::unique_ptr<Geometry> const gF(
+      io::readWkt("MULTIPOLYGON (((0.0 0.0, 5.0 -1.0, 6.0 0.0, 5.5 1.0, 5.0 "
+                  "0.5, 4.5 1.0, 0.0 0.0)), "
+                  "((6.0 0.0, 15.0 -1.0, 16.0 0.0, 15.0 1.0, 6.0 0.0)))"));
+
+  std::unique_ptr<Geometry> const gG(
+      io::readWkt("MULTIPOLYGON (((0.0 0.0, 5.0 -1.0, 6.0 0.0, 5.0 0.5, 5.5 "
+                  "1.0, 4.5 1.0, 0.0 0.0)), "
+                  "((6.0 0.0, 15.0 -1.0, 16.0 0.0, 15.0 1.0, 6.0 0.0)))"));
+
+  BOOST_CHECK(SFCGAL::algorithm::isValid(*gF.get()));
+  BOOST_CHECK(SFCGAL::algorithm::isValid(*gG.get()));
+  // not strict
+  BOOST_CHECK(gF->almostEqual(
+      *gG, 0.0, algorithm::EqualityStrictness::pointNonOrdered()));
+  // not strict
+  BOOST_CHECK(gG->almostEqual(
+      *gF, 0.0, algorithm::EqualityStrictness::pointNonOrdered()));
+  // only internal point needed to be ordered, should fail
+  BOOST_CHECK(!gF->almostEqual(
+      *gG, 0.0, algorithm::EqualityStrictness::InternalPointOrdered));
+  // shifted point allowed, should fail
+  BOOST_CHECK(!gF->almostEqual(
+      *gG, 0.0, algorithm::EqualityStrictness::InternalPointShifted));
+  // strict, should fail
+  BOOST_CHECK(!gF->almostEqual(
+      *gG, 0.0, algorithm::EqualityStrictness::allPointOrdered()));
+  // not strict
+  BOOST_CHECK(*gF == *gG);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

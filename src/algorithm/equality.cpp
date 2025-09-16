@@ -1,0 +1,413 @@
+// Copyright (c) 2024-2025, SFCGAL team.
+// SPDX-License-Identifier: LGPL-2.0-or-later
+
+#include "SFCGAL/algorithm/equality.h"
+
+#include "SFCGAL/algorithm/covers.h"
+
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/TriangulatedSurface.h"
+
+#include "SFCGAL/detail/GetPointsVisitor.h"
+
+#include <boost/format.hpp>
+
+#include <vector>
+
+namespace SFCGAL::algorithm {
+
+/// @{
+/// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+template <class G>
+auto
+compareAnySubPartOrdered(const G &geomA, const G &geomB, const double tolerance,
+                         EqualityStrictness strictOrder) -> bool
+{
+  // std::cout << "will compareAnySubPartOrdered '" << geomA.asText(1) << "' VS
+  // '"
+  //           << geomA.asText(1) << "'\n";
+  auto iteB = geomB.begin();
+  for (auto iteA = geomA.begin(); iteA != geomA.end(); ++iteA) {
+    bool found = almostEqual((*iteA), (*iteB), tolerance, strictOrder);
+    if (!found) {
+      return false;
+    }
+    ++iteB;
+  }
+
+  return true;
+}
+
+template <class G>
+auto
+compareAnySubPartNonOrdered(size_t numPart, const G &geomA, const G &geomB,
+                            const double       tolerance,
+                            EqualityStrictness strictOrder) -> bool
+{
+  // std::cout << "will compareAnySubPartNonOrdered '" << geomA.asText(1)
+  //           << "' VS '" << geomA.asText(1) << "'\n";
+  std::vector<bool> hasGoodMatch(numPart);
+  for (auto iteA = geomA.begin(); iteA != geomA.end(); ++iteA) {
+    bool found = false;
+    int  bIdx  = 0;
+    for (auto iteB = geomB.begin(); !found && iteB != geomB.end(); ++iteB) {
+      if (hasGoodMatch[bIdx]) { // already watched this geom
+        ++bIdx;
+        continue;
+      }
+      found = almostEqual((*iteA), (*iteB), tolerance, strictOrder);
+      hasGoodMatch[bIdx] = found;
+      ++bIdx;
+    }
+    if (!found) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// === Sub part geometries have to be in the same order
+auto
+compareSubPartOrdered(const Geometry &geomA, const Geometry &geomB,
+                      const double tolerance, EqualityStrictness strictOrder)
+    -> bool
+{
+  switch (geomA.geometryTypeId()) {
+  case TYPE_POINT:
+  case TYPE_LINESTRING:
+  case TYPE_TRIANGLE:
+  case TYPE_GEOMETRYCOLLECTION:
+  case TYPE_MULTIPOINT:
+  case TYPE_MULTILINESTRING:
+  case TYPE_MULTIPOLYGON:
+  case TYPE_MULTISOLID:
+    return false;
+
+  case TYPE_POLYGON:
+    return compareAnySubPartOrdered<Polygon>(
+        geomA.as<Polygon>(), geomB.as<Polygon>(), tolerance, strictOrder);
+
+  case TYPE_TRIANGULATEDSURFACE:
+    return compareAnySubPartOrdered<TriangulatedSurface>(
+        geomA.as<TriangulatedSurface>(), geomB.as<TriangulatedSurface>(),
+        tolerance, strictOrder);
+
+  case TYPE_POLYHEDRALSURFACE:
+    return compareAnySubPartOrdered<PolyhedralSurface>(
+        geomA.as<PolyhedralSurface>(), geomB.as<PolyhedralSurface>(), tolerance,
+        strictOrder);
+
+  case TYPE_SOLID:
+    return compareAnySubPartOrdered<Solid>(geomA.as<Solid>(), geomB.as<Solid>(),
+                                           tolerance, strictOrder);
+
+  default:
+    BOOST_THROW_EXCEPTION(NotImplementedException(
+        (boost::format("Unmanaged geometry type: %d.") % geomA.geometryType())
+            .str()));
+  }
+}
+
+// === Sub part geometries can be in any order
+auto
+compareSubPartNonOrdered(const Geometry &geomA, const Geometry &geomB,
+                         const double tolerance, EqualityStrictness strictOrder)
+    -> bool
+{
+  switch (geomA.geometryTypeId()) {
+  case TYPE_POINT:
+  case TYPE_LINESTRING:
+  case TYPE_TRIANGLE:
+  case TYPE_GEOMETRYCOLLECTION:
+  case TYPE_MULTIPOINT:
+  case TYPE_MULTILINESTRING:
+  case TYPE_MULTIPOLYGON:
+  case TYPE_MULTISOLID:
+    return false;
+
+  case TYPE_POLYGON: {
+    const auto &tempGA = geomA.as<Polygon>();
+    return compareAnySubPartNonOrdered<Polygon>(
+        tempGA.numRings(), tempGA, geomB.as<Polygon>(), tolerance, strictOrder);
+  }
+
+  case TYPE_TRIANGULATEDSURFACE: {
+    const auto &tempGA = geomA.as<TriangulatedSurface>();
+    return compareAnySubPartNonOrdered<TriangulatedSurface>(
+        tempGA.numPatches(), tempGA, geomB.as<TriangulatedSurface>(), tolerance,
+        strictOrder);
+  }
+
+  case TYPE_POLYHEDRALSURFACE: {
+    const auto &tempGA = geomA.as<PolyhedralSurface>();
+    return compareAnySubPartNonOrdered<PolyhedralSurface>(
+        tempGA.numPatches(), tempGA, geomB.as<PolyhedralSurface>(), tolerance,
+        strictOrder);
+  }
+
+  case TYPE_SOLID: {
+    const auto &tempGA = geomA.as<Solid>();
+    return compareAnySubPartNonOrdered<Solid>(
+        tempGA.numShells(), tempGA, geomB.as<Solid>(), tolerance, strictOrder);
+  }
+
+  default:
+    BOOST_THROW_EXCEPTION(NotImplementedException(
+        (boost::format("Unmanaged geometry type: %d.") % geomA.geometryType())
+            .str()));
+  }
+}
+
+// === Sub part geometries have to be in the same order
+auto
+compareSubGeometryOrdered(const Geometry &geomA, const Geometry &geomB,
+                          const double       tolerance,
+                          EqualityStrictness strictOrder) -> bool
+{
+  // std::cout << "will compareSubGeometryOrdered '" << geomA.asText(1) << "' VS
+  // '"
+  //           << geomA.asText(1) << "'\n";
+  for (int i = 0; i < geomA.numGeometries(); ++i) {
+    bool found = almostEqual(geomA.geometryN(i), geomB.geometryN(i), tolerance,
+                             strictOrder);
+    if (!found) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// === Sub part geometries can be in any order
+auto
+compareSubGeometryNonOrdered(const Geometry &geomA, const Geometry &geomB,
+                             const double       tolerance,
+                             EqualityStrictness strictOrder) -> bool
+{
+  // std::cout << "will compareSubGeometryNonOrdered '" << geomA.asText(1)
+  //           << "' VS '" << geomA.asText(1) << "'\n";
+  std::vector<bool> hasGoodMatch(geomA.numGeometries());
+  for (int i = 0; i < geomA.numGeometries(); ++i) {
+    bool found = false;
+    for (int j = 0; !found && j < geomA.numGeometries(); ++j) {
+      if (hasGoodMatch[j]) { // already watched this geom
+        continue;
+      }
+      found = almostEqual(geomA.geometryN(i), geomB.geometryN(j), tolerance,
+                          strictOrder);
+      hasGoodMatch[j] = found;
+    }
+    if (!found) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// === Sub part points have to be in the same order
+auto
+comparePointsOrdered(detail::GetPointsVisitor &getPointsA,
+                     detail::GetPointsVisitor &getPointsB,
+                     const double              tolerance) -> bool
+{
+  for (unsigned int i = 0; i < getPointsA.points.size(); ++i) {
+    const Point &pta = *getPointsA.points[i];
+    const Point &ptb = *getPointsB.points[i];
+    bool         found =
+        (tolerance < 0.0 && pta == ptb) || pta.almostEqual(ptb, tolerance);
+    if (!found) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// === Sub part points can be in any order
+auto
+comparePointsNonOrdered(detail::GetPointsVisitor &getPointsA,
+                        detail::GetPointsVisitor &getPointsB,
+                        const double              tolerance) -> bool
+{
+  bool isClosed = *(getPointsA.points[0]) ==
+                  *(getPointsA.points[getPointsA.points.size() - 1]);
+  std::vector<bool> hasGoodMatch(getPointsA.points.size());
+  for (unsigned int i = 0;                                //
+       i < getPointsA.points.size() - (isClosed ? 1 : 0); //
+       ++i) {
+    bool         found = false;
+    const Point &pta   = *getPointsA.points[i];
+
+    for (unsigned int j = 0; j < getPointsB.points.size(); ++j) {
+      const Point &ptb = *getPointsB.points[j];
+      if (hasGoodMatch[j]) { // already watched this point
+        continue;
+      }
+
+      if ((tolerance < 0.0 && pta == ptb) || pta.almostEqual(ptb, tolerance)) {
+        found           = true;
+        hasGoodMatch[j] = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// === Sub part points can be shifted but are in the same order
+auto
+comparePointsShifted(detail::GetPointsVisitor &getPointsA,
+                     detail::GetPointsVisitor &getPointsB,
+                     const double              tolerance) -> bool
+{
+  unsigned int startPos = -1;
+  bool         isClosed = *(getPointsA.points[0]) ==
+                  *(getPointsA.points[getPointsA.points.size() - 1]);
+
+  for (unsigned int i = 0;                                //
+       i < getPointsA.points.size() - (isClosed ? 1 : 0); //
+       ++i) {
+    // search first matching point
+    if (startPos == -1) {
+      const Point &pta = *getPointsA.points[i];
+      for (unsigned int j = 0; j < getPointsB.points.size(); ++j) {
+
+        const Point &ptb = *getPointsB.points[j];
+
+        bool found = ((tolerance < 0.0 && pta == ptb) //
+                      || pta.almostEqual(ptb, tolerance));
+        if (found) {
+          startPos = j; // found first point
+          ++i;          // go for second point
+          break;
+        }
+      }
+    }
+    // no first point found
+    if (startPos == -1) {
+      return false;
+    }
+
+    // handle next pos and array limits
+    ++startPos;
+    if (startPos == getPointsB.points.size()) {
+      startPos = (isClosed ? 1 : 0);
+    }
+
+    const Point &pta = *getPointsA.points[i];
+    const Point &ptb = *getPointsB.points[startPos];
+
+    bool found = ((tolerance < 0.0 && pta == ptb) //
+                  || pta.almostEqual(ptb, tolerance));
+    if (!found) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+auto
+hasSubPart(const Geometry &geom) -> bool
+{
+  switch (geom.geometryTypeId()) {
+  case TYPE_POINT:
+  case TYPE_LINESTRING:
+  case TYPE_TRIANGLE:
+  case TYPE_GEOMETRYCOLLECTION:
+  case TYPE_MULTIPOINT:
+  case TYPE_MULTILINESTRING:
+  case TYPE_MULTIPOLYGON:
+  case TYPE_MULTISOLID:
+    return false;
+
+  case TYPE_POLYGON:
+  case TYPE_TRIANGULATEDSURFACE:
+  case TYPE_POLYHEDRALSURFACE:
+  case TYPE_SOLID:
+    return true;
+
+  default:
+    BOOST_THROW_EXCEPTION(NotImplementedException(
+        (boost::format("Unmanaged geometry type: %d.") % geom.geometryType())
+            .str()));
+  }
+}
+
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
+/// @publicsection
+
+// ============================================================
+// === main algorithm
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+auto
+almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
+            EqualityStrictness strictOrder) -> bool
+{
+  if (geomA.geometryTypeId() != geomB.geometryTypeId() &&
+      geomA.numGeometries() == geomB.numGeometries()) {
+    return false;
+  }
+
+  if (geomA.isEmpty()) {
+    return true;
+  }
+
+  bool out;
+  if (geomA.numGeometries() > 1) {
+    if (strictOrder & EqualityStrictness::SubGeomOrdered) {
+      out = compareSubGeometryOrdered(geomA, geomB, tolerance, strictOrder);
+    } else {
+      out = compareSubGeometryNonOrdered(geomA, geomB, tolerance, strictOrder);
+    }
+  } else {
+
+    if (hasSubPart(geomB) &&
+        !(strictOrder & EqualityStrictness::CheckCoverOrPoint)) {
+      if (strictOrder & EqualityStrictness::SubPartOrdered) {
+        out = compareSubPartOrdered(geomA, geomB, tolerance, strictOrder);
+      } else {
+        out = compareSubPartNonOrdered(geomA, geomB, tolerance, strictOrder);
+      }
+
+    } else {
+      detail::GetPointsVisitor getPointsA;
+      detail::GetPointsVisitor getPointsB;
+      geomA.accept(getPointsA);
+      geomB.accept(getPointsB);
+
+      if (getPointsA.points.size() != getPointsB.points.size()) {
+        out = false;
+      } else {
+        // std::cout << "will compare point per point '" << geomA.asText(1)
+        //           << "' VS '" << geomA.asText(1) << "'\n";
+        if (strictOrder & EqualityStrictness::CheckCoverOrPoint) {
+          out = algorithm::covers3D(geomA, geomB);
+        } else if (strictOrder & EqualityStrictness::InternalPointOrdered) {
+          out = comparePointsOrdered(getPointsA, getPointsB, tolerance);
+        } else if (strictOrder & EqualityStrictness::InternalPointShifted) {
+          out = comparePointsShifted(getPointsA, getPointsB, tolerance);
+        } else {
+          out = comparePointsNonOrdered(getPointsA, getPointsB, tolerance);
+        }
+        // std::cout << "compare point per point returns " << out << "\n";
+      }
+    }
+  }
+
+  return out;
+}
+// NOLINTEND(readability-function-cognitive-complexity)
+} // namespace SFCGAL::algorithm

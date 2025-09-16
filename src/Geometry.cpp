@@ -146,41 +146,10 @@ Geometry::forceValidityFlag(bool valid)
 }
 
 auto
-Geometry::almostEqual(const Geometry &other, const double tolerance) const
-    -> bool
+Geometry::almostEqual(const Geometry &other, const double tolerance,
+                      algorithm::EqualityStrictness strictOrder) const -> bool
 {
-  if (geometryTypeId() != other.geometryTypeId()) {
-    return false;
-  }
-
-  detail::GetPointsVisitor get_points_a;
-  detail::GetPointsVisitor get_points_b;
-  accept(get_points_a);
-  other.accept(get_points_b);
-
-  if (get_points_a.points.size() != get_points_b.points.size()) {
-    return false;
-  }
-
-  for (auto &point : get_points_a.points) {
-    bool found = false;
-
-    for (auto &j : get_points_b.points) {
-      const Point &pta = *point;
-      const Point &ptb = *j;
-
-      if (pta.almostEqual(ptb, tolerance)) {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
-      return false;
-    }
-  }
-
-  return true;
+  return algorithm::almostEqual(*this, other, tolerance, strictOrder);
 }
 
 auto
@@ -206,38 +175,8 @@ Geometry::centroid3D() const -> Point
 auto
 operator==(const Geometry &geomA, const Geometry &geomB) -> bool
 {
-  if (geomA.geometryTypeId() != geomB.geometryTypeId()) {
-    return false;
-  }
-
-  detail::GetPointsVisitor get_points_a;
-  detail::GetPointsVisitor get_points_b;
-  geomA.accept(get_points_a);
-  geomB.accept(get_points_b);
-
-  if (get_points_a.points.size() != get_points_b.points.size()) {
-    return false;
-  }
-
-  for (auto &point : get_points_a.points) {
-    bool found = false;
-
-    for (auto &j : get_points_b.points) {
-      const Point &pta = *point;
-      const Point &ptb = *j;
-
-      if (pta == ptb) {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
-      return false;
-    }
-  }
-
-  return true;
+  return algorithm::almostEqual(
+      geomA, geomB, -1.0, algorithm::EqualityStrictness::pointNonOrdered());
 }
 
 } // namespace SFCGAL
