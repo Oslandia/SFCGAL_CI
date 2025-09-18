@@ -2312,13 +2312,14 @@ sfcgal_primitive_delete(sfcgal_primitive_t *primitive) -> void
 }
 
 extern "C" auto
-sfcgal_primitive_parameter_double(sfcgal_primitive_t *primitive,
-                                  const char         *name) -> double
+sfcgal_primitive_parameter_double(const sfcgal_primitive_t *primitive,
+                                  const char               *name) -> double
 {
   double returnValue = 0.;
 
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
-      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      const auto *primitiveCast =
+          reinterpret_cast<const SFCGAL::Primitive *>(primitive);
       SFCGAL::PrimitiveParameter parameter =
           primitiveCast->parameter(std::string(name));
       const SFCGAL::Kernel::FT *kernel_parameter =
@@ -2342,13 +2343,14 @@ sfcgal_primitive_set_parameter_double(sfcgal_primitive_t *primitive,
 }
 
 extern "C" auto
-sfcgal_primitive_parameter_int(sfcgal_primitive_t *primitive, const char *name)
-    -> unsigned int
+sfcgal_primitive_parameter_int(const sfcgal_primitive_t *primitive,
+                               const char               *name) -> unsigned int
 {
   unsigned int returnValue = 0;
 
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
-      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      const auto *primitiveCast =
+          reinterpret_cast<const SFCGAL::Primitive *>(primitive);
       SFCGAL::PrimitiveParameter parameter =
           primitiveCast->parameter(std::string(name));
       const unsigned int *kernel_parameter =
@@ -2376,13 +2378,14 @@ sfcgal_primitive_set_parameter_int(sfcgal_primitive_t *primitive,
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 template <class T>
 auto
-primitive_parameter_array(sfcgal_primitive_t *primitive, const char *name,
+primitive_parameter_array(const sfcgal_primitive_t *primitive, const char *name,
                           const char *parameter_type) -> double *
 {
   double *returnArray = nullptr;
 
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
-      auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+      const auto *primitiveCast =
+          reinterpret_cast<const SFCGAL::Primitive *>(primitive);
       SFCGAL::PrimitiveParameter parameter =
           primitiveCast->parameter(std::string(name));
       const T *array = std::get_if<T>(&parameter); if (array != nullptr) {
@@ -2412,8 +2415,8 @@ primitive_set_parameter_array(sfcgal_primitive_t *primitive, const char *name,
 }
 
 extern "C" auto
-sfcgal_primitive_parameter_point(sfcgal_primitive_t *primitive,
-                                 const char         *name) -> double *
+sfcgal_primitive_parameter_point(const sfcgal_primitive_t *primitive,
+                                 const char               *name) -> double *
 {
   return primitive_parameter_array<SFCGAL::Kernel::Point_3>(primitive, name,
                                                             "point");
@@ -2429,8 +2432,8 @@ sfcgal_primitive_set_parameter_point(sfcgal_primitive_t *primitive,
 }
 
 extern "C" auto
-sfcgal_primitive_parameter_vector(sfcgal_primitive_t *primitive,
-                                  const char         *name) -> double *
+sfcgal_primitive_parameter_vector(const sfcgal_primitive_t *primitive,
+                                  const char               *name) -> double *
 {
   return primitive_parameter_array<SFCGAL::Kernel::Vector_3>(primitive, name,
                                                              "vector");

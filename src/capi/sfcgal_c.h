@@ -2167,8 +2167,8 @@ sfcgal_primitive_parameters(sfcgal_primitive_t *primitive, char **buffer,
  * @ingroup capi
  */
 SFCGAL_API double
-sfcgal_primitive_parameter_double(sfcgal_primitive_t *primitive,
-                                  const char         *name);
+sfcgal_primitive_parameter_double(const sfcgal_primitive_t *primitive,
+                                  const char               *name);
 
 /**
  * @brief Sets the value of a primitive parameter as a double.
@@ -2193,7 +2193,8 @@ sfcgal_primitive_set_parameter_double(sfcgal_primitive_t *primitive,
  * @ingroup capi
  */
 SFCGAL_API unsigned int
-sfcgal_primitive_parameter_int(sfcgal_primitive_t *primitive, const char *name);
+sfcgal_primitive_parameter_int(const sfcgal_primitive_t *primitive,
+                               const char               *name);
 
 /**
  * @brief Sets the value of a primitive parameter as an unsigned int.
@@ -2221,8 +2222,8 @@ sfcgal_primitive_set_parameter_int(sfcgal_primitive_t *primitive,
  * @ingroup capi
  */
 SFCGAL_API double *
-sfcgal_primitive_parameter_point(sfcgal_primitive_t *primitive,
-                                 const char         *name);
+sfcgal_primitive_parameter_point(const sfcgal_primitive_t *primitive,
+                                 const char               *name);
 
 /**
  * @brief Sets the value of a primitive parameter as a 3D point: an array of
@@ -2251,8 +2252,8 @@ sfcgal_primitive_set_parameter_point(sfcgal_primitive_t *primitive,
  * @ingroup capi
  */
 SFCGAL_API double *
-sfcgal_primitive_parameter_vector(sfcgal_primitive_t *primitive,
-                                  const char         *name);
+sfcgal_primitive_parameter_vector(const sfcgal_primitive_t *primitive,
+                                  const char               *name);
 
 /**
  * @brief Sets the value of a primitive parameter as a 3D vector: an array of
