@@ -1572,8 +1572,9 @@ BOOST_AUTO_TEST_CASE(testSphereTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(sphere, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(paramsStr, "[\"center\",\"direction\",\"num_horizontal\","
-                               "\"num_vertical\",\"radius\"]");
+  BOOST_CHECK_EQUAL(
+      paramsStr,
+      R"([{"name":"center","type":"point3"},{"name":"direction","type":"vector3"},{"name":"num_horizontal","type":"int"},{"name":"num_vertical","type":"int"},{"name":"radius","type":"double"}])");
   sfcgal_free_buffer(params);
 
   // radius parameter
@@ -1718,7 +1719,7 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   std::string paramsStr(params, paramsLen);
   BOOST_CHECK_EQUAL(
       paramsStr,
-      "[\"num_radial\",\"height\",\"radius\",\"axis\",\"base_center\"]");
+      R"([{"name":"num_radial","type":"int"},{"name":"height","type":"double"},{"name":"radius","type":"double"},{"name":"axis","type":"vector3"},{"name":"base_center","type":"point3"}])");
   sfcgal_free_buffer(params);
 
   // base_center parameter
@@ -1853,8 +1854,9 @@ BOOST_AUTO_TEST_CASE(testTorusTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(torus, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(paramsStr, "[\"tube_num_radial\",\"main_num_radial\","
-                               "\"tube_radius\",\"main_radius\"]");
+  BOOST_CHECK_EQUAL(
+      paramsStr,
+      R"([{"name":"tube_num_radial","type":"int"},{"name":"main_num_radial","type":"int"},{"name":"tube_radius","type":"double"},{"name":"main_radius","type":"double"}])");
   sfcgal_free_buffer(params);
 
   // main_radius parameter
@@ -1958,7 +1960,9 @@ BOOST_AUTO_TEST_CASE(testBoxTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(box, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(paramsStr, "[\"z_extent\",\"y_extent\",\"x_extent\"]");
+  BOOST_CHECK_EQUAL(
+      paramsStr,
+      R"([{"name":"z_extent","type":"double"},{"name":"y_extent","type":"double"},{"name":"x_extent","type":"double"}])");
   sfcgal_free_buffer(params);
 
   // x_extent parameter
@@ -2041,7 +2045,7 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(cube, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(paramsStr, "[\"size\"]");
+  BOOST_CHECK_EQUAL(paramsStr, R"([{"name":"size","type":"double"}])");
   sfcgal_free_buffer(params);
 
   // size parameter
@@ -2114,7 +2118,7 @@ BOOST_AUTO_TEST_CASE(testConeTest)
   std::string paramsStr(params, paramsLen);
   BOOST_CHECK_EQUAL(
       paramsStr,
-      "[\"num_radial\",\"height\",\"top_radius\",\"bottom_radius\"]");
+      R"([{"name":"num_radial","type":"int"},{"name":"height","type":"double"},{"name":"top_radius","type":"double"},{"name":"bottom_radius","type":"double"}])");
   sfcgal_free_buffer(params);
 
   // bottom_radius parameter

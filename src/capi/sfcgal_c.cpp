@@ -2423,13 +2423,26 @@ sfcgal_primitive_parameters(const sfcgal_primitive_t *primitive, char **buffer,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       const auto *primitiveCast =
           reinterpret_cast<const SFCGAL::Primitive *>(primitive);
-      boost::json::array keys;
+      boost::json::array params;
       for (const auto &[key, value] : primitiveCast->parameters()) {
-        keys.emplace_back(key);
+        boost::json::object param;
+        param["name"] = key;
+        if (std::holds_alternative<SFCGAL::Kernel::FT>(value)) {
+          param["type"] = "double";
+        } else if (std::holds_alternative<unsigned int>(value)) {
+          param["type"] = "int";
+        } else if (std::holds_alternative<SFCGAL::Kernel::Point_3>(value)) {
+          param["type"] = "point3";
+        } else if (std::holds_alternative<SFCGAL::Kernel::Vector_3>(value)) {
+          param["type"] = "vector3";
+        } else {
+          param["type"] = "unknown";
+        }
+        params.emplace_back(param);
       }
 
-      std::string keysStr = serialize(keys);
-      alloc_and_copy(keysStr, buffer, len); //
+      std::string paramsStr = serialize(params);
+      alloc_and_copy(paramsStr, buffer, len); //
   )
 }
 
