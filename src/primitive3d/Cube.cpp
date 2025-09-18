@@ -37,9 +37,6 @@ Cube::primitiveTypeId() const -> PrimitiveType
 void
 Cube::setSize(const Kernel::FT &size)
 {
-  m_box.setXExtent(size);
-  m_box.setYExtent(size);
-  m_box.setZExtent(size);
   validateAndSetParameter("size", size);
 }
 
@@ -53,6 +50,21 @@ Cube::validateParameters(
 
   if (size < 0.) {
     BOOST_THROW_EXCEPTION(Exception("Cube size cannot be negative."));
+  }
+}
+
+void
+Cube::onValidatedAndSetParameter(const std::string        &name,
+                                 const PrimitiveParameter &parameter)
+{
+  (void)parameter; // unused
+
+  if (name == "size") {
+    const Kernel::FT &value = size();
+
+    m_box.setXExtent(value);
+    m_box.setYExtent(value);
+    m_box.setZExtent(value);
   }
 }
 
@@ -77,7 +89,7 @@ Cube::volume() const -> double
 auto
 Cube::size() const -> const Kernel::FT &
 {
-  return m_box.xExtent();
+  return std::get<Kernel::FT>(m_parameters.at("size"));
 }
 
 } // namespace SFCGAL

@@ -98,6 +98,10 @@ protected:
   validateParameters(std::unordered_map<std::string, PrimitiveParameter> const
                          &tempParameters) const override;
 
+  void
+  onValidatedAndSetParameter(const std::string        &name,
+                             const PrimitiveParameter &parameter) override;
+
 private:
   // prefer composition over inheritance to avoid inheriting x/y/zExtents
   // methods that could allow to modify the cube into NOT a cube.

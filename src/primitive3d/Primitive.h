@@ -137,6 +137,7 @@ protected:
   /**
    * @brief Verifies that all parameters are valid. For instance, it raises an
    * error if a radius is negative.
+   * @param tempParameters a temp map of parameter with new values
    * @throws SFCGAL::Exception if one of the parameters if not valid
    * provided variant type is not compatible with the parameter.
    */
@@ -150,11 +151,24 @@ protected:
    * Unlike @ref setParameter, this does not check that name exists and that it
    * accepts the provided variant type. This assumes that name exists and the
    * variant type is compatible with the parameter
+   * @param name parameter name to check
+   * @param parameter value
    * @throws SFCGAL::Exception if the parameter is not valid
    */
-  void
+  virtual void
   validateAndSetParameter(const std::string        &name,
                           const PrimitiveParameter &parameter);
+
+  /**
+   * @brief Callback to propagate paramater change after a parameter has been
+   * validated and set.
+   * @param name parameter name to propagate
+   * @param parameter value
+   * @throws SFCGAL::Exception if propagation failed
+   */
+  virtual void
+  onValidatedAndSetParameter(const std::string        &name,
+                             const PrimitiveParameter &parameter);
 
   std::unordered_map<std::string, PrimitiveParameter> m_parameters;
   mutable std::optional<PolyhedralSurface>            m_polyhedral_surface;

@@ -1964,6 +1964,7 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
   hasError = false;
 
   // check polyhedral conversion
+  sfcgal_primitive_set_parameter_double(cube, "size", 2.0);
   sfcgal_geometry_t *poly = sfcgal_primitive_as_polyhedral_surface(cube);
   char              *wkbApi;
   size_t             wkbLen;
@@ -1971,12 +1972,13 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
   std::string strApi(wkbApi, wkbLen);
   sfcgal_geometry_delete(poly);
 
-  BOOST_CHECK_EQUAL(
-      "POLYHEDRALSURFACE Z (((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((0 0 1,1 0 1,1 "
-      "1 1,0 1 1,0 0 1)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),((0 1 0,0 1 1,1 1 "
-      "1,1 1 0,0 1 0)),((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),((0 0 0,0 0 1,0 1 1,0 "
-      "1 0,0 0 0)))",
-      strApi);
+  BOOST_CHECK_EQUAL("POLYHEDRALSURFACE Z (((0 0 0,0 2 0,2 2 0,2 0 0,0 0 0)),"
+                    "((0 0 2,2 0 2,2 2 2,0 2 2,0 0 2)),"
+                    "((0 0 0,2 0 0,2 0 2,0 0 2,0 0 0)),"
+                    "((0 2 0,0 2 2,2 2 2,2 2 0,0 2 0)),"
+                    "((2 0 0,2 2 0,2 2 2,2 0 2,2 0 0)),"
+                    "((0 0 0,0 0 2,0 2 2,0 2 0,0 0 0)))",
+                    strApi);
   sfcgal_free_buffer(wkbApi);
 
   sfcgal_primitive_delete(cube);
