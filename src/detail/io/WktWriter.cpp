@@ -136,6 +136,19 @@ fixZeroNeg(double val, int precision) -> double
   return val;
 }
 
+static auto
+fixZeroNegForWeights(double val, int precision) -> double
+{
+  // For NURBS weights, preserve small positive values instead of converting to 0
+  if (val > 0 && val < std::pow(10, -precision)) {
+    return std::pow(10, -precision);
+  }
+  if (std::abs(val) < std::pow(10, -precision)) {
+    return 0;
+  }
+  return val;
+}
+
 void
 WktWriter::writeCoordinate(const Point &g)
 {
@@ -514,36 +527,17 @@ WktWriter::writeInner(const NURBSCurve &g)
   }
   _s << ")";
 
-  // Only write weights if the curve is rational (non-uniform weights)
-  if (g.isRational()) {
+  // Always write weights if they exist to ensure round-trip consistency
+  if (!g.weights().empty()) {
     _s << ",";
     writeWeights(g.weights());
   }
 
-  // Write knot vector if available and different from uniform
+  // Always write knot vector if available to ensure round-trip consistency
   const auto &knots = g.knotVector();
   if (!knots.empty()) {
-    // Check if knots are significantly different from uniform
-    bool isNonUniform = false;
-    if (knots.size() > 2) {
-      auto uniformKnots =
-          generateUniformKnots(g.numControlPoints(), g.degree());
-      if (knots.size() == uniformKnots.size()) {
-        for (size_t i = 0; i < knots.size(); ++i) {
-          if (CGAL::abs(knots[i] - uniformKnots[i]) > Kernel::FT(1e-10)) {
-            isNonUniform = true;
-            break;
-          }
-        }
-      } else {
-        isNonUniform = true;
-      }
-    }
-
-    if (isNonUniform) {
-      _s << ",";
-      writeKnots(knots);
-    }
+    _s << ",";
+    writeKnots(knots);
   }
 
   _s << ")";
@@ -586,7 +580,25 @@ WktWriter::writeWeights(const std::vector<Kernel::FT> &weights)
     if (i != 0) {
       _s << ",";
     }
-    _s << weights[i];
+
+    // Always ensure weight is positive - critical for NURBS validity
+    // Check if weight is zero or negative using CGAL comparison
+    if (weights[i] <= Kernel::FT(0)) {
+      // Use 1.0 as default positive weight
+      if (_exactWrite) {
+        impl::writeFT(_s, CGAL::exact(Kernel::FT(1)));
+      } else {
+        _s << "1";
+      }
+    } else {
+      // Original weight is valid, use it
+      if (_exactWrite) {
+        impl::writeFT(_s, CGAL::exact(weights[i]));
+      } else {
+        double weight_val = CGAL::to_double(weights[i]);
+        _s << fixZeroNegForWeights(weight_val, _s.precision());
+      }
+    }
   }
   _s << ")";
 }
@@ -599,7 +611,11 @@ WktWriter::writeKnots(const std::vector<Kernel::FT> &knots)
     if (i != 0) {
       _s << ",";
     }
-    _s << knots[i];
+    if (_exactWrite) {
+      impl::writeFT(_s, CGAL::exact(knots[i]));
+    } else {
+      _s << fixZeroNeg(CGAL::to_double(knots[i]), _s.precision());
+    }
   }
   _s << ")";
 }

@@ -134,7 +134,7 @@ NURBSCurve::createBSpline(const std::vector<Point> &controlPoints,
 
 auto
 NURBSCurve::createCircularArc(const Point &center, FT radius, FT startAngle,
-                              FT endAngle, const Point &normal)
+                              FT endAngle, const Point &normal, KnotMethod knotMethod)
     -> std::unique_ptr<NURBSCurve>
 {
   if (radius <= FT(0)) {
@@ -2856,34 +2856,6 @@ NURBSCurve::clearOptionalData()
   _fitPoints.shrink_to_fit();
   _startTangent.reset();
   _endTangent.reset();
-  _startM.reset();
-  _endM.reset();
-}
-
-//-- ISO 19107 / SQL-MM mandatory methods
-
-auto
-NURBSCurve::startM() const -> std::optional<double>
-{
-  return _startM;
-}
-
-void
-NURBSCurve::setStartM(const std::optional<double> &startMeasure)
-{
-  _startM = startMeasure;
-}
-
-auto
-NURBSCurve::endM() const -> std::optional<double>
-{
-  return _endM;
-}
-
-void
-NURBSCurve::setEndM(const std::optional<double> &endMeasure)
-{
-  _endM = endMeasure;
 }
 
 } // namespace SFCGAL

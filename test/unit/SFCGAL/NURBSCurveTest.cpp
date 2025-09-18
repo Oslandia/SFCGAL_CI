@@ -2658,45 +2658,6 @@ BOOST_AUTO_TEST_CASE(testWkbRoundTripCustomKnots)
   }
 }
 
-/// Test WKB with start/end measures (ISO/SQL-MM compliance)
-BOOST_AUTO_TEST_CASE(testWkbRoundTripStartEndMeasures)
-{
-  std::vector<Point> controlPoints;
-  controlPoints.emplace_back(0.0, 0.0);
-  controlPoints.emplace_back(5.0, 10.0);
-  controlPoints.emplace_back(10.0, 0.0);
-
-  NURBSCurve originalCurve(controlPoints, 2);
-
-  // Set start and end measures (ISO/SQL-MM feature)
-  originalCurve.setStartM(std::optional<double>(0.5));
-  originalCurve.setEndM(std::optional<double>(9.5));
-
-  // Test WKB round-trip
-  std::string wkbString = originalCurve.asWkb();
-  auto        wkbGeom   = SFCGAL::io::readWkb(wkbString);
-  BOOST_REQUIRE(wkbGeom->is<NURBSCurve>());
-  auto const &wkbCurve = wkbGeom->as<NURBSCurve>();
-
-  BOOST_CHECK_EQUAL(wkbCurve.degree(), originalCurve.degree());
-  BOOST_CHECK_EQUAL(wkbCurve.numControlPoints(),
-                    originalCurve.numControlPoints());
-
-  // Verify start/end measures are preserved
-  auto originalStartM = originalCurve.startM();
-  auto originalEndM   = originalCurve.endM();
-  auto wkbStartM      = wkbCurve.startM();
-  auto wkbEndM        = wkbCurve.endM();
-
-  BOOST_CHECK(originalStartM.has_value());
-  BOOST_CHECK(originalEndM.has_value());
-  BOOST_CHECK(wkbStartM.has_value());
-  BOOST_CHECK(wkbEndM.has_value());
-
-  BOOST_CHECK_CLOSE(wkbStartM.value(), originalStartM.value(), 1e-10);
-  BOOST_CHECK_CLOSE(wkbEndM.value(), originalEndM.value(), 1e-10);
-}
-
 /// Test complex WKT/WKB with all features
 BOOST_AUTO_TEST_CASE(testWktWkbRoundTripComplete)
 {
@@ -2711,8 +2672,6 @@ BOOST_AUTO_TEST_CASE(testWktWkbRoundTripComplete)
   std::vector<NURBSCurve::FT> knots   = {0.0, 0.0, 0.0, 0.3, 1.0, 1.0, 1.0};
 
   NURBSCurve originalCurve(controlPoints, weights, 2, knots);
-  originalCurve.setStartM(std::optional<double>(1.5));
-  originalCurve.setEndM(std::optional<double>(8.5));
 
   // Test WKT round-trip
   std::string wktString = originalCurve.asText(0);
@@ -2751,17 +2710,6 @@ BOOST_AUTO_TEST_CASE(testWktWkbRoundTripComplete)
   auto originalKnots = originalCurve.knotVector();
   auto wkbKnots      = wkbCurve.knotVector();
   BOOST_CHECK_EQUAL(wkbKnots.size(), originalKnots.size());
-
-  // Verify start/end measures
-  auto originalStartM = originalCurve.startM();
-  auto originalEndM   = originalCurve.endM();
-  auto wkbStartM      = wkbCurve.startM();
-  auto wkbEndM        = wkbCurve.endM();
-
-  BOOST_CHECK(wkbStartM.has_value());
-  BOOST_CHECK(wkbEndM.has_value());
-  BOOST_CHECK_CLOSE(wkbStartM.value(), originalStartM.value(), 1e-10);
-  BOOST_CHECK_CLOSE(wkbEndM.value(), originalEndM.value(), 1e-10);
 }
 
 /// Test WKT format validation with new degree-first syntax
@@ -2882,8 +2830,22 @@ BOOST_AUTO_TEST_CASE(testWktQGIS)
   for (const auto &wktString : wkts) {
     BOOST_CHECK_NO_THROW(auto geom = SFCGAL::io::readWkt(wktString));
     auto geom = SFCGAL::io::readWkt(wktString);
-    std::cout << wktString << "|"
-              << geom->asWkb(boost::endian::order::native, true) << std::endl;
+    auto wkb = geom->asWkb(boost::endian::order::native, true);
+    auto geom_bak = SFCGAL::io::readWkb(wkb, true);
+    auto wkt_bak = geom_bak->asText(6);
+    auto geom_wkt_bak = SFCGAL::io::readWkt(wkt_bak);
+    auto wkb_bak_bak = geom_wkt_bak->asWkb(boost::endian::order::native, true);
+
+  BOOST_CHECK_EQUAL(geom->as<NURBSCurve>().degree(), geom_bak->as<NURBSCurve>().degree());
+  BOOST_CHECK_EQUAL(geom->as<NURBSCurve>().numControlPoints(),
+                    geom_bak->as<NURBSCurve>().numControlPoints());
+  BOOST_CHECK_EQUAL(geom->as<NURBSCurve>().isRational(), geom_bak->as<NURBSCurve>().isRational() );
+  BOOST_CHECK_EQUAL(geom->as<NURBSCurve>().knotVector().size(), geom_bak->as<NURBSCurve>().knotVector().size() );
+  BOOST_CHECK_EQUAL(geom->as<NURBSCurve>().weights().size(), geom_bak->as<NURBSCurve>().weights().size() );
+
+    std::cout << wktString << "|" << wkb << "|" << wkt_bak << "|" << wkb_bak_bak << std::endl;
+    // std::cout << wktString << "|"
+    //           << wkb << "|" << geom_bak->asText(1) << std::endl;
   }
 }
 
