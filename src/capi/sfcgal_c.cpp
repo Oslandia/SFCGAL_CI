@@ -2247,7 +2247,7 @@ extern "C" auto
 sfcgal_geometry_is_equals(const sfcgal_geometry_t *ga,
                           const sfcgal_geometry_t *gb) -> int
 {
-  return sfcgal_geometry_is_almost_equals(ga, gb, 0.0);
+  return sfcgal_geometry_is_almost_equals(ga, gb, -1.0);
 }
 
 extern "C" auto
@@ -2353,16 +2353,20 @@ sfcgal_primitive_is_almost_equals(const sfcgal_primitive_t *prim1,
                                   const sfcgal_primitive_t *prim2,
                                   double                    tolerance) -> int
 {
-  const auto *prim1Cast = reinterpret_cast<const SFCGAL::Geometry *>(prim1);
-  const auto *prim2Cast = reinterpret_cast<const SFCGAL::Geometry *>(prim2);
+  const auto *prim1Cast = reinterpret_cast<const SFCGAL::Primitive *>(prim1);
+  const auto *prim2Cast = reinterpret_cast<const SFCGAL::Primitive *>(prim2);
 
   bool result;
   try {
     result = prim1Cast->almostEqual(*prim2Cast, tolerance);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During primitive_is_almost_equals(A, B, %g):", tolerance);
-    SFCGAL_WARNING("  with A: %s", prim1Cast->asText().c_str());
-    SFCGAL_WARNING("  with B: %s", prim2Cast->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        (prim1Cast == nullptr ? "null" : prim1Cast->toString().c_str()));
+    SFCGAL_WARNING(
+        "  with B: %s",
+        (prim2Cast == nullptr ? "null" : prim2Cast->toString().c_str()));
     SFCGAL_ERROR("%s", e.what());
     result = false;
   }
