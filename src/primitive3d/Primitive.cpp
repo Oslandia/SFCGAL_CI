@@ -157,6 +157,43 @@ Primitive::invalidateCache()
 }
 
 auto
+Primitive::toString() const -> std::string
+{
+  using FT       = Kernel::FT;
+  using Point_3  = Kernel::Point_3;
+  using Vector_3 = Kernel::Vector_3;
+
+  std::ostringstream stringStream;
+  stringStream << "[Primitive type: " << primitiveType() << ", parameters: [";
+
+  for (auto elem = m_parameters.cbegin(); elem != m_parameters.cend();) {
+    //  for (const auto &elem : m_parameters) {
+    stringStream << elem->first << ": ";
+    std::visit(
+        [&stringStream](auto &&value) {
+          using T = std::decay_t<decltype(value)>;
+          if constexpr (std::is_same_v<T, FT> ||
+                        std::is_same_v<T, unsigned int>) {
+            stringStream << value;
+          } else if constexpr (std::is_same_v<T, Point_3> ||
+                               std::is_same_v<T, Vector_3>) {
+            stringStream << "{" << value << "}";
+          } else {
+            stringStream << "{ unknown alternative }";
+          }
+        },
+        elem->second);
+
+    ++elem;
+    if (elem != m_parameters.cend()) {
+      stringStream << ", ";
+    }
+  }
+  stringStream << "]]";
+  return stringStream.str();
+}
+
+auto
 operator==(const Primitive &prim1, const Primitive &prim2) -> bool
 {
   return prim1.primitiveTypeId() == prim2.primitiveTypeId() &&

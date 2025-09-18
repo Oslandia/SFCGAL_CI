@@ -85,7 +85,15 @@ public:
    * @return The cube area
    */
   [[nodiscard]] auto
-  area3D() const -> double;
+  area3D() const -> double override;
+
+  /**
+   * Returns string representation of this object.
+   *
+   * \return string representation of this object
+   */
+  [[nodiscard]] virtual auto
+  toString() const -> std::string override;
 
 protected:
   /**

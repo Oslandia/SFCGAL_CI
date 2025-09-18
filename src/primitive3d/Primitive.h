@@ -135,6 +135,29 @@ public:
   [[nodiscard]] auto
   almostEqual(const Primitive &other, double epsilon) const -> bool;
 
+  /**
+   * Returns string representation of this object. Can be override by
+   * sub-classes.
+   *
+   * \return string representation of this object
+   */
+  [[nodiscard]] virtual auto
+  toString() const -> std::string;
+
+  /**
+   * overloaded operator<<
+   * \param out stream to fill
+   * \param prim primitive to print via Primitive::toString()
+   * \return filled stream
+   */
+  friend std::ostream &
+  operator<<(std::ostream &out, const Primitive &prim)
+  {
+    // Call virtual function toString() to get the string to be printed
+    out << prim.toString();
+    return out;
+  }
+
 protected:
   /**
    * @brief Invalidates the cached geometries

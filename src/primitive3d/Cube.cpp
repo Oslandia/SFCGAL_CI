@@ -92,4 +92,16 @@ Cube::size() const -> const Kernel::FT &
   return std::get<Kernel::FT>(m_parameters.at("size"));
 }
 
+auto
+Cube::toString() const -> std::string
+{
+  std::ostringstream stringStream;
+  stringStream << "[Primitive type: " << primitiveType() << ", size: " << size()
+               << ", box: ";
+  stringStream << m_box;
+  stringStream << "]";
+
+  return stringStream.str();
+}
+
 } // namespace SFCGAL
