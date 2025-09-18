@@ -130,7 +130,7 @@ public:
    * @return The cone volume
    */
   [[nodiscard]] auto
-  volume(bool withDiscretization = false) const -> double;
+  volume(bool withDiscretization = false) const -> double override;
 
   /**
    * @brief Returns the cone area
@@ -140,7 +140,7 @@ public:
    * @return The cone volume
    */
   [[nodiscard]] auto
-  area3D(bool withDiscretization = false) const -> double;
+  area3D(bool withDiscretization = false) const -> double override;
 
 protected:
   /**

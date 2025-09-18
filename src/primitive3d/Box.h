@@ -110,14 +110,14 @@ public:
    * @return The box volume
    */
   [[nodiscard]] auto
-  volume() const -> double;
+  volume(bool withDiscretization = false) const -> double override;
 
   /**
    * @brief Returns the box area
    * @return The box area
    */
   [[nodiscard]] auto
-  area3D() const -> double;
+  area3D(bool withDiscretization = false) const -> double override;
 
 protected:
   /**

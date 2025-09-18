@@ -191,21 +191,14 @@ public:
    * @return The volume of the sphere
    */
   auto
-  volume() const -> double
-  {
-    return CGAL::to_double((4.0 / 3.0) * radius() * radius() * radius() *
-                           CGAL_PI);
-  }
+  volume(bool withDiscretization = false) const -> double override;
 
   /**
    * @brief Calculates the surface area of the Sphere
    * @return The surface area of the sphere
    */
   auto
-  area3D() const -> double
-  {
-    return CGAL::to_double(4 * radius() * radius() * CGAL_PI);
-  }
+  area3D(bool withDiscretization = false) const -> double override;
 
 protected:
   /**

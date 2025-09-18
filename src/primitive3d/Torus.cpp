@@ -117,14 +117,14 @@ Torus::generatePolyhedralSurface() const -> PolyhedralSurface
 }
 
 auto
-Torus::area3D() const -> double
+Torus::area3D(bool) const -> double
 {
   return 4.0 * std::pow(CGAL_PI, 2) *
          CGAL::to_double(mainRadius() * tubeRadius());
 }
 
 auto
-Torus::volume() const -> double
+Torus::volume(bool) const -> double
 {
   return 2.0 * std::pow(CGAL_PI, 2) *
          CGAL::to_double(mainRadius() * tubeRadius() * tubeRadius());

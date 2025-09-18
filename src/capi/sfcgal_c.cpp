@@ -2375,8 +2375,50 @@ sfcgal_primitive_is_almost_equals(const sfcgal_primitive_t *prim1,
 }
 
 extern "C" auto
+sfcgal_primitive_area(const sfcgal_primitive_t *prim, bool withDiscretization)
+    -> double
+{
+  const auto *primCast = reinterpret_cast<const SFCGAL::Primitive *>(prim);
+
+  double result;
+  try {
+    result = primCast->area3D(withDiscretization);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During primitive_area(A, %d):", withDiscretization);
+    SFCGAL_WARNING(
+        "  with A: %s",
+        (primCast == nullptr ? "null" : primCast->toString().c_str()));
+    SFCGAL_ERROR("%s", e.what());
+    result = -1.0;
+  }
+
+  return result;
+}
+
+extern "C" auto
+sfcgal_primitive_volume(const sfcgal_primitive_t *prim, bool withDiscretization)
+    -> double
+{
+  const auto *primCast = reinterpret_cast<const SFCGAL::Primitive *>(prim);
+
+  double result;
+  try {
+    result = primCast->volume(withDiscretization);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During primitive_volume(A, %d):", withDiscretization);
+    SFCGAL_WARNING(
+        "  with A: %s",
+        (primCast == nullptr ? "null" : primCast->toString().c_str()));
+    SFCGAL_ERROR("%s", e.what());
+    result = -1.0;
+  }
+
+  return result;
+}
+
+extern "C" auto
 sfcgal_primitive_parameters(const sfcgal_primitive_t *primitive, char **buffer,
-                            size_t *len) -> void
+                            size_t                   *len) -> void
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       const auto *primitiveCast =

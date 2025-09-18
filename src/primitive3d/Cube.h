@@ -78,14 +78,14 @@ public:
    * @return The cube volume
    */
   [[nodiscard]] auto
-  volume() const -> double;
+  volume(bool withDiscretization = false) const -> double override;
 
   /**
    * @brief Returns the cube area
    * @return The cube area
    */
   [[nodiscard]] auto
-  area3D() const -> double override;
+  area3D(bool withDiscretization = false) const -> double override;
 
   /**
    * Returns string representation of this object.

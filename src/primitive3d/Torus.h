@@ -127,14 +127,14 @@ public:
    * @return The perfect torus volume (without discretization)
    */
   [[nodiscard]] auto
-  volume() const -> double;
+  volume(bool withDiscretization = false) const -> double override;
 
   /**
    * @brief Returns the perfect torus area (without discretization)
    * @return The perfect torus area (without discretization)
    */
   [[nodiscard]] auto
-  area3D() const -> double;
+  area3D(bool withDiscretization = false) const -> double override;
 
 protected:
   /**

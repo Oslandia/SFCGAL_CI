@@ -75,15 +75,15 @@ Cube::generatePolyhedralSurface() const -> PolyhedralSurface
 }
 
 auto
-Cube::area3D() const -> double
+Cube::area3D(bool withDiscretization) const -> double
 {
-  return m_box.area3D();
+  return m_box.area3D(withDiscretization);
 }
 
 auto
-Cube::volume() const -> double
+Cube::volume(bool withDiscretization) const -> double
 {
-  return m_box.volume();
+  return m_box.volume(withDiscretization);
 }
 
 auto

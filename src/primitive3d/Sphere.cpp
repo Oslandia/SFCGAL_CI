@@ -284,4 +284,17 @@ Sphere::generateSpherePoints() const -> std::vector<Point_3>
   return points;
 }
 
+auto
+Sphere::volume(bool) const -> double
+{
+  return CGAL::to_double((4.0 / 3.0) * radius() * radius() * radius() *
+                         CGAL_PI);
+}
+
+auto
+Sphere::area3D(bool) const -> double
+{
+  return CGAL::to_double(4 * radius() * radius() * CGAL_PI);
+}
+
 } // namespace SFCGAL

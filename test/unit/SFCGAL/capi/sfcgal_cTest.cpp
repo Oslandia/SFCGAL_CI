@@ -1693,6 +1693,15 @@ BOOST_AUTO_TEST_CASE(testSphereTest)
       strApi);
   sfcgal_free_buffer(wkbApi);
 
+  sfcgal_primitive_set_parameter_double(sphere, "radius", 2.0);
+  // check volume
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(sphere, false), 33.51, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(sphere, true), 33.51, 0.01);
+
+  // check area
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(sphere, false), 50.265, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(sphere, true), 50.265, 0.01);
+
   sfcgal_primitive_delete(sphere);
 }
 
@@ -1802,7 +1811,6 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   // polyhedral surface generation
   sfcgal_geometry_t *polySurface =
       sfcgal_primitive_as_polyhedral_surface(cylinder);
-  sfcgal_primitive_delete(cylinder);
 
   BOOST_REQUIRE(sfcgal_geometry_is_valid(polySurface));
 
@@ -1820,7 +1828,18 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
 
   BOOST_CHECK_EQUAL(strApi, expectedWkt);
 
+  sfcgal_primitive_set_parameter_double(cylinder, "radius", 2.0);
+  sfcgal_primitive_set_parameter_double(cylinder, "height", 10.0);
+  // check volume
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(cylinder, false), 125.66, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(cylinder, true), 125.66, 0.01);
+
+  // check area
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(cylinder, false), 150.79, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(cylinder, true), 150.79, 0.01);
+
   sfcgal_geometry_delete(polySurface);
+  sfcgal_primitive_delete(cylinder);
 }
 
 BOOST_AUTO_TEST_CASE(testTorusTest)
@@ -1915,6 +1934,16 @@ BOOST_AUTO_TEST_CASE(testTorusTest)
       strApi);
   sfcgal_free_buffer(wkbApi);
 
+  sfcgal_primitive_set_parameter_double(torus, "main_radius", 2.0);
+  sfcgal_primitive_set_parameter_double(torus, "tube_radius", 1.0);
+  // check volume
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(torus, false), 221.07, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(torus, true), 221.07, 0.01);
+
+  // check area
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(torus, false), 442.15, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(torus, true), 442.15, 0.01);
+
   sfcgal_primitive_delete(torus);
 }
 
@@ -1987,6 +2016,17 @@ BOOST_AUTO_TEST_CASE(testBoxTest)
       strApi);
   sfcgal_free_buffer(wkbApi);
 
+  sfcgal_primitive_set_parameter_double(box, "x_extent", 10.0);
+  sfcgal_primitive_set_parameter_double(box, "y_extent", 5.0);
+  sfcgal_primitive_set_parameter_double(box, "z_extent", 2.0);
+  // check volume
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(box, false), 100.0, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(box, true), 100.0, 0.01);
+
+  // check area
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(box, false), 160.0, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(box, true), 160.0, 0.01);
+
   sfcgal_primitive_delete(box);
 }
 
@@ -2049,6 +2089,14 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
                     "((0 0 0,0 0 2,0 2 2,0 2 0,0 0 0)))",
                     strApi);
   sfcgal_free_buffer(wkbApi);
+
+  // check volume
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(cube, false), 8.0, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(cube, true), 8.0, 0.01);
+
+  // check area
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(cube, false), 24.0, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(cube, true), 24.0, 0.01);
 
   sfcgal_primitive_delete(cube);
 }
@@ -2132,6 +2180,17 @@ BOOST_AUTO_TEST_CASE(testConeTest)
       "0)),((0 14 0,0 0 1,0 0 1,14 0 0,0 14 0)))",
       strApi);
   sfcgal_free_buffer(wkbApi);
+
+  sfcgal_primitive_set_parameter_double(cone, "bottom_radius", 2.0);
+  sfcgal_primitive_set_parameter_double(cone, "top_radius", 0.01);
+  sfcgal_primitive_set_parameter_double(cone, "height", 10.0);
+  // check volume
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(cone, false), 42.098, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_volume(cone, true), 26.80, 0.01);
+
+  // check area
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(cone, false), 76.95, 0.01);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_area(cone, true), 65.41, 0.01);
 
   sfcgal_primitive_delete(cone);
 }

@@ -2310,6 +2310,33 @@ sfcgal_primitive_is_almost_equals(const sfcgal_primitive_t *prim1,
                                   double                    tolerance);
 
 /**
+ * Computes primitive area.
+ *
+ * @param prim Pointer to the input primitive.
+ * @param withDiscretization If true, the area is computed
+ * using the real discretization with radial segments. If false, the area is
+ * computed for a perfect primitive.
+ * @return The primitive area
+ * @ingroup capi
+ */
+SFCGAL_API double
+sfcgal_primitive_area(const sfcgal_primitive_t *prim, bool withDiscretization);
+
+/**
+ * Computes primitive volume.
+ *
+ * @param prim Pointer to the input primitive.
+ * @param withDiscretization If true, the area is computed
+ * using the real discretization with radial segments. If false, the area is
+ * computed for a perfect primitive.
+ * @return The primitive volume
+ * @ingroup capi
+ */
+SFCGAL_API double
+sfcgal_primitive_volume(const sfcgal_primitive_t *prim,
+                        bool                      withDiscretization);
+
+/**
  * @brief Retrieves the list of primitive parameters as JSON array.
  * @param primitive Pointer to the primitive.
  * @param[out] buffer the output buffer

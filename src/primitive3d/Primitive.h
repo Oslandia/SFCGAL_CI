@@ -128,6 +128,26 @@ public:
   parameters() const -> std::unordered_map<std::string, PrimitiveParameter>;
 
   /**
+   * @brief Returns the primitive volume
+   * @param withDiscretization If true, the volume is computed
+   * using the real discretization with radial segments. If false, the volume is
+   * computed for a perfect primitive. Defaults to false.
+   * @return The cone volume
+   */
+  [[nodiscard]] virtual auto
+  volume(bool withDiscretization = false) const -> double = 0;
+
+  /**
+   * @brief Returns the primitive area
+   * @param withDiscretization If true, the area is computed
+   * using the real discretization with radial segments. If false, the area is
+   * computed for a perfect primitive. Defaults to false.
+   * @return The primitive volume
+   */
+  [[nodiscard]] virtual auto
+  area3D(bool withDiscretization = false) const -> double = 0;
+
+  /**
    * Equality operator
    * @param other other geometry to compare to
    * @param epsilon allowed tolerance

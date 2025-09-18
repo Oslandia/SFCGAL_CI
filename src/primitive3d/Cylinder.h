@@ -167,17 +167,10 @@ public:
   generatePolyhedralSurface() const -> PolyhedralSurface override;
 
   [[nodiscard]] auto
-  volume() const -> double
-  {
-    return CGAL::to_double(radius() * radius() * height() * CGAL_PI);
-  }
+  volume(bool withDiscretization = false) const -> double override;
 
   [[nodiscard]] auto
-  area3D() const -> double
-  {
-    return CGAL::to_double(2 * radius() * radius() * CGAL_PI +
-                           2 * radius() * height() * CGAL_PI);
-  }
+  area3D(bool withDiscretization = false) const -> double override;
 
 protected:
   /**

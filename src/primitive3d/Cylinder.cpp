@@ -185,4 +185,17 @@ Cylinder::generatePolyhedralSurface() const -> PolyhedralSurface
   return *m_polyhedral_surface;
 }
 
+auto
+Cylinder::volume(bool) const -> double
+{
+  return CGAL::to_double(radius() * radius() * height() * CGAL_PI);
+}
+
+auto
+Cylinder::area3D(bool) const -> double
+{
+  return CGAL::to_double(2 * radius() * radius() * CGAL_PI +
+                         2 * radius() * height() * CGAL_PI);
+}
+
 } // namespace SFCGAL
