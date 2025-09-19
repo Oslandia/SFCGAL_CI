@@ -2149,14 +2149,6 @@ typedef enum {
   SFCGAL_FIT_METHOD_APPROXIMATE = 1
 } sfcgal_fit_method_t;
 
-/**
- * Approximation modes for curve fitting
- * @ingroup capi
- */
-typedef enum {
-  SFCGAL_APPROXIMATION_MODE_SMOOTH   = 0, ///< Prioritize smoothness (geomdl-like: fix endpoints, optimize regularity)
-  SFCGAL_APPROXIMATION_MODE_FAITHFUL = 1  ///< Prioritize data fidelity (original SFCGAL: include all points in least squares)
-} sfcgal_approximation_mode_t;
 
 /**
  * Creates an empty NURBS curve
@@ -2304,8 +2296,7 @@ sfcgal_nurbs_curve_approximate(const sfcgal_geometry_t **points,
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_nurbs_curve_approximate_with_mode(const sfcgal_geometry_t **points,
                                          size_t num_points, unsigned int degree,
-                                         double tolerance, size_t max_control_points,
-                                         sfcgal_approximation_mode_t approximation_mode);
+                                         double tolerance, size_t max_control_points);
 
 /**
  * Unified curve fitting interface
@@ -2348,8 +2339,7 @@ sfcgal_nurbs_curve_fit_with_mode(const sfcgal_geometry_t **points, size_t num_po
                                  unsigned int degree, sfcgal_fit_method_t fit_method,
                                  sfcgal_knot_method_t   knot_method,
                                  sfcgal_end_condition_t end_condition, double tolerance,
-                                 size_t max_control_points,
-                                 sfcgal_approximation_mode_t approximation_mode);
+                                 size_t max_control_points);
 
 /**
  * Returns the number of control points of a NURBS curve

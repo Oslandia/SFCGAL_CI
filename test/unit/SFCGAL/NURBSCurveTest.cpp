@@ -2221,8 +2221,7 @@ BOOST_AUTO_TEST_CASE(testApproximationVsGeomdl)
         NURBSCurve::approximateCurve(dataPoints,           // Input data points
                                      degree,               // Degree
                                      NURBSCurve::FT(1e-6), // Tolerance
-                                     nb_ctrlpts,            // Maximum control points
-                                     NURBSCurve::ApproximationMode::SMOOTH // Use SMOOTH mode by default
+                                     nb_ctrlpts            // Maximum control points
         );
 
     if (approximatedCurve) {
@@ -2349,8 +2348,7 @@ BOOST_AUTO_TEST_CASE(testApproximationVsTrueControlPoints)
     // SFCGAL current approximation (problematic)
     std::cout << "\n=== SFCGAL CURRENT APPROXIMATION ===" << std::endl;
     auto sfcgalCurve =
-        NURBSCurve::approximateCurve(dataPoints, 3, NURBSCurve::FT(1e-6), 3,
-                                     NURBSCurve::ApproximationMode::SMOOTH);
+        NURBSCurve::approximateCurve(dataPoints, 3, NURBSCurve::FT(1e-6), 3);
 
     if (sfcgalCurve) {
       auto sfcgalControlPoints = sfcgalCurve->controlPoints();
@@ -2852,9 +2850,9 @@ BOOST_AUTO_TEST_CASE(testWktQGIS)
 }
 
 /// Test new approximation modes
-BOOST_AUTO_TEST_CASE(testApproximationModes)
+BOOST_AUTO_TEST_CASE(testApproximationWithFixedEndpoints)
 {
-  std::cout << "\n=== Testing Approximation Modes ===" << std::endl;
+  std::cout << "\n=== Testing Approximation with Fixed Endpoints ===" << std::endl;
 
   // Create test data - simple noisy line
   std::vector<Point> dataPoints;
@@ -2867,19 +2865,18 @@ BOOST_AUTO_TEST_CASE(testApproximationModes)
   const size_t numControlPoints = 3;
   const auto tolerance = NURBSCurve::FT(1e-6);
 
-  // Test SMOOTH mode (default, geomdl-like behavior)
-  std::cout << "Testing SMOOTH mode..." << std::endl;
-  auto smoothCurve = NURBSCurve::approximateCurve(
-      dataPoints, degree, tolerance, numControlPoints,
-      NURBSCurve::ApproximationMode::SMOOTH
+  // Test approximation (now uses geomdl-like behavior by default)
+  std::cout << "Testing approximation with fixed endpoints..." << std::endl;
+  auto curve = NURBSCurve::approximateCurve(
+      dataPoints, degree, tolerance, numControlPoints
   );
 
-  BOOST_REQUIRE(smoothCurve != nullptr);
-  BOOST_CHECK_EQUAL(smoothCurve->numControlPoints(), numControlPoints);
+  BOOST_REQUIRE(curve != nullptr);
+  BOOST_CHECK_EQUAL(curve->numControlPoints(), numControlPoints);
 
-  // Check endpoints are fixed for SMOOTH mode
-  auto startPoint = smoothCurve->evaluate(0.0);
-  auto endPoint = smoothCurve->evaluate(1.0);
+  // Check endpoints are fixed (geomdl-like behavior)
+  auto startPoint = curve->evaluate(0.0);
+  auto endPoint = curve->evaluate(1.0);
 
   double startDist = std::sqrt(std::pow(CGAL::to_double(startPoint.x() - dataPoints[0].x()), 2) +
                                std::pow(CGAL::to_double(startPoint.y() - dataPoints[0].y()), 2));
@@ -2889,35 +2886,24 @@ BOOST_AUTO_TEST_CASE(testApproximationModes)
   std::cout << "  Start distance: " << startDist << std::endl;
   std::cout << "  End distance: " << endDist << std::endl;
 
-  // SMOOTH mode should fix endpoints
+  // Endpoints should be fixed
   BOOST_CHECK_SMALL(startDist, 1e-10);
   BOOST_CHECK_SMALL(endDist, 1e-10);
 
-  // Test FAITHFUL mode (original SFCGAL behavior)
-  std::cout << "Testing FAITHFUL mode..." << std::endl;
-  auto faithfulCurve = NURBSCurve::approximateCurve(
-      dataPoints, degree, tolerance, numControlPoints,
-      NURBSCurve::ApproximationMode::FAITHFUL
-  );
-
-  BOOST_REQUIRE(faithfulCurve != nullptr);
-  BOOST_CHECK_EQUAL(faithfulCurve->numControlPoints(), numControlPoints);
-
-  // Test that fitCurve respects the mode parameter
-  std::cout << "Testing fitCurve with SMOOTH mode..." << std::endl;
-  auto fitSmooth = NURBSCurve::fitCurve(
+  // Test that fitCurve works without mode parameter
+  std::cout << "Testing fitCurve with approximation..." << std::endl;
+  auto fitCurve = NURBSCurve::fitCurve(
       dataPoints, degree,
       NURBSCurve::FitMethod::APPROXIMATE,
       NURBSCurve::KnotMethod::CHORD_LENGTH,
       NURBSCurve::EndCondition::CLAMPED,
-      tolerance, numControlPoints,
-      NURBSCurve::ApproximationMode::SMOOTH
+      tolerance, numControlPoints
   );
 
-  BOOST_REQUIRE(fitSmooth != nullptr);
-  BOOST_CHECK_EQUAL(fitSmooth->numControlPoints(), numControlPoints);
+  BOOST_REQUIRE(fitCurve != nullptr);
+  BOOST_CHECK_EQUAL(fitCurve->numControlPoints(), numControlPoints);
 
-  std::cout << "✓ All approximation modes work correctly" << std::endl;
+  std::cout << "✓ Approximation with fixed endpoints works correctly" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

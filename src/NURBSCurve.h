@@ -99,17 +99,6 @@ public:
                  ///< fewer control points)
   };
 
-  /**
-   * @brief Approximation modes for curve fitting
-   *
-   * Controls the balance between data fidelity and curve smoothness.
-   */
-  enum class ApproximationMode : std::uint8_t {
-    SMOOTH,   ///< Prioritize smoothness (geomdl-like behavior: fix endpoints,
-              ///< optimize for regularity)
-    FAITHFUL  ///< Prioritize data fidelity (original SFCGAL behavior: include
-              ///< all points in least squares)
-  };
 
   // Constructors
 
@@ -231,13 +220,11 @@ public:
    * @param degree Target curve degree
    * @param tolerance Maximum allowed deviation
    * @param maxControlPoints Maximum control points to use
-   * @param mode Approximation mode (SMOOTH by default for better behavior)
    * @return Approximating NURBS curve within tolerance
    */
   static auto
   approximateCurve(const std::vector<Point> &points, unsigned int degree,
-                   FT tolerance, size_t maxControlPoints = 50,
-                   ApproximationMode mode = ApproximationMode::SMOOTH)
+                   FT tolerance, size_t maxControlPoints = 50)
       -> std::unique_ptr<NURBSCurve>;
 
   /**
@@ -252,8 +239,6 @@ public:
    * interpolation)
    * @param maxControlPoints Maximum control points for approximation (ignored
    * for interpolation)
-   * @param approximationMode Mode for approximation behavior (ignored for
-   * interpolation)
    * @return NURBS curve fitting the specified points
    */
   static auto
@@ -262,8 +247,7 @@ public:
            KnotMethod        knotMethod        = KnotMethod::UNIFORM,
            EndCondition      endCondition      = EndCondition::CLAMPED,
            FT                tolerance         = FT(1e-6),
-           size_t            maxControlPoints  = 50,
-           ApproximationMode approximationMode = ApproximationMode::SMOOTH)
+           size_t            maxControlPoints  = 50)
       -> std::unique_ptr<NURBSCurve>;
 
   // Geometry interface implementation
