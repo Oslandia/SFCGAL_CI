@@ -1911,7 +1911,8 @@ typedef enum {
 
 /**
  * Computes a 3D buffer around a geometry
- * @param geom The input geometry (must be a Point or SFCGAL::LineString)
+ * @param geom The input geometry (must be a SFCGAL::Point or
+ * SFCGAL::LineString)
  * @param radius The buffer radius
  * @param segments The number of segments to use for approximating curved
  * surfaces
