@@ -139,7 +139,8 @@ fixZeroNeg(double val, int precision) -> double
 static auto
 fixZeroNegForWeights(double val, int precision) -> double
 {
-  // For NURBS weights, preserve small positive values instead of converting to 0
+  // For NURBS weights, preserve small positive values instead of converting to
+  // 0
   if (val > 0 && val < std::pow(10, -precision)) {
     return std::pow(10, -precision);
   }

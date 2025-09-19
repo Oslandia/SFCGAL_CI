@@ -20,9 +20,9 @@ namespace SFCGAL {
  * dimensions. Weights affect XYZ coordinates in homogeneous space (x*w, y*w,
  * z*w, w). M coordinate is interpolated non-rationally through basis functions.
  *
- * Based on "The NURBS Book" by Piegl & Tiller algorithms and NURBS-Python/geomdl.
- * Uses Kernel::FT (Exact Predicates Exact Constructions) for numerical
- * robustness.
+ * Based on "The NURBS Book" by Piegl & Tiller algorithms and
+ * NURBS-Python/geomdl. Uses Kernel::FT (Exact Predicates Exact Constructions)
+ * for numerical robustness.
  *
  * ## Key Features
  * - **Complete EndCondition support**: CLAMPED, NATURAL, PERIODIC, TANGENT
@@ -98,7 +98,6 @@ public:
     APPROXIMATE  ///< Least squares approximation within tolerance (smoother,
                  ///< fewer control points)
   };
-
 
   // Constructors
 
@@ -197,7 +196,8 @@ public:
    */
   static auto
   createCircularArc(const Point &center, FT radius, FT startAngle, FT endAngle,
-                    const Point &normal = Point(0, 0, 1), KnotMethod knotMethod = KnotMethod::UNIFORM)
+                    const Point &normal     = Point(0, 0, 1),
+                    KnotMethod   knotMethod = KnotMethod::UNIFORM)
       -> std::unique_ptr<NURBSCurve>;
 
   /**
@@ -243,11 +243,10 @@ public:
    */
   static auto
   fitCurve(const std::vector<Point> &points, unsigned int degree = 3,
-           FitMethod         fitMethod         = FitMethod::INTERPOLATE,
-           KnotMethod        knotMethod        = KnotMethod::UNIFORM,
-           EndCondition      endCondition      = EndCondition::CLAMPED,
-           FT                tolerance         = FT(1e-6),
-           size_t            maxControlPoints  = 50)
+           FitMethod    fitMethod    = FitMethod::INTERPOLATE,
+           KnotMethod   knotMethod   = KnotMethod::UNIFORM,
+           EndCondition endCondition = EndCondition::CLAMPED,
+           FT tolerance = FT(1e-6), size_t maxControlPoints = 50)
       -> std::unique_ptr<NURBSCurve>;
 
   // Geometry interface implementation

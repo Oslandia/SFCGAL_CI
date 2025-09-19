@@ -38,8 +38,6 @@ namespace SFCGAL {
 // Type aliases for convenience in static helper functions
 using FT = NURBSCurve::FT;
 
-//-- Constructors and initialization
-
 NURBSCurve::NURBSCurve() : _degree(0), _fitTolerance(FT(0)) {}
 
 NURBSCurve::NURBSCurve(const std::vector<Point> &controlPoints,
@@ -84,8 +82,6 @@ NURBSCurve::NURBSCurve(const std::vector<Point> &controlPoints,
     BOOST_THROW_EXCEPTION(Exception("Invalid NURBS curve data: " + reason));
   }
 }
-
-//-- Factory methods
 
 auto
 NURBSCurve::fromBezier(const std::vector<Point> &controlPoints)
@@ -134,7 +130,8 @@ NURBSCurve::createBSpline(const std::vector<Point> &controlPoints,
 
 auto
 NURBSCurve::createCircularArc(const Point &center, FT radius, FT startAngle,
-                              FT endAngle, const Point &normal, KnotMethod knotMethod)
+                              FT endAngle, const Point &normal,
+                              KnotMethod knotMethod)
     -> std::unique_ptr<NURBSCurve>
 {
   if (radius <= FT(0)) {
@@ -884,11 +881,11 @@ NURBSCurve::generateApproximationKnotVector(
    * This is compute_knot_vector2 from geomdl which uses Piegl & Tiller
    * Equation 9.68 from "The NURBS Book".
    *
-   * This method ensures that every knot span contains at least one parameter value,
-   * which produces better approximations than simple averaging.
+   * This method ensures that every knot span contains at least one parameter
+   * value, which produces better approximations than simple averaging.
    */
-  size_t num_dpts = parameters.size();     // Number of data points
-  size_t num_cpts = numControlPoints;      // Number of control points
+  size_t num_dpts = parameters.size(); // Number of data points
+  size_t num_cpts = numControlPoints;  // Number of control points
 
   std::vector<Knot> knots;
   knots.reserve(num_cpts + degree + 1);
@@ -899,26 +896,30 @@ NURBSCurve::generateApproximationKnotVector(
   }
 
   // Compute internal knots using geomdl method (Equation 9.68)
-  // d = n / (m - p) where n = num_data_points, m = num_control_points - 1, p = degree
-  double d = static_cast<double>(num_dpts) / static_cast<double>(num_cpts - degree);
+  // d = n / (m - p) where n = num_data_points, m = num_control_points - 1, p =
+  // degree
+  double d =
+      static_cast<double>(num_dpts) / static_cast<double>(num_cpts - degree);
 
   // Find internal knots
   for (size_t j = 1; j < num_cpts - degree; ++j) {
-    double jd = j * d;
-    int i = static_cast<int>(jd);
+    double jd    = j * d;
+    int    i     = static_cast<int>(jd);
     double alpha = jd - i;
 
     // Ensure we don't go out of bounds
     if (i >= static_cast<int>(parameters.size())) {
-      i = parameters.size() - 1;
+      i     = parameters.size() - 1;
       alpha = 0.0;
     }
     if (i < 1) {
       i = 1;
     }
 
-    // Compute knot as linear interpolation between parameters[i-1] and parameters[i]
-    FT temp_kv = (FT(1.0 - alpha) * parameters[i - 1]) + (FT(alpha) * parameters[i]);
+    // Compute knot as linear interpolation between parameters[i-1] and
+    // parameters[i]
+    FT temp_kv =
+        (FT(1.0 - alpha) * parameters[i - 1]) + (FT(alpha) * parameters[i]);
     knots.push_back(temp_kv);
   }
 
@@ -987,7 +988,8 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
       generateApproximationKnotVector(parameters, degree, m + 1);
 
   // Step 3: Set up the least-squares system based on approximation mode
-  // Mode determines whether to fix endpoints (SMOOTH) or include all points (FAITHFUL)
+  // Mode determines whether to fix endpoints (SMOOTH) or include all points
+  // (FAITHFUL)
 
   std::vector<Point> controlPoints;
   controlPoints.reserve(m + 1);
@@ -1002,130 +1004,141 @@ NURBSCurve::approximateCurve(const std::vector<Point> &points,
 
     // Initialize control points with fixed endpoints
     controlPoints.resize(m + 1);
-    controlPoints[0] = points[0];     // Fix first control point to first data point
-    controlPoints[m] = points[n];     // Fix last control point to last data point
+    controlPoints[0] = points[0]; // Fix first control point to first data point
+    controlPoints[m] = points[n]; // Fix last control point to last data point
 
     if (m > 1) {
-        // Build basis function matrix for INTERIOR data points only (like geomdl)
-        // This excludes the first and last data points which are already satisfied
-        // by the fixed control points
-        matrix<double> N_interior(n - 1, m - 1);  // Interior data points (1 to n-1) x interior control points (1 to m-1)
+      // Build basis function matrix for INTERIOR data points only (like geomdl)
+      // This excludes the first and last data points which are already
+      // satisfied by the fixed control points
+      matrix<double> N_interior(n - 1,
+                                m - 1); // Interior data points (1 to n-1) x
+                                        // interior control points (1 to m-1)
 
-        // Fill basis function matrix for INTERIOR data points only
-        for (size_t i = 1; i < n; ++i) {  // Loop from 1 to n-1 (excluding endpoints)
-          Parameter t = parameters[i];
-          size_t span = findKnotSpan(t, degree, knots);
-          auto basis = computeBasisFunctions(span, t, degree, knots);
+      // Fill basis function matrix for INTERIOR data points only
+      for (size_t i = 1; i < n;
+           ++i) { // Loop from 1 to n-1 (excluding endpoints)
+        Parameter t     = parameters[i];
+        size_t    span  = findKnotSpan(t, degree, knots);
+        auto      basis = computeBasisFunctions(span, t, degree, knots);
 
-          // Initialize row to zero
-          for (size_t j = 0; j < m - 1; ++j) {
-            N_interior(i - 1, j) = 0.0;  // i-1 because matrix starts at 0
-          }
-
-          // Fill non-zero basis functions for interior control points only
-          size_t baseIdx = span - degree;
-          for (unsigned int k = 0; k <= degree && baseIdx + k <= m; ++k) {
-            if (baseIdx + k >= 1 && baseIdx + k < m) {  // Only interior control points (1 to m-1)
-              N_interior(i - 1, baseIdx + k - 1) = CGAL::to_double(basis[k]);
-            }
-          }
+        // Initialize row to zero
+        for (size_t j = 0; j < m - 1; ++j) {
+          N_interior(i - 1, j) = 0.0; // i-1 because matrix starts at 0
         }
 
-        // Compute modified RHS for interior points: Rk = Qk - N0*P0 - Nm*Pm
-        // where P0 and Pm are fixed to data endpoints
-        vector<double> rk_x(n - 1), rk_y(n - 1);
-        vector<double> rk_z(n - 1, 0.0), rk_m(n - 1, 0.0);
-
-        for (size_t i = 1; i < n; ++i) {  // Only interior data points
-          Parameter t = parameters[i];
-          size_t span = findKnotSpan(t, degree, knots);
-          auto basis = computeBasisFunctions(span, t, degree, knots);
-
-          // Start with the interior data point
-          rk_x(i - 1) = CGAL::to_double(points[i].x());
-          rk_y(i - 1) = CGAL::to_double(points[i].y());
-          if (is3D) rk_z(i - 1) = CGAL::to_double(points[i].z());
-          if (isMeasured) rk_m(i - 1) = CGAL::to_double(points[i].m());
-
-          // Subtract contribution from fixed endpoints (like geomdl)
-          size_t baseIdx = span - degree;
-          for (unsigned int k = 0; k <= degree && baseIdx + k <= m; ++k) {
-            if (baseIdx + k == 0) {
-              // Contribution from first control point (fixed to points[0])
-              double n0 = CGAL::to_double(basis[k]);
-              rk_x(i - 1) -= n0 * CGAL::to_double(points[0].x());
-              rk_y(i - 1) -= n0 * CGAL::to_double(points[0].y());
-              if (is3D) rk_z(i - 1) -= n0 * CGAL::to_double(points[0].z());
-              if (isMeasured) rk_m(i - 1) -= n0 * CGAL::to_double(points[0].m());
-            } else if (baseIdx + k == m) {
-              // Contribution from last control point (fixed to points[n])
-              double nm = CGAL::to_double(basis[k]);
-              rk_x(i - 1) -= nm * CGAL::to_double(points[n].x());
-              rk_y(i - 1) -= nm * CGAL::to_double(points[n].y());
-              if (is3D) rk_z(i - 1) -= nm * CGAL::to_double(points[n].z());
-              if (isMeasured) rk_m(i - 1) -= nm * CGAL::to_double(points[n].m());
-            }
-          }
-        }
-
-        // Solve the reduced least-squares system: N_interior^T * N_interior * P = N_interior^T * Rk
-        matrix<double> NTN = prod(trans(N_interior), N_interior);
-        permutation_matrix<std::size_t> pm(m - 1);
-
-        // Solve for X coordinates
-        vector<double> ntqx = prod(trans(N_interior), rk_x);
-        matrix<double> NTN_copy = NTN;
-        lu_factorize(NTN_copy, pm);
-        lu_substitute(NTN_copy, pm, ntqx);
-
-        // Solve for Y coordinates
-        vector<double> ntqy = prod(trans(N_interior), rk_y);
-        NTN_copy = NTN;
-        lu_factorize(NTN_copy, pm);
-        lu_substitute(NTN_copy, pm, ntqy);
-
-        // Solve for Z coordinates if 3D
-        vector<double> pz_solved(m - 1, 0.0);
-        if (is3D) {
-          vector<double> ntqz = prod(trans(N_interior), rk_z);
-          NTN_copy = NTN;
-          lu_factorize(NTN_copy, pm);
-          lu_substitute(NTN_copy, pm, ntqz);
-          pz_solved = ntqz;
-        }
-
-        // Solve for M coordinates if measured
-        vector<double> pm_solved(m - 1, 0.0);
-        if (isMeasured) {
-          vector<double> ntqm = prod(trans(N_interior), rk_m);
-          NTN_copy = NTN;
-          lu_factorize(NTN_copy, pm);
-          lu_substitute(NTN_copy, pm, ntqm);
-          pm_solved = ntqm;
-        }
-
-        // Fill interior control points
-        for (size_t i = 1; i < m; ++i) {
-          FT x = FT(ntqx(i - 1));
-          FT y = FT(ntqy(i - 1));
-
-          if (is3D && isMeasured) {
-            FT z = FT(pz_solved(i - 1));
-            double m_val = pm_solved(i - 1);
-            controlPoints[i] = Point(x, y, z, m_val);
-          } else if (is3D) {
-            FT z = FT(pz_solved(i - 1));
-            controlPoints[i] = Point(x, y, z);
-          } else if (isMeasured) {
-            double x_d = CGAL::to_double(x);
-            double y_d = CGAL::to_double(y);
-            double m_val = pm_solved(i - 1);
-            controlPoints[i] = Point(x_d, y_d, 0.0, m_val, COORDINATE_XYM);
-          } else {
-            controlPoints[i] = Point(x, y);
+        // Fill non-zero basis functions for interior control points only
+        size_t baseIdx = span - degree;
+        for (unsigned int k = 0; k <= degree && baseIdx + k <= m; ++k) {
+          if (baseIdx + k >= 1 &&
+              baseIdx + k < m) { // Only interior control points (1 to m-1)
+            N_interior(i - 1, baseIdx + k - 1) = CGAL::to_double(basis[k]);
           }
         }
       }
+
+      // Compute modified RHS for interior points: Rk = Qk - N0*P0 - Nm*Pm
+      // where P0 and Pm are fixed to data endpoints
+      vector<double> rk_x(n - 1), rk_y(n - 1);
+      vector<double> rk_z(n - 1, 0.0), rk_m(n - 1, 0.0);
+
+      for (size_t i = 1; i < n; ++i) { // Only interior data points
+        Parameter t     = parameters[i];
+        size_t    span  = findKnotSpan(t, degree, knots);
+        auto      basis = computeBasisFunctions(span, t, degree, knots);
+
+        // Start with the interior data point
+        rk_x(i - 1) = CGAL::to_double(points[i].x());
+        rk_y(i - 1) = CGAL::to_double(points[i].y());
+        if (is3D)
+          rk_z(i - 1) = CGAL::to_double(points[i].z());
+        if (isMeasured)
+          rk_m(i - 1) = CGAL::to_double(points[i].m());
+
+        // Subtract contribution from fixed endpoints (like geomdl)
+        size_t baseIdx = span - degree;
+        for (unsigned int k = 0; k <= degree && baseIdx + k <= m; ++k) {
+          if (baseIdx + k == 0) {
+            // Contribution from first control point (fixed to points[0])
+            double n0 = CGAL::to_double(basis[k]);
+            rk_x(i - 1) -= n0 * CGAL::to_double(points[0].x());
+            rk_y(i - 1) -= n0 * CGAL::to_double(points[0].y());
+            if (is3D)
+              rk_z(i - 1) -= n0 * CGAL::to_double(points[0].z());
+            if (isMeasured)
+              rk_m(i - 1) -= n0 * CGAL::to_double(points[0].m());
+          } else if (baseIdx + k == m) {
+            // Contribution from last control point (fixed to points[n])
+            double nm = CGAL::to_double(basis[k]);
+            rk_x(i - 1) -= nm * CGAL::to_double(points[n].x());
+            rk_y(i - 1) -= nm * CGAL::to_double(points[n].y());
+            if (is3D)
+              rk_z(i - 1) -= nm * CGAL::to_double(points[n].z());
+            if (isMeasured)
+              rk_m(i - 1) -= nm * CGAL::to_double(points[n].m());
+          }
+        }
+      }
+
+      // Solve the reduced least-squares system: N_interior^T * N_interior * P =
+      // N_interior^T * Rk
+      matrix<double>                  NTN = prod(trans(N_interior), N_interior);
+      permutation_matrix<std::size_t> pm(m - 1);
+
+      // Solve for X coordinates
+      vector<double> ntqx     = prod(trans(N_interior), rk_x);
+      matrix<double> NTN_copy = NTN;
+      lu_factorize(NTN_copy, pm);
+      lu_substitute(NTN_copy, pm, ntqx);
+
+      // Solve for Y coordinates
+      vector<double> ntqy = prod(trans(N_interior), rk_y);
+      NTN_copy            = NTN;
+      lu_factorize(NTN_copy, pm);
+      lu_substitute(NTN_copy, pm, ntqy);
+
+      // Solve for Z coordinates if 3D
+      vector<double> pz_solved(m - 1, 0.0);
+      if (is3D) {
+        vector<double> ntqz = prod(trans(N_interior), rk_z);
+        NTN_copy            = NTN;
+        lu_factorize(NTN_copy, pm);
+        lu_substitute(NTN_copy, pm, ntqz);
+        pz_solved = ntqz;
+      }
+
+      // Solve for M coordinates if measured
+      vector<double> pm_solved(m - 1, 0.0);
+      if (isMeasured) {
+        vector<double> ntqm = prod(trans(N_interior), rk_m);
+        NTN_copy            = NTN;
+        lu_factorize(NTN_copy, pm);
+        lu_substitute(NTN_copy, pm, ntqm);
+        pm_solved = ntqm;
+      }
+
+      // Fill interior control points
+      for (size_t i = 1; i < m; ++i) {
+        FT x = FT(ntqx(i - 1));
+        FT y = FT(ntqy(i - 1));
+
+        if (is3D && isMeasured) {
+          FT     z         = FT(pz_solved(i - 1));
+          double m_val     = pm_solved(i - 1);
+          controlPoints[i] = Point(x, y, z, m_val);
+        } else if (is3D) {
+          FT z             = FT(pz_solved(i - 1));
+          controlPoints[i] = Point(x, y, z);
+        } else if (isMeasured) {
+          double x_d       = CGAL::to_double(x);
+          double y_d       = CGAL::to_double(y);
+          double m_val     = pm_solved(i - 1);
+          controlPoints[i] = Point(x_d, y_d, 0.0, m_val, COORDINATE_XYM);
+        } else {
+          controlPoints[i] = Point(x, y);
+        }
+      }
+    }
 
   } catch (const std::exception &e) {
     BOOST_THROW_EXCEPTION(
@@ -1149,8 +1162,7 @@ auto
 NURBSCurve::fitCurve(const std::vector<Point> &points, unsigned int degree,
                      FitMethod fitMethod, KnotMethod knotMethod,
                      EndCondition endCondition, FT tolerance,
-                     size_t maxControlPoints)
-    -> std::unique_ptr<NURBSCurve>
+                     size_t maxControlPoints) -> std::unique_ptr<NURBSCurve>
 {
   if (points.empty()) {
     BOOST_THROW_EXCEPTION(Exception("Cannot fit curve with no points"));
@@ -1169,8 +1181,6 @@ NURBSCurve::fitCurve(const std::vector<Point> &points, unsigned int degree,
     BOOST_THROW_EXCEPTION(Exception("Unknown FitMethod"));
   }
 }
-
-//-- Geometry interface implementation
 
 void
 NURBSCurve::accept(GeometryVisitor &visitor)
@@ -1247,8 +1257,6 @@ NURBSCurve::swapXY()
     point.swapXY();
   }
 }
-
-//-- Core curve evaluation and derivatives
 
 auto
 NURBSCurve::evaluate(Parameter parameter) const -> Point
@@ -2030,8 +2038,6 @@ NURBSCurve::closestPoint(const Point &point, Parameter *outParameter) const
   return closestPt;
 }
 
-//-- NURBS-specific data access and manipulation
-
 void
 NURBSCurve::setControlPoints(const std::vector<Point> &controlPoints)
 {
@@ -2221,8 +2227,6 @@ NURBSCurve::knotMultiplicity(Knot value, FT tolerance) const -> unsigned int
   return multiplicity;
 }
 
-//-- Advanced NURBS operations
-
 auto
 NURBSCurve::insertKnot(Knot parameter, unsigned int times) const
     -> std::unique_ptr<NURBSCurve>
@@ -2260,8 +2264,6 @@ NURBSCurve::removeKnots(FT tolerance) const -> std::unique_ptr<NURBSCurve>
   BOOST_THROW_EXCEPTION(
       Exception("removeKnots: NURBS knot removal not yet implemented"));
 }
-
-//-- Validation and utility methods
 
 auto
 NURBSCurve::validateData() const -> std::pair<bool, std::string>
@@ -2352,8 +2354,6 @@ NURBSCurve::getCurveStatistics() const -> std::map<std::string, double>
 
   return stats;
 }
-
-//-- Protected helper methods
 
 auto
 NURBSCurve::findSpan(Parameter parameter) const -> size_t
@@ -2710,8 +2710,6 @@ NURBSCurve::computeArcLength(Parameter startParam, Parameter endParam,
    */
   return adaptiveSimpsonArcLength(startParam, endParam, tolerance);
 }
-
-//-- Private helper methods for adaptive Simpson integration
 
 auto
 NURBSCurve::speedFunction(Parameter t) const -> FT
