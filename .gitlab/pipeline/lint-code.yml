@@ -32,7 +32,7 @@ doxygen-warnings:
   before_script:
     - apt update && apt install --no-install-recommends --yes doxygen git
   script:
-   - .gitlab/doxygen-check.sh
+   - script/doxygen-check.sh
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
