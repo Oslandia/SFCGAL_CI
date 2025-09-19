@@ -2286,19 +2286,6 @@ SFCGAL_API void
 sfcgal_primitive_delete(sfcgal_primitive_t *primitive);
 
 /**
- * @brief Retrieves the list of primitive parameters as JSON array.
- * @param primitive Pointer to the primitive.
- * @param[out] buffer the output buffer
- * @param[out] len the size of the @p buffer
- * @post @p buffer is returned allocated and must be freed by the caller with
- *       sfcgal_free_buffer()
- * @ingroup capi
- */
-SFCGAL_API void
-sfcgal_primitive_parameters(sfcgal_primitive_t *primitive, char **buffer,
-                            size_t *len);
-
-/**
  * @brief Retrieves the value of a primitive parameter as a double.
  * @param primitive Pointer to the primitive.
  * @param name Name of the parameter to retrieve.
