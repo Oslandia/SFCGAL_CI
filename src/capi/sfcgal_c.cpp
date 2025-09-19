@@ -2500,6 +2500,19 @@ cFitMethodToCpp(sfcgal_fit_method_t method) -> SFCGAL::NURBSCurve::FitMethod
 }
 
 auto
+cApproximationModeToCpp(sfcgal_approximation_mode_t mode) -> SFCGAL::NURBSCurve::ApproximationMode
+{
+  switch (mode) {
+  case SFCGAL_APPROXIMATION_MODE_SMOOTH:
+    return SFCGAL::NURBSCurve::ApproximationMode::SMOOTH;
+  case SFCGAL_APPROXIMATION_MODE_FAITHFUL:
+    return SFCGAL::NURBSCurve::ApproximationMode::FAITHFUL;
+  default:
+    return SFCGAL::NURBSCurve::ApproximationMode::SMOOTH;
+  }
+}
+
+auto
 convertPointArray(const sfcgal_geometry_t **points, size_t num_points)
     -> std::vector<SFCGAL::Point>
 {
@@ -2662,7 +2675,7 @@ sfcgal_nurbs_curve_approximate(const sfcgal_geometry_t **points,
       auto pointVec = convertPointArray(points, num_points);
       auto curve    = SFCGAL::NURBSCurve::approximateCurve(
           pointVec, degree, SFCGAL::NURBSCurve::FT(tolerance),
-          max_control_points);
+          max_control_points, SFCGAL::NURBSCurve::ApproximationMode::SMOOTH);
       return static_cast<SFCGAL::Geometry *>(curve.release());)
 }
 
@@ -2679,6 +2692,40 @@ sfcgal_nurbs_curve_fit(const sfcgal_geometry_t **points, size_t num_points,
           pointVec, degree, cFitMethodToCpp(fit_method),
           cKnotMethodToCpp(knot_method), cEndConditionToCpp(end_condition),
           SFCGAL::NURBSCurve::FT(tolerance), max_control_points);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_approximate_with_mode(const sfcgal_geometry_t **points,
+                                         size_t num_points, unsigned int degree,
+                                         double tolerance, size_t max_control_points,
+                                         sfcgal_approximation_mode_t approximation_mode)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::approximateCurve(
+          pointVec, degree, SFCGAL::NURBSCurve::FT(tolerance),
+          max_control_points, cApproximationModeToCpp(approximation_mode));
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_fit_with_mode(const sfcgal_geometry_t **points, size_t num_points,
+                                 unsigned int degree, sfcgal_fit_method_t fit_method,
+                                 sfcgal_knot_method_t   knot_method,
+                                 sfcgal_end_condition_t end_condition, double tolerance,
+                                 size_t max_control_points,
+                                 sfcgal_approximation_mode_t approximation_mode)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::fitCurve(
+          pointVec, degree, cFitMethodToCpp(fit_method),
+          cKnotMethodToCpp(knot_method), cEndConditionToCpp(end_condition),
+          SFCGAL::NURBSCurve::FT(tolerance), max_control_points,
+          cApproximationModeToCpp(approximation_mode));
       return static_cast<SFCGAL::Geometry *>(curve.release());)
 }
 

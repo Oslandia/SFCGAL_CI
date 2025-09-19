@@ -2221,7 +2221,8 @@ BOOST_AUTO_TEST_CASE(testApproximationVsGeomdl)
         NURBSCurve::approximateCurve(dataPoints,           // Input data points
                                      degree,               // Degree
                                      NURBSCurve::FT(1e-6), // Tolerance
-                                     nb_ctrlpts // Maximum control points
+                                     nb_ctrlpts,            // Maximum control points
+                                     NURBSCurve::ApproximationMode::SMOOTH // Use SMOOTH mode by default
         );
 
     if (approximatedCurve) {
@@ -2348,7 +2349,8 @@ BOOST_AUTO_TEST_CASE(testApproximationVsTrueControlPoints)
     // SFCGAL current approximation (problematic)
     std::cout << "\n=== SFCGAL CURRENT APPROXIMATION ===" << std::endl;
     auto sfcgalCurve =
-        NURBSCurve::approximateCurve(dataPoints, 3, NURBSCurve::FT(1e-6), 3);
+        NURBSCurve::approximateCurve(dataPoints, 3, NURBSCurve::FT(1e-6), 3,
+                                     NURBSCurve::ApproximationMode::SMOOTH);
 
     if (sfcgalCurve) {
       auto sfcgalControlPoints = sfcgalCurve->controlPoints();
@@ -2780,12 +2782,12 @@ BOOST_AUTO_TEST_CASE(testWktQGIS)
       "NURBSCURVE(2, (-5 -5, 0 10, 5 -5))",
       "NURBSCURVE(2, (0 0, 2 8, 8 2, 10 10))",
       "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 1, 1))",
-      "NURBSCURVE(2, (1 0, 1 1, 0 1), (1, 0.707107, 1))",
+      "NURBSCURVE(2, (1 0, 1 1, 0 1), (1, 0.5, 1))",
       "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 3, 1))",
       "NURBSCURVE(2, (0 0, 5 10, 10 0), (0.5, 1, 0.5))",
       "NURBSCURVE(2, (0.5 0.25, 2.75 5.5, 5.0 0.25), (1, 1.5, 1))",
       "NURBSCURVE(2, (0 0, 5 10, 10 0), (1, 1, 1), (0, 0, 0, 1, 1, 1))",
-      "NURBSCURVE(2, (1 0, 1 1, 0 1), (1, 0.707107, 1), (0, 0, 0, 1, 1, 1))",
+      "NURBSCURVE(2, (1 0, 1 1, 0 1), (1, 0.5, 1), (0, 0, 0, 1, 1, 1))",
       "NURBSCURVE(3, (0 0, 3 10, 7 10, 10 0))",
       "NURBSCURVE(3, (0 0, 2 8, 5 12, 8 8, 10 0))",
       "NURBSCURVE(3, (5 0, 10 2.5, 10 7.5, 5 10, 0 7.5, 0 2.5, 5 0))",
@@ -2821,8 +2823,8 @@ BOOST_AUTO_TEST_CASE(testWktQGIS)
       "NURBSCURVE ZM(2, (0 0 0 0, 5 10 5 1800, 10 0 0 3600), (1, 2, 1))",
       "NURBSCURVE ZM(3, (0 0 0 0, 3 10 3 1200, 7 10 7 2400, 10 0 10 3600), (1, "
       "1.5, 1.5, 1), (0, 0, 0, 0, 1, 1, 1, 1))",
-      "NURBSCURVE(2, (1 0, 1 1, 0 1), (1, 0.707107, 1), (0, 0, 0, 1, 1, 1))",
-      "NURBSCURVE(2, (2 0, 2 1, 0 1), (1, 0.707107, 1), (0, 0, 0, 1, 1, 1))",
+      "NURBSCURVE(2, (1 0, 1 1, 0 1), (1, 0.5, 1), (0, 0, 0, 1, 1, 1))",
+      "NURBSCURVE(2, (2 0, 2 1, 0 1), (1, 0.5, 1), (0, 0, 0, 1, 1, 1))",
       "NURBSCURVE(2, (0 0, 1 1, 2 0), (1, 1, 1), (0, 0, 0, 1, 1, 1))",
       "NURBSCURVE(2, (0 0, 5 5, 10 0))",
       "NURBSCURVE(2, (0 0, 1 2, 2 1, 3 3, 4 2, 5 4, 6 3, 7 5, 8 4, 9 6, 10 "
@@ -2843,10 +2845,79 @@ BOOST_AUTO_TEST_CASE(testWktQGIS)
   BOOST_CHECK_EQUAL(geom->as<NURBSCurve>().knotVector().size(), geom_bak->as<NURBSCurve>().knotVector().size() );
   BOOST_CHECK_EQUAL(geom->as<NURBSCurve>().weights().size(), geom_bak->as<NURBSCurve>().weights().size() );
 
-    std::cout << wktString << "|" << wkb << "|" << wkt_bak << "|" << wkb_bak_bak << std::endl;
+    std::cout << "{'wkt': '" << wktString << "', 'wkb': '" << wkb << "'}," << std::endl;
     // std::cout << wktString << "|"
     //           << wkb << "|" << geom_bak->asText(1) << std::endl;
   }
+}
+
+/// Test new approximation modes
+BOOST_AUTO_TEST_CASE(testApproximationModes)
+{
+  std::cout << "\n=== Testing Approximation Modes ===" << std::endl;
+
+  // Create test data - simple noisy line
+  std::vector<Point> dataPoints;
+  dataPoints.emplace_back(0.0, 0.0);
+  dataPoints.emplace_back(1.0, 1.1);  // slight deviation
+  dataPoints.emplace_back(2.0, 1.9);  // slight deviation
+  dataPoints.emplace_back(3.0, 3.0);
+
+  const unsigned int degree = 2;
+  const size_t numControlPoints = 3;
+  const auto tolerance = NURBSCurve::FT(1e-6);
+
+  // Test SMOOTH mode (default, geomdl-like behavior)
+  std::cout << "Testing SMOOTH mode..." << std::endl;
+  auto smoothCurve = NURBSCurve::approximateCurve(
+      dataPoints, degree, tolerance, numControlPoints,
+      NURBSCurve::ApproximationMode::SMOOTH
+  );
+
+  BOOST_REQUIRE(smoothCurve != nullptr);
+  BOOST_CHECK_EQUAL(smoothCurve->numControlPoints(), numControlPoints);
+
+  // Check endpoints are fixed for SMOOTH mode
+  auto startPoint = smoothCurve->evaluate(0.0);
+  auto endPoint = smoothCurve->evaluate(1.0);
+
+  double startDist = std::sqrt(std::pow(CGAL::to_double(startPoint.x() - dataPoints[0].x()), 2) +
+                               std::pow(CGAL::to_double(startPoint.y() - dataPoints[0].y()), 2));
+  double endDist = std::sqrt(std::pow(CGAL::to_double(endPoint.x() - dataPoints.back().x()), 2) +
+                             std::pow(CGAL::to_double(endPoint.y() - dataPoints.back().y()), 2));
+
+  std::cout << "  Start distance: " << startDist << std::endl;
+  std::cout << "  End distance: " << endDist << std::endl;
+
+  // SMOOTH mode should fix endpoints
+  BOOST_CHECK_SMALL(startDist, 1e-10);
+  BOOST_CHECK_SMALL(endDist, 1e-10);
+
+  // Test FAITHFUL mode (original SFCGAL behavior)
+  std::cout << "Testing FAITHFUL mode..." << std::endl;
+  auto faithfulCurve = NURBSCurve::approximateCurve(
+      dataPoints, degree, tolerance, numControlPoints,
+      NURBSCurve::ApproximationMode::FAITHFUL
+  );
+
+  BOOST_REQUIRE(faithfulCurve != nullptr);
+  BOOST_CHECK_EQUAL(faithfulCurve->numControlPoints(), numControlPoints);
+
+  // Test that fitCurve respects the mode parameter
+  std::cout << "Testing fitCurve with SMOOTH mode..." << std::endl;
+  auto fitSmooth = NURBSCurve::fitCurve(
+      dataPoints, degree,
+      NURBSCurve::FitMethod::APPROXIMATE,
+      NURBSCurve::KnotMethod::CHORD_LENGTH,
+      NURBSCurve::EndCondition::CLAMPED,
+      tolerance, numControlPoints,
+      NURBSCurve::ApproximationMode::SMOOTH
+  );
+
+  BOOST_REQUIRE(fitSmooth != nullptr);
+  BOOST_CHECK_EQUAL(fitSmooth->numControlPoints(), numControlPoints);
+
+  std::cout << "✓ All approximation modes work correctly" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

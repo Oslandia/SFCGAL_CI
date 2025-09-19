@@ -99,6 +99,18 @@ public:
                  ///< fewer control points)
   };
 
+  /**
+   * @brief Approximation modes for curve fitting
+   *
+   * Controls the balance between data fidelity and curve smoothness.
+   */
+  enum class ApproximationMode : std::uint8_t {
+    SMOOTH,   ///< Prioritize smoothness (geomdl-like behavior: fix endpoints,
+              ///< optimize for regularity)
+    FAITHFUL  ///< Prioritize data fidelity (original SFCGAL behavior: include
+              ///< all points in least squares)
+  };
+
   // Constructors
 
   /**
@@ -113,7 +125,7 @@ public:
    * @param knotMethod Method for generating knot vector
    */
   NURBSCurve(const std::vector<Point> &controlPoints, unsigned int degree,
-             KnotMethod knotMethod = KnotMethod::CHORD_LENGTH);
+             KnotMethod knotMethod = KnotMethod::UNIFORM);
 
   /**
    * @brief Constructor with control points and explicit weights
@@ -124,7 +136,7 @@ public:
    */
   NURBSCurve(const std::vector<Point> &controlPoints,
              const std::vector<FT> &weights, unsigned int degree,
-             KnotMethod knotMethod = KnotMethod::CHORD_LENGTH);
+             KnotMethod knotMethod = KnotMethod::UNIFORM);
 
   /**
    * @brief Full constructor with all NURBS parameters
@@ -196,7 +208,7 @@ public:
    */
   static auto
   createCircularArc(const Point &center, FT radius, FT startAngle, FT endAngle,
-                    const Point &normal = Point(0, 0, 1), KnotMethod knotMethod = KnotMethod::CHORD_LENGTH)
+                    const Point &normal = Point(0, 0, 1), KnotMethod knotMethod = KnotMethod::UNIFORM)
       -> std::unique_ptr<NURBSCurve>;
 
   /**
@@ -209,7 +221,7 @@ public:
    */
   static auto
   interpolateCurve(const std::vector<Point> &points, unsigned int degree = 3,
-                   KnotMethod   knotMethod   = KnotMethod::CENTRIPETAL,
+                   KnotMethod   knotMethod   = KnotMethod::UNIFORM,
                    EndCondition endCondition = EndCondition::CLAMPED)
       -> std::unique_ptr<NURBSCurve>;
 
@@ -219,11 +231,13 @@ public:
    * @param degree Target curve degree
    * @param tolerance Maximum allowed deviation
    * @param maxControlPoints Maximum control points to use
+   * @param mode Approximation mode (SMOOTH by default for better behavior)
    * @return Approximating NURBS curve within tolerance
    */
   static auto
   approximateCurve(const std::vector<Point> &points, unsigned int degree,
-                   FT tolerance, size_t maxControlPoints = 50)
+                   FT tolerance, size_t maxControlPoints = 50,
+                   ApproximationMode mode = ApproximationMode::SMOOTH)
       -> std::unique_ptr<NURBSCurve>;
 
   /**
@@ -238,14 +252,18 @@ public:
    * interpolation)
    * @param maxControlPoints Maximum control points for approximation (ignored
    * for interpolation)
+   * @param approximationMode Mode for approximation behavior (ignored for
+   * interpolation)
    * @return NURBS curve fitting the specified points
    */
   static auto
   fitCurve(const std::vector<Point> &points, unsigned int degree = 3,
-           FitMethod    fitMethod    = FitMethod::INTERPOLATE,
-           KnotMethod   knotMethod   = KnotMethod::CENTRIPETAL,
-           EndCondition endCondition = EndCondition::CLAMPED,
-           FT tolerance = FT(1e-6), size_t maxControlPoints = 50)
+           FitMethod         fitMethod         = FitMethod::INTERPOLATE,
+           KnotMethod        knotMethod        = KnotMethod::UNIFORM,
+           EndCondition      endCondition      = EndCondition::CLAMPED,
+           FT                tolerance         = FT(1e-6),
+           size_t            maxControlPoints  = 50,
+           ApproximationMode approximationMode = ApproximationMode::SMOOTH)
       -> std::unique_ptr<NURBSCurve>;
 
   // Geometry interface implementation

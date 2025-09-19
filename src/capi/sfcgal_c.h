@@ -2150,6 +2150,15 @@ typedef enum {
 } sfcgal_fit_method_t;
 
 /**
+ * Approximation modes for curve fitting
+ * @ingroup capi
+ */
+typedef enum {
+  SFCGAL_APPROXIMATION_MODE_SMOOTH   = 0, ///< Prioritize smoothness (geomdl-like: fix endpoints, optimize regularity)
+  SFCGAL_APPROXIMATION_MODE_FAITHFUL = 1  ///< Prioritize data fidelity (original SFCGAL: include all points in least squares)
+} sfcgal_approximation_mode_t;
+
+/**
  * Creates an empty NURBS curve
  * @ingroup capi
  */
@@ -2281,6 +2290,24 @@ sfcgal_nurbs_curve_approximate(const sfcgal_geometry_t **points,
                                double tolerance, size_t max_control_points);
 
 /**
+ * Approximate a NURBS curve with specified approximation mode
+ * @param points Array of points to approximate
+ * @param num_points Number of points
+ * @param degree Target curve degree
+ * @param tolerance Maximum allowed deviation
+ * @param max_control_points Maximum control points to use
+ * @param approximation_mode Approximation mode (SMOOTH or FAITHFUL)
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_approximate_with_mode(const sfcgal_geometry_t **points,
+                                         size_t num_points, unsigned int degree,
+                                         double tolerance, size_t max_control_points,
+                                         sfcgal_approximation_mode_t approximation_mode);
+
+/**
  * Unified curve fitting interface
  * @param points Array of points to fit
  * @param num_points Number of points
@@ -2300,6 +2327,29 @@ sfcgal_nurbs_curve_fit(const sfcgal_geometry_t **points, size_t num_points,
                        sfcgal_knot_method_t   knot_method,
                        sfcgal_end_condition_t end_condition, double tolerance,
                        size_t max_control_points);
+
+/**
+ * Unified curve fitting interface with approximation mode control
+ * @param points Array of points to fit
+ * @param num_points Number of points
+ * @param degree Target curve degree
+ * @param fit_method Whether to interpolate exactly or approximate
+ * @param knot_method Parameterization method
+ * @param end_condition Boundary conditions (for interpolation)
+ * @param tolerance Maximum deviation (for approximation, ignored otherwise)
+ * @param max_control_points Maximum control points (for approximation)
+ * @param approximation_mode Approximation mode (ignored for interpolation)
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_fit_with_mode(const sfcgal_geometry_t **points, size_t num_points,
+                                 unsigned int degree, sfcgal_fit_method_t fit_method,
+                                 sfcgal_knot_method_t   knot_method,
+                                 sfcgal_end_condition_t end_condition, double tolerance,
+                                 size_t max_control_points,
+                                 sfcgal_approximation_mode_t approximation_mode);
 
 /**
  * Returns the number of control points of a NURBS curve
