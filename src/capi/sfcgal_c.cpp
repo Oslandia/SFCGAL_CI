@@ -2416,34 +2416,130 @@ sfcgal_primitive_volume(const sfcgal_primitive_t *prim, bool withDiscretization)
   return result;
 }
 
+auto
+primitiveParamToJson(const std::string                &name,
+                     const SFCGAL::PrimitiveParameter &value,
+                     bool withValue = false) -> boost::json::object
+{
+  boost::json::object param;
+  param["name"] = name;
+  if (std::holds_alternative<SFCGAL::Kernel::FT>(value)) {
+    param["type"] = "double";
+  } else if (std::holds_alternative<unsigned int>(value)) {
+    param["type"] = "int";
+  } else if (std::holds_alternative<SFCGAL::Kernel::Point_3>(value)) {
+    param["type"] = "point3";
+  } else if (std::holds_alternative<SFCGAL::Kernel::Vector_3>(value)) {
+    param["type"] = "vector3";
+  } else {
+    param["type"] = "unknown";
+  }
+
+  if (withValue) {
+    if (std::holds_alternative<SFCGAL::Kernel::FT>(value)) {
+      param["value"] = CGAL::to_double(std::get<SFCGAL::Kernel::FT>(value));
+    } else if (std::holds_alternative<unsigned int>(value)) {
+      param["value"] = CGAL::to_double(std::get<unsigned int>(value));
+    } else if (std::holds_alternative<SFCGAL::Kernel::Point_3>(value)) {
+      SFCGAL::Kernel::Point_3 point = std::get<SFCGAL::Kernel::Point_3>(value);
+      boost::json::array      jsonPt;
+      jsonPt.emplace_back(CGAL::to_double(point.x()));
+      jsonPt.emplace_back(CGAL::to_double(point.y()));
+      jsonPt.emplace_back(CGAL::to_double(point.z()));
+      param["value"] = jsonPt;
+    } else if (std::holds_alternative<SFCGAL::Kernel::Vector_3>(value)) {
+      SFCGAL::Kernel::Vector_3 point =
+          std::get<SFCGAL::Kernel::Vector_3>(value);
+      boost::json::array jsonPt;
+      jsonPt.emplace_back(CGAL::to_double(point.x()));
+      jsonPt.emplace_back(CGAL::to_double(point.y()));
+      jsonPt.emplace_back(CGAL::to_double(point.z()));
+      param["value"] = jsonPt;
+    }
+  }
+
+  return param;
+}
+
 extern "C" auto
 sfcgal_primitive_parameters(const sfcgal_primitive_t *primitive, char **buffer,
-                            size_t                   *len) -> void
+                            size_t *len) -> void
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
       const auto *primitiveCast =
           reinterpret_cast<const SFCGAL::Primitive *>(primitive);
       boost::json::array params;
       for (const auto &[key, value] : primitiveCast->parameters()) {
-        boost::json::object param;
-        param["name"] = key;
-        if (std::holds_alternative<SFCGAL::Kernel::FT>(value)) {
-          param["type"] = "double";
-        } else if (std::holds_alternative<unsigned int>(value)) {
-          param["type"] = "int";
-        } else if (std::holds_alternative<SFCGAL::Kernel::Point_3>(value)) {
-          param["type"] = "point3";
-        } else if (std::holds_alternative<SFCGAL::Kernel::Vector_3>(value)) {
-          param["type"] = "vector3";
-        } else {
-          param["type"] = "unknown";
-        }
+        boost::json::object param = primitiveParamToJson(key, value);
         params.emplace_back(param);
       }
 
       std::string paramsStr = serialize(params);
-      alloc_and_copy(paramsStr, buffer, len); //
-  )
+      alloc_and_copy(paramsStr, buffer, len);)
+}
+
+extern "C" auto
+sfcgal_primitive_parameter(const sfcgal_primitive_t *primitive,
+                           const char *name, char **buffer, size_t *len) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      const auto *primitiveCast =
+          reinterpret_cast<const SFCGAL::Primitive *>(primitive);
+
+      const SFCGAL::PrimitiveParameter value = primitiveCast->parameter(name);
+      boost::json::object              param =
+          primitiveParamToJson(std::string(name), value, true);
+
+      std::string paramsStr = serialize(param);
+      alloc_and_copy(paramsStr, buffer, len);)
+}
+
+extern "C" auto
+sfcgal_primitive_set_parameter(sfcgal_primitive_t *primitive, const char *name,
+                               const char *jsonChars) -> void
+{
+  auto do_set_parameter = [](sfcgal_primitive_t *primitive, const char *name,
+                             const char *jsonChars) {
+    auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
+
+    boost::system::error_code ec;
+    boost::json::value        jsonValue = boost::json::parse(jsonChars, ec);
+    boost::json::object       jsonObj   = jsonValue.get_object();
+    if (ec) {
+      SFCGAL_ERROR(ec.message().c_str());
+      return;
+    }
+
+    const SFCGAL::PrimitiveParameter oldValue = primitiveCast->parameter(name);
+    SFCGAL::PrimitiveParameter       newValue;
+
+    if (std::holds_alternative<SFCGAL::Kernel::FT>(oldValue)) {
+      newValue = jsonObj["value"].to_number<double>();
+    } else if (std::holds_alternative<unsigned int>(oldValue)) {
+      newValue = jsonObj["value"].to_number<unsigned int>();
+    } else if (std::holds_alternative<SFCGAL::Kernel::Point_3>(oldValue)) {
+      boost::json::array      jsonPt = jsonObj["value"].get_array();
+      SFCGAL::Kernel::Point_3 point(jsonPt[0].get_double(),
+                                    jsonPt[1].get_double(),
+                                    jsonPt[2].get_double());
+      newValue = point;
+    } else if (std::holds_alternative<SFCGAL::Kernel::Vector_3>(oldValue)) {
+      boost::json::array      jsonPt = jsonObj["value"].get_array();
+      SFCGAL::Kernel::Point_3 point(jsonPt[0].get_double(),
+                                    jsonPt[1].get_double(),
+                                    jsonPt[2].get_double());
+      newValue = point;
+    }
+
+    primitiveCast->setParameter(name, newValue);
+  };
+
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      try {
+        do_set_parameter(primitive, name, jsonChars);
+      } catch (std::bad_alloc const &e) {
+        SFCGAL_ERROR(e.what());
+      } catch (...) { SFCGAL_ERROR("Json exception"); })
 }
 
 extern "C" auto

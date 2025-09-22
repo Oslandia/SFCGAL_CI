@@ -2337,7 +2337,8 @@ sfcgal_primitive_volume(const sfcgal_primitive_t *prim,
                         bool                      withDiscretization);
 
 /**
- * @brief Retrieves the list of primitive parameters as JSON array.
+ * @brief Retrieves the list of primitive parameters as JSON array of { name,
+ * type, value }.
  * @param primitive Pointer to the primitive.
  * @param[out] buffer the output buffer
  * @param[out] len the size of the @p buffer
@@ -2348,6 +2349,33 @@ sfcgal_primitive_volume(const sfcgal_primitive_t *prim,
 SFCGAL_API void
 sfcgal_primitive_parameters(const sfcgal_primitive_t *primitive, char **buffer,
                             size_t *len);
+
+/**
+ * @brief Retrieves the primitive parameter as JSON object { name, type, value
+ * }.
+ * @param primitive Pointer to the primitive.
+ * @param name parameter name to retrieve
+ * @param[out] buffer the output buffer
+ * @param[out] len the size of the @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_primitive_parameter(const sfcgal_primitive_t *primitive,
+                           const char *name, char **buffer, size_t *len);
+
+/**
+ * @brief Sets the value of a primitive parameter as JSON.
+ * @param primitive Pointer to the primitive.
+ * @param name Name of the parameter to set.
+ * @param parameter The new parameter value.
+ * @pre The parameter identified by @p name must exist.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_primitive_set_parameter(sfcgal_primitive_t *primitive, const char *name,
+                               const char *jsonValue);
 
 /**
  * @brief Retrieves the value of a primitive parameter as a double.
