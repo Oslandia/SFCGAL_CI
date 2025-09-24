@@ -26,7 +26,14 @@ public:
   SFCGAL::Kernel::FT m;
 
   /**
-   * Default constructor
+   * @brief Constructs a WeightedCentroid object.
+   *
+   * Initializes a weighted centroid with the given area, centroid vector, and
+   * mass.
+   *
+   * @param a Initial area (default = 0.0).
+   * @param c Initial centroid vector (default = zero vector).
+   * @param mTmp Initial mass or weight (default = 0.0).
    */
   WeightedCentroid(
       SFCGAL::Kernel::FT             a    = 0.0,
@@ -46,10 +53,12 @@ public:
  *
  * @warning Z component is ignored, geometries must be valid when projected in
  * the XY plane. Vertical geometries will generate an error.
- * @pre g is a valid geometry in 2D
+ * @param geom the input geometry
+ * @pre geom is a valid geometry in 2D
+ * @return A Point representing the 2D geometry centroid
  */
 SFCGAL_API std::unique_ptr<Point>
-           centroid(const Geometry &g);
+           centroid(const Geometry &geom);
 
 /**
  * @brief Returns the 3D centroid for a Geometry
@@ -58,75 +67,163 @@ SFCGAL_API std::unique_ptr<Point>
  * PostGIS one (https://postgis.net/docs/ST_Centroid.html). The weigth is
  * computed in the 3D space.
  *
- * @pre g is a valid geometry
+ * @param geom the input geometry
+ * @pre geom is a valid geometry
+ * @return A Point representing the 3D geometry centroid
  */
 SFCGAL_API std::unique_ptr<Point>
-           centroid3D(const Geometry &g);
+           centroid3D(const Geometry &geom);
 
 /**
- * Returns the weighted centroid for a Geometry
+ * @brief Computes the weighted centroid of a geometry.
+ *
+ * @param geom The input geometry for which the weighted centroid will be
+ * computed.
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the input geometry.
+ *
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const Geometry &g, bool enable3DComputation = false);
+weightedCentroid(const Geometry &geom, bool enable3DComputation = false);
 
 /**
- * Returns the weighted centroid for a Triangle
+ * @brief Computes the weighted centroid of a Triangle.
+ *
+ * @param triangle The input Triangle for which the weighted centroid will be
+ * computed.
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the input geometry.
+ *
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const Triangle &g, bool enable3DComputation = false);
+weightedCentroid(const Triangle &triangle, bool enable3DComputation = false);
 
 /**
- * Returns the weighted centroid for a Triangle
+ * @brief Computes the weighted centroid of a Triangle from 3 Point.
+ *
+ * @param pta The first Point of the Triangle
+ * @param ptb The second Point of the Triangle
+ * @param ptc The third Point of the Triangle
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the Triangle.
+ *
+ * @ingroup detail
+ */
+SFCGAL_API auto
+weightedCentroid(const Point &pta, const Point &ptb, const Point &ptc,
+                 bool enable3DComputation = false) -> WeightedCentroid;
+
+/**
+ * @brief Computes the weighted centroid of a LineString.
+ *
+ * @param lineString The input LineString for which the weighted centroid will
+ * be computed.
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the input geometry.
+ *
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const Point &a, const Point &b, const Point &c,
-                 bool enable3DComputation = false);
+weightedCentroid(const LineString &lineString,
+                 bool              enable3DComputation = false);
 
 /**
- * Returns the weighted centroid for a LineString
+ * @brief Computes the weighted centroid of a Polygon.
+ *
+ * @param polygon The input polygon for which the weighted centroid will be
+ * computed.
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the input geometry.
+ *
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const LineString &g, bool enable3DComputation = false);
+weightedCentroid(const Polygon &polygon, bool enable3DComputation = false);
 
 /**
- * Returns the weighted centroid for a Polygon
+ * @brief Computes the weighted centroid of a GeometryCollection.
+ *
+ *
+ * @param collection The input collection for which the weighted centroid will
+ * be computed.
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the input geometry.
+ *
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const Polygon &g, bool enable3DComputation = false);
+weightedCentroid(const GeometryCollection &collection,
+                 bool                      enable3DComputation = false);
 
 /**
- * Returns the weighted centroid for a GeometryCollection
+ * @brief Computes the weighted centroid of a TriangulatedSurface.
+ *
+ * @param tin The input TriangulatedSurface for which the weighted centroid will
+ * be computed.
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the input geometry.
+ *
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const GeometryCollection &g, bool enable3DComputation = false);
-
-/**
- * Returns the weighted centroid for a TriangulatedSurface
- * @ingroup detail
- */
-SFCGAL_API WeightedCentroid
-weightedCentroid(const TriangulatedSurface &g,
+weightedCentroid(const TriangulatedSurface &tin,
                  bool                       enable3DComputation = false);
 
 /**
- * Returns the weighted centroid for a PolyhedralSurface
+ * @brief Computes the weighted centroid of a PolyhedralSurface.
+ *
+ * @param surface The input PolyhedralSurface for which the weighted centroid
+ * will be computed.
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the input geometry.
+ *
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const PolyhedralSurface &g, bool enable3DComputation = false);
+weightedCentroid(const PolyhedralSurface &surface,
+                 bool                     enable3DComputation = false);
 
 /**
- * Returns the weighted centroid for a Solid
+ * @brief Computes the weighted centroid of a Solid.
+ *
+ * @param solid The input Solid for which the weighted centroid will be
+ * computed.
+ * @param enable3DComputation Optional flag (default: false). If set to true,
+ *        the function will take the Z-coordinate into account when computing
+ *        the centroid for 3D geometries.
+ *
+ * @return WeightedCentroid The weighted centroid of the input geometry.
+ *
  * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
-weightedCentroid(const Solid &g, bool enable3DComputation = false);
+weightedCentroid(const Solid &solid, bool enable3DComputation = false);
 
 } // namespace algorithm
 } // namespace SFCGAL
