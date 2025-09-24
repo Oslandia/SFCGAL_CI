@@ -35,6 +35,7 @@ namespace detail {
 
 namespace PS = CGAL::Polyline_simplification_2;
 
+/// \cond IGNORE
 using K   = CGAL::Projection_traits_xy_3<SFCGAL::Kernel>;
 using Vb  = PS::Vertex_base_2<K>;
 using Fb  = CGAL::Constrained_triangulation_face_base_2<K>;
@@ -52,6 +53,7 @@ using Cost                          = PS::Squared_distance_cost;
 
 // Type alias for our constraint order info with the specific Constraint_id type
 using ConstraintInfoType = ConstraintOrderInfo<Constraint_id>;
+/// \endcond
 
 /**
  * @brief Extracts points from a LineString to create a CGAL point vector
@@ -142,6 +144,7 @@ extractLineStringConstraints(const LineString &lineString, CT &ct,
  * @param ct The constrained triangulation to add to
  * @param constraintInfos Collection of constraint infos
  * @param geomIdx The geometry index
+ * @param polyIdx The polygon index
  * @param type The constraint type
  * @return true if constraint was added, false otherwise
  */
@@ -634,7 +637,6 @@ reconstructAllGeometries(
  * @brief Simplifies a LineString
  * @param lineString The LineString to simplify
  * @param threshold The simplification threshold
- * @param preserveTopology Whether to preserve topology
  * @param store The segment store for interpolation
  * @return A simplified geometry
  */
@@ -736,7 +738,6 @@ simplifyMultiLineString(const MultiLineString &multiLine, double threshold,
  * @brief Simplifies a Polygon
  * @param polygon The Polygon to simplify
  * @param threshold The simplification threshold
- * @param preserveTopology Whether to preserve topology
  * @return A simplified geometry
  */
 auto
