@@ -24,7 +24,7 @@
 
 namespace SFCGAL::detail::io {
 
-WktReader::WktReader(std::istream &s) : _reader(s) {}
+WktReader::WktReader(std::istream &inputStream) : _reader(inputStream) {}
 
 auto
 WktReader::readSRID() -> srid_t
@@ -175,7 +175,7 @@ WktReader::readGeometryType() -> GeometryType
 }
 
 void
-WktReader::readInnerPoint(Point &g)
+WktReader::readInnerPoint(Point &point)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -185,7 +185,7 @@ WktReader::readInnerPoint(Point &g)
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
   }
 
-  readPointCoordinate(g);
+  readPointCoordinate(point);
 
   if (!_reader.match(')')) {
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
@@ -193,7 +193,7 @@ WktReader::readInnerPoint(Point &g)
 }
 
 void
-WktReader::readInnerLineString(LineString &g)
+WktReader::readInnerLineString(LineString &lineString)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -208,7 +208,7 @@ WktReader::readInnerLineString(LineString &g)
     std::unique_ptr<Point> p(new Point());
 
     if (readPointCoordinate(*p)) {
-      g.addPoint(p.release());
+      lineString.addPoint(p.release());
     } else {
       BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
     }
@@ -220,7 +220,7 @@ WktReader::readInnerLineString(LineString &g)
     break;
   }
 
-  if (g.numPoints() < 2U) {
+  if (lineString.numPoints() < 2U) {
     BOOST_THROW_EXCEPTION(WktParseException(
         "WKT parse error, LineString should have at least 2 points"));
   }
@@ -231,7 +231,7 @@ WktReader::readInnerLineString(LineString &g)
 }
 
 void
-WktReader::readInnerPolygon(Polygon &g)
+WktReader::readInnerPolygon(Polygon &polygon)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -243,11 +243,11 @@ WktReader::readInnerPolygon(Polygon &g)
 
   for (int i = 0; !_reader.eof(); i++) {
     if (i == 0) {
-      readInnerLineString(g.exteriorRing());
+      readInnerLineString(polygon.exteriorRing());
     } else {
       std::unique_ptr<LineString> interiorRing(new LineString);
       readInnerLineString(*interiorRing);
-      g.addRing(interiorRing.release());
+      polygon.addRing(interiorRing.release());
     }
 
     // break if not followed by another ring
@@ -262,7 +262,7 @@ WktReader::readInnerPolygon(Polygon &g)
 }
 
 void
-WktReader::readInnerTriangle(Triangle &g)
+WktReader::readInnerTriangle(Triangle &triangle)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -299,7 +299,7 @@ WktReader::readInnerTriangle(Triangle &g)
                           "point for triangle"));
   }
 
-  g = Triangle(points[0], points[1], points[2]);
+  triangle = Triangle(points[0], points[1], points[2]);
 
   if (!_reader.match(')')) {
     BOOST_THROW_EXCEPTION(WktParseException(parseErrorMessage()));
@@ -311,7 +311,7 @@ WktReader::readInnerTriangle(Triangle &g)
 }
 
 void
-WktReader::readInnerMultiPoint(MultiPoint &g)
+WktReader::readInnerMultiPoint(MultiPoint &multiPoint)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -340,7 +340,7 @@ WktReader::readInnerMultiPoint(MultiPoint &g)
     }
 
     if (!p->isEmpty()) {
-      g.addGeometry(p.release());
+      multiPoint.addGeometry(p.release());
     }
 
     // break if not followed by another points
@@ -355,7 +355,7 @@ WktReader::readInnerMultiPoint(MultiPoint &g)
 }
 
 void
-WktReader::readInnerMultiLineString(MultiLineString &g)
+WktReader::readInnerMultiLineString(MultiLineString &multiLineString)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -370,7 +370,7 @@ WktReader::readInnerMultiLineString(MultiLineString &g)
     std::unique_ptr<LineString> lineString(new LineString());
     readInnerLineString(*lineString);
     if (!lineString->isEmpty()) {
-      g.addGeometry(lineString.release());
+      multiLineString.addGeometry(lineString.release());
     }
 
     // break if not followed by another points
@@ -385,7 +385,7 @@ WktReader::readInnerMultiLineString(MultiLineString &g)
 }
 
 void
-WktReader::readInnerMultiPolygon(MultiPolygon &g)
+WktReader::readInnerMultiPolygon(MultiPolygon &multiPolygon)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -400,7 +400,7 @@ WktReader::readInnerMultiPolygon(MultiPolygon &g)
     std::unique_ptr<Polygon> polygon(new Polygon());
     readInnerPolygon(*polygon);
     if (!polygon->isEmpty()) {
-      g.addGeometry(polygon.release());
+      multiPolygon.addGeometry(polygon.release());
     }
 
     // break if not followed by another points
@@ -415,7 +415,7 @@ WktReader::readInnerMultiPolygon(MultiPolygon &g)
 }
 
 void
-WktReader::readInnerGeometryCollection(GeometryCollection &g)
+WktReader::readInnerGeometryCollection(GeometryCollection &collection)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -430,7 +430,7 @@ WktReader::readInnerGeometryCollection(GeometryCollection &g)
     // read a full wkt geometry ex : POINT (2.0 6.0)
     Geometry *gg = readGeometry();
     if (!gg->isEmpty()) {
-      g.addGeometry(gg);
+      collection.addGeometry(gg);
     }
 
     // break if not followed by another points
@@ -445,7 +445,7 @@ WktReader::readInnerGeometryCollection(GeometryCollection &g)
 }
 
 void
-WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
+WktReader::readInnerTriangulatedSurface(TriangulatedSurface &tin)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -458,7 +458,7 @@ WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
   while (!_reader.eof()) {
     std::unique_ptr<Triangle> triangle(new Triangle());
     readInnerTriangle(*triangle);
-    g.addPatch(triangle.release());
+    tin.addPatch(triangle.release());
 
     if (!_reader.match(',')) {
       break;
@@ -471,7 +471,7 @@ WktReader::readInnerTriangulatedSurface(TriangulatedSurface &g)
 }
 
 void
-WktReader::readInnerPolyhedralSurface(PolyhedralSurface &g)
+WktReader::readInnerPolyhedralSurface(PolyhedralSurface &surface)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -484,7 +484,7 @@ WktReader::readInnerPolyhedralSurface(PolyhedralSurface &g)
   while (!_reader.eof()) {
     std::unique_ptr<Polygon> polygon(new Polygon());
     readInnerPolygon(*polygon);
-    g.addPatch(polygon.release());
+    surface.addPatch(polygon.release());
 
     // break if not followed by another points
     if (!_reader.match(',')) {
@@ -498,7 +498,7 @@ WktReader::readInnerPolyhedralSurface(PolyhedralSurface &g)
 }
 
 void
-WktReader::readInnerSolid(Solid &g)
+WktReader::readInnerSolid(Solid &solid)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -511,11 +511,11 @@ WktReader::readInnerSolid(Solid &g)
 
   for (int i = 0; !_reader.eof(); i++) {
     if (i == 0) {
-      readInnerPolyhedralSurface(g.exteriorShell());
+      readInnerPolyhedralSurface(solid.exteriorShell());
     } else {
       std::unique_ptr<PolyhedralSurface> shell(new PolyhedralSurface);
       readInnerPolyhedralSurface(*shell);
-      g.addInteriorShell(shell.release());
+      solid.addInteriorShell(shell.release());
     }
 
     // break if not followed by another points
@@ -531,7 +531,7 @@ WktReader::readInnerSolid(Solid &g)
 }
 
 void
-WktReader::readInnerMultiSolid(MultiSolid &g)
+WktReader::readInnerMultiSolid(MultiSolid &multiSolid)
 {
   if (_reader.imatch("EMPTY")) {
     return;
@@ -546,7 +546,7 @@ WktReader::readInnerMultiSolid(MultiSolid &g)
     std::unique_ptr<Solid> solid(new Solid());
     readInnerSolid(*solid);
     if (!solid->isEmpty()) {
-      g.addGeometry(solid.release());
+      multiSolid.addGeometry(solid.release());
     }
 
     // break if not followed by another points

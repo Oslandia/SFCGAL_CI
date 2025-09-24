@@ -23,18 +23,21 @@ namespace io {
  * read WKT geometry
  *
  * @warning M is ignored
- * @ŧodo take M in account?
+ * @todo take M in account?
  */
 class SFCGAL_API WktReader {
 public:
   /**
-   * read WKT from input stream
+   * Constructor: read WKT from input stream
+   *
+   * @param inputStream input stream from which WKT will be read
    */
-  WktReader(std::istream &s);
+  WktReader(std::istream &inputStream);
 
   /**
    * read an SRID, if present
    *
+   * @return SRID value
    */
   srid_t
   readSRID();
@@ -43,102 +46,140 @@ public:
    * read a geometry from a string
    *
    * @warning returns new instance
+   * @return pointer to newly created Geometry object
    */
   Geometry *
   readGeometry();
 
   /**
    * read geometry type
+   *
+   * @return GeometryType of the next geometry in the stream
    */
   GeometryType
   readGeometryType();
+
   /**
    * read coordinate type [Z][M]
+   *
+   * @return CoordinateType of the geometry
    */
   CoordinateType
   readCoordinateType();
 
   /**
-   * Read Point content from wkt
+   * Read Point content from WKT
    *
    * ex : (1.0 2.0 14.0)
+   *
+   * @param point Point object to fill with coordinates
    */
   void
-  readInnerPoint(Point &g);
+  readInnerPoint(Point &point);
+
   /**
-   * Read LineString content from wkt
+   * Read LineString content from WKT
    *
    * ex : (1.0 2.0,1.0,6.0)
+   *
+   * @param lineString LineString object to fill with coordinates
    */
   void
-  readInnerLineString(LineString &g);
+  readInnerLineString(LineString &lineString);
+
   /**
-   * Read Polygon content from wkt
+   * Read Polygon content from WKT
    *
    * ex : ((30 10, 10 20, 20 40, 40 40, 30 10))
+   *
+   * @param polygon Polygon object to fill with coordinates
    */
   void
-  readInnerPolygon(Polygon &g);
-  /**
-   * Read Triangle content from wkt
-   */
-  void
-  readInnerTriangle(Triangle &g);
+  readInnerPolygon(Polygon &polygon);
 
   /**
-   * Read MultiPoint content from wkt
+   * Read Triangle content from WKT
+   *
+   * @param triangle Triangle object to fill with coordinates
+   */
+  void
+  readInnerTriangle(Triangle &triangle);
+
+  /**
+   * Read MultiPoint content from WKT
    *
    * ex : (0.0 1.0,5.0 6.0) or ((0.0 4.0),(5.0 6.0))
+   *
+   * @param multiPoint MultiPoint object to fill with coordinates
    */
   void
-  readInnerMultiPoint(MultiPoint &g);
-  /**
-   * Read MultiLineString content from wkt
-   */
-  void
-  readInnerMultiLineString(MultiLineString &g);
-  /**
-   * Read MultiPolygon content from wkt
-   */
-  void
-  readInnerMultiPolygon(MultiPolygon &g);
+  readInnerMultiPoint(MultiPoint &multiPoint);
 
   /**
-   * Read GeometryCollection content from wkt
+   * Read MultiLineString content from WKT
+   *
+   * @param multiLineString MultiLineString object to fill with coordinates
    */
   void
-  readInnerGeometryCollection(GeometryCollection &g);
+  readInnerMultiLineString(MultiLineString &multiLineString);
 
   /**
-   * Read TriangulatedSurface content from wkt
+   * Read MultiPolygon content from WKT
+   *
+   * @param multiPolygon MultiPolygon object to fill with coordinates
    */
   void
-  readInnerTriangulatedSurface(TriangulatedSurface &g);
+  readInnerMultiPolygon(MultiPolygon &multiPolygon);
 
   /**
-   * Read PolyhedralSurface content from wkt
+   * Read GeometryCollection content from WKT
+   *
+   * @param collection GeometryCollection object to fill
    */
   void
-  readInnerPolyhedralSurface(PolyhedralSurface &g);
+  readInnerGeometryCollection(GeometryCollection &collection);
 
   /**
-   * Read Solid content from wkt
+   * Read TriangulatedSurface content from WKT
+   *
+   * @param tin TriangulatedSurface object to fill
    */
   void
-  readInnerSolid(Solid &g);
+  readInnerTriangulatedSurface(TriangulatedSurface &tin);
 
   /**
-   * Read MultiSolid content from wkt
+   * Read PolyhedralSurface content from WKT
+   *
+   * @param surface PolyhedralSurface object to fill
    */
   void
-  readInnerMultiSolid(MultiSolid &g);
+  readInnerPolyhedralSurface(PolyhedralSurface &surface);
+
+  /**
+   * Read Solid content from WKT
+   *
+   * @param solid Solid object to fill
+   */
+  void
+  readInnerSolid(Solid &solid);
+
+  /**
+   * Read MultiSolid content from WKT
+   *
+   * @param multiSolid MultiSolid object to fill
+   */
+  void
+  readInnerMultiSolid(MultiSolid &multiSolid);
 
   /**
    * Read coordinate from WKT
+   *
    * @todo ZM management
+   * @param point Point object to fill with coordinate
+   * @return true if coordinate was read successfully, false otherwise
    */
   bool
-  readPointCoordinate(Point &p);
+  readPointCoordinate(Point &point);
 
 private:
   /**
@@ -157,6 +198,8 @@ private:
 
   /**
    * returns default parse error message
+   *
+   * @return string containing error message
    */
   std::string
   parseErrorMessage();
