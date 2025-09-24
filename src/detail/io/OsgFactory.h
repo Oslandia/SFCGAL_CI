@@ -28,12 +28,16 @@ class SFCGAL_API OsgFactory {
 public:
   /**
    * create a osg::Geometry from a Point
+   * @param g SFCGAL geometry to convert
+   * @return OSG geometry representation
    */
   osg::Geometry *
   createGeometry(const Geometry &g);
 
   /**
    * create a osg::Vec3 from a Point
+   * @param g SFCGAL point to convert
+   * @return OSG 3D vector
    */
   osg::Vec3
   createVec3(const Point &g) const;
@@ -41,11 +45,17 @@ public:
 protected:
   /**
    * create a vertex and returns its position in a vertice array
+   * @param vertices OSG vertex array to add vertex to
+   * @param g SFCGAL point to convert to vertex
+   * @return Position index of the created vertex in the array
    */
   size_t
   createVertex(osg::Vec3Array *vertices, const Point &g);
   /**
    * create a vertex and returns its position in a vertice array
+   * @param vertices OSG vertex array to add vertex to
+   * @param g OSG 3D vector to add as vertex
+   * @return Position index of the created vertex in the array
    */
   size_t
   createVertex(osg::Vec3Array *vertices, const osg::Vec3 &g);
