@@ -47,6 +47,12 @@ public:
   {
   }
 
+  /**
+   * @brief Read and parse WKB data from input stream
+   *
+   * Parses the WKB header, handles endianness, and constructs the geometry.
+   * Must be called before accessing geometry(), preparedGeometry(), or srid().
+   */
   auto
   readWkb() -> void
   {
@@ -62,6 +68,7 @@ public:
    * Returns the geometry from the (E)WKB
    *
    * Must be used after readWkb
+   * @return Unique pointer to the parsed geometry
    */
   auto
   geometry() -> std::unique_ptr<SFCGAL::Geometry>
@@ -73,6 +80,7 @@ public:
    * Returns the prepared geometry from the (E)WKB
    *
    * Must be used after readWkb
+   * @return Unique pointer to a prepared geometry with SRID information
    */
   auto
   preparedGeometry() -> std::unique_ptr<SFCGAL::PreparedGeometry>
@@ -85,6 +93,7 @@ public:
    * Returns the srid from the (E)WKB
    *
    * Must be used after readWkb
+   * @return The spatial reference identifier from the WKB data
    */
   [[nodiscard]] auto
   srid() const -> srid_t
