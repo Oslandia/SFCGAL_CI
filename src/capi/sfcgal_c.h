@@ -1007,7 +1007,7 @@ sfcgal_solid_create();
 /**
  * Creates a SFCGAL::Solid from an exterior shell
  * @param shell the input geometry
- * @pre shell must be a SFCGAL::Solid
+ * @pre shell must be a SFCGAL::PolyhedralSurface
  * @post the ownership of the given shell is taken. The caller is not
  * responsible anymore of its deallocation
  * @ingroup capi
