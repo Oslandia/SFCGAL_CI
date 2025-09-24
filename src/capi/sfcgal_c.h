@@ -645,7 +645,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_polygon_create();
 
 /**
- * Creates an empty SFCGAL::Polygon from an extrior ring
+ * Creates an empty SFCGAL::Polygon from an exterior ring
  * @param ring the input geometry
  * @pre ring must be a SFCGAL::LineString
  * @post the ownership of the given ring is taken. The caller is not responsible
