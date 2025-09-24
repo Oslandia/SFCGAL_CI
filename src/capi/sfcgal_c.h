@@ -446,6 +446,8 @@ sfcgal_point_create();
 
 /**
  * Creates a point from two X and Y coordinates
+ * @param x X coordinate
+ * @param y Y coordinate
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -453,6 +455,9 @@ sfcgal_point_create_from_xy(double x, double y);
 
 /**
  * Creates a point from three X, Y and Z coordinates
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param z Z coordinate
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -460,6 +465,9 @@ sfcgal_point_create_from_xyz(double x, double y, double z);
 
 /**
  * Creates a point from three X, Y and M coordinates
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param m M coordinate
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -467,6 +475,10 @@ sfcgal_point_create_from_xym(double x, double y, double m);
 
 /**
  * Creates a point from four X, Y, Z and M coordinates
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param z Z coordinate
+ * @param m M coordinate
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
