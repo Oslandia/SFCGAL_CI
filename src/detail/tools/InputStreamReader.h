@@ -34,19 +34,27 @@ typedef BasicInputStreamReader<wchar_t> WInputStreamReader;
 template <typename CharType>
 class BasicInputStreamReader {
 public:
-  typedef CharType                                         char_type;
-  typedef typename std::basic_string<char_type>            string_type;
-  typedef typename std::basic_istream<char_type>           istream_type;
-  typedef typename std::basic_istream<char_type>::pos_type pos_type;
+  typedef CharType                                         char_type; ///< Character type for the reader
+  typedef typename std::basic_string<char_type>            string_type; ///< String type for the reader
+  typedef typename std::basic_istream<char_type>           istream_type; ///< Input stream type
+  typedef typename std::basic_istream<char_type>::pos_type pos_type; ///< Stream position type
 
-  /// \brief constructor with an input stream
+  /**
+   * @brief Constructor with an input stream
+   * @param s The input stream to read from
+   * @param skipWhiteSpaces Whether to skip white spaces during parsing
+   */
   BasicInputStreamReader(istream_type &s, bool skipWhiteSpaces = true)
       : _s(s), _states(), _skipWhiteSpaces(skipWhiteSpaces)
   {
     _s >> std::noskipws;
   }
 
-  /// \brief try to match a char in the input stream
+  /**
+   * @brief Try to match a char in the input stream
+   * @param c The character to match
+   * @return True if character matches
+   */
   bool
   match(char_type const &c)
   {
@@ -65,7 +73,11 @@ public:
     }
   }
 
-  /// \brief try to match a char in the input stream, case-insensitive variant
+  /**
+   * @brief Try to match a char in the input stream, case-insensitive variant
+   * @param c The character to match
+   * @return True if character matches (case-insensitive)
+   */
   bool
   imatch(char_type const &c)
   {
@@ -84,7 +96,11 @@ public:
     }
   }
 
-  /// \brief try to match a string in the input stream
+  /**
+   * @brief Try to match a string in the input stream
+   * @param str The string to match
+   * @return True if string matches
+   */
   bool
   match(string_type const &str)
   {
@@ -108,7 +124,11 @@ public:
     return true;
   }
 
-  /// \brief try to match a string in the input stream, case-insensitive variant
+  /**
+   * @brief Try to match a string in the input stream, case-insensitive variant
+   * @param str The string to match
+   * @return True if string matches (case-insensitive)
+   */
   bool
   imatch(string_type const &str)
   {
@@ -132,8 +152,11 @@ public:
     return true;
   }
 
-  /// \brief try to read a value in the input stream, restore state if read
-  /// fails
+  /**
+   * @brief Try to read a value in the input stream, restore state if read fails
+   * @param value Reference to store the read value
+   * @return True if read was successful
+   */
   template <typename T>
   bool
   read(T &value)
@@ -153,6 +176,11 @@ public:
     }
   }
 
+  /**
+   * @brief Read bytes from input stream into buffer
+   * @param buffer String buffer to store read bytes
+   * @param bytesToRead Number of bytes to read
+   */
   auto
   readBytes(std::string &buffer, size_t bytesToRead) -> void
   {
@@ -183,21 +211,29 @@ public:
     _states.pop();
   }
 
-  /// \brief test if read is complete (either tried to reader after eof, either
-  /// on eof)
+  /**
+   * @brief Test if read is complete (either tried to read after eof, either on eof)
+   * @return True if at end of stream
+   */
   bool
   eof() const
   {
     return _s.eof() || (_s.peek() == std::char_traits<char_type>::eof());
   }
 
-  /// \brief returns the wrapped stream
+  /**
+   * @brief Returns the wrapped stream
+   * @return Reference to the input stream
+   */
   inline istream_type &
   s()
   {
     return _s;
   }
-  /// \brief returns the wrapped stream
+  /**
+   * @brief Returns the wrapped stream
+   * @return Const reference to the input stream
+   */
   inline istream_type const &
   s() const
   {
@@ -205,7 +241,9 @@ public:
   }
 
   /**
-   * returns a string corresponding to the current state
+   * @brief Returns a string corresponding to the current state
+   * @param nMax Maximum number of characters to include in context
+   * @return String showing current stream context
    */
   string_type
   context(size_t nMax = 20)

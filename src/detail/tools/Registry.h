@@ -24,8 +24,8 @@ namespace tools {
  */
 class SFCGAL_API Registry {
 public:
-  typedef std::vector<Geometry *>::iterator       prototype_iterator;
-  typedef std::vector<Geometry *>::const_iterator const_prototype_iterator;
+  typedef std::vector<Geometry *>::iterator       prototype_iterator; ///< Iterator type for prototypes
+  typedef std::vector<Geometry *>::const_iterator const_prototype_iterator; ///< Const iterator type for prototypes
 
   /**
    * destructor
@@ -33,31 +33,38 @@ public:
   ~Registry();
 
   /**
-   * Register a new Geometry type
+   * @brief Register a new Geometry type
+   * @param g The geometry prototype to register
    */
   void
   addPrototype(const Geometry &g);
 
   /**
-   * returns the list of the geometry types
+   * @brief Returns the list of the geometry types
+   * @return Vector of geometry type names
    */
   std::vector<std::string>
   getGeometryTypes() const;
 
   /**
-   * returns a new instance of the given geometryTypeName
+   * @brief Returns a new instance of the given geometryTypeName
+   * @param geometryTypeName The name of the geometry type
+   * @return Pointer to new geometry instance
    */
   Geometry *
   newGeometryByTypeName(const std::string &geometryTypeName) const;
 
   /**
-   * returns a new instance of the given geometryType
+   * @brief Returns a new instance of the given geometryType
+   * @param typeId The geometry type ID
+   * @return Pointer to new geometry instance
    */
   Geometry *
   newGeometryByTypeId(int typeId) const;
 
   /**
-   * returns the instance of the registry
+   * @brief Returns the instance of the registry
+   * @return Reference to the singleton registry instance
    */
   static Registry &
   instance();

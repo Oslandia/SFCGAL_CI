@@ -16,7 +16,16 @@ namespace tools {
 /// http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
 class SFCGAL_API CharArrayBuffer : public std::streambuf {
 public:
+  /**
+   * @brief Constructor with begin and end pointers
+   * @param begin Pointer to start of character array
+   * @param end Pointer to end of character array
+   */
   CharArrayBuffer(const char *begin, const char *end);
+  /**
+   * @brief Constructor with null-terminated string
+   * @param str Null-terminated character string
+   */
   explicit CharArrayBuffer(const char *str);
 
 private:

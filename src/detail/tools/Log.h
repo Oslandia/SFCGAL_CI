@@ -86,6 +86,7 @@ public:
 
   /**
    * singleton accessor
+   * @return Pointer to the global Logger instance
    */
   static Logger *
   get();
@@ -114,11 +115,13 @@ public:
 
   /**
    * get the current log level
+   * @return The current logging level
    */
   const Level &
   logLevel() const;
   /**
    * set the log level
+   * @param logLevel The new log level to set
    */
   void
   setLogLevel(const Level &logLevel);
@@ -147,6 +150,7 @@ private:
 
 /**
  * get the logger
+ * @return Reference to the global logger instance
  */
 SFCGAL_API Logger &
 logger();
