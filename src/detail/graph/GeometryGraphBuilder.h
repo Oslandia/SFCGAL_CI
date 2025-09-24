@@ -29,12 +29,16 @@ namespace graph {
 template <typename Graph>
 class GeometryGraphBuilderT {
 public:
-  typedef Graph graph_t;
+  typedef Graph graph_t; ///< Graph type being used
 
-  typedef typename graph_t::vertex_properties vertex_properties;
-  typedef typename graph_t::edge_properties   edge_properties;
-  typedef typename graph_t::vertex_descriptor vertex_descriptor;
-  typedef typename graph_t::edge_descriptor   edge_descriptor;
+  typedef typename graph_t::vertex_properties
+      vertex_properties; ///< Vertex properties type
+  typedef typename graph_t::edge_properties
+      edge_properties; ///< Edge properties type
+  typedef typename graph_t::vertex_descriptor
+      vertex_descriptor; ///< Vertex descriptor type
+  typedef typename graph_t::edge_descriptor
+      edge_descriptor; ///< Edge descriptor type
 
   /**
    * allows to match duplicates
@@ -42,7 +46,8 @@ public:
   typedef std::map<Coordinate, vertex_descriptor> coordinate_list;
 
   /**
-   * default constructor
+   * @brief Default constructor
+   * @param graph The graph to build into
    */
   GeometryGraphBuilderT(graph_t &graph) : _graph(graph) {}
 
@@ -52,7 +57,9 @@ public:
   ~GeometryGraphBuilderT() {}
 
   /**
-   * add a Point to the Graph
+   * @brief Add a Point to the Graph
+   * @param point The point to add
+   * @return The vertex descriptor for the added point
    */
   vertex_descriptor
   addPoint(const Point &point)
@@ -73,8 +80,11 @@ public:
   }
 
   /**
-   * add a Point to the Graph
-   * @return the edge inserted into the graph
+   * @brief Add a line segment to the Graph
+   * @param a First point of the segment
+   * @param b Second point of the segment
+   * @param edgeProperties Properties for the edge
+   * @return The edge inserted into the graph
    */
   edge_descriptor
   addLineSegment(const Point &a, const Point &b,
@@ -87,8 +97,10 @@ public:
   }
 
   /**
-   * add a LineString to the graph
-   * @return the list of edges inserted into the graph
+   * @brief Add a LineString to the graph
+   * @param lineString The linestring to add
+   * @param edgeProperties Properties for the edges
+   * @return The list of edges inserted into the graph
    */
   std::vector<edge_descriptor>
   addLineString(const LineString      &lineString,
@@ -107,8 +119,10 @@ public:
   }
 
   /**
-   * add a Triangle to the graph
-   * @return the list of edges inserted into the graph
+   * @brief Add a Triangle to the graph
+   * @param triangle The triangle to add
+   * @param edgeProperties Properties for the edges
+   * @return The list of edges inserted into the graph
    */
   std::vector<edge_descriptor>
   addTriangle(const Triangle        &triangle,
@@ -127,8 +141,10 @@ public:
   }
 
   /**
-   * add a Polygon to the graph
-   * @returns the list of rings inserted into the graph
+   * @brief Add a Polygon to the graph
+   * @param polygon The polygon to add
+   * @param edgeProperties Properties for the edges
+   * @return The list of rings inserted into the graph
    */
   std::vector<std::vector<edge_descriptor>>
   addPolygon(const Polygon         &polygon,
@@ -146,8 +162,10 @@ public:
   }
 
   /**
-   * add a TriangulatedSurface to the graph
-   * @returns the list of rings inserted into the graph
+   * @brief Add a TriangulatedSurface to the graph
+   * @param triangulatedSurface The triangulated surface to add
+   * @param edgeProperties Properties for the edges
+   * @return The list of triangles inserted into the graph
    */
   std::vector<std::vector<edge_descriptor>>
   addTriangulatedSurface(
@@ -167,8 +185,10 @@ public:
   }
 
   /**
-   * add a PolyhedralSurface to the graph
-   * @returns the list of rings inserted into the graph
+   * @brief Add a PolyhedralSurface to the graph
+   * @param polyhedralSurface The polyhedral surface to add
+   * @param edgeProperties Properties for the edges
+   * @return The list of polygons inserted into the graph
    */
   std::vector<std::vector<std::vector<edge_descriptor>>>
   addPolyhedralSurface(
@@ -197,7 +217,8 @@ private:
   GeometryGraphBuilderT(const GeometryGraphBuilderT &other);
 };
 
-typedef GeometryGraphBuilderT<GeometryGraph> GeometryGraphBuilder;
+typedef GeometryGraphBuilderT<GeometryGraph>
+    GeometryGraphBuilder; ///< Geometry graph builder type
 
 } // namespace graph
 } // namespace SFCGAL
