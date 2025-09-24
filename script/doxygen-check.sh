@@ -65,6 +65,9 @@ fi
 echo "Files to check:"
 echo $CHANGED_FILES
 
+# add src/namespace.h because it contains the doxygen groups definition
+CHANGED_FILES="$CHANGED_FILES src/namespace.h"
+
 echo "INPUT = "${CHANGED_FILES} >> ${DOXYGEN_CONFIG_FILE}
 
 doxygen ${DOXYGEN_CONFIG_FILE}
