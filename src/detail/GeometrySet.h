@@ -50,14 +50,22 @@ struct PrimitiveHandle {
                          const typename Segment_d<Dim>::Type *,
                          const typename Surface_d<Dim>::Type *,
                          const typename Volume_d<Dim>::Type *>
-       Type;
-  Type handle;
+       Type;   ///< Variant type for storing different primitive pointers
+  Type handle; ///< The stored primitive handle
 
+  /**
+   * @brief Constructor from primitive pointer
+   * @param p Pointer to the primitive to store
+   */
   template <class T>
   PrimitiveHandle(const T *p) : handle(p)
   {
   }
 
+  /**
+   * @brief Cast handle to specific type
+   * @return Pointer to primitive of specified type
+   */
   template <class T>
   inline const T *
   as() const
@@ -71,19 +79,21 @@ template <int Dim>
 struct PrimitiveBox {
   typedef CGAL::Box_intersection_d::Box_with_handle_d<double, Dim,
                                                       PrimitiveHandle<Dim> *>
-      Type;
+      Type; ///< CGAL box type with handle for intersection operations
 };
 
 /// BoxCollection for use with CGAL::Box_intersection_d
 template <int Dim>
 struct BoxCollection {
-  typedef std::vector<typename PrimitiveBox<Dim>::Type> Type;
+  typedef std::vector<typename PrimitiveBox<Dim>::Type>
+      Type; ///< Vector of primitive boxes
 };
 
 /// HandleCollection. Used to store PrimitiveHandle
 template <int Dim>
 struct HandleCollection {
-  typedef std::list<PrimitiveHandle<Dim>> Type;
+  typedef std::list<PrimitiveHandle<Dim>>
+      Type; ///< List type for storing primitive handles
 };
 
 /// Flags available for each type of Geometry type.
@@ -98,37 +108,75 @@ enum ElementFlag {
 template <class Primitive>
 class CollectionElement {
 public:
+  /**
+   * @brief Get element flags
+   * @return The flags associated with this element
+   */
   int
   flags() const
   {
     return _flags;
   }
+  /**
+   * @brief Set element flags
+   * @param flags The flags to set for this element
+   */
   void
   setFlags(int flags)
   {
     _flags = flags;
   }
 
+  /**
+   * @brief Get mutable reference to primitive
+   * @return Reference to the underlying primitive
+   */
   Primitive &
   primitive()
   {
     return _primitive;
   }
+  /**
+   * @brief Get const reference to primitive
+   * @return Const reference to the underlying primitive
+   */
   const Primitive &
   primitive() const
   {
     return _primitive;
   }
 
-  // constructor from Primitive
+  /**
+   * @brief Default constructor
+   */
   CollectionElement() : _flags(0) {}
+
+  /**
+   * @brief Constructor from primitive
+   * @param p The primitive to wrap
+   */
   CollectionElement(const Primitive &p) : _primitive(p), _flags(0) {}
+
+  /**
+   * @brief Constructor from primitive with flags
+   * @param p The primitive to wrap
+   * @param f The initial flags
+   */
   CollectionElement(const Primitive &p, int f) : _primitive(p), _flags(f) {}
 
+  /**
+   * @brief Copy constructor
+   * @param other The element to copy from
+   */
   CollectionElement(const CollectionElement &other)
       : _primitive(other._primitive), _flags(other._flags)
   {
   }
+  /**
+   * @brief Less-than comparison operator
+   * @param other The element to compare with
+   * @return True if this element is less than other
+   */
   bool
   operator<(const CollectionElement &other) const
   {
@@ -140,11 +188,20 @@ private:
   int       _flags;
 };
 
+/**
+ * Stream output operator for a CollectionElement.
+ *
+ * @tparam Primitive The type of the underlying primitive stored in the
+ * CollectionElement.
+ * @param ostr The output stream to write to.
+ * @param collection The CollectionElement to display.
+ * @return The output stream after writing the CollectionElement.
+ */
 template <class Primitive>
 std::ostream &
-operator<<(std::ostream &ostr, const CollectionElement<Primitive> &p)
+operator<<(std::ostream &ostr, const CollectionElement<Primitive> &collection)
 {
-  ostr << p.primitive() << " flags: " << p.flags();
+  ostr << collection.primitive() << " flags: " << collection.flags();
   return ostr;
 }
 
@@ -157,56 +214,68 @@ class GeometrySet {
 public:
   // Points are stored in an ordered set
   typedef std::set<CollectionElement<typename Point_d<Dim>::Type>>
-      PointCollection;
+      PointCollection; ///< Collection type for storing points
   // Segments are stored in an ordered set
   typedef std::set<CollectionElement<typename Segment_d<Dim>::Type>>
-      SegmentCollection;
+      SegmentCollection; ///< Collection type for storing segments
   typedef std::list<CollectionElement<typename Surface_d<Dim>::Type>>
-      SurfaceCollection;
+      SurfaceCollection; ///< Collection type for storing surfaces
   typedef std::list<CollectionElement<typename Volume_d<Dim>::Type>>
-      VolumeCollection;
+      VolumeCollection; ///< Collection type for storing volumes
 
   GeometrySet();
 
   /**
    * Construct a GeometrySet from a SFCGAL::Geometry
+   * @param g The geometry to convert to GeometrySet
    */
   GeometrySet(const Geometry &g);
 
   /**
    * Construct a GeometrySet from a Point
+   * @param g The point to add to the set
+   * @param flags Optional flags for the point
    */
   GeometrySet(const typename TypeForDimension<Dim>::Point &g, int flags = 0);
 
   /**
    * Construct a GeometrySet from a Segment
+   * @param g The segment to add to the set
+   * @param flags Optional flags for the segment
    */
   GeometrySet(const typename TypeForDimension<Dim>::Segment &g, int flags = 0);
 
   /**
    * Construct a GeometrySet from a Surface
+   * @param g The surface to add to the set
+   * @param flags Optional flags for the surface
    */
   GeometrySet(const typename TypeForDimension<Dim>::Surface &g, int flags = 0);
 
   /**
    * Construct a GeometrySet from a Volume
+   * @param g The volume to add to the set
+   * @param flags Optional flags for the volume
    */
   GeometrySet(const typename TypeForDimension<Dim>::Volume &g, int flags = 0);
 
   /**
    * Add primitives from another set
+   * @param g The geometry set to merge from
    */
   void
   merge(const GeometrySet<Dim> &g);
 
   /**
    * Add a geometry by decomposing it into CGAL primitives
+   * @param g The geometry to decompose and add
    */
   void
   addGeometry(const Geometry &g);
 
   /**
    * add a primitive from a PrimitiveHandle  to the set
+   * @param p The primitive handle to add
    */
   void
   addPrimitive(const PrimitiveHandle<Dim> &p);
@@ -214,15 +283,24 @@ public:
   /**
    * add a primitive from a CGAL::Object to the set
    * pointsAsRing : if set to true, build a polygon if o is a vector of points
+   * @param o The CGAL object to add as primitive
+   * @param pointsAsRing If true, build polygon from point vector
    */
   void
   addPrimitive(const CGAL::Object &o, bool pointsAsRing = false);
 
   /**
    * add a point to the set
+   * @param g The point to add
+   * @param flags Optional flags for the point
    */
   void
   addPrimitive(const typename TypeForDimension<Dim>::Point &g, int flags = 0);
+  /**
+   * @brief Add multiple points from iterator range
+   * @param ibegin Iterator to first point
+   * @param iend Iterator to end of points
+   */
   template <class IT>
   void
   addPoints(IT ibegin, IT iend)
@@ -232,15 +310,23 @@ public:
 
   /**
    * collect all points of b and add them to the point list
+   * @param b The primitive handle to extract points from
    */
   void
   collectPoints(const PrimitiveHandle<Dim> &b);
 
   /**
    * add a segment to the set
+   * @param g The segment to add
+   * @param flags Optional flags for the segment
    */
   void
   addPrimitive(const typename TypeForDimension<Dim>::Segment &g, int flags = 0);
+  /**
+   * @brief Add multiple segments from iterator range
+   * @param ibegin Iterator to first segment
+   * @param iend Iterator to end of segments
+   */
   template <class IT>
   void
   addSegments(IT ibegin, IT iend)
@@ -250,9 +336,16 @@ public:
 
   /**
    * add a surface to the set
+   * @param g The surface to add
+   * @param flags Optional flags for the surface
    */
   void
   addPrimitive(const typename TypeForDimension<Dim>::Surface &g, int flags = 0);
+  /**
+   * @brief Add multiple surfaces from iterator range
+   * @param ibegin Iterator to first surface
+   * @param iend Iterator to end of surfaces
+   */
   template <class IT>
   void
   addSurfaces(IT ibegin, IT iend)
@@ -262,9 +355,16 @@ public:
 
   /**
    * add a volume to the set
+   * @param g The volume to add
+   * @param flags Optional flags for the volume
    */
   void
   addPrimitive(const typename TypeForDimension<Dim>::Volume &g, int flags = 0);
+  /**
+   * @brief Add multiple volumes from iterator range
+   * @param ibegin Iterator to first volume
+   * @param iend Iterator to end of volumes
+   */
   template <class IT>
   void
   addVolumes(IT ibegin, IT iend)
@@ -279,67 +379,104 @@ public:
    * 1 : there are segments
    * 2 : there are surfaces
    * 3 : there are volumes
+   * @return The maximum dimension of geometries in the set
    */
   int
   dimension() const;
 
   /**
    * Add the boundary (segments) of a surface
+   * @param surface The surface whose boundary to add
    */
   void
   addBoundary(const typename TypeForDimension<Dim>::Surface &surface);
 
   /**
    * Add the boundary (surfaces) of a volume
+   * @param volume The volume whose boundary to add
    */
   void
   addBoundary(const typename TypeForDimension<Dim>::Volume &volume);
 
   /**
    * Compute all bounding boxes and handles of the set
+   * @param handles Output collection to store primitive handles
+   * @param boxes Output collection to store bounding boxes
    */
   void
   computeBoundingBoxes(typename HandleCollection<Dim>::Type &handles,
                        typename BoxCollection<Dim>::Type    &boxes) const;
 
+  /**
+   * @brief Get mutable reference to point collection
+   * @return Reference to the point collection
+   */
   inline PointCollection &
   points()
   {
     return _points;
   }
+  /**
+   * @brief Get const reference to point collection
+   * @return Const reference to the point collection
+   */
   inline const PointCollection &
   points() const
   {
     return _points;
   }
 
+  /**
+   * @brief Get mutable reference to segment collection
+   * @return Reference to the segment collection
+   */
   inline SegmentCollection &
   segments()
   {
     return _segments;
   }
+  /**
+   * @brief Get const reference to segment collection
+   * @return Const reference to the segment collection
+   */
   inline const SegmentCollection &
   segments() const
   {
     return _segments;
   }
 
+  /**
+   * @brief Get mutable reference to surface collection
+   * @return Reference to the surface collection
+   */
   inline SurfaceCollection &
   surfaces()
   {
     return _surfaces;
   }
+  /**
+   * @brief Get const reference to surface collection
+   * @return Const reference to the surface collection
+   */
   inline const SurfaceCollection &
   surfaces() const
   {
     return _surfaces;
   }
 
+  /**
+   * @brief Get mutable reference to volume collection
+   * @return Reference to the volume collection
+   */
   inline VolumeCollection &
   volumes()
   {
     return _volumes;
   }
+  /**
+   * @brief Get const reference to volume collection
+   * @return Const reference to the volume collection
+   */
   inline const VolumeCollection &
   volumes() const
   {
@@ -348,33 +485,39 @@ public:
 
   /**
    * Returns true if the set holds points
+   * @return True if the set contains points
    */
   bool
   hasPoints() const;
   /**
    * Returns true if the set holds segments
+   * @return True if the set contains segments
    */
   bool
   hasSegments() const;
   /**
    * Returns true if the set holds surfaces
+   * @return True if the set contains surfaces
    */
   bool
   hasSurfaces() const;
   /**
    * Returns true if the set holds volumes
+   * @return True if the set contains volumes
    */
   bool
   hasVolumes() const;
 
   /**
    * convert the set to a SFCGAL::Geometry
+   * @return Unique pointer to the recomposed geometry
    */
   std::unique_ptr<Geometry>
   recompose() const;
 
   /**
    * Filter (remove) primitives that are already covered by others
+   * @param output The output geometry set with filtered primitives
    */
   void
   filterCovered(GeometrySet<Dim> &output) const;
@@ -391,22 +534,50 @@ private:
   VolumeCollection  _volumes;
 };
 
-/// Display operator
-SFCGAL_API std::ostream            &
-operator<<(std::ostream &, const GeometrySet<2> &g);
-/// Display operator
-SFCGAL_API std::ostream            &
-operator<<(std::ostream &, const GeometrySet<3> &g);
+/**
+ * Display operator for 2D GeometrySet.
+ *
+ * @param ostr The output stream to write to.
+ * @param geomSet The 2D GeometrySet to display.
+ * @return The output stream after writing the GeometrySet.
+ */
+SFCGAL_API auto
+operator<<(std::ostream &ostr, const GeometrySet<2> &geomSet) -> std::ostream &;
 
-// bbox of a 'volume' for 2D, will never be called
-inline CGAL::Bbox_2
-compute_solid_bbox(const NoVolume &, dim_t<2>)
+/**
+ * Display operator for 3D GeometrySet.
+ *
+ * @param ostr The output stream to write to.
+ * @param geomSet The 3D GeometrySet to display.
+ * @return The output stream after writing the GeometrySet.
+ */
+SFCGAL_API auto
+operator<<(std::ostream &ostr, const GeometrySet<3> &geomSet) -> std::ostream &;
+
+/**
+ * Compute the bounding box of a volume in 2D.
+ *
+ * This overload is for the `NoVolume` type and will never be called in
+ * practice.
+ *
+ * @return An empty 2D bounding box.
+ */
+inline auto
+compute_solid_bbox(const NoVolume &, dim_t<2>) -> CGAL::Bbox_2
 {
   return CGAL::Bbox_2();
 }
 
-inline CGAL::Bbox_3
+/**
+ * Compute the bounding box of a 3D volume.
+ *
+ * @param vol The volume whose bounding box is to be computed.
+ * @return The bounding box of the volume as a CGAL::Bbox_3.
+ *
+ */
+inline auto
 compute_solid_bbox(const TypeForDimension<3>::Volume &vol, dim_t<3>)
+    -> CGAL::Bbox_3
 {
   BOOST_ASSERT(vol.size_of_vertices());
   MarkedPolyhedron::Point_const_iterator pit = vol.points_begin();

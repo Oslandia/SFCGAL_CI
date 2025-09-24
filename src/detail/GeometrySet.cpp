@@ -55,6 +55,7 @@ operator<(const CGAL::Segment_3<SFCGAL::Kernel> &sega,
 
 namespace SFCGAL::detail {
 
+/// \cond IGNORE
 void
 _decompose_triangle(const Triangle                    &tri,
                     GeometrySet<2>::SurfaceCollection &surfaces,
@@ -132,6 +133,7 @@ _decompose_solid(const Solid &solid, GeometrySet<3>::VolumeCollection &volumes,
 
   volumes.emplace_back(p);
 }
+/// \endcond
 
 template <int Dim>
 GeometrySet<Dim>::GeometrySet() = default;
@@ -191,6 +193,10 @@ GeometrySet<Dim>::addGeometry(const Geometry &g)
   _decompose(g);
 }
 
+/**
+ * @brief Add primitive to 2D geometry set from primitive handle
+ * @param p The primitive handle to add
+ */
 template <>
 void
 GeometrySet<2>::addPrimitive(const PrimitiveHandle<2> &p)
@@ -215,6 +221,10 @@ GeometrySet<2>::addPrimitive(const PrimitiveHandle<2> &p)
   }
 }
 
+/**
+ * @brief Add primitive to 3D geometry set from primitive handle
+ * @param p The primitive handle to add
+ */
 template <>
 void
 GeometrySet<3>::addPrimitive(const PrimitiveHandle<3> &p)
@@ -244,6 +254,11 @@ GeometrySet<3>::addPrimitive(const PrimitiveHandle<3> &p)
   }
 }
 
+/**
+ * @brief Add primitive to 3D geometry set from CGAL object
+ * @param o The CGAL object to add as primitive
+ * @param pointsAsRing If true, build polygon from point vector
+ */
 template <>
 void
 GeometrySet<3>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
@@ -284,6 +299,11 @@ GeometrySet<3>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
   }
 }
 
+/**
+ * @brief Add primitive to 2D geometry set from CGAL object
+ * @param o The CGAL object to add as primitive
+ * @param pointsAsRing If true, build polygon from point vector
+ */
 template <>
 void
 GeometrySet<2>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
@@ -345,6 +365,11 @@ GeometrySet<Dim>::addPrimitive(const typename TypeForDimension<Dim>::Segment &p,
   _segments.insert(CollectionElement<typename Segment_d<Dim>::Type>(p, flags));
 }
 
+/**
+ * @brief Add 2D surface primitive to geometry set
+ * @param p The surface to add
+ * @param flags Optional flags for the surface
+ */
 template <>
 void
 GeometrySet<2>::addPrimitive(const TypeForDimension<2>::Surface &p, int flags)
@@ -353,6 +378,11 @@ GeometrySet<2>::addPrimitive(const TypeForDimension<2>::Surface &p, int flags)
   _surfaces.emplace_back(p);
   _surfaces.back().setFlags(flags);
 }
+/**
+ * @brief Add 3D surface primitive to geometry set
+ * @param p The surface to add
+ * @param flags Optional flags for the surface
+ */
 template <>
 void
 GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Surface &p, int flags)
@@ -361,12 +391,24 @@ GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Surface &p, int flags)
   _surfaces.back().setFlags(flags);
 }
 
+/**
+ * @brief Add 2D volume primitive to geometry set (no-op for 2D)
+ * @param volume The volume (unused in 2D)
+ * @param flags The flags (unused)
+ */
 template <>
 void
-GeometrySet<2>::addPrimitive(const TypeForDimension<2>::Volume &, int)
+GeometrySet<2>::addPrimitive(
+    [[maybe_unused]] const TypeForDimension<2>::Volume &volume,
+    [[maybe_unused]] int                                flags)
 {
 }
 
+/**
+ * @brief Add 3D volume primitive to geometry set
+ * @param p The volume to add
+ * @param flags Optional flags for the volume
+ */
 template <>
 void
 GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Volume &p, int flags)
@@ -411,12 +453,20 @@ GeometrySet<Dim>::hasSegments() const -> bool
   return !segments().empty();
 }
 
+/**
+ * @brief Check if 2D geometry set has surfaces
+ * @return True if the set contains surfaces
+ */
 template <>
 auto
 GeometrySet<2>::hasSurfaces() const -> bool
 {
   return !surfaces().empty();
 }
+/**
+ * @brief Check if 3D geometry set has surfaces
+ * @return True if the set contains surfaces or volumes
+ */
 template <>
 auto
 GeometrySet<3>::hasSurfaces() const -> bool
@@ -436,12 +486,20 @@ GeometrySet<3>::hasSurfaces() const -> bool
   return false;
 }
 
+/**
+ * @brief Check if 2D geometry set has volumes
+ * @return Always false for 2D sets
+ */
 template <>
 auto
 GeometrySet<2>::hasVolumes() const -> bool
 {
   return false;
 }
+/**
+ * @brief Check if 3D geometry set has volumes
+ * @return True if the set contains volumes
+ */
 template <>
 auto
 GeometrySet<3>::hasVolumes() const -> bool
@@ -571,6 +629,7 @@ GeometrySet<Dim>::computeBoundingBoxes(
   }
 }
 
+/// \cond IGNORE
 template <int Dim>
 void
 recompose_points(const typename GeometrySet<Dim>::PointCollection &points,
@@ -584,15 +643,30 @@ recompose_points(const typename GeometrySet<Dim>::PointCollection &points,
     rpoints.push_back(new Point(it->primitive()));
   }
 }
+/// \endcond
 
-// compare less than
+/**
+ * @brief Comparator for sorting points lexicographically
+ */
 struct ComparePoints {
+  /**
+   * @brief Compare 2D points lexicographically
+   * @param lhs Left-hand side point
+   * @param rhs Right-hand side point
+   * @return True if lhs is lexicographically smaller than rhs
+   */
   auto
   operator()(const CGAL::Point_2<Kernel> &lhs,
              const CGAL::Point_2<Kernel> &rhs) const -> bool
   {
     return lhs.x() == rhs.x() ? lhs.y() < rhs.y() : lhs.x() < rhs.x();
   }
+  /**
+   * @brief Compare 3D points lexicographically
+   * @param lhs Left-hand side point
+   * @param rhs Right-hand side point
+   * @return True if lhs is lexicographically smaller than rhs
+   */
   auto
   operator()(const CGAL::Point_3<Kernel> &lhs,
              const CGAL::Point_3<Kernel> &rhs) const -> bool
@@ -603,6 +677,7 @@ struct ComparePoints {
   }
 };
 
+/// \cond IGNORE
 template <int Dim>
 void
 recompose_segments(const typename GeometrySet<Dim>::SegmentCollection &segments,
@@ -827,6 +902,7 @@ recompose_volumes(const GeometrySet<3>::VolumeCollection &volumes,
     }
   }
 }
+/// \endcond
 
 template <int Dim>
 auto
@@ -886,6 +962,7 @@ GeometrySet<Dim>::recompose() const -> std::unique_ptr<Geometry>
   return std::unique_ptr<Geometry>(ret);
 }
 
+/// \cond IGNORE
 void
 _collect_points(const CGAL::Polygon_with_holes_2<Kernel> &poly,
                 GeometrySet<2>::PointCollection          &points)
@@ -926,6 +1003,7 @@ _collect_points(const MarkedPolyhedron          &poly,
     points.insert(vit->point());
   }
 }
+/// \endcond
 
 template <int Dim>
 void
@@ -962,6 +1040,7 @@ GeometrySet<Dim>::collectPoints(const PrimitiveHandle<Dim> &pa)
   }
 }
 
+/// \cond IGNORE
 template <int Dim, class IT>
 void
 _filter_covered(IT ibegin, IT iend, GeometrySet<Dim> &output)
@@ -996,7 +1075,12 @@ _filter_covered(IT ibegin, IT iend, GeometrySet<Dim> &output)
     }
   }
 }
+/// \endcond
 
+/**
+ * @brief Add boundary segments from 2D surface
+ * @param surface The surface whose boundary to add
+ */
 template <>
 void
 GeometrySet<2>::addBoundary(const TypeForDimension<2>::Surface &surface)
@@ -1009,13 +1093,23 @@ GeometrySet<2>::addBoundary(const TypeForDimension<2>::Surface &surface)
   }
 }
 
+/**
+ * @brief Add boundary from 3D surface (not implemented)
+ * @param surface The surface (unused)
+ */
 template <>
 void
-GeometrySet<3>::addBoundary(const TypeForDimension<3>::Surface & /*unused*/)
+GeometrySet<3>::addBoundary(
+    [[maybe_unused]] const TypeForDimension<3>::Surface &surface)
 {
   // TODO
 }
 
+/**
+ * @brief Get maximum geometry dimension for 2D set
+ * @return Maximum dimension (2 for surfaces, 1 for segments, 0 for points, -1
+ * if empty)
+ */
 template <>
 auto
 GeometrySet<2>::dimension() const -> int
@@ -1035,6 +1129,11 @@ GeometrySet<2>::dimension() const -> int
   return -1;
 }
 
+/**
+ * @brief Get maximum geometry dimension for 3D set
+ * @return Maximum dimension (3 for closed volumes, 2 for surfaces, 1 for
+ * segments, 0 for points, -1 if empty)
+ */
 template <>
 auto
 GeometrySet<3>::dimension() const -> int
@@ -1075,43 +1174,43 @@ GeometrySet<Dim>::filterCovered(GeometrySet<Dim> &output) const
 }
 
 auto
-operator<<(std::ostream &ostr, const GeometrySet<2> &g) -> std::ostream &
+operator<<(std::ostream &ostr, const GeometrySet<2> &geomSet) -> std::ostream &
 {
   ostr << "points: ";
   std::ostream_iterator<CollectionElement<Point_d<2>::Type>> const out_pt(ostr,
                                                                           ", ");
-  std::copy(g.points().begin(), g.points().end(), out_pt);
+  std::copy(geomSet.points().begin(), geomSet.points().end(), out_pt);
   ostr << '\n' << "segments: ";
   std::ostream_iterator<CollectionElement<Segment_d<2>::Type>> const out_seg(
       ostr, ", ");
-  std::copy(g.segments().begin(), g.segments().end(), out_seg);
+  std::copy(geomSet.segments().begin(), geomSet.segments().end(), out_seg);
   ostr << '\n' << "surfaces: ";
   std::ostream_iterator<CollectionElement<Surface_d<2>::Type>> const out_surf(
       ostr, ", ");
-  std::copy(g.surfaces().begin(), g.surfaces().end(), out_surf);
+  std::copy(geomSet.surfaces().begin(), geomSet.surfaces().end(), out_surf);
   ostr << '\n';
   return ostr;
 }
 
 auto
-operator<<(std::ostream &ostr, const GeometrySet<3> &g) -> std::ostream &
+operator<<(std::ostream &ostr, const GeometrySet<3> &geomSet) -> std::ostream &
 {
   ostr << "points: ";
   std::ostream_iterator<CollectionElement<Point_d<3>::Type>> const out_pt(ostr,
                                                                           ", ");
-  std::copy(g.points().begin(), g.points().end(), out_pt);
+  std::copy(geomSet.points().begin(), geomSet.points().end(), out_pt);
   ostr << '\n' << "segments: ";
   std::ostream_iterator<CollectionElement<Segment_d<3>::Type>> const out_seg(
       ostr, ", ");
-  std::copy(g.segments().begin(), g.segments().end(), out_seg);
+  std::copy(geomSet.segments().begin(), geomSet.segments().end(), out_seg);
   ostr << '\n' << "surfaces: ";
   std::ostream_iterator<CollectionElement<Surface_d<3>::Type>> const out_surf(
       ostr, ", ");
-  std::copy(g.surfaces().begin(), g.surfaces().end(), out_surf);
+  std::copy(geomSet.surfaces().begin(), geomSet.surfaces().end(), out_surf);
   ostr << '\n' << "volumes: ";
   std::ostream_iterator<CollectionElement<Volume_d<3>::Type>> const out_vol(
       ostr, ", ");
-  std::copy(g.volumes().begin(), g.volumes().end(), out_vol);
+  std::copy(geomSet.volumes().begin(), geomSet.volumes().end(), out_vol);
   ostr << '\n';
   return ostr;
 }
