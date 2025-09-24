@@ -22,9 +22,11 @@ namespace SFCGAL::triangulate {
 struct VertexInfo2 {
   VertexInfo2() = default;
 
-  const CGAL::Point_3<Kernel> *original{nullptr};
+  const CGAL::Point_3<Kernel> *original{
+      nullptr}; ///< Pointer to original 3D coordinates
 };
 
+/// \cond IGNORE
 using triangulation_vertex_base =
     CGAL::Triangulation_vertex_base_with_info_2<VertexInfo2, Kernel>;
 using triangulation_data_structure =
@@ -32,8 +34,18 @@ using triangulation_data_structure =
 
 using Triangulation =
     CGAL::Delaunay_triangulation_2<Kernel, triangulation_data_structure>;
+/// \endcond
 
-/// input polyhedron must have its planes computed
+/**
+ * @brief Triangulates a 3D polyhedron and adds the resulting triangles to a
+ * geometry set.
+ *
+ * The input polyhedron must have its planes computed.
+ *
+ * @param[in] polyhedron The input MarkedPolyhedron to triangulate.
+ * @param[out] geometry The GeometrySet<3> where the resulting triangles are
+ * added.
+ */
 void
 triangulate(const MarkedPolyhedron &polyhedron, GeometrySet<3> &geometry)
 {
@@ -92,6 +104,14 @@ triangulate(const MarkedPolyhedron &polyhedron, GeometrySet<3> &geometry)
   }
 }
 
+/**
+ * @brief Triangulates a 2D polygon with holes and adds the resulting geometry
+ * to a set.
+ *
+ * @param[in] polygon The input CGAL::Polygon_with_holes_2 to triangulate.
+ * @param[out] output The GeometrySet<2> where the resulting triangles/patches
+ * are added.
+ */
 void
 triangulate(const CGAL::Polygon_with_holes_2<Kernel> &polygon,
             GeometrySet<2>                           &output)
