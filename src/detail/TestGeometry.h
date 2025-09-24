@@ -8,15 +8,25 @@
 
 namespace SFCGAL {
 
+/**
+ * @brief Test geometry structure for validation testing
+ *
+ * Contains a WKT string, validity flag, and descriptive comment
+ * for use in geometry validation test suites.
+ */
 struct TestGeometry {
-  const std::string wkt;
-  const bool        isValid;
-  const std::string comment;
+  const std::string wkt;     ///< Well-Known Text representation
+  const bool        isValid; ///< Whether geometry should be valid
+  const std::string comment; ///< Test case description
 };
 
-// include poly with touching holes that disconnect interior
-//
-
+/**
+ * @brief Creates a set of test geometries for validation purposes.
+ * Include poly with touching holes that disconnect interior
+ *
+ * @return std::vector<TestGeometry> A vector containing all the test
+ * geometries.
+ */
 inline const std::vector<TestGeometry>
 createTestGeometries()
 {

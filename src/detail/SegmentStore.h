@@ -28,13 +28,21 @@ namespace detail {
  */
 class SegmentStore {
 private:
-  std::vector<Segment> segments;
-  bool                 hasZCoord = false;
-  bool                 hasMCoord = false;
+  std::vector<Segment>
+       segments;          ///< Collection of segments stored for interpolation
+  bool hasZCoord = false; ///< Flag indicating if any segment has Z coordinates
+  bool hasMCoord = false; ///< Flag indicating if any segment has M values
 
 public:
+  /**
+   * @brief Default constructor
+   */
   SegmentStore() {}
 
+  /**
+   * @brief Add a segment to the store
+   * @param segment The segment to add
+   */
   void
   addSegment(const Segment &segment)
   {
@@ -47,21 +55,32 @@ public:
                               segment.target().isMeasured());
   }
 
-  // Check if store contains segments with Z coordinates
+  /**
+   * @brief Check if store contains segments with Z coordinates
+   * @return True if any segment has Z coordinates
+   */
   bool
   hasZ() const
   {
     return hasZCoord;
   }
 
-  // Check if store contains segments with M values
+  /**
+   * @brief Check if store contains segments with M values
+   * @return True if any segment has M values
+   */
   bool
   hasM() const
   {
     return hasMCoord;
   }
 
-  // Find the nearest segment to a point
+  /**
+   * @brief Find the nearest segment to a point
+   * @param x X-coordinate of the point
+   * @param y Y-coordinate of the point
+   * @return The nearest segment to the given point
+   */
   Segment
   findNearestSegment(double x, double y) const
   {
@@ -123,6 +142,7 @@ public:
 
   /**
    * @brief Extract segments from a LineString for interpolation
+   * @param lineString The linestring to extract segments from
    */
   void
   extractSegments(const LineString &lineString)
@@ -140,6 +160,7 @@ public:
 
   /**
    * @brief Extract segments from a Polygon for interpolation
+   * @param polygon The polygon to extract segments from
    */
   void
   extractSegments(const Polygon &polygon)
@@ -155,6 +176,7 @@ public:
 
   /**
    * @brief Extract segments from all geometry types
+   * @param geometry The geometry to extract segments from
    */
   void
   extractSegments(const Geometry &geometry)
@@ -217,6 +239,10 @@ public:
 
   /**
    * @brief Create a point with interpolated Z and M values
+   * @param x X-coordinate of the point
+   * @param y Y-coordinate of the point
+   * @param dimension The coordinate type for the point
+   * @return Point with interpolated Z and M values
    */
   Point
   createPoint(double x, double y, CoordinateType dimension) const

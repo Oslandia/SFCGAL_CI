@@ -22,35 +22,87 @@ namespace detail {
  */
 class SFCGAL_API EnvelopeVisitor : public ConstGeometryVisitor {
 public:
+  /**
+   * @brief Constructor for envelope visitor
+   * @param envelope_ Reference to envelope to update
+   */
   EnvelopeVisitor(Envelope &envelope_);
 
+  /**
+   * @brief Visit a Point and update envelope
+   * @param g The point to visit
+   */
   void
   visit(const Point &g) override;
+  /**
+   * @brief Visit a LineString and update envelope
+   * @param g The linestring to visit
+   */
   void
   visit(const LineString &g) override;
+  /**
+   * @brief Visit a Polygon and update envelope
+   * @param g The polygon to visit
+   */
   void
   visit(const Polygon &g) override;
+  /**
+   * @brief Visit a Triangle and update envelope
+   * @param g The triangle to visit
+   */
   void
   visit(const Triangle &g) override;
+  /**
+   * @brief Visit a Solid and update envelope
+   * @param g The solid to visit
+   */
   void
   visit(const Solid &g) override;
+  /**
+   * @brief Visit a MultiPoint and update envelope
+   * @param g The multipoint to visit
+   */
   void
   visit(const MultiPoint &g) override;
+  /**
+   * @brief Visit a MultiLineString and update envelope
+   * @param g The multilinestring to visit
+   */
   void
   visit(const MultiLineString &g) override;
+  /**
+   * @brief Visit a MultiPolygon and update envelope
+   * @param g The multipolygon to visit
+   */
   void
   visit(const MultiPolygon &g) override;
+  /**
+   * @brief Visit a MultiSolid and update envelope
+   * @param g The multisolid to visit
+   */
   void
   visit(const MultiSolid &g) override;
+  /**
+   * @brief Visit a GeometryCollection and update envelope
+   * @param g The geometry collection to visit
+   */
   void
   visit(const GeometryCollection &g) override;
+  /**
+   * @brief Visit a PolyhedralSurface and update envelope
+   * @param g The polyhedral surface to visit
+   */
   void
   visit(const PolyhedralSurface &g) override;
+  /**
+   * @brief Visit a TriangulatedSurface and update envelope
+   * @param g The triangulated surface to visit
+   */
   void
   visit(const TriangulatedSurface &g) override;
 
 public:
-  Envelope &envelope;
+  Envelope &envelope; ///< Reference to the envelope being computed
 };
 
 } // namespace detail

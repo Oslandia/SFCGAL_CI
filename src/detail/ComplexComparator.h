@@ -17,6 +17,12 @@ namespace detail {
  * lexicographic order on complex
  */
 struct SFCGAL_API ComplexComparator{
+    /**
+     * @brief Lexicographic comparison of complex numbers
+     * @param a First complex number
+     * @param b Second complex number
+     * @return True if a is lexicographically less than b
+     */
     template <typename T> inline bool operator()(const std::complex<T> &a,
                                                  const std::complex<T> &b)
         const {return (a.real() < b.real()) ||

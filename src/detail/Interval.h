@@ -22,30 +22,38 @@ public:
   Interval();
   /**
    * collapsed interval constructor
+   * @param value The single value for collapsed interval
    */
   Interval(const double &value);
   /**
    * constructor with two values
+   * @param v1 First boundary value
+   * @param v2 Second boundary value
    */
   Interval(const double &v1, const double &v2);
   /**
    * copy constructor
+   * @param other The interval to copy from
    */
   Interval(const Interval &other);
   /**
    * assign operator
+   * @param other The interval to assign from
+   * @return Reference to this interval
    */
   Interval &
   operator=(const Interval &other);
 
   /**
    * indicates if the interval is empty
+   * @return True if the interval is empty
    */
   bool
   isEmpty() const;
 
   /**
-   * returns the lower value
+   * return the lower value
+   * @return The lower boundary of the interval
    */
   inline const double &
   lower() const
@@ -53,7 +61,8 @@ public:
     return _lower;
   }
   /**
-   * returns the upper value
+   * return the upper value
+   * @return The upper boundary of the interval
    */
   inline const double &
   upper() const
@@ -61,7 +70,8 @@ public:
     return _upper;
   }
   /**
-   * returns the with of the interval
+   * return the width of the interval
+   * @return The width (upper - lower) of the interval
    */
   inline double
   width() const
@@ -73,6 +83,7 @@ public:
    * expand the interval
    *
    * @warning no effect if isEmpty()
+   * @param d The amount to expand by
    */
   void
   expandBy(const double &d);
@@ -80,6 +91,7 @@ public:
    * expand the interval to include an other interval.
    *
    * @warning no effect if other.isEmpty()
+   * @param other The interval to include
    */
   void
   expandToInclude(const Interval &other);
@@ -87,12 +99,15 @@ public:
    * expand the interval to include a value
    *
    * @warning no effect if value is NaN
+   * @param value The value to include
    */
   void
   expandToInclude(const double &value);
 
   /**
    * test if this intersects other
+   * @param other The interval to test intersection with
+   * @return True if intervals intersect
    */
   bool
   intersects(const Interval &other) const;
@@ -100,12 +115,16 @@ public:
   /**
    * compare two intervals
    * @warning true for empty intervals
+   * @param other The interval to compare with
+   * @return True if intervals are equal
    */
   bool
   operator==(const Interval &other) const;
   /**
    * compare two intervals
    * @warning false for empty intervals
+   * @param other The interval to compare with
+   * @return True if intervals are not equal
    */
   bool
   operator!=(const Interval &other) const;

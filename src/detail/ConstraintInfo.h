@@ -15,6 +15,9 @@ namespace detail {
  * @brief Structure to identify constraint sources for topology-preserving mode
  */
 struct ConstraintInfo {
+  /**
+   * @brief Constraint type enumeration
+   */
   enum class Type {
     LINESTRING,
     POLYGON_EXTERIOR,
@@ -25,10 +28,16 @@ struct ConstraintInfo {
     MULTIPOLYGON_INTERIOR
   };
 
-  Type   type;
-  size_t geomIndex;
-  size_t ringIndex;
+  Type   type;      ///< The constraint type
+  size_t geomIndex; ///< Index of the source geometry
+  size_t ringIndex; ///< Index of the ring within the geometry
 
+  /**
+   * @brief Constructor for constraint info
+   * @param t The constraint type
+   * @param gIdx Index of the source geometry
+   * @param rIdx Index of the ring within the geometry
+   */
   ConstraintInfo(Type t, size_t gIdx, size_t rIdx = 0)
       : type(t), geomIndex(gIdx), ringIndex(rIdx)
   {
@@ -41,14 +50,23 @@ struct ConstraintInfo {
  */
 template <typename Constraint_id>
 struct ConstraintOrderInfo {
-  Constraint_id cid;       // Constraint ID returned by insertion
-  size_t        geomIndex; // Index of the geometry in the collection
-  size_t polyIndex; // Index of the polygon in MultiPolygon (if applicable)
-  size_t ringIndex; // Ring index (0=exterior, >0=hole)
-  size_t order; // Local order (for multiple constraints of the same polygon)
+  Constraint_id cid;       ///< Constraint ID returned by insertion
+  size_t        geomIndex; ///< Index of the geometry in the collection
+  size_t polyIndex; ///< Index of the polygon in MultiPolygon (if applicable)
+  size_t ringIndex; ///< Ring index (0=exterior, >0=hole)
+  size_t order; ///< Local order (for multiple constraints of the same polygon)
   ConstraintInfo::Type
-      type; // Geometry type (linestring, polygon exterior, polygon interior)
+      type; ///< Geometry type (linestring, polygon exterior, polygon interior)
 
+  /**
+   * @brief Constructor for constraint order info
+   * @param cid_ Constraint ID returned by insertion
+   * @param geomIndex_ Index of the geometry in the collection
+   * @param polyIndex_ Index of the polygon in MultiPolygon (if applicable)
+   * @param ringIndex_ Ring index (0=exterior, >0=hole)
+   * @param order_ Local order (for multiple constraints of the same polygon)
+   * @param type_ Geometry type
+   */
   ConstraintOrderInfo(
       Constraint_id cid_, size_t geomIndex_, size_t polyIndex_ = 0,
       size_t ringIndex_ = 0, size_t order_ = 0,
@@ -64,6 +82,12 @@ struct ConstraintOrderInfo {
  */
 template <typename Constraint_id>
 struct ConstraintInfoCompare {
+  /**
+   * @brief Compare two constraint order infos
+   * @param a First constraint order info
+   * @param b Second constraint order info
+   * @return True if a should be ordered before b
+   */
   bool
   operator()(const ConstraintOrderInfo<Constraint_id> &a,
              const ConstraintOrderInfo<Constraint_id> &b) const
