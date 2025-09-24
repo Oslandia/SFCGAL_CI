@@ -26,97 +26,97 @@ namespace SFCGAL::detail::io {
 
 namespace impl {
 auto
-writeFT(std::ostream &s, const CGAL::Gmpq &ft) -> std::ostream &
+writeFT(std::ostream &outStream, const CGAL::Gmpq &fraction) -> std::ostream &
 {
-  s << ft;
-  return s;
+  outStream << fraction;
+  return outStream;
 }
 
 #ifdef CGAL_USE_GMPXX
 auto
-writeFT(std::ostream &s, const mpq_class &ft) -> std::ostream &
+writeFT(std::ostream &outStream, const mpq_class &fraction) -> std::ostream &
 {
-  s << ft.get_num() << "/" << ft.get_den();
-  return s;
+  outStream << fraction.get_num() << "/" << fraction.get_den();
+  return outStream;
 }
 #endif
 } // namespace impl
 
-WktWriter::WktWriter(std::ostream &s) : _s(s) {}
+WktWriter::WktWriter(std::ostream &outStream) : _s(outStream) {}
 
 void
-WktWriter::writeRec(const Geometry &g)
+WktWriter::writeRec(const Geometry &geometry)
 {
-  switch (g.geometryTypeId()) {
+  switch (geometry.geometryTypeId()) {
   case TYPE_POINT:
-    write(g.as<Point>());
+    write(geometry.as<Point>());
     return;
 
   case TYPE_LINESTRING:
-    write(g.as<LineString>());
+    write(geometry.as<LineString>());
     return;
 
   case TYPE_POLYGON:
-    write(g.as<Polygon>());
+    write(geometry.as<Polygon>());
     return;
 
   case TYPE_GEOMETRYCOLLECTION:
-    write(g.as<GeometryCollection>());
+    write(geometry.as<GeometryCollection>());
     return;
 
   case TYPE_MULTIPOINT:
-    write(g.as<MultiPoint>());
+    write(geometry.as<MultiPoint>());
     return;
 
   case TYPE_MULTILINESTRING:
-    write(g.as<MultiLineString>());
+    write(geometry.as<MultiLineString>());
     return;
 
   case TYPE_MULTIPOLYGON:
-    write(g.as<MultiPolygon>());
+    write(geometry.as<MultiPolygon>());
     return;
 
   case TYPE_TRIANGLE:
-    write(g.as<Triangle>());
+    write(geometry.as<Triangle>());
     return;
 
   case TYPE_TRIANGULATEDSURFACE:
-    write(g.as<TriangulatedSurface>());
+    write(geometry.as<TriangulatedSurface>());
     return;
 
   case TYPE_POLYHEDRALSURFACE:
-    write(g.as<PolyhedralSurface>());
+    write(geometry.as<PolyhedralSurface>());
     return;
 
   case TYPE_SOLID:
-    write(g.as<Solid>());
+    write(geometry.as<Solid>());
     return;
 
   case TYPE_MULTISOLID:
-    write(g.as<MultiSolid>());
+    write(geometry.as<MultiSolid>());
     return;
   }
 
   std::ostringstream oss;
-  oss << "WktWriter : '" << g.geometryType() << "' is not supported";
+  oss << "WktWriter : '" << geometry.geometryType() << "' is not supported";
   BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
 }
 
 void
-WktWriter::write(const Geometry &g, bool exact)
+WktWriter::write(const Geometry &geometry, bool exact)
 {
   _exactWrite = exact;
-  writeRec(g);
+  writeRec(geometry);
 }
 
 void
-WktWriter::writeCoordinateType(const Geometry &g)
+WktWriter::writeCoordinateType(const Geometry &geometry)
 {
-  if (g.is3D() && !g.isMeasured()) {
+  if (geometry.is3D() && !geometry.isMeasured()) {
     _s << "Z ";
-  } else if (!g.is3D() && g.isMeasured()) {
+  } else if (!geometry.is3D() && geometry.isMeasured()) {
     _s << "M ";
-  } else if (g.is3D() && g.isMeasured()) {
+  } else if (geometry.is3D() && geometry.isMeasured()) {
     _s << "ZM ";
   }
 }
@@ -131,252 +131,252 @@ fixZeroNeg(double val, int precision) -> double
 }
 
 void
-WktWriter::writeCoordinate(const Point &g)
+WktWriter::writeCoordinate(const Point &point)
 {
   if (_exactWrite) {
-    impl::writeFT(_s, CGAL::exact(g.x())) << " ";
-    impl::writeFT(_s, CGAL::exact(g.y()));
+    impl::writeFT(_s, CGAL::exact(point.x())) << " ";
+    impl::writeFT(_s, CGAL::exact(point.y()));
 
-    if (g.is3D()) {
+    if (point.is3D()) {
       _s << " ";
-      impl::writeFT(_s, CGAL::exact(g.z()));
+      impl::writeFT(_s, CGAL::exact(point.z()));
     }
   } else {
-    _s << fixZeroNeg(CGAL::to_double(g.x()), _s.precision()) << " "
-       << fixZeroNeg(CGAL::to_double(g.y()), _s.precision());
+    _s << fixZeroNeg(CGAL::to_double(point.x()), _s.precision()) << " "
+       << fixZeroNeg(CGAL::to_double(point.y()), _s.precision());
 
-    if (g.is3D()) {
-      _s << " " << fixZeroNeg(CGAL::to_double(g.z()), _s.precision());
+    if (point.is3D()) {
+      _s << " " << fixZeroNeg(CGAL::to_double(point.z()), _s.precision());
     }
   }
 
   // m coordinate
-  if (g.isMeasured()) {
-    _s << " " << fixZeroNeg(CGAL::to_double(g.m()), _s.precision());
+  if (point.isMeasured()) {
+    _s << " " << fixZeroNeg(CGAL::to_double(point.m()), _s.precision());
   }
 }
 
 void
-WktWriter::write(const Point &g)
+WktWriter::write(const Point &point)
 {
   _s << "POINT ";
-  writeCoordinateType(g);
+  writeCoordinateType(point);
 
-  if (g.isEmpty()) {
+  if (point.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
-  writeInner(g);
+  writeInner(point);
 }
 
 void
-WktWriter::writeInner(const Point &g)
+WktWriter::writeInner(const Point &point)
 {
-  if (g.isEmpty()) {
+  if (point.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
   _s << "(";
-  writeCoordinate(g);
+  writeCoordinate(point);
   _s << ")";
 }
 
 void
-WktWriter::write(const LineString &g)
+WktWriter::write(const LineString &lineString)
 {
   _s << "LINESTRING ";
-  writeCoordinateType(g);
+  writeCoordinateType(lineString);
 
-  if (g.isEmpty()) {
+  if (lineString.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
-  writeInner(g);
+  writeInner(lineString);
 }
 
 void
-WktWriter::writeInner(const LineString &g)
+WktWriter::writeInner(const LineString &lineString)
 {
   _s << "(";
 
-  for (size_t i = 0; i < g.numPoints(); i++) {
+  for (size_t i = 0; i < lineString.numPoints(); i++) {
     if (i != 0) {
       _s << ",";
     }
 
-    writeCoordinate(g.pointN(i));
+    writeCoordinate(lineString.pointN(i));
   }
 
   _s << ")";
 }
 
 void
-WktWriter::write(const Polygon &g)
+WktWriter::write(const Polygon &polygon)
 {
   _s << "POLYGON ";
-  writeCoordinateType(g);
+  writeCoordinateType(polygon);
 
-  if (g.isEmpty()) {
+  if (polygon.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
-  writeInner(g);
+  writeInner(polygon);
 }
 
 void
-WktWriter::writeInner(const Polygon &g)
+WktWriter::writeInner(const Polygon &polygon)
 {
   _s << "(";
-  writeInner(g.exteriorRing());
+  writeInner(polygon.exteriorRing());
 
-  for (size_t i = 0; i < g.numInteriorRings(); i++) {
+  for (size_t i = 0; i < polygon.numInteriorRings(); i++) {
     _s << ",";
-    writeInner(g.interiorRingN(i));
+    writeInner(polygon.interiorRingN(i));
   }
 
   _s << ")";
 }
 
 void
-WktWriter::write(const GeometryCollection &g)
+WktWriter::write(const GeometryCollection &collection)
 {
   _s << "GEOMETRYCOLLECTION ";
-  writeCoordinateType(g);
+  writeCoordinateType(collection);
 
-  if (g.isEmpty()) {
+  if (collection.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
   _s << "(";
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
+  for (size_t i = 0; i < collection.numGeometries(); i++) {
     if (i != 0) {
       _s << ",";
     }
 
-    writeRec(g.geometryN(i));
+    writeRec(collection.geometryN(i));
   }
 
   _s << ")";
 }
 
 void
-WktWriter::write(const MultiPoint &g)
+WktWriter::write(const MultiPoint &multiPoint)
 {
   _s << "MULTIPOINT ";
-  writeCoordinateType(g);
+  writeCoordinateType(multiPoint);
 
-  if (g.isEmpty()) {
+  if (multiPoint.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
   _s << "(";
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
+  for (size_t i = 0; i < multiPoint.numGeometries(); i++) {
     if (i != 0) {
       _s << ",";
     }
 
-    writeInner(g.geometryN(i).as<Point>());
+    writeInner(multiPoint.geometryN(i).as<Point>());
   }
 
   _s << ")";
 }
 
 void
-WktWriter::write(const MultiLineString &g)
+WktWriter::write(const MultiLineString &multiLineString)
 {
   _s << "MULTILINESTRING ";
-  writeCoordinateType(g);
+  writeCoordinateType(multiLineString);
 
-  if (g.isEmpty()) {
+  if (multiLineString.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
   _s << "(";
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
+  for (size_t i = 0; i < multiLineString.numGeometries(); i++) {
     if (i != 0) {
       _s << ",";
     }
 
-    writeInner(g.geometryN(i).as<LineString>());
+    writeInner(multiLineString.geometryN(i).as<LineString>());
   }
 
   _s << ")";
 }
 
 void
-WktWriter::write(const MultiPolygon &g)
+WktWriter::write(const MultiPolygon &multiPolygon)
 {
   _s << "MULTIPOLYGON ";
-  writeCoordinateType(g);
+  writeCoordinateType(multiPolygon);
 
-  if (g.isEmpty()) {
+  if (multiPolygon.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
   _s << "(";
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
+  for (size_t i = 0; i < multiPolygon.numGeometries(); i++) {
     if (i != 0) {
       _s << ",";
     }
 
-    writeInner(g.geometryN(i).as<Polygon>());
+    writeInner(multiPolygon.geometryN(i).as<Polygon>());
   }
 
   _s << ")";
 }
 
 void
-WktWriter::write(const MultiSolid &g)
+WktWriter::write(const MultiSolid &multiSolid)
 {
   _s << "MULTISOLID ";
-  writeCoordinateType(g);
+  writeCoordinateType(multiSolid);
 
-  if (g.isEmpty()) {
+  if (multiSolid.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
   _s << "(";
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
+  for (size_t i = 0; i < multiSolid.numGeometries(); i++) {
     if (i != 0) {
       _s << ",";
     }
 
-    writeInner(g.geometryN(i).as<Solid>());
+    writeInner(multiSolid.geometryN(i).as<Solid>());
   }
 
   _s << ")";
 }
 
 void
-WktWriter::write(const Triangle &g)
+WktWriter::write(const Triangle &triangle)
 {
   _s << "TRIANGLE ";
-  writeCoordinateType(g);
+  writeCoordinateType(triangle);
 
-  if (g.isEmpty()) {
+  if (triangle.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
-  writeInner(g);
+  writeInner(triangle);
 }
 
 void
-WktWriter::writeInner(const Triangle &g)
+WktWriter::writeInner(const Triangle &triangle)
 {
   _s << "(";
   _s << "(";
@@ -387,7 +387,7 @@ WktWriter::writeInner(const Triangle &g)
       _s << ",";
     }
 
-    writeCoordinate(g.vertex(i));
+    writeCoordinate(triangle.vertex(i));
   }
 
   _s << ")";
@@ -395,82 +395,82 @@ WktWriter::writeInner(const Triangle &g)
 }
 
 void
-WktWriter::write(const TriangulatedSurface &g)
+WktWriter::write(const TriangulatedSurface &tin)
 {
   _s << "TIN ";
-  writeCoordinateType(g);
+  writeCoordinateType(tin);
 
-  if (g.isEmpty()) {
+  if (tin.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
   _s << "("; // begin TIN
 
-  for (size_t i = 0; i < g.numPatches(); i++) {
+  for (size_t i = 0; i < tin.numPatches(); i++) {
     if (i != 0) {
       _s << ",";
     }
 
-    writeInner(g.patchN(i));
+    writeInner(tin.patchN(i));
   }
 
   _s << ")"; // end TIN
 }
 
 void
-WktWriter::write(const PolyhedralSurface &g)
+WktWriter::write(const PolyhedralSurface &surface)
 {
   _s << "POLYHEDRALSURFACE ";
-  writeCoordinateType(g);
+  writeCoordinateType(surface);
 
-  if (g.isEmpty()) {
+  if (surface.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
-  writeInner(g);
+  writeInner(surface);
 }
 
 void
-WktWriter::writeInner(const PolyhedralSurface &g)
+WktWriter::writeInner(const PolyhedralSurface &surface)
 {
   _s << "("; // begin POLYHEDRALSURFACE
 
-  for (size_t i = 0; i < g.numPatches(); i++) {
+  for (size_t i = 0; i < surface.numPatches(); i++) {
     if (i != 0) {
       _s << ",";
     }
 
-    writeInner(g.patchN(i));
+    writeInner(surface.patchN(i));
   }
 
   _s << ")"; // end POLYHEDRALSURFACE
 }
 
 void
-WktWriter::write(const Solid &g)
+WktWriter::write(const Solid &solid)
 {
   _s << "SOLID ";
-  writeCoordinateType(g);
+  writeCoordinateType(solid);
 
-  if (g.isEmpty()) {
+  if (solid.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
-  writeInner(g);
+  writeInner(solid);
 }
 
 void
-WktWriter::writeInner(const Solid &g)
+WktWriter::writeInner(const Solid &solid)
 {
   _s << "("; // begin SOLID
-  writeInner(g.exteriorShell());
+  writeInner(solid.exteriorShell());
 
-  for (size_t i = 0; i < g.numInteriorShells(); i++) {
+  for (size_t i = 0; i < solid.numInteriorShells(); i++) {
     _s << ",";
-    writeInner(g.interiorShellN(i));
+    writeInner(solid.interiorShellN(i));
   }
 
   _s << ")"; // end SOLID
