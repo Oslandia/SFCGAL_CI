@@ -16,9 +16,13 @@ namespace graph {
  * algorithms could need more information)
  */
 struct SFCGAL_API Edge {
+  /**
+   * @brief Constructor for Edge
+   * @param face_ The face identifier (default -1)
+   */
   Edge(const int &face_ = -1);
 
-  int face;
+  int face; ///< Face identifier for this edge
 };
 
 } // namespace graph
