@@ -34,10 +34,13 @@ typedef BasicInputStreamReader<wchar_t> WInputStreamReader;
 template <typename CharType>
 class BasicInputStreamReader {
 public:
-  typedef CharType                                         char_type; ///< Character type for the reader
-  typedef typename std::basic_string<char_type>            string_type; ///< String type for the reader
-  typedef typename std::basic_istream<char_type>           istream_type; ///< Input stream type
-  typedef typename std::basic_istream<char_type>::pos_type pos_type; ///< Stream position type
+  typedef CharType char_type; ///< Character type for the reader
+  typedef typename std::basic_string<char_type>
+      string_type; ///< String type for the reader
+  typedef typename std::basic_istream<char_type>
+      istream_type; ///< Input stream type
+  typedef typename std::basic_istream<char_type>::pos_type
+      pos_type; ///< Stream position type
 
   /**
    * @brief Constructor with an input stream
@@ -212,7 +215,8 @@ public:
   }
 
   /**
-   * @brief Test if read is complete (either tried to read after eof, either on eof)
+   * @brief Test if read is complete (either tried to read after eof, either on
+   * eof)
    * @return True if at end of stream
    */
   bool

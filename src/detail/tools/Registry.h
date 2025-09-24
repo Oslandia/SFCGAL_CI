@@ -24,8 +24,10 @@ namespace tools {
  */
 class SFCGAL_API Registry {
 public:
-  typedef std::vector<Geometry *>::iterator       prototype_iterator; ///< Iterator type for prototypes
-  typedef std::vector<Geometry *>::const_iterator const_prototype_iterator; ///< Const iterator type for prototypes
+  typedef std::vector<Geometry *>::iterator
+      prototype_iterator; ///< Iterator type for prototypes
+  typedef std::vector<Geometry *>::const_iterator
+      const_prototype_iterator; ///< Const iterator type for prototypes
 
   /**
    * destructor
