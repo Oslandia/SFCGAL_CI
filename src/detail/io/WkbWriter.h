@@ -22,12 +22,19 @@ namespace SFCGAL::detail::io {
  */
 class SFCGAL_API WkbWriter {
 public:
+  /**
+   * @brief Construct WKB writer
+   * @param s Output stream to write WKB data to
+   * @param asHexString If true, output as hexadecimal string, otherwise binary
+   */
   WkbWriter(std::ostream &s, bool asHexString = false)
       : _s(s), _asHexString(asHexString) {};
 
   /**
    * write WKB for a geometry
    * wkbOrder is the native endianness by default.
+   * @param g Geometry to write as WKB
+   * @param wkbOrder Byte order for WKB output
    */
   void
   write(const Geometry      &g,
@@ -36,6 +43,9 @@ public:
   /**
    * write EWKB for a geometry
    * wkbOrder is the native endianness by default.
+   * @param g Geometry to write as EWKB
+   * @param srid Spatial reference identifier to include in EWKB
+   * @param wkbOrder Byte order for WKB output
    */
   void
   write(const Geometry &g, const srid_t &srid,
