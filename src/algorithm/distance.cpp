@@ -27,9 +27,29 @@
 
 namespace SFCGAL::algorithm {
 
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
+
 auto
-distance(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
-    -> double
+distance(const Geometry &gA, const Geometry &gB) -> double
+{
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gA);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gB);
+  return distance(gA, gB, NoValidityCheck());
+}
+
+// ----------------------------------------------------------------------------------
+// -- private interface
+// ----------------------------------------------------------------------------------
+/// @{
+/// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+auto
+distance(const Geometry &gA, const Geometry &gB,
+         [[maybe_unused]] NoValidityCheck noCheck) -> double
 {
   switch (gA.geometryTypeId()) {
   case TYPE_POINT:
@@ -62,14 +82,6 @@ distance(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
 
   BOOST_ASSERT(false);
   return 0;
-}
-
-auto
-distance(const Geometry &gA, const Geometry &gB) -> double
-{
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gA);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gB);
-  return distance(gA, gB, NoValidityCheck());
 }
 
 auto
@@ -347,23 +359,58 @@ distanceTriangleGeometry(const Triangle &gA, const Geometry &gB) -> double
   return distancePolygonGeometry(gA.toPolygon(), gB);
 }
 
+/**
+ * @struct Circle
+ * @brief Represents a 2D circle with a center and a radius.
+ */
 struct Circle {
-  Circle(const double &r, CGAL::Vector_2<Kernel> &c)
-      : _radius(r), _center(c), _empty(false)
+  /**
+   * @brief Main constructor.
+   * @param radius The radius of the circle.
+   * @param center The center of the circle.
+   *
+   */
+  Circle(const double &radius, CGAL::Vector_2<Kernel> &center)
+      : _radius(radius), _center(center), _empty(false)
   {
   }
+
+  /**
+   * @brief Default constructor.
+   *
+   * Initializes an empty circle.
+   */
   Circle() = default;
+
+  /**
+   * @brief Checks if the circle is empty.
+   * @return true if the circle is empty, false otherwise.
+   */
   [[nodiscard]] auto
   isEmpty() const -> bool
   {
     return _empty;
   }
+
+  /**
+   * @brief Returns the radius of the circle.
+   * @return The radius of the circle.
+   *
+   * @note Assertion: the circle must not be empty.
+   */
   [[nodiscard]] auto
   radius() const -> double
   {
     BOOST_ASSERT(!_empty);
     return _radius;
   }
+
+  /**
+   * @brief Returns the center of the circle.
+   * @return A constant reference to the circle's center.
+   *
+   * @note Assertion: the circle must not be empty.
+   */
   [[nodiscard]] auto
   center() const -> const CGAL::Vector_2<Kernel> &
   {
@@ -372,11 +419,12 @@ struct Circle {
   }
 
 private:
-  double                 _radius{};
-  CGAL::Vector_2<Kernel> _center;
-  bool                   _empty{true};
+  double                 _radius{}; ///< Radius of the circle
+  CGAL::Vector_2<Kernel> _center;   ///< Center of the circle
+  bool _empty{true};                ///< Indicates whether the circle is empty
 };
 
+/// \cond IGNORE
 auto
 boundingCircle(const Geometry &geom) -> const Circle
 {
@@ -422,6 +470,7 @@ boundingCircle(const Geometry &geom) -> const Circle
 
   return Circle(std::sqrt(CGAL::to_double(maxDistanceSq)), c);
 }
+/// \endcond
 
 auto
 distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
@@ -529,5 +578,8 @@ distanceSegmentSegment(const Point &a, const Point &b, const Point &c,
       CGAL::Segment_2<Kernel>(a.toPoint_2(), b.toPoint_2()),
       CGAL::Segment_2<Kernel>(c.toPoint_2(), d.toPoint_2()))));
 }
+
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
 
 } // namespace SFCGAL::algorithm
