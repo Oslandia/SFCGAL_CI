@@ -19,11 +19,13 @@ namespace graph {
  */
 struct SFCGAL_API Vertex {
   /**
-   * [requirement]Constructor with coordinate
+   * @brief Constructor with coordinate
+   * @param coordinate_ The coordinate for this vertex (default empty
+   * coordinate)
    */
   Vertex(const Coordinate &coordinate_ = Coordinate());
 
-  Coordinate coordinate;
+  Coordinate coordinate; ///< The coordinate of this vertex
 };
 
 } // namespace graph
