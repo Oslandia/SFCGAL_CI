@@ -23,20 +23,31 @@ namespace transform {
 class SFCGAL_API ForceOrderPoints : public Transform {
 public:
   /**
-   * Pass the forced orientation as parameter
+   * @brief Pass the forced orientation as parameter
+   * @param orientCCW Whether to force counter-clockwise orientation (default
+   * true)
    */
   ForceOrderPoints(bool orientCCW = true);
 
-  /*
-   * [SFCGAL::Transform]
+  /**
+   * @brief Transform a point (no-op for points)
+   * @param p The point to transform
    */
   void
   transform(Point &p) override;
 
+  /**
+   * @brief Visit and force point order for a triangle
+   * @param triangle The triangle to visit
+   */
   void
-  visit(Triangle &) override;
+  visit(Triangle &triangle) override;
+  /**
+   * @brief Visit and force point order for a polygon
+   * @param polygon The polygon to visit
+   */
   void
-  visit(Polygon &) override;
+  visit(Polygon &polygon) override;
 
 private:
   bool _orientCCW;

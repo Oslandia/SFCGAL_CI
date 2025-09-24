@@ -16,12 +16,14 @@ namespace SFCGAL::transform {
 class SFCGAL_API ForceM : public Transform {
 public:
   /**
-   * Constructor with a default M value
+   * @brief Constructor with a default M value
+   * @param defaultM The default M coordinate value (default 0)
    */
   ForceM(const double &defaultM = 0);
 
-  /*
-   * [SFCGAL::Transform]
+  /**
+   * @brief Transform a point to force M coordinates
+   * @param point The point to transform
    */
   void
   transform(Point &point) override;

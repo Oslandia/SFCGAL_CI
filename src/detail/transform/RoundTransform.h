@@ -20,12 +20,14 @@ namespace transform {
 class SFCGAL_API RoundTransform : public Transform {
 public:
   /**
-   * Constructor with a scale factor (default is nearest integer)
+   * @brief Constructor with a scale factor (default is nearest integer)
+   * @param scale The scale factor for rounding (default 1)
    */
   RoundTransform(const long &scale = 1);
 
-  /*
-   * [SFCGAL::Transform]
+  /**
+   * @brief Transform a point by rounding its coordinates
+   * @param p The point to transform
    */
   void
   transform(Point &p) override;

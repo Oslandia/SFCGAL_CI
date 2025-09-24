@@ -22,12 +22,14 @@ namespace transform {
 class SFCGAL_API AffineTransform2 : public Transform {
 public:
   /**
-   * Constructor with a transform
+   * @brief Constructor with a transform
+   * @param transform The CGAL 2D affine transformation
    */
   AffineTransform2(CGAL::Aff_transformation_2<Kernel> transform);
 
-  /*
-   * [SFCGAL::Transform]
+  /**
+   * @brief Transform a point using the 2D affine transformation
+   * @param p The point to transform
    */
   void
   transform(Point &p) override;

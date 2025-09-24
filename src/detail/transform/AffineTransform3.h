@@ -22,29 +22,55 @@ namespace transform {
 class SFCGAL_API AffineTransform3 : public Transform {
 public:
   /**
-   * Constructor with a transform
+   * @brief Constructor with a transform
+   * @param transform The CGAL 3D affine transformation
    */
   AffineTransform3(CGAL::Aff_transformation_3<Kernel> transform);
 
-  /*
-   * [SFCGAL::Transform]
+  /**
+   * @brief Transform a point using the 3D affine transformation
+   * @param p The point to transform
    */
   void
   transform(Point &p) override;
 
+  /**
+   * @brief Transform a linestring using the 3D affine transformation
+   * @param ls The linestring to transform
+   */
   virtual void
   transform(LineString &ls);
+  /**
+   * @brief Transform a triangle using the 3D affine transformation
+   * @param tri The triangle to transform
+   */
   virtual void
   transform(Triangle &tri);
+  /**
+   * @brief Transform a polygon using the 3D affine transformation
+   * @param poly The polygon to transform
+   */
   virtual void
   transform(Polygon &poly);
 
+  /**
+   * @brief Transform a polyhedral surface using the 3D affine transformation
+   * @param surf The polyhedral surface to transform
+   */
   virtual void
   transform(PolyhedralSurface &surf);
 
+  /**
+   * @brief Transform a triangulated surface using the 3D affine transformation
+   * @param surf The triangulated surface to transform
+   */
   virtual void
   transform(TriangulatedSurface &surf);
 
+  /**
+   * @brief Transform a solid using the 3D affine transformation
+   * @param solid The solid to transform
+   */
   virtual void
   transform(Solid &solid);
 

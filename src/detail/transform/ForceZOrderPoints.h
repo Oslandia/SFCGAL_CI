@@ -24,20 +24,30 @@ namespace transform {
 class SFCGAL_API ForceZOrderPoints : public Transform {
 public:
   /**
-   * Constructor with a default Z value
+   * @brief Constructor with a default Z value
+   * @param defaultZ The default Z coordinate value (default 0)
    */
   ForceZOrderPoints(const Kernel::FT defaultZ = 0);
 
-  /*
-   * [SFCGAL::Transform]
+  /**
+   * @brief Transform a point to force Z coordinates
+   * @param p The point to transform
    */
   void
   transform(Point &p) override;
 
+  /**
+   * @brief Visit and force point order for a triangle with Z coordinates
+   * @param triangle The triangle to visit
+   */
   void
-  visit(Triangle &) override;
+  visit(Triangle &triangle) override;
+  /**
+   * @brief Visit and force point order for a polygon with Z coordinates
+   * @param polygon The polygon to visit
+   */
   void
-  visit(Polygon &) override;
+  visit(Polygon &polygon) override;
 
 private:
   Kernel::FT _defaultZ;

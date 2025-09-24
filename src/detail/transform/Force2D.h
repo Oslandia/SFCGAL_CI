@@ -19,8 +19,9 @@ namespace transform {
  */
 class SFCGAL_API Force2D : public Transform {
 public:
-  /*
-   * [SFCGAL::Transform]
+  /**
+   * @brief Transform a point to force 2D coordinates
+   * @param p The point to transform
    */
   void
   transform(Point &p) override;

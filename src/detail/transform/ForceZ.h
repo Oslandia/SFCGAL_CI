@@ -20,12 +20,14 @@ namespace transform {
 class SFCGAL_API ForceZ : public Transform {
 public:
   /**
-   * Constructor with a default Z value
+   * @brief Constructor with a default Z value
+   * @param defaultZ The default Z coordinate value (default 0)
    */
   ForceZ(const Kernel::FT defaultZ = 0);
 
-  /*
-   * [SFCGAL::Transform]
+  /**
+   * @brief Transform a point to force Z coordinates
+   * @param p The point to transform
    */
   void
   transform(Point &p) override;
