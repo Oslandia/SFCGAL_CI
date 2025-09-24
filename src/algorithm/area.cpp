@@ -29,31 +29,32 @@
 #include <boost/format.hpp>
 
 namespace SFCGAL::algorithm {
+
 auto
-area(const Geometry &g, NoValidityCheck /*unused*/) -> double
+area(const Geometry &geom, NoValidityCheck /*unused*/) -> double
 {
-  switch (g.geometryTypeId()) {
+  switch (geom.geometryTypeId()) {
   case TYPE_POINT:
   case TYPE_LINESTRING:
     return 0;
 
   case TYPE_POLYGON:
-    return area(g.as<Polygon>());
+    return area(geom.as<Polygon>());
 
   case TYPE_TRIANGLE:
-    return area(g.as<Triangle>());
+    return area(geom.as<Triangle>());
 
   case TYPE_MULTIPOINT:
   case TYPE_MULTILINESTRING:
   case TYPE_MULTIPOLYGON:
   case TYPE_GEOMETRYCOLLECTION:
-    return area(g.as<GeometryCollection>());
+    return area(geom.as<GeometryCollection>());
 
   case TYPE_TRIANGULATEDSURFACE:
-    return area(g.as<TriangulatedSurface>());
+    return area(geom.as<TriangulatedSurface>());
 
   case TYPE_POLYHEDRALSURFACE:
-    return area(g.as<PolyhedralSurface>());
+    return area(geom.as<PolyhedralSurface>());
 
   case TYPE_SOLID:
   case TYPE_MULTISOLID:
@@ -63,43 +64,43 @@ area(const Geometry &g, NoValidityCheck /*unused*/) -> double
   BOOST_THROW_EXCEPTION(Exception(
       (boost::format(
            "Unexpected geometry type (%s) in SFCGAL::algorithm::area") %
-       g.geometryType())
+       geom.geometryType())
           .str()));
 }
 
 auto
-area(const Geometry &g) -> double
+area(const Geometry &geom) -> double
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(g);
-  return area(g, NoValidityCheck());
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geom);
+  return area(geom, NoValidityCheck());
 }
 
 auto
-signedArea(const Triangle &g) -> Kernel::FT
+signedArea(const Triangle &triangle) -> Kernel::FT
 {
-  Triangle_2 const triangle = g.toTriangle_2();
-  return triangle.area();
+  Triangle_2 const triangle2D = triangle.toTriangle_2();
+  return triangle2D.area();
 }
 
 auto
-signedArea(const LineString &g) -> Kernel::FT
+signedArea(const LineString &lineString) -> Kernel::FT
 {
-  return g.toPolygon_2(false).area();
+  return lineString.toPolygon_2(false).area();
 }
 
 auto
-area(const Triangle &g) -> double
+area(const Triangle &triangle) -> double
 {
-  return CGAL::to_double(CGAL::abs(signedArea(g)));
+  return CGAL::to_double(CGAL::abs(signedArea(triangle)));
 }
 
 auto
-area(const Polygon &g) -> double
+area(const Polygon &polygon) -> double
 {
   Kernel::RT result = 0.0;
 
-  for (size_t i = 0; i < g.numRings(); i++) {
-    Kernel::FT const ringArea = CGAL::abs(signedArea(g.ringN(i)));
+  for (size_t i = 0; i < polygon.numRings(); i++) {
+    Kernel::FT const ringArea = CGAL::abs(signedArea(polygon.ringN(i)));
 
     if (i == 0) {
       // exterior ring
@@ -114,36 +115,36 @@ area(const Polygon &g) -> double
 }
 
 auto
-area(const GeometryCollection &g) -> double
+area(const GeometryCollection &collection) -> double
 {
   double result = 0.0;
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
-    result += area(g.geometryN(i));
+  for (size_t i = 0; i < collection.numGeometries(); i++) {
+    result += area(collection.geometryN(i));
   }
 
   return result;
 }
 
 auto
-area(const TriangulatedSurface &g) -> double
+area(const TriangulatedSurface &tin) -> double
 {
   double result = 0.0;
 
-  for (size_t i = 0; i < g.numPatches(); i++) {
-    result += area(g.patchN(i));
+  for (size_t i = 0; i < tin.numPatches(); i++) {
+    result += area(tin.patchN(i));
   }
 
   return result;
 }
 
 auto
-area(const PolyhedralSurface &g) -> double
+area(const PolyhedralSurface &surface) -> double
 {
   double result = 0.0;
 
-  for (size_t i = 0; i < g.numPatches(); i++) {
-    result += area(g.patchN(i));
+  for (size_t i = 0; i < surface.numPatches(); i++) {
+    result += area(surface.patchN(i));
   }
 
   return result;
@@ -154,30 +155,30 @@ area(const PolyhedralSurface &g) -> double
 // ----------------------------------------------------------------------------------
 
 auto
-area3D(const Geometry &g, NoValidityCheck /*unused*/) -> double
+area3D(const Geometry &geom, [[maybe_unused]] NoValidityCheck noCheck) -> double
 {
-  switch (g.geometryTypeId()) {
+  switch (geom.geometryTypeId()) {
   case TYPE_POINT:
   case TYPE_LINESTRING:
     return 0;
 
   case TYPE_POLYGON:
-    return area3D(g.as<Polygon>());
+    return area3D(geom.as<Polygon>());
 
   case TYPE_TRIANGLE:
-    return area3D(g.as<Triangle>());
+    return area3D(geom.as<Triangle>());
 
   case TYPE_MULTIPOINT:
   case TYPE_MULTILINESTRING:
   case TYPE_MULTIPOLYGON:
   case TYPE_GEOMETRYCOLLECTION:
-    return area3D(g.as<GeometryCollection>());
+    return area3D(geom.as<GeometryCollection>());
 
   case TYPE_TRIANGULATEDSURFACE:
-    return area3D(g.as<TriangulatedSurface>());
+    return area3D(geom.as<TriangulatedSurface>());
 
   case TYPE_POLYHEDRALSURFACE:
-    return area3D(g.as<PolyhedralSurface>());
+    return area3D(geom.as<PolyhedralSurface>());
 
   case TYPE_SOLID:
   case TYPE_MULTISOLID:
@@ -188,25 +189,25 @@ area3D(const Geometry &g, NoValidityCheck /*unused*/) -> double
 }
 
 auto
-area3D(const Geometry &g) -> double
+area3D(const Geometry &geom) -> double
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(g);
-  return area3D(g, NoValidityCheck());
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(geom);
+  return area3D(geom, NoValidityCheck());
 }
 
 auto
-area3D(const Polygon &g) -> double
+area3D(const Polygon &polygon) -> double
 {
   double result = 0.0;
 
-  if (g.isEmpty()) {
+  if (polygon.isEmpty()) {
     return result;
   }
 
   CGAL::Point_3<Kernel> a;
   CGAL::Point_3<Kernel> b;
   CGAL::Point_3<Kernel> c;
-  algorithm::plane3D<Kernel>(g, a, b, c);
+  algorithm::plane3D<Kernel>(polygon, a, b, c);
 
   /*
    * compute polygon basis (CGAL doesn't build an orthonormal basis so that
@@ -224,8 +225,8 @@ area3D(const Polygon &g) -> double
   /*
    * compute the area for each ring in the local basis
    */
-  for (size_t i = 0; i < g.numRings(); i++) {
-    const LineString &ring = g.ringN(i);
+  for (size_t i = 0; i < polygon.numRings(); i++) {
+    const LineString &ring = polygon.ringN(i);
 
     CGAL::Polygon_2<Kernel> projectedPolygon;
 
@@ -249,45 +250,45 @@ area3D(const Polygon &g) -> double
 }
 
 auto
-area3D(const Triangle &g) -> double
+area3D(const Triangle &triangle) -> double
 {
-  CGAL::Triangle_3<Kernel> const triangle(g.vertex(0).toPoint_3(),
-                                          g.vertex(1).toPoint_3(),
-                                          g.vertex(2).toPoint_3());
-  return sqrt(CGAL::to_double(triangle.squared_area()));
+  CGAL::Triangle_3<Kernel> const triangle3D(triangle.vertex(0).toPoint_3(),
+                                            triangle.vertex(1).toPoint_3(),
+                                            triangle.vertex(2).toPoint_3());
+  return sqrt(CGAL::to_double(triangle3D.squared_area()));
 }
 
 auto
-area3D(const GeometryCollection &g) -> double
+area3D(const GeometryCollection &collection) -> double
 {
   double result = 0.0;
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
-    result += area3D(g.geometryN(i));
+  for (size_t i = 0; i < collection.numGeometries(); i++) {
+    result += area3D(collection.geometryN(i));
   }
 
   return result;
 }
 
 auto
-area3D(const PolyhedralSurface &g) -> double
+area3D(const PolyhedralSurface &surface) -> double
 {
   double area = 0.0;
 
-  for (size_t i = 0; i < g.numPatches(); i++) {
-    area += area3D(g.patchN(i));
+  for (size_t i = 0; i < surface.numPatches(); i++) {
+    area += area3D(surface.patchN(i));
   }
 
   return area;
 }
 
 auto
-area3D(const TriangulatedSurface &g) -> double
+area3D(const TriangulatedSurface &tin) -> double
 {
   double result = 0.0;
 
-  for (size_t i = 0; i < g.numPatches(); i++) {
-    result += area3D(g.patchN(i));
+  for (size_t i = 0; i < tin.numPatches(); i++) {
+    result += area3D(tin.patchN(i));
   }
 
   return result;

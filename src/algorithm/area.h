@@ -14,119 +14,207 @@ namespace algorithm {
 struct NoValidityCheck;
 
 /**
- * @brief Compute the 2D area for a Geometry
- * @warning Z component is ignored, there is no 2D projection for 3D geometries
- * @pre g is a valid geometry
- */
-SFCGAL_API double
-area(const Geometry &g);
-
-/**
- * @brief Compute the 2D area for a Geometry
+ * @brief Compute the 2D area of a Geometry.
  *
  * @warning Z component is ignored, there is no 2D projection for 3D geometries
- * @pre g is a valid geometry
+ * @pre The input geometry @p geom must be a valid geometry instance.
+ *
+ * @param geom The input geometry.
+ *
+ * @return The 2D area as a double precision value.
+ */
+SFCGAL_API auto
+area(const Geometry &geom) -> double;
+
+/**
+ * @brief Compute the 2D area of a Geometry without performing validity checks.
+ *
+ * @warning Z component is ignored, there is no 2D projection for 3D geometries
  * @warning No actual validity check is done
+ *
+ * @pre The input geometry @p geom must be valid.
+ *
+ * @param geom The input geometry.
+ * @param noCheck A tag type used to select this overload, indicating
+ *        that no validity check is performed.
+ *
+ * @return The 2D area as a double precision value.
  */
-SFCGAL_API double
-area(const Geometry &g, NoValidityCheck);
+SFCGAL_API auto
+area(const Geometry &geom, NoValidityCheck noCheck) -> double;
 
 /**
- * @brief Compute the 2D signed area for a Triangle
+ * @brief Computes the 2D signed area of a Triangle.
+ *
+ * This function calculates the oriented area of a triangle in the plane.
+ * The sign of the area depends on the orientation of the triangle's vertices:
+ * - Positive if the points are ordered counterclockwise (CCW).
+ * - Negative if the points are ordered clockwise (CW).
+ * - Zero if the points are collinear.
+ *
+ * @param triangle The input Triangle whose signed area is to be computed.
+ * @return Kernel::FT The signed area of the Triangle.
+ *
  * @ingroup detail
  */
-SFCGAL_API Kernel::FT
-           signedArea(const Triangle &g);
-/**
- * @brief Compute the 2D signed area for a closed LineString
- * @ingroup detail
- */
-SFCGAL_API Kernel::FT
-           signedArea(const LineString &g);
+SFCGAL_API auto
+signedArea(const Triangle &triangle) -> Kernel::FT;
 
 /**
- * Returns Compute the 2D area for a Triangle
+ * @brief Computes the 2D signed area of a LineString.
+ *
+ * This function calculates the oriented area of a lineString in the plane.
+ * The sign of the area depends on the orientation of the lineString's vertices:
+ * - Positive if the points are ordered counterclockwise (CCW).
+ * - Negative if the points are ordered clockwise (CW).
+ * - Zero if the points are collinear.
+ *
+ * @param lineString The input LineString whose signed area is to be computed.
+ * @return Kernel::FT The signed area of the LineString.
+ *
  * @ingroup detail
  */
-SFCGAL_API double
-area(const Triangle &g);
-/**
- * Returns Compute the 2D area for a Polygon
- * @ingroup detail
- */
-SFCGAL_API double
-area(const Polygon &g);
-/**
- * Returns the 2D area for a GeometryCollection
- * @ingroup detail
- */
-SFCGAL_API double
-area(const GeometryCollection &g);
-/**
- * Returns the 2D area for a TriangulatedSurface
- * @ingroup detail
- */
-SFCGAL_API double
-area(const TriangulatedSurface &g);
-/**
- * Returns the 2D area for a TriangulatedSurface
- * @ingroup detail
- */
-SFCGAL_API double
-area(const PolyhedralSurface &g);
+SFCGAL_API auto
+signedArea(const LineString &lineString) -> Kernel::FT;
 
 /**
- * Returns 3D area for a Geometry
- * @warning Solid area is set to 0 (might be defined as the area of the surface)
- * @pre g is a valid geometry
+ * @brief Computes the 2D area of a Triangle.
+ *
+ * @param triangle The input Triangle.
+ * @return The total area of the triangle.
+ *
+ * @ingroup detail
  */
-SFCGAL_API double
-area3D(const Geometry &g);
+SFCGAL_API auto
+area(const Triangle &triangle) -> double;
 
 /**
- * Returns 3D area for a Geometry
+ * @brief Computes the 2D area of a Polygon.
+ *
+ * @param polygon The input Polygon.
+ * @return The total area of the polygon.
+ *
+ * @ingroup detail
+ */
+SFCGAL_API auto
+area(const Polygon &polygon) -> double;
+
+/**
+ * @brief Computes the 2D area of a GeometryCollection.
+ *
+ * @param collection The input GeometryCollection.
+ * @return The total area of the collection.
+ *
+ * @ingroup detail
+ */
+SFCGAL_API auto
+area(const GeometryCollection &collection) -> double;
+
+/**
+ * @brief Computes the 2D area of a TriangulatedSurface.
+ *
+ * @param tin The input TriangulatedSurface.
+ * @return The total area of the TriangulatedSurface.
+ *
+ * @ingroup detail
+ */
+SFCGAL_API auto
+area(const TriangulatedSurface &tin) -> double;
+
+/**
+ * @brief Computes the 2D area of a PolyhedralSurface.
+ *
+ * @param surface The input PolyhedralSurface.
+ * @return The total area of the PolyhedralSurface.
+ *
+ * @ingroup detail
+ */
+SFCGAL_API auto
+area(const PolyhedralSurface &surface) -> double;
+
+/**
+ * @brief Compute the 3D area of a Geometry.
  *
  * @warning Solid area is set to 0 (might be defined as the area of the surface)
+ * @pre The input geometry @p geom must be a valid geometry instance.
+ *
+ * @param geom The input geometry.
+ *
+ * @return The 3D area as a double precision value.
  * @ingroup detail
- * @pre g is a valid geometry
+ */
+SFCGAL_API auto
+area3D(const Geometry &geom) -> double;
+
+/**
+ * @brief Computes the 3D area of a Geometry.
+ *
+ * @warning Solid area is set to 0 (might be defined as the area of the surface)
  * @warning No actual validity check is done
+ * @pre geom is a valid geometry
+ *
+ * @param geom The input geometry.
+ *
+ * @return The 3D area as a double precision value.
+ * @ingroup detail
  */
-SFCGAL_API double
-area3D(const Geometry &g, NoValidityCheck);
+SFCGAL_API auto
+area3D(const Geometry &geom, NoValidityCheck) -> double;
 
 /**
- * Returns 3D area for a Polygon
+ * @brief Compute the 3D area of a Polygon.
+ *
+ * @pre The input geometry @p polygon must be a valid geometry instance.
+ * @param polygon The input polygon.
+ * @return The 3D area as a double precision value.
  * @ingroup detail
  */
-SFCGAL_API double
-area3D(const Polygon &g);
-/**
- * Returns the 3D area for a MultiPolygon
- * @ingroup detail
- */
-SFCGAL_API double
-area3D(const GeometryCollection &g);
+SFCGAL_API auto
+area3D(const Polygon &polygon) -> double;
 
 /**
- * Returns the 3D area for a PolyhedralSurface
+ * @brief Compute the 3D area of a GeometryCollection.
+ *
+ * @pre The input geometry @p collection must be a valid geometry instance.
+ * @param collection The input geometryCollection.
+ * @return The 3D area as a double precision value.
  * @ingroup detail
  */
-SFCGAL_API double
-area3D(const PolyhedralSurface &g);
+SFCGAL_API auto
+area3D(const GeometryCollection &collection) -> double;
 
 /**
- * Returns the 3D area for a Triangle
+ * @brief Compute the 3D area of a PolyhedralSurface.
+ *
+ * @pre The input geometry @p surface must be a valid geometry instance.
+ * @param surface The input PolyhedralSurface
+ * @return The 3D area as a double precision value.
  * @ingroup detail
  */
-SFCGAL_API double
-area3D(const Triangle &g);
+SFCGAL_API auto
+area3D(const PolyhedralSurface &surface) -> double;
 
 /**
- * Returns the 3D area for a TriangulatedSurface
+ * @brief Compute the 3D area of a Triangle.
+ *
+ * @pre The input geometry @p triangle must be a valid geometry instance.
+ * @param triangle The input Triangle
+ * @return The 3D area as a double precision value.
  * @ingroup detail
  */
-SFCGAL_API double
-area3D(const TriangulatedSurface &g);
+SFCGAL_API auto
+area3D(const Triangle &triangle) -> double;
+
+/**
+ * @brief Compute the 3D area of a TriangulatedSurface.
+ *
+ * @pre The input geometry @p tin must be a valid geometry instance.
+ * @param tin The input TriangulatedSurface
+ * @return The 3D area as a double precision value.
+ * @ingroup detail
+ */
+SFCGAL_API auto
+area3D(const TriangulatedSurface &tin) -> double;
 
 } // namespace algorithm
 } // namespace SFCGAL
