@@ -298,7 +298,7 @@ sfcgal_geometry_delete(sfcgal_geometry_t *geom);
 /**
  * Returns the number of geometries of the given geometry collection
  * @param geometryCollection the input geometry
- * @pre geometry must be a GeometryCollection.
+ * @pre geometry must be a SFCGAL::GeometryCollection.
  * Otherwise, 1 is returned.  For empty geometries 0 is
  * returned.
  * @ingroup capi
@@ -472,9 +472,9 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_point_create_from_xyzm(double x, double y, double z, double m);
 
 /**
- * Returns the X coordinate of the given Point
+ * Returns the X coordinate of the given SFCGAL::Point
  * @param geom the input geometry
- * @pre the given geometry must be a Point
+ * @pre the given geometry must be a SFCGAL::Point
  * @pre the given point must not be empty
  * @ingroup capi
  */
@@ -482,9 +482,9 @@ SFCGAL_API double
 sfcgal_point_x(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the Y coordinate of the given Point
+ * Returns the Y coordinate of the given SFCGAL::Point
  * @param geom the input geometry
- * @pre the given geometry must be a Point
+ * @pre the given geometry must be a SFCGAL::Point
  * @pre the given point must not be empty
  * @ingroup capi
  */
@@ -492,9 +492,9 @@ SFCGAL_API double
 sfcgal_point_y(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the Z coordinate of the given Point
+ * Returns the Z coordinate of the given SFCGAL::Point
  * @param geom the input geometry
- * @pre the given geometry must be a Point
+ * @pre the given geometry must be a SFCGAL::Point
  * @pre the given point must not be empty
  * @post the Z coordinate can value NaN if the given point is 2D only
  * @ingroup capi
@@ -503,9 +503,9 @@ SFCGAL_API double
 sfcgal_point_z(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the M coordinate of the given Point
+ * Returns the M coordinate of the given SFCGAL::Point
  * @param geom the input geometry
- * @pre the given geometry must be a Point
+ * @pre the given geometry must be a SFCGAL::Point
  * @pre the given point must not be empty
  * @post the M coordinate can value NaN if the given point has no m
  * @ingroup capi
@@ -535,8 +535,8 @@ sfcgal_linestring_num_points(const sfcgal_geometry_t *linestring);
  * @param i is the point index in the SFCGAL::LineString
  * @pre linestring must be a SFCGAL::LineString
  * @pre i >= and i < sfcgal_linestring_num_points
- * @post the returned Point is not writable and must not be deallocated by the
- * caller
+ * @post the returned SFCGAL::Point is not writable and must not be deallocated
+ * by the caller
  * @ingroup capi
  */
 SFCGAL_API const sfcgal_geometry_t *
@@ -544,11 +544,11 @@ sfcgal_linestring_point_n(const sfcgal_geometry_t *linestring, size_t i);
 
 /**
  * Adds a point to a SFCGAL::LineString
- * @param linestring is the SFCGAL::LineString where the Point has to be added
- * to
- * @param point is the Point to add to the given SFCGAL::LineString
+ * @param linestring is the SFCGAL::LineString where the SFCGAL::Point has to be
+ * added to
+ * @param point is the SFCGAL::Point to add to the given SFCGAL::LineString
  * @pre i >= and i < sfcgal_linestring_num_points
- * @post the ownership of Point is taken by the function
+ * @post the ownership of SFCGAL::Point is taken by the function
  * @ingroup capi
  */
 SFCGAL_API void
@@ -563,7 +563,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_triangle_create();
 
 /**
- * Creates a SFCGAL::Triangle from three given Point
+ * Creates a SFCGAL::Triangle from three given SFCGAL::Point
  * @param pta first input point
  * @param ptb second input point
  * @param ptc third input point
@@ -580,13 +580,13 @@ sfcgal_triangle_create_from_points(const sfcgal_geometry_t *pta,
                                    const sfcgal_geometry_t *ptc);
 
 /**
- * Returns one the SFCGAL::Triangle's vertex as a Point
+ * Returns one the SFCGAL::Triangle's vertex as a SFCGAL::Point
  * @param triangle the input geometry
  * @param i index of the vertex in the triangle
  * @pre triangle must be a SFCGAL::Triangle
  * @pre i >= 0 and i < 3
- * @post returns a pointer to one of the vertices as a Point. This pointer is
- * not writable and must not be deallocated by the caller
+ * @post returns a pointer to one of the vertices as a SFCGAL::Point. This
+ * pointer is not writable and must not be deallocated by the caller
  * @ingroup capi
  */
 SFCGAL_API const sfcgal_geometry_t *
@@ -598,7 +598,7 @@ sfcgal_triangle_vertex(const sfcgal_geometry_t *triangle, int i);
  * @param i index of the vertex in the triangle
  * @param vertex new point
  * @pre triangle must be a SFCGAL::Triangle
- * @pre vertex must be a Point
+ * @pre vertex must be a SFCGAL::Point
  * @pre i >= 0 and i < 3
  * @post the ownership of the vertex is not taken. The caller is still
  * responsible of its deallocation.
@@ -704,16 +704,16 @@ sfcgal_polygon_add_interior_ring(sfcgal_geometry_t *polygon,
                                  sfcgal_geometry_t *ring);
 
 /**
- * Creates an empty  GeometryCollection
+ * Creates an empty SFCGAL::GeometryCollection
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_collection_create();
 
 /**
- * Returns the number of geometries of a given GeometryCollection
+ * Returns the number of geometries of a given SFCGAL::GeometryCollection
  * @param collection the input geometry
- * @pre collection is a GeometryCollection
+ * @pre collection is a SFCGAL::GeometryCollection
  * @deprecated Use sfcgal_geometry_num_geometries() instead
  * @ingroup capi
  */
@@ -722,10 +722,10 @@ SFCGAL_API size_t
 sfcgal_geometry_collection_num_geometries(const sfcgal_geometry_t *collection);
 
 /**
- * Returns the ith geometry of a GeometryCollection
+ * Returns the ith geometry of a SFCGAL::GeometryCollection
  * @param collection the input geometry
  * @param i index of the geometry in the collection
- * @pre collection is a GeometryCollection
+ * @pre collection is a SFCGAL::GeometryCollection
  * @pre i >= 0 and i < sfcgal_geometry_collection_num_geometries
  * @post the returned Geometry is not writable and must not be deallocated by
  * the caller
@@ -736,11 +736,11 @@ sfcgal_geometry_collection_geometry_n(const sfcgal_geometry_t *collection,
                                       size_t                   i);
 
 /**
- * Set the ith geometry of a given GeometryCollection
+ * Set the ith geometry of a given SFCGAL::GeometryCollection
  * @param collection the input geometry
  * @param geometry the new geometry
  * @param i index of the geometry in the collection
- * @pre collection is a GeometryCollection
+ * @pre collection is a SFCGAL::GeometryCollection
  * @pre i >= 0 and i < sfcgal_geometry_num_geometries( collection )
  * @post The ownership of the geometry is taken. The caller is not responsible
  * anymore of its deallocation.
@@ -752,10 +752,10 @@ sfcgal_geometry_collection_set_geometry_n(sfcgal_geometry_t *collection,
                                           size_t             i);
 
 /**
- * Adds a Geometry to a given GeometryCollection
+ * Adds a Geometry to a given SFCGAL::GeometryCollection
  * @param collection the input geometry
  * @param geometry the new geometry
- * @pre collection must be a GeometryCollection
+ * @pre collection must be a SFCGAL::GeometryCollection
  * @post the ownership of the given geometry is taken. The caller is not
  * responsible anymore of its deallocation
  * @ingroup capi
@@ -765,28 +765,28 @@ sfcgal_geometry_collection_add_geometry(sfcgal_geometry_t *collection,
                                         sfcgal_geometry_t *geometry);
 
 /**
- * Creates an empty MultiPoint
+ * Creates an empty SFCGAL::MultiPoint
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_multi_point_create();
 
 /**
- * Creates an empty MultiLineString
+ * Creates an empty SFCGAL::MultiLineString
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_multi_linestring_create();
 
 /**
- * Creates an empty MultiPolygon
+ * Creates an empty SFCGAL::MultiPolygon
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_multi_polygon_create();
 
 /**
- * Creates an empty MultiSolid
+ * Creates an empty SFCGAL::MultiSolid
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
@@ -1103,7 +1103,7 @@ SFCGAL_API sfcgal_prepared_geometry_t *
 sfcgal_prepared_geometry_create();
 
 /**
- * Creates a PreparedGeometry from a Geometry and an SRID
+ * Creates a SFCGAL::PreparedGeometry from a Geometry and an SRID
  * @param geometry the input geometry
  * @param srid the srid of the geometry
  * @ingroup capi
@@ -1113,9 +1113,9 @@ sfcgal_prepared_geometry_create_from_geometry(sfcgal_geometry_t *geometry,
                                               srid_t             srid);
 
 /**
- * Deletes a given PreparedGeometry
+ * Deletes a given SFCGAL::PreparedGeometry
  * @param prepared the input geometry
- * @pre prepared must be a PreparedGeometry
+ * @pre prepared must be a SFCGAL::PreparedGeometry
  * @post the underlying Geometry linked to the given PreparedGeometry is also
  * deleted
  * @ingroup capi
@@ -1124,9 +1124,9 @@ SFCGAL_API void
 sfcgal_prepared_geometry_delete(sfcgal_prepared_geometry_t *prepared);
 
 /**
- * Returns the Geometry associated with a given PreparedGeometry
+ * Returns the Geometry associated with a given SFCGAL::PreparedGeometry
  * @param prepared the input geometry
- * @pre prepared must be a PreparedGeometry
+ * @pre prepared must be a SFCGAL::PreparedGeometry
  * @post the returned Geometry is not writable and must not be deallocated by
  * the caller
  * @ingroup capi
@@ -1135,10 +1135,10 @@ SFCGAL_API const sfcgal_geometry_t *
 sfcgal_prepared_geometry_geometry(const sfcgal_prepared_geometry_t *prepared);
 
 /**
- * Sets the Geometry associated with the given PreparedGeometry
+ * Sets the Geometry associated with the given SFCGAL::PreparedGeometry
  * @param prepared the input geometry
  * @param geometry the geometry to set
- * @pre prepared must be a PreparedGeometry
+ * @pre prepared must be a SFCGAL::PreparedGeometry
  * @post the ownership of the given geometry is taken. The caller is not
  * responsible anymore of its deallocation
  * @ingroup capi
@@ -1148,19 +1148,19 @@ sfcgal_prepared_geometry_set_geometry(sfcgal_prepared_geometry_t *prepared,
                                       sfcgal_geometry_t          *geometry);
 
 /**
- * Returns SRID associated with a given PreparedGeometry
+ * Returns SRID associated with a given SFCGAL::PreparedGeometry
  * @param prepared the input geometry
- * @pre prepared must be a PreparedGeometry
+ * @pre prepared must be a SFCGAL::PreparedGeometry
  * @ingroup capi
  */
 SFCGAL_API srid_t
 sfcgal_prepared_geometry_srid(const sfcgal_prepared_geometry_t *prepared);
 
 /**
- * Sets SRID associated with a given PreparedGeometry
+ * Sets SRID associated with a given SFCGAL::PreparedGeometry
  * @param prepared the input geometry
  * @param srid the srid of the geometry
- * @pre prepared must be a PreparedGeometry
+ * @pre prepared must be a SFCGAL::PreparedGeometry
  * @ingroup capi
  */
 SFCGAL_API void
@@ -1168,7 +1168,7 @@ sfcgal_prepared_geometry_set_srid(sfcgal_prepared_geometry_t *prepared,
                                   srid_t                      srid);
 
 /**
- * Returns an EWKT representation of the given PreparedGeometry
+ * Returns an EWKT representation of the given SFCGAL::PreparedGeometry
  * @param[in] prepared the input geometry
  * @param[in] num_decimals number of decimals. -2 for a variable number of
  *            decimals.
@@ -1781,7 +1781,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_boundary(const sfcgal_geometry_t *geom);
 
 /**
- * Returns a Point representing the geometry centroid
+ * Returns a SFCGAL::Point representing the geometry centroid
  * @param geom input geometry
  * @pre isValid(geom) == true
  * @post isValid(return) == true
@@ -1791,7 +1791,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_centroid(const sfcgal_geometry_t *geom);
 
 /**
- * Returns a Point representing the geometry centroid
+ * Returns a SFCGAL::Point representing the geometry centroid
  * @param geom input geometry
  * @pre isValid(geom) == true
  * @post isValid(return) == true
@@ -1872,7 +1872,7 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the visibility polygon of a Point inside a SFCGAL::Polygon
+ * Returns the visibility polygon of a SFCGAL::Point inside a SFCGAL::Polygon
  * @param polygon input geometry
  * @param point input geometry
  * @ingroup capi
