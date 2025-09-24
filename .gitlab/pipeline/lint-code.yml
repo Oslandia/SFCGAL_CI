@@ -28,9 +28,9 @@ clang-format:
 doxygen-warnings:
   stage: lint
   image:
-    name: debian:stable-slim
+    name: fedora:43
   before_script:
-    - apt update && apt install --no-install-recommends --yes doxygen git
+    - dnf -y makecache && dnf install --setopt=install_weak_deps=False -y doxygen git
   script:
    - script/doxygen-check.sh
   rules:
