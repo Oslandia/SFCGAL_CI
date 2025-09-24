@@ -97,6 +97,7 @@ typedef enum {
 
 /**
  * Set the geometry validation mode
+ * @param enabled 1 for enabled, 0 for disabled.
  * @ingroup capi
  * @note obsolete
  * @deprecated It is not used anymore. It has no effect.
