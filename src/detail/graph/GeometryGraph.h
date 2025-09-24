@@ -15,12 +15,18 @@ namespace SFCGAL {
 namespace graph {
 
 /**
- *
+ * @enum EdgeDirection
+ * @brief Specifies the direction of an edge in a graph.
  */
 typedef enum { DIRECT = 0, REVERSE = 1 } EdgeDirection;
 
 /**
- * reverse EdgeDirection (DIRECT=>REVERSE, REVERSE=>DIRECT)
+ * @brief Returns the reverse of the given EdgeDirection.
+ *
+ * Converts DIRECT to REVERSE and REVERSE to DIRECT.
+ *
+ * @param direction The current edge direction.
+ * @return The opposite edge direction.
  */
 inline EdgeDirection
 reverse(const EdgeDirection &direction)
@@ -42,8 +48,8 @@ reverse(const EdgeDirection &direction)
 template <typename VertexProperties, typename EdgeProperties>
 class GeometryGraphT {
 public:
-  typedef VertexProperties vertex_properties;
-  typedef EdgeProperties   edge_properties;
+  typedef VertexProperties vertex_properties; ///< Vertex properties type
+  typedef EdgeProperties   edge_properties;   ///< Edge properties type
 
   /**
    * the wrapped graphEdgeProperties
@@ -55,13 +61,14 @@ public:
       graph_t;
 
   typedef typename boost::graph_traits<graph_t>::vertex_descriptor
-      vertex_descriptor;
-  typedef
-      typename boost::graph_traits<graph_t>::edge_descriptor edge_descriptor;
+      vertex_descriptor; ///< Vertex descriptor type from boost graph
+  typedef typename boost::graph_traits<graph_t>::edge_descriptor
+      edge_descriptor; ///< Edge descriptor type from boost graph
 
-  typedef
-      typename boost::graph_traits<graph_t>::vertex_iterator   vertex_iterator;
-  typedef typename boost::graph_traits<graph_t>::edge_iterator edge_iterator;
+  typedef typename boost::graph_traits<graph_t>::vertex_iterator
+      vertex_iterator; ///< Vertex iterator type
+  typedef typename boost::graph_traits<graph_t>::edge_iterator
+      edge_iterator; ///< Edge iterator type
   /**
    * An edge descriptor, with a direction.
    *
@@ -69,13 +76,14 @@ public:
    */
   typedef std::pair<edge_descriptor, EdgeDirection> directed_edge_descriptor;
 
-  typedef
-      typename boost::graph_traits<graph_t>::in_edge_iterator in_edge_iterator;
+  typedef typename boost::graph_traits<graph_t>::in_edge_iterator
+      in_edge_iterator; ///< Incoming edge iterator type
   typedef typename boost::graph_traits<graph_t>::out_edge_iterator
-      out_edge_iterator;
+      out_edge_iterator; ///< Outgoing edge iterator type
 
   /**
-   * [vertex]returns the number of vertices
+   * @brief Returns the number of vertices
+   * @return The number of vertices in the graph
    */
   inline size_t
   numVertices() const
@@ -84,7 +92,8 @@ public:
   }
 
   /**
-   * [iterator]return vertex iterator
+   * @brief Return vertex iterator pair
+   * @return Pair of vertex iterators (begin, end)
    *
    * @code
    * typename GeometryGraph<V,E>::vertex_iterator it, end ;
@@ -101,8 +110,9 @@ public:
   }
 
   /**
-   * [vertex]add a vertex to the graph
-   * @return the identifier of the vertex
+   * @brief Add a vertex to the graph
+   * @param properties The properties for the new vertex
+   * @return The identifier of the vertex
    */
   vertex_descriptor
   addVertex(const vertex_properties &properties = vertex_properties())
@@ -110,7 +120,8 @@ public:
     return boost::add_vertex(properties, _graph);
   }
   /**
-   * [vertex]Remove a vertex (and all its adjacent edges)
+   * @brief Remove a vertex (and all its adjacent edges)
+   * @param vertex The vertex descriptor to remove
    */
   void
   removeVertex(const vertex_descriptor &vertex)
@@ -120,7 +131,8 @@ public:
   }
 
   /**
-   * [edge]returns the number of vertices
+   * @brief Returns the number of edges
+   * @return The number of edges in the graph
    */
   inline size_t
   numEdges() const
@@ -129,7 +141,8 @@ public:
   }
 
   /**
-   * [iterator]return edge iterator
+   * @brief Return edge iterator pair
+   * @return Pair of edge iterators (begin, end)
    *
    * @code
    * typename GeometryGraph<V,E>::edge_iterator it, end ;
@@ -146,8 +159,11 @@ public:
   }
 
   /**
-   * [edge]Add an Edge to the Graph
-   * @return the identifier of the vertex
+   * @brief Add an Edge to the Graph
+   * @param source The source vertex descriptor
+   * @param target The target vertex descriptor
+   * @param properties The properties for the new edge
+   * @return The identifier of the edge
    */
   edge_descriptor
   addEdge(const vertex_descriptor &source, const vertex_descriptor &target,
@@ -157,7 +173,9 @@ public:
   }
 
   /**
-   * [edge]get the source vertex for an edge
+   * @brief Get the source vertex for an edge
+   * @param edge The edge descriptor
+   * @return The source vertex descriptor
    */
   vertex_descriptor
   source(const edge_descriptor &edge) const
@@ -165,7 +183,10 @@ public:
     return boost::source(edge, _graph);
   }
   /**
-   * [edge]get the source vertex for an edge
+   * @brief Get the source vertex for an edge with direction
+   * @param edge The edge descriptor
+   * @param direction The edge direction
+   * @return The source vertex descriptor
    */
   vertex_descriptor
   source(const edge_descriptor &edge, const EdgeDirection &direction) const
@@ -174,7 +195,9 @@ public:
                                : boost::target(edge, _graph);
   }
   /**
-   * [edge]get the source vertex for an edge with a direction
+   * @brief Get the source vertex for a directed edge
+   * @param edge The directed edge descriptor
+   * @return The source vertex descriptor
    */
   vertex_descriptor
   source(const directed_edge_descriptor &edge) const
@@ -183,7 +206,9 @@ public:
   }
 
   /**
-   * [edge]get the target vertex for an edge
+   * @brief Get the target vertex for an edge
+   * @param edge The edge descriptor
+   * @return The target vertex descriptor
    */
   vertex_descriptor
   target(const edge_descriptor &edge) const
@@ -191,7 +216,10 @@ public:
     return boost::target(edge, _graph);
   }
   /**
-   * [edge]get the target vertex for an edge with a direction
+   * @brief Get the target vertex for an edge with direction
+   * @param edge The edge descriptor
+   * @param direction The edge direction
+   * @return The target vertex descriptor
    */
   vertex_descriptor
   target(const edge_descriptor &edge, const EdgeDirection &direction) const
@@ -200,7 +228,9 @@ public:
                                : boost::source(edge, _graph);
   }
   /**
-   * [edge]get the target vertex for an edge with a direction
+   * @brief Get the target vertex for a directed edge
+   * @param edge The directed edge descriptor
+   * @return The target vertex descriptor
    */
   vertex_descriptor
   target(const directed_edge_descriptor &edge) const
@@ -208,7 +238,8 @@ public:
     return target(edge.first, edge.second);
   }
   /**
-   * [edge]Remove an edge
+   * @brief Remove an edge
+   * @param edge The edge descriptor to remove
    */
   void
   removeEdge(const edge_descriptor &edge)
@@ -217,7 +248,10 @@ public:
   }
 
   /**
-   * [edge]Get edges from a to b and from b to a
+   * @brief Get edges from a to b and from b to a
+   * @param a First vertex descriptor
+   * @param b Second vertex descriptor
+   * @return Vector of directed edge descriptors connecting the vertices
    */
   std::vector<directed_edge_descriptor>
   edges(const vertex_descriptor &a, const vertex_descriptor &b) const
@@ -252,7 +286,9 @@ public:
   }
 
   /**
-   * returns the degree of a vertex
+   * @brief Returns the degree of a vertex
+   * @param vertex The vertex descriptor
+   * @return The degree of the vertex
    */
   inline size_t
   degree(const vertex_descriptor &vertex) const
@@ -261,7 +297,9 @@ public:
   }
 
   /**
-   * [adjacency]get in edges
+   * @brief Get in edges for a vertex
+   * @param vertex The vertex descriptor
+   * @return Vector of incoming edge descriptors
    */
   std::vector<edge_descriptor>
   inEdges(const vertex_descriptor &vertex)
@@ -278,7 +316,9 @@ public:
     return edges;
   }
   /**
-   * [adjacency]get out edges
+   * @brief Get out edges for a vertex
+   * @param vertex The vertex descriptor
+   * @return Vector of outgoing edge descriptors
    */
   std::vector<edge_descriptor>
   outEdges(const vertex_descriptor &vertex) const
@@ -295,7 +335,9 @@ public:
     return edges;
   }
   /**
-   * [adjacency]get in/out edges
+   * @brief Get in/out edges for a vertex
+   * @param vertex The vertex descriptor
+   * @return Vector of directed edge descriptors (in and out edges)
    */
   std::vector<directed_edge_descriptor>
   inOutEdges(const vertex_descriptor &vertex) const
@@ -323,10 +365,11 @@ public:
   }
 
   /**
-   * [adjacency]Returns the list of the adjacent vertices using both DIRECT and
+   * @brief Returns the list of the adjacent vertices using both DIRECT and
    * REVERSE direction
-   * @param vertex input vertex
-   * @param withReverseDirection indicates if in_edges are used
+   * @param vertex Input vertex
+   * @param withReverseDirection Indicates if in_edges are used
+   * @return Set of adjacent vertex descriptors
    */
   std::set<vertex_descriptor>
   adjacentVertices(const vertex_descriptor &vertex,
@@ -365,7 +408,10 @@ public:
   }
 
   /**
-   * [helper]indicates if edges are opposite
+   * @brief Indicates if edges are opposite
+   * @param a First edge descriptor
+   * @param b Second edge descriptor
+   * @return True if edges are opposite
    */
   inline bool
   areOpposite(const edge_descriptor &a, const edge_descriptor &b) const
@@ -373,7 +419,10 @@ public:
     return source(a) == target(b) && target(a) == source(b);
   }
   /**
-   * [helper]indicates if edges are opposite
+   * @brief Indicates if edges are parallel
+   * @param a First edge descriptor
+   * @param b Second edge descriptor
+   * @return True if edges are parallel
    */
   inline bool
   areParallel(const edge_descriptor &a, const edge_descriptor &b) const
@@ -382,8 +431,9 @@ public:
   }
 
   /**
-   * [EdgeString]revert the order of a list of edges. Old edges are removed from
+   * @brief Revert the order of a list of edges. Old edges are removed from
    * the graph, new ones are created.
+   * @param edges Vector of edge descriptors to reverse
    *
    * @warning properties are kept but oriented one (left face, right face, etc.)
    * are lost.
@@ -405,7 +455,9 @@ public:
   }
 
   /**
-   * returns the VertexProperties attached to a Vertex
+   * @brief Returns the VertexProperties attached to a Vertex
+   * @param vertex The vertex descriptor
+   * @return Const reference to vertex properties
    */
   inline const vertex_properties &
   operator[](const vertex_descriptor &vertex) const
@@ -413,7 +465,9 @@ public:
     return _graph[vertex];
   }
   /**
-   * returns the VertexProperties attached to a Vertex
+   * @brief Returns the VertexProperties attached to a Vertex
+   * @param vertex The vertex descriptor
+   * @return Reference to vertex properties
    */
   inline vertex_properties &
   operator[](const vertex_descriptor &vertex)
@@ -422,7 +476,9 @@ public:
   }
 
   /**
-   * returns the VertexProperties attached to a Vertex
+   * @brief Returns the EdgeProperties attached to an Edge
+   * @param edge The edge descriptor
+   * @return Const reference to edge properties
    */
   inline const edge_properties &
   operator[](const edge_descriptor &edge) const
@@ -430,7 +486,9 @@ public:
     return _graph[edge];
   }
   /**
-   * returns the VertexProperties attached to a Vertex
+   * @brief Returns the EdgeProperties attached to an Edge
+   * @param edge The edge descriptor
+   * @return Reference to edge properties
    */
   inline edge_properties &
   operator[](const edge_descriptor &edge)
@@ -439,7 +497,8 @@ public:
   }
 
   /**
-   * returns the wrapped boost::graph
+   * @brief Returns the wrapped boost::graph
+   * @return Reference to the underlying graph
    */
   inline graph_t &
   graph()
@@ -447,7 +506,8 @@ public:
     return _graph;
   }
   /**
-   * returns the wrapped boost::graph
+   * @brief Returns the wrapped boost::graph
+   * @return Const reference to the underlying graph
    */
   inline const graph_t &
   graph() const
