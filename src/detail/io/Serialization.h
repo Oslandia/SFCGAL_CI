@@ -32,41 +32,71 @@ namespace SFCGAL {
 
 namespace io {
 
+/**
+ * @brief Binary serialization wrapper for SFCGAL geometries
+ *
+ * Extends boost::archive::binary_oarchive to provide binary serialization
+ * capabilities for SFCGAL geometry objects.
+ */
 class SFCGAL_API BinarySerializer : public boost::archive::binary_oarchive {
 public:
+  /**
+   * @brief Construct binary serializer
+   * @param ostr Output stream to write binary data to
+   */
   BinarySerializer(std::ostream &ostr);
 };
 
+/**
+ * @brief Binary deserialization wrapper for SFCGAL geometries
+ *
+ * Extends boost::archive::binary_iarchive to provide binary deserialization
+ * capabilities for SFCGAL geometry objects.
+ */
 class SFCGAL_API BinaryUnserializer : public boost::archive::binary_iarchive {
 public:
+  /**
+   * @brief Construct binary deserializer
+   * @param istr Input stream to read binary data from
+   */
   BinaryUnserializer(std::istream &istr);
 };
 
 /**
  * Convert a Geometry to its binary representation
+ * @param geom Geometry to convert
+ * @return The binary representation as a string
  * @warning resulting string may contain 0s
  */
-SFCGAL_API std::string
-           writeBinaryGeometry(const SFCGAL::Geometry &);
+SFCGAL_API auto
+writeBinaryGeometry(const SFCGAL::Geometry &geom) -> std::string;
 
 /**
  * Convert a PreparedGeometry to its binary representation
+ * @param preparedGeom PreparedGeometry to convert
+ * @return The binary representation as a string
  * @warning resulting string may contain 0s
  */
-SFCGAL_API std::string
-           writeBinaryPrepared(const SFCGAL::PreparedGeometry &);
+SFCGAL_API auto
+writeBinaryPrepared(const SFCGAL::PreparedGeometry &preparedGeom)
+    -> std::string;
 
 /**
  * Read a Geometry from a binary representation
+ * @param str binary representation
+ * @return A SFCGAL::Geometry
  */
-SFCGAL_API std::unique_ptr<SFCGAL::Geometry>
-           readBinaryGeometry(const std::string &);
+SFCGAL_API auto
+readBinaryGeometry(const std::string &str) -> std::unique_ptr<SFCGAL::Geometry>;
 
 /**
  * Read a PreparedGeometry from a binary representation
+ * @param str binary representation
+ * @return A SFCGAL::PreparedGeometry
  */
-SFCGAL_API std::unique_ptr<SFCGAL::PreparedGeometry>
-           readBinaryPrepared(const std::string &);
+SFCGAL_API auto
+readBinaryPrepared(const std::string &str)
+    -> std::unique_ptr<SFCGAL::PreparedGeometry>;
 } // namespace io
 } // namespace SFCGAL
 

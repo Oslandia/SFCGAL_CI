@@ -57,28 +57,28 @@ BinaryUnserializer::BinaryUnserializer(std::istream &ostr)
 }
 
 auto
-writeBinaryGeometry(const Geometry &g) -> std::string
+writeBinaryGeometry(const SFCGAL::Geometry &geom) -> std::string
 {
   std::ostringstream ostr;
   BinarySerializer   arc(ostr);
   // use the pointer version to force dynamic type writing
-  const Geometry *pg = &g;
+  const Geometry *pg = &geom;
   arc << pg;
   return ostr.str();
 }
 
 auto
-writeBinaryPrepared(const PreparedGeometry &g) -> std::string
+writeBinaryPrepared(const SFCGAL::PreparedGeometry &preparedGeom) -> std::string
 {
   std::ostringstream      ostr;
   BinarySerializer        arc(ostr);
-  const PreparedGeometry *pg = &g;
+  const PreparedGeometry *pg = &preparedGeom;
   arc << pg;
   return ostr.str();
 }
 
 auto
-readBinaryGeometry(const std::string &str) -> std::unique_ptr<Geometry>
+readBinaryGeometry(const std::string &str) -> std::unique_ptr<SFCGAL::Geometry>
 {
   std::istringstream istr(str);
   BinaryUnserializer iarc(istr);
@@ -88,7 +88,8 @@ readBinaryGeometry(const std::string &str) -> std::unique_ptr<Geometry>
 }
 
 auto
-readBinaryPrepared(const std::string &str) -> std::unique_ptr<PreparedGeometry>
+readBinaryPrepared(const std::string &str)
+    -> std::unique_ptr<SFCGAL::PreparedGeometry>
 {
   std::istringstream istr(str);
   BinaryUnserializer iarc(istr);
