@@ -235,6 +235,9 @@ isClosedNURBSCurve(const NURBSCurve &nurbsCurve) -> Closure
 // -- public interface
 // ----------------------------------------------------------------------------------
 
+/** Check if geometry is closed
+ * @param g Geometry to check
+ * @return Closure status */
 auto
 isClosed(const Geometry &g) -> Closure
 {

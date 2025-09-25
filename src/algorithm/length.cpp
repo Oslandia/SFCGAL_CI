@@ -13,6 +13,9 @@
 
 namespace SFCGAL::algorithm {
 
+/** Compute 2D length of LineString
+ * @param g The LineString to measure
+ * @return Length in 2D */
 auto
 length(const LineString &g) -> double
 {
@@ -27,6 +30,9 @@ length(const LineString &g) -> double
   return result;
 }
 
+/** Compute 2D length of GeometryCollection
+ * @param g The GeometryCollection to measure
+ * @return Total length in 2D */
 auto
 length(const GeometryCollection &g) -> double
 {
@@ -39,6 +45,9 @@ length(const GeometryCollection &g) -> double
   return result;
 }
 
+/** Compute 2D length of Geometry
+ * @param g The Geometry to measure
+ * @return Length in 2D */
 auto
 length(const Geometry &g) -> double
 {
@@ -87,6 +96,9 @@ length(const Geometry &g) -> double
 
 //------ 3D
 
+/** Compute 3D length of LineString
+ * @param g The LineString to measure
+ * @return Length in 3D */
 auto
 length3D(const LineString &g) -> double
 {
@@ -101,6 +113,9 @@ length3D(const LineString &g) -> double
   return result;
 }
 
+/** Compute 3D length of GeometryCollection
+ * @param g The GeometryCollection to measure
+ * @return Total length in 3D */
 auto
 length3D(const GeometryCollection &g) -> double
 {
@@ -113,6 +128,9 @@ length3D(const GeometryCollection &g) -> double
   return result;
 }
 
+/** Compute 3D length of Geometry
+ * @param g The Geometry to measure
+ * @return Length in 3D */
 auto
 length3D(const Geometry &g) -> double
 {

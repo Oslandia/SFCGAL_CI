@@ -18,14 +18,10 @@ struct NoValidityCheck;
 /**
  * @brief Dispatch 3D distance between two Geometries.
  *
+ * @param gA First geometry
+ * @param gB Second geometry
+ * @return 3D distance between the geometries
  * @todo complete with solid
- *
- * @pre gA is a valid geometry
- * @pre gB is a valid geometry
- *
- * @param gA The first Geometry.
- * @param gB The second Geometry.
- * @return The 3D distance between the two Geometries.
  */
 SFCGAL_API auto
 distance3D(const Geometry &gA, const Geometry &gB) -> double;
@@ -33,16 +29,13 @@ distance3D(const Geometry &gA, const Geometry &gB) -> double;
 /**
  * @brief Dispatch 3D distance between two Geometries.
  *
- *
- * @pre gA is a valid geometry
- * @pre gB is a valid geometry
- *
+ * @param gA First geometry
+ * @param gB Second geometry
+ * @param noCheck Validity check parameter
+ * @return 3D distance between the geometries
  * @warning No actual validity check is done
  *
- * @param gA The first Geometry.
- * @param gB The second Geometry.
- * @param noCheck validity check, unused parameter
- * @return The 3D distance between the two Geometries.
+ * @ingroup detail
  */
 SFCGAL_API auto
 distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck noCheck)

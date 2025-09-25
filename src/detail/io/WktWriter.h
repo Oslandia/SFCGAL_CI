@@ -143,12 +143,14 @@ protected:
 
   /**
    * Write vector of weights in WKT format: (w1, w2, w3, ...)
+   * @param weights Vector of weight values to write
    */
   void
   writeWeights(const std::vector<Kernel::FT> &weights);
 
   /**
    * Write vector of knots in WKT format: (k1, k2, k3, ...)
+   * @param knots Vector of knot values to write
    */
   void
   writeKnots(const std::vector<Kernel::FT> &knots);

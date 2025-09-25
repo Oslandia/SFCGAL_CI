@@ -191,18 +191,21 @@ public:
 
   /**
    * Read vector of weights from WKT format: (w1, w2, w3, ...)
+   * @return Vector of weight values
    */
   std::vector<Kernel::FT>
   readWeightsVector();
 
   /**
    * Read vector of knots from WKT format: (k1, k2, k3, ...)
+   * @return Vector of knot values
    */
   std::vector<Kernel::FT>
   readKnotsVector();
 
   /**
    * Read degree value (unsigned integer)
+   * @return NURBS curve degree
    */
   unsigned int
   readDegree();

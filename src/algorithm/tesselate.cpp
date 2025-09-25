@@ -12,6 +12,9 @@
 
 namespace SFCGAL::algorithm {
 
+/** Tessellate geometry without validity check
+ * @param g Geometry to tessellate
+ * @return Tessellated geometry */
 auto
 tesselate(const Geometry &g, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
@@ -66,6 +69,9 @@ tesselate(const Geometry &g, NoValidityCheck /*unused*/)
   return std::unique_ptr<Geometry>(g.clone());
 }
 
+/** Tessellate geometry
+ * @param g Geometry to tessellate
+ * @return Tessellated geometry */
 auto
 tesselate(const Geometry &g) -> std::unique_ptr<Geometry>
 {

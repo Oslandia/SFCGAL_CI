@@ -124,15 +124,6 @@ Transform::visit(TriangulatedSurface &g)
   }
 }
 
-/**
- * @brief Visit a NURBS curve and apply the transform to each control point.
- *
- * Iterates over the curve's control points and recursively visits each one
- * so the transformation is applied to all control vertices of the NURBS curve.
- *
- * @param g NURBSCurve to traverse; its control points are visited in index
- * order.
- */
 void
 Transform::visit(NURBSCurve &g)
 {

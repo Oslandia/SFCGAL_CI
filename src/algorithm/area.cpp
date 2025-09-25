@@ -40,14 +40,14 @@ namespace SFCGAL::algorithm {
  * TRIANGULATEDSURFACE, POLYHEDRALSURFACE and collections (MULTI and
  * GEOMETRYCOLLECTION types).
  *
- * @param g The geometry whose planar area is computed.
- * @param NoValidityCheck Unused tag parameter indicating that geometry validity
+ * @param geom The geometry whose planar area is computed.
+ * @param noCheck Unused tag parameter indicating that geometry validity
  * is not checked.
  * @return double The computed planar area (>= 0).
  * @throws Exception If the geometry type is not handled by this dispatch.
  */
 auto
-area(const Geometry &geom, NoValidityCheck /*unused*/) -> double
+area(const Geometry &geom, [[maybe_unused]] NoValidityCheck noCheck) -> double
 {
   switch (geom.geometryTypeId()) {
   case TYPE_POINT:
@@ -184,8 +184,8 @@ area(const PolyhedralSurface &surface) -> double
  * - MULTI types and GEOMETRYCOLLECTION: sum the 3D area of contained
  * geometries.
  *
- * @param g Geometry to measure.
- * @param NoValidityCheck Unused tag parameter selecting the unchecked path.
+ * @param geom Geometry to measure.
+ * @param noCheck Unused tag parameter selecting the unchecked path.
  * @return double 3D surface area of the geometry.
  *
  */

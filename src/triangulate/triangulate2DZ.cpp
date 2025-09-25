@@ -16,6 +16,7 @@
 
 namespace SFCGAL::triangulate {
 
+/** Type alias for Constraint Delaunay Triangulation vertex handle */
 using Vertex_handle = ConstraintDelaunayTriangulation::Vertex_handle;
 
 // ----------------------------------------------------------------------------------
@@ -78,6 +79,12 @@ triangulate2DZ(const Triangle                  &g,
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/**
+ * @brief Triangulate a geometry collection in 2D with Z values
+ *
+ * @param g The geometry collection to triangulate
+ * @param triangulation The triangulation to add vertices and constraints to
+ */
 void
 triangulateCollection2DZ(const Geometry                  &g,
                          ConstraintDelaunayTriangulation &triangulation)
@@ -87,6 +94,12 @@ triangulateCollection2DZ(const Geometry                  &g,
   }
 }
 
+/**
+ * @brief Triangulate a geometry in 2D with Z values
+ *
+ * @param g The geometry to triangulate
+ * @param triangulation The triangulation to add vertices and constraints to
+ */
 void
 triangulate2DZ(const Geometry                  &g,
                ConstraintDelaunayTriangulation &triangulation)
@@ -150,6 +163,13 @@ triangulate2DZ(const Geometry                  &g,
   }
 }
 
+/**
+ * @brief Triangulate a geometry in 2D with Z values and return the
+ * triangulation
+ *
+ * @param g The geometry to triangulate
+ * @return The constraint Delaunay triangulation
+ */
 auto
 triangulate2DZ(const Geometry &g) -> ConstraintDelaunayTriangulation
 {

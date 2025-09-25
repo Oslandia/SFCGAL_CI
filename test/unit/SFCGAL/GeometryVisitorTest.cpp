@@ -103,6 +103,7 @@ public:
     type = "NURBSCurve";
   }
 
+  /** String to store the visited geometry type name */
   std::string type;
 };
 

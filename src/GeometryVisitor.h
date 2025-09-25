@@ -34,40 +34,54 @@ public:
   virtual void
   visit(Geometry &g);
 
-  /// Visit a Point geometry
+  /**
+   * Visit a Point geometry
+   * @param g The Point geometry to visit
+   */
   virtual void
   visit(Point &g) = 0;
-  /// Visit a LineString geometry
+  /** Visit a LineString geometry
+   * @param g The LineString geometry to visit */
   virtual void
   visit(LineString &g) = 0;
-  /// Visit a Polygon geometry
+  /** Visit a Polygon geometry
+   * @param g The Polygon geometry to visit */
   virtual void
   visit(Polygon &g) = 0;
-  /// Visit a Triangle geometry
+  /** Visit a Triangle geometry
+   * @param g The Triangle geometry to visit */
   virtual void
   visit(Triangle &g) = 0;
-  /// Visit a Solid geometry
+  /** Visit a Solid geometry
+   * @param g The Solid geometry to visit */
   virtual void
   visit(Solid &g) = 0;
-  /// Visit a MultiPoint geometry
+  /** Visit a MultiPoint geometry
+   * @param g The MultiPoint geometry to visit */
   virtual void
   visit(MultiPoint &g) = 0;
-  /// Visit a MultiLineString geometry
+  /** Visit a MultiLineString geometry
+   * @param g The MultiLineString geometry to visit */
   virtual void
   visit(MultiLineString &g) = 0;
-  /// Visit a MultiPolygon geometry
+  /** Visit a MultiPolygon geometry
+   * @param g The MultiPolygon geometry to visit */
   virtual void
   visit(MultiPolygon &g) = 0;
-  /// Visit a MultiSolid geometry
+  /** Visit a MultiSolid geometry
+   * @param g The MultiSolid geometry to visit */
   virtual void
   visit(MultiSolid &g) = 0;
-  /// Visit a GeometryCollection geometry
+  /** Visit a GeometryCollection geometry
+   * @param g The GeometryCollection geometry to visit */
   virtual void
   visit(GeometryCollection &g) = 0;
-  /// Visit a PolyhedralSurface geometry
+  /** Visit a PolyhedralSurface geometry
+   * @param g The PolyhedralSurface geometry to visit */
   virtual void
   visit(PolyhedralSurface &g) = 0;
-  /// Visit a TriangulatedSurface geometry
+  /** Visit a TriangulatedSurface geometry
+   * @param g The TriangulatedSurface geometry to visit */
   virtual void
   visit(TriangulatedSurface &g) = 0;
   /**
@@ -103,40 +117,52 @@ public:
   virtual void
   visit(const Geometry &g);
 
-  /// Visit a Point geometry
+  /** Visit a const Point geometry
+   * @param g The const Point geometry to visit */
   virtual void
   visit(const Point &g) = 0;
-  /// Visit a LineString geometry
+  /** Visit a const LineString geometry
+   * @param g The const LineString geometry to visit */
   virtual void
   visit(const LineString &g) = 0;
-  /// Visit a Polygon geometry
+  /** Visit a const Polygon geometry
+   * @param g The const Polygon geometry to visit */
   virtual void
   visit(const Polygon &g) = 0;
-  /// Visit a Triangle geometry
+  /** Visit a const Triangle geometry
+   * @param g The const Triangle geometry to visit */
   virtual void
   visit(const Triangle &g) = 0;
-  /// Visit a Solid geometry
+  /** Visit a const Solid geometry
+   * @param g The const Solid geometry to visit */
   virtual void
   visit(const Solid &g) = 0;
-  /// Visit a MultiPoint geometry
+  /** Visit a const MultiPoint geometry
+   * @param g The const MultiPoint geometry to visit */
   virtual void
   visit(const MultiPoint &g) = 0;
-  /// Visit a MultiLineString geometry
+  /** Visit a const MultiLineString geometry
+   * @param g The const MultiLineString geometry to visit */
   virtual void
   visit(const MultiLineString &g) = 0;
-  /// Visit a MultiPolygon geometry
+  /** Visit a const MultiPolygon geometry
+   * @param g The const MultiPolygon geometry to visit */
   virtual void
   visit(const MultiPolygon &g) = 0;
-  /// Visit a MultiSolid geometry
+  /** Visit a const MultiSolid geometry
+   * @param g The const MultiSolid geometry to visit */
   virtual void
   visit(const MultiSolid &g) = 0;
-  /// Visit a GeometryCollection geometry
+  /** Visit a const GeometryCollection geometry
+   * @param g The const GeometryCollection geometry to visit */
   virtual void
   visit(const GeometryCollection &g) = 0;
-  /// Visit a PolyhedralSurface geometry
+  /** Visit a const PolyhedralSurface geometry
+   * @param g The const PolyhedralSurface geometry to visit */
   virtual void
   visit(const PolyhedralSurface &g) = 0;
-  /// Visit a TriangulatedSurface geometry
+  /** Visit a const TriangulatedSurface geometry
+   * @param g The const TriangulatedSurface geometry to visit */
   virtual void
   visit(const TriangulatedSurface &g) = 0;
   /**

@@ -251,6 +251,10 @@ minkowskiSumCollection(const Geometry &gA, const Polygon_2 &gB,
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/** Compute Minkowski sum without validity check
+ * @param gA First geometry
+ * @param gB Second polygon
+ * @return Minkowski sum geometry */
 auto
 minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
@@ -265,6 +269,10 @@ minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck /*unused*/)
       detail::polygonSetToMultiPolygon(polygonSet).release());
 }
 
+/** Compute Minkowski sum
+ * @param gA First geometry
+ * @param gB Second polygon
+ * @return Minkowski sum geometry */
 auto
 minkowskiSum(const Geometry &gA, const Polygon &gB) -> std::unique_ptr<Geometry>
 {

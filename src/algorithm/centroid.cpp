@@ -124,7 +124,7 @@ centroid3D(const Geometry &geom) -> std::unique_ptr<Point>
  * zero area, the point's vector as centroid, and the point's M value if
  * measured.
  *
- * @param g Geometry to compute the weighted centroid for.
+ * @param geom Geometry to compute the weighted centroid for.
  * @param enable3DComputation When true, area/length computations prefer 3D
  *        formulas (when available); otherwise 2D computations are used.
  * @return WeightedCentroid Aggregated area, centroid vector, and M value
@@ -210,9 +210,9 @@ weightedCentroid(const Triangle &triangle, bool enable3DComputation)
  * - m: the average of the three points' M values if all three are measured,
  * otherwise 0.
  *
- * @param a First triangle vertex.
- * @param b Second triangle vertex.
- * @param c Third triangle vertex.
+ * @param pta First triangle vertex.
+ * @param ptb Second triangle vertex.
+ * @param ptc Third triangle vertex.
  * @param enable3DComputation If true, compute area in 3D; if false, compute 2D
  * signed area.
  * @return WeightedCentroid Area, centroid vector, and M value for the triangle.
@@ -283,15 +283,15 @@ weightedCentroid(const Curve &g, bool enable3DComputation) -> WeightedCentroid
  *
  * Computes an area/length-weighted centroid and the associated weighted measure
  * (M).
- * - If g.isClosed() is true, treats the LineString as a polygonal ring and
- * decomposes it into triangles fan-based from the first point; each triangle's
- * area/centroid is accumulated (triangle area computation honors
+ * - If lineString.isClosed() is true, treats the LineString as a polygonal ring
+ * and decomposes it into triangles fan-based from the first point; each
+ * triangle's area/centroid is accumulated (triangle area computation honors
  * enable3DComputation).
- * - If g is open, treats it as a polyline and accumulates segment contributions
- * using segment midpoints weighted by segment length.
+ * - If lineString is open, treats it as a polyline and accumulates segment
+ * contributions using segment midpoints weighted by segment length.
  *
- * @param g The LineString to process; when closed this represents a polygonal
- * ring.
+ * @param lineString The LineString to process; when closed this represents a
+ * polygonal ring.
  * @param enable3DComputation When true, triangle area computations use 3D
  * geometry; otherwise 2D signed area is used for polygonal contributions.
  * @return WeightedCentroid A struct containing the total area/length, the

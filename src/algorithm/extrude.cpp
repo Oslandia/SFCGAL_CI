@@ -290,6 +290,10 @@ extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/** Extrude a geometry along a vector
+ * @param g The geometry to extrude
+ * @param v The extrusion vector
+ * @return Extruded geometry */
 auto
 extrude(const Geometry &g, const Kernel::Vector_3 &v)
     -> std::unique_ptr<Geometry>
@@ -340,6 +344,12 @@ extrude(const Geometry &g, const Kernel::Vector_3 &v)
           .str()));
 }
 
+/** Extrude geometry with FT coordinates (no validity check)
+ * @param g Geometry to extrude
+ * @param dx X displacement
+ * @param dy Y displacement
+ * @param dz Z displacement
+ * @return Extruded geometry */
 auto
 extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
         const Kernel::FT &dz, NoValidityCheck /*unused*/)
@@ -348,6 +358,12 @@ extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
   return extrude(g, Kernel::Vector_3(dx, dy, dz));
 }
 
+/** Extrude geometry with FT coordinates
+ * @param g Geometry to extrude
+ * @param dx X displacement
+ * @param dy Y displacement
+ * @param dz Z displacement
+ * @return Extruded geometry */
 auto
 extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
         const Kernel::FT &dz) -> std::unique_ptr<Geometry>
@@ -358,6 +374,12 @@ extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
   return result;
 }
 
+/** Extrude geometry with double coordinates
+ * @param g Geometry to extrude
+ * @param dx X displacement
+ * @param dy Y displacement
+ * @param dz Z displacement
+ * @return Extruded geometry */
 SFCGAL_API auto
 extrude(const Geometry &g, const double &dx, const double &dy, const double &dz)
     -> std::unique_ptr<Geometry>
@@ -370,6 +392,10 @@ extrude(const Geometry &g, const double &dx, const double &dy, const double &dz)
   return extrude(g, Kernel::FT(dx), Kernel::FT(dy), Kernel::FT(dz));
 }
 
+/** Extrude polygon with height
+ * @param g Polygon to extrude
+ * @param height Extrusion height
+ * @return Extruded geometry */
 SFCGAL_API auto
 extrude(const Polygon &g, const double &height) -> std::unique_ptr<Geometry>
 {

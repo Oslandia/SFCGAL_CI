@@ -41,6 +41,9 @@ namespace algorithm {
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/**
+ * @brief Compute 3D distance between two geometries
+ */
 auto
 distance3D(const Geometry &gA, const Geometry &gB) -> double
 {

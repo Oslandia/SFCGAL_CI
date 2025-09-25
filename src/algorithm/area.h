@@ -32,13 +32,7 @@ area(const Geometry &geom) -> double;
  * @warning Z component is ignored, there is no 2D projection for 3D geometries
  * @warning No actual validity check is done
  *
- * @pre The input geometry @p geom must be valid.
- *
- * @param geom The input geometry.
- * @param noCheck A tag type used to select this overload, indicating
- *        that no validity check is performed.
- *
- * @return The 2D area as a double precision value.
+ * @pre The input geometry must be valid.
  */
 SFCGAL_API auto
 area(const Geometry &geom, NoValidityCheck noCheck) -> double;
@@ -153,13 +147,10 @@ area3D(const Geometry &geom) -> double;
  * @warning No actual validity check is done
  * @pre geom is a valid geometry
  *
- * @param geom The input geometry.
- *
- * @return The 3D area as a double precision value.
  * @ingroup detail
  */
 SFCGAL_API auto
-area3D(const Geometry &geom, NoValidityCheck) -> double;
+area3D(const Geometry &geom, NoValidityCheck noCheck) -> double;
 
 /**
  * @brief Compute the 3D area of a Polygon.

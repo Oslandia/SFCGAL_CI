@@ -536,20 +536,12 @@ private:
 
 /**
  * Display operator for 2D GeometrySet.
- *
- * @param ostr The output stream to write to.
- * @param geomSet The 2D GeometrySet to display.
- * @return The output stream after writing the GeometrySet.
  */
 SFCGAL_API auto
 operator<<(std::ostream &ostr, const GeometrySet<2> &geomSet) -> std::ostream &;
 
 /**
  * Display operator for 3D GeometrySet.
- *
- * @param ostr The output stream to write to.
- * @param geomSet The 3D GeometrySet to display.
- * @return The output stream after writing the GeometrySet.
  */
 SFCGAL_API auto
 operator<<(std::ostream &ostr, const GeometrySet<3> &geomSet) -> std::ostream &;

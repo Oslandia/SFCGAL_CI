@@ -14,6 +14,9 @@
 
 namespace SFCGAL::algorithm {
 
+/** Compute volume of PolyhedralSurface without validity check
+ * @param surface The PolyhedralSurface to measure
+ * @return Volume as FT */
 auto
 volume(const PolyhedralSurface &surface, NoValidityCheck /*unused*/)
     -> Kernel::FT
@@ -33,6 +36,9 @@ volume(const PolyhedralSurface &surface, NoValidityCheck /*unused*/)
   return CGAL::Polygon_mesh_processing::volume(*cgal_polyhedron);
 }
 
+/** Compute volume of Solid without validity check
+ * @param solid The Solid to measure
+ * @return Volume as FT */
 auto
 volume(const Solid &solid, NoValidityCheck /*unused*/) -> Kernel::FT
 {
@@ -60,6 +66,9 @@ volume(const Solid &solid, NoValidityCheck /*unused*/) -> Kernel::FT
   return vol;
 }
 
+/** Compute volume of Geometry
+ * @param g The Geometry to measure
+ * @return Volume as FT */
 auto
 volume(const Geometry &g) -> Kernel::FT
 {
