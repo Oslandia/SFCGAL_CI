@@ -25,19 +25,38 @@
 #include "SFCGAL/detail/transform/AffineTransform3.h"
 #include "SFCGAL/triangulate/triangulatePolygon.h"
 
+namespace SFCGAL {
+
+/// \cond IGNORE
+using squared_distance_t = Kernel::FT;
+/// \endcond
+
+namespace algorithm {
+
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
+
+auto
+distance3D(const Geometry &gA, const Geometry &gB) -> double
+{
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gA);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gB);
+
+  return distance3D(gA, gB, NoValidityCheck());
+}
+
 // ----------------------------------------------------------------------------------
 // -- private interface
 // ----------------------------------------------------------------------------------
 /// @{
 /// @privatesection
-namespace SFCGAL {
-using squared_distance_t = Kernel::FT;
-
-namespace algorithm {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 auto
-distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
-    -> double
+distance3D(const Geometry &gA, const Geometry &gB,
+           [[maybe_unused]] NoValidityCheck noCheck) -> double
 {
   // SFCGAL_DEBUG( boost::format("dispatch distance3D(%s,%s)") % gA.asText() %
   // gB.asText() );
@@ -84,14 +103,6 @@ distance3D(const Geometry &gA, const Geometry &gB, NoValidityCheck /*unused*/)
                     .str()));
 }
 
-auto
-distance3D(const Geometry &gA, const Geometry &gB) -> double
-{
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gA);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gB);
-
-  return distance3D(gA, gB, NoValidityCheck());
-}
 auto
 distancePointGeometry3D(const Point &gA, const Geometry &gB) -> double
 {
@@ -655,23 +666,57 @@ distanceSolidSolid3D(const Solid &gA, const Solid &gB) -> double
   return dMin;
 }
 
+/**
+ * @brief Represents a 3D sphere with a radius and a center.
+ */
 struct Sphere {
+  /**
+   * @brief Construct a sphere with a given radius and center.
+   *
+   * @param r The radius of the sphere.
+   * @param c The center of the sphere, expressed as a 3D vector.
+   */
   Sphere(const double &r, CGAL::Vector_3<Kernel> &c)
       : _radius(r), _center(c), _empty(false)
   {
   }
+
+  /**
+   * @brief Default constructor, creates an empty sphere.
+   */
   Sphere() = default;
+
+  /**
+   * @brief Check whether the sphere is empty.
+   *
+   * @return true if the sphere has not been initialized with a radius
+   * and center, false otherwise.
+   */
   [[nodiscard]] auto
   isEmpty() const -> bool
   {
     return _empty;
   }
+
+  /**
+   * @brief Get the radius of the sphere.
+   *
+   * @pre The sphere must not be empty.
+   * @return The radius of the sphere.
+   */
   [[nodiscard]] auto
   radius() const -> double
   {
     BOOST_ASSERT(!_empty);
     return _radius;
   }
+
+  /**
+   * @brief Get the center of the sphere.
+   *
+   * @pre The sphere must not be empty.
+   * @return A const reference to the center vector of the sphere.
+   */
   [[nodiscard]] auto
   center() const -> const CGAL::Vector_3<Kernel> &
   {
@@ -680,9 +725,9 @@ struct Sphere {
   }
 
 private:
-  double                 _radius{};
-  CGAL::Vector_3<Kernel> _center;
-  bool                   _empty{true};
+  double                 _radius{};    ///< Radius of the sphere.
+  CGAL::Vector_3<Kernel> _center;      ///< Center of the sphere.
+  bool                   _empty{true}; ///< Indicates if the sphere is empty.
 };
 
 auto
@@ -834,9 +879,9 @@ auto
 squaredDistancePointTriangle3D(const Point_3 &p, const Triangle_3 &abc)
     -> squared_distance_t
 {
-#if CGAL_VERSION_NR >= 1041001000 // >= 4.10
+  #if CGAL_VERSION_NR >= 1041001000 // >= 4.10
   return CGAL::squared_distance(p, abc);
-#else
+  #else
   Point_3 a = abc.vertex(0);
   Point_3 b = abc.vertex(1);
   Point_3 c = abc.vertex(2);
@@ -860,7 +905,7 @@ squaredDistancePointTriangle3D(const Point_3 &p, const Triangle_3 &abc)
   }
 
   return dMin;
-#endif
+  #endif
 }
 
 auto
@@ -1003,6 +1048,8 @@ distanceTriangleTriangle3D(const Triangle &gA, const Triangle &gB) -> double
   return CGAL::sqrt(CGAL::to_double(dMin));
 }
 
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
+
 } // namespace algorithm
 } // namespace SFCGAL
-/// @} end of private section
