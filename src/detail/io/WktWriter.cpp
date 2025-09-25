@@ -165,17 +165,24 @@ WktWriter::writeCoordinate(const Point &point)
       impl::writeFT(_s, CGAL::exact(point.z()));
     }
   } else {
-    _s << fixZeroNeg(CGAL::to_double(point.x()), _s.precision()) << " "
-       << fixZeroNeg(CGAL::to_double(point.y()), _s.precision());
+    _s << fixZeroNeg(CGAL::to_double(point.x()),
+                     static_cast<int>(_s.precision()))
+       << " "
+       << fixZeroNeg(CGAL::to_double(point.y()),
+                     static_cast<int>(_s.precision()));
 
     if (point.is3D()) {
-      _s << " " << fixZeroNeg(CGAL::to_double(point.z()), _s.precision());
+      _s << " "
+         << fixZeroNeg(CGAL::to_double(point.z()),
+                       static_cast<int>(_s.precision()));
     }
   }
 
   // m coordinate
   if (point.isMeasured()) {
-    _s << " " << fixZeroNeg(CGAL::to_double(point.m()), _s.precision());
+    _s << " "
+       << fixZeroNeg(CGAL::to_double(point.m()),
+                     static_cast<int>(_s.precision()));
   }
 }
 
@@ -410,7 +417,7 @@ WktWriter::writeInner(const Triangle &triangle)
       _s << ",";
     }
 
-    writeCoordinate(triangle.vertex(i));
+    writeCoordinate(triangle.vertex(static_cast<int>(i)));
   }
 
   _s << ")";
@@ -561,7 +568,7 @@ generateUniformKnots(size_t numControlPoints, unsigned int degree)
 
   // Clamped uniform knots: [0, 0, ..., 0, 1/(n-p), 2/(n-p), ..., 1, 1, ..., 1]
   for (unsigned int i = 0; i <= degree; ++i) {
-    knots.emplace_back(Kernel::FT(0));
+    knots.emplace_back(0);
   }
 
   size_t numInternal = knotCount - static_cast<size_t>(2 * (degree + 1));
@@ -570,7 +577,7 @@ generateUniformKnots(size_t numControlPoints, unsigned int degree)
   }
 
   for (unsigned int i = 0; i <= degree; ++i) {
-    knots.emplace_back(Kernel::FT(1));
+    knots.emplace_back(1);
   }
 
   return knots;
@@ -599,7 +606,8 @@ WktWriter::writeWeights(const std::vector<Kernel::FT> &weights)
         impl::writeFT(_s, CGAL::exact(weights[i]));
       } else {
         double weight_val = CGAL::to_double(weights[i]);
-        _s << fixZeroNegForWeights(weight_val, _s.precision());
+        _s << fixZeroNegForWeights(weight_val,
+                                   static_cast<int>(_s.precision()));
       }
     }
   }
@@ -617,7 +625,8 @@ WktWriter::writeKnots(const std::vector<Kernel::FT> &knots)
     if (_exactWrite) {
       impl::writeFT(_s, CGAL::exact(knots[i]));
     } else {
-      _s << fixZeroNeg(CGAL::to_double(knots[i]), _s.precision());
+      _s << fixZeroNeg(CGAL::to_double(knots[i]),
+                       static_cast<int>(_s.precision()));
     }
   }
   _s << ")";

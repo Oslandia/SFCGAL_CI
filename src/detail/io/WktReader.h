@@ -44,8 +44,8 @@ public:
    *
    * @return SRID value
    */
-  srid_t
-  readSRID();
+  auto
+  readSRID() -> srid_t;
 
   /**
    * read a geometry from a string
@@ -53,24 +53,24 @@ public:
    * @warning returns new instance
    * @return pointer to newly created Geometry object
    */
-  Geometry *
-  readGeometry();
+  auto
+  readGeometry() -> Geometry *;
 
   /**
    * read geometry type
    *
    * @return GeometryType of the next geometry in the stream
    */
-  GeometryType
-  readGeometryType();
+  auto
+  readGeometryType() -> GeometryType;
 
   /**
    * read coordinate type [Z][M]
    *
    * @return CoordinateType of the geometry
    */
-  CoordinateType
-  readCoordinateType();
+  auto
+  readCoordinateType() -> CoordinateType;
 
   /**
    * Read Point content from WKT
@@ -193,22 +193,22 @@ public:
    * Read vector of weights from WKT format: (w1, w2, w3, ...)
    * @return Vector of weight values
    */
-  std::vector<Kernel::FT>
-  readWeightsVector();
+  auto
+  readWeightsVector() -> std::vector<Kernel::FT>;
 
   /**
    * Read vector of knots from WKT format: (k1, k2, k3, ...)
    * @return Vector of knot values
    */
-  std::vector<Kernel::FT>
-  readKnotsVector();
+  auto
+  readKnotsVector() -> std::vector<Kernel::FT>;
 
   /**
    * Read degree value (unsigned integer)
    * @return NURBS curve degree
    */
-  unsigned int
-  readDegree();
+  auto
+  readDegree() -> unsigned int;
 
   /**
    * Read coordinate from WKT
@@ -217,8 +217,8 @@ public:
    * @param point Point object to fill with coordinate
    * @return true if coordinate was read successfully, false otherwise
    */
-  bool
-  readPointCoordinate(Point &point);
+  auto
+  readPointCoordinate(Point &point) -> bool;
 
 private:
   /**
@@ -240,8 +240,8 @@ private:
    *
    * @return string containing error message
    */
-  std::string
-  parseErrorMessage();
+  auto
+  parseErrorMessage() -> std::string;
 };
 
 } // namespace io

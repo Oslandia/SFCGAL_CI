@@ -222,6 +222,7 @@ WkbReader::readInnerPolyhedralSurface() -> PolyhedralSurface
   return result;
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 auto
 WkbReader::readInnerNURBSCurve() -> NURBSCurve
 {
@@ -412,5 +413,6 @@ WkbReader::readInnerNURBSCurve() -> NURBSCurve
             .str()));
   }
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 } // namespace SFCGAL::detail::io
