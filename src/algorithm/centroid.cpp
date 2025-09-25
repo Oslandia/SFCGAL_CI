@@ -124,9 +124,6 @@ centroid3D(const Geometry &geom) -> std::unique_ptr<Point>
  * zero area, the point's vector as centroid, and the point's M value if
  * measured.
  *
- * @param geom Geometry to compute the weighted centroid for.
- * @param enable3DComputation When true, area/length computations prefer 3D
- *        formulas (when available); otherwise 2D computations are used.
  * @return WeightedCentroid Aggregated area, centroid vector, and M value
  *         for the input geometry.
  */
@@ -210,11 +207,6 @@ weightedCentroid(const Triangle &triangle, bool enable3DComputation)
  * - m: the average of the three points' M values if all three are measured,
  * otherwise 0.
  *
- * @param pta First triangle vertex.
- * @param ptb Second triangle vertex.
- * @param ptc Third triangle vertex.
- * @param enable3DComputation If true, compute area in 3D; if false, compute 2D
- * signed area.
  * @return WeightedCentroid Area, centroid vector, and M value for the triangle.
  */
 auto
@@ -257,9 +249,6 @@ weightedCentroid(const Point &pta, const Point &ptb, const Point &ptc,
  * produced, returns an empty WeightedCentroid. Otherwise delegates to the
  * LineString overload to compute the weighted centroid.
  *
- * @param curve Curve to approximate and evaluate.
- * @param enable3DComputation If true, use 3D measures (length/area and 3D
- * centroids); otherwise use 2D computations.
  * @return WeightedCentroid Empty if the curve cannot be approximated as a
  * non-empty LineString, otherwise the computed weighted centroid.
  */
@@ -291,10 +280,6 @@ weightedCentroid(const Curve &curve, bool enable3DComputation)
  * - If lineString is open, treats it as a polyline and accumulates segment
  * contributions using segment midpoints weighted by segment length.
  *
- * @param lineString The LineString to process; when closed this represents a
- * polygonal ring.
- * @param enable3DComputation When true, triangle area computations use 3D
- * geometry; otherwise 2D signed area is used for polygonal contributions.
  * @return WeightedCentroid A struct containing the total area/length, the
  * computed centroid (as a Vector_3), and the averaged M value (weighted by
  * area/length).

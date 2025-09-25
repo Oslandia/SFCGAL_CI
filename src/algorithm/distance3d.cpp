@@ -744,8 +744,6 @@ struct Sphere {
   /**
    * @brief Construct a sphere with a given radius and center.
    *
-   * @param r The radius of the sphere.
-   * @param c The center of the sphere, expressed as a 3D vector.
    */
   Sphere(const double &r, CGAL::Vector_3<Kernel> &c)
       : _radius(r), _center(c), _empty(false)

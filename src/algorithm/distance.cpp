@@ -423,8 +423,6 @@ distanceTriangleGeometry(const Triangle &gA, const Geometry &gB) -> double
 struct Circle {
   /**
    * @brief Main constructor.
-   * @param radius The radius of the circle.
-   * @param center The center of the circle.
    *
    */
   Circle(const double &radius, CGAL::Vector_2<Kernel> &center)
