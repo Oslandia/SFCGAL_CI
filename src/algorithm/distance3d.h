@@ -29,6 +29,9 @@ distance3D(const Geometry &gA, const Geometry &gB) -> double;
 /**
  * @brief Dispatch 3D distance between two Geometries.
  *
+ * @pre gA is a valid geometry
+ * @pre gB is a valid geometry
+ *
  * @param gA First geometry
  * @param gB Second geometry
  * @param noCheck Validity check parameter

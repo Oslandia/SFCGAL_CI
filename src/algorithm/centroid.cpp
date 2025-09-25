@@ -257,19 +257,20 @@ weightedCentroid(const Point &pta, const Point &ptb, const Point &ptc,
  * produced, returns an empty WeightedCentroid. Otherwise delegates to the
  * LineString overload to compute the weighted centroid.
  *
- * @param g Curve to approximate and evaluate.
+ * @param curve Curve to approximate and evaluate.
  * @param enable3DComputation If true, use 3D measures (length/area and 3D
  * centroids); otherwise use 2D computations.
  * @return WeightedCentroid Empty if the curve cannot be approximated as a
  * non-empty LineString, otherwise the computed weighted centroid.
  */
 auto
-weightedCentroid(const Curve &g, bool enable3DComputation) -> WeightedCentroid
+weightedCentroid(const Curve &curve, bool enable3DComputation)
+    -> WeightedCentroid
 {
   // Convert curve to LineString approximation for centroid calculation
-  auto lineString = g.toLineStringAdaptive(); // default tolerance FT(1e-3)
+  auto lineString = curve.toLineStringAdaptive(); // default tolerance FT(1e-3)
   if (!lineString || lineString->isEmpty()) {
-    lineString = g.toLineString(256); // fallback to denser uniform sampling
+    lineString = curve.toLineString(256); // fallback to denser uniform sampling
   }
   if (!lineString || lineString->isEmpty()) {
     return {}; // Return empty centroid for invalid/empty curves
