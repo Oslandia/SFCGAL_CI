@@ -23,6 +23,7 @@ option(ENABLE_FORTIFY_SOURCE "Enable FORTIFY_SOURCE" ON)
 set(SFCGALOP_SOURCES
     main.cpp
     operations/operations.cpp
+    constructors.cpp
     io.cpp
     util.cpp
     text_ui.cpp

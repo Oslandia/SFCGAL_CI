@@ -389,7 +389,12 @@ parse_options(int argc, char **argv) -> std::optional<Options>
     return std::nullopt;
   }
 
-  if (options.source_a.empty() && !options.operation.empty()) {
+  // Check if operation is a constructor (doesn't need input geometry)
+  bool is_constructor =
+      !options.operation.empty() && (options.operation.find("make_") == 0);
+
+  if (options.source_a.empty() && !options.operation.empty() &&
+      !is_constructor) {
     options.source_a = "stdin";
   }
 
@@ -502,13 +507,20 @@ handle_operation(const Options &options) -> bool
     std::cout << "\n";
   }
 
-  auto geom_a = load_geometry(options.source_a);
-  if (!geom_a) {
-    TextUI::print_error("Failed to load geometry A");
-    return false;
+  std::unique_ptr<SFCGAL::Geometry> geom_a;
+
+  // Check if operation is a constructor (doesn't need input geometry)
+  bool is_constructor = options.operation.find("make_") == 0;
+
+  if (!is_constructor) {
+    geom_a = load_geometry(options.source_a);
+    if (!geom_a) {
+      TextUI::print_error("Failed to load geometry A");
+      return false;
+    }
   }
 
-  if (options.validate_mode || options.verbose) {
+  if (geom_a && (options.validate_mode || options.verbose)) {
     auto validation = ErrorHandler::validate_geometry(*geom_a);
     if (!validation.valid) {
       TextUI::print_warning("Geometry A validation issues:");

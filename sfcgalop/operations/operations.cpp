@@ -1,5 +1,6 @@
 #include "operations.hpp"
 
+#include "../constructors.hpp"
 #include <SFCGAL/Kernel.h>
 
 #include <SFCGAL/algorithm/alphaShapes.h>
@@ -822,6 +823,149 @@ const std::vector<Operation> operations = {
          }
        }
        return std::nullopt;
+     }},
+
+    // Constructors
+    {"make_sphere", "Constructors", "Create a 3D sphere primitive", false,
+     "Parameters:\n  x=X_COORD: X coordinate of center (default: 0.0)\n  "
+     "y=Y_COORD: Y coordinate of center (default: 0.0)\n  z=Z_COORD: Z "
+     "coordinate of center (default: 0.0)\n  radius=VALUE: Sphere radius "
+     "(default: 1.0)\n  num_vertical=N: Number of vertical divisions (default: "
+     "16)\n  num_horizontal=N: Number of horizontal divisions (default: "
+     "32)\n\nExample:\n  sfcgalop make_sphere "
+     "\"x=0,y=0,z=0,radius=2.5,num_vertical=20,num_horizontal=40\"",
+     "params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto   params       = parse_params(args);
+       double x            = params.count("x") ? params["x"] : 0.0;
+       double y            = params.count("y") ? params["y"] : 0.0;
+       double z            = params.count("z") ? params["z"] : 0.0;
+       double radius       = params.count("radius") ? params["radius"] : 1.0;
+       auto   num_vertical = static_cast<unsigned int>(
+           params.count("num_vertical") ? params["num_vertical"] : 16);
+       auto num_horizontal = static_cast<unsigned int>(
+           params.count("num_horizontal") ? params["num_horizontal"] : 32);
+       return Constructors::make_sphere(x, y, z, radius, num_vertical,
+                                        num_horizontal);
+     }},
+
+    {"make_cube", "Constructors", "Create a 3D cube primitive", false,
+     "Parameters:\n  size=VALUE: Edge length of the cube (default: "
+     "1.0)\n\nExample:\n  sfcgalop make_cube \"size=2.0\"",
+     "params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto   params = parse_params(args);
+       double size   = params.count("size") ? params["size"] : 1.0;
+       return Constructors::make_cube(size);
+     }},
+
+    {"make_box", "Constructors", "Create a 3D box primitive", false,
+     "Parameters:\n  x_extent=VALUE: Length in X direction (default: 1.0)\n  "
+     "y_extent=VALUE: Length in Y direction (default: 1.0)\n  z_extent=VALUE: "
+     "Length in Z direction (default: 1.0)\n\nExample:\n  sfcgalop make_box "
+     "\"x_extent=2,y_extent=3,z_extent=1\"",
+     "params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto   params   = parse_params(args);
+       double x_extent = params.count("x_extent") ? params["x_extent"] : 1.0;
+       double y_extent = params.count("y_extent") ? params["y_extent"] : 1.0;
+       double z_extent = params.count("z_extent") ? params["z_extent"] : 1.0;
+       return Constructors::make_box(x_extent, y_extent, z_extent);
+     }},
+
+    {"make_cylinder", "Constructors", "Create a 3D cylinder primitive", false,
+     "Parameters:\n  base_x=VALUE: X coordinate of base center (default: "
+     "0.0)\n  base_y=VALUE: Y coordinate of base center (default: 0.0)\n  "
+     "base_z=VALUE: Z coordinate of base center (default: 0.0)\n  "
+     "axis_x=VALUE: X component of cylinder axis (default: 0.0)\n  "
+     "axis_y=VALUE: Y component of cylinder axis (default: 0.0)\n  "
+     "axis_z=VALUE: Z component of cylinder axis (default: 1.0)\n  "
+     "radius=VALUE: Cylinder radius (default: 1.0)\n  height=VALUE: Cylinder "
+     "height (default: 1.0)\n  num_radial=N: Number of radial divisions "
+     "(default: 32)\n\nExample:\n  sfcgalop make_cylinder "
+     "\"radius=1.5,height=3,num_radial=16\"",
+     "params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto   params     = parse_params(args);
+       double base_x     = params.count("base_x") ? params["base_x"] : 0.0;
+       double base_y     = params.count("base_y") ? params["base_y"] : 0.0;
+       double base_z     = params.count("base_z") ? params["base_z"] : 0.0;
+       double axis_x     = params.count("axis_x") ? params["axis_x"] : 0.0;
+       double axis_y     = params.count("axis_y") ? params["axis_y"] : 0.0;
+       double axis_z     = params.count("axis_z") ? params["axis_z"] : 1.0;
+       double radius     = params.count("radius") ? params["radius"] : 1.0;
+       double height     = params.count("height") ? params["height"] : 1.0;
+       auto   num_radial = static_cast<unsigned int>(
+           params.count("num_radial") ? params["num_radial"] : 32);
+       return Constructors::make_cylinder(base_x, base_y, base_z, axis_x,
+                                          axis_y, axis_z, radius, height,
+                                          num_radial);
+     }},
+
+    {"make_cone", "Constructors", "Create a 3D cone primitive", false,
+     "Parameters:\n  base_x=VALUE: X coordinate of base center (default: "
+     "0.0)\n  base_y=VALUE: Y coordinate of base center (default: 0.0)\n  "
+     "base_z=VALUE: Z coordinate of base center (default: 0.0)\n  "
+     "axis_x=VALUE: X component of cone axis (default: 0.0)\n  axis_y=VALUE: Y "
+     "component of cone axis (default: 0.0)\n  axis_z=VALUE: Z component of "
+     "cone axis (default: 1.0)\n  radius=VALUE: Cone base radius (default: "
+     "1.0)\n  height=VALUE: Cone height (default: 1.0)\n  num_radial=N: Number "
+     "of radial divisions (default: 32)\n\nExample:\n  sfcgalop make_cone "
+     "\"radius=2,height=4,num_radial=24\"",
+     "params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto   params     = parse_params(args);
+       double base_x     = params.count("base_x") ? params["base_x"] : 0.0;
+       double base_y     = params.count("base_y") ? params["base_y"] : 0.0;
+       double base_z     = params.count("base_z") ? params["base_z"] : 0.0;
+       double axis_x     = params.count("axis_x") ? params["axis_x"] : 0.0;
+       double axis_y     = params.count("axis_y") ? params["axis_y"] : 0.0;
+       double axis_z     = params.count("axis_z") ? params["axis_z"] : 1.0;
+       double radius     = params.count("radius") ? params["radius"] : 1.0;
+       double height     = params.count("height") ? params["height"] : 1.0;
+       auto   num_radial = static_cast<unsigned int>(
+           params.count("num_radial") ? params["num_radial"] : 32);
+       return Constructors::make_cone(base_x, base_y, base_z, axis_x, axis_y,
+                                      axis_z, radius, height, num_radial);
+     }},
+
+    {"make_torus", "Constructors", "Create a 3D torus primitive", false,
+     "Parameters:\n  center_x=VALUE: X coordinate of center (default: 0.0)\n  "
+     "center_y=VALUE: Y coordinate of center (default: 0.0)\n  center_z=VALUE: "
+     "Z coordinate of center (default: 0.0)\n  axis_x=VALUE: X component of "
+     "torus axis (default: 0.0)\n  axis_y=VALUE: Y component of torus axis "
+     "(default: 0.0)\n  axis_z=VALUE: Z component of torus axis (default: "
+     "1.0)\n  major_radius=VALUE: Major radius of torus (default: 2.0)\n  "
+     "minor_radius=VALUE: Minor radius of torus (default: 0.5)\n  num_major=N: "
+     "Number of major divisions (default: 32)\n  num_minor=N: Number of minor "
+     "divisions (default: 16)\n\nExample:\n  sfcgalop make_torus "
+     "\"major_radius=3,minor_radius=1,num_major=24,num_minor=12\"",
+     "params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto   params   = parse_params(args);
+       double center_x = params.count("center_x") ? params["center_x"] : 0.0;
+       double center_y = params.count("center_y") ? params["center_y"] : 0.0;
+       double center_z = params.count("center_z") ? params["center_z"] : 0.0;
+       double axis_x   = params.count("axis_x") ? params["axis_x"] : 0.0;
+       double axis_y   = params.count("axis_y") ? params["axis_y"] : 0.0;
+       double axis_z   = params.count("axis_z") ? params["axis_z"] : 1.0;
+       double major_radius =
+           params.count("major_radius") ? params["major_radius"] : 2.0;
+       double minor_radius =
+           params.count("minor_radius") ? params["minor_radius"] : 0.5;
+       auto num_major = static_cast<unsigned int>(
+           params.count("num_major") ? params["num_major"] : 32);
+       auto num_minor = static_cast<unsigned int>(
+           params.count("num_minor") ? params["num_minor"] : 16);
+       return Constructors::make_torus(center_x, center_y, center_z, axis_x,
+                                       axis_y, axis_z, major_radius,
+                                       minor_radius, num_major, num_minor);
      }}};
 
 } // namespace
@@ -860,8 +1004,10 @@ execute_operation(const std::string &op_name, const std::string &op_arg,
                                    });
 
   if (operation_it != operations.end()) {
-    // Check for null geometry A before calling operation
-    if (geom_a == nullptr) {
+    // Check for null geometry A before calling operation, but allow constructor
+    // operations
+    bool is_constructor = operation_it->name.find("make_") == 0;
+    if (geom_a == nullptr && !is_constructor) {
       return std::nullopt;
     }
 
