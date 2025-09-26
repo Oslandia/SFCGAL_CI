@@ -4,7 +4,9 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include <CGAL/intersections.h>
+#include <memory>
 
+#include <CGAL/Polygon_mesh_processing/bbox.h>
 #include <CGAL/Polygon_mesh_processing/clip.h>
 #include <CGAL/Polygon_mesh_processing/connected_components.h>
 #include <CGAL/Polygon_mesh_processing/corefinement.h>
@@ -21,6 +23,22 @@
 using namespace SFCGAL::detail;
 
 namespace SFCGAL::algorithm {
+
+namespace {
+
+/**
+ * @brief Fast bounding box overlap test
+ * @param bbox1 First bounding box
+ * @param bbox2 Second bounding box
+ * @return true if boxes overlap, enabling early termination
+ */
+inline bool
+bbox_intersects(const CGAL::Bbox_3 &bbox1, const CGAL::Bbox_3 &bbox2)
+{
+  return CGAL::do_overlap(bbox1, bbox2);
+}
+
+} // anonymous namespace
 
 // ----------------------------------------------------------------------------------
 // -- private interface
@@ -94,21 +112,28 @@ _intersection_solid_segment(const PrimitiveHandle<3> &polyhedron_handle,
                             const PrimitiveHandle<3> &segment_handle,
                             GeometrySet<3>           &output)
 {
-  // typedef CGAL::Polyhedral_mesh_domain_3<MarkedPolyhedron, Kernel>
-  // Mesh_domain;
-
   const auto *ext_poly = polyhedron_handle.as<MarkedPolyhedron>();
   BOOST_ASSERT(ext_poly->is_closed());
   const auto *segment = segment_handle.as<CGAL::Segment_3<Kernel>>();
+
+  // Early termination with bounding box test
+  CGAL::Bbox_3 poly_bbox = CGAL::Polygon_mesh_processing::bbox(*ext_poly);
+  CGAL::Bbox_3 seg_bbox  = segment->bbox();
+
+  if (!bbox_intersects(poly_bbox, seg_bbox)) {
+    return; // No intersection possible - significant performance gain
+  }
 
   auto *ext_poly_nc = const_cast<MarkedPolyhedron *>(ext_poly);
   CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> const is_in_ext(
       *ext_poly_nc);
 
-  GeometrySet<3>       triangles;
+  // OPTIMIZATION: Triangulate only once and reuse the result
+  GeometrySet<3> triangles;
+  triangulate::triangulate(*ext_poly, triangles);
+
   GeometrySet<3> const spoint(segment->source());
   GeometrySet<3> const tpoint(segment->target());
-  triangulate::triangulate(*ext_poly, triangles);
 
   bool const source_inside =
       (is_in_ext(segment->source()) != CGAL::ON_UNBOUNDED_SIDE) ||
@@ -121,14 +146,13 @@ _intersection_solid_segment(const PrimitiveHandle<3> &polyhedron_handle,
     // the entire segment intersects the volume, return the segment
     output.addPrimitive(segment_handle);
   } else {
-    GeometrySet<3> poly_triangles;
+    // OPTIMIZATION: Reuse the triangulation computed above
     GeometrySet<3> geometry_set;
-    triangulate::triangulate(*ext_poly, poly_triangles);
     geometry_set.addPrimitive(segment_handle);
     GeometrySet<3> intersection_result;
 
     // call recursively on triangulated polyhedron
-    intersection(geometry_set, poly_triangles, intersection_result);
+    intersection(geometry_set, triangles, intersection_result);
 
     if (!intersection_result.points().empty()) {
       // the intersection is a point, build a segment from that point to the
@@ -170,21 +194,39 @@ _intersection_solid_triangle(const MarkedPolyhedron         &polyhedron,
 {
   BOOST_ASSERT(polyhedron.is_closed());
 
+  // Early termination with bounding box test
+  CGAL::Bbox_3 poly_bbox = CGAL::Polygon_mesh_processing::bbox(polyhedron);
+  CGAL::Bbox_3 tri_bbox  = triangle.bbox();
+
+  if (!bbox_intersects(poly_bbox, tri_bbox)) {
+    return; // No intersection possible - significant performance gain
+  }
+
   MarkedPolyhedron polyb;
   polyb.make_triangle(triangle.vertex(0), triangle.vertex(1),
                       triangle.vertex(2));
 
-  MarkedPolyhedron polya = polyhedron;
-  CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel> const side_of_tm(polya);
+  // OPTIMIZATION: Avoid copy by using const_cast (safe because we don't modify)
+  MarkedPolyhedron &polya = const_cast<MarkedPolyhedron &>(polyhedron);
+
+  // OPTIMIZATION: Lazy construction - create Side_of_triangle_mesh only if
+  // needed
+  std::unique_ptr<CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel>>
+      side_of_tm_ptr;
 
   std::list<Polyline_3> polylines;
   CGAL::Polygon_mesh_processing::surface_intersection(
       polya, polyb, std::back_inserter(polylines));
   if (polylines.empty()) {
     // no surface intersection
+    // OPTIMIZATION: Create Side_of_triangle_mesh only when needed
+    if (!side_of_tm_ptr) {
+      side_of_tm_ptr = std::make_unique<
+          CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel>>(polya);
+    }
     // if one of the point of the triangle is inside the polyhedron,
     // the triangle is inside
-    if (side_of_tm(triangle.vertex(0)) != CGAL::ON_UNBOUNDED_SIDE) {
+    if ((*side_of_tm_ptr)(triangle.vertex(0)) != CGAL::ON_UNBOUNDED_SIDE) {
       output.addPrimitive(triangle);
     }
     return;
@@ -202,7 +244,12 @@ _intersection_solid_triangle(const MarkedPolyhedron         &polyhedron,
     // check if all vertices are on polya
     bool all_on = true;
     for (auto v : vertices(mp)) {
-      if (side_of_tm(v->point()) != CGAL::ON_BOUNDARY) {
+      // OPTIMIZATION: Create Side_of_triangle_mesh only when first needed
+      if (!side_of_tm_ptr) {
+        side_of_tm_ptr = std::make_unique<
+            CGAL::Side_of_triangle_mesh<MarkedPolyhedron, Kernel>>(polya);
+      }
+      if ((*side_of_tm_ptr)(v->point()) != CGAL::ON_BOUNDARY) {
         all_on = false;
         break;
       }
@@ -238,6 +285,15 @@ _intersection_solid_solid(const MarkedPolyhedron &polyhedron_a,
                           const MarkedPolyhedron &polyhedron_b,
                           GeometrySet<3>         &output)
 {
+  // Early termination with bounding box test
+  CGAL::Bbox_3 bbox_a = CGAL::Polygon_mesh_processing::bbox(polyhedron_a);
+  CGAL::Bbox_3 bbox_b = CGAL::Polygon_mesh_processing::bbox(polyhedron_b);
+
+  if (!bbox_intersects(bbox_a, bbox_b)) {
+    return; // No intersection possible - major performance improvement for
+            // distant objects
+  }
+
   // 1. find intersections on surfaces
   // CGAL corefinement or polyhedra_intersection do not return polygon
   // intersections between two solids they only return points, lines and volumes
@@ -256,12 +312,13 @@ _intersection_solid_solid(const MarkedPolyhedron &polyhedron_a,
 
   // 2. find intersections in volumes
   {
-    MarkedPolyhedron polya = polyhedron_a;
-    MarkedPolyhedron polyb = polyhedron_b;
+    // OPTIMIZATION: Avoid copies - create result mesh instead
+    MarkedPolyhedron result;
     if (CGAL::Polygon_mesh_processing::corefine_and_compute_intersection(
-            polya, polyb, polya)) {
-      if (std::next(vertices(polya).first) != vertices(polya).second) {
-        output.addPrimitive(polya);
+            const_cast<MarkedPolyhedron &>(polyhedron_a),
+            const_cast<MarkedPolyhedron &>(polyhedron_b), result)) {
+      if (std::next(vertices(result).first) != vertices(result).second) {
+        output.addPrimitive(result);
       }
     }
   }
@@ -274,7 +331,14 @@ _intersection_solid_solid(const MarkedPolyhedron &polyhedron_a,
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
-/// must be called with pa's dimension larger than pb's
+/**
+ * @brief Compute intersection between two 3D primitive handles
+ * @param primitive_a First primitive (must have dimension >= primitive_b)
+ * @param primitive_b Second primitive
+ * @param output Output geometry set to store results
+ * @param unused Dimension tag for template resolution
+ * @pre primitive_a's dimension must be larger than or equal to primitive_b's
+ */
 void
 intersection(const PrimitiveHandle<3> &primitive_a,
              const PrimitiveHandle<3> &primitive_b, GeometrySet<3> &output,
@@ -319,6 +383,23 @@ intersection(const PrimitiveHandle<3> &primitive_a,
       _intersection_solid_solid(solid_a, solid_b, output);
     }
   }
+}
+
+/**
+ * @brief Public interface for solid-triangle intersection (compatibility)
+ * @param polyhedron The solid polyhedron
+ * @param triangle The triangle to intersect with
+ * @param output Output geometry set to store results
+ *
+ * This function provides the expected public API for intersectionSolidTriangle
+ * while using the optimized internal implementation with bounding box tests.
+ */
+void
+intersectionSolidTriangle(const MarkedPolyhedron         &polyhedron,
+                          const CGAL::Triangle_3<Kernel> &triangle,
+                          GeometrySet<3>                 &output)
+{
+  _intersection_solid_triangle(polyhedron, triangle, output);
 }
 
 } // namespace SFCGAL::algorithm

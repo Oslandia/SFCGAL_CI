@@ -534,7 +534,14 @@ typedef CGAL::Box_intersection_d::Box_with_handle_d<
     FaceBboxBase;
 
 struct FaceBbox : FaceBboxBase {
+  /**
+   * @brief Bounding box for a face
+   */
   struct Bbox : CGAL::Bbox_3 {
+    /**
+     * @brief Constructor from halfedge circulator
+     * @param handle Halfedge circulator around the face
+     */
     Bbox(MarkedPolyhedron::Halfedge_around_facet_const_circulator handle)
         : CGAL::Bbox_3(handle->vertex()->point().bbox())
     {
@@ -699,10 +706,18 @@ difference(const Segment_3 &segment, const MarkedPolyhedron &polyhedron,
   return out;
 }
 
-// @TODO put that in a proper header
+// Internal optimized implementation (with underscore prefix)
 void
 _intersection_solid_triangle(const MarkedPolyhedron &pa, const Triangle_3 &tri,
                              detail::GeometrySet<3> &output);
+
+// Compatibility wrapper for existing code
+inline void
+intersectionSolidTriangle(const MarkedPolyhedron &pa, const Triangle_3 &tri,
+                          detail::GeometrySet<3> &output)
+{
+  _intersection_solid_triangle(pa, tri, output);
+}
 
 template <typename TriangleOutputIteratorType>
 TriangleOutputIteratorType
@@ -710,9 +725,9 @@ difference(const Triangle_3 &triangle, const MarkedPolyhedron &polyhedron,
            TriangleOutputIteratorType out)
 {
   std::vector<Triangle_3> inter;
-  // call _intersection_solid_triangle
+  // call intersectionSolidTriangle
   detail::GeometrySet<3> interSet;
-  _intersection_solid_triangle(polyhedron, triangle, interSet);
+  intersectionSolidTriangle(polyhedron, triangle, interSet);
 
   for (detail::GeometrySet<3>::SurfaceCollection::const_iterator it =
            interSet.surfaces().begin();

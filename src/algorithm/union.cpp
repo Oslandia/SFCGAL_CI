@@ -823,7 +823,7 @@ void
 union_surface_volume(Handle<3> a, Handle<3> b)
 {
   detail::GeometrySet<3> res;
-  _intersection_solid_triangle(b.asVolume(), a.asSurface(), res);
+  intersectionSolidTriangle(b.asVolume(), a.asSurface(), res);
 
   for (auto &it : res.surfaces()) {
     a.asSurface().remove(it.primitive());
@@ -1051,6 +1051,13 @@ union_(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/**
+ * @brief Compute 3D union of two geometries without validity check
+ * @param ga First geometry
+ * @param gb Second geometry
+ * @param NoValidityCheck Tag to skip validity checks
+ * @return The 3D union of ga and gb
+ */
 auto
 union3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
@@ -1069,6 +1076,12 @@ union3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
   return output.recompose();
 }
 
+/**
+ * @brief Compute 3D union of two geometries
+ * @param ga First geometry
+ * @param gb Second geometry
+ * @return The 3D union of ga and gb
+ */
 auto
 union3D(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
 {
