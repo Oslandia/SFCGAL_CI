@@ -62,14 +62,15 @@ make_cylinder(double base_x = 0.0, double base_y = 0.0, double base_z = 0.0,
     -> std::unique_ptr<SFCGAL::Geometry>;
 
 /**
- * @brief Create a cone primitive
+ * @brief Create a cone primitive (supports truncated cones/frustum)
  * @param base_x X coordinate of base center (default: 0.0)
  * @param base_y Y coordinate of base center (default: 0.0)
  * @param base_z Z coordinate of base center (default: 0.0)
  * @param axis_x X component of cone axis (default: 0.0)
  * @param axis_y Y component of cone axis (default: 0.0)
  * @param axis_z Z component of cone axis (default: 1.0)
- * @param radius Cone base radius (default: 1.0)
+ * @param bottom_radius Cone bottom radius (default: 1.0)
+ * @param top_radius Cone top radius - 0.0 for regular cone (default: 0.0)
  * @param height Cone height (default: 1.0)
  * @param num_radial Number of radial divisions (default: 32)
  * @return Unique pointer to PolyhedralSurface representing the cone
@@ -77,8 +78,9 @@ make_cylinder(double base_x = 0.0, double base_y = 0.0, double base_z = 0.0,
 auto
 make_cone(double base_x = 0.0, double base_y = 0.0, double base_z = 0.0,
           double axis_x = 0.0, double axis_y = 0.0, double axis_z = 1.0,
-          double radius = 1.0, double height = 1.0,
-          unsigned int num_radial = 32) -> std::unique_ptr<SFCGAL::Geometry>;
+          double bottom_radius = 1.0, double top_radius = 0.0,
+          double height = 1.0, unsigned int num_radial = 32)
+    -> std::unique_ptr<SFCGAL::Geometry>;
 
 /**
  * @brief Create a torus primitive
@@ -99,6 +101,15 @@ make_torus(double center_x = 0.0, double center_y = 0.0, double center_z = 0.0,
            double axis_x = 0.0, double axis_y = 0.0, double axis_z = 1.0,
            double major_radius = 2.0, double minor_radius = 0.5,
            unsigned int num_major = 32, unsigned int num_minor = 16)
+    -> std::unique_ptr<SFCGAL::Geometry>;
+
+/**
+ * @brief Convert a PolyhedralSurface to a Solid
+ * @param polyhedralsurface Input PolyhedralSurface geometry
+ * @return Unique pointer to Solid representing the input as a solid volume
+ */
+auto
+make_solid(std::unique_ptr<SFCGAL::Geometry> polyhedralsurface)
     -> std::unique_ptr<SFCGAL::Geometry>;
 
 } // namespace Constructors

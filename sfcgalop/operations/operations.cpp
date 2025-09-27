@@ -906,32 +906,44 @@ const std::vector<Operation> operations = {
                                           num_radial);
      }},
 
-    {"make_cone", "Constructors", "Create a 3D cone primitive", false,
+    {"make_cone", "Constructors",
+     "Create a 3D cone primitive (supports truncated cones)", false,
      "Parameters:\n  base_x=VALUE: X coordinate of base center (default: "
      "0.0)\n  base_y=VALUE: Y coordinate of base center (default: 0.0)\n  "
      "base_z=VALUE: Z coordinate of base center (default: 0.0)\n  "
      "axis_x=VALUE: X component of cone axis (default: 0.0)\n  axis_y=VALUE: Y "
      "component of cone axis (default: 0.0)\n  axis_z=VALUE: Z component of "
-     "cone axis (default: 1.0)\n  radius=VALUE: Cone base radius (default: "
-     "1.0)\n  height=VALUE: Cone height (default: 1.0)\n  num_radial=N: Number "
-     "of radial divisions (default: 32)\n\nExample:\n  sfcgalop make_cone "
-     "\"radius=2,height=4,num_radial=24\"",
+     "cone axis (default: 1.0)\n  bottom_radius=VALUE: Cone bottom radius "
+     "(default: "
+     "1.0)\n  top_radius=VALUE: Cone top radius - 0.0 for regular cone "
+     "(default: 0.0)\n  "
+     "height=VALUE: Cone height (default: 1.0)\n  num_radial=N: Number "
+     "of radial divisions (default: 32)\n\nExamples:\n  sfcgalop make_cone "
+     "\"bottom_radius=2,height=4,num_radial=24\"\n  sfcgalop make_cone "
+     "\"bottom_radius=3,top_radius=1,height=5\" # Truncated cone",
      "params", "G",
      [](const std::string &args, const SFCGAL::Geometry *,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto   params     = parse_params(args);
-       double base_x     = params.count("base_x") ? params["base_x"] : 0.0;
-       double base_y     = params.count("base_y") ? params["base_y"] : 0.0;
-       double base_z     = params.count("base_z") ? params["base_z"] : 0.0;
-       double axis_x     = params.count("axis_x") ? params["axis_x"] : 0.0;
-       double axis_y     = params.count("axis_y") ? params["axis_y"] : 0.0;
-       double axis_z     = params.count("axis_z") ? params["axis_z"] : 1.0;
-       double radius     = params.count("radius") ? params["radius"] : 1.0;
+       auto   params = parse_params(args);
+       double base_x = params.count("base_x") ? params["base_x"] : 0.0;
+       double base_y = params.count("base_y") ? params["base_y"] : 0.0;
+       double base_z = params.count("base_z") ? params["base_z"] : 0.0;
+       double axis_x = params.count("axis_x") ? params["axis_x"] : 0.0;
+       double axis_y = params.count("axis_y") ? params["axis_y"] : 0.0;
+       double axis_z = params.count("axis_z") ? params["axis_z"] : 1.0;
+       // Support both 'radius' (legacy) and 'bottom_radius' (new)
+       double bottom_radius =
+           params.count("bottom_radius")
+               ? params["bottom_radius"]
+               : (params.count("radius") ? params["radius"] : 1.0);
+       double top_radius =
+           params.count("top_radius") ? params["top_radius"] : 0.0;
        double height     = params.count("height") ? params["height"] : 1.0;
        auto   num_radial = static_cast<unsigned int>(
            params.count("num_radial") ? params["num_radial"] : 32);
        return Constructors::make_cone(base_x, base_y, base_z, axis_x, axis_y,
-                                      axis_z, radius, height, num_radial);
+                                      axis_z, bottom_radius, top_radius, height,
+                                      num_radial);
      }},
 
     {"make_torus", "Constructors", "Create a 3D torus primitive", false,
@@ -966,6 +978,15 @@ const std::vector<Operation> operations = {
        return Constructors::make_torus(center_x, center_y, center_z, axis_x,
                                        axis_y, axis_z, major_radius,
                                        minor_radius, num_major, num_minor);
+     }},
+
+    {"to_solid", "Conversions", "Convert a PolyhedralSurface to a Solid", false,
+     "", "A", "",
+     [](const std::string &, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       // Clone the input geometry to pass ownership to make_solid
+       auto geom_copy = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       return Constructors::make_solid(std::move(geom_copy));
      }}};
 
 } // namespace

@@ -2,6 +2,7 @@
 
 #include <SFCGAL/Kernel.h>
 #include <SFCGAL/PolyhedralSurface.h>
+#include <SFCGAL/Solid.h>
 #include <SFCGAL/primitive3d/Box.h>
 #include <SFCGAL/primitive3d/Cone.h>
 #include <SFCGAL/primitive3d/Cylinder.h>
@@ -60,8 +61,9 @@ make_cylinder(double base_x, double base_y, double base_z, double axis_x,
 
 auto
 make_cone(double base_x, double base_y, double base_z, double axis_x,
-          double axis_y, double axis_z, double radius, double height,
-          unsigned int num_radial) -> std::unique_ptr<SFCGAL::Geometry>
+          double axis_y, double axis_z, double bottom_radius, double top_radius,
+          double height, unsigned int num_radial)
+    -> std::unique_ptr<SFCGAL::Geometry>
 {
   // Note: SFCGAL::Cone constructor doesn't take center/axis, only dimensions
   // Parameters base_x, base_y, base_z, axis_x, axis_y, axis_z are for future
@@ -73,9 +75,7 @@ make_cone(double base_x, double base_y, double base_z, double axis_x,
   (void)axis_y;
   (void)axis_z;
 
-  SFCGAL::Cone cone(
-      radius, 0.0, height,
-      num_radial); // bottom_radius, top_radius, height, num_radial
+  SFCGAL::Cone cone(bottom_radius, top_radius, height, num_radial);
 
   auto polyhedral_surface = cone.generatePolyhedralSurface();
   return std::make_unique<SFCGAL::PolyhedralSurface>(
@@ -103,6 +103,26 @@ make_torus(double center_x, double center_y, double center_z, double axis_x,
   auto polyhedral_surface = torus.generatePolyhedralSurface();
   return std::make_unique<SFCGAL::PolyhedralSurface>(
       std::move(polyhedral_surface));
+}
+
+auto
+make_solid(std::unique_ptr<SFCGAL::Geometry> polyhedralsurface)
+    -> std::unique_ptr<SFCGAL::Geometry>
+{
+  // Check if input is a PolyhedralSurface
+  auto *polyhedral_ptr =
+      dynamic_cast<SFCGAL::PolyhedralSurface *>(polyhedralsurface.get());
+  if (polyhedral_ptr == nullptr) {
+    throw std::invalid_argument(
+        "make_solid: input geometry must be a PolyhedralSurface");
+  }
+
+  // Create a copy of the PolyhedralSurface for the Solid
+  auto polyhedral_copy =
+      std::make_unique<SFCGAL::PolyhedralSurface>(*polyhedral_ptr);
+
+  // Create and return the Solid with the PolyhedralSurface as exterior shell
+  return std::make_unique<SFCGAL::Solid>(polyhedral_copy.release());
 }
 
 } // namespace Constructors
