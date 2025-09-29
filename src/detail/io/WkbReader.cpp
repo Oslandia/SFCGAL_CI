@@ -6,6 +6,7 @@
 
 #include "SFCGAL/config.h"
 
+#include "SFCGAL/Exception.h"
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
@@ -76,8 +77,8 @@ WkbReader::readInnerLineString() -> LineString
       result.addPoint(readInnerPoint());
     }
   } catch (std::exception &e) {
-    std::cerr << e.what();
-    return {};
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
   }
   return result;
 }
@@ -101,8 +102,8 @@ WkbReader::readInnerPolygon() -> Polygon
       }
     }
   } catch (std::exception &e) {
-    std::cerr << e.what();
-    return {};
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
   }
   return result;
 }
@@ -147,8 +148,8 @@ WkbReader::readInnerMultiGeometries() -> M
       result.addGeometry(geom);
     }
   } catch (std::exception &e) {
-    std::cerr << e.what();
-    return {};
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
   }
   return result;
 }
@@ -169,8 +170,8 @@ WkbReader::readInnerGeometryCollection() -> GeometryCollection
       }
     }
   } catch (std::exception &e) {
-    std::cerr << e.what();
-    return {};
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
   }
   return result;
 }
@@ -192,8 +193,8 @@ WkbReader::readInnerTriangulatedSurface() -> TriangulatedSurface
       }
     }
   } catch (std::exception &e) {
-    std::cerr << e.what();
-    return {};
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
   }
   return result;
 }
@@ -214,8 +215,8 @@ WkbReader::readInnerPolyhedralSurface() -> PolyhedralSurface
       }
     }
   } catch (std::exception &e) {
-    std::cerr << e.what();
-    return {};
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
   }
   SFCGAL::PolyhedralSurface const result{geoms};
   return result;
