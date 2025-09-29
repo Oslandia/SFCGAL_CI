@@ -27,18 +27,27 @@ SFCGAL_API auto
 area(const Geometry &geom) -> double;
 
 /**
- * @brief Compute the 2D area of a Geometry without performing validity checks.
+ * @brief Compute the planar (2D) area of a Geometry without performing validity
+ * checks.
+ *
+ * Dispatches on the runtime geometry type:
+ * - Returns 0 for POINT, LINESTRING, NURBSCURVE, SOLID and MULTISOLID.
+ * - Delegates to specialized overloads for POLYGON, TRIANGLE,
+ * TRIANGULATEDSURFACE, POLYHEDRALSURFACE and collections (MULTI and
+ * GEOMETRYCOLLECTION types).
  *
  * @warning Z component is ignored, there is no 2D projection for 3D geometries
  * @warning No actual validity check is done
  *
  * @pre The input geometry @p geom must be valid.
  *
- * @param geom The input geometry.
- * @param noCheck A tag type used to select this overload, indicating
- *        that no validity check is performed.
+ * @param geom The geometry whose planar area is computed.
+ * @param noCheck Unused tag parameter indicating that geometry validity
+ * is not checked.
+ * @return double The computed planar area (>= 0).
+ * @throws Exception If the geometry type is not handled by this dispatch.
  *
- * @return The 2D area as a double precision value.
+ * @ingroup detail
  */
 SFCGAL_API auto
 area(const Geometry &geom, NoValidityCheck noCheck) -> double;
@@ -147,19 +156,32 @@ SFCGAL_API auto
 area3D(const Geometry &geom) -> double;
 
 /**
- * @brief Computes the 3D area of a Geometry.
+ * @brief Compute the 3D surface area of a geometry, dispatching by geometry
+ * type.
+ *
+ * This overload assumes validity checks have already been performed (the
+ * NoValidityCheck parameter is present to select this unchecked path) and
+ * returns the 3D area in the geometry's own coordinate space.
  *
  * @warning Solid area is set to 0 (might be defined as the area of the surface)
  * @warning No actual validity check is done
  * @pre geom is a valid geometry
  *
- * @param geom The input geometry.
+ * Behavior by geometry type:
+ * - POINT, LINESTRING, NURBSCURVE, SOLID, MULTISOLID: return 0.
+ * - POLYGON, TRIANGLE, TRIANGULATEDSURFACE, POLYHEDRALSURFACE: delegate to
+ *   the corresponding area3D(...) function for that type.
+ * - MULTI types and GEOMETRYCOLLECTION: sum the 3D area of contained
+ * geometries.
  *
- * @return The 3D area as a double precision value.
+ * @param geom Geometry to measure.
+ * @param noCheck Unused tag parameter selecting the unchecked path.
+ * @return double 3D surface area of the geometry.
+ *
  * @ingroup detail
  */
 SFCGAL_API auto
-area3D(const Geometry &geom, NoValidityCheck) -> double;
+area3D(const Geometry &geom, NoValidityCheck noCheck) -> double;
 
 /**
  * @brief Compute the 3D area of a Polygon.

@@ -196,7 +196,7 @@ GeometrySet<Dim>::addGeometry(const Geometry &g)
 }
 
 /**
- * @brief Add primitive to 2D geometry set from primitive handle
+ * Add primitive to 2D geometry set from primitive handle
  * @param p The primitive handle to add
  */
 template <>
@@ -224,7 +224,7 @@ GeometrySet<2>::addPrimitive(const PrimitiveHandle<2> &p)
 }
 
 /**
- * @brief Add primitive to 3D geometry set from primitive handle
+ * Add primitive to 3D geometry set from primitive handle
  * @param p The primitive handle to add
  */
 template <>
@@ -257,7 +257,7 @@ GeometrySet<3>::addPrimitive(const PrimitiveHandle<3> &p)
 }
 
 /**
- * @brief Add primitive to 3D geometry set from CGAL object
+ * Add primitive to 3D geometry set from CGAL object
  * @param o The CGAL object to add as primitive
  * @param pointsAsRing If true, build polygon from point vector
  */
@@ -302,7 +302,7 @@ GeometrySet<3>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
 }
 
 /**
- * @brief Add primitive to 2D geometry set from CGAL object
+ * Add primitive to 2D geometry set from CGAL object
  * @param o The CGAL object to add as primitive
  * @param pointsAsRing If true, build polygon from point vector
  */
@@ -368,7 +368,7 @@ GeometrySet<Dim>::addPrimitive(const typename TypeForDimension<Dim>::Segment &p,
 }
 
 /**
- * @brief Add 2D surface primitive to geometry set
+ * Add 2D surface primitive to geometry set
  * @param p The surface to add
  * @param flags Optional flags for the surface
  */
@@ -381,7 +381,7 @@ GeometrySet<2>::addPrimitive(const TypeForDimension<2>::Surface &p, int flags)
   _surfaces.back().setFlags(flags);
 }
 /**
- * @brief Add 3D surface primitive to geometry set
+ * Add 3D surface primitive to geometry set
  * @param p The surface to add
  * @param flags Optional flags for the surface
  */
@@ -394,7 +394,7 @@ GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Surface &p, int flags)
 }
 
 /**
- * @brief Add 2D volume primitive to geometry set (no-op for 2D)
+ * Add 2D volume primitive to geometry set (no-op for 2D)
  * @param volume The volume (unused in 2D)
  * @param flags The flags (unused)
  */
@@ -407,7 +407,7 @@ GeometrySet<2>::addPrimitive(
 }
 
 /**
- * @brief Add 3D volume primitive to geometry set
+ * Add 3D volume primitive to geometry set
  * @param p The volume to add
  * @param flags Optional flags for the volume
  */
@@ -456,7 +456,7 @@ GeometrySet<Dim>::hasSegments() const -> bool
 }
 
 /**
- * @brief Check if 2D geometry set has surfaces
+ * Check if 2D geometry set has surfaces
  * @return True if the set contains surfaces
  */
 template <>
@@ -466,7 +466,7 @@ GeometrySet<2>::hasSurfaces() const -> bool
   return !surfaces().empty();
 }
 /**
- * @brief Check if 3D geometry set has surfaces
+ * Check if 3D geometry set has surfaces
  * @return True if the set contains surfaces or volumes
  */
 template <>
@@ -489,7 +489,7 @@ GeometrySet<3>::hasSurfaces() const -> bool
 }
 
 /**
- * @brief Check if 2D geometry set has volumes
+ * Check if 2D geometry set has volumes
  * @return Always false for 2D sets
  */
 template <>
@@ -499,7 +499,7 @@ GeometrySet<2>::hasVolumes() const -> bool
   return false;
 }
 /**
- * @brief Check if 3D geometry set has volumes
+ * Check if 3D geometry set has volumes
  * @return True if the set contains volumes
  */
 template <>
@@ -1100,7 +1100,7 @@ _filter_covered(IT ibegin, IT iend, GeometrySet<Dim> &output)
 /// \endcond
 
 /**
- * @brief Add boundary segments from 2D surface
+ * Add boundary segments from 2D surface
  * @param surface The surface whose boundary to add
  */
 template <>
@@ -1116,7 +1116,7 @@ GeometrySet<2>::addBoundary(const TypeForDimension<2>::Surface &surface)
 }
 
 /**
- * @brief Add boundary from 3D surface (not implemented)
+ * Add boundary from 3D surface (not implemented)
  * @param surface The surface (unused)
  */
 template <>
@@ -1128,7 +1128,7 @@ GeometrySet<3>::addBoundary(
 }
 
 /**
- * @brief Get maximum geometry dimension for 2D set
+ * Get maximum geometry dimension for 2D set
  * @return Maximum dimension (2 for surfaces, 1 for segments, 0 for points, -1
  * if empty)
  */
@@ -1152,7 +1152,7 @@ GeometrySet<2>::dimension() const -> int
 }
 
 /**
- * @brief Get maximum geometry dimension for 3D set
+ * Get maximum geometry dimension for 3D set
  * @return Maximum dimension (3 for closed volumes, 2 for surfaces, 1 for
  * segments, 0 for points, -1 if empty)
  */
@@ -1195,6 +1195,12 @@ GeometrySet<Dim>::filterCovered(GeometrySet<Dim> &output) const
   _filter_covered(_points.begin(), _points.end(), output);
 }
 
+/**
+ * @brief Stream output operator for 2D GeometrySet
+ * @param ostr Output stream
+ * @param geomSet The 2D geometry set to output
+ * @return The output stream
+ */
 auto
 operator<<(std::ostream &ostr, const GeometrySet<2> &geomSet) -> std::ostream &
 {
@@ -1214,6 +1220,12 @@ operator<<(std::ostream &ostr, const GeometrySet<2> &geomSet) -> std::ostream &
   return ostr;
 }
 
+/**
+ * @brief Stream output operator for 3D GeometrySet
+ * @param ostr Output stream
+ * @param geomSet The 3D geometry set to output
+ * @return The output stream
+ */
 auto
 operator<<(std::ostream &ostr, const GeometrySet<3> &geomSet) -> std::ostream &
 {

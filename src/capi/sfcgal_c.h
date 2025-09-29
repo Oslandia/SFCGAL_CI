@@ -2707,22 +2707,6 @@ sfcgal_nurbs_curve_fit(const sfcgal_geometry_t **points, size_t num_points,
                        size_t max_control_points);
 
 /**
- * Unified curve fitting interface with approximation mode control
- * @param points Array of points to fit
- * @param num_points Number of points
- * @param degree Target curve degree
- * @param fit_method Whether to interpolate exactly or approximate
- * @param knot_method Parameterization method
- * @param end_condition Boundary conditions (for interpolation)
- * @param tolerance Maximum deviation (for approximation, ignored otherwise)
- * @param max_control_points Maximum control points (for approximation)
- * @return New NURBS curve geometry fitted to the points
- * @post The returned geometry must be deallocated by the caller with @pre
- * sfcgal_geometry_delete
- * @ingroup capi
- */
-
-/**
  * Returns the number of control points of a NURBS curve
  * @param curve The NURBS curve geometry
  * @return Number of control points

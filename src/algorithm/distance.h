@@ -17,13 +17,10 @@ struct NoValidityCheck;
 /**
  * @brief Compute the distance between two Geometries.
  *
- * @pre gA is a valid geometry
- * @pre gB is a valid geometry
+ * @param gA First geometry
+ * @param gB Second geometry
+ * @return Distance between the geometries
  * @warning No actual validity check is done
- *
- * @param gA The first Geometry.
- * @param gB The second Geometry.
- * @return The distance between the two Geometries.
  *
  * @ingroup detail
  */
@@ -33,16 +30,13 @@ distance(const Geometry &gA, const Geometry &gB) -> double;
 /**
  * @brief Dispatch distance between two Geometries.
  *
- *
- * @pre gA is a valid geometry
- * @pre gB is a valid geometry
- *
+ * @param gA First geometry
+ * @param gB Second geometry
+ * @param noCheck Validity check parameter
+ * @return Distance between the geometries
  * @warning No actual validity check is done
  *
- * @param gA The first Geometry.
- * @param gB The second Geometry.
- * @param noCheck validity check, unused parameter
- * @return The distance between the two Geometries.
+ * @ingroup detail
  */
 SFCGAL_API auto
 distance(const Geometry &gA, const Geometry &gB, NoValidityCheck noCheck)

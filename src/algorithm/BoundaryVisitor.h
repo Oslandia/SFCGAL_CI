@@ -106,11 +106,13 @@ public:
 protected:
   /**
    * get the boundary vertices for a set of LineString in a GeometryGraph
+   * @param g The GeometryGraph containing LineStrings
    */
   void
   getBoundaryFromLineStrings(const graph::GeometryGraph &g);
   /**
    * get the boundary edges for a set of Polygons in a GeometryGraph
+   * @param g The GeometryGraph containing Polygons
    * @warning not optimal (edges could be counted using complex<
    * vertex_descriptor >)
    * @todo merge resulting edges

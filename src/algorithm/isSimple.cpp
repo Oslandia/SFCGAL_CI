@@ -210,6 +210,10 @@ isSimple(const GeometryCollection &collection, const double &toleranceAbs)
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/** Check if geometry is simple
+ * @param g Geometry to check
+ * @param toleranceAbs Absolute tolerance for the check
+ * @return Simplicity status */
 auto
 isSimple(const Geometry &g, const double &toleranceAbs) -> const Simplicity
 {

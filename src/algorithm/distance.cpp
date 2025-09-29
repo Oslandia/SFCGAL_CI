@@ -34,6 +34,9 @@ namespace SFCGAL::algorithm {
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/**
+ * @brief Compute 2D distance between two geometries
+ */
 auto
 distance(const Geometry &gA, const Geometry &gB) -> double
 {

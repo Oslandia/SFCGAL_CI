@@ -16,6 +16,9 @@ public:
   Closure() : _closed(true) {}
   /**
    * @brief Constructor with status and reason
+   * @param closed true if the geometry is closed. false otherwise.
+   * @param reason A string explaining why the geometry is open. Required only
+   * if the Geometry is open.
    */
   Closure(bool closed, std::string reason = "")
       : _closed(closed), _reason(std::move(reason))
@@ -27,6 +30,7 @@ public:
   operator bool() const { return _closed; }
   /**
    * @brief Get the reason why geometry is not closed
+   * @return A string describing why the Geometry is open.
    */
   [[nodiscard]] auto
   reason() const -> const std::string &
@@ -35,6 +39,7 @@ public:
   }
   /**
    * @brief Create a closed result
+   * @return A closed result
    */
   static auto
   closed() -> Closure
@@ -43,6 +48,8 @@ public:
   }
   /**
    * @brief Create an open result with reason
+   * @param reason A string describing why the Geometry is open.
+   * @return An open result
    */
   static auto
   open(const std::string &reason) -> Closure

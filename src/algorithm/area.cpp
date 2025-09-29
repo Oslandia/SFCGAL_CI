@@ -30,24 +30,8 @@
 
 namespace SFCGAL::algorithm {
 
-/**
- * @brief Compute the planar (2D) area of a Geometry without performing validity
- * checks.
- *
- * Dispatches on the runtime geometry type:
- * - Returns 0 for POINT, LINESTRING, NURBSCURVE, SOLID and MULTISOLID.
- * - Delegates to specialized overloads for POLYGON, TRIANGLE,
- * TRIANGULATEDSURFACE, POLYHEDRALSURFACE and collections (MULTI and
- * GEOMETRYCOLLECTION types).
- *
- * @param g The geometry whose planar area is computed.
- * @param NoValidityCheck Unused tag parameter indicating that geometry validity
- * is not checked.
- * @return double The computed planar area (>= 0).
- * @throws Exception If the geometry type is not handled by this dispatch.
- */
 auto
-area(const Geometry &geom, NoValidityCheck /*unused*/) -> double
+area(const Geometry &geom, [[maybe_unused]] NoValidityCheck noCheck) -> double
 {
   switch (geom.geometryTypeId()) {
   case TYPE_POINT:
@@ -170,26 +154,6 @@ area(const PolyhedralSurface &surface) -> double
 // ----------------------------------------------------------------------------------
 //  -- area3D
 // ----------------------------------------------------------------------------------
-/**
- * @brief Compute the 3D surface area of a geometry, dispatching by geometry
- * type.
- *
- * This overload assumes validity checks have already been performed (the
- * NoValidityCheck parameter is present to select this unchecked path) and
- * returns the 3D area in the geometry's own coordinate space.
- *
- * Behavior by geometry type:
- * - POINT, LINESTRING, NURBSCURVE, SOLID, MULTISOLID: return 0.
- * - POLYGON, TRIANGLE, TRIANGULATEDSURFACE, POLYHEDRALSURFACE: delegate to
- *   the corresponding area3D(...) function for that type.
- * - MULTI types and GEOMETRYCOLLECTION: sum the 3D area of contained
- * geometries.
- *
- * @param g Geometry to measure.
- * @param NoValidityCheck Unused tag parameter selecting the unchecked path.
- * @return double 3D surface area of the geometry.
- *
- */
 
 auto
 area3D(const Geometry &geom, [[maybe_unused]] NoValidityCheck noCheck) -> double
