@@ -49,7 +49,7 @@ NURBSCurve::NURBSCurve(const std::vector<Point> &controlPoints,
     _weights.resize(_controlPoints.size(), FT(1));
     _knotVector = generateKnotVector(_controlPoints, _degree, knotMethod);
 
-    auto [isValid, reason] = validateData();
+    const auto [isValid, reason] = validateData();
     if (!isValid) {
       BOOST_THROW_EXCEPTION(Exception("Invalid NURBS curve data: " + reason));
     }
@@ -65,7 +65,7 @@ NURBSCurve::NURBSCurve(const std::vector<Point> &controlPoints,
   if (!_controlPoints.empty()) {
     _knotVector = generateKnotVector(_controlPoints, _degree, knotMethod);
 
-    auto [isValid, reason] = validateData();
+    const auto [isValid, reason] = validateData();
     if (!isValid) {
       BOOST_THROW_EXCEPTION(Exception("Invalid NURBS curve data: " + reason));
     }
@@ -78,7 +78,7 @@ NURBSCurve::NURBSCurve(const std::vector<Point> &controlPoints,
     : _controlPoints(controlPoints), _weights(weights), _degree(degree),
       _knotVector(knotVector), _fitTolerance(FT(0))
 {
-  auto [isValid, reason] = validateData();
+  const auto [isValid, reason] = validateData();
   if (!isValid) {
     BOOST_THROW_EXCEPTION(Exception("Invalid NURBS curve data: " + reason));
   }
@@ -92,7 +92,7 @@ NURBSCurve::fromBezier(const std::vector<Point> &controlPoints)
     return std::make_unique<NURBSCurve>();
   }
 
-  auto degree = static_cast<unsigned int>(controlPoints.size() - 1);
+  const auto degree = static_cast<unsigned int>(controlPoints.size() - 1);
 
   std::vector<Knot> knots;
   knots.reserve(static_cast<size_t>(2) * (degree + 1));
@@ -125,7 +125,8 @@ NURBSCurve::createBSpline(const std::vector<Point> &controlPoints,
     return std::make_unique<NURBSCurve>();
   }
 
-  auto knots = generateKnotVector(controlPoints, degree, KnotMethod::UNIFORM);
+  const auto knots =
+      generateKnotVector(controlPoints, degree, KnotMethod::UNIFORM);
   return fromBSpline(controlPoints, degree, knots);
 }
 
@@ -565,7 +566,7 @@ NURBSCurve::interpolateClampedCurve(const std::vector<Point>     &points,
     size_t span = findKnotSpan(parameter, degree, knots);
 
     // Compute basis functions at this parameter
-    auto basis = computeBasisFunctions(span, parameter, degree, knots);
+    const auto basis = computeBasisFunctions(span, parameter, degree, knots);
 
     // Initialize row to zero
     std::fill(basisMatrix.data().begin() + (i * numPoints),
@@ -705,7 +706,7 @@ NURBSCurve::interpolateNaturalCurve(const std::vector<Point>     &points,
     size_t span = findKnotSpan(parameter, degree, knots);
 
     // Compute basis functions
-    auto basis = computeBasisFunctions(span, parameter, degree, knots);
+    const auto basis = computeBasisFunctions(span, parameter, degree, knots);
 
     // Fill row of matrix
     std::fill(naturalBasisMatrix.data().begin() + (i * numDataPoints),
@@ -736,9 +737,9 @@ NURBSCurve::interpolateNaturalCurve(const std::vector<Point>     &points,
               0.0);
 
     // Set up second derivative = 0 at start
-    const FT &startParam = parameters.front();
-    size_t    startSpan  = findKnotSpan(startParam, degree, knots);
-    auto      startBasis2nd =
+    const FT  &startParam = parameters.front();
+    size_t     startSpan  = findKnotSpan(startParam, degree, knots);
+    const auto startBasis2nd =
         computeBasisDerivatives(startSpan, startParam, degree, knots, 2);
 
     size_t startBaseIdx = startSpan - degree;
@@ -749,9 +750,9 @@ NURBSCurve::interpolateNaturalCurve(const std::vector<Point>     &points,
     }
 
     // Set up second derivative = 0 at end
-    const FT &endParam = parameters.back();
-    size_t    endSpan  = findKnotSpan(endParam, degree, knots);
-    auto      endBasis2nd =
+    const FT  &endParam = parameters.back();
+    size_t     endSpan  = findKnotSpan(endParam, degree, knots);
+    const auto endBasis2nd =
         computeBasisDerivatives(endSpan, endParam, degree, knots, 2);
 
     size_t endBaseIdx = endSpan - degree;
@@ -937,7 +938,7 @@ NURBSCurve::interpolateCurve(const std::vector<Point> &points,
   }
 
   // Compute parameter values
-  auto parameters = computeParameters(points, knotMethod);
+  const auto parameters = computeParameters(points, knotMethod);
 
   // Generate appropriate knot vector based on end condition
   std::vector<Knot> knots =
@@ -1396,7 +1397,7 @@ NURBSCurve::evaluate(Parameter parameter) const -> Point
     BOOST_THROW_EXCEPTION(Exception("Cannot evaluate empty NURBS curve"));
   }
 
-  auto bounds = parameterBounds();
+  const auto bounds = parameterBounds();
   if (parameter < bounds.first || parameter > bounds.second) {
     BOOST_THROW_EXCEPTION(Exception("Parameter outside valid range"));
   }
@@ -1416,7 +1417,7 @@ NURBSCurve::derivative(Parameter parameter, unsigned int order) const -> Point
     return evaluate(parameter);
   }
 
-  auto derivatives = computeDerivatives(parameter, order);
+  const auto derivatives = computeDerivatives(parameter, order);
   if (order < derivatives.size()) {
     return derivatives[order];
   }
@@ -1615,7 +1616,7 @@ NURBSCurve::toLineStringAdaptive(FT tolerance, unsigned int minSegments,
     return lineString;
   }
 
-  auto bounds = parameterBounds();
+  const auto bounds = parameterBounds();
 
   std::vector<Parameter> parameters;
   parameters.reserve(maxSegments + 1);
@@ -1839,7 +1840,7 @@ NURBSCurve::length(Parameter from, Parameter to, FT tolerance) const -> FT
     BOOST_THROW_EXCEPTION(Exception("Cannot compute length of empty curve"));
   }
 
-  auto bounds = parameterBounds();
+  const auto bounds = parameterBounds();
 
   if (from < FT(0)) {
     from = bounds.first;
@@ -1921,7 +1922,7 @@ NURBSCurve::split(Parameter parameter) const
                           std::make_unique<NURBSCurve>());
   }
 
-  auto bounds = parameterBounds();
+  const auto bounds = parameterBounds();
 
   parameter = std::max(bounds.first, std::min(bounds.second, parameter));
 
@@ -1967,7 +1968,7 @@ NURBSCurve::subcurve(Parameter from, Parameter to) const
     return std::make_unique<NURBSCurve>();
   }
 
-  auto bounds = parameterBounds();
+  const auto bounds = parameterBounds();
   if (from < bounds.first) {
     from = bounds.first;
   }
@@ -1996,7 +1997,7 @@ NURBSCurve::subcurve(Parameter from, Parameter to) const
   unsigned int subDegree =
       std::min(_degree, static_cast<unsigned int>(subPoints.size() - 1));
 
-  auto subKnots =
+  const auto subKnots =
       generateKnotVector(subPoints, subDegree, KnotMethod::CHORD_LENGTH);
 
   std::vector<FT> subWeights;
@@ -2148,7 +2149,7 @@ NURBSCurve::closestPoint(const Point &point, Parameter *outParameter) const
         Exception("Cannot find closest point on empty curve"));
   }
 
-  auto [closestPt, parameter] = projectPointToCurve(point);
+  const auto [closestPt, parameter] = projectPointToCurve(point);
 
   if (outParameter != nullptr) {
     *outParameter = parameter;
@@ -2172,7 +2173,7 @@ NURBSCurve::setControlPoints(const std::vector<Point> &controlPoints)
         generateKnotVector(controlPoints, _degree, KnotMethod::CHORD_LENGTH);
   }
 
-  auto [isValid, reason] = validateData();
+  const auto [isValid, reason] = validateData();
   if (!isValid) {
     BOOST_THROW_EXCEPTION(Exception("Invalid control points: " + reason));
   }
@@ -2314,8 +2315,8 @@ NURBSCurve::isBSpline() const -> bool
 void
 NURBSCurve::setKnotVector(const std::vector<Knot> &knots)
 {
-  _knotVector            = knots;
-  auto [isValid, reason] = validateData();
+  _knotVector                  = knots;
+  const auto [isValid, reason] = validateData();
   if (!isValid) {
     BOOST_THROW_EXCEPTION(Exception("Invalid knot vector: " + reason));
   }
@@ -2469,7 +2470,7 @@ NURBSCurve::getCurveStatistics() const -> std::map<std::string, double>
   if (!isEmpty()) {
     stats["curve_length"] = CGAL::to_double(length());
 
-    auto bounds        = parameterBounds();
+    const auto bounds  = parameterBounds();
     stats["param_min"] = CGAL::to_double(bounds.first);
     stats["param_max"] = CGAL::to_double(bounds.second);
   }
@@ -2632,7 +2633,7 @@ NURBSCurve::computeDerivatives(const Parameter &parameter,
         }
       }
     } else {
-      auto bounds = parameterBounds();
+      const auto bounds = parameterBounds();
 
       for (unsigned int orderIdx = 1; orderIdx <= maxOrder; ++orderIdx) {
         FT param1     = std::max(bounds.first, parameter - EPSILON);
@@ -2713,7 +2714,7 @@ NURBSCurve::generateKnotVector(const std::vector<Point> &points,
       knots.emplace_back(1);
     }
   } else {
-    auto parameters = computeParameters(points, method);
+    const auto parameters = computeParameters(points, method);
 
     for (unsigned int degreeIdx = 0; degreeIdx <= degree; ++degreeIdx) {
       knots.push_back(parameters.front());
@@ -2887,7 +2888,7 @@ auto
 NURBSCurve::findParameterByArcLength(const FT &targetLength,
                                      const FT &tolerance) const -> Parameter
 {
-  auto bounds = parameterBounds();
+  const auto bounds = parameterBounds();
 
   // Use binary search with fixed iterations to avoid infinite loops
   Parameter low  = bounds.first;
