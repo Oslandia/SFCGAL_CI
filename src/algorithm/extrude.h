@@ -35,6 +35,9 @@ struct NoValidityCheck;
  *   since there is no common expectation of the
  *   values of the measures on the returned Geometry,
  *   all measures from the result are removed.
+ * @note Extrusion is not supported for NURBSCurve geometries.
+ *   Use toLineString() or toLineStringAdaptive() to convert
+ *   NURBS curves to LineStrings before extruding.
  */
 SFCGAL_API std::unique_ptr<Geometry>
 extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
@@ -59,6 +62,9 @@ extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
  *   since there is no common expectation of the
  *   values of the measures on the returned Geometry,
  *   all measures from the result are removed.
+ * @note Extrusion is not supported for NURBSCurve geometries.
+ *   Use toLineString() or toLineStringAdaptive() to convert
+ *   NURBS curves to LineStrings before extruding.
  * @warning No actual validity check is conducted.
  */
 SFCGAL_API std::unique_ptr<Geometry>
@@ -83,6 +89,9 @@ extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
  *   since there is no common expectation of the
  *   values of the measures on the returned Geometry,
  *   all measures from the result are removed.
+ * @note Extrusion is not supported for NURBSCurve geometries.
+ *   Use toLineString() or toLineStringAdaptive() to convert
+ *   NURBS curves to LineStrings before extruding.
  * @ingroup detail
  * @warning No actual validity check is conducted.
  */
@@ -102,6 +111,9 @@ SFCGAL_API std::unique_ptr<Geometry>
  *   since there is no common expectation of the
  *   values of the measures on the returned Geometry,
  *   all measures from the result are removed.
+ * @note Extrusion is not supported for NURBSCurve geometries.
+ *   Use toLineString() or toLineStringAdaptive() to convert
+ *   NURBS curves to LineStrings before extruding.
  * @todo Improve extrude for 3D surfaces - Extrude only
  *   faces whose scalar_product(v,normal) > 0 and use
  *   Polyhedron union to get output geometries with a clean
