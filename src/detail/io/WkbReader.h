@@ -15,6 +15,7 @@
 #include "SFCGAL/MultiLineString.h"
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -237,6 +238,9 @@ private:
       return std::unique_ptr<SFCGAL::Geometry>(
           readInnerPolyhedralSurface().clone());
 
+    case TYPE_NURBSCURVE:
+      return std::unique_ptr<SFCGAL::Geometry>(readInnerNURBSCurve().clone());
+
     default:
       std::ostringstream oss;
       oss << "WkbReader: type '" << geometryType << "' is not supported";
@@ -304,6 +308,12 @@ private:
    */
   auto
   readInnerPolyhedralSurface() -> PolyhedralSurface;
+
+  /**
+   * Read NURBSCurve content from wkb
+   */
+  auto
+  readInnerNURBSCurve() -> NURBSCurve;
 
   /**
    * actually reading 3D ?

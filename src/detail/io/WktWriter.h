@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/config.h"
 
 namespace SFCGAL {
@@ -16,7 +17,11 @@ namespace detail {
 namespace io {
 
 /**
- * Writer for WKT
+ * Writer for Well-Known Text (WKT) geometry format.
+ *
+ * Converts SFCGAL Geometry objects to their WKT string representation.
+ * Supports all standard geometry types including 3D coordinates and
+ * measured values.
  *
  * @warning Triangles are transformed into polygons
  */
@@ -136,6 +141,40 @@ protected:
   void
   write(const MultiPolygon &multipolygon);
 
+  /**
+   * Write vector of weights in WKT format: (w1, w2, w3, ...)
+   */
+  void
+  writeWeights(const std::vector<Kernel::FT> &weights);
+
+  /**
+   * Write vector of knots in WKT format: (k1, k2, k3, ...)
+   */
+  void
+  writeKnots(const std::vector<Kernel::FT> &knots);
+
+  /**
+   * Write NURBSCurve to WKT format.
+   *
+   * Outputs the complete WKT representation including geometry type
+   * and coordinate information.
+   *
+   * @param g The NURBSCurve geometry to write.
+   */
+  void
+  write(const NURBSCurve &g);
+  /**
+   * Write inner content of NURBSCurve to WKT format.
+   *
+   * Outputs only the coordinate content without the geometry type prefix,
+   * used for nested geometry structures.
+   *
+   * @param g The NURBSCurve geometry to write.
+   */
+  void
+  writeInner(const NURBSCurve &g);
+
+  // for recursive call use
   /**
    * Write a MultiSolid geometry
    *

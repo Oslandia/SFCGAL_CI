@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -108,11 +109,35 @@ Transform::visit(PolyhedralSurface &g)
   }
 }
 
+/**
+ * @brief Apply the transformation to every patch of a TriangulatedSurface.
+ *
+ * Iterates all patches in the given TriangulatedSurface and recursively
+ * visits each patch so the transformation is applied to their constituent
+ * geometries (control vertices/triangles).
+ */
 void
 Transform::visit(TriangulatedSurface &g)
 {
   for (size_t i = 0; i < g.numPatches(); i++) {
     visit(g.patchN(i));
+  }
+}
+
+/**
+ * @brief Visit a NURBS curve and apply the transform to each control point.
+ *
+ * Iterates over the curve's control points and recursively visits each one
+ * so the transformation is applied to all control vertices of the NURBS curve.
+ *
+ * @param g NURBSCurve to traverse; its control points are visited in index
+ * order.
+ */
+void
+Transform::visit(NURBSCurve &g)
+{
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointN(i));
   }
 }
 

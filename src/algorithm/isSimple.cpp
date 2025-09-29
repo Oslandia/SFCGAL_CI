@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/isSimple.h"
 
+#include "SFCGAL/Curve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -246,6 +247,19 @@ isSimple(const Geometry &g, const double &toleranceAbs) -> const Simplicity
 
   case TYPE_MULTISOLID: // every solid is simple
     return isSimple(g.as<MultiSolid>(), toleranceAbs);
+
+  case TYPE_NURBSCURVE: {
+    // Tessellate NURBS and check LineString simpleness to detect
+    // self-intersections
+    auto lineString = g.as<Curve>().toLineStringAdaptive();
+    if (!lineString || lineString->isEmpty()) {
+      lineString = g.as<Curve>().toLineString(256);
+    }
+    if (!lineString || lineString->isEmpty()) {
+      return Simplicity::simple(); // Empty curves are simple
+    }
+    return isSimple(*lineString, toleranceAbs);
+  }
 
   case TYPE_GEOMETRYCOLLECTION: // every geometry is simple
     return isSimple(g.as<GeometryCollection>(), toleranceAbs);

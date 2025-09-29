@@ -90,6 +90,8 @@ typedef enum {
   SFCGAL_TYPE_TRIANGULATEDSURFACE = 16,
   SFCGAL_TYPE_TRIANGLE            = 17,
 
+  SFCGAL_TYPE_NURBSCURVE = 21,
+
   //-- not official codes
   SFCGAL_TYPE_SOLID      = 101,
   SFCGAL_TYPE_MULTISOLID = 102
@@ -2505,6 +2507,406 @@ sfcgal_version();
  */
 SFCGAL_API const char *
 sfcgal_full_version();
+
+/*--------------------------------------------------------------------------------------*
+ *
+ * NURBSCurve support
+ *
+ *--------------------------------------------------------------------------------------*/
+
+/**
+ * Knot vector generation methods for NURBS curves
+ * @ingroup capi
+ */
+typedef enum {
+  SFCGAL_KNOT_METHOD_UNIFORM      = 0,
+  SFCGAL_KNOT_METHOD_CHORD_LENGTH = 1,
+  SFCGAL_KNOT_METHOD_CENTRIPETAL  = 2
+} sfcgal_knot_method_t;
+
+/**
+ * End conditions for curve fitting and interpolation
+ * @ingroup capi
+ */
+typedef enum {
+  SFCGAL_END_CONDITION_CLAMPED  = 0,
+  SFCGAL_END_CONDITION_NATURAL  = 1,
+  SFCGAL_END_CONDITION_PERIODIC = 2,
+  SFCGAL_END_CONDITION_TANGENT  = 3
+} sfcgal_end_condition_t;
+
+/**
+ * Curve fitting methods
+ * @ingroup capi
+ */
+typedef enum {
+  SFCGAL_FIT_METHOD_INTERPOLATE = 0,
+  SFCGAL_FIT_METHOD_APPROXIMATE = 1
+} sfcgal_fit_method_t;
+
+/**
+ * Creates an empty NURBS curve
+ * @return New empty NURBS curve geometry
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_create();
+
+/**
+ * Creates a NURBS curve from control points with uniform weights
+ * @param points Array of control points
+ * @param num_points Number of control points
+ * @param degree Polynomial degree of curve
+ * @param knot_method Method for generating knot vector
+ * @return New NURBS curve geometry
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_create_from_points(const sfcgal_geometry_t **points,
+                                      size_t num_points, unsigned int degree,
+                                      sfcgal_knot_method_t knot_method);
+
+/**
+ * Creates a NURBS curve from control points and weights
+ * @param points Array of control points
+ * @param weights Array of weights (must match num_points)
+ * @param num_points Number of control points
+ * @param degree Polynomial degree of curve
+ * @param knot_method Method for generating knot vector
+ * @return New NURBS curve geometry
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_create_from_points_and_weights(
+    const sfcgal_geometry_t **points, const double *weights, size_t num_points,
+    unsigned int degree, sfcgal_knot_method_t knot_method);
+
+/**
+ * Creates a NURBS curve with full control over parameters
+ * @param points Array of control points
+ * @param weights Array of weights (can be NULL for uniform weights)
+ * @param num_points Number of control points
+ * @param degree Polynomial degree
+ * @param knots Array of knot values
+ * @param num_knots Number of knot values (must equal num_points + degree + 1)
+ * @return New NURBS curve geometry
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_create_from_full_data(const sfcgal_geometry_t **points,
+                                         const double             *weights,
+                                         size_t num_points, unsigned int degree,
+                                         const double *knots, size_t num_knots);
+
+/**
+ * Creates a NURBS curve from Bezier control points
+ * @param points Array of Bezier control points
+ * @param num_points Number of control points
+ * @return New NURBS curve geometry
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_create_bezier(const sfcgal_geometry_t **points,
+                                 size_t                    num_points);
+
+/**
+ * Creates a uniform B-spline curve
+ * @param points Array of control points
+ * @param num_points Number of control points
+ * @param degree Spline degree
+ * @return New NURBS curve geometry
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_create_bspline(const sfcgal_geometry_t **points,
+                                  size_t num_points, unsigned int degree);
+
+/**
+ * Creates a circular arc as NURBS curve
+ * @param center Arc center point
+ * @param radius Arc radius (must be positive)
+ * @param start_angle Start angle in radians
+ * @param end_angle End angle in radians
+ * @param normal Normal vector for 3D arcs (can be NULL for Z-axis)
+ * @return New NURBS curve geometry representing the circular arc
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_create_circular_arc(const sfcgal_geometry_t *center,
+                                       double radius, double start_angle,
+                                       double                   end_angle,
+                                       const sfcgal_geometry_t *normal);
+
+/**
+ * Creates an interpolating NURBS curve through points
+ * @param points Array of points to interpolate through
+ * @param num_points Number of points
+ * @param degree Curve degree
+ * @param knot_method Parameterization method
+ * @param end_condition Boundary conditions
+ * @return New NURBS curve geometry interpolating through the points
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_interpolate(const sfcgal_geometry_t **points,
+                               size_t num_points, unsigned int degree,
+                               sfcgal_knot_method_t   knot_method,
+                               sfcgal_end_condition_t end_condition);
+
+/**
+ * Creates an approximating NURBS curve
+ * @param points Array of points to approximate
+ * @param num_points Number of points
+ * @param degree Target curve degree
+ * @param tolerance Maximum allowed deviation
+ * @param max_control_points Maximum control points to use
+ * @return New NURBS curve geometry approximating the points
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_approximate(const sfcgal_geometry_t **points,
+                               size_t num_points, unsigned int degree,
+                               double tolerance, size_t max_control_points);
+
+/**
+ * Unified curve fitting interface
+ * @param points Array of points to fit
+ * @param num_points Number of points
+ * @param degree Target curve degree
+ * @param fit_method Whether to interpolate exactly or approximate
+ * @param knot_method Parameterization method
+ * @param end_condition Boundary conditions (for interpolation)
+ * @param tolerance Maximum deviation (for approximation, ignored otherwise)
+ * @param max_control_points Maximum control points (for approximation)
+ * @return New NURBS curve geometry fitted to the points
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_fit(const sfcgal_geometry_t **points, size_t num_points,
+                       unsigned int degree, sfcgal_fit_method_t fit_method,
+                       sfcgal_knot_method_t   knot_method,
+                       sfcgal_end_condition_t end_condition, double tolerance,
+                       size_t max_control_points);
+
+/**
+ * Unified curve fitting interface with approximation mode control
+ * @param points Array of points to fit
+ * @param num_points Number of points
+ * @param degree Target curve degree
+ * @param fit_method Whether to interpolate exactly or approximate
+ * @param knot_method Parameterization method
+ * @param end_condition Boundary conditions (for interpolation)
+ * @param tolerance Maximum deviation (for approximation, ignored otherwise)
+ * @param max_control_points Maximum control points (for approximation)
+ * @return New NURBS curve geometry fitted to the points
+ * @post The returned geometry must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+
+/**
+ * Returns the number of control points of a NURBS curve
+ * @param curve The NURBS curve geometry
+ * @return Number of control points
+ * @pre curve must be a NURBS curve
+ * @ingroup capi
+ */
+SFCGAL_API size_t
+sfcgal_nurbs_curve_num_control_points(const sfcgal_geometry_t *curve);
+
+/**
+ * Returns the ith control point of a NURBS curve
+ * @param curve the input NURBS curve
+ * @param index control point index
+ * @return The control point at the specified index
+ * @pre curve must be a NURBS curve
+ * @pre i >= 0 and i < sfcgal_nurbs_curve_num_control_points
+ * @post the returned Point is not writable and must not be deallocated by the
+ * caller
+ * @ingroup capi
+ */
+SFCGAL_API const sfcgal_geometry_t *
+sfcgal_nurbs_curve_control_point_n(const sfcgal_geometry_t *curve,
+                                   size_t                   index);
+
+/**
+ * Sets the ith control point of a NURBS curve
+ * @param curve the NURBS curve to modify
+ * @param index control point index
+ * @param point new control point
+ * @pre curve must be a NURBS curve
+ * @pre point must be a Point
+ * @pre i >= 0 and i < sfcgal_nurbs_curve_num_control_points
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_nurbs_curve_set_control_point_n(sfcgal_geometry_t *curve, size_t index,
+                                       const sfcgal_geometry_t *point);
+
+/**
+ * Returns the weight at index i of a NURBS curve
+ * @param curve the input NURBS curve
+ * @param index weight index
+ * @return The weight value at the specified index
+ * @pre curve must be a NURBS curve
+ * @pre i >= 0 and i < sfcgal_nurbs_curve_num_control_points
+ * @ingroup capi
+ */
+SFCGAL_API double
+sfcgal_nurbs_curve_weight_n(const sfcgal_geometry_t *curve, size_t index);
+
+/**
+ * Sets the weight at index i of a NURBS curve
+ * @param curve the NURBS curve to modify
+ * @param index weight index
+ * @param weight new weight value (must be positive)
+ * @pre curve must be a NURBS curve
+ * @pre i >= 0 and i < sfcgal_nurbs_curve_num_control_points
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_nurbs_curve_set_weight_n(sfcgal_geometry_t *curve, size_t index,
+                                double weight);
+
+/**
+ * Returns the degree of a NURBS curve
+ * @param curve the input NURBS curve
+ * @return The degree of the NURBS curve
+ * @pre curve must be a NURBS curve
+ * @ingroup capi
+ */
+SFCGAL_API unsigned int
+sfcgal_nurbs_curve_degree(const sfcgal_geometry_t *curve);
+
+/**
+ * Returns the number of knots in the knot vector of a NURBS curve
+ * @param curve the input NURBS curve
+ * @return The number of knots in the knot vector
+ * @pre curve must be a NURBS curve
+ * @ingroup capi
+ */
+SFCGAL_API size_t
+sfcgal_nurbs_curve_num_knots(const sfcgal_geometry_t *curve);
+
+/**
+ * Returns the knot value at index i of a NURBS curve
+ * @param curve the input NURBS curve
+ * @param index knot index
+ * @return The knot value at the specified index
+ * @pre curve must be a NURBS curve
+ * @pre i >= 0 and i < sfcgal_nurbs_curve_num_knots
+ * @ingroup capi
+ */
+SFCGAL_API double
+sfcgal_nurbs_curve_knot_n(const sfcgal_geometry_t *curve, size_t index);
+
+/**
+ * Tests if a NURBS curve is rational (uses non-uniform weights)
+ * @param curve the input NURBS curve
+ * @return 1 if the curve is rational, 0 otherwise
+ * @pre curve must be a NURBS curve
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_nurbs_curve_is_rational(const sfcgal_geometry_t *curve);
+
+/**
+ * Tests if a NURBS curve is in Bezier form
+ * @param curve the input NURBS curve
+ * @return 1 if the curve is in Bezier form, 0 otherwise
+ * @pre curve must be a NURBS curve
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_nurbs_curve_is_bezier(const sfcgal_geometry_t *curve);
+
+/**
+ * Tests if a NURBS curve is a B-spline (uniform weights)
+ * @param curve the input NURBS curve
+ * @return 1 if the curve is a B-spline, 0 otherwise
+ * @pre curve must be a NURBS curve
+ * @ingroup capi
+ */
+SFCGAL_API int
+sfcgal_nurbs_curve_is_bspline(const sfcgal_geometry_t *curve);
+
+/**
+ * Evaluates a point on the NURBS curve at given parameter
+ * @param curve the input NURBS curve
+ * @param parameter parameter value (between curve bounds)
+ * @return The evaluated point on the curve
+ * @pre curve must be a NURBS curve
+ * @post The returned Point must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_evaluate(const sfcgal_geometry_t *curve, double parameter);
+
+/**
+ * Computes the derivative of a NURBS curve at given parameter
+ * @param curve the input NURBS curve
+ * @param parameter parameter value
+ * @param order derivative order (1 for first derivative, 2 for second, etc.)
+ * @return The derivative vector at the specified parameter
+ * @pre curve must be a NURBS curve
+ * @post The returned Point must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_derivative(const sfcgal_geometry_t *curve, double parameter,
+                              unsigned int order);
+
+/**
+ * Converts a NURBS curve to a LineString with specified number of segments
+ * @param curve the input NURBS curve
+ * @param num_segments number of line segments
+ * @return The converted LineString geometry
+ * @pre curve must be a NURBS curve
+ * @post The returned LineString must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_to_linestring(const sfcgal_geometry_t *curve,
+                                 unsigned int             num_segments);
+
+/**
+ * Converts a NURBS curve to a LineString with adaptive tessellation
+ * @param curve the input NURBS curve
+ * @param tolerance maximum deviation tolerance
+ * @param min_segments minimum number of segments
+ * @param max_segments maximum number of segments
+ * @return The converted LineString geometry
+ * @pre curve must be a NURBS curve
+ * @post The returned LineString must be deallocated by the caller with @pre
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_nurbs_curve_to_linestring_adaptive(const sfcgal_geometry_t *curve,
+                                          double                   tolerance,
+                                          unsigned int             min_segments,
+                                          unsigned int max_segments);
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,7 @@
 
 #include "SFCGAL/algorithm/centroid.h"
 
+#include "SFCGAL/Curve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/Point.h"
@@ -112,6 +113,23 @@ centroid3D(const Geometry &geom) -> std::unique_ptr<Point>
 
   return std::make_unique<Point>(out);
 }
+/**
+ * @brief Compute a weighted centroid for a Geometry by dispatching to the
+ * appropriate overload for the geometry's concrete type.
+ *
+ * Dispatches on g.geometryTypeId() and delegates computation to the
+ * corresponding weightedCentroid overload (Point, LineString, Curve,
+ * Polygon, Triangle, GeometryCollection, TriangulatedSurface,
+ * PolyhedralSurface, Solid). For a Point returns a WeightedCentroid with
+ * zero area, the point's vector as centroid, and the point's M value if
+ * measured.
+ *
+ * @param g Geometry to compute the weighted centroid for.
+ * @param enable3DComputation When true, area/length computations prefer 3D
+ *        formulas (when available); otherwise 2D computations are used.
+ * @return WeightedCentroid Aggregated area, centroid vector, and M value
+ *         for the input geometry.
+ */
 auto
 weightedCentroid(const Geometry &geom, bool enable3DComputation)
     -> WeightedCentroid
@@ -124,6 +142,10 @@ weightedCentroid(const Geometry &geom, bool enable3DComputation)
     break;
   case TYPE_LINESTRING:
     wCent = weightedCentroid(geom.as<LineString>(), enable3DComputation);
+    break;
+
+  case TYPE_NURBSCURVE:
+    wCent = weightedCentroid(geom.as<Curve>(), enable3DComputation);
     break;
 
   case TYPE_POLYGON:
@@ -173,6 +195,28 @@ weightedCentroid(const Triangle &triangle, bool enable3DComputation)
                           triangle.vertex(2), enable3DComputation);
 }
 
+/**
+ * @brief Compute the weighted centroid contribution of a triangle defined by
+ * three points.
+ *
+ * Computes the triangle's area, its centroid vector, and an M-value (measure)
+ * used for weighted aggregation across geometries. When enable3DComputation is
+ * true the area is computed in 3D (positive); otherwise a 2D signed area is
+ * computed from the XY coordinates.
+ *
+ * The returned WeightedCentroid contains:
+ * - area: triangle area (3D: non-negative; 2D: signed area),
+ * - centroid: the arithmetic mean of the three point position vectors,
+ * - m: the average of the three points' M values if all three are measured,
+ * otherwise 0.
+ *
+ * @param a First triangle vertex.
+ * @param b Second triangle vertex.
+ * @param c Third triangle vertex.
+ * @param enable3DComputation If true, compute area in 3D; if false, compute 2D
+ * signed area.
+ * @return WeightedCentroid Area, centroid vector, and M value for the triangle.
+ */
 auto
 weightedCentroid(const Point &pta, const Point &ptb, const Point &ptc,
                  bool enable3DComputation) -> WeightedCentroid
@@ -203,6 +247,59 @@ weightedCentroid(const Point &pta, const Point &ptb, const Point &ptc,
   return {area, out, m};
 }
 
+/**
+ * @brief Computes the area/length-weighted centroid of a parametric Curve by
+ * approximating it as a LineString.
+ *
+ * Attempts an adaptive sampling of the curve to produce a LineString
+ * approximation; if that fails or yields an empty result it falls back to a
+ * denser uniform sampling (256 points). If no valid approximation can be
+ * produced, returns an empty WeightedCentroid. Otherwise delegates to the
+ * LineString overload to compute the weighted centroid.
+ *
+ * @param g Curve to approximate and evaluate.
+ * @param enable3DComputation If true, use 3D measures (length/area and 3D
+ * centroids); otherwise use 2D computations.
+ * @return WeightedCentroid Empty if the curve cannot be approximated as a
+ * non-empty LineString, otherwise the computed weighted centroid.
+ */
+auto
+weightedCentroid(const Curve &g, bool enable3DComputation) -> WeightedCentroid
+{
+  // Convert curve to LineString approximation for centroid calculation
+  auto lineString = g.toLineStringAdaptive(); // default tolerance FT(1e-3)
+  if (!lineString || lineString->isEmpty()) {
+    lineString = g.toLineString(256); // fallback to denser uniform sampling
+  }
+  if (!lineString || lineString->isEmpty()) {
+    return {}; // Return empty centroid for invalid/empty curves
+  }
+  return weightedCentroid(*lineString, enable3DComputation);
+}
+
+/**
+ * @brief Computes the weighted centroid for a LineString (open polyline or
+ * closed ring).
+ *
+ * Computes an area/length-weighted centroid and the associated weighted measure
+ * (M).
+ * - If g.isClosed() is true, treats the LineString as a polygonal ring and
+ * decomposes it into triangles fan-based from the first point; each triangle's
+ * area/centroid is accumulated (triangle area computation honors
+ * enable3DComputation).
+ * - If g is open, treats it as a polyline and accumulates segment contributions
+ * using segment midpoints weighted by segment length.
+ *
+ * @param g The LineString to process; when closed this represents a polygonal
+ * ring.
+ * @param enable3DComputation When true, triangle area computations use 3D
+ * geometry; otherwise 2D signed area is used for polygonal contributions.
+ * @return WeightedCentroid A struct containing the total area/length, the
+ * computed centroid (as a Vector_3), and the averaged M value (weighted by
+ * area/length).
+ * @throws InappropriateGeometryException Thrown when the aggregated total
+ * area/length is zero (invalid LineString for centroid computation).
+ */
 auto
 weightedCentroid(const LineString &lineString, bool enable3DComputation)
     -> WeightedCentroid

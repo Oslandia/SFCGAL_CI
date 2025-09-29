@@ -11,6 +11,7 @@
 #include "SFCGAL/config.h"
 
 #include "SFCGAL/Geometry.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/PreparedGeometry.h"
 
 #include "SFCGAL/detail/tools/InputStreamReader.h"
@@ -20,7 +21,11 @@ namespace detail {
 namespace io {
 
 /**
- * read WKT geometry
+ * Reader for Well-Known Text (WKT) geometry format.
+ *
+ * Parses WKT strings to create SFCGAL Geometry objects. Supports all
+ * standard geometry types including Points, LineStrings, Polygons,
+ * and collections, as well as 3D and measured coordinates.
  *
  * @warning M is ignored
  * @todo take M in account?
@@ -170,6 +175,37 @@ public:
    */
   void
   readInnerMultiSolid(MultiSolid &multiSolid);
+
+  /**
+   * Read NURBSCurve content from WKT (NEW ISO FORMAT).
+   *
+   * Supports syntax:
+   * - NURBSCURVE(degree, (points))
+   * - NURBSCURVE(degree, (points), (weights))
+   * - NURBSCURVE(degree, (points), (weights), (knots))
+   *
+   * @param g The NURBSCurve geometry to populate with parsed data.
+   */
+  void
+  readInnerNURBSCurve(NURBSCurve &g);
+
+  /**
+   * Read vector of weights from WKT format: (w1, w2, w3, ...)
+   */
+  std::vector<Kernel::FT>
+  readWeightsVector();
+
+  /**
+   * Read vector of knots from WKT format: (k1, k2, k3, ...)
+   */
+  std::vector<Kernel::FT>
+  readKnotsVector();
+
+  /**
+   * Read degree value (unsigned integer)
+   */
+  unsigned int
+  readDegree();
 
   /**
    * Read coordinate from WKT

@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -111,6 +112,16 @@ GetPointsVisitor::visit(const TriangulatedSurface &g)
 {
   for (size_t i = 0; i < g.numPatches(); i++) {
     visit(g.patchN(i));
+  }
+}
+
+void
+GetPointsVisitor::visit(const NURBSCurve &g)
+{
+  // Use control points to avoid dangling pointers from temporary tessellation
+  // Control points are permanent parts of the geometry structure
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    visit(g.controlPointN(i));
   }
 }
 

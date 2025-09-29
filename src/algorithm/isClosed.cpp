@@ -10,12 +10,16 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/algorithm/distance.h"
+
+#include <limits>
 
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/boost/graph/helpers.h>
@@ -182,6 +186,49 @@ isClosedMultiSolid(const MultiSolid &msolid) -> Closure
   return Closure::closed();
 }
 
+auto
+isClosedNURBSCurve(const NURBSCurve &nurbsCurve) -> Closure
+{
+  if (nurbsCurve.isEmpty()) {
+    return Closure::closed();
+  }
+
+  if (nurbsCurve.numControlPoints() < 2) {
+    return Closure::closed();
+  }
+
+  // Use efficient endpoint accessors and squared distance comparison
+  Point startPoint = nurbsCurve.startPoint();
+  Point endPoint   = nurbsCurve.endPoint();
+
+  // Compute squared distance to avoid sqrt
+  auto dx = endPoint.x() - startPoint.x();
+  auto dy = endPoint.y() - startPoint.y();
+  auto dz = endPoint.is3D() && startPoint.is3D() ? endPoint.z() - startPoint.z()
+                                                 : NURBSCurve::FT(0);
+  auto squaredDistance = dx * dx + dy * dy + dz * dz;
+
+  // Use relative tolerance based on curve length or numeric epsilon
+  auto curveLength = nurbsCurve.length();
+  auto tolerance =
+      curveLength > NURBSCurve::FT(0)
+          ? curveLength * std::numeric_limits<double>::epsilon() * 100
+          : NURBSCurve::FT(std::numeric_limits<double>::epsilon());
+  auto squaredTolerance = tolerance * tolerance;
+
+  if (squaredDistance <= squaredTolerance) {
+    return Closure::closed();
+  }
+
+  // Return actual distance (not squared) in error message
+  auto actualDistance = CGAL::sqrt(CGAL::to_double(squaredDistance));
+  return Closure::open(
+      (boost::format(
+           "NURBS curve endpoints are not coincident (distance: %g)") %
+       actualDistance)
+          .str());
+}
+
 } // namespace detail
 
 // ----------------------------------------------------------------------------------
@@ -216,6 +263,9 @@ isClosed(const Geometry &g) -> Closure
 
   case TYPE_MULTISOLID:
     return detail::isClosedMultiSolid(g.as<MultiSolid>());
+
+  case TYPE_NURBSCURVE:
+    return detail::isClosedNURBSCurve(g.as<NURBSCurve>());
 
   case TYPE_GEOMETRYCOLLECTION: {
     const auto &collection = g.as<GeometryCollection>();

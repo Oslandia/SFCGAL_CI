@@ -48,6 +48,9 @@ class Solid;
 // not SFA, appears in GML/CityGML
 class MultiSolid;
 
+// Curves
+class NURBSCurve;
+
 class Envelope;
 
 class GeometryVisitor;
@@ -79,15 +82,22 @@ enum GeometryType {
   //     TYPE_CURVEPOLYGON        = 10, // not yet supported
   //     TYPE_MULTICURVE          = 11, //abstract
   //     TYPE_MULTISURFACE        = 12, //abstract
-  //     TYPE_CURVE               = 13, //abstract
+  // TYPE_CURVE = 13, // abstract
   //     TYPE_SURFACE             = 14, //abstract
   TYPE_POLYHEDRALSURFACE   = 15,
   TYPE_TRIANGULATEDSURFACE = 16,
   TYPE_TRIANGLE            = 17,
+  // TYPE_CIRCLE              = 18,
+  // TYPE_GEODESICSTRING      = 19,
+  // TYPE_ELLIPTICALCURVE     = 20,
+  TYPE_NURBSCURVE = 21,
+  // TYPE_CLOTHOID            = 22,
+  // TYPE_SPIRALCURVE         = 23,
 
   //-- not official codes
   TYPE_SOLID      = 101,
-  TYPE_MULTISOLID = 102
+  TYPE_MULTISOLID = 102,
+  //  AffinePlacement 102 1102
 };
 
 /**

@@ -83,6 +83,10 @@ minkowskiSum(const Geometry &gA, const Polygon_2 &gB,
   case TYPE_LINESTRING:
     return minkowskiSum(gA.as<LineString>(), gB, polygonSet);
 
+  case TYPE_NURBSCURVE:
+    BOOST_THROW_EXCEPTION(
+        Exception("minkowskiSum() not implemented for NURBSCurve"));
+
   case TYPE_POLYGON:
     return minkowskiSum(gA.as<Polygon>(), gB, polygonSet);
 

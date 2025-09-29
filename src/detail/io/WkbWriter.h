@@ -5,14 +5,30 @@
 #ifndef SFCGAL_IO_WKBWRITER_H_
 #define SFCGAL_IO_WKBWRITER_H_
 
+#include <array>
 #include <boost/endian/conversion.hpp>
 #include <cstddef>
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/config.h"
+
+namespace SFCGAL {
+// Forward declarations
+class Point;
+class LineString;
+class Polygon;
+class Triangle;
+class GeometryCollection;
+class PolyhedralSurface;
+class TriangulatedSurface;
+class NURBSCurve;
+
+// Use srid_t from SFCGAL/config.h
+} // namespace SFCGAL
 
 namespace SFCGAL::detail::io {
 
@@ -122,6 +138,13 @@ private:
    */
   void
   writeInner(const Triangle      &g,
+             boost::endian::order wkbOrder = boost::endian::order::native);
+
+  /**
+   * Dedicated method to write NURBSCurve into _wkb data
+   */
+  void
+  writeInner(const NURBSCurve    &g,
              boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**

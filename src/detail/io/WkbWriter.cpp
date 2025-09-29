@@ -14,6 +14,7 @@
 #include "SFCGAL/MultiLineString.h"
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -67,6 +68,10 @@ WkbWriter::writeRec(const Geometry &g, boost::endian::order wkbOrder)
 
   case TYPE_POLYHEDRALSURFACE:
     writeInner(g.as<PolyhedralSurface>(), wkbOrder);
+    return;
+
+  case TYPE_NURBSCURVE:
+    writeInner(g.as<NURBSCurve>(), wkbOrder);
     return;
 
   default:
@@ -281,6 +286,52 @@ WkbWriter::writeInner(const TriangulatedSurface &triangulatedSurface,
 
   for (size_t i = 0; i < triangulatedSurface.numPatches(); i++) {
     writeRec(triangulatedSurface.patchN(i), wkbOrder);
+  }
+}
+
+void
+WkbWriter::writeInner(const NURBSCurve &g, boost::endian::order wkbOrder)
+{
+  // Endianness
+  toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
+
+  // WkbType
+  writeGeometryType(g, wkbOrder);
+
+  // Degree (WKB standard format)
+  toByte(static_cast<uint32_t>(g.degree()), wkbOrder);
+
+  // Number of control points
+  toByte(static_cast<uint32_t>(g.numControlPoints()), wkbOrder);
+
+  // Write each control point with ISO WKB standard structure: [byte
+  // order][coordinates][flag][weight?]
+  for (size_t i = 0; i < g.numControlPoints(); i++) {
+    auto weight          = g.weight(i);
+    bool hasCustomWeight = (std::abs(CGAL::to_double(weight) - 1.0) > 1e-10);
+
+    // Write byte order for this control point (required by ISO/IEC
+    // 13249-3:2016)
+    toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
+
+    // Write coordinates
+    writeCoordinate(g.controlPointN(i), wkbOrder);
+
+    // Write weight flag (0 = default weight, 1 = custom weight follows)
+    toByte(static_cast<uint8_t>(hasCustomWeight ? 1 : 0), wkbOrder);
+
+    // Write custom weight if present
+    if (hasCustomWeight) {
+      toByte(CGAL::to_double(weight), wkbOrder);
+    }
+  }
+
+  // Knot vector
+  const auto &knots = g.knotVector();
+  toByte(static_cast<uint32_t>(knots.size()), wkbOrder);
+
+  for (const auto &knot : knots) {
+    toByte(CGAL::to_double(knot), wkbOrder);
   }
 }
 

@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -181,7 +182,7 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
     {                                                                          \
       std::unique_ptr<SFCGAL::Geometry> result;                                \
       try {                                                                    \
-        result = sfcgal_function(*(const SFCGAL::Geometry *)(ga));             \
+        result = sfcgal_function(*static_cast<const SFCGAL::Geometry *>(ga));  \
       } catch (std::exception & e) {                                           \
         SFCGAL_WARNING("During " #name "(A) :");                               \
         SFCGAL_WARNING("  with A: %s",                                         \
@@ -197,7 +198,7 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
     {                                                                          \
       double result;                                                           \
       try {                                                                    \
-        result = sfcgal_function(*(const SFCGAL::Geometry *)(ga));             \
+        result = sfcgal_function(*static_cast<const SFCGAL::Geometry *>(ga));  \
       } catch (std::exception & e) {                                           \
         SFCGAL_WARNING("During " #name "(A) :");                               \
         SFCGAL_WARNING("  with A: %s",                                         \
@@ -212,13 +213,13 @@ template <class T>
 inline auto
 down_cast(sfcgal_geometry_t *p) -> T *
 {
-  T *q = dynamic_cast<T *>(reinterpret_cast<SFCGAL::Geometry *>(p));
+  T *result = dynamic_cast<T *>(static_cast<SFCGAL::Geometry *>(p));
 
-  if (!q) {
+  if (!result) {
     BOOST_THROW_EXCEPTION(SFCGAL::Exception("wrong geometry type"));
   }
 
-  return q;
+  return result;
 }
 
 template <class T>
@@ -226,7 +227,7 @@ inline auto
 down_const_cast(const sfcgal_geometry_t *p) -> const T *
 {
   const T *q =
-      dynamic_cast<const T *>(reinterpret_cast<const SFCGAL::Geometry *>(p));
+      dynamic_cast<const T *>(static_cast<const SFCGAL::Geometry *>(p));
 
   if (!q) {
     BOOST_THROW_EXCEPTION(SFCGAL::Exception("wrong geometry type"));
@@ -1302,12 +1303,13 @@ sfcgal_geometry_volume(const sfcgal_geometry_t *geom) -> double
   double r = std::numeric_limits<double>::quiet_NaN();
 
   try {
-    r = CGAL::to_double(
-        SFCGAL::algorithm::volume(*(const SFCGAL::Geometry *)(geom)));
+    r = CGAL::to_double(SFCGAL::algorithm::volume(
+        *static_cast<const SFCGAL::Geometry *>(geom)));
   } catch (std::exception &e) {
     SFCGAL_WARNING("During volume(A) :");
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return -1.0;
   }
@@ -1318,7 +1320,7 @@ sfcgal_geometry_volume(const sfcgal_geometry_t *geom) -> double
 extern "C" auto
 sfcgal_geometry_is_planar(const sfcgal_geometry_t *ga) -> int
 {
-  const auto *g = reinterpret_cast<const SFCGAL::Geometry *>(ga);
+  const auto *g = static_cast<const SFCGAL::Geometry *>(ga);
 
   if (g->geometryTypeId() != SFCGAL::TYPE_POLYGON) {
     SFCGAL_ERROR("is_planar() only applies to polygons");
@@ -1333,7 +1335,7 @@ sfcgal_geometry_is_planar(const sfcgal_geometry_t *ga) -> int
   } catch (std::exception &e) {
     SFCGAL_WARNING("During is_planar(A) :");
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return -1.0;
   }
@@ -1365,7 +1367,7 @@ sfcgal_geometry_orientation(const sfcgal_geometry_t *ga) -> int
   } catch (std::exception &e) {
     SFCGAL_WARNING("During orientation(A) :");
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return -1.0;
   }
@@ -1399,7 +1401,7 @@ sfcgal_geometry_force_lhr(const sfcgal_geometry_t *ga) -> sfcgal_geometry_t *
   } catch (std::exception &e) {
     SFCGAL_WARNING("During force_lhr(A) :");
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1419,7 +1421,7 @@ sfcgal_geometry_force_rhr(const sfcgal_geometry_t *ga) -> sfcgal_geometry_t *
   } catch (std::exception &e) {
     SFCGAL_WARNING("During force_rhr(A) :");
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1441,7 +1443,7 @@ sfcgal_geometry_triangulate_2dz(const sfcgal_geometry_t *ga)
   } catch (std::exception &e) {
     SFCGAL_WARNING("During triangulate_2d(A) :");
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1464,7 +1466,7 @@ sfcgal_geometry_extrude(const sfcgal_geometry_t *ga, double x, double y,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During extrude(A, %g, %g, %g) :", x, y, z);
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1487,7 +1489,7 @@ sfcgal_geometry_round(const sfcgal_geometry_t *ga, int scale)
   } catch (std::exception &e) {
     SFCGAL_WARNING("During round(A):");
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1516,9 +1518,9 @@ sfcgal_geometry_minkowski_sum(const sfcgal_geometry_t *ga,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During minkowski_sum(A,B):");
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_WARNING("   and B: %s",
-                   ((const SFCGAL::Geometry *)(gb))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(gb)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1538,7 +1540,7 @@ sfcgal_geometry_offset_polygon(const sfcgal_geometry_t *ga, double offset)
   } catch (std::exception &e) {
     SFCGAL_WARNING("During offset(A,%g):", offset);
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(ga))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1571,8 +1573,9 @@ sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom,
     polys = SFCGAL::algorithm::extrudeStraightSkeleton(*g1, height);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During straight_extrude_skeleton_distance(A):");
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1594,8 +1597,9 @@ sfcgal_geometry_extrude_polygon_straight_skeleton(const sfcgal_geometry_t *geom,
                                                        roof_height);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During straight_extrude_skeleton_distance(A):");
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1616,8 +1620,9 @@ sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom)
                                               /*outputDistanceInM*/ true);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During straight_skeleton_distance_in_m(A):");
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1640,8 +1645,9 @@ sfcgal_geometry_line_sub_string(const sfcgal_geometry_t *geom, double start,
                                           start, end);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During line_sub_string(A, %g, %g):", start, end);
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1662,8 +1668,9 @@ sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
                                             alpha, allow_holes);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During alphaShapes(A,%g):", alpha);
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1685,8 +1692,9 @@ sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During optimal_alpha_shapes(A, %g %g):",
                    static_cast<int>(allow_holes), nb_components);
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1709,8 +1717,9 @@ sfcgal_geometry_alpha_wrapping_3d(const sfcgal_geometry_t *geom,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During alpha_wrapping_3d(A, %g %g):", relativeAlpha,
                    relativeOffset);
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1730,8 +1739,9 @@ sfcgal_y_monotone_partition_2(const sfcgal_geometry_t *geom)
                                             SFCGAL::algorithm::y_monotone);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During y_monotone_partition_2(A):");
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1751,8 +1761,9 @@ sfcgal_approx_convex_partition_2(const sfcgal_geometry_t *geom)
                                             SFCGAL::algorithm::approx_convex);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During approx_convex_partition_2(A):");
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1773,8 +1784,9 @@ sfcgal_greene_approx_convex_partition_2(const sfcgal_geometry_t *geom)
                                        SFCGAL::algorithm::greene_approx_convex);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During greene_approx_convex_partition_2(A):");
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1793,8 +1805,9 @@ sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom)
                                             SFCGAL::algorithm::optimal_convex);
   } catch (std::exception &e) {
     SFCGAL_WARNING("During optimal_convex_partition_2(A):");
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1887,7 +1900,7 @@ sfcgal_geometry_translate_2d(const sfcgal_geometry_t *geom, double dx,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During translate(A, %g, %g):", dx, dy);
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(gb))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(gb)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -1907,7 +1920,7 @@ sfcgal_geometry_translate_3d(const sfcgal_geometry_t *geom, double dx,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During translate(A, %g, %g, %g):", dx, dy, dz);
     SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(gb))->asText().c_str());
+                   static_cast<const SFCGAL::Geometry *>(gb)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -2049,8 +2062,9 @@ sfcgal_geometry_straight_skeleton_partition(const sfcgal_geometry_t *geom,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During straight_skeleton_partition (A, %g) :",
                    static_cast<int>(autoOrientation));
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -2087,8 +2101,9 @@ sfcgal_geometry_buffer3d(const sfcgal_geometry_t *geom, double radius,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During buffer3d (A, %g, %d, %d) :", radius, segments,
                    buffer_type);
-    SFCGAL_WARNING("  with A: %s",
-                   ((const SFCGAL::Geometry *)(geom))->asText().c_str());
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
@@ -2457,4 +2472,432 @@ sfcgal_primitive_as_polyhedral_surface(const sfcgal_primitive_t *primitive)
           reinterpret_cast<const SFCGAL::Primitive *>(primitive);
       return static_cast<SFCGAL::Geometry *>(new SFCGAL::PolyhedralSurface(
           primitiveCast->generatePolyhedralSurface()));)
+}
+
+/*--------------------------------------------------------------------------------------*
+ *
+ * NURBSCurve support
+ *
+ *--------------------------------------------------------------------------------------*/
+
+// Helper functions for enum conversion
+namespace {
+auto
+cKnotMethodToCpp(sfcgal_knot_method_t method) -> SFCGAL::NURBSCurve::KnotMethod
+{
+  switch (method) {
+  case SFCGAL_KNOT_METHOD_UNIFORM:
+    return SFCGAL::NURBSCurve::KnotMethod::UNIFORM;
+  case SFCGAL_KNOT_METHOD_CHORD_LENGTH:
+    return SFCGAL::NURBSCurve::KnotMethod::CHORD_LENGTH;
+  case SFCGAL_KNOT_METHOD_CENTRIPETAL:
+    return SFCGAL::NURBSCurve::KnotMethod::CENTRIPETAL;
+  default:
+    return SFCGAL::NURBSCurve::KnotMethod::CENTRIPETAL;
+  }
+}
+
+auto
+cEndConditionToCpp(sfcgal_end_condition_t condition)
+    -> SFCGAL::NURBSCurve::EndCondition
+{
+  switch (condition) {
+  case SFCGAL_END_CONDITION_CLAMPED:
+    return SFCGAL::NURBSCurve::EndCondition::CLAMPED;
+  case SFCGAL_END_CONDITION_NATURAL:
+    return SFCGAL::NURBSCurve::EndCondition::NATURAL;
+  case SFCGAL_END_CONDITION_PERIODIC:
+    return SFCGAL::NURBSCurve::EndCondition::PERIODIC;
+  case SFCGAL_END_CONDITION_TANGENT:
+    return SFCGAL::NURBSCurve::EndCondition::TANGENT;
+  default:
+    return SFCGAL::NURBSCurve::EndCondition::CLAMPED;
+  }
+}
+
+auto
+cFitMethodToCpp(sfcgal_fit_method_t method) -> SFCGAL::NURBSCurve::FitMethod
+{
+  switch (method) {
+  case SFCGAL_FIT_METHOD_INTERPOLATE:
+    return SFCGAL::NURBSCurve::FitMethod::INTERPOLATE;
+  case SFCGAL_FIT_METHOD_APPROXIMATE:
+    return SFCGAL::NURBSCurve::FitMethod::APPROXIMATE;
+  default:
+    return SFCGAL::NURBSCurve::FitMethod::INTERPOLATE;
+  }
+}
+
+// Helper function for safe geometry to Point conversion
+auto
+safeGeometryToPoint(const sfcgal_geometry_t *geom) -> const SFCGAL::Point *
+{
+  if (geom == nullptr) {
+    return nullptr;
+  }
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  if (geometry->geometryTypeId() != SFCGAL::TYPE_POINT) {
+    BOOST_THROW_EXCEPTION(SFCGAL::Exception("Expected Point geometry"));
+  }
+  return static_cast<const SFCGAL::Point *>(geometry);
+}
+
+// Helper function for safe geometry to NURBSCurve conversion
+auto
+safeGeometryToNURBSCurve(sfcgal_geometry_t *geom) -> SFCGAL::NURBSCurve *
+{
+  if (geom == nullptr) {
+    BOOST_THROW_EXCEPTION(SFCGAL::Exception("Geometry cannot be null"));
+  }
+  auto *geometry = reinterpret_cast<SFCGAL::Geometry *>(geom);
+  if (geometry->geometryTypeId() != SFCGAL::TYPE_NURBSCURVE) {
+    BOOST_THROW_EXCEPTION(SFCGAL::Exception("Expected NURBSCurve geometry"));
+  }
+  return static_cast<SFCGAL::NURBSCurve *>(geometry);
+}
+
+// Helper function for safe geometry to const NURBSCurve conversion
+auto
+safeGeometryToConstNURBSCurve(const sfcgal_geometry_t *geom)
+    -> const SFCGAL::NURBSCurve *
+{
+  if (geom == nullptr) {
+    BOOST_THROW_EXCEPTION(SFCGAL::Exception("Geometry cannot be null"));
+  }
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  if (geometry->geometryTypeId() != SFCGAL::TYPE_NURBSCURVE) {
+    BOOST_THROW_EXCEPTION(SFCGAL::Exception("Expected NURBSCurve geometry"));
+  }
+  return static_cast<const SFCGAL::NURBSCurve *>(geometry);
+}
+
+auto
+convertPointArray(const sfcgal_geometry_t **points, size_t num_points)
+    -> std::vector<SFCGAL::Point>
+{
+  if (points == nullptr) {
+    BOOST_THROW_EXCEPTION(SFCGAL::Exception("Points array cannot be null"));
+  }
+  std::vector<SFCGAL::Point> result;
+  result.reserve(num_points);
+  for (size_t i = 0; i < num_points; ++i) {
+    const auto *point = safeGeometryToPoint(points[i]);
+    if (point == nullptr) {
+      BOOST_THROW_EXCEPTION(SFCGAL::Exception("Point cannot be null"));
+    }
+    result.push_back(*point);
+  }
+  return result;
+}
+
+auto
+convertWeightArray(const double *weights, size_t num_weights)
+    -> std::vector<SFCGAL::NURBSCurve::FT>
+{
+  std::vector<SFCGAL::NURBSCurve::FT> result;
+  if (weights != nullptr) {
+    result.reserve(num_weights);
+    for (size_t i = 0; i < num_weights; ++i) {
+      result.emplace_back(weights[i]);
+    }
+  }
+  return result;
+}
+
+auto
+convertKnotArray(const double *knots, size_t num_knots)
+    -> std::vector<SFCGAL::NURBSCurve::Knot>
+{
+  std::vector<SFCGAL::NURBSCurve::Knot> result;
+  result.reserve(num_knots);
+  for (size_t i = 0; i < num_knots; ++i) {
+    result.emplace_back(knots[i]);
+  }
+  return result;
+}
+
+} // anonymous namespace
+
+extern "C" auto
+sfcgal_nurbs_curve_create() -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return static_cast<SFCGAL::Geometry *>(new SFCGAL::NURBSCurve());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_from_points(const sfcgal_geometry_t **points,
+                                      size_t num_points, unsigned int degree,
+                                      sfcgal_knot_method_t knot_method)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = std::make_unique<SFCGAL::NURBSCurve>(
+          pointVec, degree, cKnotMethodToCpp(knot_method));
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_from_points_and_weights(
+    const sfcgal_geometry_t **points, const double *weights, size_t num_points,
+    unsigned int degree, sfcgal_knot_method_t knot_method)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec  = convertPointArray(points, num_points);
+      auto weightVec = convertWeightArray(weights, num_points);
+      auto curve     = std::make_unique<SFCGAL::NURBSCurve>(
+          pointVec, weightVec, degree, cKnotMethodToCpp(knot_method));
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_from_full_data(const sfcgal_geometry_t **points,
+                                         const double             *weights,
+                                         size_t num_points, unsigned int degree,
+                                         const double *knots, size_t num_knots)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec  = convertPointArray(points, num_points);
+      auto weightVec = convertWeightArray(weights, num_points);
+      auto knotVec   = convertKnotArray(knots, num_knots);
+      auto curve     = std::make_unique<SFCGAL::NURBSCurve>(pointVec, weightVec,
+                                                            degree, knotVec);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_bezier(const sfcgal_geometry_t **points,
+                                 size_t num_points) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::fromBezier(pointVec);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_bspline(const sfcgal_geometry_t **points,
+                                  size_t num_points, unsigned int degree)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::createBSpline(pointVec, degree);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_create_circular_arc(const sfcgal_geometry_t *center,
+                                       double radius, double start_angle,
+                                       double                   end_angle,
+                                       const sfcgal_geometry_t *normal)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *centerPoint = safeGeometryToPoint(center);
+      if (centerPoint == nullptr) {
+        BOOST_THROW_EXCEPTION(SFCGAL::Exception("Center point cannot be null"));
+      } const auto *normalPoint =
+          normal ? safeGeometryToPoint(normal) : nullptr;
+
+      SFCGAL::Point normalVec(0, 0, 1);
+      if (normalPoint != nullptr) { normalVec = *normalPoint; }
+
+      auto curve = SFCGAL::NURBSCurve::createCircularArc(
+          *centerPoint, SFCGAL::NURBSCurve::FT(radius),
+          SFCGAL::NURBSCurve::FT(start_angle),
+          SFCGAL::NURBSCurve::FT(end_angle), normalVec);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_interpolate(const sfcgal_geometry_t **points,
+                               size_t num_points, unsigned int degree,
+                               sfcgal_knot_method_t   knot_method,
+                               sfcgal_end_condition_t end_condition)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::interpolateCurve(
+          pointVec, degree, cKnotMethodToCpp(knot_method),
+          cEndConditionToCpp(end_condition));
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_approximate(const sfcgal_geometry_t **points,
+                               size_t num_points, unsigned int degree,
+                               double tolerance, size_t max_control_points)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::approximateCurve(
+          pointVec, degree, SFCGAL::NURBSCurve::FT(tolerance),
+          max_control_points);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_fit(const sfcgal_geometry_t **points, size_t num_points,
+                       unsigned int degree, sfcgal_fit_method_t fit_method,
+                       sfcgal_knot_method_t   knot_method,
+                       sfcgal_end_condition_t end_condition, double tolerance,
+                       size_t max_control_points) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      auto pointVec = convertPointArray(points, num_points);
+      auto curve    = SFCGAL::NURBSCurve::fitCurve(
+          pointVec, degree, cFitMethodToCpp(fit_method),
+          cKnotMethodToCpp(knot_method), cEndConditionToCpp(end_condition),
+          SFCGAL::NURBSCurve::FT(tolerance), max_control_points);
+      return static_cast<SFCGAL::Geometry *>(curve.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_num_control_points(const sfcgal_geometry_t *curve) -> size_t
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      return nurbsCurve->numControlPoints();)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_control_point_n(const sfcgal_geometry_t *curve, size_t index)
+    -> const sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve   = safeGeometryToConstNURBSCurve(curve);
+      const auto &controlPoint = nurbsCurve->controlPointN(index);
+      return static_cast<const SFCGAL::Geometry *>(&controlPoint);)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_set_control_point_n(sfcgal_geometry_t *curve, size_t index,
+                                       const sfcgal_geometry_t *point) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      auto       *nurbsCurve = safeGeometryToNURBSCurve(curve);
+      const auto *pointPtr   = safeGeometryToPoint(point);
+      if (pointPtr == nullptr) {
+        BOOST_THROW_EXCEPTION(SFCGAL::Exception("Point cannot be null"));
+      } nurbsCurve->setControlPoint(index, *pointPtr);)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_weight_n(const sfcgal_geometry_t *curve, size_t index)
+    -> double
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      auto weight = nurbsCurve->weight(index); return CGAL::to_double(weight);)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_set_weight_n(sfcgal_geometry_t *curve, size_t index,
+                                double weight) -> void
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      auto *nurbsCurve = safeGeometryToNURBSCurve(curve);
+      nurbsCurve->setWeight(index, SFCGAL::NURBSCurve::FT(weight));)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_degree(const sfcgal_geometry_t *curve) -> unsigned int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      return nurbsCurve->degree();)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_num_knots(const sfcgal_geometry_t *curve) -> size_t
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      return nurbsCurve->numKnots();)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_knot_n(const sfcgal_geometry_t *curve, size_t index)
+    -> double
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      auto        knot = nurbsCurve->knot(index); return CGAL::to_double(knot);)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_is_rational(const sfcgal_geometry_t *curve) -> int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      return nurbsCurve->isRational() ? 1 : 0;)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_is_bezier(const sfcgal_geometry_t *curve) -> int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      return nurbsCurve->isBezier() ? 1 : 0;)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_is_bspline(const sfcgal_geometry_t *curve) -> int
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      return nurbsCurve->isBSpline() ? 1 : 0;)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_evaluate(const sfcgal_geometry_t *curve, double parameter)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      auto        point =
+          nurbsCurve->evaluate(SFCGAL::NURBSCurve::Parameter(parameter));
+      return static_cast<SFCGAL::Geometry *>(new SFCGAL::Point(point));)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_derivative(const sfcgal_geometry_t *curve, double parameter,
+                              unsigned int order) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      auto        derivative = nurbsCurve->derivative(
+          SFCGAL::NURBSCurve::Parameter(parameter), order);
+      return static_cast<SFCGAL::Geometry *>(new SFCGAL::Point(derivative));)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_to_linestring(const sfcgal_geometry_t *curve,
+                                 unsigned int             num_segments)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      auto        lineString = nurbsCurve->toLineString(num_segments);
+      return static_cast<SFCGAL::Geometry *>(lineString.release());)
+}
+
+extern "C" auto
+sfcgal_nurbs_curve_to_linestring_adaptive(const sfcgal_geometry_t *curve,
+                                          double                   tolerance,
+                                          unsigned int             min_segments,
+                                          unsigned int             max_segments)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      const auto *nurbsCurve = safeGeometryToConstNURBSCurve(curve);
+      auto        lineString = nurbsCurve->toLineStringAdaptive(
+          SFCGAL::NURBSCurve::FT(tolerance), min_segments, max_segments);
+      return static_cast<SFCGAL::Geometry *>(lineString.release());)
 }

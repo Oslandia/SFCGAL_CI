@@ -11,6 +11,31 @@
 #include "SFCGAL/detail/graph/GeometryGraph.h"
 #include "SFCGAL/detail/graph/GeometryGraphBuilder.h"
 
+/**
+ * Compute the topological boundary of a Geometry.
+ *
+ * This visitor computes the boundary for various geometry types:
+ * - Point, MultiPoint: empty geometry collection.
+ * - LineString, Triangle: empty if closed, otherwise a MultiPoint of endpoints.
+ * - Polygon: the polygon's exterior and interior rings as a LineString or
+ *   MultiLineString (one per ring).
+ * - MultiLineString: either empty (if all component lines are closed) or the
+ *   collection of unmatched endpoints.
+ * - MultiPolygon, PolyhedralSurface, TriangulatedSurface, Solid, MultiSolid:
+ *   handled where supported; see TODOs for incomplete cases.
+ * - NURBSCurve: processed for boundary calculation like other curve types.
+ *
+ * GeometryCollection handling is limited and not supported in the general,
+ * heterogeneous case.
+ *
+ * The computed boundary is stored internally and returned via
+ * releaseBoundary().
+ *
+ * @warning GeometryCollection is not supported in the general case.
+ * @todo Improve support for Solid, MultiPolygon, PolyhedralSurface,
+ *       TriangulatedSurface and heterogeneous GeometryCollection.
+ * @ingroup detail
+ */
 namespace SFCGAL {
 namespace algorithm {
 
@@ -67,6 +92,10 @@ public:
   visit(const PolyhedralSurface &g) override;
   void
   visit(const TriangulatedSurface &g) override;
+  /// @brief Process NURBSCurve for boundary calculation
+  /// @param g The NURBSCurve geometry to process
+  void
+  visit(const NURBSCurve &g) override;
 
   /**
    * get the boundary
