@@ -2547,6 +2547,8 @@ typedef enum {
 /**
  * Creates an empty NURBS curve
  * @return New empty NURBS curve geometry
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete()
  * @ingroup capi
  */
 SFCGAL_API sfcgal_geometry_t *
