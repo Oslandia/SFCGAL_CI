@@ -209,12 +209,13 @@ weightedCentroid(const Point &pta, const Point &ptb, const Point &ptc,
 }
 
 auto
-weightedCentroid(const Curve &g, bool enable3DComputation) -> WeightedCentroid
+weightedCentroid(const Curve &curve, bool enable3DComputation)
+    -> WeightedCentroid
 {
   // Convert curve to LineString approximation for centroid calculation
-  auto lineString = g.toLineStringAdaptive(); // default tolerance FT(1e-3)
+  auto lineString = curve.toLineStringAdaptive(); // default tolerance FT(1e-3)
   if (!lineString || lineString->isEmpty()) {
-    lineString = g.toLineString(256); // fallback to denser uniform sampling
+    lineString = curve.toLineString(256); // fallback to denser uniform sampling
   }
   if (!lineString || lineString->isEmpty()) {
     return {}; // Return empty centroid for invalid/empty curves
