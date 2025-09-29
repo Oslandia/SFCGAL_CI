@@ -165,17 +165,24 @@ WktWriter::writeCoordinate(const Point &point)
       impl::writeFT(_s, CGAL::exact(point.z()));
     }
   } else {
-    _s << fixZeroNeg(CGAL::to_double(point.x()), _s.precision()) << " "
-       << fixZeroNeg(CGAL::to_double(point.y()), _s.precision());
+    _s << fixZeroNeg(CGAL::to_double(point.x()),
+                     static_cast<int>(_s.precision()))
+       << " "
+       << fixZeroNeg(CGAL::to_double(point.y()),
+                     static_cast<int>(_s.precision()));
 
     if (point.is3D()) {
-      _s << " " << fixZeroNeg(CGAL::to_double(point.z()), _s.precision());
+      _s << " "
+         << fixZeroNeg(CGAL::to_double(point.z()),
+                       static_cast<int>(_s.precision()));
     }
   }
 
   // m coordinate
   if (point.isMeasured()) {
-    _s << " " << fixZeroNeg(CGAL::to_double(point.m()), _s.precision());
+    _s << " "
+       << fixZeroNeg(CGAL::to_double(point.m()),
+                     static_cast<int>(_s.precision()));
   }
 }
 
@@ -410,7 +417,7 @@ WktWriter::writeInner(const Triangle &triangle)
       _s << ",";
     }
 
-    writeCoordinate(triangle.vertex(i));
+    writeCoordinate(triangle.vertex(static_cast<int>(i)));
   }
 
   _s << ")";
@@ -570,7 +577,8 @@ WktWriter::writeWeights(const std::vector<Kernel::FT> &weights)
         impl::writeFT(_s, CGAL::exact(weights[i]));
       } else {
         double weight_val = CGAL::to_double(weights[i]);
-        _s << fixZeroNegForWeights(weight_val, _s.precision());
+        _s << fixZeroNegForWeights(weight_val,
+                                   static_cast<int>(_s.precision()));
       }
     }
   }
@@ -588,7 +596,8 @@ WktWriter::writeKnots(const std::vector<Kernel::FT> &knots)
     if (_exactWrite) {
       impl::writeFT(_s, CGAL::exact(knots[i]));
     } else {
-      _s << fixZeroNeg(CGAL::to_double(knots[i]), _s.precision());
+      _s << fixZeroNeg(CGAL::to_double(knots[i]),
+                       static_cast<int>(_s.precision()));
     }
   }
   _s << ")";

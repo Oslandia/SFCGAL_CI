@@ -2491,7 +2491,6 @@ cKnotMethodToCpp(sfcgal_knot_method_t method) -> SFCGAL::NURBSCurve::KnotMethod
   case SFCGAL_KNOT_METHOD_CHORD_LENGTH:
     return SFCGAL::NURBSCurve::KnotMethod::CHORD_LENGTH;
   case SFCGAL_KNOT_METHOD_CENTRIPETAL:
-    return SFCGAL::NURBSCurve::KnotMethod::CENTRIPETAL;
   default:
     return SFCGAL::NURBSCurve::KnotMethod::CENTRIPETAL;
   }
