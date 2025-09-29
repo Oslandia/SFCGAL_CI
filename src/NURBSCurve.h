@@ -169,21 +169,65 @@ public:
       -> std::unique_ptr<NURBSCurve>;
 
   /**
-   * @brief Create from B-spline parameters
-   * @param controlPoints B-spline control points
-   * @param degree Spline degree
-   * @param knots Knot vector
-   * @return NURBS curve with uniform weights
+   * @brief Create NURBS curve from explicit B-spline parameters
+   *
+   * Constructs a non-rational B-spline (NURBS with uniform weights = 1.0) from
+   * complete B-spline specification. This is the low-level constructor for
+   * users who need precise control over the knot vector structure.
+   *
+   * @param controlPoints B-spline control points defining curve shape
+   * @param degree Polynomial degree (must be ≥ 0 and < controlPoints.size())
+   * @param knots Complete knot vector (must satisfy: knots.size() =
+   * controlPoints.size() + degree + 1)
+   * @return NURBS curve with uniform weights (all = 1.0)
+   *
+   * @throws Exception if parameters violate B-spline constraints
+   *
+   * @note Use this method when you have a specific knot vector from external
+   *       sources (CAD files, mathematical specifications, etc.)
+   *
+   * @see createBSpline() for automatic knot generation with uniform spacing
+   *
+   * @par Example:
+   * @code
+   * std::vector<Point> controlPoints = {{0,0}, {1,1}, {2,0}};
+   * std::vector<Knot> knots = {0, 0, 0, 1, 1, 1}; // Clamped quadratic
+   * auto curve = NURBSCurve::fromBSpline(controlPoints, 2, knots);
+   * @endcode
    */
   static auto
   fromBSpline(const std::vector<Point> &controlPoints, unsigned int degree,
               const std::vector<Knot> &knots) -> std::unique_ptr<NURBSCurve>;
 
   /**
-   * @brief Create uniform B-spline with standard parameterization
-   * @param controlPoints Control points
-   * @param degree Spline degree
-   * @return NURBS curve with uniform knots and weights
+   * @brief Create uniform B-spline with automatic knot generation
+   *
+   * Convenience method that creates a B-spline with uniformly spaced knots,
+   * suitable for most general-purpose curve creation. The knot vector is
+   * automatically generated using uniform parameterization [0,1].
+   *
+   * @param controlPoints Control points defining the curve shape
+   * @param degree Polynomial degree (must be ≥ 0 and < controlPoints.size())
+   * @return Non-rational NURBS curve with uniform knots and weights
+   *
+   * @throws Exception if controlPoints.empty() or degree ≥ controlPoints.size()
+   *
+   * @note This method generates a clamped knot vector with uniform spacing,
+   *       which is the most common B-spline configuration for general use.
+   *
+   * @see fromBSpline() for explicit knot vector control
+   * @see NURBSCurve(controlPoints, degree, KnotMethod::UNIFORM) for constructor
+   * equivalent
+   *
+   * @par Example:
+   * @code
+   * std::vector<Point> controlPoints = {{0,0}, {1,2}, {3,1}, {4,0}};
+   * auto curve = NURBSCurve::createBSpline(controlPoints, 3); // Cubic B-spline
+   * @endcode
+   *
+   * @par Generated knot vector structure:
+   * - Degree 2, 4 control points → knots: [0,0,0, 0.5, 1,1,1] (clamped)
+   * - Degree 3, 5 control points → knots: [0,0,0,0, 0.5, 1,1,1,1] (clamped)
    */
   static auto
   createBSpline(const std::vector<Point> &controlPoints, unsigned int degree)
