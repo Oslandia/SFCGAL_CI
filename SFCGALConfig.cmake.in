@@ -1,5 +1,9 @@
-@PACKAGE_INIT@                                                                                                                                                                                                                                                                                                                                       
-include(CMakeFindDependencyMacro)                                                                                                                                                                                                                                                                                                                    
-find_dependency(Boost REQUIRED COMPONENTS ${SFCGAL_Boost_COMPONENTS})                                                                                                                                                                                                                   
-include("${CMAKE_CURRENT_LIST_DIR}/SFCGALTargets.cmake")                                                                                                                                                                                                                                                                                             
-check_required_components(SFCGAL)  
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+find_dependency(Boost REQUIRED COMPONENTS ${SFCGAL_Boost_COMPONENTS})
+
+include("${CMAKE_CURRENT_LIST_DIR}/SFCGALTargets.cmake")
+
+check_required_components(SFCGAL)
