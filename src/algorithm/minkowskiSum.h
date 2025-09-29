@@ -24,9 +24,9 @@ struct NoValidityCheck;
  *
  * @todo missing cases (union)
  * @pre gA and gB are valid geometries
- * @note Minkowski sum is not supported for NURBSCurve geometries.
- *   Use toLineString() or toLineStringAdaptive() to convert
- *   NURBS curves to LineStrings before computing the Minkowski sum.
+ * @note When applied to NURBSCurve geometries, the Minkowski sum
+ *   is internally performed on a LineString obtained via
+ *   toLineString() with its default parameters.
  */
 SFCGAL_API std::unique_ptr<Geometry>
            minkowskiSum(const Geometry &gA, const Polygon &gB);
@@ -40,9 +40,9 @@ SFCGAL_API std::unique_ptr<Geometry>
  *
  * @todo missing cases (union)
  * @pre gA and gB are valid geometries
- * @note Minkowski sum is not supported for NURBSCurve geometries.
- *   Use toLineString() or toLineStringAdaptive() to convert
- *   NURBS curves to LineStrings before computing the Minkowski sum.
+ * @note When applied to NURBSCurve geometries, the Minkowski sum
+ *   is internally performed on a LineString obtained via
+ *   toLineString() with its default parameters.
  * @warning@ No actual validity check is done.
  */
 SFCGAL_API std::unique_ptr<Geometry>

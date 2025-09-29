@@ -8,6 +8,7 @@
 #include "SFCGAL/Curve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -64,12 +65,7 @@ distance(const Geometry &gA, const Geometry &gB,
     return distanceLineStringGeometry(gA.as<LineString>(), gB);
 
   case TYPE_NURBSCURVE: {
-    auto lineString =
-        gA.as<Curve>().toLineStringAdaptive(); // default tolerance FT(1e-3)
-    if (!lineString || lineString->isEmpty()) {
-      lineString = gA.as<Curve>().toLineString(
-          256); // fallback to denser uniform sampling
-    }
+    auto lineString = gA.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return std::numeric_limits<double>::infinity();
     }
@@ -113,12 +109,7 @@ distancePointGeometry(const Point &gA, const Geometry &gB) -> double
     return distancePointLineString(gA, gB.as<LineString>());
 
   case TYPE_NURBSCURVE: {
-    auto lineString =
-        gB.as<Curve>().toLineStringAdaptive(); // default tolerance FT(1e-3)
-    if (!lineString || lineString->isEmpty()) {
-      lineString = gB.as<Curve>().toLineString(
-          256); // fallback to denser uniform sampling
-    }
+    auto lineString = gB.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return std::numeric_limits<double>::infinity();
     }
@@ -232,12 +223,7 @@ distanceLineStringGeometry(const LineString &gA, const Geometry &gB) -> double
     return distanceLineStringLineString(gA, gB.as<LineString>());
 
   case TYPE_NURBSCURVE: {
-    auto lineString =
-        gB.as<Curve>().toLineStringAdaptive(); // default tolerance FT(1e-3)
-    if (!lineString || lineString->isEmpty()) {
-      lineString = gB.as<Curve>().toLineString(
-          256); // fallback to denser uniform sampling
-    }
+    auto lineString = gB.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return std::numeric_limits<double>::infinity();
     }
@@ -339,12 +325,7 @@ distancePolygonGeometry(const Polygon &gA, const Geometry &gB) -> double
     return distanceLineStringPolygon(gB.as<LineString>(), gA); // symetric
 
   case TYPE_NURBSCURVE: {
-    auto lineString =
-        gB.as<Curve>().toLineStringAdaptive(); // default tolerance FT(1e-3)
-    if (!lineString || lineString->isEmpty()) {
-      lineString = gB.as<Curve>().toLineString(
-          256); // fallback to denser uniform sampling
-    }
+    auto lineString = gB.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return std::numeric_limits<double>::infinity();
     }

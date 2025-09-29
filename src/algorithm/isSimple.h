@@ -21,6 +21,9 @@ namespace algorithm {
 
 /**
  * Check simplicity of a geometry
+ * @note When applied to NURBSCurve geometries, simplicity
+ *   is internally checked on a LineString obtained via
+ *   toLineString() with its default parameters.
  */
 SFCGAL_API const Simplicity
 isSimple(const Geometry &g, const double &toleranceAbs = 1e-9);

@@ -24,6 +24,9 @@ struct NoValidityCheck;
  *
  * @warning test in order to compare with minkowski sum
  * @pre g is a valid Geometry
+ * @note When applied to NURBSCurve geometries, the offset
+ *   is internally computed on a LineString obtained via
+ *   toLineString() with its default parameters.
  */
 SFCGAL_API std::unique_ptr<MultiPolygon>
            offset(const Geometry &g, const double &r);

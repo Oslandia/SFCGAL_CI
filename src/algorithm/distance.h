@@ -20,6 +20,9 @@ struct NoValidityCheck;
  * @param gA First geometry
  * @param gB Second geometry
  * @return Distance between the geometries
+ * @note When applied to NURBSCurve geometries, the distance
+ *   is internally computed on a LineString obtained via
+ *   toLineString() with its default parameters.
  * @warning No actual validity check is done
  *
  * @ingroup detail

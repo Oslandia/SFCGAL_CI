@@ -8,6 +8,7 @@
 #include "SFCGAL/Curve.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Solid.h"
@@ -319,12 +320,7 @@ offset(const Geometry &g, const double &radius,
 
   case TYPE_NURBSCURVE: {
     // Convert NURBS curve to LineString and apply offset
-    auto lineString =
-        g.as<Curve>().toLineStringAdaptive(); // default tolerance FT(1e-3)
-    if (!lineString || lineString->isEmpty()) {
-      lineString = g.as<Curve>().toLineString(
-          256); // fallback to denser uniform sampling
-    }
+    auto lineString = g.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return; // Cannot offset empty curve
     }

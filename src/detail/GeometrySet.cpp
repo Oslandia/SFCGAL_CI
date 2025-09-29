@@ -13,6 +13,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -557,12 +558,7 @@ GeometrySet<Dim>::_decompose(const Geometry &g)
 
   case TYPE_NURBSCURVE: {
     // Convert NURBS curve to LineString approximation
-    auto lineString =
-        g.as<Curve>().toLineStringAdaptive(); // default tolerance FT(1e-3)
-    if (!lineString || lineString->isEmpty()) {
-      lineString = g.as<Curve>().toLineString(
-          256); // fallback to denser uniform sampling
-    }
+    auto lineString = g.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return; // Cannot decompose empty curve
     }

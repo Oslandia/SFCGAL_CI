@@ -213,10 +213,7 @@ weightedCentroid(const Curve &curve, bool enable3DComputation)
     -> WeightedCentroid
 {
   // Convert curve to LineString approximation for centroid calculation
-  auto lineString = curve.toLineStringAdaptive(); // default tolerance FT(1e-3)
-  if (!lineString || lineString->isEmpty()) {
-    lineString = curve.toLineString(256); // fallback to denser uniform sampling
-  }
+  auto lineString = curve.toLineString(); // default parameters
   if (!lineString || lineString->isEmpty()) {
     return {}; // Return empty centroid for invalid/empty curves
   }

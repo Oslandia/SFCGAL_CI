@@ -142,10 +142,7 @@ triangulate2DZ(const Geometry                  &g,
     return;
 
   case TYPE_NURBSCURVE: {
-    auto lineString = g.as<NURBSCurve>().toLineStringAdaptive();
-    if (!lineString || lineString->isEmpty()) {
-      lineString = g.as<NURBSCurve>().toLineString(256);
-    }
+    auto lineString = g.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return; // Cannot triangulate empty curve
     }

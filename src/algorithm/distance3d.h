@@ -21,6 +21,9 @@ struct NoValidityCheck;
  * @param gA First geometry
  * @param gB Second geometry
  * @return 3D distance between the geometries
+ * @note When applied to NURBSCurve geometries, the distance
+ *   is internally computed on a LineString obtained via
+ *   toLineString() with its default parameters.
  * @todo complete with solid
  */
 SFCGAL_API auto

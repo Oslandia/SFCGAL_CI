@@ -12,6 +12,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Triangle.h"
@@ -255,10 +256,7 @@ isSimple(const Geometry &g, const double &toleranceAbs) -> const Simplicity
   case TYPE_NURBSCURVE: {
     // Tessellate NURBS and check LineString simpleness to detect
     // self-intersections
-    auto lineString = g.as<Curve>().toLineStringAdaptive();
-    if (!lineString || lineString->isEmpty()) {
-      lineString = g.as<Curve>().toLineString(256);
-    }
+    auto lineString = g.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return Simplicity::simple(); // Empty curves are simple
     }

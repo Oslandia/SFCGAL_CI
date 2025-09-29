@@ -19,6 +19,9 @@ namespace algorithm {
 
 /**
  * @brief Compute the 2D length for a Geometry (0 for incompatible types)
+ * @note When applied to NURBSCurve geometries, the 2D length
+ *   is internally computed on a LineString obtained via
+ *   toLineString() with its default parameters.
  */
 SFCGAL_API double
 length(const Geometry &g);

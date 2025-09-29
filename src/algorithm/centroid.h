@@ -188,6 +188,11 @@ weightedCentroid(const LineString &lineString,
  * @param g Curve to approximate and evaluate.
  * @param enable3DComputation If true, use 3D measures (length/area and 3D
  * centroids); otherwise use 2D computations.
+ *
+ * @note When applied to NURBSCurve geometries, the centroid
+ *   is internally computed on a LineString obtained via
+ *   toLineString() with its default parameters.
+ *
  * @return WeightedCentroid Empty if the curve cannot be approximated as a
  * non-empty LineString, otherwise the computed weighted centroid.
  *

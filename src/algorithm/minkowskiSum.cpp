@@ -8,6 +8,7 @@
 
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -83,9 +84,13 @@ minkowskiSum(const Geometry &gA, const Polygon_2 &gB,
   case TYPE_LINESTRING:
     return minkowskiSum(gA.as<LineString>(), gB, polygonSet);
 
-  case TYPE_NURBSCURVE:
-    BOOST_THROW_EXCEPTION(
-        Exception("minkowskiSum() not implemented for NURBSCurve"));
+  case TYPE_NURBSCURVE: {
+    auto lineString = gA.as<NURBSCurve>().toLineString(); // default parameters
+    if (!lineString || lineString->isEmpty()) {
+      return; // empty result
+    }
+    return minkowskiSum(*lineString, gB, polygonSet);
+  }
 
   case TYPE_POLYGON:
     return minkowskiSum(gA.as<Polygon>(), gB, polygonSet);

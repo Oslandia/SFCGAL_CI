@@ -8,6 +8,7 @@
 #include "SFCGAL/Curve.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
+#include "SFCGAL/NURBSCurve.h"
 
 #include "SFCGAL/Exception.h"
 
@@ -60,10 +61,7 @@ length(const Geometry &g) -> double
 
   case TYPE_NURBSCURVE: {
     // Use tessellation to compute XY length for consistency with LineString
-    auto lineString = g.as<Curve>().toLineStringAdaptive();
-    if (!lineString || lineString->isEmpty()) {
-      lineString = g.as<Curve>().toLineString(256);
-    }
+    auto lineString = g.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return 0.0;
     }

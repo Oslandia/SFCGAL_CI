@@ -11,6 +11,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -305,9 +306,13 @@ extrude(const Geometry &g, const Kernel::Vector_3 &v)
   case TYPE_LINESTRING:
     return std::unique_ptr<Geometry>(extrude(g.as<LineString>(), v));
 
-  case TYPE_NURBSCURVE:
-    BOOST_THROW_EXCEPTION(
-        Exception("extrude() not implemented for NURBSCurve"));
+  case TYPE_NURBSCURVE: {
+    auto lineString = g.as<NURBSCurve>().toLineString(); // default parameters
+    if (!lineString || lineString->isEmpty()) {
+      return std::make_unique<PolyhedralSurface>(); // empty result
+    }
+    return std::unique_ptr<Geometry>(extrude(*lineString, v));
+  }
 
   case TYPE_POLYGON:
     return std::unique_ptr<Geometry>(extrude(g.as<Polygon>(), v));
