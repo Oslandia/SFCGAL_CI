@@ -194,7 +194,7 @@ isClosedNURBSCurve(const NURBSCurve &nurbsCurve) -> Closure
   }
 
   if (nurbsCurve.numControlPoints() < 2) {
-    return Closure::closed();
+    return Closure::open("NURBSCurve has less than 2 points");
   }
 
   // Use efficient endpoint accessors and squared distance comparison
