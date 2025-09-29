@@ -2722,7 +2722,7 @@ sfcgal_nurbs_curve_num_control_points(const sfcgal_geometry_t *curve);
  * @param index control point index
  * @return The control point at the specified index
  * @pre curve must be a NURBS curve
- * @pre i >= 0 and i < sfcgal_nurbs_curve_num_control_points
+ * @pre index >= 0 and i < sfcgal_nurbs_curve_num_control_points
  * @post the returned Point is not writable and must not be deallocated by the
  * caller
  * @ingroup capi
@@ -2738,7 +2738,7 @@ sfcgal_nurbs_curve_control_point_n(const sfcgal_geometry_t *curve,
  * @param point new control point
  * @pre curve must be a NURBS curve
  * @pre point must be a Point
- * @pre i >= 0 and i < sfcgal_nurbs_curve_num_control_points
+ * @pre index >= 0 and i < sfcgal_nurbs_curve_num_control_points
  * @ingroup capi
  */
 SFCGAL_API void
@@ -2746,7 +2746,7 @@ sfcgal_nurbs_curve_set_control_point_n(sfcgal_geometry_t *curve, size_t index,
                                        const sfcgal_geometry_t *point);
 
 /**
- * Returns the weight at index i of a NURBS curve
+ * Returns the weight at index of a NURBS curve
  * @param curve the input NURBS curve
  * @param index weight index
  * @return The weight value at the specified index
@@ -2758,12 +2758,12 @@ SFCGAL_API double
 sfcgal_nurbs_curve_weight_n(const sfcgal_geometry_t *curve, size_t index);
 
 /**
- * Sets the weight at index i of a NURBS curve
+ * Sets the weight at index of a NURBS curve
  * @param curve the NURBS curve to modify
  * @param index weight index
  * @param weight new weight value (must be positive)
  * @pre curve must be a NURBS curve
- * @pre i >= 0 and i < sfcgal_nurbs_curve_num_control_points
+ * @pre index >= 0 and i < sfcgal_nurbs_curve_num_control_points
  * @ingroup capi
  */
 SFCGAL_API void
@@ -2791,12 +2791,12 @@ SFCGAL_API size_t
 sfcgal_nurbs_curve_num_knots(const sfcgal_geometry_t *curve);
 
 /**
- * Returns the knot value at index i of a NURBS curve
+ * Returns the knot value at index of a NURBS curve
  * @param curve the input NURBS curve
  * @param index knot index
  * @return The knot value at the specified index
  * @pre curve must be a NURBS curve
- * @pre i >= 0 and i < sfcgal_nurbs_curve_num_knots
+ * @pre index >= 0 and i < sfcgal_nurbs_curve_num_knots
  * @ingroup capi
  */
 SFCGAL_API double
