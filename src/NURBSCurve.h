@@ -52,6 +52,24 @@ namespace SFCGAL {
  *     NURBSCurve::FitMethod::INTERPOLATE,
  *     NURBSCurve::KnotMethod::CHORD_LENGTH,
  *     NURBSCurve::EndCondition::CLAMPED);
+ *
+ * // Create a Bézier curve from control points
+ * std::vector<Point> bezierPoints = {
+ *     Point(0, 0), Point(1, 3), Point(3, 3), Point(4, 0)  // Cubic Bézier
+ * };
+ * auto bezier = NURBSCurve::fromBezier(bezierPoints);
+ *
+ * // Create a B-spline curve with automatic knot generation
+ * std::vector<Point> controlPoints = {
+ *     Point(0, 0), Point(1, 2), Point(3, 3), Point(4, 1), Point(5, 0)
+ * };
+ * auto bspline = NURBSCurve::createBSpline(controlPoints, 3);
+ *
+ * // Create a B-spline with explicit knot vector
+ * std::vector<Point> explicitPoints = {Point(0, 0), Point(2, 1), Point(4, 0)};
+ * std::vector<NURBSCurve::Knot> knots = {0, 0, 0, 1, 1, 1}; // Clamped
+ * quadratic auto explicitBSpline = NURBSCurve::fromBSpline(explicitPoints, 2,
+ * knots);
  * @endcode
  *
  * @since 2.3.0
