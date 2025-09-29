@@ -9,6 +9,7 @@
 #include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/NURBSCurve.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
@@ -410,6 +411,184 @@ BOOST_AUTO_TEST_CASE(testGeometryCollectionNested)
   Closure result = isClosed(outer);
   BOOST_CHECK(!result);
   BOOST_CHECK(result.reason().find("not closed") != std::string::npos);
+}
+
+// ----------------------------------------------------------------------------------
+// NURBSCurve tests
+// ----------------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveClosedLinear)
+{
+  // Create a closed NURBS curve (triangle)
+  std::vector<Point> controlPoints = {
+      Point(0, 0), Point(1, 0), Point(0.5, 1), Point(0, 0) // Closed triangle
+  };
+
+  auto curve = NURBSCurve::interpolateCurve(controlPoints, 2);
+  BOOST_CHECK(isClosed(*curve));
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveOpen)
+{
+  // Create an open NURBS curve
+  std::vector<Point> controlPoints = {
+      Point(0, 0), Point(1, 0), Point(2, 1), Point(3, 0) // Open curve
+  };
+
+  auto    curve  = NURBSCurve::interpolateCurve(controlPoints, 3);
+  Closure result = isClosed(*curve);
+  BOOST_CHECK(!result);
+  BOOST_CHECK(result.reason().find("not coincident") != std::string::npos);
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveClosedCircular)
+{
+  // Create a closed circular arc (full circle)
+  auto curve = NURBSCurve::createCircularArc(Point(0, 0), // center
+                                             1.0,         // radius
+                                             0.0,         // start angle
+                                             2 * M_PI // end angle (full circle)
+  );
+
+  // Test that the full circle is properly closed
+  Closure result = isClosed(*curve);
+
+  // Verify closure by checking endpoints manually
+  Point startPoint = curve->startPoint();
+  Point endPoint   = curve->endPoint();
+
+  // Calculate distance between endpoints
+  auto dx              = endPoint.x() - startPoint.x();
+  auto dy              = endPoint.y() - startPoint.y();
+  auto squaredDistance = dx * dx + dy * dy;
+  auto distance        = CGAL::sqrt(CGAL::to_double(squaredDistance));
+
+  // The full circle should be closed within numerical tolerance
+  // SFCGAL's createCircularArc should produce an exact closed circle
+  BOOST_CHECK_MESSAGE(
+      result, "Full circle should be closed. Distance between endpoints: "
+                  << distance << ". Reason: " << result.reason());
+
+  // Additional verification: endpoints should be very close
+  BOOST_CHECK_LT(distance, EPSILON); // Very tight tolerance for exact closure
+
+  // Verify we actually have a circle by checking the start point is at (1,0)
+  // for center (0,0), radius 1, start angle 0
+  BOOST_CHECK_CLOSE(CGAL::to_double(startPoint.x()), 1.0, EPSILON);
+  BOOST_CHECK_CLOSE(CGAL::to_double(startPoint.y()), 0.0, EPSILON);
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveOpenCircularArc)
+{
+  // Create an open circular arc (quarter circle)
+  auto curve =
+      NURBSCurve::createCircularArc(Point(0, 0), // center
+                                    1.0,         // radius
+                                    0.0,         // start angle
+                                    M_PI / 2     // end angle (quarter circle)
+      );
+
+  Closure result = isClosed(*curve);
+  BOOST_CHECK(!result);
+  BOOST_CHECK(result.reason().find("not coincident") != std::string::npos);
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveClosed3D)
+{
+  // Create a closed 3D NURBS curve
+  std::vector<Point> controlPoints = {
+      Point(0, 0, 0), Point(1, 0, 1), Point(1, 1, 1), Point(0, 1, 0),
+      Point(0, 0, 0) // Closed 3D curve
+  };
+
+  auto curve = NURBSCurve::interpolateCurve(controlPoints, 2);
+  BOOST_CHECK(isClosed(*curve));
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveClosedWithMeasure)
+{
+  // Create a closed NURBS curve with measure coordinates
+  std::vector<Point> controlPoints = {
+      Point(0, 0, 0, 0), // XYZ + M
+      Point(1, 0, 0, 1), Point(1, 1, 0, 2), Point(0, 1, 0, 3),
+      Point(0, 0, 0, 4) // Back to start (XYZ closed, M different)
+  };
+
+  auto curve = NURBSCurve::interpolateCurve(controlPoints, 2);
+  BOOST_CHECK(isClosed(*curve));
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveClosedBSpline)
+{
+  // Create a closed B-spline
+  std::vector<Point> controlPoints = {Point(0, 0), Point(2, 0), Point(2, 2),
+                                      Point(0, 2)};
+
+  // Create closed periodic curve
+  std::vector<Point> periodicPoints = controlPoints;
+  periodicPoints.push_back(controlPoints[0]); // Close explicitly
+
+  auto curve = NURBSCurve::createBSpline(periodicPoints, 3);
+  BOOST_CHECK(isClosed(*curve));
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveEmptyAlwaysClosed)
+{
+  // Empty NURBS curve should be considered closed
+  NURBSCurve emptyCurve;
+  BOOST_CHECK(isClosed(emptyCurve));
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveSinglePoint)
+{
+  // Single control point NURBS curve
+  std::vector<Point> controlPoints = {Point(1, 1, 1)};
+
+  auto    curve  = NURBSCurve::createBSpline(controlPoints, 0);
+  Closure result = isClosed(*curve);
+  BOOST_CHECK(!result); // Single point should be considered open according to
+                        // implementation
+  BOOST_CHECK(result.reason().find("less than 2 points") != std::string::npos);
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveClosedHighDegree)
+{
+  // Create a closed high-degree NURBS curve
+  std::vector<Point> controlPoints = {
+      Point(0, 0),  Point(1, 0),  Point(2, 0), Point(3, 1),
+      Point(3, 2),  Point(2, 3),  Point(1, 3), Point(0, 3),
+      Point(-1, 2), Point(-1, 1), Point(0, 0) // Closed loop
+  };
+
+  auto curve = NURBSCurve::interpolateCurve(controlPoints, 5);
+  BOOST_CHECK(isClosed(*curve));
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveNearlyClosedButOpen)
+{
+  // Create a NURBS curve that's nearly closed but not quite
+  std::vector<Point> controlPoints = {
+      Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1),
+      Point(0.001, 0.001) // Very close to start but not identical
+  };
+
+  auto    curve  = NURBSCurve::interpolateCurve(controlPoints, 3);
+  Closure result = isClosed(*curve);
+  BOOST_CHECK(!result);
+  BOOST_CHECK(result.reason().find("not coincident") != std::string::npos);
+}
+
+BOOST_AUTO_TEST_CASE(testNURBSCurveFromBezierClosed)
+{
+  // Create a closed Bezier curve
+  std::vector<Point> bezierPoints = {Point(0, 0), Point(1, 0), Point(1, 1),
+                                     Point(0, 1)};
+
+  auto curve = NURBSCurve::fromBezier(bezierPoints);
+
+  // Bezier curves are typically open, but let's test the closure detection
+  Closure result = isClosed(*curve);
+  BOOST_CHECK(!result); // Bezier should be open unless explicitly closed
 }
 
 // ----------------------------------------------------------------------------------
