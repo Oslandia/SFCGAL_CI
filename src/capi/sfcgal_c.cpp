@@ -135,14 +135,16 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
     {                                                                          \
       cpp_type result;                                                         \
       try {                                                                    \
-        result = sfcgal_function(*(const SFCGAL::Geometry *)(ga),              \
-                                 *(const SFCGAL::Geometry *)(gb));             \
+        result = sfcgal_function(*static_cast<const SFCGAL::Geometry *>(ga),   \
+                                 *static_cast<const SFCGAL::Geometry *>(gb));  \
       } catch (std::exception & e) {                                           \
         SFCGAL_WARNING("During " #name "(A,B) :");                             \
-        SFCGAL_WARNING("  with A: %s",                                         \
-                       ((const SFCGAL::Geometry *)(ga))->asText().c_str());    \
-        SFCGAL_WARNING("   and B: %s",                                         \
-                       ((const SFCGAL::Geometry *)(gb))->asText().c_str());    \
+        SFCGAL_WARNING(                                                        \
+            "  with A: %s",                                                    \
+            static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());      \
+        SFCGAL_WARNING(                                                        \
+            "   and B: %s",                                                    \
+            static_cast<const SFCGAL::Geometry *>(gb)->asText().c_str());      \
         SFCGAL_ERROR("%s", e.what());                                          \
         return fail_value;                                                     \
       }                                                                        \
@@ -162,14 +164,16 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
     {                                                                          \
       std::unique_ptr<SFCGAL::Geometry> result;                                \
       try {                                                                    \
-        result = sfcgal_function(*(const SFCGAL::Geometry *)(ga),              \
-                                 *(const SFCGAL::Geometry *)(gb));             \
+        result = sfcgal_function(*static_cast<const SFCGAL::Geometry *>(ga),   \
+                                 *static_cast<const SFCGAL::Geometry *>(gb));  \
       } catch (std::exception & e) {                                           \
         SFCGAL_WARNING("During " #name "(A,B) :");                             \
-        SFCGAL_WARNING("  with A: %s",                                         \
-                       ((const SFCGAL::Geometry *)(ga))->asText().c_str());    \
-        SFCGAL_WARNING("   and B: %s",                                         \
-                       ((const SFCGAL::Geometry *)(gb))->asText().c_str());    \
+        SFCGAL_WARNING(                                                        \
+            "  with A: %s",                                                    \
+            static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());      \
+        SFCGAL_WARNING(                                                        \
+            "   and B: %s",                                                    \
+            static_cast<const SFCGAL::Geometry *>(gb)->asText().c_str());      \
         SFCGAL_ERROR("%s", e.what());                                          \
         return 0;                                                              \
       }                                                                        \
@@ -185,8 +189,9 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
         result = sfcgal_function(*static_cast<const SFCGAL::Geometry *>(ga));  \
       } catch (std::exception & e) {                                           \
         SFCGAL_WARNING("During " #name "(A) :");                               \
-        SFCGAL_WARNING("  with A: %s",                                         \
-                       ((const SFCGAL::Geometry *)(ga))->asText().c_str());    \
+        SFCGAL_WARNING(                                                        \
+            "  with A: %s",                                                    \
+            static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());      \
         SFCGAL_ERROR("%s", e.what());                                          \
         return 0;                                                              \
       }                                                                        \
@@ -201,8 +206,9 @@ static sfcgal_error_handler_t __sfcgal_error_handler   = printf;
         result = sfcgal_function(*static_cast<const SFCGAL::Geometry *>(ga));  \
       } catch (std::exception & e) {                                           \
         SFCGAL_WARNING("During " #name "(A) :");                               \
-        SFCGAL_WARNING("  with A: %s",                                         \
-                       ((const SFCGAL::Geometry *)(ga))->asText().c_str());    \
+        SFCGAL_WARNING(                                                        \
+            "  with A: %s",                                                    \
+            static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());      \
         SFCGAL_ERROR("%s", e.what());                                          \
         return -1.0;                                                           \
       }                                                                        \
