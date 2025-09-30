@@ -6,8 +6,6 @@
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/GeometryVisitor.h"
 #include "SFCGAL/algorithm/distance.h"
-#include "SFCGAL/algorithm/offset.h"
-#include "SFCGAL/detail/EnvelopeVisitor.h"
 #include "SFCGAL/detail/ublas.h"
 #include <CGAL/Bbox_3.h>
 #include <algorithm>
@@ -15,7 +13,6 @@
 #include <boost/numeric/ublas/lu.hpp>
 #include <cmath>
 #include <map>
-#include <numeric>
 #include <utility>
 
 namespace SFCGAL {
