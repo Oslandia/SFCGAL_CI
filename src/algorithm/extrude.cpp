@@ -291,52 +291,59 @@ extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
-/** Extrude a geometry along a vector
- * @param g The geometry to extrude
- * @param v The extrusion vector
- * @return Extruded geometry */
 auto
-extrude(const Geometry &g, const Kernel::Vector_3 &v)
+extrude(const Geometry &inputGeometry, const Kernel::Vector_3 &vector)
     -> std::unique_ptr<Geometry>
 {
-  switch (g.geometryTypeId()) {
+  switch (inputGeometry.geometryTypeId()) {
   case TYPE_POINT:
-    return std::unique_ptr<Geometry>(extrude(g.as<Point>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<Point>(), vector));
 
   case TYPE_LINESTRING:
-    return std::unique_ptr<Geometry>(extrude(g.as<LineString>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<LineString>(), vector));
 
   case TYPE_NURBSCURVE: {
-    auto lineString = g.as<NURBSCurve>().toLineString(); // default parameters
+    auto lineString =
+        inputGeometry.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return std::make_unique<PolyhedralSurface>(); // empty result
     }
-    return std::unique_ptr<Geometry>(extrude(*lineString, v));
+    return std::unique_ptr<Geometry>(extrude(*lineString, vector));
   }
 
   case TYPE_POLYGON:
-    return std::unique_ptr<Geometry>(extrude(g.as<Polygon>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<Polygon>(), vector));
 
   case TYPE_TRIANGLE:
-    return std::unique_ptr<Geometry>(extrude(g.as<Triangle>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<Triangle>(), vector));
 
   case TYPE_GEOMETRYCOLLECTION:
-    return std::unique_ptr<Geometry>(extrude(g.as<GeometryCollection>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<GeometryCollection>(), vector));
 
   case TYPE_MULTIPOINT:
-    return std::unique_ptr<Geometry>(extrude(g.as<MultiPoint>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<MultiPoint>(), vector));
 
   case TYPE_MULTILINESTRING:
-    return std::unique_ptr<Geometry>(extrude(g.as<MultiLineString>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<MultiLineString>(), vector));
 
   case TYPE_MULTIPOLYGON:
-    return std::unique_ptr<Geometry>(extrude(g.as<MultiPolygon>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<MultiPolygon>(), vector));
 
   case TYPE_TRIANGULATEDSURFACE:
-    return std::unique_ptr<Geometry>(extrude(g.as<TriangulatedSurface>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<TriangulatedSurface>(), vector));
 
   case TYPE_POLYHEDRALSURFACE:
-    return std::unique_ptr<Geometry>(extrude(g.as<PolyhedralSurface>(), v));
+    return std::unique_ptr<Geometry>(
+        extrude(inputGeometry.as<PolyhedralSurface>(), vector));
 
   case TYPE_SOLID:
   case TYPE_MULTISOLID:
@@ -345,64 +352,56 @@ extrude(const Geometry &g, const Kernel::Vector_3 &v)
   }
 
   BOOST_THROW_EXCEPTION(InappropriateGeometryException(
-      (boost::format("Extrusion of %s is not supported") % g.geometryType())
+      (boost::format("Extrusion of %s is not supported") %
+       inputGeometry.geometryType())
           .str()));
 }
 
-/** Extrude geometry with FT coordinates (no validity check)
- * @param g Geometry to extrude
- * @param dx X displacement
- * @param dy Y displacement
- * @param dz Z displacement
+/** Implementation of extrude without validity check using vector conversion
+ * @param inputGeom Geometry to extrude
+ * @param displacementX X displacement
+ * @param displacementY Y displacement
+ * @param displacementZ Z displacement
  * @return Extruded geometry */
 auto
-extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
-        const Kernel::FT &dz, NoValidityCheck /*unused*/)
-    -> std::unique_ptr<Geometry>
+extrude(const Geometry &inputGeom, const Kernel::FT &displacementX,
+        const Kernel::FT &displacementY, const Kernel::FT &displacementZ,
+        NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
-  return extrude(g, Kernel::Vector_3(dx, dy, dz));
+  return extrude(inputGeom,
+                 Kernel::Vector_3(displacementX, displacementY, displacementZ));
 }
 
-/** Extrude geometry with FT coordinates
- * @param g Geometry to extrude
- * @param dx X displacement
- * @param dy Y displacement
- * @param dz Z displacement
- * @return Extruded geometry */
 auto
-extrude(const Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
-        const Kernel::FT &dz) -> std::unique_ptr<Geometry>
+extrude(const Geometry &geometry, const Kernel::FT &deltaX,
+        const Kernel::FT &deltaY, const Kernel::FT &deltaZ)
+    -> std::unique_ptr<Geometry>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY(g);
-  std::unique_ptr<Geometry> result(extrude(g, dx, dy, dz, NoValidityCheck()));
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY(geometry);
+  std::unique_ptr<Geometry> result(
+      extrude(geometry, deltaX, deltaY, deltaZ, NoValidityCheck()));
   propagateValidityFlag(*result, true);
   return result;
 }
 
-/** Extrude geometry with double coordinates
- * @param g Geometry to extrude
- * @param dx X displacement
- * @param dy Y displacement
- * @param dz Z displacement
- * @return Extruded geometry */
 SFCGAL_API auto
-extrude(const Geometry &g, const double &dx, const double &dy, const double &dz)
+extrude(const Geometry &geom, const double &displacementX,
+        const double &displacementY, const double &displacementZ)
     -> std::unique_ptr<Geometry>
 {
-  if (!std::isfinite(dx) || !std::isfinite(dy) || !std::isfinite(dz)) {
+  if (!std::isfinite(displacementX) || !std::isfinite(displacementY) ||
+      !std::isfinite(displacementZ)) {
     BOOST_THROW_EXCEPTION(NonFiniteValueException(
         "trying to extrude with non finite value in direction"));
   }
 
-  return extrude(g, Kernel::FT(dx), Kernel::FT(dy), Kernel::FT(dz));
+  return extrude(geom, Kernel::FT(displacementX), Kernel::FT(displacementY),
+                 Kernel::FT(displacementZ));
 }
 
-/** Extrude polygon with height
- * @param g Polygon to extrude
- * @param height Extrusion height
- * @return Extruded geometry */
 SFCGAL_API auto
-extrude(const Polygon &g, const double &height) -> std::unique_ptr<Geometry>
+extrude(const Polygon &polygon, const double &height)
+    -> std::unique_ptr<Geometry>
 {
 
   if (!std::isfinite(height)) {
@@ -411,6 +410,6 @@ extrude(const Polygon &g, const double &height) -> std::unique_ptr<Geometry>
   }
 
   return std::unique_ptr<Geometry>(
-      extrude(g, Kernel::Vector_3(0.0, 0.0, height), false));
+      extrude(polygon, Kernel::Vector_3(0.0, 0.0, height), false));
 }
 } // namespace SFCGAL::algorithm

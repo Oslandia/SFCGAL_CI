@@ -22,6 +22,9 @@ struct NoValidityCheck;
 /**
  * @brief [experimental]compute polygon offset
  *
+ * @param g The input geometry
+ * @param r The offset radius
+ * @return The offset polygon as a MultiPolygon
  * @warning test in order to compare with minkowski sum
  * @pre g is a valid Geometry
  * @note When applied to NURBSCurve geometries, the offset
@@ -34,6 +37,9 @@ SFCGAL_API std::unique_ptr<MultiPolygon>
 /**
  * @brief [experimental]compute polygon offset
  *
+ * @param g The input geometry
+ * @param r The offset radius
+ * @return The offset polygon as a MultiPolygon
  * @warning test in order to compare with minkowski sum
  * @pre g is a valid Geometry
  * @warning No actual validity check is done.

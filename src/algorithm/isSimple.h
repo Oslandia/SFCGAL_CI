@@ -12,7 +12,9 @@
 namespace SFCGAL {
 
 /**
- * Functions used to assert for geometry simplicity
+ * @brief Assert that a geometry is simple
+ * @param g The geometry to check for simplicity
+ * @return void (throws exception if geometry is not simple)
  */
 void SFCGAL_API
 SFCGAL_ASSERT_GEOMETRY_SIMPLICITY(const Geometry &g);
