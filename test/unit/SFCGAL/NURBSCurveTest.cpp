@@ -127,6 +127,7 @@ createTestCurvePoints() -> std::vector<Point>
   return points;
 }
 
+// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 auto
 createCircularPoints(const double radius = 1.0, const size_t numPoints = 8)
     -> std::vector<Point>
@@ -139,6 +140,7 @@ createCircularPoints(const double radius = 1.0, const size_t numPoints = 8)
   }
   return points;
 }
+// NOLINTEND(bugprone-easily-swappable-parameters)
 
 auto
 checkControlPointsEqual(const NURBSCurve &curve1, const NURBSCurve &curve2,
