@@ -2350,7 +2350,8 @@ NURBSCurve::knotMultiplicity(const Knot &value, const FT &tolerance) const
 
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 auto
-NURBSCurve::insertKnot(const Knot &parameter, unsigned int times) const
+NURBSCurve::insertKnot([[maybe_unused]] const Knot  &parameter,
+                       [[maybe_unused]] unsigned int times) const
     -> std::unique_ptr<NURBSCurve>
 {
   BOOST_THROW_EXCEPTION(
@@ -2358,15 +2359,15 @@ NURBSCurve::insertKnot(const Knot &parameter, unsigned int times) const
 }
 
 auto
-NURBSCurve::refineKnotVector(const std::vector<Knot> &newKnots) const
-    -> std::unique_ptr<NURBSCurve>
+NURBSCurve::refineKnotVector([[maybe_unused]] const std::vector<Knot> &newKnots)
+    const -> std::unique_ptr<NURBSCurve>
 {
   BOOST_THROW_EXCEPTION(Exception(
       "refineKnotVector: NURBS knot vector refinement not yet implemented"));
 }
 
 auto
-NURBSCurve::elevateDegree(unsigned int times) const
+NURBSCurve::elevateDegree([[maybe_unused]] unsigned int times) const
     -> std::unique_ptr<NURBSCurve>
 {
   BOOST_THROW_EXCEPTION(
@@ -2374,7 +2375,7 @@ NURBSCurve::elevateDegree(unsigned int times) const
 }
 
 auto
-NURBSCurve::reduceDegree(const FT &tolerance) const
+NURBSCurve::reduceDegree([[maybe_unused]] const FT &tolerance) const
     -> std::unique_ptr<NURBSCurve>
 {
   BOOST_THROW_EXCEPTION(
@@ -2382,7 +2383,7 @@ NURBSCurve::reduceDegree(const FT &tolerance) const
 }
 
 auto
-NURBSCurve::removeKnots(const FT &tolerance) const
+NURBSCurve::removeKnots([[maybe_unused]] const FT &tolerance) const
     -> std::unique_ptr<NURBSCurve>
 {
   BOOST_THROW_EXCEPTION(
