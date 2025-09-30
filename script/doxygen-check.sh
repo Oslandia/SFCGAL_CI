@@ -46,15 +46,27 @@ fi
 # remove empty lines
 CHANGED_FILES=$(echo $CHANGED_FILES | sed '/^[\s\n\r]*$/d')
 
-# filter by extensions
-NEW_FILES=""
-for f in $CHANGED_FILES;
-do
-    if [[ "$f" =~ \.cpp$ ]] || [[ "$f" =~ \.hpp$ ]] || [[ "$f" =~ \.c$ ]] || [[ "$f" =~ \.h$ ]]; then
-        NEW_FILES="$NEW_FILES $f"
+# 1. filter by extensions to keep only the source files
+# 2. for all the '.cpp' and '.c' files, add the corresponding '.h' file, if it exists and it's not already in the list
+# This ensures that doxygen does not return errors on '.cpp' or '.c' file because the documentation is in the header file.
+declare -a FILES_TO_CHECK
+for f in $CHANGED_FILES; do
+    if [[ "$f" =~ \.cpp$ ]] || [[ "$f" =~ \.c$ ]] || [[ "$f" =~ \.hpp$ ]] || [[ "$f" =~ \.h$ ]]; then
+        # Add the file if it's not already in the list
+        if [[ ! " ${FILES_TO_CHECK[@]} " =~ " $f " ]]; then
+            FILES_TO_CHECK+=("$f")
+        fi
+
+        # If it's a '.cpp' or '.c' file, add the corresponding '.h' file if it exists and it's not in the list
+        if [[ "$f" =~ \.cpp$ ]] || [[ "$f" =~ \.c$ ]]; then
+            header="${f%.*}.h"
+            if [ -f "$header" ] && [[ ! " ${FILES_TO_CHECK[@]} " =~ " $header " ]]; then
+                FILES_TO_CHECK+=("$header")
+            fi
+        fi
     fi
 done
-CHANGED_FILES=$NEW_FILES
+CHANGED_FILES="${FILES_TO_CHECK[@]}"
 
 # exit if nothing to do
 if [ -z "$CHANGED_FILES" ]; then
