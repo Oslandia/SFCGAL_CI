@@ -889,7 +889,8 @@ NURBSCurve::interpolatePeriodicCurve(const std::vector<Point> &points,
   parameters.reserve(numPeriodicPoints);
 
   for (size_t i = 0; i < numPeriodicPoints; ++i) {
-    parameters.push_back(FT(i) / FT(numPeriodicPoints));
+    parameters.push_back(FT(static_cast<unsigned long>(i)) /
+                         FT(static_cast<unsigned long>(numPeriodicPoints)));
   }
 
   // Create periodic knot vector
@@ -900,7 +901,8 @@ NURBSCurve::interpolatePeriodicCurve(const std::vector<Point> &points,
   // Periodic knots wrap around
   for (size_t i = 0; i < numKnots; ++i) {
     int knotIndex = static_cast<int>(i) - static_cast<int>(degree);
-    knots.push_back(FT(knotIndex) / FT(numPeriodicPoints));
+    knots.push_back(FT(knotIndex) /
+                    FT(static_cast<unsigned long>(numPeriodicPoints)));
   }
 
   // For now, use simple periodic control points (same as data points)
@@ -1900,8 +1902,10 @@ NURBSCurve::reparameterizeByArcLength() const -> std::unique_ptr<Curve>
   newControlPoints.reserve(numSamples);
 
   for (size_t idx = 0; idx < numSamples; ++idx) {
-    FT        targetLength = (FT(idx) / FT(numSamples - 1)) * totalLength;
-    Parameter param        = parameterAtLength(targetLength, EPSILON);
+    FT targetLength = (FT(static_cast<unsigned long>(idx)) /
+                       FT(static_cast<unsigned long>(numSamples - 1))) *
+                      totalLength;
+    Parameter param = parameterAtLength(targetLength, EPSILON);
     newControlPoints.push_back(evaluate(param));
   }
 
@@ -2692,9 +2696,9 @@ NURBSCurve::generateKnotVector(const std::vector<Point> &points,
   if (degree == 0) {
     knots.reserve(numKnots);
     for (size_t pointIdx = 0; pointIdx < numPoints; ++pointIdx) {
-      knots.emplace_back(pointIdx);
+      knots.emplace_back(static_cast<unsigned long>(pointIdx));
     }
-    knots.emplace_back(numPoints);
+    knots.emplace_back(static_cast<unsigned long>(numPoints));
     return knots;
   }
 
@@ -2707,7 +2711,8 @@ NURBSCurve::generateKnotVector(const std::vector<Point> &points,
 
     size_t numInternal = numKnots - (static_cast<size_t>(2) * (degree + 1));
     for (size_t internalIdx = 1; internalIdx <= numInternal; ++internalIdx) {
-      knots.push_back(FT(internalIdx) / FT(numInternal + 1));
+      knots.push_back(FT(static_cast<unsigned long>(internalIdx)) /
+                      FT(static_cast<unsigned long>(numInternal + 1)));
     }
 
     for (unsigned int degreeIdx = 0; degreeIdx <= degree; ++degreeIdx) {
@@ -2751,7 +2756,8 @@ NURBSCurve::computeParameters(const std::vector<Point> &points,
 
   if (method == KnotMethod::UNIFORM) {
     for (size_t pointIdx = 0; pointIdx < points.size(); ++pointIdx) {
-      parameters.push_back(FT(pointIdx) / FT(points.size() - 1));
+      parameters.push_back(FT(static_cast<unsigned long>(pointIdx)) /
+                           FT(static_cast<unsigned long>(points.size() - 1)));
     }
   } else {
     parameters.emplace_back(0);
