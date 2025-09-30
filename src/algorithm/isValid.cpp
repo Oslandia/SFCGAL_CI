@@ -706,7 +706,8 @@ isValid(const MultiSolid &multisolid, const double &toleranceAbs) -> Validity
  * @param toleranceAbs Absolute tolerance for validation
  * @return Validity status */
 auto
-isValid(const NURBSCurve &nurbsCurve, const double &toleranceAbs) -> Validity
+isValid(const NURBSCurve              &nurbsCurve,
+        [[maybe_unused]] const double &toleranceAbs) -> Validity
 {
   auto [valid, reason] = nurbsCurve.validateData();
   return valid ? Validity::valid() : Validity::invalid(reason);
