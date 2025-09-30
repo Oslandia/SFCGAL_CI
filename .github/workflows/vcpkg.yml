@@ -16,7 +16,7 @@ jobs:
           - os: ubuntu-latest
             triplet: x64-linux
           - os: macos-latest
-            triplet: x64-osx
+            triplet: arm64-osx
 
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
