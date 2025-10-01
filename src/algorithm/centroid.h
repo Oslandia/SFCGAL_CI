@@ -185,7 +185,7 @@ weightedCentroid(const LineString &lineString,
  * produced, returns an empty WeightedCentroid. Otherwise delegates to the
  * LineString overload to compute the weighted centroid.
  *
- * @param g Curve to approximate and evaluate.
+ * @param curve Curve to approximate and evaluate.
  * @param enable3DComputation If true, use 3D measures (length/area and 3D
  * centroids); otherwise use 2D computations.
  *
