@@ -42,9 +42,10 @@ using namespace SFCGAL::detail::algorithm;
 
 namespace SFCGAL {
 
-/** Assert geometry validity with context message
- * @param g The geometry to validate
- * @param ctxt Context message for error reporting */
+/// @{
+/// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 void
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_(const Geometry &g, const std::string &ctxt)
 {
@@ -60,16 +61,15 @@ SFCGAL_ASSERT_GEOMETRY_VALIDITY_(const Geometry &g, const std::string &ctxt)
   }
 }
 
-/** Assert geometry validity without context
- * @param g The geometry to validate */
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
+
 void
 SFCGAL_ASSERT_GEOMETRY_VALIDITY(const Geometry &g)
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_(g, "");
 }
 
-/** Assert 2D geometry validity
- * @param g The geometry to validate in 2D */
 void
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(const Geometry &g)
 {
@@ -87,8 +87,6 @@ SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(const Geometry &g)
   }
 }
 
-/** Assert 3D geometry validity
- * @param g The geometry to validate in 3D */
 void
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(const Geometry &g)
 {
@@ -105,9 +103,6 @@ SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(const Geometry &g)
   }
 }
 
-/** Assert geometry validity on a plane (not implemented)
- * @param geom The geometry to validate
- */
 void
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_ON_PLANE([[maybe_unused]] const Geometry &geom)
 {
@@ -117,10 +112,10 @@ SFCGAL_ASSERT_GEOMETRY_VALIDITY_ON_PLANE([[maybe_unused]] const Geometry &geom)
 
 namespace algorithm {
 
-/**
- * @brief Internal utility to detect unconnected interior in polygon validation.
- * @ingroup detail
- */
+/// @{
+/// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 struct LoopDetector : public boost::dfs_visitor<> {
   /** Constructor
    * @param hasLoop Reference to boolean flag to set when loop detected */
@@ -151,14 +146,6 @@ auto
 validatePolygonInteriorRings(const Polygon &polygon) -> Validity;
 } // namespace detail
 
-/**
- * Check validity of a Point geometry
- * @param point The Point geometry to validate
- * @return Validity status of the point
- * @note empty geometries are valid, but the test is only performed in the
- * interface function in individual functions for implementation, an assertion
- * !empty is present for this reason
- */
 auto
 isValid(const Point &point) -> Validity
 {
@@ -171,10 +158,6 @@ isValid(const Point &point) -> Validity
   return Validity::valid();
 }
 
-/** Check validity of LineString geometry
- * @param linestring The LineString to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const LineString &linestring, const double &toleranceAbs) -> Validity
 {
@@ -186,10 +169,6 @@ isValid(const LineString &linestring, const double &toleranceAbs) -> Validity
                                              : Validity::invalid("no length");
 }
 
-/** Check validity of Polygon geometry
- * @param polygon The Polygon to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const Polygon &polygon, const double &toleranceAbs) -> Validity
 {
@@ -412,20 +391,12 @@ validatePolygonInteriorRings(const Polygon &polygon) -> Validity
 
 } // namespace detail
 
-/** Check validity of Triangle geometry
- * @param triangle The Triangle to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const Triangle &triangle, const double &toleranceAbs) -> Validity
 {
   return isValid(triangle.toPolygon(), toleranceAbs);
 }
 
-/** Check validity of MultiLineString geometry
- * @param multilinestring The MultiLineString to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const MultiLineString &multilinestring, const double &toleranceAbs)
     -> Validity
@@ -450,10 +421,6 @@ isValid(const MultiLineString &multilinestring, const double &toleranceAbs)
   return Validity::valid();
 }
 
-/** Check validity of MultiPolygon geometry
- * @param multipolygon The MultiPolygon to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const MultiPolygon &multipolygon, const double &toleranceAbs)
     -> Validity
@@ -495,10 +462,6 @@ isValid(const MultiPolygon &multipolygon, const double &toleranceAbs)
   return Validity::valid();
 }
 
-/** Check validity of GeometryCollection geometry
- * @param geometrycollection The GeometryCollection to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const GeometryCollection &geometrycollection,
         const double             &toleranceAbs) -> Validity
@@ -525,11 +488,6 @@ isValid(const GeometryCollection &geometrycollection,
   return Validity::valid();
 }
 
-/** Check validity of TriangulatedSurface geometry with graph
- * @param triangulatedsurface The TriangulatedSurface to validate
- * @param graph The SurfaceGraph for validation
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const TriangulatedSurface &triangulatedsurface,
         const SurfaceGraph &graph, const double &toleranceAbs) -> Validity
@@ -563,10 +521,6 @@ isValid(const TriangulatedSurface &triangulatedsurface,
   return Validity::valid();
 }
 
-/** Check validity of TriangulatedSurface geometry
- * @param triangulatedsurface The TriangulatedSurface to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const TriangulatedSurface &triangulatedsurface,
         const double              &toleranceAbs) -> Validity
@@ -580,11 +534,6 @@ isValid(const TriangulatedSurface &triangulatedsurface,
                          : graph.isValid();
 }
 
-/** Check validity of PolyhedralSurface geometry with graph
- * @param polyhedralsurface The PolyhedralSurface to validate
- * @param graph The SurfaceGraph for validation
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const PolyhedralSurface &polyhedralsurface, const SurfaceGraph &graph,
         const double &toleranceAbs) -> Validity
@@ -618,10 +567,6 @@ isValid(const PolyhedralSurface &polyhedralsurface, const SurfaceGraph &graph,
   return Validity::valid();
 }
 
-/** Check validity of PolyhedralSurface geometry
- * @param polyhedralsurface The PolyhedralSurface to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const PolyhedralSurface &polyhedralsurface, const double &toleranceAbs)
     -> Validity
@@ -635,10 +580,6 @@ isValid(const PolyhedralSurface &polyhedralsurface, const double &toleranceAbs)
                          : graph.isValid();
 }
 
-/** Check validity of Solid geometry
- * @param solid The Solid to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const Solid &solid, const double &toleranceAbs) -> Validity
 {
@@ -675,10 +616,6 @@ isValid(const Solid &solid, const double &toleranceAbs) -> Validity
   return Validity::valid();
 }
 
-/** Check validity of MultiSolid geometry
- * @param multisolid The MultiSolid to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const MultiSolid &multisolid, const double &toleranceAbs) -> Validity
 {
@@ -701,10 +638,6 @@ isValid(const MultiSolid &multisolid, const double &toleranceAbs) -> Validity
   return Validity::valid();
 }
 
-/** Check validity of NURBSCurve geometry
- * @param nurbsCurve The NURBSCurve to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
 auto
 isValid(const NURBSCurve              &nurbsCurve,
         [[maybe_unused]] const double &toleranceAbs) -> Validity
@@ -713,10 +646,9 @@ isValid(const NURBSCurve              &nurbsCurve,
   return valid ? Validity::valid() : Validity::invalid(reason);
 }
 
-/** Check validity of generic Geometry
- * @param geometry The Geometry to validate
- * @param toleranceAbs Absolute tolerance for validation
- * @return Validity status */
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
+
 auto
 isValid(const Geometry &geometry, const double &toleranceAbs) -> Validity
 {
@@ -769,9 +701,6 @@ isValid(const Geometry &geometry, const double &toleranceAbs) -> Validity
           .str()); // to avoid warning
 }
 
-/** Propagate validity flag to geometry
- * @param geometry The geometry to mark
- * @param valid The validity flag to set */
 void
 propagateValidityFlag(Geometry &geometry, bool valid)
 {

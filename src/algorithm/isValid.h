@@ -18,27 +18,47 @@ namespace SFCGAL {
  * @note exception message is apparently limited in length, thus print the
  * reason for invalidity before its text representation (that can be very long)
  */
+
+/** Assert geometry validity without context
+ * @param geometry The geometry to validate
+ */
 void SFCGAL_API
 SFCGAL_ASSERT_GEOMETRY_VALIDITY(const Geometry &geometry);
 void SFCGAL_API
+
+/** Assert 2D geometry validity
+ * @param geometry The geometry to validate in 2D
+ */
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(const Geometry &geometry);
+
+/** Assert 3D geometry validity
+ * @param geometry The geometry to validate in 3D
+ */
 void SFCGAL_API
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(const Geometry &geometry);
+
+/** Assert geometry validity on a plane (not implemented)
+ * @param geometry The geometry to validate
+ */
 void SFCGAL_API
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_ON_PLANE(const Geometry &geometry);
 
 namespace algorithm {
 
 /**
- * @brief Check validity of a geometry
+ * @brief Check validity of generic Geometry
+ * @param geometry The Geometry to validate
+ * @param toleranceAbs Absolute tolerance for validation
+ * @return Validity status
  */
 SFCGAL_API auto
 isValid(const Geometry &geometry, const double &toleranceAbs = 1e-9)
     -> Validity;
 
 /**
- * Sets the geometry flag on a geometry and propagate to every internal
- * geometries
+ * @brief Propagate validity flag to geometry
+ * @param geometry The geometry to mark
+ * @param valid The validity flag to set
  */
 SFCGAL_API void
 propagateValidityFlag(Geometry &geometry, bool valid);
