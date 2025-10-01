@@ -937,9 +937,9 @@ BOOST_AUTO_TEST_CASE(testTransformNURBSCurve3D)
   const Point &transformed = transformedCurve.controlPointN(0);
 
   // For point (0,0,0), rotation should still give (0,0,0)
-  BOOST_CHECK_SMALL(CGAL::to_double(transformed.x()), EPSILON);
-  BOOST_CHECK_SMALL(CGAL::to_double(transformed.y()), EPSILON);
-  BOOST_CHECK_SMALL(CGAL::to_double(transformed.z()), EPSILON);
+  BOOST_CHECK_SMALL(transformed.x(), original.x());
+  BOOST_CHECK_SMALL(transformed.y(), original.y());
+  BOOST_CHECK_SMALL(transformed.z(), original.z());
 
   // Check that weights are preserved
   for (size_t idx = 0; idx < originalCurve.numControlPoints(); ++idx) {
