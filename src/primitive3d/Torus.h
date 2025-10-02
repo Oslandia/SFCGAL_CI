@@ -10,7 +10,6 @@
 #include "SFCGAL/primitive3d/Primitive.h"
 
 #include <CGAL/Surface_mesh.h>
-#include <optional>
 
 namespace SFCGAL {
 
@@ -39,6 +38,7 @@ public:
 
   /**
    * @brief Copy constructor
+   * @param other copy from
    */
   Torus(const Torus &other) = default;
 
@@ -50,6 +50,8 @@ public:
 
   /**
    * @brief Assignment operator
+   * @param other copy from
+   * @return ref on this
    */
   auto
   operator=(Torus &other) -> Torus &;
@@ -122,17 +124,9 @@ public:
   auto
   generatePolyhedralSurface() const -> PolyhedralSurface override;
 
-  /**
-   * @brief Returns the perfect torus volume (without discretization)
-   * @return The perfect torus volume (without discretization)
-   */
   [[nodiscard]] auto
   volume(bool withDiscretization = false) const -> double override;
 
-  /**
-   * @brief Returns the perfect torus area (without discretization)
-   * @return The perfect torus area (without discretization)
-   */
   [[nodiscard]] auto
   area3D(bool withDiscretization = false) const -> double override;
 
@@ -140,6 +134,7 @@ protected:
   /**
    * @brief Verifies that all parameters are valid. For instance, it raises an
    * error if a radius is negative.
+   * @param tempParameters a temp map of parameter with new values
    * @throws SFCGAL::Exception if one of the parameters if not valid
    * provided variant type is not compatible with the parameter.
    */

@@ -32,6 +32,7 @@ public:
 
   /**
    * @brief Copy constructor
+   * @param other copy from
    */
   Cube(const Cube &other) = default;
 
@@ -43,6 +44,8 @@ public:
 
   /**
    * @brief Assignment operator
+   * @param other copy from
+   * @return ref on this
    */
   auto
   operator=(Cube &other) -> Cube &;
@@ -73,25 +76,12 @@ public:
   auto
   generatePolyhedralSurface() const -> PolyhedralSurface override;
 
-  /**
-   * @brief Returns the cube volume
-   * @return The cube volume
-   */
   [[nodiscard]] auto
   volume(bool withDiscretization = false) const -> double override;
 
-  /**
-   * @brief Returns the cube area
-   * @return The cube area
-   */
   [[nodiscard]] auto
   area3D(bool withDiscretization = false) const -> double override;
 
-  /**
-   * Returns string representation of this object.
-   *
-   * \return string representation of this object
-   */
   [[nodiscard]] virtual auto
   toString() const -> std::string override;
 
@@ -99,6 +89,7 @@ protected:
   /**
    * @brief Verifies that all parameters are valid. For instance, it raises an
    * error if an extent is negative.
+   * @param tempParameters a temp map of parameter with new values
    * @throws SFCGAL::Exception if one of the parameters if not valid
    * provided variant type is not compatible with the parameter.
    */

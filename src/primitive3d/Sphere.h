@@ -44,11 +44,14 @@ public:
 
   /**
    * @brief Copy constructor
+   * @param other copy from
    */
   Sphere(const Sphere &other) = default;
 
   /**
    * @brief Assignment operator
+   * @param other copy from
+   * @return ref on this
    */
   auto
   operator=(Sphere other) -> Sphere &;
@@ -186,17 +189,9 @@ public:
   auto
   generatePolyhedralSurface() const -> PolyhedralSurface override;
 
-  /**
-   * @brief Calculates the volume of the Sphere
-   * @return The volume of the sphere
-   */
   auto
   volume(bool withDiscretization = false) const -> double override;
 
-  /**
-   * @brief Calculates the surface area of the Sphere
-   * @return The surface area of the sphere
-   */
   auto
   area3D(bool withDiscretization = false) const -> double override;
 
@@ -210,6 +205,7 @@ protected:
   /**
    * @brief Verifies that all parameters are valid. For instance, it raises an
    * error if a radius is negative.
+   * @param tempParameters a temp map of parameter with new values
    * @throws SFCGAL::Exception if one of the parameters if not valid
    * provided variant type is not compatible with the parameter.
    */

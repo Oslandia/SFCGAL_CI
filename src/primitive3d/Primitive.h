@@ -68,6 +68,8 @@ public:
 
   /**
    * @brief Assignment operator
+   * @param other copy from
+   * @return ref on this
    */
   auto
   operator=(const Primitive &other) -> Primitive &;
@@ -80,12 +82,13 @@ public:
   /**
    * @brief returns the primitive type
    * @warning use CamelCase (Cylinder, not CYLINDER)
+   * @return the primitive type as string
    */
   [[nodiscard]] virtual auto
   primitiveType() const -> std::string = 0;
 
   /**
-   * @brief Returns a code corresponding to the type
+   * @return a code corresponding to the type
    */
   [[nodiscard]] virtual auto
   primitiveTypeId() const -> PrimitiveType = 0;
@@ -123,6 +126,7 @@ public:
 
   /**
    * @brief Retrieves the list of parameters
+   * @return the key/value parameter map
    */
   [[nodiscard]] auto
   parameters() const -> std::unordered_map<std::string, PrimitiveParameter>;
@@ -151,12 +155,13 @@ public:
    * Equality operator
    * @param other other geometry to compare to
    * @param epsilon allowed tolerance
+   * @return true when this is almost equal
    */
   [[nodiscard]] auto
   almostEqual(const Primitive &other, double epsilon) const -> bool;
 
   /**
-   * Returns string representation of this object. Can be override by
+   * Returns string representation of this object. Can be overriden by
    * sub-classes.
    *
    * \return string representation of this object
@@ -221,17 +226,28 @@ protected:
   onValidatedAndSetParameter(const std::string        &name,
                              const PrimitiveParameter &parameter);
 
+  /**
+   * Holds parameter value according to their name
+   */
   std::unordered_map<std::string, PrimitiveParameter> m_parameters;
-  mutable std::optional<PolyhedralSurface>            m_polyhedral_surface;
+
+  /**
+   * Cached PolyhedralSurface to avoid regeneration each time we call
+   * generatePolyhedralSurface()
+   */
+  mutable std::optional<PolyhedralSurface> m_polyhedral_surface;
 };
 
 /**
  * Equality operator
  * @todo only compare coordinate points
  * @pre the two geometries must be valid
+ * @param prim1 first primitive to compare
+ * @param prim2 second primitive to compare
+ * @return true when the primitives are the same
  */
 SFCGAL_API auto
-operator==(const Primitive &, const Primitive &) -> bool;
+operator==(const Primitive &prim1, const Primitive &prim2) -> bool;
 
 } // namespace SFCGAL
 
