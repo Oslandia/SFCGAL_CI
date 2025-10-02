@@ -2384,7 +2384,8 @@ sfcgal_primitive_area(const sfcgal_primitive_t *prim, bool withDiscretization)
   try {
     result = primCast->area3D(withDiscretization);
   } catch (std::exception &e) {
-    SFCGAL_WARNING("During primitive_area(A, %d):", withDiscretization);
+    SFCGAL_WARNING("During primitive_area(A, %d):",
+                   static_cast<int>(withDiscretization));
     SFCGAL_WARNING(
         "  with A: %s",
         (primCast == nullptr ? "null" : primCast->toString().c_str()));
@@ -2405,7 +2406,8 @@ sfcgal_primitive_volume(const sfcgal_primitive_t *prim, bool withDiscretization)
   try {
     result = primCast->volume(withDiscretization);
   } catch (std::exception &e) {
-    SFCGAL_WARNING("During primitive_volume(A, %d):", withDiscretization);
+    SFCGAL_WARNING("During primitive_volume(A, %d):",
+                   static_cast<int>(withDiscretization));
     SFCGAL_WARNING(
         "  with A: %s",
         (primCast == nullptr ? "null" : primCast->toString().c_str()));
@@ -2502,11 +2504,11 @@ sfcgal_primitive_set_parameter(sfcgal_primitive_t *primitive, const char *name,
                              const char *jsonChars) {
     auto *primitiveCast = reinterpret_cast<SFCGAL::Primitive *>(primitive);
 
-    boost::system::error_code ec;
-    boost::json::value        jsonValue = boost::json::parse(jsonChars, ec);
-    boost::json::object       jsonObj   = jsonValue.get_object();
-    if (ec) {
-      SFCGAL_ERROR(ec.message().c_str());
+    boost::system::error_code errCode;
+    boost::json::value  jsonValue = boost::json::parse(jsonChars, errCode);
+    boost::json::object jsonObj   = jsonValue.get_object();
+    if (errCode) {
+      SFCGAL_ERROR(errCode.message().c_str());
       return;
     }
 
