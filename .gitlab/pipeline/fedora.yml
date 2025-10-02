@@ -22,7 +22,7 @@
     - ctest -VV
   parallel:
     matrix:
-      - CGAL_VERSION: [$CGAL_5_VERSION, $CGAL_LATEST_VERSION, 6.1-beta2]
+      - CGAL_VERSION: [$CGAL_5_VERSION, $CGAL_LATEST_VERSION]
         OS_VERSION: ["41", "42"]
 
 fedora_clang:
