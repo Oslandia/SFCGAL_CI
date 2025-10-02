@@ -32,7 +32,10 @@ jobs:
 
       - name: Install Ninja (macOS)
         if: matrix.os == 'macos-latest'
-        run: brew install ninja autoconf automake libtool
+        run: |
+          brew install ninja autoconf automake libtool
+          # Ensure Xcode command line tools are properly configured
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
 
       - name: Restore from cache and run vcpkg
         uses: lukka/run-vcpkg@v11
