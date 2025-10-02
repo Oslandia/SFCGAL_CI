@@ -2288,6 +2288,7 @@ sfcgal_primitive_delete(sfcgal_primitive_t *primitive);
 /**
  * Returns a deep clone of the given primitive
  * @param primitive Pointer to the primitive.
+ * @return a deep clone of the given primitive
  * @post returns a pointer to an allocated primitive that must be deallocated by
  * sfcgal_primitive_delete()
  * @ingroup capi
@@ -2302,6 +2303,7 @@ sfcgal_primitive_clone(const sfcgal_primitive_t *primitive);
  * @param prim1 Pointer to the first primitive.
  * @param prim2 Pointer to the second primitive.
  * @param tolerance the tolerance
+ * @return 1 if primitives are almost equal. 0 otherwise.
  * @ingroup capi
  */
 SFCGAL_API int
@@ -2351,7 +2353,8 @@ sfcgal_primitive_parameters(const sfcgal_primitive_t *primitive, char **buffer,
                             size_t *len);
 
 /**
- * @brief Retrieves the primitive parameter as JSON object { name, type, value
+ * @brief Retrieves the primitive parameter @p name as JSON object { name, type,
+ * value
  * }.
  * @param primitive Pointer to the primitive.
  * @param name parameter name to retrieve
@@ -2366,10 +2369,11 @@ sfcgal_primitive_parameter(const sfcgal_primitive_t *primitive,
                            const char *name, char **buffer, size_t *len);
 
 /**
- * @brief Sets the value of a primitive parameter as JSON.
+ * @brief Sets the value of a primitive parameter @p name as JSON object { name,
+ * type, value }.
  * @param primitive Pointer to the primitive.
  * @param name Name of the parameter to set.
- * @param parameter The new parameter value.
+ * @param jsonValue The new parameter value as JSON strong.
  * @pre The parameter identified by @p name must exist.
  * @ingroup capi
  */
