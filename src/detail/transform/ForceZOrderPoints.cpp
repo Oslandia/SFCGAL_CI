@@ -30,7 +30,7 @@ void
 ForceZOrderPoints::visit(Triangle &t)
 {
   if (!t.is3D()) {
-    if (!algorithm::isCounterClockWiseOriented(t)) {
+    if (!SFCGAL::algorithm::isCounterClockWiseOriented(t)) {
       // not pointing up, reverse
       t.reverse();
     }
@@ -45,7 +45,7 @@ ForceZOrderPoints::visit(Polygon &p)
   if (!p.is3D()) {
     LineString &ext = p.exteriorRing();
 
-    if (!algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
+    if (!SFCGAL::algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
       // exterior ring not pointing up, reverse
       ext.reverse();
     }
@@ -53,7 +53,7 @@ ForceZOrderPoints::visit(Polygon &p)
     for (size_t i = 0; i < p.numInteriorRings(); ++i) {
       LineString &inter = p.interiorRingN(i);
 
-      if (algorithm::isCounterClockWiseOriented(inter)) {
+      if (SFCGAL::algorithm::isCounterClockWiseOriented(inter)) {
         // interior ring is pointing up, reverse
         inter.reverse();
       }

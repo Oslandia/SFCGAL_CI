@@ -21,7 +21,7 @@ ForceOrderPoints::transform(Point & /*p*/)
 void
 ForceOrderPoints::visit(Triangle &t)
 {
-  if (!algorithm::isCounterClockWiseOriented(t)) {
+  if (!SFCGAL::algorithm::isCounterClockWiseOriented(t)) {
     // not pointing up, reverse
     if (_orientCCW) {
       t.reverse();
@@ -40,7 +40,7 @@ ForceOrderPoints::visit(Polygon &p)
 {
   LineString &ext = p.exteriorRing();
 
-  if (!algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
+  if (!SFCGAL::algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
     // exterior ring not pointing up, reverse
     if (_orientCCW) {
       ext.reverse();
@@ -50,11 +50,11 @@ ForceOrderPoints::visit(Polygon &p)
       ext.reverse();
     }
   }
-  const bool isCCWO{algorithm::isCounterClockWiseOriented(ext)};
+  const bool isCCWO{SFCGAL::algorithm::isCounterClockWiseOriented(ext)};
   for (size_t i = 0; i < p.numInteriorRings(); ++i) {
     LineString &inter = p.interiorRingN(i);
 
-    if (algorithm::isCounterClockWiseOriented(inter) == isCCWO) {
+    if (SFCGAL::algorithm::isCounterClockWiseOriented(inter) == isCCWO) {
       inter.reverse();
     }
   }

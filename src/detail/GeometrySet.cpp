@@ -127,7 +127,7 @@ _decompose_solid(const Solid &solid, GeometrySet<3>::VolumeCollection &volumes,
   MarkedPolyhedron p =
       *solid.exteriorShell().toPolyhedron_3<Kernel, MarkedPolyhedron>();
 
-  if (algorithm::volume(solid) < 0) {
+  if (SFCGAL::algorithm::volume(solid) < 0) {
     // if the volume is "inverted", we reverse it
     // TODO: Once every boolean operations work with complement geometries, we
     // may want to keep the solid inverted
@@ -824,7 +824,7 @@ recompose_surfaces(const GeometrySet<3>::SurfaceCollection &surfaces,
     tri->addPatch(new Triangle(surface.primitive()));
   }
 
-  algorithm::SurfaceGraph const graph(*tri);
+  SFCGAL::algorithm::SurfaceGraph const graph(*tri);
   std::vector<size_t> component(boost::num_vertices(graph.faceGraph()));
   BOOST_ASSERT(tri->numPatches() == component.size());
   const size_t numComponents =
@@ -1076,7 +1076,7 @@ _filter_covered(IT ibegin, IT iend, GeometrySet<Dim> &output)
       GeometrySet<Dim> v2;
       v2.addPrimitive(it2->primitive());
 
-      if (algorithm::covers(v2, v1)) {
+      if (SFCGAL::algorithm::covers(v2, v1)) {
         v1_covered = true;
         break;
       }
@@ -1085,7 +1085,7 @@ _filter_covered(IT ibegin, IT iend, GeometrySet<Dim> &output)
     // if its not covered by another primitive
     if (!v1_covered) {
       // and not covered by another already inserted primitive
-      bool const b = algorithm::covers(output, v1);
+      bool const b = SFCGAL::algorithm::covers(output, v1);
 
       if (!b) {
         output.addPrimitive(it->primitive(), it->flags());

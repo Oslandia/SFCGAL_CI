@@ -1040,7 +1040,7 @@ inline auto
 simplify(const Geometry &geometry, double threshold, bool preserveTopology)
     -> std::unique_ptr<Geometry>
 {
-  return algorithm::simplify(geometry, threshold, preserveTopology);
+  return SFCGAL::algorithm::simplify(geometry, threshold, preserveTopology);
 }
 
 /**

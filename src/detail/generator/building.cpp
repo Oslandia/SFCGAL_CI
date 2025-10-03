@@ -68,7 +68,7 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
   Polygon_with_holes_2 polygon = g.toPolygon_with_holes_2();
 
   // fix orientation
-  algorithm::makeValidOrientation(polygon);
+  SFCGAL::algorithm::makeValidOrientation(polygon);
 #if CGAL_VERSION_MAJOR < 6
   boost::shared_ptr<Straight_skeleton_2> const skeleton =
 #else
@@ -84,7 +84,7 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
   {
     Polygon bottom(polygon);
     bottom.reverse();
-    algorithm::force3D(bottom);
+    SFCGAL::algorithm::force3D(bottom);
     shell->addPolygon(bottom);
   }
 
