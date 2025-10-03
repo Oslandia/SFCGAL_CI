@@ -1,6 +1,6 @@
 sudo yum update -qy
 sudo yum install -y \
-    cmake boost boost-devel gmp gmp-c++ gmp-devel mpfr mpfr-devel make \
+    cmake boost boost-devel gmp gmp-c++ gmp-devel mpfr mpfr-devel make json-devel \
     xz
 
 #CGAL

@@ -4,6 +4,6 @@ zypper install -y \
     libboost_serialization-devel \
     libboost_timer-devel \
     libboost_program_options-devel \
-    libboost_json-devel \
-    libboost_test-devel
+    libboost_test-devel \
+    nlohmann_json-devel
 rm -rf build

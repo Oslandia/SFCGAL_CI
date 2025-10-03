@@ -1819,6 +1819,8 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
 
   BOOST_CHECK_EQUAL(strApi, expectedWkt);
 
+  sfcgal_geometry_delete(polySurface);
+
   sfcgal_primitive_set_parameter_double(cylinder, "radius", 2.0);
   sfcgal_primitive_set_parameter_double(cylinder, "height", 10.0);
   // check volume
@@ -1828,8 +1830,6 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   // check area
   BOOST_CHECK_CLOSE(sfcgal_primitive_area(cylinder, false), 150.79, 0.01);
   BOOST_CHECK_CLOSE(sfcgal_primitive_area(cylinder, true), 150.79, 0.01);
-
-  sfcgal_geometry_delete(polySurface);
 
   // checks parameter list
   char  *params;
@@ -1847,14 +1847,13 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   sfcgal_primitive_parameter(cylinder, "num_radial", &param, &paramLen);
   std::string paramStr = std::string(param, paramLen);
   BOOST_CHECK_EQUAL(paramStr,
-                    R"({"name":"num_radial","type":"int","value":3.6E1})");
+                    R"({"name":"num_radial","type":"int","value":36})");
   sfcgal_free_buffer(param);
 
   sfcgal_primitive_parameter(cylinder, "axis", &param, &paramLen);
   paramStr = std::string(param, paramLen);
   BOOST_CHECK_EQUAL(
-      paramStr,
-      R"({"name":"axis","type":"vector3","value":[1.1E0,2.1E0,3.1E0]})");
+      paramStr, R"({"name":"axis","type":"vector3","value":[1.1,2.1,3.1]})");
   sfcgal_free_buffer(param);
 
   // checks set parameter value generic
@@ -1870,9 +1869,10 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
       R"({"name":"axis","type":"vector3","value":[2.0,3.0,4.0]})");
   newAxis = sfcgal_primitive_parameter_vector(cylinder, "axis");
   BOOST_CHECK(newAxis != nullptr);
-  BOOST_CHECK_CLOSE(newAxis[0], expectedAxis[0], 2.0);
-  BOOST_CHECK_CLOSE(newAxis[1], expectedAxis[1], 3.0);
-  BOOST_CHECK_CLOSE(newAxis[2], expectedAxis[2], 4.0);
+  BOOST_CHECK(!hasError);
+  BOOST_CHECK_CLOSE(newAxis[0], 2.0, 1e-6);
+  BOOST_CHECK_CLOSE(newAxis[1], 3.0, 1e-6);
+  BOOST_CHECK_CLOSE(newAxis[2], 4.0, 1e-6);
   sfcgal_free_buffer(newAxis);
 
   sfcgal_primitive_delete(cylinder);

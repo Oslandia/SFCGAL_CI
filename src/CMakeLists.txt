@@ -61,13 +61,14 @@ add_dependencies( SFCGAL copy )
 set_target_properties( SFCGAL PROPERTIES VERSION ${SFCGAL_VERSION}
                                          SOVERSION ${SFCGAL_VERSION_MAJOR} )
 
-target_link_libraries( SFCGAL ${CGAL_3RD_PARTY_LIBRARIES})
+target_link_libraries( SFCGAL PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries( SFCGAL PRIVATE ${CGAL_3RD_PARTY_LIBRARIES})
 
 if( CGAL_USE_GMPXX )
-  target_link_libraries( SFCGAL gmpxx )
+  target_link_libraries( SFCGAL PRIVATE gmpxx)
 endif()
 
-target_link_libraries( SFCGAL ${Boost_LIBRARIES} )
+target_link_libraries( SFCGAL PRIVATE "${Boost_LIBRARIES}" )
 set_target_properties(SFCGAL PROPERTIES
   INTERFACE_LINK_LIBRARIES ""
 )
