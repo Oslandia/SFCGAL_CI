@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>➡️ Translate - SFCGAL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1200px;
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 2rem; }
+        .back-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .status {
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: 500;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        .status.loading { background: #fff3cd; color: #856404; }
+        .status.ready { background: #d4edda; color: #155724; }
+        .content { display: flex; min-height: 500px; }
+        .controls {
+            flex: 0 0 350px;
+            padding: 20px;
+            background: #f8f9fa;
+            overflow-y: auto;
+        }
+        .section {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .slider-group {
+            margin: 10px 0;
+        }
+        .slider-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            min-height: 70px;
+        }
+        textarea:focus { outline: none; border-color: #667eea; }
+        .viewer {
+            flex: 1;
+            position: relative;
+            background: #1a1a2e;
+        }
+        #canvas2d { width: 100%; height: 100%; }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>➡️ Translate</h1>
+            <a href="index.html" class="back-btn">← Back</a>
+        </div>
+        <div id="status" class="status loading">Loading...</div>
+        <div class="content">
+            <div class="controls">
+                <div class="section">
+                    <h3>Input Geometry</h3>
+                    <textarea id="wkt-input">POLYGON((0 0, 5 0, 5 2, 0 2, 0 0))</textarea>
+                </div>
+                <div class="section">
+                    <h3>Parameters</h3>
+
+                    <div class="slider-group">
+                        <label>X: <span id="x-display">5</span></label>
+                        <input type="range" id="x-slider" min="-10" max="10" value="5" step="0.5">
+                    </div>
+                    <div class="slider-group">
+                        <label>Y: <span id="y-display">0</span></label>
+                        <input type="range" id="y-slider" min="-10" max="10" value="0" step="0.5">
+                    </div>
+                </div>
+                <div id="result" class="result"></div>
+            </div>
+            <div class="viewer">
+                <canvas id="canvas2d"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        let SFCGAL = null;
+        let canvas, ctx;
+
+        function parseWKT(wkt) {
+            const coords = [];
+            const matches = wkt.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g);
+            for (const m of matches) {
+                coords.push({ x: parseFloat(m[1]), y: parseFloat(m[2]) });
+            }
+            return coords;
+        }
+
+        function getBounds(...wkts) {
+            const allCoords = [];
+            wkts.forEach(wkt => {
+                if (wkt) allCoords.push(...parseWKT(wkt));
+            });
+            if (allCoords.length === 0) return { minX: -1, maxX: 11, minY: -1, maxY: 11 };
+            
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            allCoords.forEach(c => {
+                minX = Math.min(minX, c.x);
+                maxX = Math.max(maxX, c.x);
+                minY = Math.min(minY, c.y);
+                maxY = Math.max(maxY, c.y);
+            });
+            const margin = Math.max(maxX - minX, maxY - minY) * 0.3 || 1;
+            return { minX: minX - margin, maxX: maxX + margin, minY: minY - margin, maxY: maxY + margin };
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('canvas2d');
+            ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        function toScreen(x, y, bounds) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const rangeX = bounds.maxX - bounds.minX;
+            const rangeY = bounds.maxY - bounds.minY;
+            return {
+                x: (x - bounds.minX) / rangeX * w,
+                y: h - (y - bounds.minY) / rangeY * h
+            };
+        }
+
+        function clear() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawPolygon(wkt, bounds, color, opacity = 1) {
+            const coords = parseWKT(wkt);
+            if (coords.length < 2) return;
+            
+            ctx.globalAlpha = opacity;
+            ctx.beginPath();
+            const start = toScreen(coords[0].x, coords[0].y, bounds);
+            ctx.moveTo(start.x, start.y);
+            for (let i = 1; i < coords.length; i++) {
+                const p = toScreen(coords[i].x, coords[i].y, bounds);
+                ctx.lineTo(p.x, p.y);
+            }
+            ctx.closePath();
+            
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+
+
+        window.transform = function() {
+            if (!SFCGAL) return;
+            const wkt = document.getElementById('wkt-input').value;
+            const dx = parseFloat(document.getElementById('x-slider').value);
+            const dy = parseFloat(document.getElementById('y-slider').value);
+            
+            if (!SFCGAL.isValid(wkt)) return;
+
+            const result = SFCGAL.translate(wkt, dx, dy, 0);
+            document.getElementById('result').textContent = `Translated by (${dx}, ${dy})`;
+
+            const bounds = getBounds(wkt, result);
+            clear();
+            drawPolygon(wkt, bounds, '#ff6b6b', 0.3);
+            drawPolygon(result, bounds, '#667eea', 1);
+        };
+
+        ['x', 'y'].forEach(axis => {
+            document.getElementById(`${axis}-slider`).addEventListener('input', (e) => {
+                document.getElementById(`${axis}-display`).textContent = e.target.value;
+                transform();
+            });
+        });
+
+        async function init() {
+            try {
+                initCanvas();
+                const module = await import('./sfcgal.js');
+                const Module = await module.default();
+                SFCGAL = new Module.SFCGAL();
+                SFCGAL.initialize();
+                document.getElementById('status').className = 'status ready';
+                document.getElementById('status').textContent = '✅ Ready';
+                setTimeout(() => document.getElementById('status').style.display = 'none', 2000);
+                transform();
+            } catch (error) {
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').textContent = '❌ Error';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

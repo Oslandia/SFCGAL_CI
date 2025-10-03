@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intersection - SFCGAL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1200px;
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 2rem; }
+        .back-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .status {
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: 500;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        .status.loading { background: #fff3cd; color: #856404; }
+        .status.ready { background: #d4edda; color: #155724; }
+        .content { display: flex; min-height: 500px; }
+        .controls {
+            flex: 0 0 350px;
+            padding: 20px;
+            background: #f8f9fa;
+            overflow-y: auto;
+        }
+        .section {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .btn {
+            padding: 8px 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-primary { width: 100%; padding: 10px; font-size: 1rem; margin-top: 10px; }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            min-height: 70px;
+        }
+        textarea:focus { outline: none; border-color: #667eea; }
+        .viewer {
+            flex: 1;
+            position: relative;
+            background: #1a1a2e;
+        }
+        #canvas2d { width: 100%; height: 100%; }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>∩ Intersection</h1>
+            <a href="index.html" class="back-btn">← Back</a>
+        </div>
+        <div id="status" class="status loading">Loading...</div>
+        <div class="content">
+            <div class="controls">
+                <div class="section">
+                    <h3>Geometry A</h3>
+                    <textarea id="wkt-a">POLYGON((0 0, 5 0, 5 5, 0 5, 0 0))</textarea>
+                </div>
+                <div class="section">
+                    <h3>Geometry B</h3>
+                    <textarea id="wkt-b">POLYGON((2.5 2.5, 7.5 2.5, 7.5 7.5, 2.5 7.5, 2.5 2.5))</textarea>
+                </div>
+                <button class="btn btn-primary" onclick="computeIntersection()">Compute Intersection</button>
+                <div id="result" class="result"></div>
+            </div>
+            <div class="viewer">
+                <canvas id="canvas2d"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        let SFCGAL = null;
+        let canvas, ctx;
+
+        function parseWKT(wkt) {
+            const coords = [];
+            const matches = wkt.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g);
+            for (const m of matches) {
+                coords.push({ x: parseFloat(m[1]), y: parseFloat(m[2]) });
+            }
+            return coords;
+        }
+
+        function getBounds(...wkts) {
+            const allCoords = [];
+            wkts.forEach(wkt => {
+                if (wkt) allCoords.push(...parseWKT(wkt));
+            });
+            if (allCoords.length === 0) return { minX: -1, maxX: 11, minY: -1, maxY: 11 };
+            
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            allCoords.forEach(c => {
+                minX = Math.min(minX, c.x);
+                maxX = Math.max(maxX, c.x);
+                minY = Math.min(minY, c.y);
+                maxY = Math.max(maxY, c.y);
+            });
+            const margin = Math.max(maxX - minX, maxY - minY) * 0.2 || 1;
+            return { minX: minX - margin, maxX: maxX + margin, minY: minY - margin, maxY: maxY + margin };
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('canvas2d');
+            ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        function toScreen(x, y, bounds) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const rangeX = bounds.maxX - bounds.minX;
+            const rangeY = bounds.maxY - bounds.minY;
+            return {
+                x: (x - bounds.minX) / rangeX * w,
+                y: h - (y - bounds.minY) / rangeY * h
+            };
+        }
+
+        function clear() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawPolygon(wkt, bounds, strokeColor, fillColor = null, lineWidth = 2) {
+            const coords = parseWKT(wkt);
+            if (coords.length < 2) return;
+
+            ctx.beginPath();
+            const start = toScreen(coords[0].x, coords[0].y, bounds);
+            ctx.moveTo(start.x, start.y);
+            for (let i = 1; i < coords.length; i++) {
+                const p = toScreen(coords[i].x, coords[i].y, bounds);
+                ctx.lineTo(p.x, p.y);
+            }
+            ctx.closePath();
+
+            if (fillColor) {
+                ctx.fillStyle = fillColor;
+                ctx.fill();
+            }
+
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+        }
+
+        window.computeIntersection = function() {
+            if (!SFCGAL) return;
+            const wktA = document.getElementById('wkt-a').value;
+            const wktB = document.getElementById('wkt-b').value;
+
+            if (!SFCGAL.isValid(wktA) || !SFCGAL.isValid(wktB)) {
+                document.getElementById('result').textContent = 'Invalid WKT';
+                return;
+            }
+
+            const result = SFCGAL.intersection(wktA, wktB);
+            document.getElementById('result').textContent = `Result:\n${result}`;
+
+            const bounds = getBounds(wktA, wktB, result);
+            clear();
+            // Draw result filled in white
+            drawPolygon(result, bounds, '#ffffff', '#ffffff', 2);
+            // Draw input polygons as colored outlines only
+            drawPolygon(wktA, bounds, '#ff6b6b', null, 3);
+            drawPolygon(wktB, bounds, '#4ecdc4', null, 3);
+        };
+
+        async function init() {
+            try {
+                initCanvas();
+                const module = await import('./sfcgal.js');
+                const Module = await module.default();
+                SFCGAL = new Module.SFCGAL();
+                SFCGAL.initialize();
+                document.getElementById('status').className = 'status ready';
+                document.getElementById('status').textContent = '✅ Ready';
+                setTimeout(() => document.getElementById('status').style.display = 'none', 2000);
+                computeIntersection();
+            } catch (error) {
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').textContent = '❌ Error';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
