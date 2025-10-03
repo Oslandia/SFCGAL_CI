@@ -28,6 +28,9 @@ struct NoValidityCheck;
 /**
  * Robust intersection test on 2D geometries. Force projection to z=0 if needed
  * @pre ga and gb are valid geometries
+ * @param ga first geometry to operate
+ * @param gb second geometry to operate
+ * @return true when @p ga intersects @p gb
  */
 SFCGAL_API bool
 intersects(const Geometry &ga, const Geometry &gb);
@@ -35,6 +38,9 @@ intersects(const Geometry &ga, const Geometry &gb);
 /**
  * Robust intersection test on 3D geometries. Assume z = 0 if needed
  * @pre ga and gb are valid geometries
+ * @param ga first geometry to operate
+ * @param gb second geometry to operate
+ * @return true when @p ga intersects @p gb
  */
 SFCGAL_API bool
 intersects3D(const Geometry &ga, const Geometry &gb);
@@ -42,6 +48,10 @@ intersects3D(const Geometry &ga, const Geometry &gb);
 /**
  * Intersection test on 2D geometries. Force projection to z=0 if needed
  * @pre ga and gb are valid geometries
+ * @param ga first geometry to operate
+ * @param gb second geometry to operate
+ * @return true when @p ga intersects @p gb
+ *
  * @ingroup detail
  * @warning the validity is assumed, no actual check is done
  */
@@ -51,6 +61,10 @@ intersects(const Geometry &ga, const Geometry &gb, NoValidityCheck);
 /**
  * Intersection test on 3D geometries. Assume z = 0 if needed
  * @pre ga and gb are valid geometries
+ * @param ga first geometry to operate
+ * @param gb second geometry to operate
+ * @return true when @p ga intersects @p gb
+ *
  * @ingroup detail
  * @warning the validity is assumed, no actual check is done
  */
@@ -59,6 +73,10 @@ intersects3D(const Geometry &ga, const Geometry &gb, NoValidityCheck);
 
 /**
  * Intersection test on GeometrySet
+ * @param a first geometry set to operate
+ * @param b second geometry set to operate
+ * @return true when @p a intersects @p b
+ *
  * @ingroup detail
  */
 template <int Dim>
@@ -68,6 +86,10 @@ intersects(const detail::GeometrySet<Dim> &a,
 
 /**
  * Intersection test on a PrimitiveHandle
+ * @param a first primitive handle to operate
+ * @param b second primitive handle to operate
+ * @return true when @p a intersects @p b
+ *
  * @ingroup detail
  */
 template <int Dim>
@@ -77,6 +99,9 @@ intersects(const detail::PrimitiveHandle<Dim> &a,
 
 /**
  * Self intersection test for 2D LineString (false if only endpoint touch)
+ * @param l geometry to check self intersection with
+ * @return true when @p l self intersects
+ *
  * @ingroup detail
  */
 bool
@@ -84,6 +109,9 @@ selfIntersects(const LineString &l);
 
 /**
  * Self intersection test for 3D LineString (false if only endpoints touch)
+ * @param l geometry to check self intersection with
+ * @return true when @p l self intersects
+ *
  * @ingroup detail
  */
 bool
@@ -91,6 +119,10 @@ selfIntersects3D(const LineString &l);
 
 /**
  * Self intersection test for 2D PolyhedralSurface (false if only point touch)
+ * @param s geometry to check self intersection with
+ * @param g surface graph matching @p s
+ * @return true when @p s self intersects
+ *
  * @ingroup detail
  */
 bool
@@ -98,6 +130,10 @@ selfIntersects(const PolyhedralSurface &s, const SurfaceGraph &g);
 
 /**
  * Self intersection test for 3D PolyhedralSurface (false if only point touch)
+ * @param s geometry to check self intersection with
+ * @param g surface graph matching @p s
+ * @return true when @p s self intersects
+ *
  * @ingroup detail
  */
 
@@ -106,6 +142,10 @@ selfIntersects3D(const PolyhedralSurface &s, const SurfaceGraph &g);
 
 /**
  * Self intersection test for 2D TriangulatedSurface (false if only point touch)
+ * @param s geometry to check self intersection with
+ * @param g surface graph matching @p s
+ * @return true when @p s self intersects
+ *
  * @ingroup detail
  */
 bool
@@ -113,6 +153,10 @@ selfIntersects(const TriangulatedSurface &s, const SurfaceGraph &g);
 
 /**
  * Self intersection test for 3D TriangulatedSurface (false if only point touch)
+ * @param s geometry to check self intersection with
+ * @param g surface graph matching @p s
+ * @return true when @p s self intersects
+ *
  * @ingroup detail
  */
 bool

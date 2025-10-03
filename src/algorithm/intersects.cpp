@@ -340,6 +340,20 @@ dispatch_intersects_sym(const PrimitiveHandle<Dim> &pa,
   return _intersects(pb, pa);
 }
 
+struct found_an_intersection {};
+
+template <int Dim>
+struct intersects_callback {
+  void
+  operator()(const typename PrimitiveBox<Dim>::Type &a,
+             const typename PrimitiveBox<Dim>::Type &b)
+  {
+    if (dispatch_intersects_sym(*a.handle(), *b.handle())) {
+      throw found_an_intersection();
+    }
+  }
+};
+
 /// @} end of private section
 
 // ----------------------------------------------------------------------------------
@@ -355,20 +369,6 @@ intersects(const PrimitiveHandle<Dim> &pa, const PrimitiveHandle<Dim> &pb)
   return dispatch_intersects_sym(pa, pb);
 }
 
-struct found_an_intersection {};
-
-template <int Dim>
-struct intersects_cb {
-  void
-  operator()(const typename PrimitiveBox<Dim>::Type &a,
-             const typename PrimitiveBox<Dim>::Type &b)
-  {
-    if (dispatch_intersects_sym(*a.handle(), *b.handle())) {
-      throw found_an_intersection();
-    }
-  }
-};
-
 template <int Dim>
 auto
 intersects(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
@@ -381,9 +381,9 @@ intersects(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
   b.computeBoundingBoxes(bhandles, bboxes);
 
   try {
-    intersects_cb<Dim> const cb;
+    intersects_callback<Dim> const callback;
     CGAL::box_intersection_d(aboxes.begin(), aboxes.end(), bboxes.begin(),
-                             bboxes.end(), cb);
+                             bboxes.end(), callback);
   } catch (found_an_intersection &e) {
     return true;
   }
@@ -551,12 +551,15 @@ selfIntersectsImpl(const PolyhedralSurface &s, const SurfaceGraph &graph)
   size_t const numPatches = s.numPatches();
 
   for (size_t pi = 0; pi != numPatches; ++pi) {
+    GeometrySet<Dim> geomSetI(s.patchN(pi));
     for (size_t pj = pi + 1; pj < numPatches; ++pj) {
-      std::unique_ptr<Geometry> inter =
-          Dim == 3 ? intersection3D(s.patchN(pi), s.patchN(pj))
-                   : intersection(s.patchN(pi), s.patchN(pj));
+      GeometrySet<Dim> geomSetJ(s.patchN(pj));
+      bool             hasIntersection = intersects<Dim>(geomSetI, geomSetJ);
+      if (hasIntersection) {
+        GeometrySet<Dim> geomSetInter;
+        // call intersection() version without recompose:
+        intersection<Dim>(geomSetI, geomSetJ, geomSetInter);
 
-      if (!inter->isEmpty()) {
         // two cases:
         // - neighbors can have a line as intersection
         // - non neighbors can only have a point or a set of points
@@ -568,13 +571,19 @@ selfIntersectsImpl(const PolyhedralSurface &s, const SurfaceGraph &graph)
             std::find(neighbors.first, neighbors.second, pj)) {
           // neighbor
           // std::cerr << pi << " " << pj << " neighbor\n";
-          if (!inter->is<LineString>()) {
+
+          // apply recompose code from intersection(const Geometry, const
+          // Geometry, NoValidityCheck):
+          GeometrySet<Dim> filtered;
+          geomSetInter.filterCovered(filtered);
+          std::unique_ptr<Geometry> interRecomposed = filtered.recompose();
+          if (!interRecomposed->is<LineString>()) {
             return true;
           }
         } else {
           // not a neighbor
           // std::cerr << pi << " " << pj << " not neighbor\n";
-          if (inter->dimension() != 0) {
+          if (geomSetInter.dimension() != 0) {
             return true;
           }
         }
@@ -606,12 +615,16 @@ selfIntersectsImpl(const TriangulatedSurface &tin, const SurfaceGraph &graph)
   size_t const numPatches = tin.numPatches();
 
   for (size_t ti = 0; ti != numPatches; ++ti) {
+    GeometrySet<Dim> geomSetI(tin.patchN(ti));
     for (size_t tj = ti + 1; tj < numPatches; ++tj) {
-      std::unique_ptr<Geometry> inter =
-          Dim == 3 ? intersection3D(tin.patchN(ti), tin.patchN(tj))
-                   : intersection(tin.patchN(ti), tin.patchN(tj));
+      GeometrySet<Dim> geomSetJ(tin.patchN(tj));
+      bool             hasIntersection = intersects<Dim>(geomSetI, geomSetJ);
 
-      if (!inter->isEmpty()) {
+      if (hasIntersection) {
+        GeometrySet<Dim> geomSetInter;
+        // call intersection() version without recompose:
+        intersection<Dim>(geomSetI, geomSetJ, geomSetInter);
+
         // two cases:
         // - neighbors can have a line as intersection
         // - non neighbors can only have a point or a set of points
@@ -623,13 +636,19 @@ selfIntersectsImpl(const TriangulatedSurface &tin, const SurfaceGraph &graph)
             std::find(neighbors.first, neighbors.second, tj)) {
           // neighbor
           // std::cerr << ti << " " << tj << " neighbor\n";
-          if (!inter->is<LineString>()) {
+
+          // apply recompose code from intersection(const Geometry, const
+          // Geometry, NoValidityCheck):
+          GeometrySet<Dim> filtered;
+          geomSetInter.filterCovered(filtered);
+          std::unique_ptr<Geometry> interRecomposed = filtered.recompose();
+          if (!interRecomposed->is<LineString>()) {
             return true;
           }
         } else {
           // not a neighbor
           // std::cerr << ti << " " << tj << " not neighbor\n";
-          if (inter->dimension() != 0) {
+          if (geomSetInter.dimension() != 0) {
             return true;
           }
         }
