@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SFCGAL Playground</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg-main: #f5f5f5;
+            --bg-panel: #ffffff;
+            --bg-header: #222b45;
+            --text-header: #f7fafc;
+            --accent: #5a67d8;
+            --accent-strong: #434190;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e0;
+            --console-bg: #1a202c;
+            --console-text: #e2e8f0;
+            --error: #f56565;
+            --success: #48bb78;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-main);
+            color: #2d3748;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(120deg, var(--bg-header), #1a202c 80%);
+            color: var(--text-header);
+            padding: 18px 32px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.25);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-header);
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+        }
+
+        .playground {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr auto;
+            gap: 16px;
+            padding: 20px;
+            min-height: 0;
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .panel-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(90, 103, 216, 0.08);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-body {
+            flex: 1;
+            padding: 18px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #editor {
+            flex: 1;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 14px;
+            background: #1a202c;
+            color: #f7fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            resize: none;
+            line-height: 1.5;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        select, button {
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        button.primary {
+            background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+            color: #fff;
+            border: none;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(67, 56, 202, 0.15);
+        }
+
+        .view-toggle {
+            display: inline-flex;
+            background: rgba(90, 103, 216, 0.1);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .view-toggle button {
+            border: none;
+            background: transparent;
+            padding: 8px 16px;
+            color: var(--accent-strong);
+        }
+
+        .view-toggle button.active {
+            background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+            color: #fff;
+        }
+
+        #canvas2d-wrapper, #canvas3d-wrapper {
+            flex: 1;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #fff;
+            box-shadow: inset 0 0 25px rgba(15, 23, 42, 0.08);
+            display: none;
+            position: relative;
+            min-height: 400px;
+        }
+
+        #canvas2d {
+            width: 100%;
+            height: 100%;
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #canvas3d canvas {
+            display: block;
+            border-radius: 12px;
+        }
+
+        #output {
+            flex: 1;
+            background: #0f172a;
+            color: var(--console-text);
+            border-radius: 12px;
+            border: 1px solid rgba(226, 232, 240, 0.2);
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            overflow: auto;
+            line-height: 1.5;
+        }
+
+        .output-entry { margin-bottom: 12px; }
+        .output-label { font-weight: 600; opacity: 0.8; }
+        .output-value { margin-left: 10px; white-space: pre-wrap; }
+        .output-entry.error { color: var(--error); }
+        .output-entry.success { color: var(--success); }
+
+        @media (max-width: 1100px) {
+            .playground {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(3, auto);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>SFCGAL Playground</h1>
+        <div class="header-right">
+            <span id="status" class="badge">Loading SFCGAL…</span>
+            <span id="version" class="badge">-</span>
+        </div>
+    </header>
+
+    <div class="playground">
+        <section class="panel" style="grid-column: span 1;">
+            <div class="panel-header">
+                <span>Code</span>
+                <div class="controls">
+                    <select id="example-select">
+                        <option value="">Load example…</option>
+                        <optgroup label="2D Operations">
+                            <option value="union2d">Union 2D</option>
+                            <option value="buffer2d">Buffer 2D</option>
+                            <option value="intersection2d">Intersection 2D</option>
+                            <option value="difference2d">Difference 2D</option>
+                            <option value="convexhull2d">Convex Hull 2D</option>
+                        </optgroup>
+                        <optgroup label="3D Operations">
+                            <option value="extrude3d">Extrude 3D</option>
+                            <option value="polygon3d">3D Polygon</option>
+                        </optgroup>
+                    </select>
+                    <button id="run-btn" class="primary">Run (Ctrl+Enter)</button>
+                    <button id="clear-btn">Clear</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <textarea id="editor" spellcheck="false"></textarea>
+            </div>
+        </section>
+
+        <section class="panel" style="grid-column: span 1;">
+            <div class="panel-header">
+                <span>Visualisation</span>
+                <div class="controls">
+                    <div class="view-toggle">
+                        <button id="view-2d" class="active">2D</button>
+                        <button id="view-3d">3D</button>
+                    </div>
+                    <button id="clear-visuals">Reset</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="canvas2d-wrapper" style="display:flex;">
+                    <canvas id="canvas2d"></canvas>
+                </div>
+                <div id="canvas3d-wrapper">
+                    <div id="canvas3d"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" style="grid-column: span 2; max-height: 250px;">
+            <div class="panel-header">
+                <span>Output</span>
+                <button id="clear-output">Clear</button>
+            </div>
+            <div class="panel-body">
+                <div id="output"></div>
+            </div>
+        </section>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import { Canvas2DRenderer } from './lib/canvas2d-renderer.js';
+        import { Three3DRenderer } from './lib/three3d-renderer.js';
+        import { loadSFCGAL } from './lib/sfcgal-module.js';
+
+        const editorElem = document.getElementById('editor');
+        const outputElem = document.getElementById('output');
+        const statusBadge = document.getElementById('status');
+        const versionBadge = document.getElementById('version');
+        const runBtn = document.getElementById('run-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const exampleSelect = document.getElementById('example-select');
+        const view2dBtn = document.getElementById('view-2d');
+        const view3dBtn = document.getElementById('view-3d');
+        const clearVisualsBtn = document.getElementById('clear-visuals');
+        const clearOutputBtn = document.getElementById('clear-output');
+        const canvas2dWrapper = document.getElementById('canvas2d-wrapper');
+        const canvas3dWrapper = document.getElementById('canvas3d-wrapper');
+
+        let sfcgal = null;
+        let renderer2d = null;
+        let renderer3d = null;
+        let currentView = '2d';
+
+        const EXAMPLES = {
+            union2d: `// Union: Combine two polygons into one
+const poly1 = "POLYGON((0 0, 4 0, 4 3, 0 3, 0 0))";
+const poly2 = "POLYGON((2 1, 6 1, 6 4, 2 4, 2 1))";
+const result = union(poly1, poly2);
+
+log('Area poly1:', area(poly1).toFixed(2));
+log('Area poly2:', area(poly2).toFixed(2));
+log('Area union:', area(result).toFixed(2));
+
+visualize(poly1, { color: '#5a67d8' });
+visualize(poly2, { color: '#f56565' });
+visualize(result, { color: '#48bb78' });
+result;`,
+
+            buffer2d: `// Buffer: Create a zone around a geometry
+const point = "POINT(3 3)";
+const buffered = buffer(point, 2);
+
+log('Buffer distance: 2');
+log('Buffered area:', area(buffered).toFixed(2));
+
+visualize(point, { color: '#f6ad55' });
+visualize(buffered, { color: '#63b3ed' });
+buffered;`,
+
+            intersection2d: `// Intersection: Find common area between geometries
+const poly1 = "POLYGON((0 0, 4 0, 4 3, 0 3, 0 0))";
+const poly2 = "POLYGON((2 1, 6 1, 6 4, 2 4, 2 1))";
+const result = intersection(poly1, poly2);
+
+log('Area poly1:', area(poly1).toFixed(2));
+log('Area poly2:', area(poly2).toFixed(2));
+log('Area intersection:', area(result).toFixed(2));
+
+visualize(poly1, { color: '#5a67d8', fillColor: 'rgba(90, 103, 216, 0.2)' });
+visualize(poly2, { color: '#f56565', fillColor: 'rgba(245, 101, 101, 0.2)' });
+visualize(result, { color: '#48bb78' });
+result;`,
+
+            difference2d: `// Difference: Subtract one geometry from another
+const poly1 = "POLYGON((0 0, 5 0, 5 5, 0 5, 0 0))";
+const poly2 = "POLYGON((3 3, 7 3, 7 7, 3 7, 3 3))";
+const result = difference(poly1, poly2);
+
+log('Area poly1:', area(poly1).toFixed(2));
+log('Area poly2:', area(poly2).toFixed(2));
+log('Area difference:', area(result).toFixed(2));
+
+visualize(poly1, { color: '#5a67d8', fillColor: 'rgba(90, 103, 216, 0.2)' });
+visualize(poly2, { color: '#f56565', fillColor: 'rgba(245, 101, 101, 0.2)' });
+visualize(result, { color: '#48bb78' });
+result;`,
+
+            convexhull2d: `// Convex Hull: Find smallest convex polygon containing points
+const multipoint = "MULTIPOINT((0 0), (2 4), (5 1), (3 3), (1 2))";
+const hull = convexHull(multipoint);
+
+log('Convex hull computed');
+log('Hull area:', area(hull).toFixed(2));
+
+visualize(multipoint, { color: '#f6ad55', pointRadius: 6 });
+visualize(hull, { color: '#63b3ed' });
+hull;`,
+
+            extrude3d: `// Extrude: Transform 2D polygon into 3D solid
+const base = "POLYGON((0 0, 3 0, 3 3, 0 3, 0 0))";
+const solid = extrude(base, 4);
+
+const baseArea = area(base);
+log('Base area:', baseArea.toFixed(2));
+log('Extrusion height: 4');
+log('Expected volume:', (baseArea * 4).toFixed(2));
+
+// Note: volume(solid) is disabled due to known issues
+visualize(solid, { color: '#48bb78' });
+solid;`,
+
+            polygon3d: `// 3D Polygon: Create and visualize a 3D polygon
+const poly3d = "POLYGON Z ((0 0 0, 4 0 0, 4 3 2, 0 3 2, 0 0 0))";
+
+log('3D Polygon created');
+log('2D Area projection:', area(poly3d).toFixed(2));
+
+visualize(poly3d, { color: '#667eea' });
+poly3d;`
+        };
+
+        init();
+
+        async function init() {
+            editorElem.value = EXAMPLES.union2d;
+            renderer2d = new Canvas2DRenderer('canvas2d', { showGrid: true, showAxes: true });
+            renderer3d = new Three3DRenderer('canvas3d', { wireframe: false, showGrid: true, showAxes: true });
+
+            try {
+                sfcgal = await loadSFCGAL();
+                const version = sfcgal.version();
+                statusBadge.textContent = 'SFCGAL ready';
+                statusBadge.style.background = 'rgba(72, 187, 120, 0.2)';
+                versionBadge.textContent = `v${version}`;
+            } catch (error) {
+                statusBadge.textContent = 'SFCGAL load failed';
+                statusBadge.style.background = 'rgba(245, 101, 101, 0.2)';
+                addOutput('error', 'Failed to load SFCGAL: ' + error.message);
+            }
+
+            runBtn.addEventListener('click', runCode);
+            clearBtn.addEventListener('click', () => editorElem.value = '');
+            exampleSelect.addEventListener('change', onExampleChange);
+            clearVisualsBtn.addEventListener('click', clearVisuals);
+            clearOutputBtn.addEventListener('click', () => outputElem.innerHTML = '');
+            view2dBtn.addEventListener('click', () => switchView('2d'));
+            view3dBtn.addEventListener('click', () => switchView('3d'));
+
+            document.addEventListener('keydown', (event) => {
+                if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                    event.preventDefault();
+                    runCode();
+                }
+            });
+
+            switchView('2d');
+            clearVisuals();
+
+            // Run the initial example
+            setTimeout(() => runCode(), 500);
+        }
+
+        function onExampleChange(event) {
+            const key = event.target.value;
+            if (key && EXAMPLES[key]) {
+                // Clear everything first
+                clearVisuals();
+                outputElem.innerHTML = '';
+
+                editorElem.value = EXAMPLES[key];
+
+                // Auto-switch to 3D view for 3D examples
+                if (key.includes('3d')) {
+                    switchView('3d');
+                } else {
+                    switchView('2d');
+                }
+
+                // Auto-run the example
+                setTimeout(() => runCode(), 100);
+            }
+            event.target.value = '';
+        }
+
+        function switchView(view) {
+            currentView = view;
+            view2dBtn.classList.toggle('active', view === '2d');
+            view3dBtn.classList.toggle('active', view === '3d');
+            canvas2dWrapper.style.display = view === '2d' ? 'flex' : 'none';
+            canvas3dWrapper.style.display = view === '3d' ? 'block' : 'none';
+
+            // Force 3D renderer to resize when switching to 3D view
+            if (view === '3d' && renderer3d) {
+                setTimeout(() => {
+                    renderer3d.onResize();
+                }, 100);
+            }
+        }
+
+        function clearVisuals() {
+            renderer2d.clearGeometries();
+            renderer2d.clear();
+            renderer3d.clear();
+        }
+
+        function addOutput(type, message) {
+            const entry = document.createElement('div');
+            entry.className = `output-entry ${type}`;
+            entry.textContent = message;
+            outputElem.appendChild(entry);
+            outputElem.scrollTop = outputElem.scrollHeight;
+        }
+
+        function createExecutionContext() {
+            const geometries = [];
+            return {
+                log: (...args) => addOutput('success', args.join(' ')),
+                fromWKT: (wkt) => wkt,
+                toWKT: (geom) => geom,
+                area: (wkt) => {
+                    if (!sfcgal) return 0;
+                    try {
+                        return sfcgal.area(wkt);
+                    } catch (e) {
+                        addOutput('error', 'area() error: ' + e.message);
+                        return 0;
+                    }
+                },
+                // Note: volume() has issues with some geometry types (index out of bounds)
+                // Disabled for now to prevent crashes
+                volume: (wkt) => {
+                    if (!sfcgal || !sfcgal.volume) {
+                        addOutput('error', 'volume() is not available or disabled due to known issues');
+                        return 0;
+                    }
+                    try {
+                        return sfcgal.volume(wkt);
+                    } catch (e) {
+                        addOutput('error', 'volume() error: ' + e.message + ' (this is a known issue)');
+                        return 0;
+                    }
+                },
+                buffer: (wkt, dist) => sfcgal ? sfcgal.buffer(wkt, dist) : wkt,
+                union: (wkt1, wkt2) => sfcgal ? (sfcgal.union_ ? sfcgal.union_(wkt1, wkt2) : sfcgal.union(wkt1, wkt2)) : wkt1,
+                intersection: (wkt1, wkt2) => sfcgal ? sfcgal.intersection(wkt1, wkt2) : wkt1,
+                difference: (wkt1, wkt2) => sfcgal ? sfcgal.difference(wkt1, wkt2) : wkt1,
+                convexHull: (wkt) => sfcgal ? sfcgal.convexHull(wkt) : wkt,
+                centroid: (wkt) => sfcgal ? sfcgal.centroid(wkt) : wkt,
+                extrude: (wkt, h) => sfcgal ? sfcgal.extrude(wkt, h) : wkt,
+                visualize: (geom, opts = {}) => geometries.push({ geom, opts }),
+                console: console,
+                _geometries: geometries
+            };
+        }
+
+        function runCode() {
+            if (!sfcgal) {
+                addOutput('error', 'SFCGAL not ready');
+                return;
+            }
+
+            // Clear everything before running
+            outputElem.innerHTML = '';
+            renderer2d.clearGeometries();
+            renderer2d.clear();
+            renderer3d.clear();
+
+            const code = editorElem.value;
+            const context = createExecutionContext();
+
+            try {
+                const func = new Function(...Object.keys(context), code);
+                const result = func(...Object.values(context));
+
+                // Determine if we need to switch to 3D view
+                const has3D = context._geometries.some(({ geom }) => {
+                    const upperWKT = geom.toUpperCase();
+                    return upperWKT.includes('SOLID') ||
+                           upperWKT.includes('POLYHEDRALSURFACE') ||
+                           upperWKT.includes('TIN') ||
+                           (upperWKT.includes('POLYGON') && /\s+-?\d+\.?\d*\s+-?\d+\.?\d*\s+-?\d+\.?\d*/.test(geom));
+                });
+
+                // Auto-switch to 3D view if 3D geometries detected
+                if (has3D && currentView === '2d') {
+                    switchView('3d');
+                }
+
+                // Add geometries to the appropriate renderer
+                context._geometries.forEach(({ geom, opts }) => {
+                    if (currentView === '2d') {
+                        renderer2d.addGeometry(geom, opts);
+                    } else {
+                        renderer3d.addGeometry(geom, opts);
+                    }
+                });
+
+                // Render based on current view
+                if (currentView === '2d') {
+                    renderer2d.render();
+                } else {
+                    // 3D renders automatically, but force a resize to ensure proper display
+                    setTimeout(() => {
+                        if (renderer3d) {
+                            renderer3d.onResize();
+                        }
+                    }, 50);
+                }
+
+                if (result !== undefined) {
+                    addOutput('success', 'Result: ' + (typeof result === 'string' ? result : JSON.stringify(result)));
+                }
+            } catch (error) {
+                addOutput('error', 'Execution error: ' + error.message);
+                console.error('Full error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

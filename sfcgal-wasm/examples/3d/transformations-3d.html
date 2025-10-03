@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformations 3D - SFCGAL</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 5px; }
+        .header p { opacity: 0.9; }
+        .content { padding: 30px; display: flex; gap: 20px; }
+        .sidebar { flex: 0 0 350px; }
+        .viewer { flex: 1; }
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .control-group { margin-bottom: 15px; }
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .control-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            resize: vertical;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
+            padding: 8px;
+        }
+        .range-value {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .transform-section {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .transform-section h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            font-size: 13px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover { background: #5a6268; }
+        #viewer3d {
+            width: 100%;
+            height: 700px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #f5f5f5;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .status-info { background: #fff3cd; color: #856404; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Transformations 3D</h1>
+            <p>Apply geometric transformations (translate, rotate, scale) on 3D geometries using SFCGAL</p>
+        </div>
+
+        <div class="content">
+            <div class="sidebar">
+                <a href="../index.html" class="back-link">← Back</a>
+
+                <div id="status" class="status status-info">Loading...</div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Geometry (WKT):</label>
+                        <textarea id="wkt" rows="4">POLYGON((0 0 0, 4 0 0, 4 3 0, 0 3 0, 0 0 0))</textarea>
+                    </div>
+
+                    <div class="transform-section">
+                        <h4>Translate</h4>
+                        <div class="control-group">
+                            <label>X: <span class="range-value" id="txValue">2</span></label>
+                            <input type="range" id="tx" min="-5" max="5" step="0.5" value="2">
+                        </div>
+                        <div class="control-group">
+                            <label>Y: <span class="range-value" id="tyValue">2</span></label>
+                            <input type="range" id="ty" min="-5" max="5" step="0.5" value="2">
+                        </div>
+                        <div class="control-group">
+                            <label>Z: <span class="range-value" id="tzValue">2</span></label>
+                            <input type="range" id="tz" min="-5" max="5" step="0.5" value="2">
+                        </div>
+                        <button class="btn-primary" onclick="applyTransform('translate')">Translate</button>
+                    </div>
+
+                    <div class="transform-section">
+                        <h4>Rotate (Z-axis)</h4>
+                        <div class="control-group">
+                            <label>Angle (rad): <span class="range-value" id="raValue">0.785</span></label>
+                            <input type="range" id="ra" min="0" max="6.28" step="0.01" value="0.785">
+                        </div>
+                        <button class="btn-primary" onclick="applyTransform('rotate')">Rotate</button>
+                    </div>
+
+                    <div class="transform-section">
+                        <h4>Scale</h4>
+                        <div class="control-group">
+                            <label>X: <span class="range-value" id="sxValue">1.5</span></label>
+                            <input type="range" id="sx" min="0.5" max="3" step="0.1" value="1.5">
+                        </div>
+                        <div class="control-group">
+                            <label>Y: <span class="range-value" id="syValue">1.5</span></label>
+                            <input type="range" id="sy" min="0.5" max="3" step="0.1" value="1.5">
+                        </div>
+                        <div class="control-group">
+                            <label>Z: <span class="range-value" id="szValue">1.5</span></label>
+                            <input type="range" id="sz" min="0.5" max="3" step="0.1" value="1.5">
+                        </div>
+                        <button class="btn-primary" onclick="applyTransform('scale')">Scale</button>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="wireframe">
+                        <label for="wireframe">Wireframe</label>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="btn-secondary" onclick="reset()">Reset</button>
+                        <button class="btn-secondary" onclick="loadExample('box')">Box</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="viewer">
+                <div id="viewer3d"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { loadSFCGAL, showStatus } from '../lib/sfcgal-module.js';
+        import { Three3DRenderer } from '../lib/three3d-renderer.js';
+
+        let sfcgal;
+        let renderer;
+        let originalWkt = '';
+        let currentWkt = '';
+
+        async function init() {
+            try {
+                sfcgal = await loadSFCGAL();
+                renderer = new Three3DRenderer('viewer3d');
+
+                showStatus('status', '✅ SFCGAL loaded', 'success');
+                setTimeout(() => {
+                    document.getElementById('status').style.display = 'none';
+                }, 2000);
+
+                document.getElementById('wireframe').addEventListener('change', (e) => {
+                    renderer.setWireframe(e.target.checked);
+                });
+
+                ['tx', 'ty', 'tz', 'ra', 'sx', 'sy', 'sz'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', (e) => {
+                        document.getElementById(id + 'Value').textContent = parseFloat(e.target.value).toFixed(id === 'ra' ? 3 : 1);
+                    });
+                });
+
+                reset();
+            } catch (error) {
+                showStatus('status', '❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        window.applyTransform = function(type) {
+            const wkt = currentWkt || document.getElementById('wkt').value.trim();
+
+            try {
+                let transformedWkt;
+
+                if (type === 'translate') {
+                    const dx = parseFloat(document.getElementById('tx').value);
+                    const dy = parseFloat(document.getElementById('ty').value);
+                    const dz = parseFloat(document.getElementById('tz').value);
+                    transformedWkt = sfcgal.translate(wkt, dx, dy, dz);
+                } else if (type === 'rotate') {
+                    const angle = parseFloat(document.getElementById('ra').value);
+                    transformedWkt = sfcgal.rotate(wkt, angle);
+                } else if (type === 'scale') {
+                    const sx = parseFloat(document.getElementById('sx').value);
+                    const sy = parseFloat(document.getElementById('sy').value);
+                    const sz = parseFloat(document.getElementById('sz').value);
+                    transformedWkt = sfcgal.scale(wkt, sx, sy, sz);
+                }
+
+                currentWkt = transformedWkt;
+                renderGeometries();
+
+                showStatus('status', '✅ Transformed successfully', 'success');
+                setTimeout(() => {
+                    document.getElementById('status').style.display = 'none';
+                }, 2000);
+            } catch (error) {
+                showStatus('status', '❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.reset = function() {
+            originalWkt = document.getElementById('wkt').value.trim();
+            currentWkt = originalWkt;
+            renderGeometries();
+        };
+
+        window.loadExample = function(type) {
+            const examples = {
+                'box': sfcgal.extrude('POLYGON((0 0, 4 0, 4 3, 0 3, 0 0))', 5)
+            };
+
+            document.getElementById('wkt').value = examples[type] || originalWkt;
+            reset();
+        };
+
+        function renderGeometries() {
+            renderer.clear();
+            if (originalWkt) {
+                renderer.addGeometry(originalWkt, { color: 0x999999 });
+            }
+            if (currentWkt && currentWkt !== originalWkt) {
+                renderer.addGeometry(currentWkt, { color: 0x4caf50 });
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boolean Operations 3D - SFCGAL</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 5px; }
+        .header p { opacity: 0.9; }
+        .content { padding: 30px; display: flex; gap: 20px; }
+        .sidebar { flex: 0 0 350px; }
+        .viewer { flex: 1; }
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .control-group { margin-bottom: 15px; }
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .control-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            resize: vertical;
+        }
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover { background: #5a6268; }
+        .results {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .results h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        .result-item {
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+        .result-label { font-weight: 600; color: #555; display: block; margin-bottom: 3px; }
+        .result-value {
+            font-family: 'Courier New', monospace;
+            color: #2e7d32;
+            word-break: break-all;
+        }
+        #viewer3d {
+            width: 100%;
+            height: 700px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #f5f5f5;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .status-info { background: #fff3cd; color: #856404; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Boolean Operations 3D</h1>
+            <p>Perform intersection, union, and difference on 3D geometries using SFCGAL</p>
+        </div>
+
+        <div class="content">
+            <div class="sidebar">
+                <a href="../index.html" class="back-link">← Back</a>
+
+                <div id="status" class="status status-info">Loading...</div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Operation:</label>
+                        <select id="operation">
+                            <option value="intersection">Intersection</option>
+                            <option value="union" selected>Union</option>
+                            <option value="difference">Difference</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Geometry 1 (WKT):</label>
+                        <textarea id="wkt1" rows="4">POLYGON((0 0 0, 2 0 0, 1 1 1, 0 0 0))</textarea>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Geometry 2 (WKT):</label>
+                        <textarea id="wkt2" rows="4">POLYGON((1 0 0.5, 3 0 0.5, 2 1 1.5, 1 0 0.5))</textarea>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="wireframe">
+                        <label for="wireframe">Wireframe Mode</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="showOnlyResult">
+                        <label for="showOnlyResult">Show Only Result</label>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="btn-primary" onclick="calculate()">Calculate</button>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="btn-secondary" onclick="loadExample('triangles')">3D Triangles</button>
+                        <button class="btn-secondary" onclick="loadExample('quads')">3D Quads</button>
+                        <button class="btn-secondary" onclick="loadExample('pyramids')">Pyramids</button>
+                        <button class="btn-secondary" onclick="loadExample('cubes')">Cubes</button>
+                    </div>
+                </div>
+
+                <div id="results" class="results" style="display:none;">
+                    <h4>Visualization</h4>
+                    <div class="result-item">
+                        <span class="result-label">🔵 Geometry 1 (Blue):</span>
+                        <div class="result-value" style="color: #667eea; font-weight: bold;">Input geometry</div>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">🟣 Geometry 2 (Pink):</span>
+                        <div class="result-value" style="color: #f06292; font-weight: bold;">Input geometry</div>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">🟢 Result (Green):</span>
+                        <div class="result-value" id="result">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="viewer">
+                <div id="viewer3d"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { loadSFCGAL, showStatus } from '../lib/sfcgal-module.js';
+        import { Three3DRenderer } from '../lib/three3d-renderer.js';
+
+        let sfcgal;
+        let renderer;
+
+        async function init() {
+            try {
+                sfcgal = await loadSFCGAL();
+                renderer = new Three3DRenderer('viewer3d');
+
+                showStatus('status', '✅ SFCGAL loaded', 'success');
+                setTimeout(() => {
+                    document.getElementById('status').style.display = 'none';
+                }, 2000);
+
+                document.getElementById('wireframe').addEventListener('change', (e) => {
+                    renderer.setWireframe(e.target.checked);
+                });
+
+                calculate();
+            } catch (error) {
+                showStatus('status', '❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        window.calculate = function() {
+            const wkt1 = document.getElementById('wkt1').value.trim();
+            const wkt2 = document.getElementById('wkt2').value.trim();
+            const operation = document.getElementById('operation').value;
+            const showOnlyResult = document.getElementById('showOnlyResult').checked;
+
+            try {
+                let resultWkt;
+                let operationName = '';
+
+                // Using 3D algorithms for truly 3D geometries
+                if (operation === 'intersection') {
+                    operationName = 'Intersection';
+                    resultWkt = sfcgal.intersection3D(wkt1, wkt2);
+                } else if (operation === 'union') {
+                    operationName = 'Union';
+                    resultWkt = sfcgal.union3D(wkt1, wkt2);
+                } else if (operation === 'difference') {
+                    operationName = 'Difference';
+                    resultWkt = sfcgal.difference3D(wkt1, wkt2);
+                }
+
+                document.getElementById('result').textContent = resultWkt;
+                document.getElementById('results').style.display = 'block';
+
+                // Clear and render geometries
+                renderer.clear();
+
+                if (showOnlyResult) {
+                    // Show only the result geometry
+                    if (!resultWkt.includes('EMPTY')) {
+                        renderer.addGeometry(resultWkt, { color: 0x4caf50 }); // Green
+                    }
+                } else {
+                    // Show all geometries with distinct colors
+                    renderer.addGeometry(wkt1, { color: 0x667eea }); // Blue
+                    renderer.addGeometry(wkt2, { color: 0xf06292 }); // Pink
+                    if (!resultWkt.includes('EMPTY')) {
+                        renderer.addGeometry(resultWkt, { color: 0x4caf50 }); // Green
+                    }
+                }
+
+                showStatus('status', `✅ ${operationName} calculated successfully`, 'success');
+                setTimeout(() => {
+                    document.getElementById('status').style.display = 'none';
+                }, 2000);
+
+            } catch (error) {
+                showStatus('status', '❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.loadExample = function(type) {
+            const examples = {
+                'triangles': {
+                    // Two triangles in 3D space with different Z coordinates
+                    wkt1: 'POLYGON((0 0 0, 2 0 0, 1 1 1, 0 0 0))',
+                    wkt2: 'POLYGON((1 0 0.5, 3 0 0.5, 2 1 1.5, 1 0 0.5))'
+                },
+                'quads': {
+                    // Two quadrilaterals in 3D space
+                    wkt1: 'POLYGON((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0))',
+                    wkt2: 'POLYGON((1 0 0.5, 3 0 0.5, 3 2 1.5, 1 2 1.5, 1 0 0.5))'
+                },
+                'pyramids': {
+                    // Two small pyramid-like polyhedralsurfaces
+                    wkt1: 'POLYHEDRALSURFACE(((0 0 0, 1 0 0, 0.5 0.5 0, 0 0 0)),((0 0 0, 0.5 0.5 0, 0.5 0.5 1, 0 0 0)),((1 0 0, 0.5 0.5 1, 0.5 0.5 0, 1 0 0)),((0 0 0, 0.5 0.5 1, 1 0 0, 0 0 0)))',
+                    wkt2: 'POLYHEDRALSURFACE(((0.5 0 0, 1.5 0 0, 1 0.5 0, 0.5 0 0)),((0.5 0 0, 1 0.5 0, 1 0.5 1, 0.5 0 0)),((1.5 0 0, 1 0.5 1, 1 0.5 0, 1.5 0 0)),((0.5 0 0, 1 0.5 1, 1.5 0 0, 0.5 0 0)))'
+                },
+		'cubes': {
+		   // Two SOLID cube
+		   // TODO: FIX with SOLID geometry
+		   wkt1: 'POLYHEDRALSURFACE Z (((0 0 0,0 2 0,2 2 0,2 0 0,0 0 0)),((0 0 2,2 0 2,2 2 2,0 2 2,0 0 2)),((0 0 0,2 0 0,2 0 2,0 0 2,0 0 0)),((0 2 0,0 2 2,2 2 2,2 2 0,0 2 0)),((2 0 0,2 2 0,2 2 2,2 0 2,2 0 0)),((0 0 0,0 0 2,0 2 2,0 2 0,0 0 0)))',
+		   wkt2: 'POLYHEDRALSURFACE Z (((1 0 0,1 2 0,3 2 0,3 0 0,1 0 0)),((1 0 2,3 0 2,3 2 2,1 2 2,1 0 2)),((1 0 0,3 0 0,3 0 2,1 0 2,1 0 0)),((1 2 0,1 2 2,3 2 2,3 2 0,1 2 0)),((3 0 0,3 2 0,3 2 2,3 0 2,3 0 0)),((1 0 0,1 0 2,1 2 2,1 2 0,1 0 0)))'
+		},
+            };
+
+            if (examples[type]) {
+                document.getElementById('wkt1').value = examples[type].wkt1;
+                document.getElementById('wkt2').value = examples[type].wkt2;
+                calculate();
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SFCGAL WebAssembly Examples</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1rem; }
+        .version {
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        .content { padding: 40px; }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .example-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            border: 2px solid #e0e0e0;
+        }
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+        .example-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        .example-card p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        .example-card a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .example-card a:hover {
+            background: #5568d3;
+        }
+        .intro {
+            background: #e8f5e9;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .intro h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        .intro p {
+            color: #555;
+            line-height: 1.6;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .status-info { background: #fff3cd; color: #856404; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 SFCGAL WebAssembly Examples</h1>
+            <p>Interactive demonstrations of SFCGAL algorithms in the browser</p>
+            <div class="version">Version <span id="version">Loading...</span></div>
+        </div>
+
+        <div id="status" class="status status-info">Loading SFCGAL module...</div>
+
+        <div class="content">
+            <div class="intro">
+                <h3>About SFCGAL</h3>
+                <p>SFCGAL is a C++ wrapper library around CGAL with the aim of supporting ISO 19107:2019 and OGC Simple Features for 3D operations. These examples demonstrate real SFCGAL algorithms compiled to WebAssembly, running directly in your browser.</p>
+            </div>
+
+            <div class="section">
+                <h2>🎮 Interactive Playground</h2>
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <h3>SFCGAL Playground</h3>
+                        <p>Interactive code editor to experiment with SFCGAL operations in 2D and 3D with live visualization.</p>
+                        <a href="playground.html">Launch Playground</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📐 2D Operations</h2>
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <h3>Area & Length 2D</h3>
+                        <p>Calculate area and perimeter of 2D polygons and length of linestrings.</p>
+                        <a href="2d/area-2d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Distance 2D</h3>
+                        <p>Calculate the minimum distance between two 2D geometries.</p>
+                        <a href="2d/distance-2d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Centroid 2D</h3>
+                        <p>Find the geometric center (centroid) of 2D geometries.</p>
+                        <a href="2d/centroid-2d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Intersection 2D</h3>
+                        <p>Compute the intersection of two 2D geometries.</p>
+                        <a href="2d/intersection-2d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Union 2D</h3>
+                        <p>Compute the union of two 2D geometries.</p>
+                        <a href="2d/union-2d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Difference 2D</h3>
+                        <p>Compute the difference between two 2D geometries.</p>
+                        <a href="2d/difference-2d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Convex Hull 2D</h3>
+                        <p>Compute the convex hull of a 2D geometry.</p>
+                        <a href="2d/convexhull-2d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Buffer (Offset) 2D</h3>
+                        <p>Create a buffer zone around a 2D geometry.</p>
+                        <a href="2d/buffer-2d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Transformations 2D</h3>
+                        <p>Apply translate, rotate, and scale transformations to 2D geometries.</p>
+                        <a href="2d/transformations-2d.html">Launch Example</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🎲 3D Operations</h2>
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <h3>Extrude 3D</h3>
+                        <p>Transform 2D polygons into 3D solids using extrusion.</p>
+                        <a href="3d/extrude-3d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Area & Length 3D</h3>
+                        <p>Calculate surface area and length of 3D geometries.</p>
+                        <a href="3d/area-3d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Distance 3D</h3>
+                        <p>Calculate the minimum distance between two 3D geometries.</p>
+                        <a href="3d/distance-3d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Boolean Operations 3D</h3>
+                        <p>Perform intersection, union, and difference on 3D geometries.</p>
+                        <a href="3d/boolean-3d.html">Launch Example</a>
+                    </div>
+
+                    <div class="example-card">
+                        <h3>Transformations 3D</h3>
+                        <p>Apply translate, rotate, and scale transformations to 3D geometries.</p>
+                        <a href="3d/transformations-3d.html">Launch Example</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { loadSFCGAL, showStatus } from './lib/sfcgal-module.js';
+
+        async function init() {
+            try {
+                const sfcgal = await loadSFCGAL();
+                const version = sfcgal.version();
+
+                document.getElementById('version').textContent = version;
+
+                const status = document.getElementById('status');
+                status.className = 'status status-success';
+                status.textContent = `✅ SFCGAL ${version} loaded successfully`;
+
+                setTimeout(() => status.style.display = 'none', 3000);
+
+            } catch (error) {
+                console.error('Init error:', error);
+                const status = document.getElementById('status');
+                status.className = 'status status-error';
+                status.textContent = '❌ Error loading SFCGAL: ' + error.message;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

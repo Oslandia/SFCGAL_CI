@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SFCGAL WebAssembly - Simple Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .loading { background: #fff3cd; color: #856404; }
+        .ready { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #5a6fd8; }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .output {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <h1>SFCGAL WebAssembly - Simple Demo</h1>
+    <a href="../index.html" style="display: inline-block; margin: 10px 0; padding: 8px 16px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">← Back</a>
+
+    <div id="status" class="status loading">Loading SFCGAL module...</div>
+
+    <h2>Test Functions</h2>
+
+    <button onclick="testArea()" disabled>Calculate Area</button>
+    <button onclick="testExtrusion()" disabled>Test Extrusion</button>
+    <button onclick="testValidation()" disabled>Test Validation</button>
+    <button onclick="testOperations()" disabled>Test Boolean Operations</button>
+    <button onclick="testAnalysis()" disabled>Test Analysis</button>
+
+    <h2>Custom WKT Input</h2>
+    <textarea id="custom-wkt" rows="3" placeholder="Enter WKT geometry...">POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))</textarea>
+    <br>
+    <button onclick="analyzeCustom()" disabled>Analyze Custom Geometry</button>
+
+    <h2>Output</h2>
+    <div id="output" class="output">Ready to test...</div>
+
+    <script type="module">
+        let SFCGAL = null;
+        const output = document.getElementById('output');
+
+        function log(message) {
+            output.textContent += message + '\n';
+        }
+
+        function clearOutput() {
+            output.textContent = '';
+        }
+
+        window.testArea = function() {
+            clearOutput();
+            log('=== Testing Area Calculation ===');
+
+            const polygon = "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))";
+            log(`Input: ${polygon}`);
+
+            const area = SFCGAL.area(polygon);
+            const perimeter = SFCGAL.perimeter(polygon);
+            const centroid = SFCGAL.centroid(polygon);
+
+            log(`Area: ${area}`);
+            log(`Perimeter: ${perimeter}`);
+            log(`Centroid: ${centroid}`);
+        };
+
+        window.testExtrusion = function() {
+            clearOutput();
+            log('=== Testing 3D Extrusion ===');
+
+            const polygon = "POLYGON((0 0, 5 0, 5 5, 0 5, 0 0))";
+            const height = 3;
+
+            log(`Base polygon: ${polygon}`);
+            log(`Height: ${height}`);
+
+            const result = SFCGAL.extrudeDetailed(polygon, height, {});
+
+            log(`\nExtrusion Results:`);
+            log(`Base Area: ${result.baseArea}`);
+            log(`Volume: ${result.volume}`);
+            log(`Perimeter: ${result.perimeter}`);
+            log(`Number of faces: ${result.stats.numFaces}`);
+            log(`Surface Area: ${result.stats.surfaceArea}`);
+        };
+
+        window.testValidation = function() {
+            clearOutput();
+            log('=== Testing Validation ===');
+
+            const validPolygon = "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))";
+            const invalidPolygon = "POLYGON((0 0, 10 0, 10 10))"; // Not closed
+
+            log('Valid polygon test:');
+            log(`Input: ${validPolygon}`);
+            log(`Is valid: ${SFCGAL.isValid(validPolygon)}`);
+            log(`Validation message: ${SFCGAL.validationMessage(validPolygon)}`);
+
+            log('\nInvalid polygon test:');
+            log(`Input: ${invalidPolygon}`);
+            log(`Is valid: ${SFCGAL.isValid(invalidPolygon)}`);
+            log(`Validation message: ${SFCGAL.validationMessage(invalidPolygon)}`);
+
+            log('\nMaking valid:');
+            const fixed = SFCGAL.makeValid(invalidPolygon);
+            log(`Fixed: ${fixed}`);
+            log(`Is now valid: ${SFCGAL.isValid(fixed)}`);
+        };
+
+        window.testOperations = function() {
+            clearOutput();
+            log('=== Testing Boolean Operations ===');
+
+            const poly1 = "POLYGON((0 0, 5 0, 5 5, 0 5, 0 0))";
+            const poly2 = "POLYGON((2.5 2.5, 7.5 2.5, 7.5 7.5, 2.5 7.5, 2.5 2.5))";
+
+            log(`Polygon A: ${poly1}`);
+            log(`Polygon B: ${poly2}`);
+            log('');
+
+            log(`Intersection: ${SFCGAL.intersection(poly1, poly2)}`);
+            log(`Union: ${SFCGAL.union(poly1, poly2)}`);
+            log(`Difference (A - B): ${SFCGAL.difference(poly1, poly2)}`);
+            log(`Symmetric Difference: ${SFCGAL.symDifference(poly1, poly2)}`);
+        };
+
+        window.testAnalysis = function() {
+            clearOutput();
+            log('=== Testing Geometry Analysis ===');
+
+            const polygon = "POLYGON Z ((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0))";
+            log(`Input: ${polygon}`);
+
+            const analysis = SFCGAL.analyze(polygon);
+
+            log('\nAnalysis Results:');
+            log(`Type: ${analysis.type}`);
+            log(`Dimension: ${analysis.dimension}`);
+            log(`Is 3D: ${analysis.is3D}`);
+            log(`Is Valid: ${analysis.isValid}`);
+            log(`Number of points: ${analysis.numPoints}`);
+            log(`Area: ${analysis.area}`);
+            log(`Perimeter: ${analysis.perimeter}`);
+            log(`Number of holes: ${analysis.numHoles}`);
+        };
+
+        window.analyzeCustom = function() {
+            clearOutput();
+            log('=== Analyzing Custom Geometry ===');
+
+            const wkt = document.getElementById('custom-wkt').value;
+
+            if (!wkt) {
+                log('Please enter a WKT geometry');
+                return;
+            }
+
+            log(`Input: ${wkt}`);
+            log('');
+
+            try {
+                // Validation
+                const isValid = SFCGAL.isValid(wkt);
+                log(`Valid: ${isValid}`);
+
+                if (!isValid) {
+                    log(`Validation message: ${SFCGAL.validationMessage(wkt)}`);
+                    const fixed = SFCGAL.makeValid(wkt);
+                    log(`Fixed geometry: ${fixed}`);
+                    return;
+                }
+
+                // Analysis
+                const analysis = SFCGAL.analyze(wkt);
+                log('\nAnalysis:');
+                log(`Type: ${analysis.type}`);
+                log(`Dimension: ${analysis.dimension}`);
+                log(`Is 3D: ${analysis.is3D}`);
+
+                // Measurements
+                if (analysis.type === 'Polygon') {
+                    log(`\nMeasurements:`);
+                    log(`Area: ${SFCGAL.area(wkt)}`);
+                    log(`Perimeter: ${SFCGAL.perimeter(wkt)}`);
+                    log(`Centroid: ${SFCGAL.centroid(wkt)}`);
+
+                    // Try extrusion
+                    const result = SFCGAL.extrudeDetailed(wkt, 5, {});
+                    log(`\nIf extruded by 5 units:`);
+                    log(`Volume would be: ${result.volume}`);
+                    log(`Number of faces: ${result.stats.numFaces}`);
+                }
+
+                // Envelope
+                log(`\nBounding box: ${SFCGAL.envelope(wkt)}`);
+
+            } catch (error) {
+                log(`Error: ${error.message}`);
+            }
+        };
+
+        // Initialize SFCGAL
+        async function init() {
+            try {
+                const module = await import('./sfcgal.js');
+                const Module = await module.default();
+                SFCGAL = new Module.SFCGAL();
+                SFCGAL.initialize();
+
+                const version = SFCGAL.version();
+
+                const status = document.getElementById('status');
+                status.className = 'status ready';
+                status.textContent = `✅ SFCGAL ${version} loaded successfully`;
+
+                // Enable all buttons
+                document.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = false;
+                });
+
+                log(`SFCGAL ${version} ready for testing!`);
+
+            } catch (error) {
+                const status = document.getElementById('status');
+                status.className = 'status error';
+                status.textContent = '❌ Failed to load SFCGAL: ' + error.message;
+                log('Error: ' + error.message);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

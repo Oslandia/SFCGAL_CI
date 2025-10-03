@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centroid 2D - SFCGAL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 5px; }
+        .header p { opacity: 0.9; }
+        .content { padding: 30px; }
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .control-group { margin-bottom: 15px; }
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .control-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover { background: #5a6268; }
+        .results {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .results h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        .result-label { font-weight: 600; color: #555; }
+        .result-value {
+            font-family: 'Courier New', monospace;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        #canvas {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .status-info { background: #fff3cd; color: #856404; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Centroid 2D</h1>
+            <p>Calculate the geometric center (centroid) of 2D geometries using SFCGAL</p>
+        </div>
+
+        <div class="content">
+            <a href="../index.html" class="back-link">← Back to Examples</a>
+
+            <div id="status" class="status status-info">Loading SFCGAL...</div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>Geometry (WKT):</label>
+                    <textarea id="wkt" rows="4">POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))</textarea>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn-primary" onclick="calculate()">Calculate Centroid</button>
+                    <button class="btn-secondary" onclick="loadExample('square')">Square</button>
+                    <button class="btn-secondary" onclick="loadExample('triangle')">Triangle</button>
+                    <button class="btn-secondary" onclick="loadExample('multipoint')">MultiPoint</button>
+                </div>
+            </div>
+
+            <div id="results" class="results">
+                <h3>Results</h3>
+                <div class="result-item">
+                    <span class="result-label">Centroid:</span>
+                    <span class="result-value" id="centroid">-</span>
+                </div>
+            </div>
+
+            <canvas id="canvas" width="800" height="500"></canvas>
+        </div>
+    </div>
+
+    <script type="module">
+        import { loadSFCGAL, showStatus } from '../lib/sfcgal-module.js';
+        import { Canvas2DRenderer } from '../lib/canvas2d-renderer.js';
+
+        let sfcgal;
+        let renderer;
+
+        async function init() {
+            try {
+                sfcgal = await loadSFCGAL();
+                renderer = new Canvas2DRenderer('canvas');
+
+                showStatus('status', '✅ SFCGAL loaded successfully', 'success');
+                setTimeout(() => {
+                    document.getElementById('status').style.display = 'none';
+                }, 2000);
+
+                calculate();
+            } catch (error) {
+                showStatus('status', '❌ Error loading SFCGAL: ' + error.message, 'error');
+            }
+        }
+
+        window.calculate = function() {
+            const wkt = document.getElementById('wkt').value.trim();
+
+            try {
+                const centroidWkt = sfcgal.centroid(wkt);
+
+                document.getElementById('centroid').textContent = centroidWkt;
+                document.getElementById('results').style.display = 'block';
+
+                renderer.clearGeometries();
+                renderer.addGeometry(wkt, { strokeColor: '#667eea', fillColor: 'rgba(102, 126, 234, 0.3)' });
+                renderer.addGeometry(centroidWkt, { strokeColor: '#f06292', fillColor: '#f06292', pointRadius: 6 });
+                renderer.render();
+
+            } catch (error) {
+                showStatus('status', '❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.loadExample = function(type) {
+            const examples = {
+                'square': 'POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))',
+                'triangle': 'POLYGON((0 0, 10 0, 5 8, 0 0))',
+                'multipoint': 'MULTIPOINT((0 0), (10 0), (10 10), (0 10))'
+            };
+
+            document.getElementById('wkt').value = examples[type] || examples['square'];
+            calculate();
+        };
+
+        init();
+    </script>
+</body>
+</html>

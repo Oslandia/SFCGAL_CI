@@ -1,0 +1,30 @@
+# Build directories
+build/
+deps/
+
+# Generated WebAssembly files
+examples/sfcgal.js
+examples/sfcgal.wasm
+
+# Backup files from patching
+*.bak
+
+# Node modules if using npm
+node_modules/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp

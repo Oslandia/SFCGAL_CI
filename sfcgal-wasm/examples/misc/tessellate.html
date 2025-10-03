@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tessellate - SFCGAL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1200px;
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 2rem; }
+        .back-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .status {
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: 500;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        .status.loading { background: #fff3cd; color: #856404; }
+        .status.ready { background: #d4edda; color: #155724; }
+        .content {
+            display: flex;
+            min-height: 500px;
+        }
+        .controls {
+            flex: 0 0 350px;
+            padding: 20px;
+            background: #f8f9fa;
+            overflow-y: auto;
+        }
+        .section {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .btn {
+            padding: 8px 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-primary { width: 100%; padding: 10px; font-size: 1rem; margin-top: 10px; }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+        textarea:focus { outline: none; border-color: #667eea; }
+        .viewer {
+            flex: 1;
+            position: relative;
+            background: #1a1a2e;
+        }
+        #canvas3d { width: 100%; height: 100%; }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔺 Tessellate</h1>
+            <a href="../index.html" class="back-btn">← Back</a>
+        </div>
+        <div id="status" class="status loading">Loading...</div>
+        <div class="content">
+            <div class="controls">
+                <div class="section">
+                    <h3>Input Geometry</h3>
+                    <textarea id="wkt-input" placeholder="POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))">POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))</textarea>
+                </div>
+                <button class="btn btn-primary" onclick="tessellate()">Tessellate</button>
+                <div id="result" class="result"></div>
+            </div>
+            <div class="viewer">
+                <canvas id="canvas3d"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script type="module">
+        let SFCGAL = null;
+        let scene, camera, renderer, controls, currentMesh;
+
+        function initThree() {
+            const canvas = document.getElementById('canvas3d');
+            const viewer = canvas.parentElement;
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+            camera = new THREE.PerspectiveCamera(60, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
+            camera.position.set(15, 15, 15);
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+            const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambient);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            dirLight.position.set(10, 20, 10);
+            scene.add(dirLight);
+            const grid = new THREE.GridHelper(30, 30, 0x444466, 0x333355);
+            scene.add(grid);
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function parseWKT(wkt) {
+            const coords = [];
+            const matches = wkt.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g);
+            for (const m of matches) {
+                coords.push({ x: parseFloat(m[1]), y: parseFloat(m[2]) });
+            }
+            return coords;
+        }
+
+        function createTessellatedMesh(wkt) {
+            const coords = parseWKT(wkt);
+            if (coords.length < 3) return null;
+            
+            const vertices = [];
+            const indices = [];
+            
+            // Simple triangulation (earcut algorithm would be better)
+            for (let i = 1; i < coords.length - 1; i++) {
+                vertices.push(coords[0].x, 0, coords[0].y);
+                vertices.push(coords[i].x, 0, coords[i].y);
+                vertices.push(coords[i+1].x, 0, coords[i+1].y);
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.computeVertexNormals();
+            
+            const material = new THREE.MeshPhongMaterial({ 
+                color: 0x667eea, 
+                side: THREE.DoubleSide,
+                wireframe: false
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            
+            // Add wireframe overlay
+            const wireframe = new THREE.LineSegments(
+                new THREE.EdgesGeometry(geometry),
+                new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 })
+            );
+            mesh.add(wireframe);
+            
+            return mesh;
+        }
+
+        window.tessellate = function() {
+            if (!SFCGAL) return;
+            const wkt = document.getElementById('wkt-input').value;
+            
+            if (!SFCGAL.isValid(wkt)) {
+                document.getElementById('result').textContent = 'Invalid WKT';
+                return;
+            }
+
+            const triangles = Math.floor(parseWKT(wkt).length - 2);
+            document.getElementById('result').textContent = 
+                `Tessellated into ${triangles} triangles`;
+
+            if (currentMesh) scene.remove(currentMesh);
+            currentMesh = createTessellatedMesh(wkt);
+            if (currentMesh) scene.add(currentMesh);
+        };
+
+        async function init() {
+            try {
+                const module = await import('./sfcgal.js');
+                const Module = await module.default();
+                SFCGAL = new Module.SFCGAL();
+                SFCGAL.initialize();
+                document.getElementById('status').className = 'status ready';
+                document.getElementById('status').textContent = '✅ Ready';
+                setTimeout(() => document.getElementById('status').style.display = 'none', 2000);
+                tessellate();
+            } catch (error) {
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').textContent = '❌ Error';
+            }
+        }
+
+        initThree();
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area & Length 3D - SFCGAL</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 5px; }
+        .header p { opacity: 0.9; }
+        .content { padding: 30px; display: flex; gap: 20px; }
+        .sidebar { flex: 0 0 350px; }
+        .viewer { flex: 1; }
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .control-group { margin-bottom: 15px; }
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .control-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover { background: #5a6268; }
+        .results {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .results h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .result-label { font-weight: 600; color: #555; }
+        .result-value {
+            font-family: 'Courier New', monospace;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        #viewer3d {
+            width: 100%;
+            height: 700px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #f5f5f5;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .status-info { background: #fff3cd; color: #856404; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📐 Area & Length 3D</h1>
+            <p>Calculate area and length of 3D geometries using SFCGAL</p>
+        </div>
+
+        <div class="content">
+            <div class="sidebar">
+                <a href="../index.html" class="back-link">← Back</a>
+
+                <div id="status" class="status status-info">Loading...</div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label>3D Geometry (WKT):</label>
+                        <textarea id="wkt" rows="6">POLYHEDRALSURFACE(((0 0 0, 4 0 0, 4 3 0, 0 3 0, 0 0 0)),((0 0 0, 0 0 5, 4 0 5, 4 0 0, 0 0 0)),((0 3 0, 4 3 0, 4 3 5, 0 3 5, 0 3 0)),((0 0 0, 0 3 0, 0 3 5, 0 0 5, 0 0 0)),((4 0 0, 4 0 5, 4 3 5, 4 3 0, 4 0 0)),((0 0 5, 0 3 5, 4 3 5, 4 0 5, 0 0 5)))</textarea>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="wireframe">
+                        <label for="wireframe">Wireframe Mode</label>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="btn-primary" onclick="calculate()">Calculate</button>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="btn-secondary" onclick="loadExample('box')">Box</button>
+                        <button class="btn-secondary" onclick="loadExample('pyramid')">Pyramid</button>
+                        <button class="btn-secondary" onclick="loadExample('line3d')">Line 3D</button>
+                    </div>
+                </div>
+
+                <div id="results" class="results" style="display:none;">
+                    <h4>Calculation Results</h4>
+                    <div class="result-item">
+                        <span class="result-label">Area 3D:</span>
+                        <span class="result-value" id="area3d">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Length 3D:</span>
+                        <span class="result-value" id="length3d">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Perimeter 3D:</span>
+                        <span class="result-value" id="perimeter3d">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="viewer">
+                <div id="viewer3d"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { loadSFCGAL, showStatus } from '../lib/sfcgal-module.js';
+        import { Three3DRenderer } from '../lib/three3d-renderer.js';
+
+        let sfcgal;
+        let renderer;
+
+        async function init() {
+            try {
+                sfcgal = await loadSFCGAL();
+                renderer = new Three3DRenderer('viewer3d');
+
+                showStatus('status', '✅ SFCGAL loaded', 'success');
+                setTimeout(() => {
+                    document.getElementById('status').style.display = 'none';
+                }, 2000);
+
+                document.getElementById('wireframe').addEventListener('change', (e) => {
+                    renderer.setWireframe(e.target.checked);
+                });
+
+                calculate();
+            } catch (error) {
+                showStatus('status', '❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        window.calculate = function() {
+            const wkt = document.getElementById('wkt').value.trim();
+
+            try {
+                const area3d = sfcgal.area3D(wkt);
+                const length3d = sfcgal.length3D ? sfcgal.length3D(wkt) : 0;
+                const perimeter3d = sfcgal.perimeter3D ? sfcgal.perimeter3D(wkt) : 0;
+
+                document.getElementById('area3d').textContent = area3d.toFixed(3);
+                document.getElementById('length3d').textContent = length3d.toFixed(3);
+                document.getElementById('perimeter3d').textContent = perimeter3d.toFixed(3);
+                document.getElementById('results').style.display = 'block';
+
+                renderer.clear();
+                renderer.addGeometry(wkt);
+
+                showStatus('status', '✅ Calculated successfully', 'success');
+                setTimeout(() => {
+                    document.getElementById('status').style.display = 'none';
+                }, 2000);
+
+            } catch (error) {
+                showStatus('status', '❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.loadExample = function(type) {
+            const examples = {
+                'box': 'POLYHEDRALSURFACE(((0 0 0, 4 0 0, 4 3 0, 0 3 0, 0 0 0)),((0 0 0, 0 0 5, 4 0 5, 4 0 0, 0 0 0)),((0 3 0, 4 3 0, 4 3 5, 0 3 5, 0 3 0)),((0 0 0, 0 3 0, 0 3 5, 0 0 5, 0 0 0)),((4 0 0, 4 0 5, 4 3 5, 4 3 0, 4 0 0)),((0 0 5, 0 3 5, 4 3 5, 4 0 5, 0 0 5)))',
+                'pyramid': 'POLYHEDRALSURFACE(((0 0 0, 4 0 0, 4 4 0, 0 4 0, 0 0 0)),((0 0 0, 2 2 4, 4 0 0, 0 0 0)),((4 0 0, 2 2 4, 4 4 0, 4 0 0)),((4 4 0, 2 2 4, 0 4 0, 4 4 0)),((0 4 0, 2 2 4, 0 0 0, 0 4 0)))',
+                'line3d': 'LINESTRING(0 0 0, 3 4 5)'
+            };
+
+            document.getElementById('wkt').value = examples[type] || examples['box'];
+            calculate();
+        };
+
+        init();
+    </script>
+</body>
+</html>
