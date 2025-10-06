@@ -61,6 +61,7 @@ const uint32_t wkbM    = 0x40000000;
 const uint32_t wkbZ    = 0x80000000;
 /// @} end of private section
 
+// NOLINTBEGIN(performance-enum-size)
 /**
  * [OGC/SFA]8.2.3 "A common list of codes for geometric types"
  *
@@ -110,6 +111,7 @@ enum CoordinateType {
   COORDINATE_XYM  = 2000,
   COORDINATE_XYZM = 3000
 };
+// NOLINTEND(performance-enum-size)
 
 /**
  * @brief OGC/SFA based Geometry abstract class
@@ -301,9 +303,11 @@ public:
    * Equality operator
    * @todo only compare coordinate points
    * @pre the two geometries must be valid
+   * @param other the other geometry to compare with
+   * @param tolerance allowed tolerance
    */
-  [[nodiscard]] auto
-  almostEqual(const Geometry & /*other*/, double tolerance) const -> bool;
+  [[nodiscard]] virtual auto
+  almostEqual(const Geometry &other, double tolerance) const -> bool;
 
   /**
    * @brief [OGC/SFA]Gets the number of geometries in a collection of geometries
@@ -316,16 +320,20 @@ public:
    * @brief [OGC/SFA]Returns the n-th geometry
    * @warning *this for Point, LineString, Polygon, PolyhedralSurface, Triangle,
    * TriangulatedSurface
+   * @param idx The zero-based index of the geometry to retrieve. Must be less
+   * than the total number of geometries contained in the collection.
    */
   [[nodiscard]] virtual auto
-  geometryN(size_t const &n) const -> const Geometry &;
+  geometryN(size_t const &idx) const -> const Geometry &;
   /**
    * @brief [OGC/SFA]Returns the n-th geometry
    * @warning *this for Point, LineString, Polygon, PolyhedralSurface, Triangle,
    * TriangulatedSurface
+   * @param idx The zero-based index of the geometry to retrieve. Must be less
+   * than the total number of geometries contained in the collection.
    */
   virtual auto
-  geometryN(size_t const &n) -> Geometry &;
+  geometryN(size_t const &idx) -> Geometry &;
 
   /**
    * @brief [OGC/SFA]Sets the n-th geometry, starting at zero
