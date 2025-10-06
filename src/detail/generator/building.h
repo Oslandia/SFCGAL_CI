@@ -23,6 +23,12 @@ namespace generator {
 /**
  * @brief Basic building generator relying on a straight skeleton
  *
+ * @param g Input geometry
+ * @param wallHeight wall height
+ * @param roofSlope roof slope
+ * @return A new geometry representing a building with wall height and roof
+ * slope
+ *
  * @warning only supports Polygon and MultiPolygon
  * @todo unittest
  */

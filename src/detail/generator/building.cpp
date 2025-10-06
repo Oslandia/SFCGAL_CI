@@ -19,6 +19,10 @@
 
 namespace SFCGAL::generator {
 
+/// @{
+/// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 using Straight_skeleton_2 = CGAL::Straight_skeleton_2<Kernel>;
 
 /**
@@ -69,11 +73,11 @@ building(const Polygon &g, const Kernel::FT &wallHeight,
 
   // fix orientation
   SFCGAL::algorithm::makeValidOrientation(polygon);
-#if CGAL_VERSION_MAJOR < 6
+  #if CGAL_VERSION_MAJOR < 6
   boost::shared_ptr<Straight_skeleton_2> const skeleton =
-#else
+  #else
   std::shared_ptr<Straight_skeleton_2> const skeleton =
-#endif
+  #endif
       create_interior_straight_skeleton_2(
           polygon.outer_boundary().vertices_begin(),
           polygon.outer_boundary().vertices_end(), polygon.holes_begin(),
@@ -143,6 +147,13 @@ building(const MultiPolygon &g, const Kernel::FT &wallHeight,
 
   return std::unique_ptr<Geometry>(multiSolid.release());
 }
+
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
+// ----------------------------------------------------------------------------------
+// -- public interface
+// ----------------------------------------------------------------------------------
+/// @publicsection
 
 auto
 building(const Geometry &g, const Kernel::FT &wallHeight,
