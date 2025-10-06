@@ -32,9 +32,9 @@ namespace generator {
  * @warning only supports Polygon and MultiPolygon
  * @todo unittest
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           building(const Geometry &g, const Kernel::FT &wallHeight,
-                    const Kernel::FT &roofSlope);
+SFCGAL_API auto
+building(const Geometry &g, const Kernel::FT &wallHeight,
+         const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>;
 
 } // namespace generator
 } // namespace SFCGAL
