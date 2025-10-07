@@ -40,19 +40,26 @@ public:
    */
   virtual ~MultiPolygon();
 
-  //-- SFCGAL::Geometry
+  /**
+   * @copydoc SFCGAL::Geometry::clone()
+   */
   MultiPolygon *
   clone() const override;
 
-  //-- SFCGAL::Geometry
+  /**
+   * @copydoc SFCGAL::Geometry::geometryType()
+   */
   std::string
   geometryType() const override;
-  //-- SFCGAL::Geometry
+  /**
+   * @copydoc SFCGAL::Geometry::geometryTypeId()
+   */
   GeometryType
   geometryTypeId() const override;
 
   /**
    * returns the n-th Geometry as a Polygon
+   * @param n index of the polygon
    */
   inline Polygon &
   polygonN(const size_t &n)
@@ -61,6 +68,7 @@ public:
   }
   /**
    * returns the n-th Geometry as a Polygon
+   * @param n index of the polygon
    */
   inline const Polygon &
   polygonN(const size_t &n) const
@@ -70,10 +78,14 @@ public:
 
   //-- visitors
 
-  //-- SFCGAL::Geometry
+  /**
+   * @copydoc SFCGAL::Geometry::accept()
+   */
   void
   accept(GeometryVisitor &visitor) override;
-  //-- SFCGAL::Geometry
+  /**
+   * @copydoc SFCGAL::Geometry::accept()
+   */
   void
   accept(ConstGeometryVisitor &visitor) const override;
 
@@ -88,7 +100,9 @@ public:
   }
 
 protected:
-  //-- SFCGAL::GeometryCollection
+  /**
+   * @copydoc SFCGAL::GeometryCollection::isAllowed()
+   */
   bool
   isAllowed(Geometry const &g) override;
 };
