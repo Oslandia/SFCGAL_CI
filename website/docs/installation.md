@@ -58,18 +58,20 @@ Default building options should work out-of-the-box. You may want to fine-tune t
 
 ## Build options (CMake options)
 
-| Option Name              | Default   | Description                                                                                               |
-| ------------------------ | --------- | --------------------------------------------------------------------------------------------------------- |
-| `CMAKE_INSTALL_PREFIX`    | /usr/local | Specifies where SFCGAL will be installed when `make install` is invoked                                    |
-| `CMAKE_BUILD_TYPE`        | Release   | Switches between a `Release` build for speed efficiency and a `Debug` build for development (slower, with assertions) |
-| `SFCGAL_BUILD_VIEWER`     | OFF       | Turn to `ON` to build the viewer and conversion tools (viewer-SFCGAL)                                      |
-| `SFCGAL_BUILD_TESTS`      | OFF       | Turn to `ON` to build unit and regression tests (run tests with `unit-test-SFCGAL`, etc.)                  |
-| `SFCGAL_BUILD_EXAMPLES`   | OFF       | Turn to `ON` to build examples                                                                             |
-| `SFCGAL_BUILD_BENCH`      | OFF       | Turn to `ON` to build benchmark tests                                                                      |
-| `SFCGAL_WARNING_AS_ERROR` | OFF       | Turn to `ON` to convert build warnings into errors                                                         |
-| `SFCGAL_BUILD_WITH_GPROF` | OFF       | Turn to `ON` to build with GNU gprof                                                                       |
-| `SFCGAL_USE_STATIC_LIBS`  | OFF       | Turn to `ON` to compile as a static library                                                                |
-| `SFCGAL_VALGRIND`         | OFF       | Turn to `ON` to compile with Valgrind support (Debug only)                                                 |
+| Option Name               | Default    | Description                                                                                                           |
+| ------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------- |
+| `CMAKE_INSTALL_PREFIX`    | /usr/local | Specifies where SFCGAL will be installed when `make install` is invoked                                               |
+| `CMAKE_BUILD_TYPE`        | Release    | Switches between a `Release` build for speed efficiency and a `Debug` build for development (slower, with assertions) |
+| `SFCGAL_BUILD_BENCH`      | OFF        | Turn to `ON` to build benchmark tests                                                                                 |
+| `SFCGAL_BUILD_DOC`        | OFF        | Turn to `ON` to build documentation                                                                                   |
+| `SFCGAL_BUILD_EXAMPLES`   | OFF        | Turn to `ON` to build examples                                                                                        |
+| `SFCGAL_BUILD_TESTS`      | OFF        | Turn to `ON` to build unit and regression tests (run tests with `unit-test-SFCGAL`, etc.)                             |
+| `SFCGAL_BUILD_WITH_GPROF` | OFF        | Turn to `ON` to build with GNU gprof                                                                                  |
+| `SFCGAL_TSAN`             | OFF        | Turn to `ON` to enable ThreadSanitizer (Debug only)                                                                   |
+| `SFCGAL_USE_STATIC_LIBS`  | OFF        | Turn to `ON` to compile as a static library                                                                           |
+| `SFCGAL_VALGRIND`         | OFF        | Turn to `ON` to compile with Valgrind support (Debug only)                                                            |
+| `SFCGAL_WARNING_AS_ERROR` | OFF        | Turn to `ON` to convert build warnings into errors                                                                    |
+| `SFCGAL_WITH_OSG`         | OFF        | Turn to `ON` to build with OpenSceneGraph support                                                                     |
 
 ## Installation with PostGIS
 
