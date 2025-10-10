@@ -76,9 +76,17 @@ public:
   auto
   generatePolyhedralSurface() const -> PolyhedralSurface override;
 
+  /**
+   * @copydoc SFCGAL::Primitive::volume
+   * @note only perfect primitive version is available
+   */
   [[nodiscard]] auto
   volume(bool withDiscretization = false) const -> double override;
 
+  /**
+   * @copydoc SFCGAL::Primitive::area3D
+   * @note only perfect primitive version is available
+   */
   [[nodiscard]] auto
   area3D(bool withDiscretization = false) const -> double override;
 

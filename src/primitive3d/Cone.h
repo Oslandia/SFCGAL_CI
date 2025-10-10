@@ -125,23 +125,9 @@ public:
   auto
   generatePolyhedralSurface() const -> PolyhedralSurface override;
 
-  /**
-   * @brief Returns the cone volume
-   * @param withDiscretization If true, the volume is computed
-   * using the real discretization with radial segments. If false, the volume is
-   * computed for a perfect cone. Defaults to false.
-   * @return The cone volume
-   */
   [[nodiscard]] auto
   volume(bool withDiscretization = false) const -> double override;
 
-  /**
-   * @brief Returns the cone area
-   * @param withDiscretization If true, the area is computed
-   * using the real discretization with radial segments. If false, the area is
-   * computed for a perfect cone. Defaults to false.
-   * @return The cone volume
-   */
   [[nodiscard]] auto
   area3D(bool withDiscretization = false) const -> double override;
 
