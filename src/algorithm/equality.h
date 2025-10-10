@@ -156,7 +156,7 @@ protected:
 SFCGAL_API auto
 almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
             EqualityStrictness strictOrder =
-                EqualityStrictness::pointNonOrdered()) -> bool;
+                EqualityStrictness::allPointOrdered()) -> bool;
 
 } // namespace algorithm
 } // namespace SFCGAL
