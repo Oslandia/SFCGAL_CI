@@ -1,0 +1,65 @@
+name: Build with MSVC
+
+on: [push, pull_request]
+
+jobs:
+  build-msvc:
+    name: Windows MSVC Release - ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022]
+        arch: [x64]
+        include:
+          - os: windows-2022
+            triplet: x64-windows
+
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Restore from cache and run vcpkg
+        uses: lukka/run-vcpkg@v11
+        id: runvcpkg
+
+      - name: Configure CMake with MSVC
+        uses: lukka/run-cmake@v10
+        id: runcmake_configure
+        with:
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          configurePreset: 'msbuild-vcpkg'
+
+      - name: Build with MSVC
+        uses: lukka/run-cmake@v10
+        id: runcmake_build
+        with:
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          buildPreset: 'msbuild-vcpkg'
+          buildPresetAdditionalArgs: '[`--config Release`]'
+
+      - name: Test with CTest
+        working-directory: ${{ github.workspace }}/builds/msbuild-vcpkg
+        run: ctest -C Release --output-on-failure --verbose
+        continue-on-error: false
+
+      - name: Install
+        working-directory: ${{ github.workspace }}/builds/msbuild-vcpkg
+        run: cmake --install . --config Release --prefix ${{ github.workspace }}/install
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sfcgal-msvc-${{ matrix.arch }}-Release
+          path: ${{ github.workspace }}/install
+          retention-days: 7
