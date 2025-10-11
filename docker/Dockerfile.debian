@@ -7,6 +7,7 @@ WORKDIR /SFCGAL
 
 COPY src ./src
 COPY test ./test
+COPY sfcgalop ./sfcgalop
 COPY CMakeLists.txt SFCGALConfig.cmake.in sfcgal.pc.in sfcgal-config.in ci/debian/before_install.sh ./
 
 RUN apt update -qq && \
