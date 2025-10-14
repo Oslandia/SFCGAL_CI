@@ -59,7 +59,7 @@ public:
   /**
    * @brief Destructor
    */
-  ~Sphere() = default;
+  ~Sphere() override = default;
 
   [[nodiscard]] auto
   primitiveType() const -> std::string override;
@@ -237,10 +237,9 @@ private:
   get_orthogonal_vector(const Kernel::Vector_3 &vec) -> Kernel::Vector_3
   {
     if (vec.x() != 0 || vec.y() != 0) {
-      return Kernel::Vector_3(-vec.y(), vec.x(), 0);
-    } else {
-      return Kernel::Vector_3(0, -vec.z(), vec.y());
+      return {-vec.y(), vec.x(), 0};
     }
+    return {0, -vec.z(), vec.y()};
   }
 };
 

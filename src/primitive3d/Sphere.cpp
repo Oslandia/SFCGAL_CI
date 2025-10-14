@@ -40,7 +40,7 @@ public:
   {
     CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
 
-    int num_vertices = (num_vertical - 1) * num_horizontal + 2;
+    int num_vertices = ((num_vertical - 1) * num_horizontal) + 2;
     int num_faces    = num_vertical * num_horizontal * 2;
 
     B.begin_surface(num_vertices, num_faces);
@@ -99,7 +99,7 @@ private:
     for (unsigned int j = 0; j < num_horizontal; ++j) {
       B.begin_facet();
       B.add_vertex_to_facet(0);
-      B.add_vertex_to_facet(1 + (j + 1) % num_horizontal);
+      B.add_vertex_to_facet(1 + ((j + 1) % num_horizontal));
       B.add_vertex_to_facet(1 + j);
       B.end_facet();
     }
@@ -110,10 +110,10 @@ private:
   {
     for (unsigned int i = 1; i < num_vertical - 1; ++i) {
       for (unsigned int j = 0; j < num_horizontal; ++j) {
-        int current = 1 + (i - 1) * num_horizontal + j;
-        int next    = 1 + (i - 1) * num_horizontal + (j + 1) % num_horizontal;
-        int below_current = 1 + i * num_horizontal + j;
-        int below_next    = 1 + i * num_horizontal + (j + 1) % num_horizontal;
+        int current = 1 + ((i - 1) * num_horizontal) + j;
+        int next = 1 + ((i - 1) * num_horizontal) + ((j + 1) % num_horizontal);
+        int below_current = 1 + (i * num_horizontal) + j;
+        int below_next = 1 + (i * num_horizontal) + ((j + 1) % num_horizontal);
 
         B.begin_facet();
         B.add_vertex_to_facet(current);
@@ -139,7 +139,7 @@ private:
       B.begin_facet();
       B.add_vertex_to_facet(last_vertex);
       B.add_vertex_to_facet(last_row + j);
-      B.add_vertex_to_facet(last_row + (j + 1) % num_horizontal);
+      B.add_vertex_to_facet(last_row + ((j + 1) % num_horizontal));
       B.end_facet();
     }
   }
@@ -285,14 +285,14 @@ Sphere::generateSpherePoints() const -> std::vector<Point_3>
 }
 
 auto
-Sphere::volume(bool) const -> double
+Sphere::volume(bool /*withDiscretization*/) const -> double
 {
   return CGAL::to_double((4.0 / 3.0) * radius() * radius() * radius() *
                          CGAL_PI);
 }
 
 auto
-Sphere::area3D(bool) const -> double
+Sphere::area3D(bool /*withDiscretization*/) const -> double
 {
   return CGAL::to_double(4 * radius() * radius() * CGAL_PI);
 }

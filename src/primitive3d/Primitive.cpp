@@ -128,11 +128,8 @@ Primitive::almostEqual(const Primitive &other, double epsilon) const -> bool
           if constexpr (std::is_same_v<T, FT> ||
                         std::is_same_v<T, unsigned int>) {
             return SFCGAL::almostEqual(value1, value2, epsilon);
-          } else if constexpr (std::is_same_v<T, Point_3>) {
-            return SFCGAL::almostEqual(value1.x(), value2.x(), epsilon) &&
-                   SFCGAL::almostEqual(value1.y(), value2.y(), epsilon) &&
-                   SFCGAL::almostEqual(value1.z(), value2.z(), epsilon);
-          } else if constexpr (std::is_same_v<T, Vector_3>) {
+          } else if constexpr (std::is_same_v<T, Point_3> ||
+                               std::is_same_v<T, Vector_3>) {
             return SFCGAL::almostEqual(value1.x(), value2.x(), epsilon) &&
                    SFCGAL::almostEqual(value1.y(), value2.y(), epsilon) &&
                    SFCGAL::almostEqual(value1.z(), value2.z(), epsilon);

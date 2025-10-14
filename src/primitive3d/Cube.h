@@ -90,7 +90,7 @@ public:
   [[nodiscard]] auto
   area3D(bool withDiscretization = false) const -> double override;
 
-  [[nodiscard]] virtual auto
+  [[nodiscard]] auto
   toString() const -> std::string override;
 
 protected:

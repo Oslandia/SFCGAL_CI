@@ -173,8 +173,8 @@ public:
    * \param prim primitive to print via Primitive::toString()
    * \return filled stream
    */
-  friend std::ostream &
-  operator<<(std::ostream &out, const Primitive &prim)
+  friend auto
+  operator<<(std::ostream &out, const Primitive &prim) -> std::ostream &
   {
     // Call virtual function toString() to get the string to be printed
     out << prim.toString();

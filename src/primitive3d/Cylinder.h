@@ -61,7 +61,7 @@ public:
   /**
    * @brief Destructor
    */
-  ~Cylinder() = default;
+  ~Cylinder() override = default;
 
   /**
    * @brief Sets the base center of the cylinder

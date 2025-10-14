@@ -133,14 +133,14 @@ Box::generatePolyhedralSurface() const -> PolyhedralSurface
 }
 
 auto
-Box::area3D(bool) const -> double
+Box::area3D(bool /*withDiscretization*/) const -> double
 {
   return CGAL::to_double(2 * (xExtent() * yExtent() + yExtent() * zExtent() +
                               zExtent() * xExtent()));
 }
 
 auto
-Box::volume(bool) const -> double
+Box::volume(bool /*withDiscretization*/) const -> double
 {
   return CGAL::to_double(xExtent() * yExtent() * zExtent());
 }

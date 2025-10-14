@@ -59,7 +59,7 @@ public:
   /**
    * @brief Destructor
    */
-  ~Torus() = default;
+  ~Torus() override = default;
 
   /**
    * @brief Sets the main radius of the torus

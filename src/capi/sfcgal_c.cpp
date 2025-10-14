@@ -2437,17 +2437,17 @@ struct PrimitiveParameterDesc {
 
 // deserialize json to PrimitiveParameterDesc
 void
-from_json(const nlohmann::json &j, PrimitiveParameterDesc &p)
+from_json(const nlohmann::json &jsonObject, PrimitiveParameterDesc &desc)
 {
-  j.at("name").get_to(p.name);
-  j.at("type").get_to(p.type);
-  if (j.contains("value")) {
-    nlohmann::json value = j.at("value");
-    if (p.type == "int") {
-      p.value = value.get<unsigned int>();
-    } else if (p.type == "double") {
-      p.value = value.get<double>();
-    } else if (p.type == "point3") {
+  jsonObject.at("name").get_to(desc.name);
+  jsonObject.at("type").get_to(desc.type);
+  if (jsonObject.contains("value")) {
+    const nlohmann::json &value = jsonObject.at("value");
+    if (desc.type == "int") {
+      desc.value = value.get<unsigned int>();
+    } else if (desc.type == "double") {
+      desc.value = value.get<double>();
+    } else if (desc.type == "point3") {
       std::vector<double> vect;
       vect = value.get<std::vector<double>>();
       Kernel::Point_3 point(
@@ -2456,54 +2456,57 @@ from_json(const nlohmann::json &j, PrimitiveParameterDesc &p)
                            : std::numeric_limits<double>::quiet_NaN()), //
           (vect.size() > 3 ? vect[3]
                            : std::numeric_limits<double>::quiet_NaN()));
-      p.value = point;
-    } else if (p.type == "vector3") {
+      desc.value = point;
+    } else if (desc.type == "vector3") {
       std::vector<double> vect;
       vect = value.get<std::vector<double>>();
       Kernel::Vector_3 point(vect[0], vect[1], //
                              (vect.size() > 2
                                   ? vect[2]
                                   : std::numeric_limits<double>::quiet_NaN()));
-      p.value = point;
-    } else
+      desc.value = point;
+    } else {
       throw nlohmann::json::type_error::create(
-          306, (boost::format("Unknown type '%1%'.") % p.type).str(), nullptr);
+          306, (boost::format("Unknown type '%1%'.") % desc.type).str(),
+          nullptr);
+    }
   }
 }
 
 // serialize PrimitiveParameterDesc to json
 void
-to_json(nlohmann::json &param, const PrimitiveParameterDesc &desc)
+to_json(nlohmann::json &jsonObject, const PrimitiveParameterDesc &desc)
 {
-  param["name"] = desc.name;
+  jsonObject["name"] = desc.name;
   if (std::holds_alternative<SFCGAL::Kernel::FT>(desc.value)) {
-    param["type"] = "double";
+    jsonObject["type"] = "double";
   } else if (std::holds_alternative<unsigned int>(desc.value)) {
-    param["type"] = "int";
+    jsonObject["type"] = "int";
   } else if (std::holds_alternative<SFCGAL::Kernel::Point_3>(desc.value)) {
-    param["type"] = "point3";
+    jsonObject["type"] = "point3";
   } else if (std::holds_alternative<SFCGAL::Kernel::Vector_3>(desc.value)) {
-    param["type"] = "vector3";
+    jsonObject["type"] = "vector3";
   } else {
-    param["type"] = "unknown";
+    jsonObject["type"] = "unknown";
   }
 
   if (std::holds_alternative<SFCGAL::Kernel::FT>(desc.value)) {
-    param["value"] = CGAL::to_double(std::get<SFCGAL::Kernel::FT>(desc.value));
+    jsonObject["value"] =
+        CGAL::to_double(std::get<SFCGAL::Kernel::FT>(desc.value));
   } else if (std::holds_alternative<unsigned int>(desc.value)) {
-    param["value"] = std::get<unsigned int>(desc.value);
+    jsonObject["value"] = std::get<unsigned int>(desc.value);
   } else if (std::holds_alternative<SFCGAL::Kernel::Point_3>(desc.value)) {
     SFCGAL::Kernel::Point_3 point =
         std::get<SFCGAL::Kernel::Point_3>(desc.value);
-    param["value"] = std::vector<double>{CGAL::to_double(point.x()),
-                                         CGAL::to_double(point.y()),
-                                         CGAL::to_double(point.z())};
+    jsonObject["value"] = std::vector<double>{CGAL::to_double(point.x()),
+                                              CGAL::to_double(point.y()),
+                                              CGAL::to_double(point.z())};
   } else if (std::holds_alternative<SFCGAL::Kernel::Vector_3>(desc.value)) {
     SFCGAL::Kernel::Vector_3 point =
         std::get<SFCGAL::Kernel::Vector_3>(desc.value);
-    param["value"] = std::vector<double>{CGAL::to_double(point.x()),
-                                         CGAL::to_double(point.y()),
-                                         CGAL::to_double(point.z())};
+    jsonObject["value"] = std::vector<double>{CGAL::to_double(point.x()),
+                                              CGAL::to_double(point.y()),
+                                              CGAL::to_double(point.z())};
   }
 }
 

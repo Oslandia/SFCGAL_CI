@@ -186,13 +186,13 @@ Cylinder::generatePolyhedralSurface() const -> PolyhedralSurface
 }
 
 auto
-Cylinder::volume(bool) const -> double
+Cylinder::volume(bool /*withDiscretization*/) const -> double
 {
   return CGAL::to_double(radius() * radius() * height() * CGAL_PI);
 }
 
 auto
-Cylinder::area3D(bool) const -> double
+Cylinder::area3D(bool /*withDiscretization*/) const -> double
 {
   return CGAL::to_double(2 * radius() * radius() * CGAL_PI +
                          2 * radius() * height() * CGAL_PI);

@@ -22,11 +22,7 @@ Torus::Torus(const Kernel::FT &main_radius, const Kernel::FT &tube_radius,
 }
 
 auto
-Torus::operator=(Torus &other) -> Torus &
-{
-  Primitive::operator=(other);
-  return *this;
-}
+Torus::operator=(Torus &other) -> Torus & = default;
 
 auto
 Torus::primitiveType() const -> std::string
@@ -117,14 +113,14 @@ Torus::generatePolyhedralSurface() const -> PolyhedralSurface
 }
 
 auto
-Torus::area3D(bool) const -> double
+Torus::area3D(bool /*withDiscretization*/) const -> double
 {
   return 4.0 * std::pow(CGAL_PI, 2) *
          CGAL::to_double(mainRadius() * tubeRadius());
 }
 
 auto
-Torus::volume(bool) const -> double
+Torus::volume(bool /*withDiscretization*/) const -> double
 {
   return 2.0 * std::pow(CGAL_PI, 2) *
          CGAL::to_double(mainRadius() * tubeRadius() * tubeRadius());
