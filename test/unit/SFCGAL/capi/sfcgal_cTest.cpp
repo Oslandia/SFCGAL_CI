@@ -1102,6 +1102,87 @@ BOOST_AUTO_TEST_CASE(testRotate3D)
   sfcgal_geometry_delete(rotated);
 }
 
+BOOST_AUTO_TEST_CASE(testTransform)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  std::unique_ptr<Geometry> const multiPolygon(io::readWkt(
+      "MULTIPOLYGON Z (((0 0 0, 20 0 0, 20 10 0, 0 10 0, 0 0 0))," //
+      "((25 5 1, 30 5 1, 30 15 1, 25 15 1, 25 5 1)))"));
+
+  // translate
+  {
+    float mat[] = {1, 0, 0, 0, //
+                   0, 1, 0, 0, //
+                   0, 0, 1, 0, //
+                   1, 2, 3, 1};
+
+    hasError = false;
+    sfcgal_geometry_t *result =
+        sfcgal_geometry_transform(multiPolygon.get(), mat);
+    BOOST_CHECK(hasError == false);
+
+    char  *wkt;
+    size_t len;
+    sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
+    BOOST_CHECK_EQUAL(
+        std::string(wkt),
+        "MULTIPOLYGON Z (((1 2 3,21 2 3,21 12 3,1 12 3,1 2 3))," //
+        "((26 7 4,31 7 4,31 17 4,26 17 4,26 7 4)))");
+
+    sfcgal_free_buffer(wkt);
+    sfcgal_geometry_delete(result);
+  }
+
+  // scale
+  {
+    float mat[] = {1, 0, 0, 0, //
+                   0, 2, 0, 0, //
+                   0, 0, 3, 0, //
+                   0, 0, 0, 1};
+
+    hasError = false;
+    sfcgal_geometry_t *result =
+        sfcgal_geometry_transform(multiPolygon.get(), mat);
+    BOOST_CHECK(hasError == false);
+
+    char  *wkt;
+    size_t len;
+    sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
+    BOOST_CHECK_EQUAL(
+        std::string(wkt),
+        "MULTIPOLYGON Z (((0 0 0,20 0 0,20 20 0,0 20 0,0 0 0))," //
+        "((25 10 3,30 10 3,30 30 3,25 30 3,25 10 3)))");
+
+    sfcgal_free_buffer(wkt);
+    sfcgal_geometry_delete(result);
+  }
+
+  // rotate
+  {
+    float mat[] = {-1.0e-07, 1.0,      0.0, 0.0, //
+                   -1.0,     -1.0e-07, 0.0, 0.0, //
+                   0.0,      0.0,      1.0, 0.0, //
+                   0.0,      0.0,      0.0, 1.0};
+
+    hasError = false;
+    sfcgal_geometry_t *result =
+        sfcgal_geometry_transform(multiPolygon.get(), mat);
+    BOOST_CHECK(hasError == false);
+
+    char  *wkt;
+    size_t len;
+    sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
+    BOOST_CHECK_EQUAL(
+        std::string(wkt),
+        "MULTIPOLYGON Z (((0 0 0,0 20 0,-10 20 0,-10 0 0,0 0 0))," //
+        "((-5 25 1,-5 30 1,-15 30 1,-15 25 1,-5 25 1)))");
+
+    sfcgal_free_buffer(wkt);
+    sfcgal_geometry_delete(result);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(testEnvelope2D)
 {
   sfcgal_set_error_handlers(printf, on_error);

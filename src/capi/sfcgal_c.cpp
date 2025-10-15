@@ -74,6 +74,7 @@
 #include "SFCGAL/algorithm/union.h"
 #include "SFCGAL/algorithm/visibility.h"
 #include "SFCGAL/algorithm/volume.h"
+#include "SFCGAL/detail/transform/AffineTransform3.h"
 #include "SFCGAL/triangulate/triangulate2DZ.h"
 
 #include "SFCGAL/detail/transform/ForceOrderPoints.h"
@@ -81,9 +82,7 @@
 #include "SFCGAL/detail/transform/RoundTransform.h"
 #include <cmath>
 
-#include <format>
 #include <nlohmann/json.hpp>
-// using json = nlohmann::json;
 
 //
 // Note about sfcgal_geometry_t pointers: they are basically void* pointers that
@@ -1934,6 +1933,29 @@ sfcgal_geometry_translate_3d(const sfcgal_geometry_t *geom, double dx,
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
+
+  return gb;
+}
+
+extern "C" auto
+sfcgal_geometry_transform(const sfcgal_geometry_t *geom, const float *matrix4x4)
+    -> sfcgal_geometry_t *
+{
+  const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  SFCGAL::Geometry *gb = g->clone();
+
+  // row by row
+  CGAL::Aff_transformation_3<SFCGAL::Kernel> transf(
+      matrix4x4[0 * 4 + 0], matrix4x4[1 * 4 + 0], matrix4x4[2 * 4 + 0],
+      matrix4x4[3 * 4 + 0], //
+      matrix4x4[0 * 4 + 1], matrix4x4[1 * 4 + 1], matrix4x4[2 * 4 + 1],
+      matrix4x4[3 * 4 + 1], //
+      matrix4x4[0 * 4 + 2], matrix4x4[1 * 4 + 2], matrix4x4[2 * 4 + 2],
+      matrix4x4[3 * 4 + 2], //
+      matrix4x4[3 * 4 + 3]);
+
+  SFCGAL::transform::AffineTransform3 visitor(transf);
+  gb->accept(visitor);
 
   return gb;
 }
