@@ -1112,14 +1112,14 @@ BOOST_AUTO_TEST_CASE(testTransform)
 
   // translate
   {
-    float mat[] = {1, 0, 0, 0, //
-                   0, 1, 0, 0, //
-                   0, 0, 1, 0, //
-                   1, 2, 3, 1};
+    std::array<float, 16> mat = {1, 0, 0, 0, //
+                                 0, 1, 0, 0, //
+                                 0, 0, 1, 0, //
+                                 1, 2, 3, 1};
 
     hasError = false;
     sfcgal_geometry_t *result =
-        sfcgal_geometry_transform(multiPolygon.get(), mat);
+        sfcgal_geometry_transform(multiPolygon.get(), mat.data());
     BOOST_CHECK(hasError == false);
 
     char  *wkt;
@@ -1136,14 +1136,14 @@ BOOST_AUTO_TEST_CASE(testTransform)
 
   // scale
   {
-    float mat[] = {1, 0, 0, 0, //
-                   0, 2, 0, 0, //
-                   0, 0, 3, 0, //
-                   0, 0, 0, 1};
+    std::array<float, 16> mat = {1, 0, 0, 0, //
+                                 0, 2, 0, 0, //
+                                 0, 0, 3, 0, //
+                                 0, 0, 0, 1};
 
     hasError = false;
     sfcgal_geometry_t *result =
-        sfcgal_geometry_transform(multiPolygon.get(), mat);
+        sfcgal_geometry_transform(multiPolygon.get(), mat.data());
     BOOST_CHECK(hasError == false);
 
     char  *wkt;
@@ -1160,14 +1160,14 @@ BOOST_AUTO_TEST_CASE(testTransform)
 
   // rotate
   {
-    float mat[] = {-1.0e-07, 1.0,      0.0, 0.0, //
-                   -1.0,     -1.0e-07, 0.0, 0.0, //
-                   0.0,      0.0,      1.0, 0.0, //
-                   0.0,      0.0,      0.0, 1.0};
+    std::array<float, 16> mat = {-1.0e-07, 1.0,      0.0, 0.0, //
+                                 -1.0,     -1.0e-07, 0.0, 0.0, //
+                                 0.0,      0.0,      1.0, 0.0, //
+                                 0.0,      0.0,      0.0, 1.0};
 
     hasError = false;
     sfcgal_geometry_t *result =
-        sfcgal_geometry_transform(multiPolygon.get(), mat);
+        sfcgal_geometry_transform(multiPolygon.get(), mat.data());
     BOOST_CHECK(hasError == false);
 
     char  *wkt;

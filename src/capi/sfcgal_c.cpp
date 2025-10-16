@@ -1946,13 +1946,13 @@ sfcgal_geometry_transform(const sfcgal_geometry_t *geom, const float *matrix4x4)
 
   // row by row
   CGAL::Aff_transformation_3<SFCGAL::Kernel> transf(
-      matrix4x4[0 * 4 + 0], matrix4x4[1 * 4 + 0], matrix4x4[2 * 4 + 0],
-      matrix4x4[3 * 4 + 0], //
-      matrix4x4[0 * 4 + 1], matrix4x4[1 * 4 + 1], matrix4x4[2 * 4 + 1],
-      matrix4x4[3 * 4 + 1], //
-      matrix4x4[0 * 4 + 2], matrix4x4[1 * 4 + 2], matrix4x4[2 * 4 + 2],
-      matrix4x4[3 * 4 + 2], //
-      matrix4x4[3 * 4 + 3]);
+      matrix4x4[(0 * 4) + 0], matrix4x4[(1 * 4) + 0], matrix4x4[(2 * 4) + 0],
+      matrix4x4[(3 * 4) + 0], //
+      matrix4x4[(0 * 4) + 1], matrix4x4[(1 * 4) + 1], matrix4x4[(2 * 4) + 1],
+      matrix4x4[(3 * 4) + 1], //
+      matrix4x4[(0 * 4) + 2], matrix4x4[(1 * 4) + 2], matrix4x4[(2 * 4) + 2],
+      matrix4x4[(3 * 4) + 2], //
+      matrix4x4[(3 * 4) + 3]);
 
   SFCGAL::transform::AffineTransform3 visitor(transf);
   gb->accept(visitor);
