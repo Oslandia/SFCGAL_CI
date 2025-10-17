@@ -21,7 +21,6 @@ char *optarg = nullptr; // Pointer to option argument
 // Internal state
 namespace {
 int  nextchar = 0;     // Position within current argument
-bool optreset = false; // Reset flag
 } // namespace
 
 int
