@@ -1653,9 +1653,9 @@ BOOST_AUTO_TEST_CASE(testSphereTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(sphere, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(
-      paramsStr,
+  std::string expectedStr(
       R"([{"name":"center","type":"point3"},{"name":"direction","type":"vector3"},{"name":"num_horizontal","type":"int"},{"name":"num_vertical","type":"int"},{"name":"radius","type":"double"}])");
+  BOOST_CHECK(compare_json(paramsStr, expectedStr));
   sfcgal_free_buffer(params);
 
   // radius parameter
@@ -1917,9 +1917,9 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(cylinder, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(
-      paramsStr,
+  std::string expectedStr(
       R"([{"name":"num_radial","type":"int"},{"name":"height","type":"double"},{"name":"radius","type":"double"},{"name":"axis","type":"vector3"},{"name":"base_center","type":"point3"}])");
+  BOOST_CHECK(compare_json(paramsStr, expectedStr));
   sfcgal_free_buffer(params);
 
   // checks get parameter value generic
@@ -1927,14 +1927,17 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
   size_t paramLen;
   sfcgal_primitive_parameter(cylinder, "num_radial", &param, &paramLen);
   std::string paramStr = std::string(param, paramLen);
-  BOOST_CHECK_EQUAL(paramStr,
-                    R"({"name":"num_radial","type":"int","value":36})");
+  std::string expectedParamStr(
+      R"({"name":"num_radial","type":"int","value":36})");
+  BOOST_CHECK(compare_json(paramStr, expectedParamStr));
+
   sfcgal_free_buffer(param);
 
   sfcgal_primitive_parameter(cylinder, "axis", &param, &paramLen);
   paramStr = std::string(param, paramLen);
-  BOOST_CHECK_EQUAL(
-      paramStr, R"({"name":"axis","type":"vector3","value":[1.1,2.1,3.1]})");
+  expectedParamStr =
+      std::string(R"({"name":"axis","type":"vector3","value":[1.1,2.1,3.1]})");
+  BOOST_CHECK(compare_json(paramStr, expectedParamStr));
   sfcgal_free_buffer(param);
 
   // checks set parameter value generic
@@ -1970,9 +1973,9 @@ BOOST_AUTO_TEST_CASE(testTorusTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(torus, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(
-      paramsStr,
+  std::string expectedStr(
       R"([{"name":"tube_num_radial","type":"int"},{"name":"main_num_radial","type":"int"},{"name":"tube_radius","type":"double"},{"name":"main_radius","type":"double"}])");
+  BOOST_CHECK(compare_json(paramsStr, expectedStr));
   sfcgal_free_buffer(params);
 
   // main_radius parameter
@@ -2076,9 +2079,9 @@ BOOST_AUTO_TEST_CASE(testBoxTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(box, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(
-      paramsStr,
+  std::string expectedParamsStr(
       R"([{"name":"z_extent","type":"double"},{"name":"y_extent","type":"double"},{"name":"x_extent","type":"double"}])");
+  BOOST_CHECK(compare_json(paramsStr, expectedParamsStr));
   sfcgal_free_buffer(params);
 
   // x_extent parameter
@@ -2161,7 +2164,8 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(cube, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(paramsStr, R"([{"name":"size","type":"double"}])");
+  std::string expectedParamsStr(R"([{"name":"size","type":"double"}])");
+  BOOST_CHECK(compare_json(paramsStr, expectedParamsStr));
   sfcgal_free_buffer(params);
 
   // size parameter
@@ -2232,9 +2236,9 @@ BOOST_AUTO_TEST_CASE(testConeTest)
   size_t paramsLen;
   sfcgal_primitive_parameters(cone, &params, &paramsLen);
   std::string paramsStr(params, paramsLen);
-  BOOST_CHECK_EQUAL(
-      paramsStr,
+  std::string expectedParamsStr(
       R"([{"name":"num_radial","type":"int"},{"name":"height","type":"double"},{"name":"top_radius","type":"double"},{"name":"bottom_radius","type":"double"}])");
+  BOOST_CHECK(compare_json(paramsStr, expectedParamsStr));
   sfcgal_free_buffer(params);
 
   // bottom_radius parameter
