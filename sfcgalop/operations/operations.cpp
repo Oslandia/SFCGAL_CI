@@ -6,7 +6,10 @@
 #include "../constructors.hpp"
 #include <SFCGAL/Kernel.h>
 
+
+#if !defined(_MSC_VER)
 #include <SFCGAL/algorithm/alphaShapes.h>
+#endif
 #include <SFCGAL/algorithm/alphaWrapping3D.h>
 #include <SFCGAL/algorithm/area.h>
 #include <SFCGAL/algorithm/buffer3D.h>
@@ -535,6 +538,7 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::minkowskiSum3D(*geom_a, *geom_b);
      }},
 
+#if !defined(_MSC_VER)
     {"alphashapes", "Construction", "Compute alpha shapes from point cloud",
      false,
      "Parameters:\n  alpha=VALUE: Alpha parameter controlling shape detail "
@@ -549,6 +553,7 @@ const std::vector<Operation> operations = {
        bool   allowHoles = true;
        return SFCGAL::algorithm::alphaShapes(*geom_a, alpha, allowHoles);
      }},
+#endif
 
     {"alphawrapping3d", "Construction",
      "Create 3D alpha wrapping surface from points", false,
