@@ -25,14 +25,14 @@ jobs:
             echo `sysctl -n hw.ncpu`
             case "${{ matrix.os.name }}" in
               freebsd)
-                ASSUME_ALWAYS_YES=yes sudo pkg install -y cgal gmp mpfr boost-libs cmake ninja curl
+                ASSUME_ALWAYS_YES=yes sudo pkg install -y cgal gmp mpfr boost-libs cmake ninja curl nlohmann-json
                 ;;
               netbsd)
                 sudo pkgin -y update
-                sudo pkgin -y install cgal gmp mpfr boost cmake ninja-build curl
+                sudo pkgin -y install cgal gmp mpfr boost cmake ninja-build curl nlohmann-json
                 ;;
               openbsd)
-                sudo pkg_add cgal gmp gmpxx mpfr boost cmake ninja curl
+                sudo pkg_add cgal gmp gmpxx mpfr boost cmake ninja curl nlohmann-json
                 ;;
             esac
 
@@ -53,11 +53,10 @@ jobs:
       - name: Install dependencies
         run: |
           brew update
-          brew install boost cgal gmp mpfr
+          brew install boost cgal gmp mpfr nlohmann-json
 
       - name: Build
         run: |
           cmake -DSFCGAL_BUILD_TESTS=ON -S . -B build
           cmake --build build
           ctest -VV --test-dir build
-

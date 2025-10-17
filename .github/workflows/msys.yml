@@ -33,6 +33,7 @@ jobs:
           cmake:p
           ninja:p
           cgal:p
+          nlohmann-json:p
 
     - name: '🚧 Build TOOL'
       run: |
