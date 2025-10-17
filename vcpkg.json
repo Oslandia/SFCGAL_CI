@@ -2,7 +2,8 @@
   "name": "main",
   "version-string": "latest",
   "dependencies": [
-    "cgal"
+    "cgal",
+    "nlohmann-json"
   ],
   "builtin-baseline": "4ed84798137bcf664989fa432d41d278d7ad3b25"
 }
