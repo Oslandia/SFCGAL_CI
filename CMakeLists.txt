@@ -177,7 +177,7 @@ if( SFCGAL_USE_STATIC_LIBS )
 endif()
 
 #-- nlohmann/json -----------------------------------------
-find_package( nlohmann_json 3.11.3 REQUIRED )
+find_package( nlohmann_json 3.11 REQUIRED )
 
 #-- OpenScenegraph -----------------------------------------
 if ( SFCGAL_WITH_OSG )
