@@ -12,7 +12,8 @@ COPY CMakeLists.txt SFCGALConfig.cmake.in sfcgal.pc.in sfcgal-config.in ./
 RUN cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
     -DSFCGAL_BUILD_TESTS=OFF \
-    -DCMAKE_TOOLCHAIN_FILE="\"$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake\""; \
+    -DCMAKE_TOOLCHAIN_FILE="\"$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake\"" \
+    -DVCPKG_TARGET_TRIPLET=x64-windows-release; \
     cmake --build build --config Release -j $env:NUMBER_OF_PROCESSORS
 
 # Restore the default Windows shell for correct batch processing.
