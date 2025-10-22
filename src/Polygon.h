@@ -7,13 +7,14 @@
 #define SFCGAL_POLYGON_H_
 
 #include <boost/assert.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/ptr_container/serialize_ptr_vector.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/unique_ptr.hpp>
+#include <memory>
 #include <vector>
 
 #include <CGAL/Polygon_with_holes_2.h>
 
+#include "SFCGAL/DereferenceIterator.h"
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/Surface.h"
@@ -25,8 +26,10 @@ namespace SFCGAL {
  */
 class SFCGAL_API Polygon : public Surface {
 public:
-  typedef boost::ptr_vector<LineString>::iterator       iterator;
-  typedef boost::ptr_vector<LineString>::const_iterator const_iterator;
+  using iterator =
+      DereferenceIterator<std::vector<std::unique_ptr<LineString>>::iterator>;
+  using const_iterator = DereferenceIterator<
+      std::vector<std::unique_ptr<LineString>>::const_iterator>;
 
   /**
    * Empty Polygon constructor
@@ -123,7 +126,7 @@ public:
   inline const LineString &
   exteriorRing() const
   {
-    return _rings.front();
+    return *_rings.front();
   }
   /**
    * [OGC/SFA]returns the exterior ring
@@ -131,7 +134,7 @@ public:
   inline LineString &
   exteriorRing()
   {
-    return _rings.front();
+    return *_rings.front();
   }
   /**
    * Sets the exterior ring
@@ -139,7 +142,7 @@ public:
   inline void
   setExteriorRing(const LineString &ring)
   {
-    _rings.front() = ring;
+    setExteriorRing(ring.clone());
   }
   /**
    * Sets the exterior ring (takes ownership)
@@ -147,7 +150,7 @@ public:
   inline void
   setExteriorRing(LineString *ring)
   {
-    _rings.replace(0, ring);
+    _rings[0] = std::unique_ptr<LineString>(ring);
   }
 
   /**
@@ -173,7 +176,7 @@ public:
   inline const LineString &
   interiorRingN(const size_t &n) const
   {
-    return _rings[n + 1];
+    return *_rings[n + 1];
   }
   /**
    * [OGC/SFA]returns the exterior ring
@@ -181,7 +184,7 @@ public:
   inline LineString &
   interiorRingN(const size_t &n)
   {
-    return _rings[n + 1];
+    return *_rings[n + 1];
   }
 
   /**
@@ -200,7 +203,7 @@ public:
   ringN(const size_t &n) const
   {
     BOOST_ASSERT(n < _rings.size());
-    return _rings[n];
+    return *_rings[n];
   }
   /**
    * Returns the n-th ring, 0 is exteriorRing
@@ -210,7 +213,7 @@ public:
   ringN(const size_t &n)
   {
     BOOST_ASSERT(n < _rings.size());
-    return _rings[n];
+    return *_rings[n];
   }
 
   /**
@@ -219,7 +222,7 @@ public:
   inline void
   addInteriorRing(const LineString &ls)
   {
-    _rings.push_back(ls.clone());
+    _rings.push_back(std::unique_ptr<LineString>(ls.clone()));
   }
   /**
    * append a ring to the Polygon (take ownership)
@@ -228,7 +231,7 @@ public:
   addInteriorRing(LineString *ls)
   {
     BOOST_ASSERT(ls != NULL);
-    _rings.push_back(ls);
+    _rings.push_back(std::unique_ptr<LineString>(ls));
   }
 
   /**
@@ -238,7 +241,7 @@ public:
   inline void
   addRing(const LineString &ls)
   {
-    _rings.push_back(ls.clone());
+    _rings.push_back(std::unique_ptr<LineString>(ls.clone()));
   }
   /**
    * append a ring to the Polygon (take ownership)
@@ -248,29 +251,29 @@ public:
   addRing(LineString *ls)
   {
     BOOST_ASSERT(ls != NULL);
-    _rings.push_back(ls);
+    _rings.push_back(std::unique_ptr<LineString>(ls));
   }
 
   inline iterator
   begin()
   {
-    return _rings.begin();
+    return dereference_iterator(_rings.begin());
   }
   inline const_iterator
   begin() const
   {
-    return _rings.begin();
+    return dereference_iterator(_rings.begin());
   }
 
   inline iterator
   end()
   {
-    return _rings.end();
+    return dereference_iterator(_rings.end());
   }
   inline const_iterator
   end() const
   {
-    return _rings.end();
+    return dereference_iterator(_rings.end());
   }
 
   /*
@@ -317,7 +320,7 @@ private:
    *
    * @warning never empty, empty LineString as exteriorRing for empty Polygon
    */
-  boost::ptr_vector<LineString> _rings;
+  std::vector<std::unique_ptr<LineString>> _rings;
 
   void
   swap(Polygon &other)

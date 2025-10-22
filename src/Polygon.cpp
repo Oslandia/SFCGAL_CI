@@ -11,29 +11,33 @@
 
 namespace SFCGAL {
 
-Polygon::Polygon() { _rings.push_back(new LineString()); }
+Polygon::Polygon() { _rings.push_back(std::make_unique<LineString>()); }
 
 Polygon::Polygon(const std::vector<LineString> &rings)
 {
   if (rings.empty()) {
-    _rings.resize(1, new LineString());
+    _rings.resize(1);
+    _rings[0] = std::make_unique<LineString>();
   } else {
     for (const auto &ring : rings) {
-      _rings.push_back(ring.clone());
+      _rings.push_back(std::unique_ptr<LineString>(ring.clone()));
     }
   }
 }
 
 Polygon::Polygon(const LineString &exteriorRing)
 {
-  _rings.push_back(exteriorRing.clone());
+  _rings.push_back(std::unique_ptr<LineString>(exteriorRing.clone()));
 }
 
-Polygon::Polygon(LineString *exteriorRing) { _rings.push_back(exteriorRing); }
+Polygon::Polygon(LineString *exteriorRing)
+{
+  _rings.push_back(std::unique_ptr<LineString>(exteriorRing));
+}
 
 Polygon::Polygon(const Triangle &triangle)
 {
-  _rings.push_back(new LineString());
+  _rings.push_back(std::make_unique<LineString>());
 
   if (!triangle.isEmpty()) {
     for (size_t i = 0; i < 4; i++) {
@@ -44,42 +48,43 @@ Polygon::Polygon(const Triangle &triangle)
 
 Polygon::Polygon(const Polygon &other) : Surface(other)
 {
-  for (size_t i = 0; i < other.numRings(); i++) {
-    _rings.push_back(other.ringN(i).clone());
+  _rings.reserve(other._rings.size());
+  for (const auto &ring : other._rings) {
+    _rings.emplace_back(std::unique_ptr<LineString>(ring->clone()));
   }
 }
 
 Polygon::Polygon(const CGAL::Polygon_2<Kernel> &other)
 {
-  _rings.push_back(new LineString());
+  _rings.push_back(std::make_unique<LineString>());
   CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
 
   for (ei = other.edges_begin(); ei != other.edges_end(); ++ei) {
-    _rings.back().addPoint(ei->source());
+    _rings.back()->addPoint(ei->source());
   }
 }
 
 Polygon::Polygon(const CGAL::Polygon_with_holes_2<Kernel> &poly)
 {
-  _rings.push_back(new LineString());
+  _rings.push_back(std::make_unique<LineString>());
   const CGAL::Polygon_2<Kernel>               &outer = poly.outer_boundary();
   CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
 
   for (ei = outer.edges_begin(); ei != outer.edges_end(); ++ei) {
-    _rings.back().addPoint(ei->source());
+    _rings.back()->addPoint(ei->source());
   }
 
-  _rings.back().addPoint(_rings.back().startPoint());
+  _rings.back()->addPoint(_rings.back()->startPoint());
 
   for (auto hit = poly.holes_begin(); hit != poly.holes_end(); ++hit) {
-    _rings.push_back(new LineString());
+    _rings.push_back(std::make_unique<LineString>());
     CGAL::Polygon_2<Kernel>::Edge_const_iterator ei;
 
     for (ei = hit->edges_begin(); ei != hit->edges_end(); ++ei) {
-      _rings.back().addPoint(ei->source());
+      _rings.back()->addPoint(ei->source());
     }
 
-    _rings.back().addPoint(_rings.back().startPoint());
+    _rings.back()->addPoint(_rings.back()->startPoint());
   }
 }
 
@@ -95,7 +100,7 @@ Polygon::~Polygon() = default;
 auto
 Polygon::coordinateDimension() const -> int
 {
-  return _rings[0].coordinateDimension();
+  return _rings[0]->coordinateDimension();
 }
 
 auto
@@ -142,7 +147,7 @@ Polygon::dropZ() -> bool
   }
 
   for (auto &_ring : _rings) {
-    _ring.dropZ();
+    _ring->dropZ();
   }
 
   return true;
@@ -156,7 +161,7 @@ Polygon::dropM() -> bool
   }
 
   for (auto &_ring : _rings) {
-    _ring.dropM();
+    _ring->dropM();
   }
 
   return true;
@@ -166,7 +171,7 @@ auto
 Polygon::swapXY() -> void
 {
   for (auto &_ring : _rings) {
-    _ring.swapXY();
+    _ring->swapXY();
   }
 }
 
