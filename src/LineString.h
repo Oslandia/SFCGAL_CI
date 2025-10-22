@@ -6,13 +6,14 @@
 #ifndef SFCGAL_LINESTRING_H_
 #define SFCGAL_LINESTRING_H_
 
+#include <memory>
 #include <vector>
 
 #include <boost/assert.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/ptr_container/serialize_ptr_vector.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/unique_ptr.hpp>
 
+#include "SFCGAL/DereferenceIterator.h"
 #include "SFCGAL/Point.h"
 
 #include <CGAL/Polygon_2.h>
@@ -24,8 +25,10 @@ namespace SFCGAL {
  */
 class SFCGAL_API LineString : public Geometry {
 public:
-  typedef boost::ptr_vector<Point>::iterator       iterator;
-  typedef boost::ptr_vector<Point>::const_iterator const_iterator;
+  using iterator =
+      DereferenceIterator<std::vector<std::unique_ptr<Point>>::iterator>;
+  using const_iterator =
+      DereferenceIterator<std::vector<std::unique_ptr<Point>>::const_iterator>;
 
   /**
    * Empty LineString constructor
@@ -124,7 +127,7 @@ public:
   pointN(size_t const &n) const
   {
     BOOST_ASSERT(n < numPoints());
-    return _points[n];
+    return *_points[n];
   }
   /**
    * [SFA/OGC]Returns the n-th point
@@ -133,7 +136,7 @@ public:
   pointN(size_t const &n)
   {
     BOOST_ASSERT(n < numPoints());
-    return _points[n];
+    return *_points[n];
   }
 
   /**
@@ -142,7 +145,7 @@ public:
   inline const Point &
   startPoint() const
   {
-    return _points.front();
+    return *_points.front();
   }
   /**
    * [SFA/OGC]Returns the first point
@@ -150,7 +153,7 @@ public:
   inline Point &
   startPoint()
   {
-    return _points.front();
+    return *_points.front();
   }
 
   /**
@@ -159,7 +162,7 @@ public:
   inline const Point &
   endPoint() const
   {
-    return _points.back();
+    return *_points.back();
   }
   /**
    * [SFA/OGC]Returns the first point
@@ -167,7 +170,7 @@ public:
   inline Point &
   endPoint()
   {
-    return _points.back();
+    return *_points.back();
   }
 
   /**
@@ -176,7 +179,7 @@ public:
   inline void
   addPoint(const Point &p)
   {
-    _points.push_back(p.clone());
+    _points.push_back(std::unique_ptr<Point>(p.clone()));
   }
   /**
    * append a Point to the LineString and takes ownership
@@ -184,7 +187,7 @@ public:
   inline void
   addPoint(Point *p)
   {
-    _points.push_back(p);
+    _points.push_back(std::unique_ptr<Point>(p));
   }
 
   //-- methods
@@ -201,7 +204,7 @@ public:
   inline void
   closes()
   {
-    _points.push_back(_points.front().clone());
+    _points.push_back(std::unique_ptr<Point>(_points.front()->clone()));
   }
 
   //-- iterators
@@ -209,23 +212,23 @@ public:
   inline iterator
   begin()
   {
-    return _points.begin();
+    return dereference_iterator(_points.begin());
   }
   inline const_iterator
   begin() const
   {
-    return _points.begin();
+    return dereference_iterator(_points.begin());
   }
 
   inline iterator
   end()
   {
-    return _points.end();
+    return dereference_iterator(_points.end());
   }
   inline const_iterator
   end() const
   {
-    return _points.end();
+    return dereference_iterator(_points.end());
   }
 
   //-- optimization
@@ -375,7 +378,7 @@ public:
   }
 
 private:
-  boost::ptr_vector<Point> _points;
+  std::vector<std::unique_ptr<Point>> _points;
 
   void
   swap(LineString &other)

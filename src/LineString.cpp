@@ -13,21 +13,22 @@ LineString::LineString() = default;
 LineString::LineString(const std::vector<Point> &points)
 {
   for (const auto &point : points) {
-    _points.push_back(point.clone());
+    _points.push_back(std::unique_ptr<Point>(point.clone()));
   }
 }
 
 LineString::LineString(const Point &startPoint, const Point &endPoint)
 
 {
-  _points.push_back(startPoint.clone());
-  _points.push_back(endPoint.clone());
+  _points.push_back(std::unique_ptr<Point>(startPoint.clone()));
+  _points.push_back(std::unique_ptr<Point>(endPoint.clone()));
 }
 
 LineString::LineString(const LineString &other) : Geometry(other)
 {
-  for (size_t i = 0; i < other.numPoints(); i++) {
-    _points.push_back(other.pointN(i).clone());
+  _points.reserve(other._points.size());
+  for (const auto &point : other._points) {
+    _points.push_back(std::unique_ptr<Point>(point->clone()));
   }
 }
 
@@ -67,7 +68,7 @@ LineString::dimension() const -> int
 auto
 LineString::coordinateDimension() const -> int
 {
-  return isEmpty() ? 0 : _points[0].coordinateDimension();
+  return isEmpty() ? 0 : _points[0]->coordinateDimension();
 }
 
 auto
@@ -96,7 +97,7 @@ LineString::dropZ() -> bool
   }
 
   for (auto &_point : _points) {
-    _point.dropZ();
+    _point->dropZ();
   }
 
   return true;
@@ -110,7 +111,7 @@ LineString::dropM() -> bool
   }
 
   for (auto &_point : _points) {
-    _point.dropM();
+    _point->dropM();
   }
 
   return true;
@@ -120,7 +121,7 @@ auto
 LineString::swapXY() -> void
 {
   for (auto &_point : _points) {
-    _point.swapXY();
+    _point->swapXY();
   }
 }
 
