@@ -17,11 +17,11 @@ namespace SFCGAL {
 GeometryCollection::GeometryCollection() = default;
 
 GeometryCollection::GeometryCollection(GeometryCollection const &other)
-    : Geometry(other)
+    : GeometryImpl(other)
 {
   _geometries.reserve(other._geometries.size());
   for (const auto &geometry : other._geometries) {
-    _geometries.emplace_back(std::unique_ptr<Geometry>(geometry->clone()));
+    _geometries.emplace_back(geometry->clone());
   }
 }
 
@@ -33,12 +33,6 @@ GeometryCollection::operator=(GeometryCollection other) -> GeometryCollection &
 }
 
 GeometryCollection::~GeometryCollection() = default;
-
-auto
-GeometryCollection::clone() const -> GeometryCollection *
-{
-  return new GeometryCollection(*this);
-}
 
 auto
 GeometryCollection::geometryType() const -> std::string
@@ -194,7 +188,7 @@ GeometryCollection::setGeometryN(Geometry *geometry, size_t const &idx)
 void
 GeometryCollection::setGeometryN(const Geometry &geometry, size_t const &idx)
 {
-  setGeometryN(std::unique_ptr<Geometry>(geometry.clone()), idx);
+  setGeometryN(geometry.clone(), idx);
 }
 
 void
@@ -221,7 +215,7 @@ GeometryCollection::addGeometry(Geometry *geometry)
 void
 GeometryCollection::addGeometry(Geometry const &geometry)
 {
-  addGeometry(std::unique_ptr<Geometry>(geometry.clone()));
+  addGeometry(geometry.clone());
 }
 
 auto

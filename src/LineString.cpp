@@ -13,22 +13,22 @@ LineString::LineString() = default;
 LineString::LineString(const std::vector<Point> &points)
 {
   for (const auto &point : points) {
-    _points.push_back(std::unique_ptr<Point>(point.clone()));
+    _points.push_back(point.clone());
   }
 }
 
 LineString::LineString(const Point &startPoint, const Point &endPoint)
 
 {
-  _points.push_back(std::unique_ptr<Point>(startPoint.clone()));
-  _points.push_back(std::unique_ptr<Point>(endPoint.clone()));
+  _points.push_back(startPoint.clone());
+  _points.push_back(endPoint.clone());
 }
 
-LineString::LineString(const LineString &other) : Geometry(other)
+LineString::LineString(const LineString &other) : GeometryImpl(other)
 {
   _points.reserve(other._points.size());
   for (const auto &point : other._points) {
-    _points.push_back(std::unique_ptr<Point>(point->clone()));
+    _points.push_back(point->clone());
   }
 }
 
@@ -40,12 +40,6 @@ LineString::operator=(LineString other) -> LineString &
 }
 
 LineString::~LineString() = default;
-
-auto
-LineString::clone() const -> LineString *
-{
-  return new LineString(*this);
-}
 
 auto
 LineString::geometryTypeId() const -> GeometryType

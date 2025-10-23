@@ -22,12 +22,6 @@ MultiPoint::operator=(MultiPoint other) -> MultiPoint &
 MultiPoint::~MultiPoint() = default;
 
 auto
-MultiPoint::clone() const -> MultiPoint *
-{
-  return new MultiPoint(*this);
-}
-
-auto
 MultiPoint::geometryType() const -> std::string
 {
   return "MultiPoint";

@@ -22,12 +22,6 @@ MultiSolid::operator=(MultiSolid other) -> MultiSolid &
 MultiSolid::~MultiSolid() = default;
 
 auto
-MultiSolid::clone() const -> MultiSolid *
-{
-  return new MultiSolid(*this);
-}
-
-auto
 MultiSolid::geometryType() const -> std::string
 {
   return "MultiSolid";

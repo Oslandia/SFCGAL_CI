@@ -27,7 +27,7 @@ namespace SFCGAL {
  * Without Solid concept,
  * @note Volume concept is missing.
  */
-class SFCGAL_API Solid : public Geometry {
+class SFCGAL_API Solid : public GeometryImpl<Solid, Geometry> {
 public:
   using iterator = DereferenceIterator<
       std::vector<std::unique_ptr<PolyhedralSurface>>::iterator>;
@@ -63,10 +63,6 @@ public:
    * destructor
    */
   ~Solid();
-
-  //-- SFCGAL::Geometry
-  Solid *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string
@@ -146,7 +142,7 @@ public:
   void
   addInteriorShell(const PolyhedralSurface &shell)
   {
-    addInteriorShell(std::unique_ptr<PolyhedralSurface>(shell.clone()));
+    addInteriorShell(shell.clone());
   }
   /**
    * adds an interior shell to the Solid
@@ -189,7 +185,7 @@ public:
   inline void
   setExteriorShell(const PolyhedralSurface &shell)
   {
-    setExteriorShell(std::unique_ptr<PolyhedralSurface>(shell.clone()));
+    setExteriorShell(shell.clone());
   }
 
   /**

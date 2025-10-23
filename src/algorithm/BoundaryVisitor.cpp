@@ -60,7 +60,7 @@ BoundaryVisitor::visit(const Polygon &g)
   }
 
   if (!g.hasInteriorRings()) {
-    _boundary.reset(g.exteriorRing().clone());
+    _boundary = g.exteriorRing().clone();
   } else {
     std::unique_ptr<MultiLineString> boundary(new MultiLineString);
 

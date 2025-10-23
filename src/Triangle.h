@@ -28,7 +28,7 @@ namespace SFCGAL {
  *
  * @warning An empty triangle has empty points
  */
-class SFCGAL_API Triangle : public Surface {
+class SFCGAL_API Triangle : public GeometryImpl<Triangle, Surface> {
 public:
   /**
    * empty Triangle constructor
@@ -59,10 +59,6 @@ public:
    * destructor
    */
   ~Triangle();
-
-  //-- SFCGAL::Geometry
-  Triangle *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string

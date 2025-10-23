@@ -149,12 +149,12 @@ BOOST_AUTO_TEST_CASE(testFileIntersectionTest)
             false, numLine << ": can't find the geometry named " << name);
       }
 
-      gA.reset(found->second->clone());
+      gA = found->second->clone();
     } else {
       gA = io::readWkt(wktGA);
     }
 
-    insertOrReplace(storedGeom, "A", gA->clone());
+    insertOrReplace(storedGeom, "A", gA->clone().release());
 
     std::getline(iss, wktGB, '|');
 
@@ -169,12 +169,12 @@ BOOST_AUTO_TEST_CASE(testFileIntersectionTest)
             false, numLine << ": can't find the geometry named " << name);
       }
 
-      gB.reset(found->second->clone());
+      gB = found->second->clone();
     } else {
       gB = io::readWkt(wktGB);
     }
 
-    insertOrReplace(storedGeom, "B", gB->clone());
+    insertOrReplace(storedGeom, "B", gB->clone().release());
 
     // exception management
     bool expectException      = false;
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(testFileIntersectionTest)
                                            << name);
       }
 
-      gOut.reset(found->second->clone());
+      gOut = found->second->clone();
     }
     // expect an exception
     else if (wktOut[0] == '!') {

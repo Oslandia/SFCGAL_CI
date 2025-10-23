@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(testClone)
   exteriorRing.addPoint(Point(0.0, 0.0));
 
   Polygon const            g(exteriorRing);
-  std::unique_ptr<Polygon> copy(g.clone());
+  std::unique_ptr<Polygon> copy = g.clone();
 
   BOOST_CHECK(!copy->isEmpty());
   BOOST_CHECK(!copy->is3D());

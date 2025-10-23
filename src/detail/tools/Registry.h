@@ -38,6 +38,11 @@ public:
    */
   ~Registry() = default;
 
+  // Delete copy operations
+  Registry(const Registry &) = delete;
+  auto
+  operator=(const Registry &) -> Registry & = delete;
+
   /**
    * @brief Register a new Geometry type
    * @param g The geometry prototype to register
@@ -55,18 +60,19 @@ public:
   /**
    * @brief Returns a new instance of the given geometryTypeName
    * @param geometryTypeName The name of the geometry type
-   * @return Pointer to new geometry instance
+   * @return std::unique_ptr to new geometry instance
    */
-  Geometry *
-  newGeometryByTypeName(const std::string &geometryTypeName) const;
+  [[nodiscard]] auto
+  newGeometryByTypeName(const std::string &geometryTypeName) const
+      -> std::unique_ptr<Geometry>;
 
   /**
    * @brief Returns a new instance of the given geometryType
    * @param typeId The geometry type ID
    * @return Pointer to new geometry instance
    */
-  Geometry *
-  newGeometryByTypeId(int typeId) const;
+  [[nodiscard]] auto
+  newGeometryByTypeId(int typeId) const -> std::unique_ptr<Geometry>;
 
   /**
    * @brief Returns the instance of the registry

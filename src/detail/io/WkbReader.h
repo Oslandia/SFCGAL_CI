@@ -203,43 +203,37 @@ private:
   {
     switch (geometryType) {
     case TYPE_POINT:
-      return std::unique_ptr<SFCGAL::Geometry>{readInnerPoint().clone()};
+      return readInnerPoint().clone();
 
     case TYPE_LINESTRING:
-      return std::unique_ptr<SFCGAL::Geometry>(readInnerLineString().clone());
+      return readInnerLineString().clone();
 
     case TYPE_POLYGON:
-      return std::unique_ptr<SFCGAL::Geometry>(readInnerPolygon().clone());
+      return readInnerPolygon().clone();
 
     case TYPE_GEOMETRYCOLLECTION:
-      return std::unique_ptr<SFCGAL::Geometry>(
-          readInnerGeometryCollection().clone());
+      return readInnerGeometryCollection().clone();
 
     case TYPE_MULTIPOINT:
-      return std::unique_ptr<SFCGAL::Geometry>(
-          readInnerMultiGeometries<MultiPoint, Point>().clone());
+      return readInnerMultiGeometries<MultiPoint, Point>().clone();
 
     case TYPE_MULTILINESTRING:
-      return std::unique_ptr<SFCGAL::Geometry>(
-          readInnerMultiGeometries<MultiLineString, LineString>().clone());
+      return readInnerMultiGeometries<MultiLineString, LineString>().clone();
 
     case TYPE_MULTIPOLYGON:
-      return std::unique_ptr<SFCGAL::Geometry>(
-          readInnerMultiGeometries<MultiPolygon, Polygon>().clone());
+      return readInnerMultiGeometries<MultiPolygon, Polygon>().clone();
 
     case TYPE_TRIANGLE:
-      return std::unique_ptr<SFCGAL::Geometry>(readInnerTriangle().clone());
+      return readInnerTriangle().clone();
 
     case TYPE_TRIANGULATEDSURFACE:
-      return std::unique_ptr<SFCGAL::Geometry>(
-          readInnerTriangulatedSurface().clone());
+      return readInnerTriangulatedSurface().clone();
 
     case TYPE_POLYHEDRALSURFACE:
-      return std::unique_ptr<SFCGAL::Geometry>(
-          readInnerPolyhedralSurface().clone());
+      return readInnerPolyhedralSurface().clone();
 
     case TYPE_NURBSCURVE:
-      return std::unique_ptr<SFCGAL::Geometry>(readInnerNURBSCurve().clone());
+      return readInnerNURBSCurve().clone();
 
     default:
       std::ostringstream oss;

@@ -20,14 +20,14 @@ Polygon::Polygon(const std::vector<LineString> &rings)
     _rings[0] = std::make_unique<LineString>();
   } else {
     for (const auto &ring : rings) {
-      _rings.push_back(std::unique_ptr<LineString>(ring.clone()));
+      _rings.push_back(ring.clone());
     }
   }
 }
 
 Polygon::Polygon(const LineString &exteriorRing)
 {
-  _rings.push_back(std::unique_ptr<LineString>(exteriorRing.clone()));
+  _rings.push_back(exteriorRing.clone());
 }
 
 Polygon::Polygon(LineString *exteriorRing)
@@ -46,11 +46,11 @@ Polygon::Polygon(const Triangle &triangle)
   }
 }
 
-Polygon::Polygon(const Polygon &other) : Surface(other)
+Polygon::Polygon(const Polygon &other) : GeometryImpl(other)
 {
   _rings.reserve(other._rings.size());
   for (const auto &ring : other._rings) {
-    _rings.emplace_back(std::unique_ptr<LineString>(ring->clone()));
+    _rings.emplace_back(ring->clone());
   }
 }
 
@@ -113,12 +113,6 @@ auto
 Polygon::geometryTypeId() const -> GeometryType
 {
   return TYPE_POLYGON;
-}
-
-auto
-Polygon::clone() const -> Polygon *
-{
-  return new Polygon(*this);
 }
 
 auto

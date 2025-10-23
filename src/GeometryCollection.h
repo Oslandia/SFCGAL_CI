@@ -20,7 +20,8 @@ namespace SFCGAL {
 /**
  * A GeometryCollection in SFA.
  */
-class SFCGAL_API GeometryCollection : public Geometry {
+class SFCGAL_API GeometryCollection
+    : public GeometryImpl<GeometryCollection, Geometry> {
 public:
   using iterator =
       DereferenceIterator<std::vector<std::unique_ptr<Geometry>>::iterator>;
@@ -44,10 +45,6 @@ public:
    * destructor
    */
   virtual ~GeometryCollection();
-
-  //-- SFCGAL::Geometry
-  GeometryCollection *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string

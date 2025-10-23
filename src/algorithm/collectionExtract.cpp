@@ -34,33 +34,25 @@ collectionExtractPolygons(std::unique_ptr<Geometry> g)
     return g;
   }
 
-  auto *ret_geo = new MultiPolygon;
+  auto ret_geo = std::make_unique<MultiPolygon>();
 
   // copy each geometry
   for (size_t i = 0; i < coll.numGeometries(); ++i) {
 
-    Geometry *gi = coll.geometryN(i).clone();
+    std::unique_ptr<Geometry> gi = coll.geometryN(i).clone();
 
     switch (gi->geometryTypeId()) {
+    case TYPE_POLYGON:
     case TYPE_TRIANGLE:
-      ret_geo->addGeometry(Polygon(gi->as<Triangle>()));
+      ret_geo->addGeometry(std::move(gi));
       break;
 
+    case TYPE_POLYHEDRALSURFACE:
     case TYPE_TRIANGULATEDSURFACE: {
-      for (size_t j = 0; j < gi->numGeometries(); ++j) {
-        ret_geo->addGeometry(Polygon(gi->geometryN(j).as<Triangle>()));
-      }
-    } break;
-
-    case TYPE_POLYHEDRALSURFACE: {
       for (size_t j = 0; j < gi->numGeometries(); ++j) {
         ret_geo->addGeometry(gi->geometryN(j));
       }
     } break;
-
-    case TYPE_POLYGON:
-      ret_geo->addGeometry(*gi);
-      break;
 
     default:
       // nothing
@@ -68,7 +60,7 @@ collectionExtractPolygons(std::unique_ptr<Geometry> g)
     }
   }
 
-  return std::unique_ptr<Geometry>(ret_geo);
+  return ret_geo;
 }
 
 } // namespace SFCGAL::algorithm

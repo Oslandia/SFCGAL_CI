@@ -19,7 +19,7 @@ PolyhedralSurface::PolyhedralSurface(const std::vector<Polygon> &polygons)
 
 {
   for (const auto &polygon : polygons) {
-    _polygons.push_back(std::unique_ptr<Polygon>(polygon.clone()));
+    _polygons.push_back(polygon.clone());
   }
 }
 
@@ -41,11 +41,11 @@ PolyhedralSurface::PolyhedralSurface(const std::unique_ptr<Geometry> &geometry)
 }
 
 PolyhedralSurface::PolyhedralSurface(const PolyhedralSurface &other)
-    : Surface(other)
+    : GeometryImpl(other)
 {
   _polygons.reserve(other._polygons.size());
   for (const auto &poly : other._polygons) {
-    _polygons.emplace_back(std::unique_ptr<Polygon>(poly->clone()));
+    _polygons.emplace_back(poly->clone());
   }
 }
 
@@ -91,12 +91,6 @@ PolyhedralSurface::operator=(PolyhedralSurface other) -> PolyhedralSurface &
 }
 
 PolyhedralSurface::~PolyhedralSurface() = default;
-
-auto
-PolyhedralSurface::clone() const -> PolyhedralSurface *
-{
-  return new PolyhedralSurface(*this);
-}
 
 auto
 PolyhedralSurface::geometryType() const -> std::string
@@ -263,7 +257,7 @@ PolyhedralSurface::setPatchN(std::unique_ptr<Polygon> patch, size_t const &idx)
 void
 PolyhedralSurface::setPatchN(const Polygon &patch, size_t const &idx)
 {
-  setPatchN(std::unique_ptr<Polygon>(patch.clone()), idx);
+  setPatchN(patch.clone(), idx);
 }
 
 void

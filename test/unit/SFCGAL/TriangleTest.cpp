@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(testClone)
 
   Triangle const g(Kernel::Triangle_3(a, b, c));
 
-  std::unique_ptr<Geometry> copy(g.clone());
+  std::unique_ptr<Geometry> copy = g.clone();
   BOOST_REQUIRE(copy->is<Triangle>());
   BOOST_CHECK_EQUAL(copy->asText(0), "TRIANGLE Z ((0 0 1,1 0 2,1 1 3,0 0 1))");
 }
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(testBoundary)
 
   Triangle const g(Kernel::Triangle_2(a, b, c));
 
-  std::unique_ptr<Geometry> boundary(g.boundary());
+  std::unique_ptr<Geometry> boundary = g.boundary();
   BOOST_CHECK_EQUAL(boundary->asText(0), "LINESTRING (0 0,1 0,1 1,0 0)");
 }
 

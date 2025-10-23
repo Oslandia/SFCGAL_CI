@@ -42,7 +42,7 @@ Registry::addPrototype(const Geometry &g)
     return;
   }
 
-  _prototypes.push_back(std::unique_ptr<Geometry>(g.clone()));
+  _prototypes.push_back(g.clone());
 }
 
 auto
@@ -60,7 +60,7 @@ Registry::getGeometryTypes() const -> std::vector<std::string>
 
 auto
 Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
-    -> Geometry *
+    -> std::unique_ptr<Geometry>
 {
   for (const auto &_prototype : _prototypes) {
     if (geometryTypeName == _prototype->geometryType()) {
@@ -75,7 +75,7 @@ Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
 }
 
 auto
-Registry::newGeometryByTypeId(int typeId) const -> Geometry *
+Registry::newGeometryByTypeId(int typeId) const -> std::unique_ptr<Geometry>
 {
   for (const auto &_prototype : _prototypes) {
     if (typeId == _prototype->geometryTypeId()) {

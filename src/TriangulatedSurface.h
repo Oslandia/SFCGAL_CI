@@ -26,7 +26,8 @@ namespace SFCGAL {
  * A TriangulatedSurface in SFA modeled as a Triangle soup
  * @todo do better than a "triangle soup" or add topological view?
  */
-class SFCGAL_API TriangulatedSurface : public Surface {
+class SFCGAL_API TriangulatedSurface
+    : public GeometryImpl<TriangulatedSurface, Surface> {
 public:
   using iterator =
       DereferenceIterator<std::vector<std::unique_ptr<Triangle>>::iterator>;
@@ -54,10 +55,6 @@ public:
    * destructor
    */
   ~TriangulatedSurface();
-
-  //-- SFCGAL::Geometry
-  TriangulatedSurface *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string
@@ -118,7 +115,7 @@ public:
   void
   addPatch(const Triangle &patch)
   {
-    addPatch(std::unique_ptr<Triangle>(patch.clone()));
+    addPatch(patch.clone());
   }
   /**
    * @brief Adds a patch to the TriangulatedSurface.
@@ -188,7 +185,7 @@ public:
   inline void
   addTriangle(const Triangle &triangle)
   {
-    addTriangle(std::unique_ptr<Triangle>(triangle.clone()));
+    addTriangle(triangle.clone());
   }
   /**
    * add a Triangle to the TriangulatedSurface

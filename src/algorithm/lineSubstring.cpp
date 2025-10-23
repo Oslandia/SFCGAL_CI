@@ -179,7 +179,7 @@ lineSubstring(const LineString &ls, double start, double end)
     reverse = true;
   } else if (closed && std::fabs(end - start - 1.0) < tol) {
     // The desired line substring is the entire line.
-    return std::unique_ptr<LineString>(ls.clone());
+    return ls.clone();
   }
 
   // Retrieve length of the line.

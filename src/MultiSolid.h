@@ -19,7 +19,8 @@ namespace SFCGAL {
 /**
  * A MultiSolid
  */
-class SFCGAL_API MultiSolid : public GeometryCollection {
+class SFCGAL_API MultiSolid
+    : public GeometryImpl<MultiSolid, GeometryCollection> {
 public:
   /**
    * Empty MultiSolid constructor
@@ -38,10 +39,6 @@ public:
    * destructor
    */
   virtual ~MultiSolid();
-
-  //-- SFCGAL::Geometry
-  MultiSolid *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string
