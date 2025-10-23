@@ -34,7 +34,8 @@ namespace SFCGAL {
  * A PolyhedralSurface in SFA modeled as a Polygon soup
  * @todo do better than a "polygon soup" or add topological view?
  */
-class SFCGAL_API PolyhedralSurface : public Surface {
+class SFCGAL_API PolyhedralSurface
+    : public GeometryImpl<PolyhedralSurface, Surface> {
 public:
   using iterator =
       DereferenceIterator<std::vector<std::unique_ptr<Polygon>>::iterator>;
@@ -96,10 +97,6 @@ public:
    * destructor
    */
   ~PolyhedralSurface();
-
-  //-- SFCGAL::Geometry
-  PolyhedralSurface *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string

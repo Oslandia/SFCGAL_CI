@@ -19,7 +19,8 @@ namespace SFCGAL {
 /**
  * A MultiLineString in SFA.
  */
-class SFCGAL_API MultiLineString : public GeometryCollection {
+class SFCGAL_API MultiLineString
+    : public GeometryImpl<MultiLineString, GeometryCollection> {
 public:
   /**
    * Empty MultiLineString constructor
@@ -38,10 +39,6 @@ public:
    * destructor
    */
   virtual ~MultiLineString();
-
-  //-- SFCGAL::Geometry
-  MultiLineString *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string

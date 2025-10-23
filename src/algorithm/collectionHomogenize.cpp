@@ -31,7 +31,7 @@ collectionHomogenize(std::unique_ptr<Geometry> g) -> std::unique_ptr<Geometry>
 
   // test if it is a singleton
   if (coll.numGeometries() == 1) {
-    return std::unique_ptr<Geometry>(coll.geometryN(0).clone());
+    return coll.geometryN(0).clone();
   }
 
   for (size_t i = 0; i < coll.numGeometries(); ++i) {

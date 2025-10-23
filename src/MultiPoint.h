@@ -19,7 +19,8 @@ namespace SFCGAL {
 /**
  * A MultiPoint in SFA.
  */
-class SFCGAL_API MultiPoint : public GeometryCollection {
+class SFCGAL_API MultiPoint
+    : public GeometryImpl<MultiPoint, GeometryCollection> {
 public:
   /**
    * Empty MultiPoint constructor
@@ -38,10 +39,6 @@ public:
    * destructor
    */
   virtual ~MultiPoint();
-
-  //-- SFCGAL::Geometry
-  MultiPoint *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string

@@ -117,8 +117,7 @@ BOOST_AUTO_TEST_CASE(solidSetExteriorRingTest)
   BOOST_CHECK(solid->isEmpty());
   BOOST_CHECK_EQUAL(solid->numGeometries(), 0U);
 
-  solid->setExteriorShell(
-      dynamic_cast<PolyhedralSurface *>(shell1.get())->clone());
+  solid->setExteriorShell(shell1->as<PolyhedralSurface>().clone());
   BOOST_CHECK_EQUAL(solid->numShells(), 1U);
   BOOST_CHECK_EQUAL(solid->numGeometries(), 1U);
   BOOST_CHECK(!solid->isEmpty());
@@ -142,8 +141,7 @@ BOOST_AUTO_TEST_CASE(solidDropZTest)
   std::unique_ptr<Geometry> shell1(io::readWkt(polyhedral1Str));
 
   std::unique_ptr<Solid> solid = std::make_unique<Solid>();
-  solid->setExteriorShell(
-      dynamic_cast<PolyhedralSurface *>(shell1.get())->clone());
+  solid->setExteriorShell(shell1->as<PolyhedralSurface>().clone());
   BOOST_CHECK(!solid->isEmpty());
   BOOST_CHECK(solid->is3D());
   BOOST_CHECK(solid->dropZ());
@@ -177,8 +175,7 @@ BOOST_AUTO_TEST_CASE(solidSwapXYTest)
   std::unique_ptr<Geometry> shell1(io::readWkt(polyhedral1Str));
 
   std::unique_ptr<Solid> solid = std::make_unique<Solid>();
-  solid->setExteriorShell(
-      dynamic_cast<PolyhedralSurface *>(shell1.get())->clone());
+  solid->setExteriorShell(shell1->as<PolyhedralSurface>().clone());
   solid->swapXY();
 
   BOOST_CHECK_EQUAL(

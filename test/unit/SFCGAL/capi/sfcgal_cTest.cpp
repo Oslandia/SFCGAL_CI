@@ -657,7 +657,7 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
       geomCollection2.get()));
   BOOST_CHECK(hasError == false);
   sfcgal_geometry_collection_set_geometry_n(geomCollection.get(),
-                                            point->clone(), 1);
+                                            point->clone().release(), 1);
   BOOST_CHECK(sfcgal_geometry_covers(
       sfcgal_geometry_collection_geometry_n(geomCollection.get(), 1),
       point.get()));
@@ -682,7 +682,7 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   std::unique_ptr<Geometry> const simplePolygon(
       io::readWkt("POLYGON Z ((0 0 0, 2 0 1, 2 2 2, 0 2 1, 0 0 0))"));
   sfcgal_polyhedral_surface_set_patch_n(polySurface.get(),
-                                        simplePolygon->clone(), 1);
+                                        simplePolygon->clone().release(), 1);
   BOOST_CHECK(sfcgal_geometry_covers_3d(
       sfcgal_polyhedral_surface_patch_n(polySurface.get(), 1),
       simplePolygon.get()));
@@ -703,8 +703,8 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   BOOST_CHECK(hasError == false);
   std::unique_ptr<Geometry> const simpleTriangle(
       io::readWkt("TRIANGLE Z ((0 0 0, 2 0 1, 2 2 2, 0 0 0))"));
-  sfcgal_triangulated_surface_set_patch_n(tin.get(), simpleTriangle->clone(),
-                                          1);
+  sfcgal_triangulated_surface_set_patch_n(tin.get(),
+                                          simpleTriangle->clone().release(), 1);
   BOOST_CHECK(sfcgal_geometry_covers_3d(
       sfcgal_triangulated_surface_patch_n(tin.get(), 1), simpleTriangle.get()));
 

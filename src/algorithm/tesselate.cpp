@@ -26,7 +26,7 @@ tesselate(const Geometry &g, NoValidityCheck /*unused*/)
   case TYPE_TRIANGLE:
   case TYPE_MULTIPOINT:
   case TYPE_MULTILINESTRING:
-    return std::unique_ptr<Geometry>(g.clone());
+    return g.clone();
 
   case TYPE_POLYGON:
   case TYPE_POLYHEDRALSURFACE: {
@@ -66,7 +66,7 @@ tesselate(const Geometry &g, NoValidityCheck /*unused*/)
     break;
   }
 
-  return std::unique_ptr<Geometry>(g.clone());
+  return g.clone();
 }
 
 /** Tessellate geometry

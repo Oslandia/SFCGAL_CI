@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(testClone)
 
   TriangulatedSurface const g(triangles);
 
-  std::unique_ptr<Geometry> copy(g.clone());
+  std::unique_ptr<Geometry> copy = g.clone();
   BOOST_REQUIRE(copy->is<TriangulatedSurface>());
   BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numPatches(), 2U);
   BOOST_CHECK_EQUAL(copy->as<TriangulatedSurface>().numGeometries(), 1U);

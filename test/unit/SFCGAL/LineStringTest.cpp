@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE(testClone)
   LineString g;
   g.addPoint(Point(0.0, 0.0));
   g.addPoint(Point(1.0, 1.0));
-  std::unique_ptr<Geometry> copy(g.clone());
+  std::unique_ptr<Geometry> copy = g.clone();
   BOOST_REQUIRE(copy->is<LineString>());
   BOOST_CHECK_EQUAL(copy->as<LineString>().numPoints(), 2U);
 }

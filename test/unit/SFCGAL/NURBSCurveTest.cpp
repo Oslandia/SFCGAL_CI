@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(testClone)
   auto weights = convertWeights({1.0, 2.0});
 
   NURBSCurve                  curve(controlPoints, weights, 1);
-  std::unique_ptr<NURBSCurve> cloned(curve.clone());
+  std::unique_ptr<NURBSCurve> cloned = curve.clone();
 
   BOOST_REQUIRE(cloned != nullptr);
   BOOST_CHECK_EQUAL(cloned->numControlPoints(), 2U);

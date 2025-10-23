@@ -531,7 +531,9 @@ extern "C" auto
 sfcgal_geometry_clone(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
-      return reinterpret_cast<const SFCGAL::Geometry *>(geom)->clone();)
+      return reinterpret_cast<const SFCGAL::Geometry *>(geom)
+          ->clone()
+          .release();)
 }
 
 extern "C" void
@@ -1401,8 +1403,8 @@ sfcgal_geometry_make_solid(const sfcgal_geometry_t *ga) -> sfcgal_geometry_t *
 extern "C" auto
 sfcgal_geometry_force_lhr(const sfcgal_geometry_t *ga) -> sfcgal_geometry_t *
 {
-  const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(ga);
-  SFCGAL::Geometry *gb = g->clone();
+  const auto *g = reinterpret_cast<const SFCGAL::Geometry *>(ga);
+  std::unique_ptr<SFCGAL::Geometry>   gb = g->clone();
   SFCGAL::transform::ForceOrderPoints force(/* ccw */ true);
 
   try {
@@ -1415,14 +1417,14 @@ sfcgal_geometry_force_lhr(const sfcgal_geometry_t *ga) -> sfcgal_geometry_t *
     return nullptr;
   }
 
-  return gb;
+  return gb.release();
 }
 
 extern "C" auto
 sfcgal_geometry_force_rhr(const sfcgal_geometry_t *ga) -> sfcgal_geometry_t *
 {
-  const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(ga);
-  SFCGAL::Geometry *gb = g->clone();
+  const auto *g = reinterpret_cast<const SFCGAL::Geometry *>(ga);
+  std::unique_ptr<SFCGAL::Geometry>   gb = g->clone();
   SFCGAL::transform::ForceOrderPoints force(/* ccw */ false);
 
   try {
@@ -1435,7 +1437,7 @@ sfcgal_geometry_force_rhr(const sfcgal_geometry_t *ga) -> sfcgal_geometry_t *
     return nullptr;
   }
 
-  return gb;
+  return gb.release();
 }
 
 extern "C" auto
@@ -1465,7 +1467,7 @@ sfcgal_geometry_extrude(const sfcgal_geometry_t *ga, double x, double y,
                         double z) -> sfcgal_geometry_t *
 {
   const auto *g = reinterpret_cast<const SFCGAL::Geometry *>(ga);
-  std::unique_ptr<SFCGAL::Geometry>    gb(g->clone());
+  std::unique_ptr<SFCGAL::Geometry>    gb = g->clone();
   SFCGAL::transform::ForceZOrderPoints forceZ;
   std::unique_ptr<SFCGAL::Geometry>    result;
 
@@ -1487,8 +1489,8 @@ extern "C" auto
 sfcgal_geometry_round(const sfcgal_geometry_t *ga, int scale)
     -> sfcgal_geometry_t *
 {
-  const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(ga);
-  SFCGAL::Geometry *gb = g->clone();
+  const auto *g = reinterpret_cast<const SFCGAL::Geometry *>(ga);
+  std::unique_ptr<SFCGAL::Geometry> gb = g->clone();
   //	SFCGAL_WARNING( "geom: %s %s", gb->asText().c_str(), typeid(g).name() );
 
   SFCGAL::transform::RoundTransform roundT(scale);
@@ -1504,7 +1506,7 @@ sfcgal_geometry_round(const sfcgal_geometry_t *ga, int scale)
   }
 
   //	SFCGAL_WARNING( "processed geom: %s", gb->asText().c_str() );
-  return gb;
+  return gb.release();
 }
 
 extern "C" auto
@@ -1901,48 +1903,46 @@ extern "C" auto
 sfcgal_geometry_translate_2d(const sfcgal_geometry_t *geom, double dx,
                              double dy) -> sfcgal_geometry_t *
 {
-  const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(geom);
-  SFCGAL::Geometry *gb = g->clone();
+  const auto *g = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> gb = g->clone();
   try {
 
     SFCGAL::algorithm::translate(*gb, SFCGAL::Kernel::Vector_2(dx, dy));
   } catch (std::exception &e) {
     SFCGAL_WARNING("During translate(A, %g, %g):", dx, dy);
-    SFCGAL_WARNING("  with A: %s",
-                   static_cast<const SFCGAL::Geometry *>(gb)->asText().c_str());
+    SFCGAL_WARNING("  with A: %s", gb->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
 
-  return gb;
+  return gb.release();
 }
 
 extern "C" auto
 sfcgal_geometry_translate_3d(const sfcgal_geometry_t *geom, double dx,
                              double dy, double dz) -> sfcgal_geometry_t *
 {
-  const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(geom);
-  SFCGAL::Geometry *gb = g->clone();
+  const auto *g = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> gb = g->clone();
 
   try {
     SFCGAL::algorithm::translate(*gb, SFCGAL::Kernel::Vector_3(dx, dy, dz));
   } catch (std::exception &e) {
     SFCGAL_WARNING("During translate(A, %g, %g, %g):", dx, dy, dz);
-    SFCGAL_WARNING("  with A: %s",
-                   static_cast<const SFCGAL::Geometry *>(gb)->asText().c_str());
+    SFCGAL_WARNING("  with A: %s", gb->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
   }
 
-  return gb;
+  return gb.release();
 }
 
 extern "C" auto
 sfcgal_geometry_transform(const sfcgal_geometry_t *geom, const float *matrix4x4)
     -> sfcgal_geometry_t *
 {
-  const auto       *g  = reinterpret_cast<const SFCGAL::Geometry *>(geom);
-  SFCGAL::Geometry *gb = g->clone();
+  const auto *g = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::Geometry> gb = g->clone();
 
   // row by row
   CGAL::Aff_transformation_3<SFCGAL::Kernel> transf(
@@ -1957,7 +1957,7 @@ sfcgal_geometry_transform(const sfcgal_geometry_t *geom, const float *matrix4x4)
   SFCGAL::transform::AffineTransform3 visitor(transf);
   gb->accept(visitor);
 
-  return gb;
+  return gb.release();
 }
 
 extern "C" auto
@@ -1967,7 +1967,7 @@ sfcgal_geometry_scale(const sfcgal_geometry_t *geom, double s)
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::scale(*result, s); return result.release();)
 }
 
@@ -1978,7 +1978,7 @@ sfcgal_geometry_scale_3d(const sfcgal_geometry_t *geom, double sx, double sy,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::scale(*result, sx, sy, sz); return result.release();)
 }
 
@@ -1991,7 +1991,7 @@ sfcgal_geometry_scale_3d_around_center(const sfcgal_geometry_t *geom, double sx,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::scale(*result, sx, sy, sz, cx, cy, cz);
       return result.release();)
 }
@@ -2003,7 +2003,7 @@ sfcgal_geometry_rotate(const sfcgal_geometry_t *geom, double angle)
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::rotate(*result, angle); return result.release();)
 }
 
@@ -2014,7 +2014,7 @@ sfcgal_geometry_rotate_2d(const sfcgal_geometry_t *geom, double angle,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::rotate(*result, angle, SFCGAL::Point(cx, cy));
       return result.release();)
 }
@@ -2027,7 +2027,7 @@ sfcgal_geometry_rotate_3d(const sfcgal_geometry_t *geom, double angle,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::rotate(*result, angle,
                                 SFCGAL::Kernel::Vector_3(ax, ay, az));
       return result.release();)
@@ -2042,7 +2042,7 @@ sfcgal_geometry_rotate_3d_around_center(const sfcgal_geometry_t *geom,
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::rotate(*result, angle,
                                 SFCGAL::Kernel::Vector_3(ax, ay, az),
                                 SFCGAL::Point(cx, cy, cz));
@@ -2056,7 +2056,7 @@ sfcgal_geometry_rotate_x(const sfcgal_geometry_t *geom, double angle)
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::rotateX(*result, angle); return result.release();)
 }
 
@@ -2067,7 +2067,7 @@ sfcgal_geometry_rotate_y(const sfcgal_geometry_t *geom, double angle)
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::rotateY(*result, angle); return result.release();)
 }
 
@@ -2078,7 +2078,7 @@ sfcgal_geometry_rotate_z(const sfcgal_geometry_t *geom, double angle)
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       const SFCGAL::Geometry &g =
           *reinterpret_cast<const SFCGAL::Geometry *>(geom);
-      std::unique_ptr<SFCGAL::Geometry> result(g.clone());
+      std::unique_ptr<SFCGAL::Geometry> result = g.clone();
       SFCGAL::algorithm::rotateZ(*result, angle); return result.release();)
 }
 
@@ -2243,7 +2243,7 @@ sfcgal_geometry_centroid(const sfcgal_geometry_t *geom) -> sfcgal_geometry_t *
     return nullptr;
   }
 
-  std::unique_ptr<SFCGAL::Geometry> out(result->clone());
+  std::unique_ptr<SFCGAL::Geometry> out = result->clone();
   return out.release();
 }
 
@@ -2263,7 +2263,7 @@ sfcgal_geometry_centroid_3d(const sfcgal_geometry_t *geom)
     return nullptr;
   }
 
-  std::unique_ptr<SFCGAL::Geometry> out(result->clone());
+  std::unique_ptr<SFCGAL::Geometry> out = result->clone();
   return out.release();
 }
 
@@ -2314,7 +2314,7 @@ sfcgal_geometry_simplify(const sfcgal_geometry_t *geom, double threshold,
     return nullptr;
   }
 
-  std::unique_ptr<SFCGAL::Geometry> out(result->clone());
+  std::unique_ptr<SFCGAL::Geometry> out = result->clone();
   return out.release();
 }
 

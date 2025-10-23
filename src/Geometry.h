@@ -140,8 +140,11 @@ public:
   /**
    * @brief Get a deep copy of the geometry
    */
-  virtual Geometry *
-  clone() const = 0;
+  [[nodiscard]] auto
+  clone() const -> std::unique_ptr<Geometry>
+  {
+    return std::unique_ptr<Geometry>(this->cloneImpl());
+  }
 
   /**
    * @brief [OGC/SFA]returns the geometry type
@@ -441,6 +444,10 @@ public:
 
 protected:
   bool validityFlag_ = false;
+
+private:
+  [[nodiscard]] virtual auto
+  cloneImpl() const -> Geometry * = 0;
 };
 
 /**
@@ -478,6 +485,27 @@ SFCGAL_API auto inline geom_unique_ptr_as(std::unique_ptr<Geometry> &&geometry)
   BOOST_ASSERT(geometry->is<Derived>());
   return std::unique_ptr<Derived>(static_cast<Derived *>(geometry.release()));
 }
+
+/**
+ * @brief Base class that implements covariant cloning with CRTP pattern
+ */
+template <typename Derived, typename Base>
+class SFCGAL_API GeometryImpl : public Base {
+
+public:
+  [[nodiscard]] auto
+  clone() const -> std::unique_ptr<Derived>
+  {
+    return std::unique_ptr<Derived>(static_cast<Derived *>(this->cloneImpl()));
+  }
+
+private:
+  [[nodiscard]] auto
+  cloneImpl() const -> GeometryImpl * override
+  {
+    return new Derived(*static_cast<const Derived *>(this));
+  }
+};
 
 } // namespace SFCGAL
 

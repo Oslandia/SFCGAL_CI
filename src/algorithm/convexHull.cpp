@@ -32,7 +32,7 @@ convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
   using CGAL::object_cast;
 
   if (g.isEmpty()) {
-    return std::unique_ptr<Geometry>(g.clone());
+    return g.clone();
   }
 
   SFCGAL::detail::GetPointsVisitor getPointVisitor;

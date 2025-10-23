@@ -20,7 +20,8 @@ namespace SFCGAL {
  * A MultiPolygon in SFA.
  * @ŧodo add polygon() etc.
  */
-class SFCGAL_API MultiPolygon : public GeometryCollection {
+class SFCGAL_API MultiPolygon
+    : public GeometryImpl<MultiPolygon, GeometryCollection> {
 public:
   /**
    * Empty MultiPolygon constructor
@@ -39,10 +40,6 @@ public:
    * destructor
    */
   virtual ~MultiPolygon();
-
-  //-- SFCGAL::Geometry
-  MultiPolygon *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string

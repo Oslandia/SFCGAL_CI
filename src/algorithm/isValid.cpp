@@ -93,7 +93,7 @@ SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(const Geometry &g)
   if (!(g).hasValidityFlag()) {
     using namespace SFCGAL;
     if (!(g).is3D()) {
-      std::unique_ptr<Geometry> sfcgalAssertGeometryValidityClone((g).clone());
+      std::unique_ptr<Geometry> sfcgalAssertGeometryValidityClone = g.clone();
       algorithm::force3D(*sfcgalAssertGeometryValidityClone);
       SFCGAL_ASSERT_GEOMETRY_VALIDITY_((*sfcgalAssertGeometryValidityClone),
                                        "When converting to 3D - ");

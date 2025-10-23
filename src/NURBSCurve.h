@@ -74,7 +74,7 @@ namespace SFCGAL {
  *
  * @since 2.3.0
  */
-class SFCGAL_API NURBSCurve : public Curve {
+class SFCGAL_API NURBSCurve : public GeometryImpl<NURBSCurve, Curve> {
 public:
   // Type aliases for clarity and consistency
   using FT = Kernel::FT;      ///< Floating-point type for NURBS calculations
@@ -345,13 +345,6 @@ public:
    */
   [[nodiscard]] auto
   geometryType() const -> std::string override;
-
-  /**
-   * @brief Create a deep copy of this NURBSCurve
-   * @return Pointer to cloned NURBSCurve
-   */
-  [[nodiscard]] auto
-  clone() const -> NURBSCurve * override;
 
   /**
    * @brief Check if curve is empty

@@ -23,7 +23,7 @@ namespace SFCGAL {
 /**
  * A LineString in SFA
  */
-class SFCGAL_API LineString : public Geometry {
+class SFCGAL_API LineString : public GeometryImpl<LineString, Geometry> {
 public:
   using iterator =
       DereferenceIterator<std::vector<std::unique_ptr<Point>>::iterator>;
@@ -57,10 +57,6 @@ public:
    * destructor
    */
   ~LineString();
-
-  //-- SFCGAL::Geometry
-  LineString *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string
@@ -181,7 +177,7 @@ public:
   void
   addPoint(const Point &point)
   {
-    addPoint(std::unique_ptr<Point>(point.clone()));
+    addPoint(point.clone());
   }
   /**
    * @brief Appends a Point to the LineString and takes ownership
@@ -221,7 +217,7 @@ public:
   inline void
   closes()
   {
-    _points.push_back(std::unique_ptr<Point>(_points.front()->clone()));
+    _points.push_back(_points.front()->clone());
   }
 
   //-- iterators

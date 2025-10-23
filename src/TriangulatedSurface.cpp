@@ -18,16 +18,16 @@ TriangulatedSurface::TriangulatedSurface(const std::vector<Triangle> &triangles)
 
 {
   for (const auto &triangle : triangles) {
-    _triangles.push_back(std::unique_ptr<Triangle>(triangle.clone()));
+    _triangles.push_back(triangle.clone());
   }
 }
 
 TriangulatedSurface::TriangulatedSurface(const TriangulatedSurface &other)
-    : Surface(other)
+    : GeometryImpl(other)
 {
   _triangles.reserve(other._triangles.size());
   for (const auto &triangle : other._triangles) {
-    _triangles.emplace_back(std::unique_ptr<Triangle>(triangle->clone()));
+    _triangles.emplace_back(triangle->clone());
   }
 }
 
@@ -40,12 +40,6 @@ TriangulatedSurface::operator=(TriangulatedSurface other)
 }
 
 TriangulatedSurface::~TriangulatedSurface() = default;
-
-auto
-TriangulatedSurface::clone() const -> TriangulatedSurface *
-{
-  return new TriangulatedSurface(*this);
-}
 
 auto
 TriangulatedSurface::geometryType() const -> std::string
@@ -197,7 +191,7 @@ TriangulatedSurface::setPatchN(Triangle *triangle, size_t const &idx)
 void
 TriangulatedSurface::setPatchN(const Triangle &triangle, size_t const &idx)
 {
-  setPatchN(std::unique_ptr<Triangle>(triangle.clone()), idx);
+  setPatchN(triangle.clone(), idx);
 }
 
 void
@@ -223,7 +217,7 @@ TriangulatedSurface::setPatchN(Geometry *geometry, size_t const &idx)
 void
 TriangulatedSurface::setPatchN(const Geometry &geometry, size_t const &idx)
 {
-  setPatchN(std::unique_ptr<Geometry>(geometry.clone()), idx);
+  setPatchN(geometry.clone(), idx);
 }
 
 void

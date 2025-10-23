@@ -604,7 +604,7 @@ const std::vector<Operation> operations = {
        double dx     = params["dx"];
        double dy     = params["dy"];
        double dz     = params["dz"];
-       auto   result = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto   result = geom_a->clone();
        SFCGAL::algorithm::translate(*result, dx, dy, dz);
        return result;
      }},
@@ -637,7 +637,7 @@ const std::vector<Operation> operations = {
        // Convert degrees to radians
        double angle_rad = (angle_deg * M_PI) / 180.0;
 
-       auto result = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto result = geom_a->clone();
 
        try {
          if (axis == "x" || axis == "X") {
@@ -668,7 +668,7 @@ const std::vector<Operation> operations = {
        double sx     = params.count("sx") ? params["sx"] : scale;
        double sy     = params.count("sy") ? params["sy"] : scale;
        double sz     = params.count("sz") ? params["sz"] : scale;
-       auto   result = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto   result = geom_a->clone();
        SFCGAL::algorithm::scale(*result, sx, sy, sz);
        return result;
      }},
@@ -680,7 +680,7 @@ const std::vector<Operation> operations = {
      "A", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto result = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto result = geom_a->clone();
        SFCGAL::algorithm::force2D(*result);
        return result;
      }},
@@ -694,7 +694,7 @@ const std::vector<Operation> operations = {
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
        auto   params = parse_params(args);
        double z      = params.count("z") ? params["z"] : 1.0;
-       auto   result = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto   result = geom_a->clone();
        SFCGAL::algorithm::force3D(*result, z);
        return result;
      }},
@@ -708,7 +708,7 @@ const std::vector<Operation> operations = {
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
        auto   params = parse_params(args);
        double m      = params.count("m") ? params["m"] : 1.0;
-       auto   result = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto   result = geom_a->clone();
        SFCGAL::algorithm::forceMeasured(*result, m);
        return result;
      }},
@@ -745,7 +745,7 @@ const std::vector<Operation> operations = {
      "Extract polygons from geometry collection", false, "", "A", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto copy = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto copy = geom_a->clone();
        return SFCGAL::algorithm::collectionExtractPolygons(std::move(copy));
      }},
 
@@ -753,7 +753,7 @@ const std::vector<Operation> operations = {
      "Convert collection to appropriate multi-type", false, "", "A", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto copy = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto copy = geom_a->clone();
        return SFCGAL::algorithm::collectionHomogenize(std::move(copy));
      }},
 
@@ -761,7 +761,7 @@ const std::vector<Operation> operations = {
      "Convert collection to multi-geometry type", false, "", "A", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto copy = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto copy = geom_a->clone();
        return SFCGAL::algorithm::collectionToMulti(std::move(copy));
      }},
 
@@ -1025,7 +1025,7 @@ const std::vector<Operation> operations = {
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
        // Clone the input geometry to pass ownership to make_solid
-       auto geom_copy = std::unique_ptr<SFCGAL::Geometry>(geom_a->clone());
+       auto geom_copy = geom_a->clone();
        return Constructors::make_solid(std::move(geom_copy));
      }}};
 

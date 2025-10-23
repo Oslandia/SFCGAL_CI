@@ -24,12 +24,6 @@ MultiLineString::operator=(MultiLineString other) -> MultiLineString &
 MultiLineString::~MultiLineString() = default;
 
 auto
-MultiLineString::clone() const -> MultiLineString *
-{
-  return new MultiLineString(*this);
-}
-
-auto
 MultiLineString::geometryType() const -> std::string
 {
   return "MultiLineString";

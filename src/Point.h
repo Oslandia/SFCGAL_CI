@@ -21,7 +21,7 @@ namespace SFCGAL {
  * from examples/Kernel_23/MyPointC2.h
  * @todo strong typing on coordinate dimension?
  */
-class SFCGAL_API Point : public Geometry {
+class SFCGAL_API Point : public GeometryImpl<Point, Geometry> {
 public:
   /**
    * Empty point constructor
@@ -89,10 +89,6 @@ public:
    * destructor
    */
   ~Point();
-
-  //-- SFCGAL::Geometry
-  Point *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string

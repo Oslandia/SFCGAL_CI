@@ -14,7 +14,7 @@ Solid::Solid() { _shells.push_back(std::make_unique<PolyhedralSurface>()); }
 
 Solid::Solid(const PolyhedralSurface &exteriorShell)
 {
-  _shells.push_back(std::unique_ptr<PolyhedralSurface>(exteriorShell.clone()));
+  _shells.push_back(exteriorShell.clone());
 }
 
 Solid::Solid(PolyhedralSurface *exteriorShell)
@@ -29,16 +29,16 @@ Solid::Solid(const std::vector<PolyhedralSurface> &shells)
     _shells[0] = std::make_unique<PolyhedralSurface>();
   } else {
     for (const auto &shell : shells) {
-      _shells.push_back(std::unique_ptr<PolyhedralSurface>(shell.clone()));
+      _shells.push_back(shell.clone());
     }
   }
 }
 
-Solid::Solid(const Solid &other) : Geometry(other)
+Solid::Solid(const Solid &other) : GeometryImpl(other)
 {
   _shells.reserve(other._shells.size());
   for (const auto &shell : other._shells) {
-    _shells.emplace_back(std::unique_ptr<PolyhedralSurface>(shell->clone()));
+    _shells.emplace_back(shell->clone());
   }
 }
 
@@ -50,12 +50,6 @@ Solid::operator=(Solid other) -> Solid &
 }
 
 Solid::~Solid() = default;
-
-auto
-Solid::clone() const -> Solid *
-{
-  return new Solid(*this);
-}
 
 auto
 Solid::geometryType() const -> std::string

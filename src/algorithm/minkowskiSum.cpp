@@ -265,7 +265,7 @@ minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
 {
   if (gB.isEmpty()) {
-    return std::unique_ptr<Geometry>(gA.clone());
+    return gA.clone();
   }
 
   Polygon_set_2 polygonSet;

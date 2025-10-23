@@ -24,7 +24,7 @@ namespace SFCGAL {
 /**
  * A Polygon in SFA with holes
  */
-class SFCGAL_API Polygon : public Surface {
+class SFCGAL_API Polygon : public GeometryImpl<Polygon, Surface> {
 public:
   using iterator =
       DereferenceIterator<std::vector<std::unique_ptr<LineString>>::iterator>;
@@ -75,10 +75,6 @@ public:
    * destructor
    */
   ~Polygon();
-
-  //-- SFCGAL::Geometry
-  Polygon *
-  clone() const override;
 
   //-- SFCGAL::Geometry
   std::string
@@ -237,7 +233,7 @@ public:
   void
   addInteriorRing(const LineString &ls)
   {
-    addInteriorRing(std::unique_ptr<LineString>(ls.clone()));
+    addInteriorRing(ls.clone());
   }
   /**
    * append a ring to the Polygon (take ownership)
@@ -267,7 +263,7 @@ public:
   inline void
   addRing(const LineString &ls)
   {
-    _rings.push_back(std::unique_ptr<LineString>(ls.clone()));
+    _rings.push_back(ls.clone());
   }
   /**
    * append a ring to the Polygon (take ownership)

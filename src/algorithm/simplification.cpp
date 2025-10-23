@@ -46,7 +46,7 @@ simplify(const Geometry &geometry, double threshold, bool preserveTopology,
          NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
   if (geometry.isEmpty()) {
-    return std::unique_ptr<Geometry>(geometry.clone());
+    return geometry.clone();
   }
 
   const double squaredThreshold = threshold * threshold;
@@ -88,7 +88,7 @@ simplify(const Geometry &geometry, double threshold, bool preserveTopology,
 
   default:
     // For unsupported types, return a copy
-    return std::unique_ptr<Geometry>(geometry.clone());
+    return geometry.clone();
   }
 }
 

@@ -849,12 +849,12 @@ simplifyMultiPolygon(const MultiPolygon &multiPolygon, double threshold,
     if (result->numGeometries() > 0) {
       auto *mp = dynamic_cast<const MultiPolygon *>(&(result->geometryN(0)));
       if (mp) {
-        return std::unique_ptr<Geometry>(mp->clone());
+        return mp->clone();
       }
     }
 
     // Fallback if reconstruction failed
-    return std::unique_ptr<Geometry>(multiPolygon.clone());
+    return multiPolygon.clone();
   } else {
     // Non-topology preserving mode: simplify each polygon independently
     auto result = std::make_unique<MultiPolygon>();
@@ -939,12 +939,12 @@ simplifyPolyhedralSurface(const PolyhedralSurface &polySurface,
       auto *ps =
           dynamic_cast<const PolyhedralSurface *>(&(result->geometryN(0)));
       if (ps) {
-        return std::unique_ptr<Geometry>(ps->clone());
+        return ps->clone();
       }
     }
 
     // Fallback if reconstruction failed
-    return std::unique_ptr<Geometry>(polySurface.clone());
+    return polySurface.clone();
   } else {
     // Create a MultiPolygon containing the same polygons and preserving
     // coordinate type
@@ -963,7 +963,7 @@ simplifyPolyhedralSurface(const PolyhedralSurface &polySurface,
 
     if (!simplifiedMultiPolygon) {
       // Fallback if casting fails
-      return std::unique_ptr<Geometry>(polySurface.clone());
+      return polySurface.clone();
     }
 
     // Create a new PolyhedralSurface from the simplified MultiPolygon

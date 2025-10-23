@@ -95,12 +95,6 @@ Point::operator=(const Point &other) -> Point &
 Point::~Point() = default;
 
 auto
-Point::clone() const -> Point *
-{
-  return new Point(*this);
-}
-
-auto
 Point::geometryType() const -> std::string
 {
   return "Point";

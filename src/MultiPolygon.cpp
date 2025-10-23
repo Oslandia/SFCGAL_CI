@@ -24,12 +24,6 @@ MultiPolygon::operator=(MultiPolygon other) -> MultiPolygon &
 MultiPolygon::~MultiPolygon() = default;
 
 auto
-MultiPolygon::clone() const -> MultiPolygon *
-{
-  return new MultiPolygon(*this);
-}
-
-auto
 MultiPolygon::geometryType() const -> std::string
 {
   return "MultiPolygon";

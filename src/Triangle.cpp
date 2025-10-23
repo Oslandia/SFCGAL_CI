@@ -38,7 +38,7 @@ Triangle::Triangle(const Point &p, const Point &q, const Point &r)
   _vertices[2] = r;
 }
 
-Triangle::Triangle(const Triangle &other) : Surface(other)
+Triangle::Triangle(const Triangle &other) : GeometryImpl(other)
 {
   _vertices[0] = other._vertices[0];
   _vertices[1] = other._vertices[1];
@@ -55,12 +55,6 @@ Triangle::operator=(const Triangle &other) -> Triangle &
 }
 
 Triangle::~Triangle() = default;
-
-auto
-Triangle::clone() const -> Triangle *
-{
-  return new Triangle(*this);
-}
 
 auto
 Triangle::geometryType() const -> std::string

@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(xyToVector_3)
 BOOST_AUTO_TEST_CASE(testClone)
 {
   Point const               p(3.0, 4.0);
-  std::unique_ptr<Geometry> copy(p.clone());
+  std::unique_ptr<Geometry> copy = p.clone();
   BOOST_REQUIRE(copy->is<Point>());
   BOOST_CHECK_EQUAL(copy->as<Point>().x(), 3.0);
   BOOST_CHECK_EQUAL(copy->as<Point>().y(), 4.0);

@@ -1338,12 +1338,6 @@ NURBSCurve::geometryType() const -> std::string
 }
 
 auto
-NURBSCurve::clone() const -> NURBSCurve *
-{
-  return new NURBSCurve(*this);
-}
-
-auto
 NURBSCurve::isEmpty() const -> bool
 {
   return _controlPoints.empty();
@@ -1887,7 +1881,7 @@ NURBSCurve::reparameterizeByArcLength() const -> std::unique_ptr<Curve>
   FT totalLength = length();
 
   if (totalLength <= EPSILON) {
-    return std::unique_ptr<NURBSCurve>(clone());
+    return clone();
   }
 
   // Use a reasonable number of samples for reparameterization
@@ -1929,12 +1923,12 @@ NURBSCurve::split(Parameter parameter) const
 
   if (parameter <= bounds.first) {
     auto emptyCurve = std::make_unique<NURBSCurve>();
-    auto fullCurve  = std::unique_ptr<NURBSCurve>(clone());
+    auto fullCurve  = clone();
     return std::make_pair(std::move(emptyCurve), std::move(fullCurve));
   }
 
   if (parameter >= bounds.second) {
-    auto fullCurve  = std::unique_ptr<NURBSCurve>(clone());
+    auto fullCurve  = clone();
     auto emptyCurve = std::make_unique<NURBSCurve>();
     return std::make_pair(std::move(fullCurve), std::move(emptyCurve));
   }
@@ -2061,11 +2055,11 @@ NURBSCurve::join(const Curve &other, Continuity /*continuity*/,
   }
 
   if (isEmpty()) {
-    return std::unique_ptr<NURBSCurve>(otherNurbs->clone());
+    return otherNurbs->clone();
   }
 
   if (otherNurbs->isEmpty()) {
-    return std::unique_ptr<NURBSCurve>(clone());
+    return clone();
   }
 
   Point thisEnd    = endPoint();

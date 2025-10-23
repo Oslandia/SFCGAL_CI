@@ -245,7 +245,7 @@ preparePolygon(const Polygon &poly, Kernel::Vector_2 &trans)
   trans              = Kernel::Vector_2(-env.xMin(), -env.yMin());
 
   // @todo: avoid cloning !
-  std::unique_ptr<Polygon> cloned(poly.clone());
+  std::unique_ptr<Polygon> cloned = poly.clone();
   algorithm::translate(*cloned, trans);
   Polygon_with_holes_2 ret = cloned->toPolygon_with_holes_2();
   trans                    = -trans;
