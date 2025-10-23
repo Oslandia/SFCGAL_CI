@@ -220,7 +220,7 @@ public:
    * It needs to be a triangle.
    */
   void
-  setPatchN(const Geometry &geometry, size_t const &n);
+  setPatchN(const Geometry &geometry, size_t const &idx);
 
   /**
    * Sets the n-th Geometry, starting at zero
@@ -229,21 +229,51 @@ public:
    * anymore of its deallocation.
    */
   void
-  setPatchN(Geometry *geometry, size_t const &n);
+  setPatchN(Geometry *geometry, size_t const &idx);
+
+  /**
+   * @brief Sets the n-th patch in the TriangulatedSurface.
+   *
+   * Replaces the patch at the specified index with the provided one.
+   * Only Triangle geometries are allowed. Indexing starts at zero.
+   *
+   * @param geometry A unique pointer to the Geometry object to set. Ownership
+   * is transferred to this class.
+   * @param idx The zero-based index of the patch to replace.
+   *
+   */
+  void
+  setPatchN(std::unique_ptr<Geometry> geometry, size_t const &idx);
 
   /**
    * Sets the n-th Patch, starting at zero
    */
   void
-  setPatchN(const Triangle &triangle, size_t const &n);
+  setPatchN(const Triangle &triangle, size_t const &idx);
 
   /**
    * Sets the n-th Patch, starting at zero
    * The ownership of the polygon is taken. The caller is not responsible
    * anymore of its deallocation.
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
   void
-  setPatchN(Triangle *triangle, size_t const &n);
+  setPatchN(Triangle *triangle, size_t const &idx);
+
+  /**
+   * @brief Sets the n-th patch in the TriangulatedSurface.
+   *
+   * Replaces the patch at the specified index with the provided one.
+   * Indexing starts at zero.
+   *
+   * @param triangle A unique pointer to the Triangle object to set. Ownership
+   * is transferred to this class.
+   * @param idx The zero-based index of the patch to replace.
+   *
+   */
+  void
+  setPatchN(std::unique_ptr<Triangle> triangle, size_t const &idx);
 
   //-- optimization
 

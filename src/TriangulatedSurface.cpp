@@ -6,6 +6,7 @@
 #include <boost/format.hpp>
 
 #include "SFCGAL/Exception.h"
+#include "SFCGAL/Geometry.h"
 #include "SFCGAL/GeometryVisitor.h"
 #include "SFCGAL/TriangulatedSurface.h"
 
@@ -171,45 +172,58 @@ TriangulatedSurface::patchN(size_t const &n) -> Triangle &
 }
 
 void
-TriangulatedSurface::setPatchN(Triangle *triangle, size_t const &n)
+TriangulatedSurface::setPatchN(std::unique_ptr<Triangle> triangle,
+                               size_t const             &idx)
 {
-  BOOST_ASSERT(triangle != NULL);
+  BOOST_ASSERT(triangle != nullptr);
 
-  if (n >= numPatches()) {
+  if (idx >= numPatches()) {
     BOOST_THROW_EXCEPTION(Exception(
         (boost::format("Cannot set geometry at position %s. "
                        "TriangulatedSurface has only %d geometries.") %
-         n % numPatches())
+         idx % numPatches())
             .str()));
   }
 
-  _triangles[n] = std::unique_ptr<Triangle>(triangle);
+  _triangles[idx] = std::move(triangle);
 }
 
 void
-TriangulatedSurface::setPatchN(const Triangle &triangle, size_t const &n)
+TriangulatedSurface::setPatchN(Triangle *triangle, size_t const &idx)
 {
-  setPatchN(triangle.clone(), n);
+  setPatchN(std::unique_ptr<Triangle>(triangle), idx);
 }
 
 void
-TriangulatedSurface::setPatchN(Geometry *geometry, size_t const &n)
+TriangulatedSurface::setPatchN(const Triangle &triangle, size_t const &idx)
+{
+  setPatchN(std::unique_ptr<Triangle>(triangle.clone()), idx);
+}
+
+void
+TriangulatedSurface::setPatchN(std::unique_ptr<Geometry> geometry,
+                               size_t const             &idx)
 {
   if (geometry->geometryTypeId() != TYPE_TRIANGLE) {
     std::ostringstream oss;
     oss << "try to set a '" << geometry->geometryType()
         << "' in a TriangulatedSurface\n";
-    delete geometry; // we are responsible for the resource here
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
-  setPatchN(dynamic_cast<Triangle *>(geometry), n);
+  setPatchN(geom_unique_ptr_as<Triangle>(std::move(geometry)), idx);
 }
 
 void
-TriangulatedSurface::setPatchN(const Geometry &geometry, size_t const &n)
+TriangulatedSurface::setPatchN(Geometry *geometry, size_t const &idx)
 {
-  setPatchN(geometry.clone(), n);
+  setPatchN(std::unique_ptr<Geometry>(geometry), idx);
+}
+
+void
+TriangulatedSurface::setPatchN(const Geometry &geometry, size_t const &idx)
+{
+  setPatchN(std::unique_ptr<Geometry>(geometry.clone()), idx);
 }
 
 void
