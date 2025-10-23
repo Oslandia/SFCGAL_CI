@@ -121,6 +121,12 @@ Geometry::setGeometryN(Geometry *, size_t const &)
 {
 }
 
+void
+Geometry::setGeometryN([[maybe_unused]] std::unique_ptr<Geometry> geometry,
+                       [[maybe_unused]] size_t const             &idx)
+{
+}
+
 Geometry::Geometry() = default;
 
 auto

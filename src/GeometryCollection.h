@@ -91,11 +91,14 @@ public:
   geometryN(size_t const &n) override;
 
   //-- SFCGAL::Geometry
-  virtual void
-  setGeometryN(const Geometry &geometry, size_t const &n) override;
+  void
+  setGeometryN(const Geometry &geometry, size_t const &idx) override;
   //-- SFCGAL::Geometry
-  virtual void
-  setGeometryN(Geometry *geometry, size_t const &n) override;
+  void
+  setGeometryN(Geometry *geometry, size_t const &idx) override;
+  //-- SFCGAL::Geometry
+  void
+  setGeometryN(std::unique_ptr<Geometry> geometry, size_t const &idx) override;
 
   /**
    * [SFA/OGC]add a geometry to the collection (takes ownership)

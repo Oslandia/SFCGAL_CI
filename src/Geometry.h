@@ -329,9 +329,15 @@ public:
    * @brief [OGC/SFA]Sets the n-th geometry, starting at zero
    * @warning Does nothing for Point, LineString, Polygon, Triangle
    * TriangulatedSurface
+   *
+   * @param geometry A unique pointer to the new Geometry object that will
+   * replace the existing geometry at index `n`. Ownership of the geometry is
+   * transferred to the collection.
+   * @param idx The zero-based index of the geometry to set. Must be less than
+   * the total number of geometries contained in the collection.
    */
   virtual void
-  setGeometryN(const Geometry &geometry, size_t const &n);
+  setGeometryN(const Geometry &geometry, size_t const &idx);
 
   /**
    * @brief [OGC/SFA]Sets the n-th geometry, starting at zero
@@ -339,9 +345,31 @@ public:
    * anymore of its deallocation.
    * @warning *this for GeometryCollection, PolyhedralSurface,
    * TriangulatedSurface
+   *
+   * @param geometry A unique pointer to the new Geometry object that will
+   * replace the existing geometry at index `n`. Ownership of the geometry is
+   * transferred to the collection.
+   * @param idx The zero-based index of the geometry to set. Must be less than
+   * the total number of geometries contained in the collection.
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
   virtual void
-  setGeometryN(Geometry *geometry, size_t const &n);
+  setGeometryN(Geometry *geometry, size_t const &idx);
+
+  /**
+   * @brief [OGC/SFA]Sets the n-th geometry, starting at zero
+   * @warning *this for GeometryCollection, PolyhedralSurface,
+   * TriangulatedSurface
+   *
+   * @param geometry A unique pointer to the new Geometry object that will
+   * replace the existing geometry at index `n`. Ownership of the geometry is
+   * transferred to the collection.
+   * @param idx The zero-based index of the geometry to set. Must be less than
+   * the total number of geometries contained in the collection.
+   */
+  virtual void
+  setGeometryN(std::unique_ptr<Geometry> geometry, size_t const &idx);
 
   /**
    * @brief Tests if geometry is of "Derived" type given as template parameter
