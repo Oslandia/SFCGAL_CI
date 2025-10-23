@@ -159,23 +159,37 @@ public:
   }
 
   /**
+   * @brief Sets the Solid exterior shell.
+   *
+   * @param shell A unique pointer to the new shell. Ownership is transferred to
+   * this class.
+   */
+  void
+  setExteriorShell(std::unique_ptr<PolyhedralSurface> shell)
+  {
+    _shells[0] = std::move(shell);
+  }
+
+  /**
    * Sets the Solid exterior shell
    */
   inline void
   setExteriorShell(const PolyhedralSurface &shell)
   {
-    _shells[0] = std::unique_ptr<PolyhedralSurface>(shell.clone());
+    setExteriorShell(std::unique_ptr<PolyhedralSurface>(shell.clone()));
   }
 
   /**
    * Sets the Solid exterior shell
    * The ownership of the shell is taken. The caller is not responsible
    * anymore of its deallocation.
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
   inline void
   setExteriorShell(PolyhedralSurface *shell)
   {
-    _shells[0] = std::unique_ptr<PolyhedralSurface>(shell);
+    setExteriorShell(std::unique_ptr<PolyhedralSurface>(shell));
   }
 
   /**
