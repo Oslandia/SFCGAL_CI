@@ -5,36 +5,40 @@
 
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/GeometryVisitor.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include <memory>
 
 namespace SFCGAL {
 
-Solid::Solid() { _shells.push_back(new PolyhedralSurface()); }
+Solid::Solid() { _shells.push_back(std::make_unique<PolyhedralSurface>()); }
 
 Solid::Solid(const PolyhedralSurface &exteriorShell)
 {
-  _shells.push_back(exteriorShell.clone());
+  _shells.push_back(std::unique_ptr<PolyhedralSurface>(exteriorShell.clone()));
 }
 
 Solid::Solid(PolyhedralSurface *exteriorShell)
 {
-  _shells.push_back(exteriorShell);
+  _shells.push_back(std::unique_ptr<PolyhedralSurface>(exteriorShell));
 }
 
 Solid::Solid(const std::vector<PolyhedralSurface> &shells)
 {
   if (shells.empty()) {
-    _shells.resize(1, new PolyhedralSurface());
+    _shells.resize(1);
+    _shells[0] = std::make_unique<PolyhedralSurface>();
   } else {
     for (const auto &shell : shells) {
-      _shells.push_back(shell.clone());
+      _shells.push_back(std::unique_ptr<PolyhedralSurface>(shell.clone()));
     }
   }
 }
 
 Solid::Solid(const Solid &other) : Geometry(other)
 {
-  for (size_t i = 0; i < other.numShells(); i++) {
-    _shells.push_back(other.shellN(i).clone());
+  _shells.reserve(other._shells.size());
+  for (const auto &shell : other._shells) {
+    _shells.emplace_back(std::unique_ptr<PolyhedralSurface>(shell->clone()));
   }
 }
 
@@ -103,7 +107,7 @@ Solid::dropZ() -> bool
   }
 
   for (auto &_shell : _shells) {
-    _shell.dropZ();
+    _shell->dropZ();
   }
 
   return true;
@@ -117,7 +121,7 @@ Solid::dropM() -> bool
   }
 
   for (auto &_shell : _shells) {
-    _shell.dropM();
+    _shell->dropM();
   }
 
   return true;
@@ -127,7 +131,7 @@ auto
 Solid::swapXY() -> void
 {
   for (auto &_shell : _shells) {
-    _shell.swapXY();
+    _shell->swapXY();
   }
 }
 
