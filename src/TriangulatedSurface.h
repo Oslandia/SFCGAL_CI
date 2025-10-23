@@ -7,15 +7,15 @@
 #define SFCGAL_TRIANGULATED_SURFACE_H_
 
 #include <boost/assert.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/ptr_container/serialize_ptr_vector.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/unique_ptr.hpp>
 #include <set>
 #include <vector>
 
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 
+#include "SFCGAL/DereferenceIterator.h"
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Triangle.h"
@@ -28,8 +28,10 @@ namespace SFCGAL {
  */
 class SFCGAL_API TriangulatedSurface : public Surface {
 public:
-  typedef boost::ptr_vector<Triangle>::iterator       iterator;
-  typedef boost::ptr_vector<Triangle>::const_iterator const_iterator;
+  using iterator =
+      DereferenceIterator<std::vector<std::unique_ptr<Triangle>>::iterator>;
+  using const_iterator = DereferenceIterator<
+      std::vector<std::unique_ptr<Triangle>>::const_iterator>;
 
   /**
    * Empty TriangulatedSurface constructor
@@ -121,7 +123,7 @@ public:
   inline void
   addPatch(Triangle *patch)
   {
-    _triangles.push_back(patch);
+    _triangles.push_back(std::unique_ptr<Triangle>(patch));
   }
   /**
    * add patchs from an other TriangulatedSurface
@@ -146,7 +148,7 @@ public:
   triangleN(size_t const &n) const
   {
     BOOST_ASSERT(n < _triangles.size());
-    return _triangles[n];
+    return *_triangles[n];
   }
   /**
    * [SFA/OGC]Returns the n-th point
@@ -156,7 +158,7 @@ public:
   triangleN(size_t const &n)
   {
     BOOST_ASSERT(n < _triangles.size());
-    return _triangles[n];
+    return *_triangles[n];
   }
   /**
    * add a Triangle to the TriangulatedSurface
@@ -174,7 +176,7 @@ public:
   inline void
   addTriangle(Triangle *triangle)
   {
-    _triangles.push_back(triangle);
+    _triangles.push_back(std::unique_ptr<Triangle>(triangle));
   }
   /**
    * add triangles from an other TriangulatedSurface
@@ -223,23 +225,23 @@ public:
   inline iterator
   begin()
   {
-    return _triangles.begin();
+    return dereference_iterator(_triangles.begin());
   }
   inline const_iterator
   begin() const
   {
-    return _triangles.begin();
+    return dereference_iterator(_triangles.begin());
   }
 
   inline iterator
   end()
   {
-    return _triangles.end();
+    return dereference_iterator(_triangles.end());
   }
   inline const_iterator
   end() const
   {
-    return _triangles.end();
+    return dereference_iterator(_triangles.end());
   }
 
   //-- visitors
@@ -272,7 +274,7 @@ public:
   }
 
 private:
-  boost::ptr_vector<Triangle> _triangles;
+  std::vector<std::unique_ptr<Triangle>> _triangles;
 
   void
   swap(TriangulatedSurface &other)

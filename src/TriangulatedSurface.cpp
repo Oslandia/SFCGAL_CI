@@ -17,13 +17,18 @@ TriangulatedSurface::TriangulatedSurface(const std::vector<Triangle> &triangles)
 
 {
   for (const auto &triangle : triangles) {
-    _triangles.push_back(triangle.clone());
+    _triangles.push_back(std::unique_ptr<Triangle>(triangle.clone()));
   }
 }
 
 TriangulatedSurface::TriangulatedSurface(const TriangulatedSurface &other)
-
-    = default;
+    : Surface(other)
+{
+  _triangles.reserve(other._triangles.size());
+  for (const auto &triangle : other._triangles) {
+    _triangles.emplace_back(std::unique_ptr<Triangle>(triangle->clone()));
+  }
+}
 
 auto
 TriangulatedSurface::operator=(TriangulatedSurface other)
@@ -66,7 +71,7 @@ TriangulatedSurface::coordinateDimension() const -> int
   if (_triangles.empty()) {
     return 0;
   }
-  return _triangles[0].coordinateDimension();
+  return _triangles[0]->coordinateDimension();
 }
 
 auto
@@ -78,13 +83,13 @@ TriangulatedSurface::isEmpty() const -> bool
 auto
 TriangulatedSurface::is3D() const -> bool
 {
-  return !_triangles.empty() && _triangles.front().is3D();
+  return !_triangles.empty() && _triangles.front()->is3D();
 }
 
 auto
 TriangulatedSurface::isMeasured() const -> bool
 {
-  return !_triangles.empty() && _triangles.front().isMeasured();
+  return !_triangles.empty() && _triangles.front()->isMeasured();
 }
 
 auto
@@ -95,7 +100,7 @@ TriangulatedSurface::dropZ() -> bool
   }
 
   for (auto &_triangle : _triangles) {
-    _triangle.dropZ();
+    _triangle->dropZ();
   }
 
   return true;
@@ -109,7 +114,7 @@ TriangulatedSurface::dropM() -> bool
   }
 
   for (auto &_triangle : _triangles) {
-    _triangle.dropM();
+    _triangle->dropM();
   }
 
   return true;
@@ -119,7 +124,7 @@ auto
 TriangulatedSurface::swapXY() -> void
 {
   for (auto &_triangle : _triangles) {
-    _triangle.swapXY();
+    _triangle->swapXY();
   }
 }
 
@@ -148,7 +153,7 @@ TriangulatedSurface::patchN(size_t const &n) const -> const Triangle &
             .str()));
   }
 
-  return _triangles[n];
+  return *_triangles[n];
 }
 
 auto
@@ -162,7 +167,7 @@ TriangulatedSurface::patchN(size_t const &n) -> Triangle &
             .str()));
   }
 
-  return _triangles[n];
+  return *_triangles[n];
 }
 
 void
@@ -178,7 +183,7 @@ TriangulatedSurface::setPatchN(Triangle *triangle, size_t const &n)
             .str()));
   }
 
-  _triangles.replace(n, triangle);
+  _triangles[n] = std::unique_ptr<Triangle>(triangle);
 }
 
 void
