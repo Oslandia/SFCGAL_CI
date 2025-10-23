@@ -239,45 +239,57 @@ PolyhedralSurface::addPolygons(const PolyhedralSurface &polyhedralSurface)
 }
 
 void
-PolyhedralSurface::setPatchN(Polygon *patch, size_t const &n)
+PolyhedralSurface::setPatchN(Polygon *patch, size_t const &idx)
 {
-  BOOST_ASSERT(patch != NULL);
+  setPatchN(std::unique_ptr<Polygon>(patch), idx);
+}
 
-  if (n >= numPatches()) {
+void
+PolyhedralSurface::setPatchN(std::unique_ptr<Polygon> patch, size_t const &idx)
+{
+  BOOST_ASSERT(patch != nullptr);
+
+  if (idx >= numPatches()) {
     BOOST_THROW_EXCEPTION(
         Exception((boost::format("Cannot set geometry at position %s. "
                                  "PolyhedralSurface has only %d geometries.") %
-                   n % numPatches())
+                   idx % numPatches())
                       .str()));
   }
 
-  _polygons[n] = std::unique_ptr<Polygon>(patch);
+  _polygons[idx] = std::move(patch);
 }
 
 void
-PolyhedralSurface::setPatchN(const Polygon &patch, size_t const &n)
+PolyhedralSurface::setPatchN(const Polygon &patch, size_t const &idx)
 {
-  setPatchN(patch.clone(), n);
+  setPatchN(std::unique_ptr<Polygon>(patch.clone()), idx);
 }
 
 void
-PolyhedralSurface::setPatchN(Geometry *geometry, size_t const &n)
+PolyhedralSurface::setPatchN(std::unique_ptr<Geometry> geometry,
+                             size_t const             &idx)
 {
   if (geometry->geometryTypeId() != TYPE_POLYGON) {
     std::ostringstream oss;
     oss << "try to set a '" << geometry->geometryType()
         << "' in a PolyhedralSurface\n";
-    delete geometry; // we are responsible for the resource here
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
-  setPatchN(dynamic_cast<Polygon *>(geometry), n);
+  setPatchN(geom_unique_ptr_as<Polygon>(std::move(geometry)), idx);
 }
 
 void
-PolyhedralSurface::setPatchN(const Geometry &geometry, size_t const &n)
+PolyhedralSurface::setPatchN(Geometry *geometry, size_t const &idx)
 {
-  setPatchN(geometry.clone(), n);
+  setPatchN(std::unique_ptr<Geometry>(geometry), idx);
+}
+
+void
+PolyhedralSurface::setPatchN(const Geometry &geometry, size_t const &idx)
+{
+  setPatchN(std::unique_ptr<Geometry>(geometry.clone()), idx);
 }
 
 void
