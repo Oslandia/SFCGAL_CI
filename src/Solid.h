@@ -7,13 +7,14 @@
 #define SFCGAL_SOLID_H_
 
 #include <boost/assert.hpp>
+#include <memory>
 #include <vector>
 
-#include <boost/ptr_container/ptr_vector.hpp>
-
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include "SFCGAL/DereferenceIterator.h"
 #include "SFCGAL/PolyhedralSurface.h"
 
 namespace SFCGAL {
@@ -28,8 +29,10 @@ namespace SFCGAL {
  */
 class SFCGAL_API Solid : public Geometry {
 public:
-  typedef boost::ptr_vector<PolyhedralSurface>::iterator       iterator;
-  typedef boost::ptr_vector<PolyhedralSurface>::const_iterator const_iterator;
+  using iterator = DereferenceIterator<
+      std::vector<std::unique_ptr<PolyhedralSurface>>::iterator>;
+  using const_iterator = DereferenceIterator<
+      std::vector<std::unique_ptr<PolyhedralSurface>>::const_iterator>;
 
   /**
    * Empty Solid constructor
@@ -102,7 +105,7 @@ public:
   inline const PolyhedralSurface &
   exteriorShell() const
   {
-    return _shells[0];
+    return *_shells[0];
   }
   /**
    * Returns the exterior shell
@@ -110,7 +113,7 @@ public:
   inline PolyhedralSurface &
   exteriorShell()
   {
-    return _shells[0];
+    return *_shells[0];
   }
 
   /**
@@ -127,7 +130,7 @@ public:
   inline const PolyhedralSurface &
   interiorShellN(size_t const &n) const
   {
-    return _shells[n + 1];
+    return *_shells[n + 1];
   }
   /**
    * Returns the n-th interior shell
@@ -135,7 +138,7 @@ public:
   inline PolyhedralSurface &
   interiorShellN(size_t const &n)
   {
-    return _shells[n + 1];
+    return *_shells[n + 1];
   }
   /**
    * adds an interior shell to the Solid
@@ -143,7 +146,7 @@ public:
   inline void
   addInteriorShell(const PolyhedralSurface &shell)
   {
-    _shells.push_back(shell.clone());
+    _shells.push_back(std::unique_ptr<PolyhedralSurface>(shell.clone()));
   }
   /**
    * adds an interior shell to the Solid
@@ -152,7 +155,7 @@ public:
   addInteriorShell(PolyhedralSurface *shell)
   {
     BOOST_ASSERT(shell != NULL);
-    _shells.push_back(shell);
+    _shells.push_back(std::unique_ptr<PolyhedralSurface>(shell));
   }
 
   /**
@@ -161,7 +164,7 @@ public:
   inline void
   setExteriorShell(const PolyhedralSurface &shell)
   {
-    _shells.replace(0, shell.clone());
+    _shells[0] = std::unique_ptr<PolyhedralSurface>(shell.clone());
   }
 
   /**
@@ -172,7 +175,7 @@ public:
   inline void
   setExteriorShell(PolyhedralSurface *shell)
   {
-    _shells.replace(0, shell);
+    _shells[0] = std::unique_ptr<PolyhedralSurface>(shell);
   }
 
   /**
@@ -191,7 +194,7 @@ public:
   shellN(const size_t &n) const
   {
     BOOST_ASSERT(n < numShells());
-    return _shells[n];
+    return *_shells[n];
   }
   /**
    * Returns the n-th shell, 0 is exteriorShell
@@ -201,7 +204,7 @@ public:
   shellN(const size_t &n)
   {
     BOOST_ASSERT(n < numShells());
-    return _shells[n];
+    return *_shells[n];
   }
 
   //-- iterators
@@ -209,23 +212,23 @@ public:
   inline iterator
   begin()
   {
-    return _shells.begin();
+    return dereference_iterator(_shells.begin());
   }
   inline const_iterator
   begin() const
   {
-    return _shells.begin();
+    return dereference_iterator(_shells.begin());
   }
 
   inline iterator
   end()
   {
-    return _shells.end();
+    return dereference_iterator(_shells.end());
   }
   inline const_iterator
   end() const
   {
-    return _shells.end();
+    return dereference_iterator(_shells.end());
   }
 
   //-- visitors
@@ -249,7 +252,7 @@ public:
   }
 
 private:
-  boost::ptr_vector<PolyhedralSurface> _shells;
+  std::vector<std::unique_ptr<PolyhedralSurface>> _shells;
 
   void
   swap(Solid &other)
