@@ -78,10 +78,44 @@ export async function loadSFCGAL(options = {}) {
         }
 
         // Create SFCGAL instance
-        const sfcgalClass = new Module.SFCGAL();
-        sfcgalClass.initialize();
+        const rawInstance = new Module.SFCGAL();
+        rawInstance.initialize();
 
-        sfcgalInstance = sfcgalClass;
+        // Wrap all SFCGAL methods with error handling
+        const wrappedInstance = {};
+        const methodsToWrap = [
+            // Validation
+            'isValid', 'getGeometryInfo',
+            // Metrics
+            'area', 'area3D', 'volume', 'length', 'length3D',
+            'perimeter', 'perimeter3D', 'distance', 'distance3D',
+            // Geometric operations
+            'centroid', 'convexHull', 'buffer',
+            // Boolean operations 2D
+            'intersection', 'union', 'difference',
+            // Boolean operations 3D
+            'intersection3D', 'union3D', 'difference3D',
+            // 3D operations
+            'extrude', 'extrudeDetailed', 'toSolid',
+            // Transformations
+            'translate', 'rotate', 'scale',
+            // Utility
+            'version'
+        ];
+
+        methodsToWrap.forEach(method => {
+            if (typeof rawInstance[method] === 'function') {
+                wrappedInstance[method] = wrapSFCGALOperation(
+                    rawInstance[method].bind(rawInstance),
+                    method
+                );
+            } else {
+                // Copy non-function properties as-is
+                wrappedInstance[method] = rawInstance[method];
+            }
+        });
+
+        sfcgalInstance = wrappedInstance;
         return sfcgalInstance;
 
     } catch (error) {
@@ -134,16 +168,96 @@ export function getSFCGAL() {
 }
 
 /**
+ * Validate WKT (Well-Known Text) format
+ * @param {string} wkt - WKT string to validate
+ * @returns {boolean} True if WKT appears valid
+ */
+export function isValidWKT(wkt) {
+    if (!wkt || typeof wkt !== 'string') {
+        return false;
+    }
+
+    // WKT pattern: GEOMETRY_TYPE( optional Z/M )( coordinates )
+    const WKT_PATTERN = /^(POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION|POLYHEDRALSURFACE|SOLID|TRIANGULATEDSURFACE|TRIANGLE|TIN)\s*(\w+)?\s*\(/i;
+
+    return WKT_PATTERN.test(wkt.trim());
+}
+
+/**
+ * Validate WKT and throw error if invalid
+ * @param {string} wkt - WKT string to validate
+ * @param {string} operationName - Name of operation for error message
+ * @throws {SFCGALError} If WKT is invalid
+ */
+export function validateWKT(wkt, operationName = 'operation') {
+    if (!isValidWKT(wkt)) {
+        throw new SFCGALError(
+            `Invalid WKT format for ${operationName}. Expected format: GEOMETRY_TYPE(coordinates)`,
+            'INVALID_WKT'
+        );
+    }
+}
+
+/**
+ * Extract geometry type from WKT
+ * @param {string} wkt - WKT string
+ * @returns {string|null} Geometry type (e.g., 'POLYGON', 'SOLID') or null if invalid
+ */
+export function getGeometryType(wkt) {
+    if (!wkt || typeof wkt !== 'string') return null;
+
+    const match = wkt.trim().match(/^(\w+)\s*/i);
+    return match ? match[1].toUpperCase() : null;
+}
+
+/**
+ * Check if geometry is 3D (has Z coordinate)
+ * @param {string} wkt - WKT string
+ * @returns {boolean} True if geometry appears to be 3D
+ */
+export function is3DGeometry(wkt) {
+    if (!wkt || typeof wkt !== 'string') return false;
+
+    const type = getGeometryType(wkt);
+    // Check for Z suffix or 3D geometry types
+    return wkt.includes(' Z ') ||
+           wkt.match(/\w+\s+Z\s*\(/i) !== null ||
+           type === 'SOLID' ||
+           type === 'POLYHEDRALSURFACE' ||
+           type === 'TIN';
+}
+
+/**
+ * Check if geometry type is suitable for volume calculation
+ * @param {string} wkt - WKT string
+ * @returns {boolean} True if geometry can have volume
+ */
+export function canCalculateVolume(wkt) {
+    const type = getGeometryType(wkt);
+    return type === 'SOLID' || type === 'POLYHEDRALSURFACE';
+}
+
+/**
  * Wrap a SFCGAL function call with error handling
  * Catches Wasm runtime errors and converts them to SFCGALError
  *
  * @param {Function} fn - Function to wrap
  * @param {string} operationName - Name of operation for error messages
+ * @param {boolean} validateInput - Whether to validate WKT inputs (default: true)
  * @returns {Function} Wrapped function
  */
-export function wrapSFCGALOperation(fn, operationName = 'operation') {
+export function wrapSFCGALOperation(fn, operationName = 'operation', validateInput = true) {
     return (...args) => {
         try {
+            // Validate WKT inputs if enabled
+            if (validateInput) {
+                args.forEach((arg, index) => {
+                    if (typeof arg === 'string' && arg.trim().match(/^(POINT|LINESTRING|POLYGON|MULTI|GEOMETRYCOLLECTION|POLYHEDRALSURFACE|SOLID|TRIANGLE)/i)) {
+                        validateWKT(arg, `${operationName} argument ${index + 1}`);
+                    }
+                });
+            }
+
             const result = fn(...args);
 
             // Check for error strings returned by C++
@@ -156,8 +270,18 @@ export function wrapSFCGALOperation(fn, operationName = 'operation') {
                 }
 
                 // Check for EMPTY results that might indicate failure
-                if (result === 'GEOMETRYCOLLECTION EMPTY') {
-                    console.warn(`[SFCGAL] ${operationName} returned empty geometry - geometries may not intersect`);
+                if (result === 'GEOMETRYCOLLECTION EMPTY' || result === 'POINT EMPTY' || result.includes(' EMPTY')) {
+                    const emptyWarning = `${operationName} returned empty geometry - geometries may not intersect or may be degenerate`;
+                    console.warn(`[SFCGAL] ${emptyWarning}`);
+
+                    // Call global EMPTY callback if registered
+                    if (typeof window !== 'undefined' && typeof window.onSFCGALEmptyResult === 'function') {
+                        window.onSFCGALEmptyResult({
+                            operation: operationName,
+                            result: result,
+                            message: emptyWarning
+                        });
+                    }
                 }
             }
 

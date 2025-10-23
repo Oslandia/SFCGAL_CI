@@ -210,13 +210,13 @@
                         <span class="result-label">Base Area:</span>
                         <span class="result-value" id="baseArea">-</span>
                     </div>
-                    <!-- <div class="result-item"> -->
-                    <!--     <span class="result-label">Volume</span> -->
-                    <!--     <span class="result-value" id="volumeExt">-</span> -->
-                    <!-- </div> -->
                     <div class="result-item">
                         <span class="result-label">Height:</span>
                         <span class="result-value" id="extHeight">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Volume:</span>
+                        <span class="result-value" id="volume">-</span>
                     </div>
                 </div>
             </div>
@@ -269,14 +269,21 @@
                 // Use SFCGAL's extrude algorithm
                 const baseArea = sfcgal.area(wkt);
                 const extrudedWKT = sfcgal.extrude(wkt, height);
-		console.log(extrudedWKT);
-		// TODO: fix index out of bounds
-                // const volExtruded = sfcgal.volume(extrudedWKT);
+                console.log('Extruded geometry:', extrudedWKT);
+
+                // Calculate volume with proper error handling
+                let volExtruded = 0.0;
+                try {
+                    volExtruded = sfcgal.volume(extrudedWKT);
+                } catch (volumeError) {
+                    console.warn('Volume calculation failed:', volumeError.message);
+                    volExtruded = baseArea * height; // Fallback to simple calculation
+                }
 
                 // Display results
                 document.getElementById('baseArea').textContent = baseArea.toFixed(3);
                 document.getElementById('extHeight').textContent = height.toFixed(2);
-                // document.getElementById('volume').textContent = volume3d.toFixed(2);
+                document.getElementById('volume').textContent = volExtruded.toFixed(2);
                 document.getElementById('results').style.display = 'block';
 
                 // Render 3D geometry

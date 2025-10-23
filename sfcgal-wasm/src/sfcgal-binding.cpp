@@ -142,13 +142,24 @@ public:
     double area(const std::string& wkt) const {
         try {
             std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
-            if (!geom) return 0.0;
+            if (!geom) {
+                std::cerr << "Warning: Failed to parse WKT for area calculation" << std::endl;
+                return 0.0;
+            }
+            if (geom->isEmpty()) {
+                std::cerr << "Warning: Empty geometry for area calculation" << std::endl;
+                return 0.0;
+            }
             if (!SFCGAL::algorithm::isValid(*geom)) {
                 std::cerr << "Warning: Invalid geometry for area calculation" << std::endl;
                 return 0.0;
             }
             return CGAL::to_double(SFCGAL::algorithm::area(*geom));
+        } catch (const std::exception& e) {
+            std::cerr << "Error in area calculation: " << e.what() << std::endl;
+            return 0.0;
         } catch (...) {
+            std::cerr << "Unknown error in area calculation" << std::endl;
             return 0.0;
         }
     }
@@ -156,9 +167,20 @@ public:
     double area3D(const std::string& wkt) const {
         try {
             std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
-            if (!geom) return 0.0;
+            if (!geom) {
+                std::cerr << "Warning: Failed to parse WKT for 3D area calculation" << std::endl;
+                return 0.0;
+            }
+            if (geom->isEmpty()) {
+                std::cerr << "Warning: Empty geometry for 3D area calculation" << std::endl;
+                return 0.0;
+            }
             return CGAL::to_double(SFCGAL::algorithm::area3D(*geom));
+        } catch (const std::exception& e) {
+            std::cerr << "Error in 3D area calculation: " << e.what() << std::endl;
+            return 0.0;
         } catch (...) {
+            std::cerr << "Unknown error in 3D area calculation" << std::endl;
             return 0.0;
         }
     }
@@ -166,9 +188,34 @@ public:
     double volume(const std::string& wkt) const {
         try {
             std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
-            if (!geom) return 0.0;
+            if (!geom) {
+                std::cerr << "Warning: Failed to parse WKT for volume calculation" << std::endl;
+                return 0.0;
+            }
+            if (geom->isEmpty()) {
+                std::cerr << "Warning: Empty geometry for volume calculation" << std::endl;
+                return 0.0;
+            }
+
+            // Volume only makes sense for 3D solid geometries
+            if (geom->geometryTypeId() != SFCGAL::TYPE_SOLID &&
+                geom->geometryTypeId() != SFCGAL::TYPE_POLYHEDRALSURFACE) {
+                std::cerr << "Warning: Volume calculation requires SOLID or POLYHEDRALSURFACE geometry" << std::endl;
+                return 0.0;
+            }
+
+            // Validate geometry before computing volume
+            if (!SFCGAL::algorithm::isValid(*geom)) {
+                std::cerr << "Warning: Invalid geometry for volume calculation" << std::endl;
+                return 0.0;
+            }
+
             return CGAL::to_double(SFCGAL::algorithm::volume(*geom));
+        } catch (const std::exception& e) {
+            std::cerr << "Error in volume calculation: " << e.what() << std::endl;
+            return 0.0;
         } catch (...) {
+            std::cerr << "Unknown error in volume calculation" << std::endl;
             return 0.0;
         }
     }
@@ -176,9 +223,19 @@ public:
     double length(const std::string& wkt) const {
         try {
             std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
-            if (!geom) return 0.0;
+            if (!geom) {
+                std::cerr << "Warning: Failed to parse WKT for length calculation" << std::endl;
+                return 0.0;
+            }
+            if (geom->isEmpty()) {
+                return 0.0;
+            }
             return CGAL::to_double(SFCGAL::algorithm::length(*geom));
+        } catch (const std::exception& e) {
+            std::cerr << "Error in length calculation: " << e.what() << std::endl;
+            return 0.0;
         } catch (...) {
+            std::cerr << "Unknown error in length calculation" << std::endl;
             return 0.0;
         }
     }
@@ -233,9 +290,20 @@ public:
         try {
             std::unique_ptr<SFCGAL::Geometry> geom1(SFCGAL::io::readWkt(wkt1));
             std::unique_ptr<SFCGAL::Geometry> geom2(SFCGAL::io::readWkt(wkt2));
-            if (!geom1 || !geom2) return 0.0;
+            if (!geom1 || !geom2) {
+                std::cerr << "Warning: Failed to parse WKT for distance calculation" << std::endl;
+                return 0.0;
+            }
+            if (geom1->isEmpty() || geom2->isEmpty()) {
+                std::cerr << "Warning: Empty geometry for distance calculation" << std::endl;
+                return 0.0;
+            }
             return CGAL::to_double(SFCGAL::algorithm::distance(*geom1, *geom2));
+        } catch (const std::exception& e) {
+            std::cerr << "Error in distance calculation: " << e.what() << std::endl;
+            return 0.0;
         } catch (...) {
+            std::cerr << "Unknown error in distance calculation" << std::endl;
             return 0.0;
         }
     }
@@ -255,13 +323,22 @@ public:
     std::string centroid(const std::string& wkt) const {
         try {
             std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
-            if (!geom) return "POINT EMPTY";
+            if (!geom) {
+                return "ERROR: Failed to parse WKT for centroid";
+            }
+            if (geom->isEmpty()) {
+                return "ERROR: Empty geometry for centroid";
+            }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::centroid(*geom));
             return result ? result->asText(10) : "POINT EMPTY";
 
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: centroid failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            return "POINT EMPTY";
+            return "ERROR: Unknown error in centroid";
         }
     }
 
@@ -269,12 +346,27 @@ public:
         try {
             std::unique_ptr<SFCGAL::Geometry> geom1(SFCGAL::io::readWkt(wkt1));
             std::unique_ptr<SFCGAL::Geometry> geom2(SFCGAL::io::readWkt(wkt2));
-            if (!geom1 || !geom2) return "GEOMETRYCOLLECTION EMPTY";
+            if (!geom1 || !geom2) {
+                return "ERROR: Failed to parse WKT for intersection";
+            }
+            if (geom1->isEmpty() || geom2->isEmpty()) {
+                return "ERROR: Empty geometry for intersection";
+            }
+            if (!SFCGAL::algorithm::isValid(*geom1)) {
+                return "ERROR: Invalid geometry 1 for intersection. Check geometry validity with isValid().";
+            }
+            if (!SFCGAL::algorithm::isValid(*geom2)) {
+                return "ERROR: Invalid geometry 2 for intersection. Check geometry validity with isValid().";
+            }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::intersection(*geom1, *geom2));
             return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: intersection failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            return "GEOMETRYCOLLECTION EMPTY";
+            return "ERROR: Unknown error in intersection";
         }
     }
 
@@ -308,12 +400,27 @@ public:
         try {
             std::unique_ptr<SFCGAL::Geometry> geom1(SFCGAL::io::readWkt(wkt1));
             std::unique_ptr<SFCGAL::Geometry> geom2(SFCGAL::io::readWkt(wkt2));
-            if (!geom1 || !geom2) return "GEOMETRYCOLLECTION EMPTY";
+            if (!geom1 || !geom2) {
+                return "ERROR: Failed to parse WKT for union";
+            }
+            if (geom1->isEmpty() || geom2->isEmpty()) {
+                return "ERROR: Empty geometry for union";
+            }
+            if (!SFCGAL::algorithm::isValid(*geom1)) {
+                return "ERROR: Invalid geometry 1 for union. Check geometry validity with isValid().";
+            }
+            if (!SFCGAL::algorithm::isValid(*geom2)) {
+                return "ERROR: Invalid geometry 2 for union. Check geometry validity with isValid().";
+            }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::union_(*geom1, *geom2));
             return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: union failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            return "GEOMETRYCOLLECTION EMPTY";
+            return "ERROR: Unknown error in union";
         }
     }
 
@@ -356,12 +463,27 @@ public:
         try {
             std::unique_ptr<SFCGAL::Geometry> geom1(SFCGAL::io::readWkt(wkt1));
             std::unique_ptr<SFCGAL::Geometry> geom2(SFCGAL::io::readWkt(wkt2));
-            if (!geom1 || !geom2) return "GEOMETRYCOLLECTION EMPTY";
+            if (!geom1 || !geom2) {
+                return "ERROR: Failed to parse WKT for difference";
+            }
+            if (geom1->isEmpty() || geom2->isEmpty()) {
+                return "ERROR: Empty geometry for difference";
+            }
+            if (!SFCGAL::algorithm::isValid(*geom1)) {
+                return "ERROR: Invalid geometry 1 for difference. Check geometry validity with isValid().";
+            }
+            if (!SFCGAL::algorithm::isValid(*geom2)) {
+                return "ERROR: Invalid geometry 2 for difference. Check geometry validity with isValid().";
+            }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::difference(*geom1, *geom2));
             return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: difference failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            return "GEOMETRYCOLLECTION EMPTY";
+            return "ERROR: Unknown error in difference";
         }
     }
 
@@ -394,24 +516,42 @@ public:
     std::string convexHull(const std::string& wkt) const {
         try {
             std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
-            if (!geom) return "GEOMETRYCOLLECTION EMPTY";
+            if (!geom) {
+                return "ERROR: Failed to parse WKT for convexHull";
+            }
+            if (geom->isEmpty()) {
+                return "ERROR: Empty geometry for convexHull";
+            }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::convexHull(*geom));
             return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: convexHull failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            return "GEOMETRYCOLLECTION EMPTY";
+            return "ERROR: Unknown error in convexHull";
         }
     }
 
     std::string buffer(const std::string& wkt, double distance) const {
         try {
             std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
-            if (!geom) return "GEOMETRYCOLLECTION EMPTY";
+            if (!geom) {
+                return "ERROR: Failed to parse WKT for buffer";
+            }
+            if (geom->isEmpty()) {
+                return "ERROR: Empty geometry for buffer";
+            }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::offset(*geom, distance));
             return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: buffer failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            return "GEOMETRYCOLLECTION EMPTY";
+            return "ERROR: Unknown error in buffer";
         }
     }
 
@@ -419,13 +559,22 @@ public:
     std::string extrude(const std::string& wkt, double height) const {
         try {
             std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
-            if (!geom) return "GEOMETRYCOLLECTION EMPTY";
+            if (!geom) {
+                return "ERROR: Failed to parse WKT for extrude";
+            }
+            if (geom->isEmpty()) {
+                return "ERROR: Empty geometry for extrude";
+            }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::extrude(*geom, 0, 0, height));
             // Use higher precision (10 decimals) for accurate 3D coordinates
             return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: extrude failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            return "GEOMETRYCOLLECTION EMPTY";
+            return "ERROR: Unknown error in extrude";
         }
     }
 
@@ -436,28 +585,48 @@ public:
             std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
             if (!geom) {
                 result.set("wkt", std::string("GEOMETRYCOLLECTION EMPTY"));
+                result.set("error", std::string("Failed to parse WKT"));
                 return result;
             }
 
             std::unique_ptr<SFCGAL::Geometry> extruded(SFCGAL::algorithm::extrude(*geom, 0, 0, height));
 
-            result.set("wkt", extruded ? extruded->asText(10) : std::string("GEOMETRYCOLLECTION EMPTY"));
+            if (!extruded) {
+                result.set("wkt", std::string("GEOMETRYCOLLECTION EMPTY"));
+                result.set("error", std::string("Extrusion failed"));
+                return result;
+            }
+
+            result.set("wkt", extruded->asText(10));
             result.set("baseArea", CGAL::to_double(SFCGAL::algorithm::area(*geom)));
-            result.set("volume", CGAL::to_double(SFCGAL::algorithm::volume(*extruded)));
             result.set("perimeter", this->length(wkt));
 
+            // Calculate volume with proper error handling
+            try {
+                double vol = this->volume(extruded->asText(10));
+                result.set("volume", vol);
+            } catch (const std::exception& e) {
+                std::cerr << "Warning: Volume calculation failed in extrudeDetailed: " << e.what() << std::endl;
+                result.set("volume", 0.0);
+                result.set("volumeError", std::string(e.what()));
+            }
+
             val stats = val::object();
-            if (extruded && extruded->geometryTypeId() == SFCGAL::TYPE_SOLID) {
+            if (extruded->geometryTypeId() == SFCGAL::TYPE_SOLID) {
                 const SFCGAL::Solid& solid = extruded->as<SFCGAL::Solid>();
                 stats.set("numFaces", solid.numShells() > 0 ? solid.shellN(0).numPolygons() : 0);
-            } else if (extruded && extruded->geometryTypeId() == SFCGAL::TYPE_POLYHEDRALSURFACE) {
+            } else if (extruded->geometryTypeId() == SFCGAL::TYPE_POLYHEDRALSURFACE) {
                 const SFCGAL::PolyhedralSurface& surf = extruded->as<SFCGAL::PolyhedralSurface>();
                 stats.set("numFaces", surf.numPolygons());
             }
             result.set("stats", stats);
 
+        } catch (const std::exception& e) {
+            result.set("wkt", std::string("GEOMETRYCOLLECTION EMPTY"));
+            result.set("error", std::string(e.what()));
         } catch (...) {
             result.set("wkt", std::string("GEOMETRYCOLLECTION EMPTY"));
+            result.set("error", std::string("Unknown error"));
         }
 
         return result;

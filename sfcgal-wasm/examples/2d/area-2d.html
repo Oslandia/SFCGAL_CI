@@ -42,6 +42,17 @@
             margin-bottom: 5px;
             color: #333;
         }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
         .control-group textarea {
             width: 100%;
             padding: 10px;
@@ -163,7 +174,12 @@
                 </div>
             </div>
 
-            <canvas id="canvas" width="800" height="500"></canvas>
+            <canvas
+                id="canvas"
+                width="800"
+                height="500"
+                role="img"
+                aria-label="2D geometry visualization canvas"></canvas>
         </div>
     </div>
 

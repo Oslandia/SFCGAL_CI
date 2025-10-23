@@ -272,6 +272,7 @@
                             <optgroup label="3D Operations">
                                 <option value="extrude3d">Extrude 3D</option>
                                 <option value="polygon3d">3D Polygon</option>
+                                <option value="toSolid">POLYHEDRALSURFACE → SOLID</option>
                             </optgroup>
                         </select>
                         <button
@@ -473,7 +474,13 @@ log('Base area:', baseArea.toFixed(2));
 log('Extrusion height: 4');
 log('Expected volume:', (baseArea * 4).toFixed(2));
 
-// Note: volume(solid) is disabled due to known issues
+try {
+    const vol = volume(solid);
+    log('Calculated volume:', vol.toFixed(2));
+} catch (e) {
+    log('Volume calculation note:', 'Using expected volume');
+}
+
 visualize(solid, { color: '#48bb78' });
 solid;`,
 
@@ -484,7 +491,37 @@ log('3D Polygon created');
 log('2D Area projection:', area(poly3d).toFixed(2));
 
 visualize(poly3d, { color: '#667eea' });
-poly3d;`
+poly3d;`,
+
+            toSolid: `// Convert POLYHEDRALSURFACE to SOLID
+// Extrude a 2D polygon to create a POLYHEDRALSURFACE
+const base = "POLYGON((0 0, 3 0, 3 3, 0 3, 0 0))";
+const polyhedralSurf = extrude(base, 2);
+
+log('Original geometry:', polyhedralSurf.substring(0, 50) + '...');
+
+// Get geometry info before conversion
+const infoBefore = getGeometryInfo(polyhedralSurf);
+log('Type before:', infoBefore.geometryType);
+log('Is valid:', infoBefore.isValid);
+
+// Convert POLYHEDRALSURFACE to SOLID
+const solid = toSolid(polyhedralSurf);
+
+// Get geometry info after conversion
+const infoAfter = getGeometryInfo(solid);
+log('Type after:', infoAfter.geometryType);
+
+// Calculate volume (works best with SOLID)
+try {
+    const vol = volume(solid);
+    log('Volume:', vol.toFixed(2), 'cubic units');
+} catch (e) {
+    log('Volume calculation:', 'Expected =', (area(base) * 2).toFixed(2));
+}
+
+visualize(solid, { color: '#8b5cf6' });
+solid;`
         };
 
         init();
@@ -617,17 +654,19 @@ poly3d;`
                         return 0;
                     }
                 },
-                // Note: volume() has issues with some geometry types (index out of bounds)
-                // Disabled for now to prevent crashes
                 volume: (wkt) => {
                     if (!sfcgal || !sfcgal.volume) {
-                        addOutput('error', 'volume() is not available or disabled due to known issues');
+                        addOutput('error', 'volume() is not available');
                         return 0;
                     }
                     try {
-                        return sfcgal.volume(wkt);
+                        const result = sfcgal.volume(wkt);
+                        if (result === 0) {
+                            addOutput('warning', 'volume() returned 0 (may indicate invalid geometry type or empty geometry)');
+                        }
+                        return result;
                     } catch (e) {
-                        addOutput('error', 'volume() error: ' + e.message + ' (this is a known issue)');
+                        addOutput('error', 'volume() error: ' + e.message);
                         return 0;
                     }
                 },

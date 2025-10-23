@@ -1,9 +1,23 @@
 /**
  * Three.js 3D Renderer for SFCGAL geometries
- * Simplified version that actually works
+ * Renders 3D WKT geometries (SOLID, POLYHEDRALSURFACE) using Three.js with orbit controls
+ *
+ * @class Three3DRenderer
+ * @example
+ * const renderer = new Three3DRenderer('viewer3d', { showGrid: true });
+ * await renderer.ready();
+ * await renderer.addGeometry('SOLID(...)', { color: '#8b5cf6' });
  */
-
 export class Three3DRenderer {
+    /**
+     * Create a new Three.js 3D renderer
+     * @param {string} containerId - ID of the container element for the 3D viewer
+     * @param {Object} [options={}] - Rendering options
+     * @param {boolean} [options.wireframe=false] - Render as wireframe
+     * @param {boolean} [options.showGrid=true] - Show grid helper
+     * @param {boolean} [options.showAxes=true] - Show axes helper
+     * @throws {Error} If container element is not found
+     */
     constructor(containerId, options = {}) {
         this.containerId = containerId;
         this.container = document.getElementById(containerId);
@@ -35,21 +49,50 @@ export class Three3DRenderer {
             this.THREE = THREE;
             this.OrbitControls = OrbitControls;
 
-            // Wait a bit for container to have dimensions
-            await new Promise(resolve => {
-                setTimeout(() => {
+            // Use ResizeObserver to wait for container to have dimensions
+            await new Promise((resolve, reject) => {
+                const checkDimensions = () => {
                     const width = this.container.clientWidth;
                     const height = this.container.clientHeight;
 
                     if (width > 0 && height > 0) {
                         this.init();
                         this.initialized = true;
-                    } else {
-                        console.warn('[Three3DRenderer] Container has zero dimensions');
-                        this.initialized = false;
+                        return true;
                     }
+                    return false;
+                };
+
+                // Check immediately
+                if (checkDimensions()) {
                     resolve();
-                }, 100);
+                    return;
+                }
+
+                // If not ready, observe for dimension changes
+                const observer = new ResizeObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+                            observer.disconnect();
+                            this.init();
+                            this.initialized = true;
+                            resolve();
+                            return;
+                        }
+                    }
+                });
+
+                observer.observe(this.container);
+
+                // Fallback timeout in case container never gets dimensions
+                setTimeout(() => {
+                    observer.disconnect();
+                    if (!this.initialized) {
+                        console.warn('[Three3DRenderer] Container dimensions timeout');
+                        this.initialized = false;
+                        reject(new Error('Container never received valid dimensions'));
+                    }
+                }, 5000);
             });
         } catch (error) {
             console.error('Failed to load Three.js:', error);
@@ -339,6 +382,17 @@ export class Three3DRenderer {
         return null;
     }
 
+    /**
+     * Add a 3D geometry to the scene
+     * @param {string} wkt - WKT geometry string (SOLID, POLYHEDRALSURFACE, POLYGON Z, etc.)
+     * @param {Object} [opts={}] - Rendering options
+     * @param {string} [opts.color] - Geometry color (hex string)
+     * @param {number} [opts.opacity=1.0] - Opacity (0-1)
+     * @returns {Promise<void>}
+     * @throws {Error} If WKT is invalid or GEOMETRYCOLLECTION (unsupported)
+     * @example
+     * await renderer.addGeometry('SOLID(...)', { color: '#3b82f6', opacity: 0.8 });
+     */
     async addGeometry(wkt, opts = {}) {
         if (!this.initialized) {
             await this.initPromise;
@@ -352,17 +406,14 @@ export class Three3DRenderer {
         try {
             // Handle GEOMETRYCOLLECTION by extracting individual geometries
             if (wkt.toUpperCase().includes('GEOMETRYCOLLECTION')) {
-                console.warn('[Three3DRenderer] GEOMETRYCOLLECTION not fully supported - attempting to extract geometries');
-                // For now, just skip GEOMETRYCOLLECTION
-                return;
+                throw new Error('GEOMETRYCOLLECTION is not currently supported in 3D visualization. Please use individual geometry types (SOLID, POLYHEDRALSURFACE, etc.)');
             }
 
             const geom = this.parseWKT(wkt);
             const geometry = this.createGeometryFromWKT(geom);
 
             if (!geometry) {
-                console.warn('[Three3DRenderer] Could not create geometry from WKT');
-                return;
+                throw new Error('Could not create geometry from WKT: unsupported geometry type or invalid format');
             }
 
             const color = opts.color || this.colors[this.geometries.length % this.colors.length];
@@ -460,6 +511,11 @@ export class Three3DRenderer {
         mesh.userData.edgeLines = null;
     }
 
+    /**
+     * Toggle wireframe rendering for all geometries
+     * @param {boolean} enabled - Enable or disable wireframe mode
+     * @returns {void}
+     */
     setWireframe(enabled) {
         this.wireframeEnabled = enabled;
 
@@ -486,6 +542,10 @@ export class Three3DRenderer {
         });
     }
 
+    /**
+     * Remove all geometries from the scene
+     * @returns {void}
+     */
     clear() {
         if (!this.scene) return;
 
