@@ -20,6 +20,7 @@ export class Three3DRenderer {
         this.geometries = [];
         this.colors = [0xef4444, 0x3b82f6, 0x10b981, 0xf59e0b, 0x8b5cf6];
         this.options = { wireframe: false, showGrid: true, showAxes: true, ...options };
+        this.wireframeEnabled = false;
         this.initialized = false;
         this.initPromise = this.initAsync();
     }
@@ -349,6 +350,13 @@ export class Three3DRenderer {
         }
 
         try {
+            // Handle GEOMETRYCOLLECTION by extracting individual geometries
+            if (wkt.toUpperCase().includes('GEOMETRYCOLLECTION')) {
+                console.warn('[Three3DRenderer] GEOMETRYCOLLECTION not fully supported - attempting to extract geometries');
+                // For now, just skip GEOMETRYCOLLECTION
+                return;
+            }
+
             const geom = this.parseWKT(wkt);
             const geometry = this.createGeometryFromWKT(geom);
 
@@ -378,19 +386,17 @@ export class Three3DRenderer {
 
                 mesh = new this.THREE.Mesh(geometry, material);
 
-                // Add wireframe edges (not for lines or points)
-                if (geom.type !== 'POINT') {
-                    const edges = new this.THREE.EdgesGeometry(geometry);
-                    const line = new this.THREE.LineSegments(
-                        edges,
-                        new this.THREE.LineBasicMaterial({ color: 0x000000 })
-                    );
-                    mesh.add(line);
-                }
+                // Store geometry type for conditional edge rendering
+                mesh.userData.geomType = geom.type;
             }
 
             this.scene.add(mesh);
             this.geometries.push({ mesh, wkt });
+
+            // Create edges only if wireframe is enabled
+            if (this.wireframeEnabled && geom.type !== 'POINT' && geom.type !== 'LINESTRING') {
+                this.addEdgesToMesh(mesh);
+            }
 
             // Adjust camera to fit all geometries
             this.fitCameraToGeometries();
@@ -432,8 +438,48 @@ export class Three3DRenderer {
         }
     }
 
+    addEdgesToMesh(mesh) {
+        if (!mesh.geometry || mesh.userData.edgeLines) return;
+
+        const edges = new this.THREE.EdgesGeometry(mesh.geometry);
+        const line = new this.THREE.LineSegments(
+            edges,
+            new this.THREE.LineBasicMaterial({ color: 0x000000 })
+        );
+        mesh.add(line);
+        mesh.userData.edgeLines = line;
+    }
+
+    removeEdgesFromMesh(mesh) {
+        const edgeLines = mesh.userData.edgeLines;
+        if (!edgeLines) return;
+
+        mesh.remove(edgeLines);
+        edgeLines.geometry.dispose();
+        edgeLines.material.dispose();
+        mesh.userData.edgeLines = null;
+    }
+
     setWireframe(enabled) {
+        this.wireframeEnabled = enabled;
+
         this.geometries.forEach(({ mesh }) => {
+            const geomType = mesh.userData.geomType;
+
+            // Skip points and lines
+            if (geomType === 'POINT' || geomType === 'LINESTRING') {
+                return;
+            }
+
+            if (enabled) {
+                // Lazy-create edges when enabled
+                this.addEdgesToMesh(mesh);
+            } else {
+                // Remove edges when disabled
+                this.removeEdgesFromMesh(mesh);
+            }
+
+            // Also set material wireframe property
             if (mesh.material && mesh.material.wireframe !== undefined) {
                 mesh.material.wireframe = enabled;
             }
@@ -444,6 +490,9 @@ export class Three3DRenderer {
         if (!this.scene) return;
 
         this.geometries.forEach(({ mesh }) => {
+            // Clean up edge lines if they exist
+            this.removeEdgesFromMesh(mesh);
+
             this.scene.remove(mesh);
             if (mesh.geometry) mesh.geometry.dispose();
             if (mesh.material) mesh.material.dispose();

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SFCGAL Playground</title>
+    <link rel="stylesheet" href="css/responsive.css">
     <style>
         :root {
             color-scheme: light dark;
@@ -19,6 +20,19 @@
             --console-text: #e2e8f0;
             --error: #f56565;
             --success: #48bb78;
+        }
+
+        /* Screen reader only utility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -240,65 +254,117 @@
         </div>
     </header>
 
-    <div class="playground">
-        <section class="panel" style="grid-column: span 1;">
-            <div class="panel-header">
-                <span>Code</span>
-                <div class="controls">
-                    <select id="example-select">
-                        <option value="">Load example…</option>
-                        <optgroup label="2D Operations">
-                            <option value="union2d">Union 2D</option>
-                            <option value="buffer2d">Buffer 2D</option>
-                            <option value="intersection2d">Intersection 2D</option>
-                            <option value="difference2d">Difference 2D</option>
-                            <option value="convexhull2d">Convex Hull 2D</option>
-                        </optgroup>
-                        <optgroup label="3D Operations">
-                            <option value="extrude3d">Extrude 3D</option>
-                            <option value="polygon3d">3D Polygon</option>
-                        </optgroup>
-                    </select>
-                    <button id="run-btn" class="primary">Run (Ctrl+Enter)</button>
-                    <button id="clear-btn">Clear</button>
-                </div>
-            </div>
-            <div class="panel-body">
-                <textarea id="editor" spellcheck="false"></textarea>
-            </div>
-        </section>
-
-        <section class="panel" style="grid-column: span 1;">
-            <div class="panel-header">
-                <span>Visualisation</span>
-                <div class="controls">
-                    <div class="view-toggle">
-                        <button id="view-2d" class="active">2D</button>
-                        <button id="view-3d">3D</button>
+    <main role="main" aria-label="SFCGAL Playground">
+        <div class="playground">
+            <section class="panel" style="grid-column: span 1;" aria-labelledby="code-heading">
+                <div class="panel-header">
+                    <span id="code-heading">Code</span>
+                    <div class="controls">
+                        <select id="example-select" aria-label="Load example code">
+                            <option value="">Load example…</option>
+                            <optgroup label="2D Operations">
+                                <option value="union2d">Union 2D</option>
+                                <option value="buffer2d">Buffer 2D</option>
+                                <option value="intersection2d">Intersection 2D</option>
+                                <option value="difference2d">Difference 2D</option>
+                                <option value="convexhull2d">Convex Hull 2D</option>
+                            </optgroup>
+                            <optgroup label="3D Operations">
+                                <option value="extrude3d">Extrude 3D</option>
+                                <option value="polygon3d">3D Polygon</option>
+                            </optgroup>
+                        </select>
+                        <button
+                            id="run-btn"
+                            class="primary"
+                            aria-label="Execute SFCGAL code"
+                            aria-describedby="run-help"
+                            aria-keyshortcuts="Control+Enter">
+                            Run (Ctrl+Enter)
+                        </button>
+                        <button
+                            id="clear-btn"
+                            aria-label="Clear code editor">
+                            Clear
+                        </button>
                     </div>
-                    <button id="clear-visuals">Reset</button>
+                </div>
+                <div class="panel-body">
+                    <textarea
+                        id="editor"
+                        spellcheck="false"
+                        aria-label="SFCGAL JavaScript code editor"
+                        aria-describedby="editor-help"></textarea>
+                    <div id="editor-help" class="sr-only">
+                        Write SFCGAL geometry operations using JavaScript. Press Ctrl+Enter to execute code.
+                    </div>
+                    <div id="run-help" class="sr-only">
+                        Execute the code in the editor. Keyboard shortcut: Ctrl+Enter or Cmd+Enter
+                    </div>
+                </div>
+            </section>
+
+        <section class="panel" style="grid-column: span 1;" aria-labelledby="visual-heading">
+            <div class="panel-header">
+                <span id="visual-heading">Visualisation</span>
+                <div class="controls">
+                    <div class="view-toggle" role="group" aria-label="Visualization mode">
+                        <button
+                            id="view-2d"
+                            class="active"
+                            aria-label="Switch to 2D view"
+                            aria-pressed="true">
+                            2D
+                        </button>
+                        <button
+                            id="view-3d"
+                            aria-label="Switch to 3D view"
+                            aria-pressed="false">
+                            3D
+                        </button>
+                    </div>
+                    <button
+                        id="clear-visuals"
+                        aria-label="Clear visualization canvas">
+                        Reset
+                    </button>
                 </div>
             </div>
             <div class="panel-body">
                 <div id="canvas2d-wrapper" style="display:flex;">
-                    <canvas id="canvas2d"></canvas>
+                    <canvas
+                        id="canvas2d"
+                        role="img"
+                        aria-label="2D geometry visualization"></canvas>
                 </div>
                 <div id="canvas3d-wrapper">
-                    <div id="canvas3d"></div>
+                    <div
+                        id="canvas3d"
+                        role="img"
+                        aria-label="3D geometry visualization"></div>
                 </div>
             </div>
         </section>
 
-        <section class="panel" style="grid-column: span 2; max-height: 250px;">
+        <section class="panel" style="grid-column: span 2; max-height: 250px;" aria-labelledby="output-heading">
             <div class="panel-header">
-                <span>Output</span>
-                <button id="clear-output">Clear</button>
+                <span id="output-heading">Output</span>
+                <button
+                    id="clear-output"
+                    aria-label="Clear console output">
+                    Clear
+                </button>
             </div>
             <div class="panel-body">
-                <div id="output"></div>
+                <div
+                    id="output"
+                    role="log"
+                    aria-live="polite"
+                    aria-atomic="false"></div>
             </div>
         </section>
     </div>
+    </main>
 
     <script type="importmap">
     {
@@ -312,7 +378,7 @@
     <script type="module">
         import { Canvas2DRenderer } from './lib/canvas2d-renderer.js';
         import { Three3DRenderer } from './lib/three3d-renderer.js';
-        import { loadSFCGAL } from './lib/sfcgal-module.js';
+        import { loadSFCGAL, wrapSFCGALOperation } from './lib/sfcgal-module.js';
 
         const editorElem = document.getElementById('editor');
         const outputElem = document.getElementById('output');
@@ -489,6 +555,11 @@ poly3d;`
             currentView = view;
             view2dBtn.classList.toggle('active', view === '2d');
             view3dBtn.classList.toggle('active', view === '3d');
+
+            // Update aria-pressed for accessibility
+            view2dBtn.setAttribute('aria-pressed', view === '2d');
+            view3dBtn.setAttribute('aria-pressed', view === '3d');
+
             canvas2dWrapper.style.display = view === '2d' ? 'flex' : 'none';
             canvas3dWrapper.style.display = view === '3d' ? 'flex' : 'none';
 
@@ -562,8 +633,44 @@ poly3d;`
                 },
                 buffer: (wkt, dist) => sfcgal ? sfcgal.buffer(wkt, dist) : wkt,
                 union: (wkt1, wkt2) => sfcgal ? (sfcgal.union_ ? sfcgal.union_(wkt1, wkt2) : sfcgal.union(wkt1, wkt2)) : wkt1,
+                union3D: (wkt1, wkt2) => {
+                    if (!sfcgal || !sfcgal.union3D) return wkt1;
+                    try {
+                        return wrapSFCGALOperation(
+                            () => sfcgal.union3D(wkt1, wkt2),
+                            'union3D'
+                        )();
+                    } catch (e) {
+                        addOutput('error', e.message);
+                        return 'GEOMETRYCOLLECTION EMPTY';
+                    }
+                },
                 intersection: (wkt1, wkt2) => sfcgal ? sfcgal.intersection(wkt1, wkt2) : wkt1,
+                intersection3D: (wkt1, wkt2) => {
+                    if (!sfcgal || !sfcgal.intersection3D) return wkt1;
+                    try {
+                        return wrapSFCGALOperation(
+                            () => sfcgal.intersection3D(wkt1, wkt2),
+                            'intersection3D'
+                        )();
+                    } catch (e) {
+                        addOutput('error', e.message);
+                        return 'GEOMETRYCOLLECTION EMPTY';
+                    }
+                },
                 difference: (wkt1, wkt2) => sfcgal ? sfcgal.difference(wkt1, wkt2) : wkt1,
+                difference3D: (wkt1, wkt2) => {
+                    if (!sfcgal || !sfcgal.difference3D) return wkt1;
+                    try {
+                        return wrapSFCGALOperation(
+                            () => sfcgal.difference3D(wkt1, wkt2),
+                            'difference3D'
+                        )();
+                    } catch (e) {
+                        addOutput('error', e.message);
+                        return 'GEOMETRYCOLLECTION EMPTY';
+                    }
+                },
                 convexHull: (wkt) => sfcgal ? sfcgal.convexHull(wkt) : wkt,
                 centroid: (wkt) => sfcgal ? sfcgal.centroid(wkt) : wkt,
                 extrude: (wkt, h) => sfcgal ? sfcgal.extrude(wkt, h) : wkt,
@@ -660,6 +767,31 @@ poly3d;`
                 console.error('Full error:', error);
             }
         }
+
+        // Keyboard shortcuts for accessibility
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + Enter to run code
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                runCode();
+            }
+
+            // Escape to clear console
+            if (e.key === 'Escape' && e.target.id === 'editor') {
+                e.preventDefault();
+                outputElem.innerHTML = '';
+            }
+        });
+
+        // Focus management for buttons
+        runBtn.addEventListener('click', runCode);
+        clearBtn.addEventListener('click', () => {
+            editorElem.value = '';
+            editorElem.focus();
+        });
+        clearOutputBtn.addEventListener('click', () => {
+            outputElem.innerHTML = '';
+        });
     </script>
 </body>
 </html>

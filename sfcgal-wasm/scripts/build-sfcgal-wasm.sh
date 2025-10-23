@@ -57,11 +57,12 @@ echo -e "${YELLOW}Using custom FindBoost.cmake from: ${PROJECT_DIR}/cmake${NC}"
 # Use CMAKE_MODULE_PATH to inject our custom FindBoost.cmake
 # This makes CMake use our FindBoost before searching elsewhere
 # This approach avoids the need to patch CGAL CMake files
-emcmake cmake "${SFCGAL_SRC}" \
+EMCC_CFLAGS="-sMEMORY64=1" emcmake cmake "${SFCGAL_SRC}" \
     -DCMAKE_MODULE_PATH="${PROJECT_DIR}/cmake" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_POLICY_DEFAULT_CMP0167=NEW \
-    -DCMAKE_CXX_FLAGS="-DCGAL_DISABLE_ROUNDING_MATH_CHECK" \
+    -DCMAKE_CXX_FLAGS="-DCGAL_DISABLE_ROUNDING_MATH_CHECK -sMEMORY64=1" \
+    -DCMAKE_C_FLAGS="-sMEMORY64=1" \
     -DSFCGAL_USE_STATIC_LIBS=ON \
     -DBUILD_SHARED_LIBS=OFF \
     -DSFCGAL_BUILD_TESTS=OFF \
@@ -74,7 +75,11 @@ emcmake cmake "${SFCGAL_SRC}" \
     -DBOOST_INCLUDE_DIR="${BOOST_INCLUDE}" \
     -DCGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE=TRUE \
     -DCGAL_HEADER_ONLY=TRUE \
-    -DCGAL_DIR="${DEPS_INSTALL}/lib/cmake/CGAL"
+    -DCGAL_DIR="${DEPS_INSTALL}/lib/cmake/CGAL" \
+    -DTHREADS_PREFER_PTHREAD_FLAG=OFF \
+    -DCMAKE_USE_PTHREADS_INIT=OFF \
+    -DCMAKE_THREAD_LIBS_INIT="" \
+    -DCMAKE_HAVE_THREADS_LIBRARY=OFF
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}CMake configuration failed${NC}"

@@ -1,0 +1,242 @@
+/**
+ * Responsive Design CSS for SFCGAL Examples
+ * Mobile-first approach with breakpoints at 768px and 1024px
+ */
+
+/* Base mobile styles (< 768px) */
+.container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: min(20px, 5vw);
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 16px;
+}
+
+.sidebar {
+    width: 100%;
+    order: 2; /* Move sidebar below viewer on mobile */
+}
+
+.viewer {
+    width: 100%;
+    order: 1;
+    min-height: 400px;
+}
+
+/* Viewer canvas responsive sizing */
+#viewer3d,
+#viewer2d,
+#canvas3d,
+#canvas2d {
+    width: 100% !important;
+    height: clamp(300px, 50vh, 700px) !important;
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+/* Buttons stack vertically on mobile */
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.buttons button {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px; /* Larger for touch targets */
+}
+
+/* Form controls full width */
+.control-group textarea,
+.control-group input,
+.control-group select {
+    width: 100%;
+    font-size: 16px; /* Prevent zoom on iOS */
+}
+
+/* Playground grid layout */
+.playground {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 16px;
+    padding: 16px;
+}
+
+.panel {
+    min-height: 300px;
+}
+
+/* Header responsive */
+.header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.header h1 {
+    font-size: 1.2rem;
+}
+
+.header-right {
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   Tablet (768px - 1023px)
+   ============================================ */
+@media (min-width: 768px) {
+    .content {
+        flex-direction: row;
+        gap: 24px;
+    }
+
+    .sidebar {
+        flex: 0 0 300px;
+        order: 1; /* Sidebar on left for tablet+ */
+    }
+
+    .viewer {
+        flex: 1;
+        order: 2;
+    }
+
+    .buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .buttons button {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .playground {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr auto;
+        padding: 20px;
+    }
+
+    .header {
+        padding: 18px 24px;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    #viewer3d,
+    #viewer2d {
+        height: clamp(400px, 60vh, 700px) !important;
+    }
+}
+
+/* ============================================
+   Desktop (1024px+)
+   ============================================ */
+@media (min-width: 1024px) {
+    .sidebar {
+        flex: 0 0 350px;
+    }
+
+    .control-group textarea {
+        font-size: 14px;
+    }
+
+    .buttons button {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+
+    .header h1 {
+        font-size: 1.6rem;
+    }
+
+    #viewer3d,
+    #viewer2d {
+        height: clamp(500px, 70vh, 800px) !important;
+    }
+}
+
+/* ============================================
+   Large Desktop (1440px+)
+   ============================================ */
+@media (min-width: 1440px) {
+    .container {
+        padding: min(32px, 3vw);
+    }
+
+    .content {
+        gap: 32px;
+    }
+
+    .sidebar {
+        flex: 0 0 400px;
+    }
+}
+
+/* ============================================
+   Print styles
+   ============================================ */
+@media print {
+    .header,
+    .sidebar,
+    .buttons {
+        display: none;
+    }
+
+    .viewer {
+        width: 100%;
+        page-break-inside: avoid;
+    }
+
+    .playground {
+        display: block;
+    }
+}
+
+/* ============================================
+   Touch device optimizations
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets */
+    button,
+    select,
+    input[type="checkbox"],
+    input[type="radio"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Prevent double-tap zoom */
+    button,
+    a {
+        touch-action: manipulation;
+    }
+
+    /* Smooth scrolling */
+    * {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ============================================
+   Reduced motion preference
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

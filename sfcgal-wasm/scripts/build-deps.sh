@@ -82,14 +82,14 @@ if [ ! -f "${INSTALL_DIR}/lib/libgmp.a" ]; then
         NATIVE_CC=cc
     fi
 
-    emconfigure ./configure \
+    EMCC_CFLAGS="-sMEMORY64=1" emconfigure ./configure \
         --prefix="${INSTALL_DIR}" \
         --enable-static \
         --disable-shared \
         --disable-assembly \
-	--host=wasm32 \
+	--host=wasm64-unknown-emscripten \
         HOST_CC="${NATIVE_CC}" \
-        CFLAGS="-O3"
+        CFLAGS="-O3 -sMEMORY64=1"
 
     emmake make -j$(get_num_cores)
     emmake make install
@@ -110,12 +110,13 @@ if [ ! -f "${INSTALL_DIR}/lib/libmpfr.a" ]; then
     tar xf "mpfr-${MPFR_VERSION}.tar.xz"
     cd "mpfr-${MPFR_VERSION}"
 
-    emconfigure ./configure \
+    EMCC_CFLAGS="-sMEMORY64=1" emconfigure ./configure \
         --prefix="${INSTALL_DIR}" \
         --enable-static \
         --disable-shared \
         --with-gmp="${INSTALL_DIR}" \
-        CFLAGS="-O3"
+        --host=wasm64-unknown-emscripten \
+        CFLAGS="-O3 -sMEMORY64=1"
 
     emmake make -j$(get_num_cores)
     emmake make install

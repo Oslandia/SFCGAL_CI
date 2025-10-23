@@ -178,12 +178,12 @@
 
                     <div class="control-group">
                         <label>Geometry 1 (WKT):</label>
-                        <textarea id="wkt1" rows="4">POLYGON((0 0 0, 2 0 0, 1 1 1, 0 0 0))</textarea>
+                        <textarea id="wkt1" rows="4">POLYGON((0 0, 4 0, 4 4, 0 4, 0 0))</textarea>
                     </div>
 
                     <div class="control-group">
                         <label>Geometry 2 (WKT):</label>
-                        <textarea id="wkt2" rows="4">POLYGON((1 0 0.5, 3 0 0.5, 2 1 1.5, 1 0 0.5))</textarea>
+                        <textarea id="wkt2" rows="4">POLYGON((2 2, 6 2, 6 6, 2 6, 2 2))</textarea>
                     </div>
 
                     <div class="checkbox-group">
@@ -232,7 +232,7 @@
     </div>
 
     <script type="module">
-        import { loadSFCGAL, showStatus } from '../lib/sfcgal-module.js';
+        import { loadSFCGAL, showStatus, wrapSFCGALOperation } from '../lib/sfcgal-module.js';
         import { Three3DRenderer } from '../lib/three3d-renderer.js';
 
         let sfcgal;
@@ -269,16 +269,49 @@
                 let resultWkt;
                 let operationName = '';
 
-                // Using 3D algorithms for truly 3D geometries
+                // Check if geometries are 3D volumes (SOLID) or 2D
+                const is3D = wkt1.includes('SOLID') || wkt1.includes('POLYHEDRALSURFACE');
+
+                // Use appropriate algorithm based on geometry type
                 if (operation === 'intersection') {
                     operationName = 'Intersection';
-                    resultWkt = sfcgal.intersection3D(wkt1, wkt2);
+                    if (is3D) {
+                        resultWkt = wrapSFCGALOperation(
+                            () => sfcgal.intersection3D(wkt1, wkt2),
+                            'intersection3D'
+                        )();
+                    } else {
+                        resultWkt = wrapSFCGALOperation(
+                            () => sfcgal.intersection(wkt1, wkt2),
+                            'intersection'
+                        )();
+                    }
                 } else if (operation === 'union') {
                     operationName = 'Union';
-                    resultWkt = sfcgal.union3D(wkt1, wkt2);
+                    if (is3D) {
+                        resultWkt = wrapSFCGALOperation(
+                            () => sfcgal.union3D(wkt1, wkt2),
+                            'union3D'
+                        )();
+                    } else {
+                        resultWkt = wrapSFCGALOperation(
+                            () => sfcgal.union(wkt1, wkt2),
+                            'union'
+                        )();
+                    }
                 } else if (operation === 'difference') {
                     operationName = 'Difference';
-                    resultWkt = sfcgal.difference3D(wkt1, wkt2);
+                    if (is3D) {
+                        resultWkt = wrapSFCGALOperation(
+                            () => sfcgal.difference3D(wkt1, wkt2),
+                            'difference3D'
+                        )();
+                    } else {
+                        resultWkt = wrapSFCGALOperation(
+                            () => sfcgal.difference(wkt1, wkt2),
+                            'difference'
+                        )();
+                    }
                 }
 
                 document.getElementById('result').textContent = resultWkt;
@@ -329,10 +362,9 @@
                     wkt2: 'POLYHEDRALSURFACE(((0.5 0 0, 1.5 0 0, 1 0.5 0, 0.5 0 0)),((0.5 0 0, 1 0.5 0, 1 0.5 1, 0.5 0 0)),((1.5 0 0, 1 0.5 1, 1 0.5 0, 1.5 0 0)),((0.5 0 0, 1 0.5 1, 1.5 0 0, 0.5 0 0)))'
                 },
 		'cubes': {
-		   // Two SOLID cube
-		   // TODO: FIX with SOLID geometry
-		   wkt1: 'POLYHEDRALSURFACE Z (((0 0 0,0 2 0,2 2 0,2 0 0,0 0 0)),((0 0 2,2 0 2,2 2 2,0 2 2,0 0 2)),((0 0 0,2 0 0,2 0 2,0 0 2,0 0 0)),((0 2 0,0 2 2,2 2 2,2 2 0,0 2 0)),((2 0 0,2 2 0,2 2 2,2 0 2,2 0 0)),((0 0 0,0 0 2,0 2 2,0 2 0,0 0 0)))',
-		   wkt2: 'POLYHEDRALSURFACE Z (((1 0 0,1 2 0,3 2 0,3 0 0,1 0 0)),((1 0 2,3 0 2,3 2 2,1 2 2,1 0 2)),((1 0 0,3 0 0,3 0 2,1 0 2,1 0 0)),((1 2 0,1 2 2,3 2 2,3 2 0,1 2 0)),((3 0 0,3 2 0,3 2 2,3 0 2,3 0 0)),((1 0 0,1 0 2,1 2 2,1 2 0,1 0 0)))'
+		   // Two SOLID cubes - proper closed volumes
+		   wkt1: 'SOLID(POLYHEDRALSURFACE Z (((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((0 0 1,1 0 1,1 1 1,0 1 1,0 0 1)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0)),((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)),((0 0 0,0 0 1,0 1 1,0 1 0,0 0 0))))',
+		   wkt2: 'SOLID(POLYHEDRALSURFACE Z (((0.5 0 0,0.5 1 0,1.5 1 0,1.5 0 0,0.5 0 0)),((0.5 0 1,1.5 0 1,1.5 1 1,0.5 1 1,0.5 0 1)),((0.5 0 0,1.5 0 0,1.5 0 1,0.5 0 1,0.5 0 0)),((0.5 1 0,0.5 1 1,1.5 1 1,1.5 1 0,0.5 1 0)),((1.5 0 0,1.5 1 0,1.5 1 1,1.5 0 1,1.5 0 0)),((0.5 0 0,0.5 0 1,0.5 1 1,0.5 1 0,0.5 0 0))))'
 		},
             };
 

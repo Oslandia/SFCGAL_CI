@@ -62,6 +62,82 @@ public:
         }
     }
 
+    // Get geometry information for debugging
+    val getGeometryInfo(const std::string& wkt) const {
+        val info = val::object();
+        try {
+            std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
+            if (!geom) {
+                info.set("error", std::string("Failed to parse WKT"));
+                return info;
+            }
+
+            info.set("isEmpty", geom->isEmpty());
+            info.set("is3D", geom->is3D());
+            info.set("dimension", static_cast<int>(geom->dimension()));
+            info.set("coordinateDimension", static_cast<int>(geom->coordinateDimension()));
+
+            std::string geomType;
+            switch (geom->geometryTypeId()) {
+                case SFCGAL::TYPE_POINT: geomType = "POINT"; break;
+                case SFCGAL::TYPE_LINESTRING: geomType = "LINESTRING"; break;
+                case SFCGAL::TYPE_POLYGON: geomType = "POLYGON"; break;
+                case SFCGAL::TYPE_MULTIPOINT: geomType = "MULTIPOINT"; break;
+                case SFCGAL::TYPE_MULTILINESTRING: geomType = "MULTILINESTRING"; break;
+                case SFCGAL::TYPE_MULTIPOLYGON: geomType = "MULTIPOLYGON"; break;
+                case SFCGAL::TYPE_GEOMETRYCOLLECTION: geomType = "GEOMETRYCOLLECTION"; break;
+                case SFCGAL::TYPE_POLYHEDRALSURFACE: geomType = "POLYHEDRALSURFACE"; break;
+                case SFCGAL::TYPE_TRIANGULATEDSURFACE: geomType = "TRIANGULATEDSURFACE"; break;
+                case SFCGAL::TYPE_SOLID: geomType = "SOLID"; break;
+                default: geomType = "UNKNOWN";
+            }
+            info.set("geometryType", geomType);
+            info.set("isValid", SFCGAL::algorithm::isValid(*geom));
+
+            // Count elements for POLYHEDRALSURFACE
+            if (geom->geometryTypeId() == SFCGAL::TYPE_POLYHEDRALSURFACE) {
+                const SFCGAL::PolyhedralSurface& surf = geom->as<SFCGAL::PolyhedralSurface>();
+                info.set("numPolygons", static_cast<int>(surf.numPolygons()));
+            }
+
+        } catch (const std::exception& e) {
+            info.set("error", std::string(e.what()));
+        } catch (...) {
+            info.set("error", std::string("Unknown error"));
+        }
+        return info;
+    }
+
+    // Convert POLYHEDRALSURFACE to SOLID
+    std::string toSolid(const std::string& wkt) const {
+        try {
+            std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
+            if (!geom) {
+                return "ERROR: Failed to parse WKT";
+            }
+
+            // If already a SOLID, return as-is
+            if (geom->geometryTypeId() == SFCGAL::TYPE_SOLID) {
+                return geom->asText(10);
+            }
+
+            // If POLYHEDRALSURFACE, wrap it in a SOLID
+            if (geom->geometryTypeId() == SFCGAL::TYPE_POLYHEDRALSURFACE) {
+                SFCGAL::PolyhedralSurface* surf = static_cast<SFCGAL::PolyhedralSurface*>(geom->clone());
+                SFCGAL::Solid solid(surf);
+                return solid.asText(10);
+            }
+
+            return "ERROR: Can only convert POLYHEDRALSURFACE to SOLID";
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: toSolid failed: ";
+            msg += e.what();
+            return msg;
+        } catch (...) {
+            return "ERROR: Unknown error in toSolid";
+        }
+    }
+
     // Metrics
     double area(const std::string& wkt) const {
         try {
@@ -207,27 +283,24 @@ public:
             std::unique_ptr<SFCGAL::Geometry> geom1(SFCGAL::io::readWkt(wkt1));
             std::unique_ptr<SFCGAL::Geometry> geom2(SFCGAL::io::readWkt(wkt2));
             if (!geom1 || !geom2) {
-                std::cerr << "Warning: Failed to parse WKT for intersection3D" << std::endl;
-                return "GEOMETRYCOLLECTION EMPTY";
+                return "ERROR: Failed to parse WKT for intersection3D";
             }
 
             if (!SFCGAL::algorithm::isValid(*geom1)) {
-                std::cerr << "Warning: Invalid geometry 1 for intersection3D" << std::endl;
-                return "GEOMETRYCOLLECTION EMPTY";
+                return "ERROR: Invalid geometry 1 for intersection3D. Check geometry validity with isValid().";
             }
             if (!SFCGAL::algorithm::isValid(*geom2)) {
-                std::cerr << "Warning: Invalid geometry 2 for intersection3D" << std::endl;
-                return "GEOMETRYCOLLECTION EMPTY";
+                return "ERROR: Invalid geometry 2 for intersection3D. Check geometry validity with isValid().";
             }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::intersection3D(*geom1, *geom2));
             return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (const std::exception& e) {
-            std::cerr << "Error in intersection3D: " << e.what() << std::endl;
-            return "GEOMETRYCOLLECTION EMPTY";
+            std::string msg = "ERROR: intersection3D failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            std::cerr << "Unknown error in intersection3D" << std::endl;
-            return "GEOMETRYCOLLECTION EMPTY";
+            return "ERROR: Unknown error in intersection3D";
         }
     }
 
@@ -249,27 +322,33 @@ public:
             std::unique_ptr<SFCGAL::Geometry> geom1(SFCGAL::io::readWkt(wkt1));
             std::unique_ptr<SFCGAL::Geometry> geom2(SFCGAL::io::readWkt(wkt2));
             if (!geom1 || !geom2) {
-                std::cerr << "Warning: Failed to parse WKT for union3D" << std::endl;
-                return "GEOMETRYCOLLECTION EMPTY";
+                return "ERROR: Failed to parse WKT for union3D";
             }
 
+            // Check if empty
+            if (geom1->isEmpty() || geom2->isEmpty()) {
+                return "ERROR: One or both geometries are empty";
+            }
+
+            // Check validity
             if (!SFCGAL::algorithm::isValid(*geom1)) {
-                std::cerr << "Warning: Invalid geometry 1 for union3D" << std::endl;
-                return "GEOMETRYCOLLECTION EMPTY";
+                return "ERROR: Invalid geometry 1 for union3D. Check geometry validity with isValid().";
             }
             if (!SFCGAL::algorithm::isValid(*geom2)) {
-                std::cerr << "Warning: Invalid geometry 2 for union3D" << std::endl;
-                return "GEOMETRYCOLLECTION EMPTY";
+                return "ERROR: Invalid geometry 2 for union3D. Check geometry validity with isValid().";
             }
 
+            // Perform union3D
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::union3D(*geom1, *geom2));
             return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
+        } catch (const std::bad_alloc& e) {
+            return "ERROR: Memory allocation failed. The geometries may be too complex. Try simplifying them or converting POLYHEDRALSURFACE to SOLID with toSolid().";
         } catch (const std::exception& e) {
-            std::cerr << "Error in union3D: " << e.what() << std::endl;
-            return "GEOMETRYCOLLECTION EMPTY";
+            std::string msg = "ERROR: union3D failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            std::cerr << "Unknown error in union3D" << std::endl;
-            return "GEOMETRYCOLLECTION EMPTY";
+            return "ERROR: Unknown error in union3D";
         }
     }
 
@@ -291,27 +370,24 @@ public:
             std::unique_ptr<SFCGAL::Geometry> geom1(SFCGAL::io::readWkt(wkt1));
             std::unique_ptr<SFCGAL::Geometry> geom2(SFCGAL::io::readWkt(wkt2));
             if (!geom1 || !geom2) {
-                std::cerr << "Warning: Failed to parse WKT for difference3D" << std::endl;
-                return "GEOMETRYCOLLECTION EMPTY";
+                return "ERROR: Failed to parse WKT for difference3D";
             }
 
             if (!SFCGAL::algorithm::isValid(*geom1)) {
-                std::cerr << "Warning: Invalid geometry 1 for difference3D" << std::endl;
-                return "GEOMETRYCOLLECTION EMPTY";
+                return "ERROR: Invalid geometry 1 for difference3D. Check geometry validity with isValid().";
             }
             if (!SFCGAL::algorithm::isValid(*geom2)) {
-                std::cerr << "Warning: Invalid geometry 2 for difference3D" << std::endl;
-                return "GEOMETRYCOLLECTION EMPTY";
+                return "ERROR: Invalid geometry 2 for difference3D. Check geometry validity with isValid().";
             }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::difference3D(*geom1, *geom2));
             return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (const std::exception& e) {
-            std::cerr << "Error in difference3D: " << e.what() << std::endl;
-            return "GEOMETRYCOLLECTION EMPTY";
+            std::string msg = "ERROR: difference3D failed: ";
+            msg += e.what();
+            return msg;
         } catch (...) {
-            std::cerr << "Unknown error in difference3D" << std::endl;
-            return "GEOMETRYCOLLECTION EMPTY";
+            return "ERROR: Unknown error in difference3D";
         }
     }
 
@@ -438,6 +514,8 @@ EMSCRIPTEN_BINDINGS(sfcgal_module) {
         .function("initialize", &SFCGALWrapper::initialize)
         .function("version", &SFCGALWrapper::version)
         .function("isValid", &SFCGALWrapper::isValid)
+        .function("getGeometryInfo", &SFCGALWrapper::getGeometryInfo)
+        .function("toSolid", &SFCGALWrapper::toSolid)
         .function("area", &SFCGALWrapper::area)
         .function("area3D", &SFCGALWrapper::area3D)
         .function("length", &SFCGALWrapper::length)
