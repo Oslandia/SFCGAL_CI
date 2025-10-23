@@ -7,11 +7,12 @@
 #define SFCGAL_POLYHEDRALSURFACE_H_
 
 #include <boost/assert.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/ptr_container/serialize_ptr_vector.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/unique_ptr.hpp>
+#include <memory>
 #include <vector>
 
+#include "SFCGAL/DereferenceIterator.h"
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/Point.h"
@@ -35,8 +36,10 @@ namespace SFCGAL {
  */
 class SFCGAL_API PolyhedralSurface : public Surface {
 public:
-  typedef boost::ptr_vector<Polygon>::iterator       iterator;
-  typedef boost::ptr_vector<Polygon>::const_iterator const_iterator;
+  using iterator =
+      DereferenceIterator<std::vector<std::unique_ptr<Polygon>>::iterator>;
+  using const_iterator = DereferenceIterator<
+      std::vector<std::unique_ptr<Polygon>>::const_iterator>;
 
   /**
    * Empty PolyhedralSurface constructor
@@ -70,7 +73,7 @@ public:
       } while (hit != fit->facet_begin());
       // close the ring
       face->addPoint(hit->vertex()->point());
-      _polygons.push_back(new Polygon(face));
+      _polygons.push_back(std::make_unique<Polygon>(face));
     }
   }
 
@@ -167,7 +170,7 @@ public:
   patchN(size_t const &n) const
   {
     BOOST_ASSERT(n < _polygons.size());
-    return _polygons[n];
+    return *_polygons[n];
   }
   /**
    * [SFA/OGC]Returns the n-th patch
@@ -176,7 +179,7 @@ public:
   patchN(size_t const &n)
   {
     BOOST_ASSERT(n < _polygons.size());
-    return _polygons[n];
+    return *_polygons[n];
   }
   /**
    * add a patch to the PolyhedralSurface
@@ -278,23 +281,23 @@ public:
   inline iterator
   begin()
   {
-    return _polygons.begin();
+    return dereference_iterator(_polygons.begin());
   }
   inline const_iterator
   begin() const
   {
-    return _polygons.begin();
+    return dereference_iterator(_polygons.begin());
   }
 
   inline iterator
   end()
   {
-    return _polygons.end();
+    return dereference_iterator(_polygons.end());
   }
   inline const_iterator
   end() const
   {
-    return _polygons.end();
+    return dereference_iterator(_polygons.end());
   }
 
   //-- visitors
@@ -329,7 +332,7 @@ public:
   }
 
 private:
-  boost::ptr_vector<Polygon> _polygons;
+  std::vector<std::unique_ptr<Polygon>> _polygons;
 
   void
   swap(PolyhedralSurface &other)
