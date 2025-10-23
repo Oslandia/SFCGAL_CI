@@ -19,7 +19,7 @@ PolyhedralSurface::PolyhedralSurface(const std::vector<Polygon> &polygons)
 
 {
   for (const auto &polygon : polygons) {
-    _polygons.push_back(polygon.clone());
+    _polygons.push_back(std::unique_ptr<Polygon>(polygon.clone()));
   }
 }
 
@@ -41,8 +41,13 @@ PolyhedralSurface::PolyhedralSurface(const std::unique_ptr<Geometry> &geometry)
 }
 
 PolyhedralSurface::PolyhedralSurface(const PolyhedralSurface &other)
-
-    = default;
+    : Surface(other)
+{
+  _polygons.reserve(other._polygons.size());
+  for (const auto &poly : other._polygons) {
+    _polygons.emplace_back(std::unique_ptr<Polygon>(poly->clone()));
+  }
+}
 
 PolyhedralSurface::PolyhedralSurface(const Mesh &sm)
 {
@@ -56,7 +61,7 @@ PolyhedralSurface::PolyhedralSurface(const Mesh &sm)
     }
 
     new_face->addPoint(new_face->startPoint().clone());
-    _polygons.push_back(new Polygon(new_face));
+    _polygons.push_back(std::make_unique<Polygon>(new_face));
   }
 }
 
@@ -74,7 +79,7 @@ PolyhedralSurface::PolyhedralSurface(const InexactMesh &inexactMesh)
     }
 
     new_face->addPoint(new_face->startPoint().clone());
-    _polygons.push_back(new Polygon(new_face));
+    _polygons.push_back(std::make_unique<Polygon>(new_face));
   }
 }
 
@@ -117,7 +122,7 @@ PolyhedralSurface::coordinateDimension() const -> int
   if (isEmpty()) {
     return 0;
   }
-  return _polygons.front().coordinateDimension();
+  return _polygons.front()->coordinateDimension();
 }
 
 auto
@@ -132,7 +137,7 @@ PolyhedralSurface::is3D() const -> bool
   if (isEmpty()) {
     return false;
   }
-  return _polygons.front().is3D();
+  return _polygons.front()->is3D();
 }
 
 auto
@@ -141,7 +146,7 @@ PolyhedralSurface::isMeasured() const -> bool
   if (isEmpty()) {
     return false;
   }
-  return _polygons.front().isMeasured();
+  return _polygons.front()->isMeasured();
 }
 
 auto
@@ -152,7 +157,7 @@ PolyhedralSurface::dropZ() -> bool
   }
 
   for (auto &_polygon : _polygons) {
-    _polygon.dropZ();
+    _polygon->dropZ();
   }
 
   return true;
@@ -166,7 +171,7 @@ PolyhedralSurface::dropM() -> bool
   }
 
   for (auto &_polygon : _polygons) {
-    _polygon.dropM();
+    _polygon->dropM();
   }
 
   return true;
@@ -176,7 +181,7 @@ auto
 PolyhedralSurface::swapXY() -> void
 {
   for (auto &_polygon : _polygons) {
-    _polygon.swapXY();
+    _polygon->swapXY();
   }
 }
 
@@ -198,7 +203,7 @@ void
 PolyhedralSurface::addPatch(Polygon *patch)
 {
   BOOST_ASSERT(patch != NULL);
-  _polygons.push_back(patch);
+  _polygons.push_back(std::unique_ptr<Polygon>(patch));
 }
 
 void
@@ -240,7 +245,7 @@ PolyhedralSurface::setPatchN(Polygon *patch, size_t const &n)
                       .str()));
   }
 
-  _polygons.replace(n, patch);
+  _polygons[n] = std::unique_ptr<Polygon>(patch);
 }
 
 void
