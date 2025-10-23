@@ -182,15 +182,30 @@ public:
     return *_polygons[n];
   }
   /**
-   * add a patch to the PolyhedralSurface
+   * @brief Adds a polygonal patch to the PolyhedralSurface.
+   *
+   * @param patch The Polygon object representing the new patch to add.
    */
   void
   addPatch(const Polygon &patch);
   /**
-   * add a patch to the PolyhedralSurface
+   * @brief Adds a polygonal patch to the PolyhedralSurface.
+   *
+   * @param patch A raw pointer to the Polygon object representing the new
+   * patch to add. Ownership of this patch is moved into the PolyhedralSurface.
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
   void
   addPatch(Polygon *patch);
+  /**
+   * @brief Adds a polygonal patch to the PolyhedralSurface.
+   *
+   * @param patch A unique pointer to the Polygon object representing the new
+   * patch to add. Ownership of this patch is moved into the PolyhedralSurface.
+   */
+  void
+  addPatch(std::unique_ptr<Polygon> patch);
   /**
    * add patches from an other PolyhedralSurface
    */
