@@ -26,13 +26,6 @@ namespace SFCGAL::tools {
 
 Registry *Registry::_instance = nullptr;
 
-Registry::~Registry()
-{
-  for (auto &_prototype : _prototypes) {
-    delete _prototype;
-  }
-}
-
 void
 Registry::addPrototype(const Geometry &g)
 {
@@ -49,7 +42,7 @@ Registry::addPrototype(const Geometry &g)
     return;
   }
 
-  _prototypes.push_back(g.clone());
+  _prototypes.push_back(std::unique_ptr<Geometry>(g.clone()));
 }
 
 auto
@@ -58,7 +51,7 @@ Registry::getGeometryTypes() const -> std::vector<std::string>
   std::vector<std::string> names;
 
   names.reserve(_prototypes.size());
-  for (auto *_prototype : _prototypes) {
+  for (const auto &_prototype : _prototypes) {
     names.push_back(_prototype->geometryType());
   }
 
@@ -69,7 +62,7 @@ auto
 Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
     -> Geometry *
 {
-  for (auto *_prototype : _prototypes) {
+  for (const auto &_prototype : _prototypes) {
     if (geometryTypeName == _prototype->geometryType()) {
       return _prototype->clone();
     }
@@ -84,7 +77,7 @@ Registry::newGeometryByTypeName(const std::string &geometryTypeName) const
 auto
 Registry::newGeometryByTypeId(int typeId) const -> Geometry *
 {
-  for (auto *_prototype : _prototypes) {
+  for (const auto &_prototype : _prototypes) {
     if (typeId == _prototype->geometryTypeId()) {
       return _prototype->clone();
     }

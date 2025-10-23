@@ -6,9 +6,11 @@
 #ifndef SFCGAL_REGISTRY_H_
 #define SFCGAL_REGISTRY_H_
 
+#include "SFCGAL/DereferenceIterator.h"
 #include "SFCGAL/config.h"
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -24,15 +26,17 @@ namespace tools {
  */
 class SFCGAL_API Registry {
 public:
-  typedef std::vector<Geometry *>::iterator
-      prototype_iterator; ///< Iterator type for prototypes
-  typedef std::vector<Geometry *>::const_iterator
-      const_prototype_iterator; ///< Const iterator type for prototypes
+  using prototype_iterator =
+      DereferenceIterator<std::vector<std::unique_ptr<Geometry>>>::
+          iterator; ///< Iterator type for prototypes
+  using const_prototype_iterator =
+      DereferenceIterator<std::vector<std::unique_ptr<Geometry>>>::
+          const_iterator; ///< Const iterator type for prototypes
 
   /**
    * destructor
    */
-  ~Registry();
+  ~Registry() = default;
 
   /**
    * @brief Register a new Geometry type
@@ -71,6 +75,55 @@ public:
   static Registry &
   instance();
 
+  //-- iterators
+
+  /**
+   * @brief Returns a mutable iterator to the beginning of the registry
+   * collection.
+   *
+   * @return prototype_iterator Iterator to the first element.
+   */
+  auto
+  begin() -> prototype_iterator
+  {
+    return dereference_iterator(_prototypes.begin());
+  }
+
+  /**
+   * @brief Returns a const iterator to the beginning of the registry
+   * collection.
+   *
+   * @return const_prototype_iterator Const iterator to the first element.
+   */
+  [[nodiscard]] auto
+  begin() const -> const_prototype_iterator
+  {
+    return dereference_iterator(_prototypes.begin());
+  }
+
+  /**
+   * @brief Returns a mutable iterator to the end of the registry collection.
+   *
+   * @return prototype_iterator Iterator pointing past the last element.
+   */
+  auto
+  end() -> prototype_iterator
+  {
+    return dereference_iterator(_prototypes.end());
+  }
+
+  /**
+   * @brief Returns a const iterator to the end of the registry collection.
+   *
+   * @return const_prototype_iterator Const iterator pointing past the last
+   * element.
+   */
+  [[nodiscard]] auto
+  end() const -> const_prototype_iterator
+  {
+    return dereference_iterator(_prototypes.end());
+  }
+
 private:
   /**
    * static instance of the Singleton
@@ -79,7 +132,7 @@ private:
   /**
    * prototypes of the geometries
    */
-  std::vector<Geometry *> _prototypes;
+  std::vector<std::unique_ptr<Geometry>> _prototypes;
 
   /**
    * init registry
