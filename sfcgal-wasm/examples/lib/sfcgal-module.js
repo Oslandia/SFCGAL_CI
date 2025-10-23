@@ -96,7 +96,8 @@ export async function loadSFCGAL(options = {}) {
             // Boolean operations 3D
             'intersection3D', 'union3D', 'difference3D',
             // 3D operations
-            'extrude', 'extrudeDetailed', 'toSolid',
+            'extrude', 'straightSkeleton', 'extrudeStraightSkeleton',
+            'extrudeDetailed', 'toSolid',
             // Transformations
             'translate', 'rotate', 'scale',
             // Utility

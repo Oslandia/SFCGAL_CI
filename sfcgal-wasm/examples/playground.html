@@ -713,6 +713,19 @@ solid;`
                 convexHull: (wkt) => sfcgal ? sfcgal.convexHull(wkt) : wkt,
                 centroid: (wkt) => sfcgal ? sfcgal.centroid(wkt) : wkt,
                 extrude: (wkt, h) => sfcgal ? sfcgal.extrude(wkt, h) : wkt,
+                toSolid: (wkt) => sfcgal ? sfcgal.toSolid(wkt) : wkt,
+                getGeometryInfo: (wkt) => {
+                    if (!sfcgal || !sfcgal.getGeometryInfo) {
+                        addOutput('error', 'getGeometryInfo() is not available');
+                        return {};
+                    }
+                    try {
+                        return sfcgal.getGeometryInfo(wkt);
+                    } catch (e) {
+                        addOutput('error', 'getGeometryInfo() error: ' + e.message);
+                        return {};
+                    }
+                },
                 visualize: (geom, opts = {}) => geometries.push({ geom, opts }),
                 console: console,
                 _geometries: geometries

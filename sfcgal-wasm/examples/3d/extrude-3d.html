@@ -188,6 +188,22 @@
                         <input type="range" id="height" min="0.5" max="10" step="0.5" value="5">
                     </div>
 
+                    <div class="control-group">
+                        <label>Extrusion Method:</label>
+                        <select id="extrusionMethod">
+                            <option value="standard">Standard Extrusion</option>
+                            <option value="straightSkeleton">Straight Skeleton (Roof)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group" id="roofHeightControl" style="display:none;">
+                        <label>
+                            Roof Height:
+                            <span class="range-value" id="roofHeightValue">2.0</span>
+                        </label>
+                        <input type="range" id="roofHeight" min="0.5" max="5" step="0.5" value="2">
+                    </div>
+
                     <div class="checkbox-group">
                         <input type="checkbox" id="wireframe">
                         <label for="wireframe">Wireframe Mode</label>
@@ -249,6 +265,19 @@
                     document.getElementById('heightValue').textContent = parseFloat(e.target.value).toFixed(1);
                 });
 
+                document.getElementById('roofHeight').addEventListener('input', (e) => {
+                    document.getElementById('roofHeightValue').textContent = parseFloat(e.target.value).toFixed(1);
+                });
+
+                document.getElementById('extrusionMethod').addEventListener('change', (e) => {
+                    const roofControl = document.getElementById('roofHeightControl');
+                    if (e.target.value === 'straightSkeleton') {
+                        roofControl.style.display = 'block';
+                    } else {
+                        roofControl.style.display = 'none';
+                    }
+                });
+
                 document.getElementById('wireframe').addEventListener('change', (e) => {
                     renderer.setWireframe(e.target.checked);
                 });
@@ -264,26 +293,64 @@
         window.extrude = async function() {
             const wkt = document.getElementById('wkt').value.trim();
             const height = parseFloat(document.getElementById('height').value);
+            const roofHeight = parseFloat(document.getElementById('roofHeight').value);
+            const method = document.getElementById('extrusionMethod').value;
 
             try {
                 // Use SFCGAL's extrude algorithm
                 const baseArea = sfcgal.area(wkt);
-                const extrudedWKT = sfcgal.extrude(wkt, height);
+
+                // Choose extrusion method
+                let extrudedWKT;
+                let displayHeight;
+
+                if (method === 'straightSkeleton') {
+                    // For straight skeleton: buildingHeight + roofHeight
+                    // The building goes up 'height' units, then roof adds 'roofHeight' more
+                    extrudedWKT = sfcgal.extrudeStraightSkeleton(wkt, height, roofHeight);
+                    displayHeight = height + roofHeight;
+                    showStatus('status', `✅ Extruding with straight skeleton (building: ${height.toFixed(1)}m + roof: ${roofHeight.toFixed(1)}m)...`, 'success');
+                } else {
+                    extrudedWKT = sfcgal.extrude(wkt, height);
+                    displayHeight = height;
+                    showStatus('status', '✅ Extruding (standard)...', 'success');
+                }
+
                 console.log('Extruded geometry:', extrudedWKT);
 
                 // Calculate volume with proper error handling
                 let volExtruded = 0.0;
                 try {
-                    volExtruded = sfcgal.volume(extrudedWKT);
+                    if (method === 'straightSkeleton') {
+                        // Check if geometry is valid before calculating volume
+                        const isValid = sfcgal.isValid(extrudedWKT);
+                        console.log('Straight skeleton geometry valid:', isValid);
+
+                        // Try direct volume calculation (SFCGAL supports POLYHEDRALSURFACE)
+                        volExtruded = sfcgal.volume(extrudedWKT);
+                        console.log('Direct volume from POLYHEDRALSURFACE:', volExtruded);
+
+                        // If volume is 0, try converting to SOLID
+                        if (volExtruded === 0) {
+                            const solidWKT = sfcgal.toSolid(extrudedWKT);
+                            console.log('Converted to SOLID, checking validity...');
+                            const solidValid = sfcgal.isValid(solidWKT);
+                            console.log('SOLID valid:', solidValid);
+                            volExtruded = sfcgal.volume(solidWKT);
+                            console.log('Volume from SOLID:', volExtruded);
+                        }
+                    } else {
+                        volExtruded = sfcgal.volume(extrudedWKT);
+                    }
                 } catch (volumeError) {
                     console.warn('Volume calculation failed:', volumeError.message);
-                    volExtruded = baseArea * height; // Fallback to simple calculation
+                    volExtruded = 0.0;
                 }
 
                 // Display results
                 document.getElementById('baseArea').textContent = baseArea.toFixed(3);
-                document.getElementById('extHeight').textContent = height.toFixed(2);
-                document.getElementById('volume').textContent = volExtruded.toFixed(2);
+                document.getElementById('extHeight').textContent = displayHeight.toFixed(2);
+                document.getElementById('volume').textContent = volExtruded > 0 ? volExtruded.toFixed(2) : 'Calculating...';
                 document.getElementById('results').style.display = 'block';
 
                 // Render 3D geometry

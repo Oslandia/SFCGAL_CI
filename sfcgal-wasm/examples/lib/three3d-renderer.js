@@ -188,9 +188,10 @@ export class Three3DRenderer {
             const match = wkt.match(/POINT(?:\s+Z)?\s*\(\s*([^)]+)\s*\)/i);
             if (match) {
                 const parts = match[1].trim().split(/\s+/).map(Number);
+                // Convert SFCGAL (Z=up) to Three.js (Y=up): (x,y,z) → (x,z,y)
                 return {
                     type: 'POINT',
-                    coords: { x: parts[0], y: parts[1], z: parts[2] || 0 }
+                    coords: { x: parts[0], y: parts[2] || 0, z: parts[1] }
                 };
             }
         }
@@ -201,7 +202,8 @@ export class Three3DRenderer {
             if (match) {
                 const coords = match[1].split(',').map(point => {
                     const parts = point.trim().split(/\s+/).map(Number);
-                    return { x: parts[0], y: parts[1], z: parts[2] || 0 };
+                    // Convert SFCGAL (Z=up) to Three.js (Y=up): (x,y,z) → (x,z,y)
+                    return { x: parts[0], y: parts[2] || 0, z: parts[1] };
                 });
                 return { type: 'LINESTRING', coords };
             }
@@ -213,7 +215,8 @@ export class Three3DRenderer {
             if (match) {
                 const coords = match[1].split(',').map(point => {
                     const parts = point.trim().split(/\s+/).map(Number);
-                    return { x: parts[0], y: parts[1], z: parts[2] || 0 };
+                    // Convert SFCGAL (Z=up) to Three.js (Y=up): (x,y,z) → (x,z,y)
+                    return { x: parts[0], y: parts[2] || 0, z: parts[1] };
                 });
                 return { type: 'POLYGON', coords };
             }
@@ -225,7 +228,8 @@ export class Three3DRenderer {
             if (match) {
                 const coords = match[1].split(',').map(point => {
                     const parts = point.trim().split(/\s+/).map(Number);
-                    return { x: parts[0], y: parts[1], z: parts[2] || 0 };
+                    // Convert SFCGAL (Z=up) to Three.js (Y=up): (x,y,z) → (x,z,y)
+                    return { x: parts[0], y: parts[2] || 0, z: parts[1] };
                 });
                 return { type: 'TRIANGLE', coords };
             }
@@ -273,11 +277,13 @@ export class Three3DRenderer {
             for (const point of points) {
                 const parts = point.trim().split(/\s+/).filter(p => p.length > 0);
                 if (parts.length >= 3) {
-                    const x = parseFloat(parts[0]);
-                    const y = parseFloat(parts[1]);
-                    const z = parseFloat(parts[2]);
-                    if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
-                        coords.push({ x, y, z });
+                    const sfcX = parseFloat(parts[0]);
+                    const sfcY = parseFloat(parts[1]);
+                    const sfcZ = parseFloat(parts[2]);
+                    if (!isNaN(sfcX) && !isNaN(sfcY) && !isNaN(sfcZ)) {
+                        // Convert SFCGAL coordinates (Z=up) to Three.js (Y=up)
+                        // SFCGAL: (x, y, z) → Three.js: (x, z, y)
+                        coords.push({ x: sfcX, y: sfcZ, z: sfcY });
                     }
                 }
             }

@@ -30,6 +30,7 @@
 #include <SFCGAL/algorithm/difference.h>
 #include <SFCGAL/algorithm/offset.h>
 #include <SFCGAL/algorithm/extrude.h>
+#include <SFCGAL/algorithm/straightSkeleton.h>
 #include <SFCGAL/algorithm/convexHull.h>
 #include <SFCGAL/algorithm/isValid.h>
 #include <SFCGAL/algorithm/translate.h>
@@ -39,6 +40,10 @@
 
 using namespace emscripten;
 
+// Maximum vertex count to prevent excessive memory usage (17 GB issue)
+static const size_t MAX_VERTICES_3D = 5000;
+static const size_t MAX_VERTICES_2D = 50000;
+
 class SFCGALWrapper {
 public:
     SFCGALWrapper() {}
@@ -46,6 +51,63 @@ public:
     void initialize() {
         // SFCGAL initialization if needed
     }
+
+private:
+    // Helper to count vertices in a geometry
+    size_t countVertices(const SFCGAL::Geometry* geom) const {
+        if (!geom || geom->isEmpty()) return 0;
+
+        size_t count = 0;
+
+        switch (geom->geometryTypeId()) {
+            case SFCGAL::TYPE_POINT:
+                return 1;
+
+            case SFCGAL::TYPE_LINESTRING:
+                return geom->as<SFCGAL::LineString>().numPoints();
+
+            case SFCGAL::TYPE_POLYGON: {
+                const SFCGAL::Polygon& poly = geom->as<SFCGAL::Polygon>();
+                count = poly.exteriorRing().numPoints();
+                for (size_t i = 0; i < poly.numInteriorRings(); ++i) {
+                    count += poly.interiorRingN(i).numPoints();
+                }
+                return count;
+            }
+
+            case SFCGAL::TYPE_MULTIPOINT:
+            case SFCGAL::TYPE_MULTILINESTRING:
+            case SFCGAL::TYPE_MULTIPOLYGON:
+            case SFCGAL::TYPE_GEOMETRYCOLLECTION: {
+                const SFCGAL::GeometryCollection& coll = geom->as<SFCGAL::GeometryCollection>();
+                for (size_t i = 0; i < coll.numGeometries(); ++i) {
+                    count += countVertices(&coll.geometryN(i));
+                }
+                return count;
+            }
+
+            case SFCGAL::TYPE_POLYHEDRALSURFACE: {
+                const SFCGAL::PolyhedralSurface& surf = geom->as<SFCGAL::PolyhedralSurface>();
+                for (size_t i = 0; i < surf.numPolygons(); ++i) {
+                    count += countVertices(&surf.polygonN(i));
+                }
+                return count;
+            }
+
+            case SFCGAL::TYPE_SOLID: {
+                const SFCGAL::Solid& solid = geom->as<SFCGAL::Solid>();
+                for (size_t i = 0; i < solid.numShells(); ++i) {
+                    count += countVertices(&solid.shellN(i));
+                }
+                return count;
+            }
+
+            default:
+                return 0;
+        }
+    }
+
+public:
 
     std::string version() const {
         return SFCGAL_VERSION;
@@ -197,20 +259,24 @@ public:
                 return 0.0;
             }
 
-            // Volume only makes sense for 3D solid geometries
-            if (geom->geometryTypeId() != SFCGAL::TYPE_SOLID &&
-                geom->geometryTypeId() != SFCGAL::TYPE_POLYHEDRALSURFACE) {
-                std::cerr << "Warning: Volume calculation requires SOLID or POLYHEDRALSURFACE geometry" << std::endl;
+            // Volume calculation based on geometry type
+            // SFCGAL's volume() accepts POLYHEDRALSURFACE and SOLID directly
+            if (geom->geometryTypeId() == SFCGAL::TYPE_POLYHEDRALSURFACE) {
+                const SFCGAL::PolyhedralSurface& surface = geom->as<SFCGAL::PolyhedralSurface>();
+                std::cerr << "Computing volume for POLYHEDRALSURFACE with " << surface.numPolygons() << " polygons" << std::endl;
+                double vol = CGAL::to_double(SFCGAL::algorithm::volume(surface, SFCGAL::algorithm::NoValidityCheck()));
+                std::cerr << "Volume result: " << vol << std::endl;
+                return vol;
+            } else if (geom->geometryTypeId() == SFCGAL::TYPE_SOLID) {
+                const SFCGAL::Solid& solid = geom->as<SFCGAL::Solid>();
+                std::cerr << "Computing volume for SOLID" << std::endl;
+                double vol = CGAL::to_double(SFCGAL::algorithm::volume(solid, SFCGAL::algorithm::NoValidityCheck()));
+                std::cerr << "Volume result: " << vol << std::endl;
+                return vol;
+            } else {
+                std::cerr << "Warning: Volume calculation requires SOLID or POLYHEDRALSURFACE geometry, got type: " << geom->geometryTypeId() << std::endl;
                 return 0.0;
             }
-
-            // Validate geometry before computing volume
-            if (!SFCGAL::algorithm::isValid(*geom)) {
-                std::cerr << "Warning: Invalid geometry for volume calculation" << std::endl;
-                return 0.0;
-            }
-
-            return CGAL::to_double(SFCGAL::algorithm::volume(*geom));
         } catch (const std::exception& e) {
             std::cerr << "Error in volume calculation: " << e.what() << std::endl;
             return 0.0;
@@ -378,6 +444,15 @@ public:
                 return "ERROR: Failed to parse WKT for intersection3D";
             }
 
+            // Check complexity
+            size_t v1 = countVertices(geom1.get());
+            size_t v2 = countVertices(geom2.get());
+            if (v1 > MAX_VERTICES_3D || v2 > MAX_VERTICES_3D) {
+                std::ostringstream oss;
+                oss << "ERROR: Geometry too complex for WebAssembly (max " << MAX_VERTICES_3D << " vertices). Try simplifying.";
+                return oss.str();
+            }
+
             if (!SFCGAL::algorithm::isValid(*geom1)) {
                 return "ERROR: Invalid geometry 1 for intersection3D. Check geometry validity with isValid().";
             }
@@ -437,6 +512,17 @@ public:
                 return "ERROR: One or both geometries are empty";
             }
 
+            // Check complexity to prevent excessive memory usage (17 GB issue)
+            size_t v1 = countVertices(geom1.get());
+            size_t v2 = countVertices(geom2.get());
+            if (v1 > MAX_VERTICES_3D || v2 > MAX_VERTICES_3D) {
+                std::ostringstream oss;
+                oss << "ERROR: Geometry too complex for WebAssembly (max " << MAX_VERTICES_3D
+                    << " vertices). Geometry 1: " << v1 << " vertices, Geometry 2: " << v2
+                    << " vertices. Try simplifying the geometries.";
+                return oss.str();
+            }
+
             // Check validity
             if (!SFCGAL::algorithm::isValid(*geom1)) {
                 return "ERROR: Invalid geometry 1 for union3D. Check geometry validity with isValid().";
@@ -493,6 +579,15 @@ public:
             std::unique_ptr<SFCGAL::Geometry> geom2(SFCGAL::io::readWkt(wkt2));
             if (!geom1 || !geom2) {
                 return "ERROR: Failed to parse WKT for difference3D";
+            }
+
+            // Check complexity
+            size_t v1 = countVertices(geom1.get());
+            size_t v2 = countVertices(geom2.get());
+            if (v1 > MAX_VERTICES_3D || v2 > MAX_VERTICES_3D) {
+                std::ostringstream oss;
+                oss << "ERROR: Geometry too complex for WebAssembly (max " << MAX_VERTICES_3D << " vertices). Try simplifying.";
+                return oss.str();
             }
 
             if (!SFCGAL::algorithm::isValid(*geom1)) {
@@ -575,6 +670,64 @@ public:
             return msg;
         } catch (...) {
             return "ERROR: Unknown error in extrude";
+        }
+    }
+
+    std::string straightSkeleton(const std::string& wkt) const {
+        try {
+            std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
+            if (!geom) {
+                return "ERROR: Failed to parse WKT for straightSkeleton";
+            }
+            if (geom->isEmpty()) {
+                return "ERROR: Empty geometry for straightSkeleton";
+            }
+
+            // straightSkeleton only works on 2D polygons
+            if (geom->geometryTypeId() != SFCGAL::TYPE_POLYGON) {
+                return "ERROR: straightSkeleton requires a POLYGON geometry";
+            }
+
+            std::unique_ptr<SFCGAL::Geometry> result(
+                SFCGAL::algorithm::straightSkeleton(geom->as<SFCGAL::Polygon>())
+            );
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: straightSkeleton failed: ";
+            msg += e.what();
+            return msg;
+        } catch (...) {
+            return "ERROR: Unknown error in straightSkeleton";
+        }
+    }
+
+    std::string extrudeStraightSkeleton(const std::string& wkt, double buildingHeight, double roofHeight) const {
+        try {
+            std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
+            if (!geom) {
+                return "ERROR: Failed to parse WKT for extrudeStraightSkeleton";
+            }
+            if (geom->isEmpty()) {
+                return "ERROR: Empty geometry for extrudeStraightSkeleton";
+            }
+
+            // extrudeStraightSkeleton only works on 2D polygons
+            if (geom->geometryTypeId() != SFCGAL::TYPE_POLYGON) {
+                return "ERROR: extrudeStraightSkeleton requires a POLYGON geometry";
+            }
+
+            // Use the version with building_height and roof_height
+            // This creates a building with vertical walls (buildingHeight) + sloped roof (roofHeight)
+            std::unique_ptr<SFCGAL::Geometry> result(
+                SFCGAL::algorithm::extrudeStraightSkeleton(*geom, buildingHeight, roofHeight)
+            );
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
+        } catch (const std::exception& e) {
+            std::string msg = "ERROR: extrudeStraightSkeleton failed: ";
+            msg += e.what();
+            return msg;
+        } catch (...) {
+            return "ERROR: Unknown error in extrudeStraightSkeleton";
         }
     }
 
@@ -703,6 +856,8 @@ EMSCRIPTEN_BINDINGS(sfcgal_module) {
         .function("convexHull", &SFCGALWrapper::convexHull)
         .function("buffer", &SFCGALWrapper::buffer)
         .function("extrude", &SFCGALWrapper::extrude)
+        .function("straightSkeleton", &SFCGALWrapper::straightSkeleton)
+        .function("extrudeStraightSkeleton", &SFCGALWrapper::extrudeStraightSkeleton)
         .function("extrudeDetailed", &SFCGALWrapper::extrudeDetailed)
         .function("translate", &SFCGALWrapper::translate)
         .function("rotate", &SFCGALWrapper::rotate)
