@@ -97,23 +97,28 @@ em++ "${SRC_DIR}/sfcgal-binding.cpp" \
     -lgmp \
     -lmpfr \
     -DCGAL_DISABLE_ROUNDING_MATH_CHECK \
+    -DNDEBUG \
     -s WASM=1 \
     -s MEMORY64=1 \
     -s MODULARIZE=1 \
     -s EXPORT_ES6=1 \
     -s EXPORT_NAME="SFCGALModule" \
     -s ALLOW_MEMORY_GROWTH=1 \
-    -s INITIAL_MEMORY=512MB \
+    -s INITIAL_MEMORY=256MB \
     -s MAXIMUM_MEMORY=16GB \
-    -s STACK_SIZE=10MB \
-    -s TOTAL_STACK=10MB \
+    -s MEMORY_GROWTH_GEOMETRIC_STEP=0.5 \
+    -s STACK_SIZE=8MB \
+    -s TOTAL_STACK=8MB \
+    -s MALLOC="emmalloc" \
     -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]' \
     -s ENVIRONMENT='web,worker,node' \
     -s SINGLE_FILE=0 \
     -s DISABLE_EXCEPTION_CATCHING=0 \
-    -s ASSERTIONS=1 \
+    -s ASSERTIONS=0 \
+    -s GL_DEBUG=0 \
+    -s RUNTIME_DEBUG=0 \
     -s ALLOW_TABLE_GROWTH=1 \
-    -Os \
+    -O3 \
     --closure 1 \
     -flto \
     -std=c++17 \

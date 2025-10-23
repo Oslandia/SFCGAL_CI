@@ -57,12 +57,12 @@ echo -e "${YELLOW}Using custom FindBoost.cmake from: ${PROJECT_DIR}/cmake${NC}"
 # Use CMAKE_MODULE_PATH to inject our custom FindBoost.cmake
 # This makes CMake use our FindBoost before searching elsewhere
 # This approach avoids the need to patch CGAL CMake files
-EMCC_CFLAGS="-sMEMORY64=1" emcmake cmake "${SFCGAL_SRC}" \
+EMCC_CFLAGS="-sMEMORY64=1 -O3" emcmake cmake "${SFCGAL_SRC}" \
     -DCMAKE_MODULE_PATH="${PROJECT_DIR}/cmake" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_POLICY_DEFAULT_CMP0167=NEW \
-    -DCMAKE_CXX_FLAGS="-DCGAL_DISABLE_ROUNDING_MATH_CHECK -sMEMORY64=1" \
-    -DCMAKE_C_FLAGS="-sMEMORY64=1" \
+    -DCMAKE_CXX_FLAGS="-DCGAL_DISABLE_ROUNDING_MATH_CHECK -DCGAL_NDEBUG=1 -DNDEBUG -sMEMORY64=1 -O3" \
+    -DCMAKE_C_FLAGS="-sMEMORY64=1 -O3" \
     -DSFCGAL_USE_STATIC_LIBS=ON \
     -DBUILD_SHARED_LIBS=OFF \
     -DSFCGAL_BUILD_TESTS=OFF \
