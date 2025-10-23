@@ -162,15 +162,16 @@ GeometryCollection::geometryN(size_t const &n) -> Geometry &
 }
 
 void
-GeometryCollection::setGeometryN(Geometry *geometry, size_t const &n)
+GeometryCollection::setGeometryN(std::unique_ptr<Geometry> geometry,
+                                 size_t const             &idx)
 {
-  BOOST_ASSERT(geometry != NULL);
+  BOOST_ASSERT(geometry != nullptr);
 
-  if (n >= numGeometries()) {
+  if (idx >= numGeometries()) {
     BOOST_THROW_EXCEPTION(
         Exception((boost::format("Cannot set geometry at position %s. "
                                  "GeometryCollection has only %d geometries.") %
-                   n % numGeometries())
+                   idx % numGeometries())
                       .str()));
   }
 
@@ -178,17 +179,22 @@ GeometryCollection::setGeometryN(Geometry *geometry, size_t const &n)
     std::ostringstream oss;
     oss << "try to add a '" << geometry->geometryType() << "' in a '"
         << geometryType() << "'\n";
-    delete geometry; // we are responsible for the resource here
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
-  _geometries[n] = std::unique_ptr<Geometry>(geometry);
+  _geometries[idx] = std::move(geometry);
 }
 
 void
-GeometryCollection::setGeometryN(const Geometry &geometry, size_t const &n)
+GeometryCollection::setGeometryN(Geometry *geometry, size_t const &idx)
 {
-  setGeometryN(geometry.clone(), n);
+  setGeometryN(std::unique_ptr<Geometry>(geometry), idx);
+}
+
+void
+GeometryCollection::setGeometryN(const Geometry &geometry, size_t const &idx)
+{
+  setGeometryN(std::unique_ptr<Geometry>(geometry.clone()), idx);
 }
 
 void
