@@ -254,30 +254,62 @@ public:
    * It needs to be a polygon.
    */
   void
-  setPatchN(const Geometry &geometry, size_t const &n);
+  setPatchN(const Geometry &geometry, size_t const &idx);
 
   /**
    * Sets the n-th Geometry, starting at zero
    * It needs to be a polygon.
    * The ownership of the polygon is taken. The caller is not responsible
    * anymore of its deallocation.
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
   void
-  setPatchN(Geometry *geometry, size_t const &n);
+  setPatchN(Geometry *geometry, size_t const &idx);
+
+  /**
+   * @brief Sets the n-th patch in the PolyhedralSurface.
+   *
+   * Replaces the patch at the specified index with the provided one.
+   * Only polygon geometries are allowed. Indexing starts at zero.
+   *
+   * @param geometry A unique pointer to the Geometry object to set. Ownership
+   * is transferred to this class.
+   * @param idx The zero-based index of the patch to replace.
+   *
+   */
+  void
+  setPatchN(std::unique_ptr<Geometry> geometry, size_t const &idx);
 
   /**
    * Sets the n-th Patch, starting at zero
    */
   void
-  setPatchN(const Polygon &patch, size_t const &n);
+  setPatchN(const Polygon &patch, size_t const &idx);
 
   /**
    * Sets the n-th Patch, starting at zero
    * The ownership of the polygon is taken. The caller is not responsible
    * anymore of its deallocation.
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
   void
-  setPatchN(Polygon *patch, size_t const &n);
+  setPatchN(Polygon *patch, size_t const &idx);
+
+  /**
+   * @brief Sets the n-th patch in the PolyhedralSurface.
+   *
+   * Replaces the patch at the specified index with the provided one.
+   * Indexing starts at zero.
+   *
+   * @param patch A unique pointer to the Polygon object to set. Ownership is
+   * transferred to this class.
+   * @param idx The zero-based index of the patch to replace.
+   *
+   */
+  void
+  setPatchN(std::unique_ptr<Polygon> patch, size_t const &idx);
 
   /**
    * Convert to CGAL::Polyhedron_3
