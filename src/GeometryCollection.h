@@ -7,11 +7,12 @@
 #define SFCGAL_GEOMETRYCOLLECTION_H_
 
 #include <boost/assert.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/ptr_container/serialize_ptr_vector.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/unique_ptr.hpp>
+#include <memory>
 #include <vector>
 
+#include "SFCGAL/DereferenceIterator.h"
 #include "SFCGAL/Geometry.h"
 
 namespace SFCGAL {
@@ -21,8 +22,10 @@ namespace SFCGAL {
  */
 class SFCGAL_API GeometryCollection : public Geometry {
 public:
-  typedef boost::ptr_vector<Geometry>::iterator       iterator;
-  typedef boost::ptr_vector<Geometry>::const_iterator const_iterator;
+  using iterator =
+      DereferenceIterator<std::vector<std::unique_ptr<Geometry>>::iterator>;
+  using const_iterator = DereferenceIterator<
+      std::vector<std::unique_ptr<Geometry>>::const_iterator>;
 
   /**
    * Empty GeometryCollection constructor
@@ -110,23 +113,23 @@ public:
   inline iterator
   begin()
   {
-    return _geometries.begin();
+    return dereference_iterator(_geometries.begin());
   }
   inline const_iterator
   begin() const
   {
-    return _geometries.begin();
+    return dereference_iterator(_geometries.begin());
   }
 
   inline iterator
   end()
   {
-    return _geometries.end();
+    return dereference_iterator(_geometries.end());
   }
   inline const_iterator
   end() const
   {
-    return _geometries.end();
+    return dereference_iterator(_geometries.end());
   }
 
   //-- visitors
@@ -150,7 +153,7 @@ public:
   }
 
 private:
-  boost::ptr_vector<Geometry> _geometries;
+  std::vector<std::unique_ptr<Geometry>> _geometries;
 
 protected:
   /**

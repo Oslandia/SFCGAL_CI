@@ -4,7 +4,9 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include <boost/format.hpp>
+#include <memory>
 
+#include "SFCGAL/Geometry.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/GeometryVisitor.h"
 
@@ -17,8 +19,9 @@ GeometryCollection::GeometryCollection() = default;
 GeometryCollection::GeometryCollection(GeometryCollection const &other)
     : Geometry(other)
 {
-  for (size_t i = 0; i < other.numGeometries(); i++) {
-    addGeometry(other.geometryN(i).clone());
+  _geometries.reserve(other._geometries.size());
+  for (const auto &geometry : other._geometries) {
+    _geometries.emplace_back(std::unique_ptr<Geometry>(geometry->clone()));
   }
 }
 
@@ -54,8 +57,8 @@ GeometryCollection::dimension() const -> int
 {
   int maxDimension = 0;
 
-  for (const auto &_geometrie : _geometries) {
-    maxDimension = std::max(maxDimension, _geometrie.dimension());
+  for (const auto &_geometry : _geometries) {
+    maxDimension = std::max(maxDimension, _geometry->dimension());
   }
 
   return maxDimension;
@@ -67,7 +70,7 @@ GeometryCollection::coordinateDimension() const -> int
   if (isEmpty()) {
     return 0;
   }
-  return _geometries.front().coordinateDimension();
+  return _geometries.front()->coordinateDimension();
 }
 
 auto
@@ -79,13 +82,13 @@ GeometryCollection::isEmpty() const -> bool
 auto
 GeometryCollection::is3D() const -> bool
 {
-  return !isEmpty() && _geometries.front().is3D();
+  return !isEmpty() && _geometries.front()->is3D();
 }
 
 auto
 GeometryCollection::isMeasured() const -> bool
 {
-  return !isEmpty() && _geometries.front().isMeasured();
+  return !isEmpty() && _geometries.front()->isMeasured();
 }
 
 auto
@@ -96,7 +99,7 @@ GeometryCollection::dropZ() -> bool
   }
 
   for (auto &_geometry : _geometries) {
-    _geometry.dropZ();
+    _geometry->dropZ();
   }
 
   return true;
@@ -110,7 +113,7 @@ GeometryCollection::dropM() -> bool
   }
 
   for (auto &_geometry : _geometries) {
-    _geometry.dropM();
+    _geometry->dropM();
   }
 
   return true;
@@ -120,7 +123,7 @@ auto
 GeometryCollection::swapXY() -> void
 {
   for (auto &_geometry : _geometries) {
-    _geometry.swapXY();
+    _geometry->swapXY();
   }
 }
 
@@ -141,7 +144,7 @@ GeometryCollection::geometryN(size_t const &n) const -> const Geometry &
                       .str()));
   }
 
-  return _geometries[n];
+  return *_geometries[n];
 }
 
 auto
@@ -155,7 +158,7 @@ GeometryCollection::geometryN(size_t const &n) -> Geometry &
                       .str()));
   }
 
-  return _geometries[n];
+  return *_geometries[n];
 }
 
 void
@@ -179,7 +182,7 @@ GeometryCollection::setGeometryN(Geometry *geometry, size_t const &n)
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
-  _geometries.replace(n, geometry);
+  _geometries[n] = std::unique_ptr<Geometry>(geometry);
 }
 
 void
@@ -201,7 +204,7 @@ GeometryCollection::addGeometry(Geometry *geometry)
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
-  _geometries.push_back(geometry);
+  _geometries.push_back(std::unique_ptr<Geometry>(geometry));
 }
 
 void
