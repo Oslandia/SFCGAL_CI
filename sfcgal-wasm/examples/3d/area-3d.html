@@ -227,13 +227,14 @@
                     renderer.setWireframe(e.target.checked);
                 });
 
+                await renderer.initPromise;
                 calculate();
             } catch (error) {
                 showStatus('status', '❌ Error: ' + error.message, 'error');
             }
         }
 
-        window.calculate = function() {
+        window.calculate = async function() {
             const wkt = document.getElementById('wkt').value.trim();
 
             try {
@@ -247,7 +248,7 @@
                 document.getElementById('results').style.display = 'block';
 
                 renderer.clear();
-                renderer.addGeometry(wkt);
+                await renderer.addGeometry(wkt);
 
                 showStatus('status', '✅ Calculated successfully', 'success');
                 setTimeout(() => {

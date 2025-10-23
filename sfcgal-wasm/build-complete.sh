@@ -112,6 +112,7 @@ check_prerequisites() {
 
 # Trap errors
 set -e
+set -o pipefail
 trap 'log_error "Build failed at step: $BASH_COMMAND"; exit 1' ERR
 
 # Start
@@ -186,9 +187,13 @@ echo
 # Step 3: Source Emscripten environment
 log_step "Activating Emscripten environment"
 
-set +e  # Don't exit on error for source command
-source build/emsdk/emsdk_env.sh 2>&1 | tee -a "$LOG_FILE"
-set -e
+# Source may return non-zero even on success, so check differently
+if ! source build/emsdk/emsdk_env.sh 2>&1 | tee -a "$LOG_FILE"; then
+    if [ -z "$EMSDK" ]; then
+        log_error "Failed to activate Emscripten environment"
+        exit 1
+    fi
+fi
 
 log_success "Emscripten environment activated"
 echo
@@ -198,7 +203,10 @@ log_step "Step 2/4: Building dependencies (GMP, MPFR, Boost, CGAL)"
 log_info "This step takes ~15 minutes"
 echo
 
-./scripts/build-deps.sh 2>&1 | tee -a "$LOG_FILE"
+if ! ./scripts/build-deps.sh 2>&1 | tee -a "$LOG_FILE"; then
+    log_error "Dependencies build failed"
+    exit 1
+fi
 
 log_success "Dependencies built successfully"
 show_elapsed_time
@@ -209,8 +217,10 @@ log_step "Step 3/4: Building SFCGAL WebAssembly library"
 log_info "This step takes ~8 minutes"
 echo
 
-source build/emsdk/emsdk_env.sh
-./scripts/build-sfcgal-wasm.sh 2>&1 | tee -a "$LOG_FILE"
+if ! ./scripts/build-sfcgal-wasm.sh 2>&1 | tee -a "$LOG_FILE"; then
+    log_error "SFCGAL build failed"
+    exit 1
+fi
 
 log_success "SFCGAL library built successfully"
 show_elapsed_time
@@ -221,8 +231,10 @@ log_step "Step 4/4: Building WebAssembly binding"
 log_info "This step takes ~20 seconds"
 echo
 
-source build/emsdk/emsdk_env.sh
-./scripts/build.sh 2>&1 | tee -a "$LOG_FILE"
+if ! ./scripts/build.sh 2>&1 | tee -a "$LOG_FILE"; then
+    log_error "WebAssembly binding build failed"
+    exit 1
+fi
 
 log_success "WebAssembly binding built successfully"
 show_elapsed_time

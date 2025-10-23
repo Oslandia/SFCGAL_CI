@@ -253,14 +253,15 @@
                     renderer.setWireframe(e.target.checked);
                 });
 
-                // Initial extrusion
+                // Wait for renderer to be ready, then do initial extrusion
+                await renderer.initPromise;
                 extrude();
             } catch (error) {
                 showStatus('status', '❌ Error: ' + error.message, 'error');
             }
         }
 
-        window.extrude = function() {
+        window.extrude = async function() {
             const wkt = document.getElementById('wkt').value.trim();
             const height = parseFloat(document.getElementById('height').value);
 
@@ -280,7 +281,7 @@
 
                 // Render 3D geometry
                 renderer.clear();
-                renderer.addGeometry(extrudedWKT);
+                await renderer.addGeometry(extrudedWKT);
 
                 showStatus('status', '✅ Extruded successfully', 'success');
                 setTimeout(() => {

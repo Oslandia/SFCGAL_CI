@@ -1,9 +1,20 @@
 #!/bin/bash
+set -e
+set -o pipefail
 
 echo "=== Building SFCGAL WebAssembly Dependencies (No Patch Method) ==="
 echo "This version does NOT patch CGAL CMake files"
 echo "Instead, it relies on the CMake toolchain file to configure Boost"
 echo
+
+# Function to get number of CPU cores (cross-platform)
+get_num_cores() {
+    if command -v nproc >/dev/null 2>&1; then
+        nproc
+    else
+        sysctl -n hw.ncpu 2>/dev/null || echo 4
+    fi
+}
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -62,15 +73,25 @@ if [ ! -f "${INSTALL_DIR}/lib/libgmp.a" ]; then
     tar xf "gmp-${GMP_VERSION}.tar.xz"
     cd "gmp-${GMP_VERSION}"
 
+    # Detect native compiler for build tools
+    if command -v clang >/dev/null 2>&1; then
+        NATIVE_CC=clang
+    elif command -v gcc >/dev/null 2>&1; then
+        NATIVE_CC=gcc
+    else
+        NATIVE_CC=cc
+    fi
+
     emconfigure ./configure \
         --prefix="${INSTALL_DIR}" \
         --enable-static \
         --disable-shared \
         --disable-assembly \
 	--host=wasm32 \
+        HOST_CC="${NATIVE_CC}" \
         CFLAGS="-O3"
 
-    emmake make -j$(nproc)
+    emmake make -j$(get_num_cores)
     emmake make install
 
     cd ..
@@ -96,7 +117,7 @@ if [ ! -f "${INSTALL_DIR}/lib/libmpfr.a" ]; then
         --with-gmp="${INSTALL_DIR}" \
         CFLAGS="-O3"
 
-    emmake make -j$(nproc)
+    emmake make -j$(get_num_cores)
     emmake make install
 
     cd ..

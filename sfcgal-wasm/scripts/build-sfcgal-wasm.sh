@@ -1,4 +1,15 @@
 #!/bin/bash
+set -e
+set -o pipefail
+
+# Function to get number of CPU cores (cross-platform)
+get_num_cores() {
+    if command -v nproc >/dev/null 2>&1; then
+        nproc
+    else
+        sysctl -n hw.ncpu 2>/dev/null || echo 4
+    fi
+}
 
 echo "=== Building SFCGAL Static Library for WebAssembly (No Patch Method) ==="
 echo
@@ -34,7 +45,8 @@ fi
 
 BOOST_VERSION="1_86_0"
 BOOST_INCLUDE="${DEPS_DIR}/boost_${BOOST_VERSION}"
-SFCGAL_SRC="/home/lbartoletti/sfcgal"
+# Auto-detect SFCGAL source directory (parent of sfcgal-wasm)
+SFCGAL_SRC="$(dirname "$PROJECT_DIR")"
 
 mkdir -p "${SFCGAL_WASM_BUILD}"
 cd "${SFCGAL_WASM_BUILD}"
@@ -72,7 +84,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo -e "${YELLOW}Building SFCGAL static library...${NC}"
-emmake make -j$(nproc)
+emmake make -j$(get_num_cores)
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ SFCGAL static library built successfully!${NC}"

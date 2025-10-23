@@ -252,13 +252,14 @@
                     renderer.setWireframe(e.target.checked);
                 });
 
+                await renderer.initPromise;
                 calculate();
             } catch (error) {
                 showStatus('status', '❌ Error: ' + error.message, 'error');
             }
         }
 
-        window.calculate = function() {
+        window.calculate = async function() {
             const wkt1 = document.getElementById('wkt1').value.trim();
             const wkt2 = document.getElementById('wkt2').value.trim();
             const operation = document.getElementById('operation').value;
@@ -289,14 +290,14 @@
                 if (showOnlyResult) {
                     // Show only the result geometry
                     if (!resultWkt.includes('EMPTY')) {
-                        renderer.addGeometry(resultWkt, { color: 0x4caf50 }); // Green
+                        await renderer.addGeometry(resultWkt, { color: 0x4caf50 }); // Green
                     }
                 } else {
                     // Show all geometries with distinct colors
-                    renderer.addGeometry(wkt1, { color: 0x667eea }); // Blue
-                    renderer.addGeometry(wkt2, { color: 0xf06292 }); // Pink
+                    await renderer.addGeometry(wkt1, { color: 0x667eea }); // Blue
+                    await renderer.addGeometry(wkt2, { color: 0xf06292 }); // Pink
                     if (!resultWkt.includes('EMPTY')) {
-                        renderer.addGeometry(resultWkt, { color: 0x4caf50 }); // Green
+                        await renderer.addGeometry(resultWkt, { color: 0x4caf50 }); // Green
                     }
                 }
 

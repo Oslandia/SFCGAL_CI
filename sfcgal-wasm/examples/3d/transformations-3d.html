@@ -254,6 +254,7 @@
                     });
                 });
 
+                await renderer.initPromise;
                 reset();
             } catch (error) {
                 showStatus('status', '❌ Error: ' + error.message, 'error');
@@ -308,13 +309,13 @@
             reset();
         };
 
-        function renderGeometries() {
+        async function renderGeometries() {
             renderer.clear();
             if (originalWkt) {
-                renderer.addGeometry(originalWkt, { color: 0x999999 });
+                await renderer.addGeometry(originalWkt, { color: 0x999999 });
             }
             if (currentWkt && currentWkt !== originalWkt) {
-                renderer.addGeometry(currentWkt, { color: 0x4caf50 });
+                await renderer.addGeometry(currentWkt, { color: 0x4caf50 });
             }
         }
 

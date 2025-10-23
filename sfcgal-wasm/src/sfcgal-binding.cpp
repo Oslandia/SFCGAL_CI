@@ -182,7 +182,7 @@ public:
             if (!geom) return "POINT EMPTY";
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::centroid(*geom));
-            return result ? result->asText(1) : "POINT EMPTY";
+            return result ? result->asText(10) : "POINT EMPTY";
 
         } catch (...) {
             return "POINT EMPTY";
@@ -196,7 +196,7 @@ public:
             if (!geom1 || !geom2) return "GEOMETRYCOLLECTION EMPTY";
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::intersection(*geom1, *geom2));
-            return result ? result->asText(1) : "GEOMETRYCOLLECTION EMPTY";
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (...) {
             return "GEOMETRYCOLLECTION EMPTY";
         }
@@ -221,7 +221,7 @@ public:
             }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::intersection3D(*geom1, *geom2));
-            return result ? result->asText(1) : "GEOMETRYCOLLECTION EMPTY";
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (const std::exception& e) {
             std::cerr << "Error in intersection3D: " << e.what() << std::endl;
             return "GEOMETRYCOLLECTION EMPTY";
@@ -238,7 +238,7 @@ public:
             if (!geom1 || !geom2) return "GEOMETRYCOLLECTION EMPTY";
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::union_(*geom1, *geom2));
-            return result ? result->asText(1) : "GEOMETRYCOLLECTION EMPTY";
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (...) {
             return "GEOMETRYCOLLECTION EMPTY";
         }
@@ -263,7 +263,7 @@ public:
             }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::union3D(*geom1, *geom2));
-            return result ? result->asText(1) : "GEOMETRYCOLLECTION EMPTY";
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (const std::exception& e) {
             std::cerr << "Error in union3D: " << e.what() << std::endl;
             return "GEOMETRYCOLLECTION EMPTY";
@@ -280,7 +280,7 @@ public:
             if (!geom1 || !geom2) return "GEOMETRYCOLLECTION EMPTY";
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::difference(*geom1, *geom2));
-            return result ? result->asText(1) : "GEOMETRYCOLLECTION EMPTY";
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (...) {
             return "GEOMETRYCOLLECTION EMPTY";
         }
@@ -305,7 +305,7 @@ public:
             }
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::difference3D(*geom1, *geom2));
-            return result ? result->asText(1) : "GEOMETRYCOLLECTION EMPTY";
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (const std::exception& e) {
             std::cerr << "Error in difference3D: " << e.what() << std::endl;
             return "GEOMETRYCOLLECTION EMPTY";
@@ -321,7 +321,7 @@ public:
             if (!geom) return "GEOMETRYCOLLECTION EMPTY";
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::convexHull(*geom));
-            return result ? result->asText(1) : "GEOMETRYCOLLECTION EMPTY";
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (...) {
             return "GEOMETRYCOLLECTION EMPTY";
         }
@@ -333,7 +333,7 @@ public:
             if (!geom) return "GEOMETRYCOLLECTION EMPTY";
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::offset(*geom, distance));
-            return result ? result->asText(1) : "GEOMETRYCOLLECTION EMPTY";
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (...) {
             return "GEOMETRYCOLLECTION EMPTY";
         }
@@ -346,7 +346,8 @@ public:
             if (!geom) return "GEOMETRYCOLLECTION EMPTY";
 
             std::unique_ptr<SFCGAL::Geometry> result(SFCGAL::algorithm::extrude(*geom, 0, 0, height));
-            return result ? result->asText(1) : "GEOMETRYCOLLECTION EMPTY";
+            // Use higher precision (10 decimals) for accurate 3D coordinates
+            return result ? result->asText(10) : "GEOMETRYCOLLECTION EMPTY";
         } catch (...) {
             return "GEOMETRYCOLLECTION EMPTY";
         }
@@ -364,7 +365,7 @@ public:
 
             std::unique_ptr<SFCGAL::Geometry> extruded(SFCGAL::algorithm::extrude(*geom, 0, 0, height));
 
-            result.set("wkt", extruded ? extruded->asText(1) : std::string("GEOMETRYCOLLECTION EMPTY"));
+            result.set("wkt", extruded ? extruded->asText(10) : std::string("GEOMETRYCOLLECTION EMPTY"));
             result.set("baseArea", CGAL::to_double(SFCGAL::algorithm::area(*geom)));
             result.set("volume", CGAL::to_double(SFCGAL::algorithm::volume(*extruded)));
             result.set("perimeter", this->length(wkt));
@@ -393,7 +394,7 @@ public:
             if (!geom) return wkt;
 
             SFCGAL::algorithm::translate(*geom, dx, dy, dz);
-            return geom->asText(1);
+            return geom->asText(10);
         } catch (...) {
             return wkt;
         }
@@ -405,7 +406,7 @@ public:
             if (!geom) return wkt;
 
             SFCGAL::algorithm::rotate(*geom, angle);
-            return geom->asText(1);
+            return geom->asText(10);
         } catch (...) {
             return wkt;
         }
@@ -424,7 +425,7 @@ public:
                 )
             );
             geom->accept(transform);
-            return geom->asText(1);
+            return geom->asText(10);
         } catch (...) {
             return wkt;
         }

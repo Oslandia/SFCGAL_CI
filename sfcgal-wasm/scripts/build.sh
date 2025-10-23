@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+set -o pipefail
 
 echo "=== Building SFCGAL WebAssembly Module ==="
 echo
@@ -119,7 +121,6 @@ if [ $? -eq 0 ]; then
     echo
     echo "Output files:"
     ls -lah "${OUTPUT_DIR}"/sfcgal.* | grep -E "(\.js|\.wasm)$"
-
     echo
     echo -e "To test the module, run: ${YELLOW}./scripts/serve.sh${NC}"
 else

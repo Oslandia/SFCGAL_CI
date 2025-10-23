@@ -127,7 +127,21 @@
             font-size: 0.9rem;
             cursor: pointer;
             background: #ffffff;
+            color: #2d3748;
             transition: all 0.2s ease;
+        }
+
+        select {
+            appearance: auto;
+            -webkit-appearance: menulist;
+            -moz-appearance: menulist;
+            min-width: 180px;
+        }
+
+        select option {
+            background: #ffffff;
+            color: #2d3748;
+            padding: 8px;
         }
 
         button.primary {
@@ -169,6 +183,7 @@
             display: none;
             position: relative;
             min-height: 400px;
+            overflow: hidden;
         }
 
         #canvas2d {
@@ -179,16 +194,14 @@
         #canvas3d {
             width: 100%;
             height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            border-radius: 12px;
-            overflow: hidden;
         }
 
         #canvas3d canvas {
             display: block;
-            border-radius: 12px;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100%;
+            max-height: 100%;
         }
 
         #output {
@@ -413,7 +426,8 @@ poly3d;`
         async function init() {
             editorElem.value = EXAMPLES.union2d;
             renderer2d = new Canvas2DRenderer('canvas2d', { showGrid: true, showAxes: true });
-            renderer3d = new Three3DRenderer('canvas3d', { wireframe: false, showGrid: true, showAxes: true });
+            // Don't initialize 3D renderer yet - wait until 3D view is activated
+            renderer3d = null;
 
             try {
                 sfcgal = await loadSFCGAL();
@@ -476,20 +490,37 @@ poly3d;`
             view2dBtn.classList.toggle('active', view === '2d');
             view3dBtn.classList.toggle('active', view === '3d');
             canvas2dWrapper.style.display = view === '2d' ? 'flex' : 'none';
-            canvas3dWrapper.style.display = view === '3d' ? 'block' : 'none';
+            canvas3dWrapper.style.display = view === '3d' ? 'flex' : 'none';
 
-            // Force 3D renderer to resize when switching to 3D view
-            if (view === '3d' && renderer3d) {
-                setTimeout(() => {
-                    renderer3d.onResize();
-                }, 100);
+            // Initialize 3D renderer when switching to 3D view for the first time
+            if (view === '3d') {
+                if (!renderer3d) {
+                    console.log('[Playground] Initializing 3D renderer...');
+                    setTimeout(() => {
+                        const rect = canvas3dWrapper.getBoundingClientRect();
+                        console.log('[Playground] Container dimensions:', rect);
+                        if (rect.width > 0 && rect.height > 0) {
+                            renderer3d = new Three3DRenderer('canvas3d', { wireframe: false, showGrid: true, showAxes: true });
+                            console.log('[Playground] 3D renderer initialized');
+                        } else {
+                            console.error('[Playground] Container still has zero dimensions!');
+                        }
+                    }, 50);
+                } else {
+                    setTimeout(() => {
+                        console.log('[Playground] Resizing 3D renderer');
+                        renderer3d.onResize();
+                    }, 50);
+                }
             }
         }
 
         function clearVisuals() {
             renderer2d.clearGeometries();
             renderer2d.clear();
-            renderer3d.clear();
+            if (renderer3d) {
+                renderer3d.clear();
+            }
         }
 
         function addOutput(type, message) {
@@ -552,7 +583,9 @@ poly3d;`
             outputElem.innerHTML = '';
             renderer2d.clearGeometries();
             renderer2d.clear();
-            renderer3d.clear();
+            if (renderer3d) {
+                renderer3d.clear();
+            }
 
             const code = editorElem.value;
             const context = createExecutionContext();
@@ -573,27 +606,50 @@ poly3d;`
                 // Auto-switch to 3D view if 3D geometries detected
                 if (has3D && currentView === '2d') {
                     switchView('3d');
-                }
-
-                // Add geometries to the appropriate renderer
-                context._geometries.forEach(({ geom, opts }) => {
-                    if (currentView === '2d') {
-                        renderer2d.addGeometry(geom, opts);
-                    } else {
-                        renderer3d.addGeometry(geom, opts);
-                    }
-                });
-
-                // Render based on current view
-                if (currentView === '2d') {
-                    renderer2d.render();
-                } else {
-                    // 3D renders automatically, but force a resize to ensure proper display
-                    setTimeout(() => {
-                        if (renderer3d) {
-                            renderer3d.onResize();
+                    // Wait for 3D renderer to initialize before adding geometries
+                    const waitForRenderer = setInterval(() => {
+                        if (renderer3d && renderer3d.initialized) {
+                            clearInterval(waitForRenderer);
+                            console.log('[Playground] 3D renderer ready, adding geometries');
+                            addGeometriesAndRender(context._geometries);
                         }
                     }, 50);
+                    // Fallback timeout after 2 seconds
+                    setTimeout(() => {
+                        clearInterval(waitForRenderer);
+                        if (!renderer3d || !renderer3d.initialized) {
+                            console.error('[Playground] 3D renderer failed to initialize');
+                        }
+                    }, 2000);
+                } else {
+                    addGeometriesAndRender(context._geometries);
+                }
+
+                function addGeometriesAndRender(geometries) {
+                    // Add geometries to the appropriate renderer
+                    geometries.forEach(({ geom, opts }) => {
+                        if (currentView === '2d') {
+                            renderer2d.addGeometry(geom, opts);
+                        } else {
+                            if (renderer3d) {
+                                renderer3d.addGeometry(geom, opts);
+                            } else {
+                                console.warn('[Playground] 3D renderer not ready yet');
+                            }
+                        }
+                    });
+
+                    // Render based on current view
+                    if (currentView === '2d') {
+                        renderer2d.render();
+                    } else {
+                        // 3D renders automatically, but force a resize to ensure proper display
+                        setTimeout(() => {
+                            if (renderer3d) {
+                                renderer3d.onResize();
+                            }
+                        }, 50);
+                    }
                 }
 
                 if (result !== undefined) {

@@ -223,13 +223,14 @@
                     renderer.setWireframe(e.target.checked);
                 });
 
+                await renderer.initPromise;
                 calculate();
             } catch (error) {
                 showStatus('status', '❌ Error: ' + error.message, 'error');
             }
         }
 
-        window.calculate = function() {
+        window.calculate = async function() {
             const wkt1 = document.getElementById('wkt1').value.trim();
             const wkt2 = document.getElementById('wkt2').value.trim();
 
@@ -240,8 +241,8 @@
                 document.getElementById('results').style.display = 'block';
 
                 renderer.clear();
-                renderer.addGeometry(wkt1, { color: 0x667eea });
-                renderer.addGeometry(wkt2, { color: 0xf06292 });
+                await renderer.addGeometry(wkt1, { color: 0x667eea });
+                await renderer.addGeometry(wkt2, { color: 0xf06292 });
 
                 showStatus('status', '✅ Calculated successfully', 'success');
                 setTimeout(() => {
