@@ -109,21 +109,42 @@ public:
    */
   auto
   patchN(size_t const &n) -> Triangle &;
+
   /**
-   * add a Patch to the TriangulatedSurface
+   * @brief Adds a patch to the TriangulatedSurface.
+   *
+   * @param patch The Triangle object representing the new patch to add.
    */
-  inline void
+  void
   addPatch(const Triangle &patch)
   {
-    addPatch(patch.clone());
+    addPatch(std::unique_ptr<Triangle>(patch.clone()));
   }
   /**
-   * add a Patch to the TriangulatedSurface
+   * @brief Adds a patch to the TriangulatedSurface.
+   *
+   * @param patch A raw pointer to the Triangle object representing the new
+   * patch to add. Ownership of this patch is transferred to the
+   * TriangulatedSurface.
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
-  inline void
+  void
   addPatch(Triangle *patch)
   {
-    _triangles.push_back(std::unique_ptr<Triangle>(patch));
+    addPatch(std::unique_ptr<Triangle>(patch));
+  }
+  /**
+   * @brief Adds a patch to the TriangulatedSurface.
+   *
+   * @param patch A unique pointer to the Triangle object representing the new
+   * patch to add. Ownership of this patch is moved into the
+   * TriangulatedSurface.
+   */
+  void
+  addPatch(std::unique_ptr<Triangle> patch)
+  {
+    _triangles.push_back(std::move(patch));
   }
   /**
    * add patchs from an other TriangulatedSurface
@@ -167,7 +188,7 @@ public:
   inline void
   addTriangle(const Triangle &triangle)
   {
-    addTriangle(triangle.clone());
+    addTriangle(std::unique_ptr<Triangle>(triangle.clone()));
   }
   /**
    * add a Triangle to the TriangulatedSurface
@@ -176,7 +197,16 @@ public:
   inline void
   addTriangle(Triangle *triangle)
   {
-    _triangles.push_back(std::unique_ptr<Triangle>(triangle));
+    addTriangle(std::unique_ptr<Triangle>(triangle));
+  }
+  /**
+   * add a Triangle to the TriangulatedSurface
+   * @deprecated see addPatch()
+   */
+  void
+  addTriangle(std::unique_ptr<Triangle> triangle)
+  {
+    _triangles.push_back(std::move(triangle));
   }
   /**
    * add triangles from an other TriangulatedSurface
