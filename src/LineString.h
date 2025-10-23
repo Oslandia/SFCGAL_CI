@@ -174,20 +174,37 @@ public:
   }
 
   /**
-   * append a Point to the LineString
+   * @brief Appends a Point to the LineString
+   *
+   * @param point The Point object to append.
    */
-  inline void
-  addPoint(const Point &p)
+  void
+  addPoint(const Point &point)
   {
-    _points.push_back(std::unique_ptr<Point>(p.clone()));
+    addPoint(std::unique_ptr<Point>(point.clone()));
   }
   /**
-   * append a Point to the LineString and takes ownership
+   * @brief Appends a Point to the LineString and takes ownership
+   *
+   * @param point A raw pointer to the Point object to append. Ownership of
+   * this point is moved into the LineString.
+   * @deprecated The unique_ptr version should be used instead
    */
-  inline void
-  addPoint(Point *p)
+  void
+  addPoint(Point *point)
   {
-    _points.push_back(std::unique_ptr<Point>(p));
+    addPoint(std::unique_ptr<Point>(point));
+  }
+  /**
+   * @brief Appends a Point to the LineString
+   *
+   * @param point A unique pointer to the Point object to append. Ownership of
+   * this point is moved into the LineString.
+   */
+  void
+  addPoint(std::unique_ptr<Point> point)
+  {
+    _points.push_back(std::move(point));
   }
 
   //-- methods
