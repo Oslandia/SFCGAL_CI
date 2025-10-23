@@ -198,25 +198,30 @@ GeometryCollection::setGeometryN(const Geometry &geometry, size_t const &idx)
 }
 
 void
-GeometryCollection::addGeometry(Geometry *geometry)
+GeometryCollection::addGeometry(std::unique_ptr<Geometry> geometry)
 {
-  BOOST_ASSERT(geometry != NULL);
+  BOOST_ASSERT(geometry != nullptr);
 
   if (!isAllowed(*geometry)) {
     std::ostringstream oss;
     oss << "try to add a '" << geometry->geometryType() << "' in a '"
         << geometryType() << "'\n";
-    delete geometry; // we are responsible for the resource here
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
-  _geometries.push_back(std::unique_ptr<Geometry>(geometry));
+  _geometries.push_back(std::move(geometry));
+}
+
+void
+GeometryCollection::addGeometry(Geometry *geometry)
+{
+  addGeometry(std::unique_ptr<Geometry>(geometry));
 }
 
 void
 GeometryCollection::addGeometry(Geometry const &geometry)
 {
-  addGeometry(geometry.clone());
+  addGeometry(std::unique_ptr<Geometry>(geometry.clone()));
 }
 
 auto
