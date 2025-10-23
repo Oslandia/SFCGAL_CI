@@ -101,7 +101,17 @@ public:
   setGeometryN(std::unique_ptr<Geometry> geometry, size_t const &idx) override;
 
   /**
+   * @brief [SFA/OGC] Add a geometry to the collection.
+   *
+   * @param geometry A unique pointer to the Geometry object to add. Ownership
+   * of this geometry is moved into the GeometryCollection.
+   */
+  void
+  addGeometry(std::unique_ptr<Geometry> geometry);
+  /**
    * [SFA/OGC]add a geometry to the collection (takes ownership)
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
   void
   addGeometry(Geometry *geometry);
