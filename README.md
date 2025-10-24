@@ -19,7 +19,7 @@ Please refer to the <a href="http://sfcgal.gitlab.io/SFCGAL">project page</a> fo
 * Website: <https://sfcgal.org>
 * **git** repository: <https://gitlab.com/sfcgal/SFCGAL>
 * **#sfcgal** chat channel (all bridged):
-  * IRC: irc://irc.libera.chat/#sfcgal (<https://kiwiirc.com/nextclient/irc.libera.chat/#sfcgal>)
+    * IRC: irc://irc.libera.chat/#sfcgal (<https://kiwiirc.com/nextclient/irc.libera.chat/#sfcgal>)
 
 ## Build/Install
 
@@ -45,8 +45,10 @@ to be dynamically linked to a system install of SFCGAL.
 The `sfcgal-config` program can be used to determine appropriate compiler and
 linker flags for building against the C library:
 
-    CFLAGS += `sfcgal-config --cflags`
-    LDFLAGS += `sfcgal-config --ldflags --libs`
+```text
+CFLAGS += `sfcgal-config --cflags`
+LDFLAGS += `sfcgal-config --ldflags --libs`
+```
 
 All functionality of the C API is available through the `sfcgal_c.h` header file.
 
@@ -68,13 +70,14 @@ in the default build. To build the documentation see the [Development](https://s
 
 To format your code into the desired style, use the `clang-format` tools.
 
-It can be automatically called with a series of *git hooks* (thanks to the [pre-commit](https://pre-commit.com/)) tool). To install them:  
+It can be automatically called with a series of *git hooks* (thanks to the [pre-commit](https://pre-commit.com/)) tool). To install them:
 
 ```bash
 pre-commit install
 ```
 
-To commit without the *git hooks*, add the `--no-verify` option to the `git commit` command.
+> [!tip]
+> To commit without the *git hooks*, add the `--no-verify` option to the `git commit` command.
 
 ## Testing
 
@@ -84,4 +87,5 @@ See documentation in [Development](https://sfcgal.gitlab.io/SFCGAL/development/)
 
 SFCGAL is provided under the following licence LGPL version 2 or later.
 
-:warning: Note that the main dependency for SFCGAL is the CGAL library, and SFCGAL uses CGAL modules which are licenced as GPLv3+. Whenever you compile and distribute SFCGAL with the GPL-licenced CGAL, the full packaged result is automatically considered as GPL version 3 or later, due to GPL "viral" property. **If you link and distribute SFCGAL with another software package, be assured to fully understand the implications and check any legal and technical requirements implied by the licence**.
+> [!warning]
+> Note that the main dependency for SFCGAL is the CGAL library, and SFCGAL uses CGAL modules which are licenced as GPLv3+. Whenever you compile and distribute SFCGAL with the GPL-licenced CGAL, the full packaged result is automatically considered as GPL version 3 or later, due to GPL "viral" property. **If you link and distribute SFCGAL with another software package, be assured to fully understand the implications and check any legal and technical requirements implied by the licence**.
