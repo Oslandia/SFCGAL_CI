@@ -143,19 +143,32 @@ public:
   /**
    * adds an interior shell to the Solid
    */
-  inline void
+  void
   addInteriorShell(const PolyhedralSurface &shell)
   {
-    _shells.push_back(std::unique_ptr<PolyhedralSurface>(shell.clone()));
+    addInteriorShell(std::unique_ptr<PolyhedralSurface>(shell.clone()));
   }
   /**
    * adds an interior shell to the Solid
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
-  inline void
+  void
   addInteriorShell(PolyhedralSurface *shell)
   {
-    BOOST_ASSERT(shell != NULL);
-    _shells.push_back(std::unique_ptr<PolyhedralSurface>(shell));
+    addInteriorShell(std::unique_ptr<PolyhedralSurface>(shell));
+  }
+  /**
+   * @brief Adds an interior shell to the Solid.
+   *
+   * @param shell A unique pointer to the PolyhedralSurface object representing
+   * the new shell to add. Ownership of this shell is moved into the Solid.
+   */
+  void
+  addInteriorShell(std::unique_ptr<PolyhedralSurface> shell)
+  {
+    BOOST_ASSERT(shell != nullptr);
+    _shells.push_back(std::move(shell));
   }
 
   /**
