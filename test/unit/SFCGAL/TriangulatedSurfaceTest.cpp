@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(polyhedronConversionTest)
   triangulate::triangulatePolygon3D(*g, tri);
 
   std::unique_ptr<CGAL::Polyhedron_3<Kernel>> poly(
-      tri.toPolyhedron_3<Kernel, CGAL::Polyhedron_3<Kernel>>());
+      tri.toPolyhedron_3<CGAL::Polyhedron_3<Kernel>>());
   // we check the two squares share a common edge
   BOOST_CHECK_EQUAL(poly->size_of_facets(), 4U);
   BOOST_CHECK_EQUAL(poly->size_of_vertices(), 6U);

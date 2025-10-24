@@ -318,7 +318,7 @@ struct Plane_from_facet {
   }
 };
 
-template <typename K, typename Polyhedron>
+template <typename Polyhedron>
 auto
 TriangulatedSurface::toPolyhedron_3() const -> std::unique_ptr<Polyhedron>
 {
@@ -333,9 +333,24 @@ TriangulatedSurface::toPolyhedron_3() const -> std::unique_ptr<Polyhedron>
   return std::unique_ptr<Polyhedron>(poly);
 }
 
+/**
+ * @brief Explicit template instantiation of toPolyhedron_3 for
+ * MarkedPolyhedron.
+ *
+ * Converts the triangulated surface to a MarkedPolyhedron.
+ * Returns a std::unique_ptr owning the polyhedron.
+ */
 template SFCGAL_API std::unique_ptr<detail::MarkedPolyhedron>
-TriangulatedSurface::toPolyhedron_3<Kernel, detail::MarkedPolyhedron>() const;
+TriangulatedSurface::toPolyhedron_3<detail::MarkedPolyhedron>() const;
+
+/**
+ * @brief Explicit template instantiation of toPolyhedron_3 for
+ * CGAL::Polyhedron_3.
+ *
+ * Converts the triangulated surface to a CGAL Polyhedron_3.
+ * Returns a std::unique_ptr owning the polyhedron.
+ */
 template SFCGAL_API std::unique_ptr<CGAL::Polyhedron_3<Kernel>>
-TriangulatedSurface::toPolyhedron_3<Kernel, CGAL::Polyhedron_3<Kernel>>() const;
+TriangulatedSurface::toPolyhedron_3<CGAL::Polyhedron_3<Kernel>>() const;
 
 } // namespace SFCGAL
