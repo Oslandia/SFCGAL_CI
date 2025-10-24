@@ -459,6 +459,26 @@ protected:
  */
 SFCGAL_API auto
 operator==(const Geometry &geomA, const Geometry &geomB) -> bool;
+
+/**
+ * @brief Downcasts a std::unique_ptr Geomety to a derived class.
+ *
+ * @tparam Derived The derived class to cast to.
+ *
+ * @param geometry A unique_ptr to the Geometry object. Ownership is released
+ * and transferred to the resulting unique_ptr of class @p Derived.
+ *
+ * @return A std::unique_ptr of class @p Derived that takes ownership of the
+ * casted pointer.
+ */
+template <typename Derived>
+SFCGAL_API auto inline geom_unique_ptr_as(std::unique_ptr<Geometry> &&geometry)
+    -> std::unique_ptr<Derived>
+{
+  BOOST_ASSERT(geometry->is<Derived>());
+  return std::unique_ptr<Derived>(static_cast<Derived *>(geometry.release()));
+}
+
 } // namespace SFCGAL
 
 #endif
