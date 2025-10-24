@@ -234,19 +234,30 @@ public:
   /**
    * append a ring to the Polygon
    */
-  inline void
+  void
   addInteriorRing(const LineString &ls)
   {
-    _rings.push_back(std::unique_ptr<LineString>(ls.clone()));
+    addInteriorRing(std::unique_ptr<LineString>(ls.clone()));
   }
   /**
    * append a ring to the Polygon (take ownership)
    */
-  inline void
+  void
   addInteriorRing(LineString *ls)
   {
-    BOOST_ASSERT(ls != NULL);
-    _rings.push_back(std::unique_ptr<LineString>(ls));
+    addInteriorRing(std::unique_ptr<LineString>(ls));
+  }
+  /**
+   * @brief Adds a ring to the Polygon.
+   *
+   * @param ring A unique pointer to the LineString object representing the new
+   * ring to add. Ownership of this ring is moved into the Polygon.
+   */
+  void
+  addInteriorRing(std::unique_ptr<LineString> ring)
+  {
+    BOOST_ASSERT(ring != nullptr);
+    _rings.push_back(std::move(ring));
   }
 
   /**
