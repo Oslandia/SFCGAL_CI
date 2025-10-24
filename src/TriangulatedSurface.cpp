@@ -225,6 +225,10 @@ TriangulatedSurface::accept(ConstGeometryVisitor &visitor) const
   return visitor.visit(*this);
 }
 
+/// @{
+/// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 // Private class
 // A modifier creating triangles from a TriangulatedSurface with the incremental
 // builder.
@@ -317,6 +321,9 @@ struct Plane_from_facet {
                                         h->opposite()->vertex()->point());
   }
 };
+
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
 
 template <typename Polyhedron>
 auto
