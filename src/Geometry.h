@@ -416,12 +416,21 @@ protected:
 };
 
 /**
- * Equality operator
- * @todo only compare coordinate points
- * @pre the two geometries must be valid
+ * @brief Equality operator for geometries.
+ *
+ * Compares two Geometry objects for equality.
+ *
+ * @param[in] geomA The first Geometry object to compare.
+ * @param[in] geomB The second Geometry object to compare.
+ * @return true if the two Geometry objects have identical coordinate points,
+ * false otherwise
+ *
+ * @pre Both Geometry objects must be valid.
+ * @todo Extend comparison to include more than just coordinate points if
+ * needed.
  */
-SFCGAL_API bool
-operator==(const Geometry &, const Geometry &);
+SFCGAL_API auto
+operator==(const Geometry &geomA, const Geometry &geomB) -> bool;
 } // namespace SFCGAL
 
 #endif

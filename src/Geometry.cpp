@@ -194,16 +194,16 @@ Geometry::centroid3D() const -> Point
 /// Since we do not have (yet) a real "equals" operator, we only compare points
 /// coordinates
 auto
-operator==(const Geometry &ga, const Geometry &gb) -> bool
+operator==(const Geometry &geomA, const Geometry &geomB) -> bool
 {
-  if (ga.geometryTypeId() != gb.geometryTypeId()) {
+  if (geomA.geometryTypeId() != geomB.geometryTypeId()) {
     return false;
   }
 
   detail::GetPointsVisitor get_points_a;
   detail::GetPointsVisitor get_points_b;
-  ga.accept(get_points_a);
-  gb.accept(get_points_b);
+  geomA.accept(get_points_a);
+  geomB.accept(get_points_b);
 
   if (get_points_a.points.size() != get_points_b.points.size()) {
     return false;
