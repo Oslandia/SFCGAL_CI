@@ -139,18 +139,33 @@ public:
   /**
    * Sets the exterior ring
    */
-  inline void
+  void
   setExteriorRing(const LineString &ring)
   {
-    setExteriorRing(ring.clone());
+    setExteriorRing(std::unique_ptr<LineString>(ring.clone()));
   }
   /**
    * Sets the exterior ring (takes ownership)
+   *
+   * @deprecated The unique_ptr version should be used instead
    */
-  inline void
+  void
   setExteriorRing(LineString *ring)
   {
-    _rings[0] = std::unique_ptr<LineString>(ring);
+    setExteriorRing(std::unique_ptr<LineString>(ring));
+  }
+  /**
+   * @brief Sets the exterior ring.
+   *
+   * Replaces the exterior ring with the provided one.
+   *
+   * @param ring A unique pointer to the ring object to set. Ownership is
+   * transferred to this class.
+   */
+  void
+  setExteriorRing(std::unique_ptr<LineString> ring)
+  {
+    _rings[0] = std::move(ring);
   }
 
   /**
