@@ -4,13 +4,21 @@
     <img alt="SFCGAL logo" src="./graphics/logo.png" height="120">
   </a>
 </div>
+
+<div align="center">
+  Add OGC Simple Feature functionality to CGAL
+</div>
+
+<br>
+
+<div align="center">
+  <a href="https://gitlab.com/sfcgal/SFCGAL/-/commits/master"><img alt="GitLab pipeline status" src="https://gitlab.com/sfcgal/SFCGAL/badges/master/pipeline.svg"></a>
+  <a href="https://github.com/Oslandia/SFCGAL_CI/actions?query=branch%3Amaster"><img alt="GitHub pipeline status" src="https://github.com/Oslandia/SFCGAL_CI/actions/workflows/msys.yml/badge.svg"></a>
+   <a href="http://cirrus-ci.com/github/Oslandia/SFCGAL_CI"><img alt="Cirrus pipeline status" src="https://api.cirrus-ci.com/github/Oslandia/SFCGAL_CI.svg"></a>
+</div>
 <!-- markdownlint-enable MD033 MD041 -->
 
 # SFCGAL
-
-[![GitLab pipeline status](https://gitlab.com/sfcgal/SFCGAL/badges/master/pipeline.svg)](https://gitlab.com/sfcgal/SFCGAL/-/commits/master)
-[![GitHub pipeline status](https://github.com/Oslandia/SFCGAL_CI/actions/workflows/msys.yml/badge.svg)](https://github.com/Oslandia/SFCGAL_CI/actions?query=branch%3Amaster)
-[![Cirrus pipeline status](https://api.cirrus-ci.com/github/Oslandia/SFCGAL_CI.svg)](http://cirrus-ci.com/github/Oslandia/SFCGAL_CI)
 
 SFCGAL is a C++ wrapper library around [CGAL](http://www.cgal.org) with the aim of supporting ISO 19107:2019 and OGC Simple Features for 3D operations.
 
