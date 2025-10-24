@@ -19,8 +19,7 @@ volume(const PolyhedralSurface &surface, NoValidityCheck /*unused*/)
     -> Kernel::FT
 {
   // Convert to CGAL Polyhedron
-  auto cgal_polyhedron =
-      surface.toPolyhedron_3<SFCGAL::Kernel, detail::MarkedPolyhedron>();
+  auto cgal_polyhedron = surface.toPolyhedron_3<detail::MarkedPolyhedron>();
 
   // Ensure correct orientation
   // TODO: Could be an option or a dedicated algorithm

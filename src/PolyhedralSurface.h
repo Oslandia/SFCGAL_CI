@@ -311,13 +311,13 @@ public:
   /**
    * Convert to CGAL::Polyhedron_3
    */
-  template <typename K, typename Polyhedron>
-  std::unique_ptr<Polyhedron>
-  toPolyhedron_3() const
+  template <typename Polyhedron>
+  auto
+  toPolyhedron_3() const -> std::unique_ptr<Polyhedron>
   {
     TriangulatedSurface tri;
     triangulate::triangulatePolygon3D(*this, tri);
-    return tri.toPolyhedron_3<K, Polyhedron>();
+    return tri.toPolyhedron_3<Polyhedron>();
   }
 
   //-- iterators

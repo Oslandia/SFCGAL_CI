@@ -125,7 +125,7 @@ _decompose_solid(const Solid &solid, GeometrySet<3>::VolumeCollection &volumes,
   // volume orientation test
   // TODO: simplfiy ?
   MarkedPolyhedron p =
-      *solid.exteriorShell().toPolyhedron_3<Kernel, MarkedPolyhedron>();
+      *solid.exteriorShell().toPolyhedron_3<MarkedPolyhedron>();
 
   if (SFCGAL::algorithm::volume(solid) < 0) {
     // if the volume is "inverted", we reverse it

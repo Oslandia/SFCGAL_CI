@@ -313,11 +313,19 @@ public:
   //-- helpers
 
   /**
-   * @brief Converts a TriangulatedSurface to a CGAL::Polyhedron_3
+   * @brief Converts the current TriangulatedSurface into a CGAL::Polyhedron_3.
+   *
+   * This function creates a new `Polyhedron` instance that represents the
+   * geometry of the TriangulatedSurface.
+   *
+   * @tparam Polyhedron The CGAL Polyhedron_3 type.
+   *
+   * @return std::unique_ptr<Polyhedron> A unique pointer to the newly created
+   * Polyhedron.
    */
-  template <typename K, typename Polyhedron>
-  std::unique_ptr<Polyhedron>
-  toPolyhedron_3() const;
+  template <typename Polyhedron>
+  auto
+  toPolyhedron_3() const -> std::unique_ptr<Polyhedron>;
 
   /**
    * Serializer

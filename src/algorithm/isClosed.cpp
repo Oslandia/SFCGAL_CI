@@ -60,9 +60,7 @@ isClosedPolyhedralSurface(const PolyhedralSurface &surface) -> Closure
 
   try {
     // Convert to CGAL Polyhedron to check closure
-    auto cgal_poly =
-        surface
-            .toPolyhedron_3<SFCGAL::Kernel, SFCGAL::detail::MarkedPolyhedron>();
+    auto cgal_poly = surface.toPolyhedron_3<SFCGAL::detail::MarkedPolyhedron>();
 
     // Check if the polyhedron is closed (no boundary edges)
     if (!cgal_poly->is_closed()) {
@@ -98,9 +96,7 @@ isClosedTriangulatedSurface(const TriangulatedSurface &surface) -> Closure
 
   try {
     // Convert to CGAL Polyhedron to check closure
-    auto cgal_poly =
-        surface
-            .toPolyhedron_3<SFCGAL::Kernel, SFCGAL::detail::MarkedPolyhedron>();
+    auto cgal_poly = surface.toPolyhedron_3<SFCGAL::detail::MarkedPolyhedron>();
 
     // Check if the polyhedron is closed
     if (!cgal_poly->is_closed()) {
