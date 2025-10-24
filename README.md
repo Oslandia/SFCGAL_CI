@@ -1,3 +1,11 @@
+<!-- markdownlint-disable MD033 MD041 -->
+<div align="center">
+  <a href="https://sfcgal.org">
+    <img alt="SFCGAL logo" src="./graphics/logo.png" height="120">
+  </a>
+</div>
+<!-- markdownlint-enable MD033 MD041 -->
+
 # SFCGAL
 
 [![GitLab pipeline status](https://gitlab.com/sfcgal/SFCGAL/badges/master/pipeline.svg)](https://gitlab.com/sfcgal/SFCGAL/-/commits/master)
