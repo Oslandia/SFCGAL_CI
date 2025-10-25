@@ -33,13 +33,12 @@ public:
    * @brief Constructs a Sphere object
    * @param radius The radius of the sphere
    * @param center The center point of the sphere
-   * @param num_vertical The number of vertical divisions
-   * @param num_horizontal The number of horizontal divisions
+   * @param num_subdivisions The number of icosahedron subdivisions (0=12 vertices, 1=42, 2=162, etc.)
    * @param direction The direction vector for sphere orientation
    */
   Sphere(const Kernel::FT      &radius = 1.0,
          const Kernel::Point_3 &center = Kernel::Point_3(0, 0, 0),
-         unsigned int num_vertical = 16, unsigned int num_horizontal = 32,
+         unsigned int num_subdivisions = 2,
          const Kernel::Vector_3 &direction = Kernel::Vector_3(0, 0, 1));
 
   /**
@@ -88,23 +87,13 @@ public:
   }
 
   /**
-   * @brief Sets the number of vertical divisions
-   * @param num The new number of vertical divisions
+   * @brief Sets the number of subdivisions
+   * @param num The new number of subdivisions
    */
   void
-  setNumVertical(unsigned int num)
+  setNumSubdivisions(unsigned int num)
   {
-    validateAndSetParameter("num_vertical", num);
-  }
-
-  /**
-   * @brief Sets the number of horizontal divisions
-   * @param num The new number of horizontal divisions
-   */
-  void
-  setNumHorizontal(unsigned int num)
-  {
-    validateAndSetParameter("num_horizontal", num);
+    validateAndSetParameter("num_subdivisions", num);
   }
 
   /**
@@ -138,23 +127,13 @@ public:
   }
 
   /**
-   * @brief Gets the number of vertical divisions
-   * @return The number of vertical divisions
+   * @brief Gets the number of subdivisions
+   * @return The number of subdivisions
    */
   [[nodiscard]] auto
-  numVertical() const -> unsigned int
+  numSubdivisions() const -> unsigned int
   {
-    return std::get<unsigned int>(m_parameters.at("num_vertical"));
-  }
-
-  /**
-   * @brief Gets the number of horizontal divisions
-   * @return The number of horizontal divisions
-   */
-  [[nodiscard]] auto
-  numHorizontal() const -> unsigned int
-  {
-    return std::get<unsigned int>(m_parameters.at("num_horizontal"));
+    return std::get<unsigned int>(m_parameters.at("num_subdivisions"));
   }
 
   /**
