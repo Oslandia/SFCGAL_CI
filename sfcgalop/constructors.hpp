@@ -11,18 +11,17 @@
 namespace Constructors {
 
 /**
- * @brief Create a sphere primitive
+ * @brief Create a sphere primitive using icosahedron subdivision
  * @param x X coordinate of center (default: 0.0)
  * @param y Y coordinate of center (default: 0.0)
  * @param z Z coordinate of center (default: 0.0)
  * @param radius Sphere radius (default: 1.0)
- * @param num_vertical Number of vertical divisions (default: 16)
- * @param num_horizontal Number of horizontal divisions (default: 32)
+ * @param num_subdivisions Number of icosahedron subdivisions (default: 2)
  * @return Unique pointer to PolyhedralSurface representing the sphere
  */
 auto
 make_sphere(double x = 0.0, double y = 0.0, double z = 0.0, double radius = 1.0,
-            unsigned int num_vertical = 16, unsigned int num_horizontal = 32)
+            unsigned int num_subdivisions = 2)
     -> std::unique_ptr<SFCGAL::Geometry>;
 
 /**
