@@ -55,18 +55,27 @@ Coordinate::operator=(const Coordinate &other) -> Coordinate & = default;
 
 Coordinate::~Coordinate() = default;
 
+/**
+ * @brief Visitor to get coordinate dimension
+ */
 class CoordinateDimensionVisitor : public boost::static_visitor<int> {
 public:
+  /// @brief Handle empty coordinates
+  /// @return 0 for empty coordinates
   auto
   operator()(const Coordinate::Empty & /*unused*/) const -> int
   {
     return 0;
   }
+  /// @brief Handle 2D points
+  /// @return 2 for 2D coordinates
   auto
   operator()(const Kernel::Point_2 & /*unused*/) const -> int
   {
     return 2;
   }
+  /// @brief Handle 3D points
+  /// @return 3 for 3D coordinates
   auto
   operator()(const Kernel::Point_3 & /*unused*/) const -> int
   {
@@ -93,8 +102,14 @@ Coordinate::is3D() const -> bool
   return _storage.which() == 2;
 }
 
+/**
+ * @brief Visitor to get X coordinate value
+ */
 class GetXVisitor : public boost::static_visitor<Kernel::FT> {
 public:
+  /// @brief Handle empty coordinates
+  /// @throws Exception when trying to get X from empty coordinate
+  /// @return Never returns (throws exception)
   auto
   operator()(const Coordinate::Empty & /*unused*/) const -> Kernel::FT
   {
@@ -102,11 +117,17 @@ public:
         Exception("trying to get an empty coordinate x value"));
     return 0;
   }
+  /// @brief Get X coordinate from 2D point
+  /// @param storage The 2D point
+  /// @return X coordinate value
   auto
   operator()(const Kernel::Point_2 &storage) const -> Kernel::FT
   {
     return storage.x();
   }
+  /// @brief Get X coordinate from 3D point
+  /// @param storage The 3D point
+  /// @return X coordinate value
   auto
   operator()(const Kernel::Point_3 &storage) const -> Kernel::FT
   {
@@ -121,8 +142,14 @@ Coordinate::x() const -> Kernel::FT
   return boost::apply_visitor(visitor, _storage);
 }
 
+/**
+ * @brief Visitor to get Y coordinate value
+ */
 class GetYVisitor : public boost::static_visitor<Kernel::FT> {
 public:
+  /// @brief Handle empty coordinates
+  /// @throws Exception when trying to get Y from empty coordinate
+  /// @return Never returns (throws exception)
   auto
   operator()(const Coordinate::Empty & /*unused*/) const -> Kernel::FT
   {
@@ -130,11 +157,17 @@ public:
         Exception("trying to get an empty coordinate y value"));
     return 0;
   }
+  /// @brief Get Y coordinate from 2D point
+  /// @param storage The 2D point
+  /// @return Y coordinate value
   auto
   operator()(const Kernel::Point_2 &storage) const -> Kernel::FT
   {
     return storage.y();
   }
+  /// @brief Get Y coordinate from 3D point
+  /// @param storage The 3D point
+  /// @return Y coordinate value
   auto
   operator()(const Kernel::Point_3 &storage) const -> Kernel::FT
   {
@@ -149,8 +182,14 @@ Coordinate::y() const -> Kernel::FT
   return boost::apply_visitor(visitor, _storage);
 }
 
+/**
+ * @brief Visitor to get Z coordinate value
+ */
 class GetZVisitor : public boost::static_visitor<Kernel::FT> {
 public:
+  /// @brief Handle empty coordinates
+  /// @throws Exception when trying to get Z from empty coordinate
+  /// @return Never returns (throws exception)
   auto
   operator()(const Coordinate::Empty & /*unused*/) const -> Kernel::FT
   {
@@ -158,11 +197,16 @@ public:
         Exception("trying to get an empty coordinate z value"));
     return 0;
   }
+  /// @brief Handle 2D points (no Z coordinate)
+  /// @return 0 for 2D points (no Z coordinate)
   auto
   operator()(const Kernel::Point_2 & /*unused*/) const -> Kernel::FT
   {
     return 0;
   }
+  /// @brief Get Z coordinate from 3D point
+  /// @param storage The 3D point
+  /// @return Z coordinate value
   auto
   operator()(const Kernel::Point_3 &storage) const -> Kernel::FT
   {
@@ -179,19 +223,29 @@ Coordinate::z() const -> Kernel::FT
 
 //----------------------
 
+/**
+ * @brief Visitor to round coordinate values
+ */
 class RoundVisitor : public boost::static_visitor<> {
 public:
+  /// @brief Constructor with scale factor
+  /// @param scaleFactor The scaling factor for rounding
   RoundVisitor(const long &scaleFactor) : _scaleFactor(scaleFactor) {}
 
+  /// @brief Handle empty coordinates (no operation)
   void
   operator()(Coordinate::Empty & /*unused*/) const
   {
   }
+  /// @brief Round 2D point coordinates
+  /// @param storage The 2D point to round
   void
   operator()(Kernel::Point_2 &storage) const
   {
     storage = Kernel::Point_2(_roundFT(storage.x()), _roundFT(storage.y()));
   }
+  /// @brief Round 3D point coordinates
+  /// @param storage The 3D point to round
   void
   operator()(Kernel::Point_3 &storage) const
   {
@@ -206,7 +260,7 @@ private:
   _roundFT(const Kernel::FT &v) const -> Kernel::FT
   {
 
-#if defined(CGAL_USE_GMPXX)
+#ifdef CGAL_USE_GMPXX
     ::mpq_class q(SFCGAL::round(v.exact() * _scaleFactor), _scaleFactor);
     q.canonicalize();
     return Kernel::FT(q);
@@ -227,18 +281,29 @@ Coordinate::round(const long &scaleFactor) -> Coordinate &
 
 //----------------------
 
+/**
+ * @brief Visitor to convert coordinate to CGAL 2D point
+ */
 class ToPoint2Visitor : public boost::static_visitor<Kernel::Point_2> {
 public:
+  /// @brief Handle empty coordinates
+  /// @return Origin point for empty coordinates
   auto
   operator()(const Coordinate::Empty & /*unused*/) const -> Kernel::Point_2
   {
     return Kernel::Point_2(CGAL::ORIGIN);
   }
+  /// @brief Convert 2D point to 2D point (identity)
+  /// @param storage The 2D point
+  /// @return The same 2D point
   auto
   operator()(const Kernel::Point_2 &storage) const -> Kernel::Point_2
   {
     return storage;
   }
+  /// @brief Convert 3D point to 2D point (drop Z)
+  /// @param storage The 3D point
+  /// @return 2D point with X,Y coordinates
   auto
   operator()(const Kernel::Point_3 &storage) const -> Kernel::Point_2
   {
@@ -253,18 +318,29 @@ Coordinate::toPoint_2() const -> Kernel::Point_2
   return boost::apply_visitor(visitor, _storage);
 }
 
+/**
+ * @brief Visitor to convert coordinate to CGAL 3D point
+ */
 class ToPoint3Visitor : public boost::static_visitor<Kernel::Point_3> {
 public:
+  /// @brief Handle empty coordinates
+  /// @return Origin point for empty coordinates
   auto
   operator()(const Coordinate::Empty & /*storage*/) const -> Kernel::Point_3
   {
     return Kernel::Point_3(CGAL::ORIGIN);
   }
+  /// @brief Convert 2D point to 3D point (Z=0)
+  /// @param storage The 2D point
+  /// @return 3D point with X,Y coordinates and Z=0
   auto
   operator()(const Kernel::Point_2 &storage) const -> Kernel::Point_3
   {
     return Kernel::Point_3(storage.x(), storage.y(), 0.0);
   }
+  /// @brief Convert 3D point to 3D point (identity)
+  /// @param storage The 3D point
+  /// @return The same 3D point
   auto
   operator()(const Kernel::Point_3 &storage) const -> Kernel::Point_3
   {
