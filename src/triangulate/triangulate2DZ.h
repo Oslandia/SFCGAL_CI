@@ -11,23 +11,36 @@
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/detail/triangulate/ConstraintDelaunayTriangulation.h"
 
-namespace SFCGAL {
-namespace triangulate {
+namespace SFCGAL::triangulate {
+/**
+ * @brief Constraint 2DZ Delaunay Triangulation for geometry collections (keep Z
+ * if defined, a projectionPlane may be provided)
+ * @param g The input geometry collection to triangulate
+ * @param triangulation The triangulation object to fill
+ */
+SFCGAL_API void
+triangulateCollection2DZ(const Geometry                  &g,
+                         ConstraintDelaunayTriangulation &triangulation);
+
 /**
  * @brief Constraint 2DZ Delaunay Triangulation (keep Z if defined, a
  * projectionPlane may be provided)
+ * @param g The input geometry to triangulate
+ * @param triangulation The triangulation object to fill
  */
 SFCGAL_API void
-triangulate2DZ(const Geometry &g, ConstraintDelaunayTriangulation &triangulate);
+triangulate2DZ(const Geometry                  &g,
+               ConstraintDelaunayTriangulation &triangulation);
 
 /**
  * @brief Constraint 2DZ Delaunay Triangulation (keep Z if defined, project
  * points in OXY plane)
+ * @param g The input geometry to triangulate
+ * @return The constraint Delaunay triangulation
  */
 SFCGAL_API ConstraintDelaunayTriangulation
 triangulate2DZ(const Geometry &g);
 
-} // namespace triangulate
-} // namespace SFCGAL
+} // namespace SFCGAL::triangulate
 
 #endif
