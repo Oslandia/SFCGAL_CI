@@ -166,17 +166,6 @@ BoundaryVisitor::visit(const PolyhedralSurface &g)
   getBoundaryFromPolygons(graph);
 }
 
-/**
- * @brief Compute and set the boundary of a TriangulatedSurface.
- *
- * Constructs a GeometryGraph from the provided triangulated surface and derives
- * the boundary by calling getBoundaryFromPolygons. The visitor's internal
- * boundary is updated (or cleared) according to the derived result.
- *
- * @param g TriangulatedSurface whose boundary will be computed.
- *
- * @see getBoundaryFromPolygons(const graph::GeometryGraph &)
- */
 void
 BoundaryVisitor::visit(const TriangulatedSurface &g)
 {
@@ -273,7 +262,7 @@ void
 BoundaryVisitor::getBoundaryFromPolygons(const graph::GeometryGraph &g)
 {
   using vertex_descriptor = graph::GeometryGraph::vertex_descriptor;
-  // typedef graph::GeometryGraph::vertex_iterator   vertex_iterator ;
+  // using = graph::GeometryGraph::vertex_iterator   vertex_iterator;
   using edge_descriptor = graph::GeometryGraph::edge_descriptor;
   using edge_iterator   = graph::GeometryGraph::edge_iterator;
 
