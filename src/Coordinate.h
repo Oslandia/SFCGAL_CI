@@ -32,42 +32,57 @@ public:
 
   /**
    * XY Constructor with exact coordinates
+   * @param x The X coordinate
+   * @param y The Y coordinate
    */
   Coordinate(const Kernel::FT &x, const Kernel::FT &y);
   /**
    * XYZ Constructor with exact coordinates
+   * @param x The X coordinate
+   * @param y The Y coordinate
+   * @param z The Z coordinate
    */
   Coordinate(const Kernel::FT &x, const Kernel::FT &y, const Kernel::FT &z);
 
   /**
    * XYZ constructor
+   * @param x The X coordinate
+   * @param y The Y coordinate
+   * @param z The Z coordinate
    * @warning x,y,z must not be not be NaN nor inf
    */
   Coordinate(const double &x, const double &y, const double &z);
 
   /**
    * XY constructor
+   * @param x The X coordinate
+   * @param y The Y coordinate
    * @warning x,y must not be not be NaN nor inf
    */
   Coordinate(const double &x, const double &y);
   /**
    * Constructor from CGAL::Point_2<K>
+   * @param other The CGAL 2D point to copy
    */
   Coordinate(const Kernel::Point_2 &other);
   /**
    * Constructor from CGAL::Point_3<K>
+   * @param other The CGAL 3D point to copy
    */
   Coordinate(const Kernel::Point_3 &other);
 
   /**
    * copy constructor
+   * @param other The coordinate to copy from
    */
   Coordinate(const Coordinate &other);
   /**
    * assign operator
+   * @param other The coordinate to assign from
+   * @return Reference to this coordinate
    */
-  Coordinate &
-  operator=(const Coordinate &other);
+  auto
+  operator=(const Coordinate &other) -> Coordinate &;
   /**
    * destructor
    */
@@ -75,112 +90,129 @@ public:
 
   /**
    * @brief Get the dimension of the coordinates
+   * @return Number of coordinates (2 or 3)
    */
-  int
-  coordinateDimension() const;
+  [[nodiscard]] auto
+  coordinateDimension() const -> int;
   /**
    * @brief Tests if the coordinates are empty
+   * @return true if empty, false otherwise
    */
-  bool
-  isEmpty() const;
+  [[nodiscard]] auto
+  isEmpty() const -> bool;
   /**
    * @brief Tests if Z is defined
+   * @return true if 3D, false otherwise
    */
-  bool
-  is3D() const;
+  [[nodiscard]] auto
+  is3D() const -> bool;
 
   //--- accessors
 
   /**
    * @brief Gets the x value
+   * @return The X coordinate value
    * @warning Exact, NaN for empty coordinates
    */
-  Kernel::FT
-  x() const;
+  [[nodiscard]] auto
+  x() const -> Kernel::FT;
 
   /**
    * @brief Gets the y value
+   * @return The Y coordinate value
    * @warning Exact, NaN for empty coordinates
    */
-  Kernel::FT
-  y() const;
+  [[nodiscard]] auto
+  y() const -> Kernel::FT;
 
   /**
    * @brief Gets the z value
+   * @return The Z coordinate value
    * @warning Exact, NaN for empty or 0 for 2D coordinates
    */
-  Kernel::FT
-  z() const;
+  [[nodiscard]] auto
+  z() const -> Kernel::FT;
 
   //-- helper
 
   /**
    * @brief round coordinates with a scale factor
+   * @param scaleFactor The scale factor to apply (default 1)
    * @return *this
    */
-  Coordinate &
-  round(const long &scaleFactor = 1);
+  auto
+  round(const long &scaleFactor = 1) -> Coordinate &;
 
   //-- comparator
 
   /**
    * @brief Compares two points (lexicographic order)
-   *
+   * @param other The coordinate to compare with
+   * @return true if this coordinate is less than other
    * @warning coordinates must have the same dimension
    */
-  bool
-  operator<(const Coordinate &other) const;
+  auto
+  operator<(const Coordinate &other) const -> bool;
 
   /**
    * @brief Compares with an other point
-   *
+   * @param other The coordinate to compare with
+   * @return true if coordinates are equal
    * @warning coordinates must have the same dimension
    */
-  bool
-  operator==(const Coordinate &other) const;
+  auto
+  operator==(const Coordinate &other) const -> bool;
   /**
    * @brief Compares with an other point
-   *
+   * @param other The coordinate to compare with
+   * @return true if coordinates are not equal
    * @warning coordinates must have the same dimension
    */
-  bool
-  operator!=(const Coordinate &other) const;
+  auto
+  operator!=(const Coordinate &other) const -> bool;
 
   /**
-   * absolute comparison with an other coordinate
+   * @brief absolute comparison with an other coordinate
+   * @param other The coordinate to compare with
+   * @param tolerance The tolerance for comparison
+   * @return true if coordinates are almost equal within tolerance
    */
-  bool
-  almostEqual(const Coordinate &other, const double tolerance) const;
+  [[nodiscard]] auto
+  almostEqual(const Coordinate &other, double tolerance) const -> bool;
 
   /**
    * @brief Converts to Kernel::Vector_2
+   * @return CGAL 2D vector representation
    */
-  inline Kernel::Vector_2
-  toVector_2() const
+  [[nodiscard]] auto
+  toVector_2() const -> Kernel::Vector_2
   {
-    return Kernel::Vector_2(CGAL::ORIGIN, toPoint_2());
+    return {CGAL::ORIGIN, toPoint_2()};
   }
 
   /**
    * @brief Converts to Kernel::Vector_3
+   * @return CGAL 3D vector representation
    */
-  inline Kernel::Vector_3
-  toVector_3() const
+  [[nodiscard]] auto
+  toVector_3() const -> Kernel::Vector_3
   {
-    return Kernel::Vector_3(CGAL::ORIGIN, toPoint_3());
+    return {CGAL::ORIGIN, toPoint_3()};
   }
 
   /**
    * @brief Converts to Kernel::Point_2
+   * @return CGAL 2D point representation
    */
-  Kernel::Point_2
-  toPoint_2() const;
+  [[nodiscard]] auto
+  toPoint_2() const -> Kernel::Point_2;
 
   /**
    * @brief Converts to Kernel::Point_3
+   * @return CGAL 3D point representation
    */
-  Kernel::Point_3
-  toPoint_3() const;
+  [[nodiscard]] auto
+  toPoint_3() const -> Kernel::Point_3;
 
   /**
    * @brief Drops the z coordinate
@@ -203,7 +235,8 @@ private:
 
 public:
   /**
-   * Serialization
+   * @brief Save coordinate to archive
+   * @param ar Archive to save to
    */
   template <class Archive>
   void
@@ -225,6 +258,10 @@ public:
     }
   }
 
+  /**
+   * @brief Load coordinate from archive
+   * @param ar Archive to load from
+   */
   template <class Archive>
   void
   load(Archive &ar, const unsigned int /*version*/)
@@ -235,12 +272,15 @@ public:
     if (dim == 0) {
       _storage = Empty();
     } else if (dim == 2) {
-      Kernel::FT x_, y_;
+      Kernel::FT x_;
+      Kernel::FT y_;
       ar >> x_;
       ar >> y_;
       _storage = Kernel::Point_2(x_, y_);
     } else if (dim == 3) {
-      Kernel::FT x_, y_, z_;
+      Kernel::FT x_;
+      Kernel::FT y_;
+      Kernel::FT z_;
       ar >> x_;
       ar >> y_;
       ar >> z_;
@@ -248,6 +288,11 @@ public:
     }
   }
 
+  /**
+   * @brief Serialize coordinate to/from archive
+   * @param ar Archive for serialization
+   * @param version Serialization version
+   */
   template <class Archive>
   void
   serialize(Archive &ar, const unsigned int version)
