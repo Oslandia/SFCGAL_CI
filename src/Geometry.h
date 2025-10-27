@@ -486,6 +486,10 @@ SFCGAL_API auto inline geom_unique_ptr_as(std::unique_ptr<Geometry> &&geometry)
   return std::unique_ptr<Derived>(static_cast<Derived *>(geometry.release()));
 }
 
+/// @{
+/// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 /**
  * @brief Base class that implements covariant cloning with CRTP pattern
  */
@@ -519,6 +523,10 @@ private:
   virtual auto
   cloneImpl() const -> GeometryImpl * = 0;
 };
+
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
+/// @publicsection
 
 } // namespace SFCGAL
 
