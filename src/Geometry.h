@@ -24,7 +24,7 @@ class Object;
 /**
  * SRID type
  */
-typedef uint32_t srid_t;
+using srid_t = uint32_t;
 
 namespace SFCGAL {
 
@@ -69,7 +69,7 @@ const uint32_t wkbZ    = 0x80000000;
  * @warning code values have are important for WKB
  */
 enum GeometryType {
-  //      TYPE_GEOMETRY            = 0, //abstract
+  // TYPE_GEOMETRY = 0, //abstract
   TYPE_POINT              = 1,
   TYPE_LINESTRING         = 2,
   TYPE_POLYGON            = 3,
@@ -77,39 +77,39 @@ enum GeometryType {
   TYPE_MULTILINESTRING    = 5,
   TYPE_MULTIPOLYGON       = 6,
   TYPE_GEOMETRYCOLLECTION = 7,
-  //     TYPE_CIRCULARSTRING      = 8, // not yet supported
-  //     TYPE_COMPOUNDCURVE       = 9, // not yet supported
-  //     TYPE_CURVEPOLYGON        = 10, // not yet supported
-  //     TYPE_MULTICURVE          = 11, //abstract
-  //     TYPE_MULTISURFACE        = 12, //abstract
+  // TYPE_CIRCULARSTRING = 8, // not yet supported
+  // TYPE_COMPOUNDCURVE = 9, // not yet supported
+  // TYPE_CURVEPOLYGON = 10, // not yet supported
+  // TYPE_MULTICURVE = 11, //abstract
+  // TYPE_MULTISURFACE = 12, //abstract
   // TYPE_CURVE = 13, // abstract
-  //     TYPE_SURFACE             = 14, //abstract
+  // TYPE_SURFACE = 14, //abstract
   TYPE_POLYHEDRALSURFACE   = 15,
   TYPE_TRIANGULATEDSURFACE = 16,
   TYPE_TRIANGLE            = 17,
-  // TYPE_CIRCLE              = 18,
-  // TYPE_GEODESICSTRING      = 19,
-  // TYPE_ELLIPTICALCURVE     = 20,
+  // TYPE_CIRCLE = 18,
+  // TYPE_GEODESICSTRING = 19,
+  // TYPE_ELLIPTICALCURVE = 20,
   TYPE_NURBSCURVE = 21,
-  // TYPE_CLOTHOID            = 22,
-  // TYPE_SPIRALCURVE         = 23,
+  // TYPE_CLOTHOID = 22,
+  // TYPE_SPIRALCURVE = 23,
 
   //-- not official codes
   TYPE_SOLID      = 101,
   TYPE_MULTISOLID = 102,
-  //  AffinePlacement 102 1102
+  // AffinePlacement 102 1102
 };
 
 /**
  * @brief coordinate types (XY, XYZ, XYM, etc.)
  * @see SFA 2.8.3 LineStringZ = 1003 ( coordinateType + geometryType)
  */
-typedef enum {
+enum CoordinateType {
   COORDINATE_XY   = 0,
   COORDINATE_XYZ  = 1000,
   COORDINATE_XYM  = 2000,
   COORDINATE_XYZM = 3000
-} CoordinateType;
+};
 
 /**
  * @brief OGC/SFA based Geometry abstract class
@@ -129,8 +129,8 @@ public:
   /**
    * @brief Copy assignemnt operator.
    */
-  Geometry &
-  operator=(const Geometry &other) = default;
+  auto
+  operator=(const Geometry &other) -> Geometry & = default;
 
   /**
    * @brief Destructor.
@@ -150,45 +150,45 @@ public:
    * @brief [OGC/SFA]returns the geometry type
    * @warning use CamelCase (LineString, not LINESTRING)
    */
-  virtual std::string
-  geometryType() const = 0;
+  [[nodiscard]] virtual auto
+  geometryType() const -> std::string = 0;
   /**
    * @brief Returns a code corresponding to the type
    * @warning not standard
    */
-  virtual GeometryType
-  geometryTypeId() const = 0;
+  [[nodiscard]] virtual auto
+  geometryTypeId() const -> GeometryType = 0;
 
   /**
    * [OGC/SFA]Dimension of the Geometry ( 0 : punctual, 1 : curve, ...)
    * @warning empty geometries provide the dimension corresponding to the object
    */
-  virtual int
-  dimension() const = 0;
+  [[nodiscard]] virtual auto
+  dimension() const -> int = 0;
   /**
    * [OGC/SFA]returns the dimension of the coordinates
    * @pre suppose no mix of 2D/3D coordinates
    */
-  virtual int
-  coordinateDimension() const = 0;
+  [[nodiscard]] virtual auto
+  coordinateDimension() const -> int = 0;
   /**
    * [OGC/SFA]test if geometry is empty
    */
-  virtual bool
-  isEmpty() const = 0;
+  [[nodiscard]] virtual auto
+  isEmpty() const -> bool = 0;
 
   /**
    * [OGC/SFA]test if geometry is 3d
    * @pre suppose no mix of 2D/3D coordinates
    */
-  virtual bool
-  is3D() const = 0;
+  [[nodiscard]] virtual auto
+  is3D() const -> bool = 0;
   /**
    * [OGC/SFA]test if geometry is measured (has an m)
    * @pre suppose no mix of M/!M points
    */
-  virtual bool
-  isMeasured() const = 0;
+  [[nodiscard]] virtual auto
+  isMeasured() const -> bool = 0;
 
   /**
    * @brief Drops the z coordinate of the geometry
@@ -217,7 +217,7 @@ public:
    *
    * @return CoordinateType The coordinate dimension (XY, XYZ, XYM, XYZM)
    */
-  auto
+  [[nodiscard]] auto
   getCoordinateType() const -> CoordinateType
   {
     bool hasZ = is3D();
@@ -226,13 +226,12 @@ public:
     if (hasZ) {
       return hasM ? CoordinateType::COORDINATE_XYZM
                   : CoordinateType::COORDINATE_XYZ;
-    } else {
-      return hasM ? CoordinateType::COORDINATE_XYM
-                  : CoordinateType::COORDINATE_XY;
     }
+    return hasM ? CoordinateType::COORDINATE_XYM
+                : CoordinateType::COORDINATE_XY;
   }
 
-  // virtual bool         isSimple() const = 0 ;
+  // virtual bool isSimple() const = 0 ;
 
   /**
    * Force the state of the validity flag. The validity flag allows to bypass
@@ -246,47 +245,47 @@ public:
   forceValidityFlag(bool validity);
 
   /** Returns the validity flag */
-  bool
-  hasValidityFlag() const;
+  [[nodiscard]] auto
+  hasValidityFlag() const -> bool;
 
   /**
    * [OGC/SFA]returns the WKT string
    * @param numDecimals extension specify fix precision output
    */
-  std::string
-  asText(const int &numDecimals = -1) const;
+  [[nodiscard]] auto
+  asText(const int &numDecimals = -1) const -> std::string;
 
   /**
    * [OGC/SFA]returns the WKB string
    */
-  std::string
+  [[nodiscard]] auto
   asWkb(boost::endian::order wkbOrder = boost::endian::order::native,
-        bool                 asHex    = false) const;
+        bool                 asHex    = false) const -> std::string;
   /**
    * [OGC/SFA]Returns a polygon representing the BBOX of the geometry
    * @todo In order to adapt to 3D, would be better to define an "Envelope
    * type", otherway would lead to Polygon and PolyhedralSurface
    */
   // std::unique_ptr< Geometry > envelope() const = 0 ;
-  Envelope
-  envelope() const;
+  [[nodiscard]] auto
+  envelope() const -> Envelope;
 
   /**
    * @brief [OGC/SFA]Returns the boundary of the geometry
    */
-  virtual std::unique_ptr<Geometry>
-  boundary() const;
+  [[nodiscard]] virtual auto
+  boundary() const -> std::unique_ptr<Geometry>;
 
   /**
    * @brief Computes the distance to an other geometry
    */
-  double
-  distance(const Geometry &other) const;
+  [[nodiscard]] auto
+  distance(const Geometry &other) const -> double;
   /**
    * @brief Computes the 3D distance to an other geometry
    */
-  double
-  distance3D(const Geometry &other) const;
+  [[nodiscard]] auto
+  distance3D(const Geometry &other) const -> double;
 
   //-- helpers
 
@@ -303,30 +302,30 @@ public:
    * @todo only compare coordinate points
    * @pre the two geometries must be valid
    */
-  auto
-  almostEqual(const Geometry &, const double tolerance) const -> bool;
+  [[nodiscard]] auto
+  almostEqual(const Geometry & /*other*/, double tolerance) const -> bool;
 
   /**
    * @brief [OGC/SFA]Gets the number of geometries in a collection of geometries
    * @warning 1 for Point, LineString, Polygon, PolyhedralSurface, Triangle,
    * TriangulatedSurface
    */
-  virtual size_t
-  numGeometries() const;
+  [[nodiscard]] virtual auto
+  numGeometries() const -> size_t;
   /**
    * @brief [OGC/SFA]Returns the n-th geometry
    * @warning *this for Point, LineString, Polygon, PolyhedralSurface, Triangle,
    * TriangulatedSurface
    */
-  virtual const Geometry &
-  geometryN(size_t const &n) const;
+  [[nodiscard]] virtual auto
+  geometryN(size_t const &n) const -> const Geometry &;
   /**
    * @brief [OGC/SFA]Returns the n-th geometry
    * @warning *this for Point, LineString, Polygon, PolyhedralSurface, Triangle,
    * TriangulatedSurface
    */
-  virtual Geometry &
-  geometryN(size_t const &n);
+  virtual auto
+  geometryN(size_t const &n) -> Geometry &;
 
   /**
    * @brief [OGC/SFA]Sets the n-th geometry, starting at zero
@@ -379,8 +378,8 @@ public:
    * @warning not optimized (slow with dynamic_cast)
    */
   template <typename Derived>
-  inline bool
-  is() const
+  [[nodiscard]] auto
+  is() const -> bool
   {
     return dynamic_cast<Derived const *>(this) != NULL;
   }
@@ -391,8 +390,8 @@ public:
    * @pre The cast must be doable
    */
   template <typename Derived>
-  inline const Derived &
-  as() const
+  auto
+  as() const -> const Derived &
   {
     BOOST_ASSERT(is<Derived>());
     return *static_cast<Derived const *>(this);
@@ -403,8 +402,8 @@ public:
    * @pre The cast must be doable
    */
   template <typename Derived>
-  inline Derived &
-  as()
+  auto
+  as() -> Derived &
   {
     BOOST_ASSERT(is<Derived>());
     return *static_cast<Derived *>(this);
@@ -433,14 +432,14 @@ public:
   /**
    * @brief Computes centroid of this geometry
    */
-  Point
-  centroid() const;
+  [[nodiscard]] auto
+  centroid() const -> Point;
 
   /**
    * @brief Computes 3D centroid of this geometry
    */
-  Point
-  centroid3D() const;
+  [[nodiscard]] auto
+  centroid3D() const -> Point;
 
 protected:
   bool validityFlag_ = false;
@@ -491,6 +490,7 @@ SFCGAL_API auto inline geom_unique_ptr_as(std::unique_ptr<Geometry> &&geometry)
  */
 template <typename Derived, typename Base>
 class SFCGAL_API GeometryImpl : public Base {
+  GeometryImpl() = default;
 
 public:
   [[nodiscard]] auto
@@ -505,6 +505,7 @@ private:
   {
     return new Derived(*static_cast<const Derived *>(this));
   }
+  friend Derived;
 };
 
 } // namespace SFCGAL
