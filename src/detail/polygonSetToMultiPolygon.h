@@ -11,17 +11,18 @@
 #include "SFCGAL/MultiPolygon.h"
 #include <CGAL/Polygon_set_2.h>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /**
  * @brief convert a CGAL::Polygon_set_2 to a MultiPolygon
+ * @param polygonSet The CGAL polygon set to convert
+ * @return A unique pointer to the resulting MultiPolygon
  * @todo unittest
  */
-SFCGAL_API std::unique_ptr<MultiPolygon>
-polygonSetToMultiPolygon(const CGAL::Polygon_set_2<Kernel> &polygonSet);
+SFCGAL_API auto
+polygonSetToMultiPolygon(const CGAL::Polygon_set_2<Kernel> &polygonSet)
+    -> std::unique_ptr<MultiPolygon>;
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif
