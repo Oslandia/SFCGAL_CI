@@ -16,10 +16,10 @@ namespace SFCGAL {
 PolyhedralSurface::PolyhedralSurface() = default;
 
 PolyhedralSurface::PolyhedralSurface(const std::vector<Polygon> &polygons)
-
 {
+  _polygons.reserve(polygons.size());
   for (const auto &polygon : polygons) {
-    _polygons.push_back(polygon.clone());
+    _polygons.emplace_back(polygon.clone());
   }
 }
 
@@ -150,8 +150,8 @@ PolyhedralSurface::dropZ() -> bool
     return false;
   }
 
-  for (auto &_polygon : _polygons) {
-    _polygon->dropZ();
+  for (auto &polygon : _polygons) {
+    polygon->dropZ();
   }
 
   return true;
@@ -164,8 +164,8 @@ PolyhedralSurface::dropM() -> bool
     return false;
   }
 
-  for (auto &_polygon : _polygons) {
-    _polygon->dropM();
+  for (auto &polygon : _polygons) {
+    polygon->dropM();
   }
 
   return true;
@@ -174,8 +174,8 @@ PolyhedralSurface::dropM() -> bool
 auto
 PolyhedralSurface::swapXY() -> void
 {
-  for (auto &_polygon : _polygons) {
-    _polygon->swapXY();
+  for (auto &polygon : _polygons) {
+    polygon->swapXY();
   }
 }
 
@@ -203,12 +203,13 @@ void
 PolyhedralSurface::addPatch(std::unique_ptr<Polygon> patch)
 {
   BOOST_ASSERT(patch != nullptr);
-  _polygons.push_back(std::move(patch));
+  _polygons.emplace_back(std::move(patch));
 }
 
 void
 PolyhedralSurface::addPatchs(const PolyhedralSurface &polyhedralSurface)
 {
+  _polygons.reserve(_polygons.size() + polyhedralSurface.numPatches());
   for (size_t i = 0; i < polyhedralSurface.numPatches(); i++) {
     addPatch(polyhedralSurface.patchN(i));
   }
@@ -289,13 +290,13 @@ PolyhedralSurface::setPatchN(const Geometry &geometry, size_t const &idx)
 void
 PolyhedralSurface::accept(GeometryVisitor &visitor)
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 void
 PolyhedralSurface::accept(ConstGeometryVisitor &visitor) const
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 // Explicit instantiations
