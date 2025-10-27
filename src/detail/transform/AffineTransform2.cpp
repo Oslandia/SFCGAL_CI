@@ -20,15 +20,15 @@ AffineTransform2::AffineTransform2(CGAL::Aff_transformation_2<Kernel> transform)
  * [SFCGAL::Transform]
  */
 void
-AffineTransform2::transform(Point &p)
+AffineTransform2::transform(Point &point)
 {
-  if (!p.isEmpty()) {
+  if (!point.isEmpty()) {
     // FIXME add a Point::Point( Kernel::Point_2&, double m );
-    Point pt(p.toPoint_2().transform(_transform));
-    if (p.isMeasured()) {
-      pt.setM(p.m());
+    Point pt(point.toPoint_2().transform(_transform));
+    if (point.isMeasured()) {
+      pt.setM(point.m());
     }
-    p = pt;
+    point = pt;
   }
 }
 
