@@ -14,7 +14,7 @@ namespace SFCGAL::transform {
 ForceOrderPoints::ForceOrderPoints(bool orientCCW) : _orientCCW(orientCCW) {}
 
 void
-ForceOrderPoints::transform(Point & /*p*/)
+ForceOrderPoints::transform(Point & /*point*/)
 {
 }
 
