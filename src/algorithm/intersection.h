@@ -24,49 +24,73 @@ struct NoValidityCheck;
 
 /**
  * Intersection on 2D geometries.
- * @pre ga and gb are valid geometries
+ * @param geometry1 the first geometry
+ * @param geometry2 the second geometry
+ * @return the intersection of the two geometries as a unique_ptr<Geometry>
+ * @pre geometry1 and geometry2 are valid geometries
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           intersection(const Geometry &ga, const Geometry &gb);
+SFCGAL_API auto
+intersection(const Geometry &geometry1, const Geometry &geometry2)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * Intersection on 2D geometries. No validity check variant
- * @pre ga and gb are valid geometries
+ * @param geometry1 the first geometry
+ * @param geometry2 the second geometry
+ * @return the intersection of the two geometries as a unique_ptr<Geometry>
+ * @pre geometry1 and geometry2 are valid geometries
  * @warning No actual validity check is done.
  */
-SFCGAL_API std::unique_ptr<Geometry>
-intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck);
+SFCGAL_API auto
+intersection(const Geometry &geometry1, const Geometry &geometry2,
+             NoValidityCheck) -> std::unique_ptr<Geometry>;
 
 /**
  * Intersection on 3D geometries. Assume z = 0 if needed
- * @pre ga and gb are valid geometries
+ * @param geometry1 the first geometry
+ * @param geometry2 the second geometry
+ * @return the 3D intersection of the two geometries as a unique_ptr<Geometry>
+ * @pre geometry1 and geometry2 are valid geometries
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           intersection3D(const Geometry &ga, const Geometry &gb);
+SFCGAL_API auto
+intersection3D(const Geometry &geometry1, const Geometry &geometry2)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * Intersection on 3D geometries. Assume z = 0 if needed
- * @pre ga and gb are valid geometries
- * @warning@ No actual validity check is done
+ * @param geometry1 the first geometry
+ * @param geometry2 the second geometry
+ * @return the 3D intersection of the two geometries as a unique_ptr<Geometry>
+ * @pre geometry1 and geometry2 are valid geometries
+ * @warning No actual validity check is done
  */
-SFCGAL_API std::unique_ptr<Geometry>
-intersection3D(const Geometry &ga, const Geometry &gb, NoValidityCheck);
+SFCGAL_API auto
+intersection3D(const Geometry &geometry1, const Geometry &geometry2,
+               NoValidityCheck) -> std::unique_ptr<Geometry>;
 
 /**
- * @ingroup detail
+ * Intersection between two geometry sets
+ * @param geometrySet1 the first geometry set
+ * @param geometrySet2 the second geometry set
+ * @param result the result geometry set (output parameter)
  */
 template <int Dim>
-void
-intersection(const detail::GeometrySet<Dim> &a,
-             const detail::GeometrySet<Dim> &b, detail::GeometrySet<Dim> &);
+auto
+intersection(const detail::GeometrySet<Dim> &geometrySet1,
+             const detail::GeometrySet<Dim> &geometrySet2,
+             detail::GeometrySet<Dim>       &result) -> void;
 
 /**
- * @ingroup detail
+ * Intersection between two primitive handles
+ * @param primitiveHandle1 the first primitive handle
+ * @param primitiveHandle2 the second primitive handle
+ * @param result the result geometry set (output parameter)
  */
 template <int Dim>
-void
-intersection(const detail::PrimitiveHandle<Dim> &a,
-             const detail::PrimitiveHandle<Dim> &b, detail::GeometrySet<Dim> &);
+auto
+intersection(const detail::PrimitiveHandle<Dim> &primitiveHandle1,
+             const detail::PrimitiveHandle<Dim> &primitiveHandle2,
+             detail::GeometrySet<Dim>           &result) -> void;
 
 } // namespace algorithm
 } // namespace SFCGAL
