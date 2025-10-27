@@ -12,6 +12,7 @@
 #include "SFCGAL/MultiSolid.h"
 
 namespace SFCGAL::algorithm {
+/// @private
 auto
 collect(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
 {
