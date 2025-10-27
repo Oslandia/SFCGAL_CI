@@ -14,33 +14,44 @@ namespace SFCGAL {
 class Geometry;
 }
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * @brief translate a geometry from a given vector
+ * @param geometry The geometry to translate
+ * @param vector The 3D translation vector
  */
 SFCGAL_API void
-translate(Geometry &g, const Kernel::Vector_3 &v);
+translate(Geometry &geometry, const Kernel::Vector_3 &vector);
 /**
  * @brief translate a geometry from a given vector
+ * @param geometry The geometry to translate
+ * @param vector The 2D translation vector
  */
 SFCGAL_API void
-translate(Geometry &g, const Kernel::Vector_2 &v);
+translate(Geometry &geometry, const Kernel::Vector_2 &vector);
 /**
  * @brief translate a geometry from a given vector
+ * @param geometry The geometry to translate
+ * @param dx Translation distance in X direction
+ * @param dy Translation distance in Y direction
+ * @param dz Translation distance in Z direction
  */
 SFCGAL_API void
-translate(Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
+translate(Geometry &geometry, const Kernel::FT &dx, const Kernel::FT &dy,
           const Kernel::FT &dz);
 
 /**
  * @brief translate a geometry from double-coordinates
+ * @param geometry The geometry to translate
+ * @param dx Translation distance in X direction
+ * @param dy Translation distance in Y direction
+ * @param dz Translation distance in Z direction
  */
 SFCGAL_API void
-translate(Geometry &g, const double &dx, const double &dy, const double &dz);
+translate(Geometry &geometry, const double &dx, const double &dy,
+          const double &dz);
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
