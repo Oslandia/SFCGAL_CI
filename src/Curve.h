@@ -25,7 +25,7 @@ namespace SFCGAL {
  *
  * @since 2.3.0
  */
-class SFCGAL_API Curve : public Geometry {
+class SFCGAL_API Curve : public GeometryImpl<AbstractMethod<Curve>, Geometry> {
 public:
   using FT        = Kernel::FT; ///< Floating-point type for curve calculations
   using Parameter = FT;         ///< Parameter type for curve parameterization
