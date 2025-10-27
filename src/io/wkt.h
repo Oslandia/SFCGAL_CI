@@ -16,24 +16,29 @@ namespace SFCGAL {
 class Geometry;
 }
 
-namespace SFCGAL {
-namespace io {
+namespace SFCGAL::io {
 /**
- * Read a WKT geometry from an input stream
+ * @brief Read a WKT geometry from an input stream
+ * @param s The input stream to read from
+ * @return A unique pointer to the geometry
  */
 SFCGAL_API auto
 readWkt(std::istream &s) -> std::unique_ptr<Geometry>;
 /**
- * Read a WKT geometry from a string
+ * @brief Read a WKT geometry from a string
+ * @param s The string containing WKT data
+ * @return A unique pointer to the geometry
  */
 SFCGAL_API auto
 readWkt(const std::string &s) -> std::unique_ptr<Geometry>;
 /**
- * Read a WKT geometry from a char*
+ * @brief Read a WKT geometry from a char array
+ * @param str The character array containing WKT data
+ * @param len The length of the character array
+ * @return A unique pointer to the geometry
  */
 SFCGAL_API auto
-readWkt(const char *, size_t) -> std::unique_ptr<Geometry>;
-} // namespace io
-} // namespace SFCGAL
+readWkt(const char *str, size_t len) -> std::unique_ptr<Geometry>;
+} // namespace SFCGAL::io
 
 #endif
