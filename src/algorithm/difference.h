@@ -24,41 +24,59 @@ struct NoValidityCheck;
 
 /**
  * Difference on 2D geometries.
- * @pre ga and gb are valid geometries
+ * @param geometry1 the first geometry
+ * @param geometry2 the second geometry
+ * @return the difference of the two geometries as a unique_ptr<Geometry>
+ * @pre geometry1 and geometry2 are valid geometries
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           difference(const Geometry &ga, const Geometry &gb);
+           difference(const Geometry &geometry1, const Geometry &geometry2);
 
 /**
- * Diffrence on 2D geometries. No validity check variant
- * @pre ga and gb are valid geometries
+ * Difference on 2D geometries. No validity check variant
+ * @param geometry1 the first geometry
+ * @param geometry2 the second geometry
+ * @return the difference of the two geometries as a unique_ptr<Geometry>
+ * @pre geometry1 and geometry2 are valid geometries
  * @warning No actual validity check is done.
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           difference(const Geometry &ga, const Geometry &gb, NoValidityCheck);
+           difference(const Geometry &geometry1, const Geometry &geometry2,
+                      NoValidityCheck);
 
 /**
  * Difference on 3D geometries. Assume z = 0 if needed
- * @pre ga and gb are valid geometries
+ * @param geometry1 the first geometry
+ * @param geometry2 the second geometry
+ * @return the 3D difference of the two geometries as a unique_ptr<Geometry>
+ * @pre geometry1 and geometry2 are valid geometries
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           difference3D(const Geometry &ga, const Geometry &gb);
+           difference3D(const Geometry &geometry1, const Geometry &geometry2);
 
 /**
  * Difference on 3D geometries. Assume z = 0 if needed
- * @pre ga and gb are valid geometries
- * @warning@ No actual validity check is done
+ * @param geometry1 the first geometry
+ * @param geometry2 the second geometry
+ * @return the 3D difference of the two geometries as a unique_ptr<Geometry>
+ * @pre geometry1 and geometry2 are valid geometries
+ * @warning No actual validity check is done
  */
 SFCGAL_API std::unique_ptr<Geometry>
-difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck);
+           difference3D(const Geometry &geometry1, const Geometry &geometry2,
+                        NoValidityCheck);
 
 /**
- * @ingroup detail
+ * Difference between two geometry sets
+ * @param geometrySet1 the first geometry set
+ * @param geometrySet2 the second geometry set
+ * @param result the result geometry set (output parameter)
  */
 template <int Dim>
 void
-difference(const detail::GeometrySet<Dim> &a, const detail::GeometrySet<Dim> &b,
-           detail::GeometrySet<Dim> &);
+difference(const detail::GeometrySet<Dim> &geometrySet1,
+           const detail::GeometrySet<Dim> &geometrySet2,
+           detail::GeometrySet<Dim>       &result);
 
 } // namespace algorithm
 } // namespace SFCGAL
