@@ -28,12 +28,18 @@ namespace algorithm {
 // ----------------------------------------------------------------------------------
 /// @{
 /// @privatesection
-typedef detail::NoVolume         NoVolume;
-typedef detail::MarkedPolyhedron MarkedPolyhedron;
+using NoVolume         = detail::NoVolume;
+using MarkedPolyhedron = detail::MarkedPolyhedron;
 
+/**
+ * @brief Compute intersection of two CGAL triangles
+ * @param triangle1 First triangle
+ * @param triangle2 Second triangle
+ * @return CGAL::Object containing the intersection result
+ */
 CGAL::Object
-intersection(const CGAL::Triangle_3<Kernel> &a,
-             const CGAL::Triangle_3<Kernel> &b);
+intersection(const CGAL::Triangle_3<Kernel> &triangle1,
+             const CGAL::Triangle_3<Kernel> &triangle2);
 
 inline bool
 do_intersect(const Point_2 &point, const Polygon_with_holes_2 &polygon)
@@ -534,7 +540,17 @@ typedef CGAL::Box_intersection_d::Box_with_handle_d<
     FaceBboxBase;
 
 struct FaceBbox : FaceBboxBase {
+  /**
+   * @brief Axis-aligned bounding box for a polygon face.
+   *
+   * Computes and stores the 3D bounding box that encompasses all vertices
+   * of a face represented by a halfedge circulator.
+   */
   struct Bbox : CGAL::Bbox_3 {
+    /**
+     * @brief Constructor that computes the bounding box of a face.
+     * @param handle Halfedge circulator pointing to the face vertices.
+     */
     Bbox(MarkedPolyhedron::Halfedge_around_facet_const_circulator handle)
         : CGAL::Bbox_3(handle->vertex()->point().bbox())
     {
