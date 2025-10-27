@@ -17,24 +17,29 @@ class Geometry;
 class PreparedGeometry;
 } // namespace SFCGAL
 
-namespace SFCGAL {
-namespace io {
+namespace SFCGAL::io {
 /**
- * Read a EWKT prepared geometry from an input stream
+ * @brief Read a EWKT prepared geometry from an input stream
+ * @param s The input stream to read from
+ * @return A unique pointer to the prepared geometry
  */
-SFCGAL_API std::unique_ptr<PreparedGeometry>
-           readEwkt(std::istream &s);
+SFCGAL_API auto
+readEwkt(std::istream &s) -> std::unique_ptr<PreparedGeometry>;
 /**
- * Read a EWKT geometry from a string
+ * @brief Read a EWKT geometry from a string
+ * @param s The string containing EWKT data
+ * @return A unique pointer to the prepared geometry
  */
-SFCGAL_API std::unique_ptr<PreparedGeometry>
-           readEwkt(const std::string &s);
+SFCGAL_API auto
+readEwkt(const std::string &s) -> std::unique_ptr<PreparedGeometry>;
 /**
- * Read a EWKT geometry from a char*
+ * @brief Read a EWKT geometry from a char array
+ * @param str The character array containing EWKT data
+ * @param len The length of the character array
+ * @return A unique pointer to the prepared geometry
  */
-SFCGAL_API std::unique_ptr<PreparedGeometry>
-           readEwkt(const char *, size_t);
-} // namespace io
-} // namespace SFCGAL
+SFCGAL_API auto
+readEwkt(const char *str, size_t len) -> std::unique_ptr<PreparedGeometry>;
+} // namespace SFCGAL::io
 
 #endif
