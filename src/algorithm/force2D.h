@@ -14,17 +14,16 @@ namespace SFCGAL {
 class Geometry;
 }
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * @brief force a geometry to be 2D (project on O,x,y)
+ * @param g the geometry to force to 2D
  * @warning ignore empty geometries
  */
 SFCGAL_API void
 force2D(Geometry &g);
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
