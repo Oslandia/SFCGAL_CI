@@ -18,11 +18,13 @@ public:
   /**
    * destructor
    */
-  virtual ~Surface();
+  ~Surface() override;
 
   //-- SFCGAL::Geometry
-  int
-  dimension() const override;
+  /// @brief Get the dimension of the surface
+  /// @return 2 (surfaces are 2-dimensional)
+  [[nodiscard]] auto
+  dimension() const -> int override;
 
   /**
    * [OGC/SFS]"The area of this Surface, as measured in the spatial reference
@@ -46,6 +48,7 @@ protected:
   Surface();
   /**
    * no copy constructor
+   * @param other The surface to copy from
    */
   Surface(Surface const &other);
 };
