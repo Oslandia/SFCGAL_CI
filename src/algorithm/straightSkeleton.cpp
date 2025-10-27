@@ -406,6 +406,7 @@ approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>
   return mx;
 }
 
+/// @private
 auto
 extrudeStraightSkeleton(const Polygon &geom, double height)
     -> std::unique_ptr<PolyhedralSurface>
@@ -421,6 +422,7 @@ extrudeStraightSkeleton(const Polygon &geom, double height)
   return polys;
 }
 
+/// @private
 auto
 extrudeStraightSkeleton(const Geometry &geom, double height)
     -> std::unique_ptr<PolyhedralSurface>
@@ -436,6 +438,7 @@ extrudeStraightSkeleton(const Geometry &geom, double height)
   return result;
 }
 
+/// @private
 auto
 extrudeStraightSkeleton(const Geometry &geom, double building_height,
                         double roof_height)
@@ -454,12 +457,13 @@ extrudeStraightSkeleton(const Geometry &geom, double building_height,
   auto roof = std::make_unique<PolyhedralSurface>();
 
   // Predicate to identify non-base faces (roof slopes)
-  auto isNotBaseFace = [](const Polygon &patch) {
+  auto isNotBaseFace = [](const Polygon &patch) -> bool {
     const LineString &exterior = patch.exteriorRing();
 
     // Check if any point has z != 0 (not a base face)
-    return std::any_of(exterior.begin(), exterior.end(),
-                       [](const Point &point) { return point.z() != 0.0; });
+    return std::any_of(
+        exterior.begin(), exterior.end(),
+        [](const Point &point) -> bool { return point.z() != 0.0; });
   };
 
   std::copy_if(completeRoof->begin(), completeRoof->end(),
@@ -544,24 +548,25 @@ straightSkeletonPartition(const Polygon &geom, bool /*autoOrientation*/)
 
   // Function to create a polygon from a face
   auto create_polygon_from_face =
-      [&trans](const Straight_skeleton_2::Face_const_handle &face) {
-        std::vector<Point>                         points;
-        Straight_skeleton_2::Halfedge_const_handle start   = face->halfedge();
-        Straight_skeleton_2::Halfedge_const_handle current = start;
-        do {
-          const Point_2 &p = current->vertex()->point();
-          points.emplace_back(CGAL::to_double(p.x()), CGAL::to_double(p.y()));
-          current = current->next();
-        } while (current != start);
+      [&trans](const Straight_skeleton_2::Face_const_handle &face)
+      -> SFCGAL::Polygon {
+    std::vector<Point>                         points;
+    Straight_skeleton_2::Halfedge_const_handle start   = face->halfedge();
+    Straight_skeleton_2::Halfedge_const_handle current = start;
+    do {
+      const Point_2 &p = current->vertex()->point();
+      points.emplace_back(CGAL::to_double(p.x()), CGAL::to_double(p.y()));
+      current = current->next();
+    } while (current != start);
 
-        SFCGAL::Polygon poly((SFCGAL::LineString(points)));
-        algorithm::translate(poly, trans);
-        return poly;
-      };
+    SFCGAL::Polygon poly((SFCGAL::LineString(points)));
+    algorithm::translate(poly, trans);
+    return poly;
+  };
 
   // Function to check if a face corresponds to a hole
-  auto is_hole_face = [&polygon](
-                          const Straight_skeleton_2::Face_const_handle &face) {
+  auto is_hole_face =
+      [&polygon](const Straight_skeleton_2::Face_const_handle &face) -> bool {
     Point_2 test_point = face->halfedge()->vertex()->point();
     for (auto hit = polygon.holes_begin(); hit != polygon.holes_end(); ++hit) {
       if (hit->bounded_side(test_point) == CGAL::ON_BOUNDED_SIDE) {
