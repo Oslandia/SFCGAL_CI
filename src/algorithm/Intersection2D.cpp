@@ -64,7 +64,7 @@ numIntersectionPoints(const CGAL::Polygon_with_holes_2<Kernel> &poly) -> int
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
-/// must be called with pa's dimension larger than pb's
+/// @private
 void
 intersection(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb,
              GeometrySet<2> &output, dim_t<2> /*unused*/)
