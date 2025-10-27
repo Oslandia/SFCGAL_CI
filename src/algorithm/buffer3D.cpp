@@ -70,10 +70,10 @@ Buffer3D::computePointBuffer() const -> std::unique_ptr<PolyhedralSurface>
 auto
 Buffer3D::computeRoundBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
-  typedef Point_3                                  *point_iterator;
-  typedef std::pair<point_iterator, point_iterator> point_range;
-  typedef std::list<point_range>                    polyline;
-  typedef CGAL::Nef_polyhedron_3<Kernel>            Nef_polyhedron;
+  using point_iterator = Point_3 *;
+  using point_range    = std::pair<point_iterator, point_iterator>;
+  using polyline       = std::list<point_range>;
+  using Nef_polyhedron = CGAL::Nef_polyhedron_3<Kernel>;
 
   // Create sphere
   Point_3        center(0, 0, 0);
@@ -110,8 +110,8 @@ Buffer3D::computeRoundBuffer() const -> std::unique_ptr<PolyhedralSurface>
 auto
 Buffer3D::computeCylSphereBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
-  typedef CGAL::Nef_polyhedron_3<Kernel> Nef_polyhedron;
-  Nef_polyhedron                         result;
+  using Nef_polyhedron = CGAL::Nef_polyhedron_3<Kernel>;
+  Nef_polyhedron result;
 
   // Add a sphere at the first point of the line
   if (!_inputPoints.empty()) {
@@ -285,22 +285,22 @@ Buffer3D::computeFlatBuffer() const -> std::unique_ptr<PolyhedralSurface>
 }
 
 auto
-Buffer3D::extend_point(const Kernel::Point_3  &point,
-                       const Kernel::Vector_3 &direction, double distance) const
-    -> Kernel::Point_3
+Buffer3D::extend_point(const CGAL::Point_3<Kernel>  &point,
+                       const CGAL::Vector_3<Kernel> &direction,
+                       double distance) const -> CGAL::Point_3<Kernel>
 {
   return point + direction * distance;
 }
 
 auto
-Buffer3D::create_circle_points(const Kernel::Point_3  &center,
-                               const Kernel::Vector_3 &axis, double radius,
-                               int segments) const
-    -> std::vector<Kernel::Point_3>
+Buffer3D::create_circle_points(const CGAL::Point_3<Kernel>  &center,
+                               const CGAL::Vector_3<Kernel> &axis,
+                               double radius, int segments) const
+    -> std::vector<CGAL::Point_3<Kernel>>
 {
-  std::vector<Kernel::Point_3> points;
-  Kernel::Vector_3             perpendicular =
-      CGAL::cross_product(axis, Kernel::Vector_3(0, 0, 1));
+  std::vector<CGAL::Point_3<Kernel>> points;
+  CGAL::Vector_3<Kernel>             perpendicular =
+      CGAL::cross_product(axis, CGAL::Vector_3<Kernel>(0, 0, 1));
   if (perpendicular == CGAL::NULL_VECTOR) {
     perpendicular = CGAL::cross_product(axis, Kernel::Vector_3(0, 1, 0));
   }
@@ -318,25 +318,25 @@ Buffer3D::create_circle_points(const Kernel::Point_3  &center,
 }
 
 auto
-Buffer3D::compute_bisector_plane(const Kernel::Point_3 &p1,
-                                 const Kernel::Point_3 &p2,
-                                 const Kernel::Point_3 &p3) const
-    -> Kernel::Plane_3
+Buffer3D::compute_bisector_plane(const CGAL::Point_3<Kernel> &p1,
+                                 const CGAL::Point_3<Kernel> &p2,
+                                 const CGAL::Point_3<Kernel> &p3) const
+    -> CGAL::Plane_3<Kernel>
 {
-  Kernel::Vector_3 v1       = normalizeVector(p2 - p1);
-  Kernel::Vector_3 v2       = normalizeVector(p3 - p2);
-  Kernel::Vector_3 bisector = v1 + v2;
-  return Kernel::Plane_3(p2, bisector);
+  CGAL::Vector_3<Kernel> v1       = normalizeVector(p2 - p1);
+  CGAL::Vector_3<Kernel> v2       = normalizeVector(p3 - p2);
+  CGAL::Vector_3<Kernel> bisector = v1 + v2;
+  return {p2, bisector};
 }
 
 auto
-Buffer3D::intersect_segment_plane(const Kernel::Point_3 &p1,
-                                  const Kernel::Point_3 &p2,
-                                  const Kernel::Plane_3 &plane) const
-    -> Kernel::Point_3
+Buffer3D::intersect_segment_plane(const CGAL::Point_3<Kernel> &p1,
+                                  const CGAL::Point_3<Kernel> &p2,
+                                  const CGAL::Plane_3<Kernel> &plane) const
+    -> CGAL::Point_3<Kernel>
 {
-  Kernel::Vector_3 v = p2 - p1;
-  Kernel::FT       t =
+  CGAL::Vector_3<Kernel> v = p2 - p1;
+  CGAL::Epeck::FT        t =
       -plane.a() * p1.x() - plane.b() * p1.y() - plane.c() * p1.z() - plane.d();
   t /= plane.a() * v.x() + plane.b() * v.y() + plane.c() * v.z();
   return p1 + t * v;
