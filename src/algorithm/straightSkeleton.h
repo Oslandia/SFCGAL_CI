@@ -19,13 +19,13 @@ class MultiPolygon;
 class MultiLineString;
 } // namespace SFCGAL
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 struct NoValidityCheck;
 
 /**
  * @brief build an approximate medial axis for a Polygon
  * @param geom input geometry
+ * @return approximate medial axis as a MultiLineString
  * @pre geom is a valid geometry
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
@@ -42,6 +42,7 @@ approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>;
  * @param outputDistanceInM whether to output the distance to border as M
  * @param toleranceAbs Distance tolerance between returned points. A line must
  * have a maximum distance of toleranceAbs.
+ * @return 2D straight skeleton as a MultiLineString
  * @pre geom is a valid geometry
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
@@ -60,6 +61,7 @@ straightSkeleton(const Geometry &geom, bool autoOrientation = true,
  * @param outputDistanceInM whether to output the distance to border as M
  * @param toleranceAbs Distance tolerance between returned points. A line must
  * have a maximum distance of toleranceAbs.
+ * @return 2D straight skeleton as a MultiLineString
  * @pre geom is a valid geometry
  * @warning No actual validity check is done
  * @throws NotImplementedException If geom is a Polygon with point touching
@@ -73,7 +75,12 @@ straightSkeleton(const Geometry &geom, bool autoOrientation, NoValidityCheck,
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
- * @ingroup detail
+ * @param geom input polygon
+ * @param autoOrientation check and fix polygon orientation
+ * @param innerOnly Skip non-inner edges if requested
+ * @param outputDistanceInM whether to output the distance to border as M
+ * @param toleranceAbs Distance tolerance between returned points
+ * @return 2D straight skeleton as a MultiLineString
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
@@ -85,7 +92,12 @@ straightSkeleton(const Polygon &geom, bool autoOrientation = true,
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
- * @ingroup detail
+ * @param geom input multi-polygon
+ * @param autoOrientation check and fix polygon orientation
+ * @param innerOnly Skip non-inner edges if requested
+ * @param outputDistanceInM whether to output the distance to border as M
+ * @param toleranceAbs Distance tolerance between returned points
+ * @return 2D straight skeleton as a MultiLineString
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
@@ -97,18 +109,38 @@ straightSkeleton(const MultiPolygon &geom, bool autoOrientation = true,
 
 /**
  * @brief build a 3D straight skeleton extruded for a Polygon
- * @ingroup detail
+ * @param geom the input polygon
+ * @param height extrusion height
+ * @return extruded straight skeleton as a PolyhedralSurface
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
 SFCGAL_API auto
-extrudedStraightSkeleton(const Polygon &geom, double height)
+extrudeStraightSkeleton(const Polygon &geom, double height)
     -> std::unique_ptr<PolyhedralSurface>;
 
+/**
+ * @brief build a 3D straight skeleton extruded for a Geometry
+ * @param geom input geometry
+ * @param height extrusion height
+ * @return extruded straight skeleton as a PolyhedralSurface
+ * @throws NotImplementedException If geom is a Polygon with point touching
+ * rings.
+ */
 SFCGAL_API auto
 extrudeStraightSkeleton(const Geometry &geom, double height)
     -> std::unique_ptr<PolyhedralSurface>;
 
+/**
+ * @brief build a 3D straight skeleton extruded for a Geometry with building and
+ * roof heights
+ * @param geom input geometry
+ * @param building_height building height
+ * @param roof_height roof height
+ * @return extruded straight skeleton as a PolyhedralSurface
+ * @throws NotImplementedException If geom is a Polygon with point touching
+ * rings.
+ */
 SFCGAL_API auto
 extrudeStraightSkeleton(const Geometry &geom, double building_height,
                         double roof_height)
@@ -132,7 +164,6 @@ straightSkeletonPartition(const Geometry &geom, bool autoOrientation = true)
 
 /**
  * @brief Build a 2D straight skeleton partition for a Polygon
- * @ingroup detail
  * @param[in] geom The input polygon
  * @param[in] autoOrientation Check and fix polygon orientation (not used in
  * this implementation)
@@ -150,7 +181,6 @@ straightSkeletonPartition(const Polygon &geom, bool autoOrientation = true)
 
 /**
  * @brief Build a 2D straight skeleton partition for a MultiPolygon
- * @ingroup detail
  * @param[in] geom The input multi-polygon
  * @param[in] autoOrientation Check and fix polygon orientation
  * @return A unique pointer to a MultiPolygon representing the partitioned
@@ -163,7 +193,6 @@ SFCGAL_API auto
 straightSkeletonPartition(const MultiPolygon &geom, bool autoOrientation = true)
     -> std::unique_ptr<PolyhedralSurface>;
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
