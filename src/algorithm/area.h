@@ -9,8 +9,7 @@
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/Kernel.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 struct NoValidityCheck;
 
 /**
@@ -47,7 +46,6 @@ area(const Geometry &geom) -> double;
  * @return double The computed planar area (>= 0).
  * @throws Exception If the geometry type is not handled by this dispatch.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 area(const Geometry &geom, NoValidityCheck noCheck) -> double;
@@ -64,7 +62,6 @@ area(const Geometry &geom, NoValidityCheck noCheck) -> double;
  * @param triangle The input Triangle whose signed area is to be computed.
  * @return Kernel::FT The signed area of the Triangle.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 signedArea(const Triangle &triangle) -> Kernel::FT;
@@ -81,7 +78,6 @@ signedArea(const Triangle &triangle) -> Kernel::FT;
  * @param lineString The input LineString whose signed area is to be computed.
  * @return Kernel::FT The signed area of the LineString.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 signedArea(const LineString &lineString) -> Kernel::FT;
@@ -92,7 +88,6 @@ signedArea(const LineString &lineString) -> Kernel::FT;
  * @param triangle The input Triangle.
  * @return The total area of the triangle.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 area(const Triangle &triangle) -> double;
@@ -103,7 +98,6 @@ area(const Triangle &triangle) -> double;
  * @param polygon The input Polygon.
  * @return The total area of the polygon.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 area(const Polygon &polygon) -> double;
@@ -114,7 +108,6 @@ area(const Polygon &polygon) -> double;
  * @param collection The input GeometryCollection.
  * @return The total area of the collection.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 area(const GeometryCollection &collection) -> double;
@@ -125,7 +118,6 @@ area(const GeometryCollection &collection) -> double;
  * @param tin The input TriangulatedSurface.
  * @return The total area of the TriangulatedSurface.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 area(const TriangulatedSurface &tin) -> double;
@@ -136,7 +128,6 @@ area(const TriangulatedSurface &tin) -> double;
  * @param surface The input PolyhedralSurface.
  * @return The total area of the PolyhedralSurface.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 area(const PolyhedralSurface &surface) -> double;
@@ -150,7 +141,6 @@ area(const PolyhedralSurface &surface) -> double;
  * @param geom The input geometry.
  *
  * @return The 3D area as a double precision value.
- * @ingroup detail
  */
 SFCGAL_API auto
 area3D(const Geometry &geom) -> double;
@@ -178,7 +168,6 @@ area3D(const Geometry &geom) -> double;
  * @param noCheck Unused tag parameter selecting the unchecked path.
  * @return double 3D surface area of the geometry.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 area3D(const Geometry &geom, NoValidityCheck noCheck) -> double;
@@ -189,7 +178,6 @@ area3D(const Geometry &geom, NoValidityCheck noCheck) -> double;
  * @pre The input geometry @p polygon must be a valid geometry instance.
  * @param polygon The input polygon.
  * @return The 3D area as a double precision value.
- * @ingroup detail
  */
 SFCGAL_API auto
 area3D(const Polygon &polygon) -> double;
@@ -200,7 +188,6 @@ area3D(const Polygon &polygon) -> double;
  * @pre The input geometry @p collection must be a valid geometry instance.
  * @param collection The input geometryCollection.
  * @return The 3D area as a double precision value.
- * @ingroup detail
  */
 SFCGAL_API auto
 area3D(const GeometryCollection &collection) -> double;
@@ -211,7 +198,6 @@ area3D(const GeometryCollection &collection) -> double;
  * @pre The input geometry @p surface must be a valid geometry instance.
  * @param surface The input PolyhedralSurface
  * @return The 3D area as a double precision value.
- * @ingroup detail
  */
 SFCGAL_API auto
 area3D(const PolyhedralSurface &surface) -> double;
@@ -222,7 +208,6 @@ area3D(const PolyhedralSurface &surface) -> double;
  * @pre The input geometry @p triangle must be a valid geometry instance.
  * @param triangle The input Triangle
  * @return The 3D area as a double precision value.
- * @ingroup detail
  */
 SFCGAL_API auto
 area3D(const Triangle &triangle) -> double;
@@ -233,12 +218,10 @@ area3D(const Triangle &triangle) -> double;
  * @pre The input geometry @p tin must be a valid geometry instance.
  * @param tin The input TriangulatedSurface
  * @return The 3D area as a double precision value.
- * @ingroup detail
  */
 SFCGAL_API auto
 area3D(const TriangulatedSurface &tin) -> double;
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
