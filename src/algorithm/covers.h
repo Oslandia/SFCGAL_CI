@@ -23,32 +23,46 @@ struct PrimitiveHandle;
 
 namespace algorithm {
 /**
- * Cover test on 2D geometries. Checks if gA covers gB. Force projection to z=0
- * if needed
+ * @brief Cover test on 2D geometries. Checks if gA covers gB. Force projection
+ * to z=0 if needed
+ * @param geometry1 The first geometry
+ * @param geometry2 The second geometry
+ * @return true if geometry1 covers geometry2, false otherwise
  */
-SFCGAL_API bool
-covers(const Geometry &ga, const Geometry &gb);
+SFCGAL_API auto
+covers(const Geometry &geometry1, const Geometry &geometry2) -> bool;
 
 /**
- * Cover test on 3D geometries. Checks if gA covers gB. Assume z = 0 if needed
+ * @brief Cover test on 3D geometries. Checks if gA covers gB. Assume z = 0 if
+ * needed
+ * @param geometry1 The first geometry
+ * @param geometry2 The second geometry
+ * @return true if geometry1 covers geometry2, false otherwise
  */
-SFCGAL_API bool
-covers3D(const Geometry &ga, const Geometry &gb);
+SFCGAL_API auto
+covers3D(const Geometry &geometry1, const Geometry &geometry2) -> bool;
 
 /**
- * @ingroup detail
+ * @brief Cover test on GeometrySet objects
+ * @param geometrySet1 The first geometry set
+ * @param geometrySet2 The second geometry set
+ * @return true if geometrySet1 covers geometrySet2, false otherwise
  */
 template <int Dim>
-bool
-covers(const detail::GeometrySet<Dim> &a, const detail::GeometrySet<Dim> &b);
+auto
+covers(const detail::GeometrySet<Dim> &geometrySet1,
+       const detail::GeometrySet<Dim> &geometrySet2) -> bool;
 
 /**
- * @ingroup detail
+ * @brief Cover test on PrimitiveHandle objects
+ * @param handle1 The first primitive handle
+ * @param handle2 The second primitive handle
+ * @return true if handle1 covers handle2, false otherwise
  */
 template <int Dim>
-bool
-covers(const detail::PrimitiveHandle<Dim> &a,
-       const detail::PrimitiveHandle<Dim> &b);
+auto
+covers(const detail::PrimitiveHandle<Dim> &handle1,
+       const detail::PrimitiveHandle<Dim> &handle2) -> bool;
 } // namespace algorithm
 } // namespace SFCGAL
 
