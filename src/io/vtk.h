@@ -8,9 +8,7 @@
 #include <ostream>
 #include <string>
 
-namespace SFCGAL {
-namespace io {
-namespace VTK {
+namespace SFCGAL::io::VTK {
 
 /**
  * @brief Saves a geometry to a legacy VTK format stream.
@@ -40,8 +38,8 @@ save(const Geometry &geom, const std::string &filename);
  * @return The legacy VTK format string
  * @throws SFCGAL::Exception If the geometry is invalid or unsupported
  */
-SFCGAL_API std::string
-           saveToString(const Geometry &geom);
+SFCGAL_API auto
+saveToString(const Geometry &geom) -> std::string;
 
 /**
  * @brief Saves a geometry to a legacy VTK format buffer (C API).
@@ -55,8 +53,6 @@ SFCGAL_API std::string
 SFCGAL_API void
 saveToBuffer(const Geometry &geom, char *buffer, size_t *size);
 
-} // namespace VTK
-} // namespace io
-} // namespace SFCGAL
+} // namespace SFCGAL::io::VTK
 
 #endif // SFCGAL_IO_VTK_H_
