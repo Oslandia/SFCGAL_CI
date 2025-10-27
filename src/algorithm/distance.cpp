@@ -26,6 +26,7 @@
 #include "SFCGAL/algorithm/intersects.h"
 #include "SFCGAL/detail/GetPointsVisitor.h"
 #include "SFCGAL/detail/transform/AffineTransform3.h"
+#include <algorithm>
 #include <limits>
 
 namespace SFCGAL::algorithm {
@@ -39,11 +40,11 @@ namespace SFCGAL::algorithm {
  * @brief Compute 2D distance between two geometries
  */
 auto
-distance(const Geometry &gA, const Geometry &gB) -> double
+distance(const Geometry &geometry1, const Geometry &geometry2) -> double
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gA);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gB);
-  return distance(gA, gB, NoValidityCheck());
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry1);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry2);
+  return distance(geometry1, geometry2, NoValidityCheck());
 }
 
 // ----------------------------------------------------------------------------------
@@ -54,29 +55,30 @@ distance(const Geometry &gA, const Geometry &gB) -> double
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 auto
-distance(const Geometry &gA, const Geometry &gB,
+distance(const Geometry &geometry1, const Geometry &geometry2,
          [[maybe_unused]] NoValidityCheck noCheck) -> double
 {
-  switch (gA.geometryTypeId()) {
+  switch (geometry1.geometryTypeId()) {
   case TYPE_POINT:
-    return distancePointGeometry(gA.as<Point>(), gB);
+    return distancePointGeometry(geometry1.as<Point>(), geometry2);
 
   case TYPE_LINESTRING:
-    return distanceLineStringGeometry(gA.as<LineString>(), gB);
+    return distanceLineStringGeometry(geometry1.as<LineString>(), geometry2);
 
   case TYPE_NURBSCURVE: {
-    auto lineString = gA.as<NURBSCurve>().toLineString(); // default parameters
+    auto lineString =
+        geometry1.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return std::numeric_limits<double>::infinity();
     }
-    return distanceLineStringGeometry(*lineString, gB);
+    return distanceLineStringGeometry(*lineString, geometry2);
   }
 
   case TYPE_POLYGON:
-    return distancePolygonGeometry(gA.as<Polygon>(), gB);
+    return distancePolygonGeometry(geometry1.as<Polygon>(), geometry2);
 
   case TYPE_TRIANGLE:
-    return distanceTriangleGeometry(gA.as<Triangle>(), gB);
+    return distanceTriangleGeometry(geometry1.as<Triangle>(), geometry2);
 
   case TYPE_MULTIPOINT:
   case TYPE_MULTILINESTRING:
@@ -85,12 +87,12 @@ distance(const Geometry &gA, const Geometry &gB,
   case TYPE_GEOMETRYCOLLECTION:
   case TYPE_TRIANGULATEDSURFACE:
   case TYPE_POLYHEDRALSURFACE:
-    return distanceGeometryCollectionToGeometry(gA, gB);
+    return distanceGeometryCollectionToGeometry(geometry1, geometry2);
 
   case TYPE_SOLID:
     BOOST_THROW_EXCEPTION(NotImplementedException(
         (boost::format("distance(%s,%s) is not implemented") %
-         gA.geometryType() % gB.geometryType())
+         geometry1.geometryType() % geometry2.geometryType())
             .str()));
   }
 
@@ -99,28 +101,29 @@ distance(const Geometry &gA, const Geometry &gB,
 }
 
 auto
-distancePointGeometry(const Point &gA, const Geometry &gB) -> double
+distancePointGeometry(const Point &point, const Geometry &geometry) -> double
 {
-  switch (gB.geometryTypeId()) {
+  switch (geometry.geometryTypeId()) {
   case TYPE_POINT:
-    return distancePointPoint(gA, gB.as<Point>());
+    return distancePointPoint(point, geometry.as<Point>());
 
   case TYPE_LINESTRING:
-    return distancePointLineString(gA, gB.as<LineString>());
+    return distancePointLineString(point, geometry.as<LineString>());
 
   case TYPE_NURBSCURVE: {
-    auto lineString = gB.as<NURBSCurve>().toLineString(); // default parameters
+    auto lineString =
+        geometry.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return std::numeric_limits<double>::infinity();
     }
-    return distancePointLineString(gA, *lineString);
+    return distancePointLineString(point, *lineString);
   }
 
   case TYPE_POLYGON:
-    return distancePointPolygon(gA, gB.as<Polygon>());
+    return distancePointPolygon(point, geometry.as<Polygon>());
 
   case TYPE_TRIANGLE:
-    return distancePointTriangle(gA, gB.as<Triangle>());
+    return distancePointTriangle(point, geometry.as<Triangle>());
 
     // collection dispatch
   case TYPE_MULTIPOINT:
@@ -130,12 +133,12 @@ distancePointGeometry(const Point &gA, const Geometry &gB) -> double
   case TYPE_GEOMETRYCOLLECTION:
   case TYPE_TRIANGULATEDSURFACE:
   case TYPE_POLYHEDRALSURFACE:
-    return distanceGeometryCollectionToGeometry(gB, gA);
+    return distanceGeometryCollectionToGeometry(geometry, point);
 
   case TYPE_SOLID:
     BOOST_THROW_EXCEPTION(NotImplementedException(
         (boost::format("distance(%s,%s) is not implemented") %
-         gA.geometryType() % gB.geometryType())
+         point.geometryType() % geometry.geometryType())
             .str()));
   }
 
@@ -144,30 +147,31 @@ distancePointGeometry(const Point &gA, const Geometry &gB) -> double
 }
 
 auto
-distancePointPoint(const Point &gA, const Point &gB) -> double
+distancePointPoint(const Point &point1, const Point &point2) -> double
 {
-  if (gA.isEmpty() || gB.isEmpty()) {
+  if (point1.isEmpty() || point2.isEmpty()) {
     return std::numeric_limits<double>::infinity();
   }
 
-  return CGAL::sqrt(
-      CGAL::to_double(CGAL::squared_distance(gA.toPoint_2(), gB.toPoint_2())));
+  return CGAL::sqrt(CGAL::to_double(
+      CGAL::squared_distance(point1.toPoint_2(), point2.toPoint_2())));
 }
 
 auto
-distancePointLineString(const Point &gA, const LineString &gB) -> double
+distancePointLineString(const Point &point, const LineString &lineString)
+    -> double
 {
-  if (gA.isEmpty() || gB.isEmpty()) {
+  if (point.isEmpty() || lineString.isEmpty()) {
     return std::numeric_limits<double>::infinity();
   }
 
-  size_t const numSegments = gB.numSegments();
+  size_t const numSegments = lineString.numSegments();
 
   double dMin = std::numeric_limits<double>::infinity();
 
   for (size_t i = 0; i < numSegments; i++) {
-    double const segmentDistance =
-        distancePointSegment(gA, gB.pointN(i), gB.pointN(i + 1));
+    double const segmentDistance = distancePointSegment(
+        point, lineString.pointN(i), lineString.pointN(i + 1));
 
     if (i == 0 || segmentDistance < dMin) {
       dMin = segmentDistance;
@@ -178,21 +182,22 @@ distancePointLineString(const Point &gA, const LineString &gB) -> double
 }
 
 auto
-distancePointPolygon(const Point &gA, const Polygon &gB) -> double
+distancePointPolygon(const Point &point, const Polygon &polygon) -> double
 {
-  if (gA.isEmpty() || gB.isEmpty()) {
+  if (point.isEmpty() || polygon.isEmpty()) {
     return std::numeric_limits<double>::infinity();
   }
 
-  if (intersects(gA, gB, NoValidityCheck())) {
+  if (intersects(point, polygon, NoValidityCheck())) {
     return 0.0;
   }
 
   double dMin = 0.0;
 
   // check if the point is in the polygon
-  for (size_t i = 0; i < gB.numRings(); i++) {
-    double const ringDistance = distancePointLineString(gA, gB.ringN(i));
+  for (size_t i = 0; i < polygon.numRings(); i++) {
+    double const ringDistance =
+        distancePointLineString(point, polygon.ringN(i));
 
     if (i == 0 || ringDistance < dMin) {
       dMin = ringDistance;
@@ -203,38 +208,41 @@ distancePointPolygon(const Point &gA, const Polygon &gB) -> double
 }
 
 auto
-distancePointTriangle(const Point &gA, const Triangle &gB) -> double
+distancePointTriangle(const Point &point, const Triangle &triangle) -> double
 {
-  return distancePointPolygon(gA, gB.toPolygon());
+  return distancePointPolygon(point, triangle.toPolygon());
 }
 
 auto
-distanceLineStringGeometry(const LineString &gA, const Geometry &gB) -> double
+distanceLineStringGeometry(const LineString &lineString,
+                           const Geometry   &geometry) -> double
 {
-  if (gA.isEmpty() || gB.isEmpty()) {
+  if (lineString.isEmpty() || geometry.isEmpty()) {
     return std::numeric_limits<double>::infinity();
   }
 
-  switch (gB.geometryTypeId()) {
+  switch (geometry.geometryTypeId()) {
   case TYPE_POINT:
-    return distancePointLineString(gB.as<Point>(), gA); // symetric
+    return distancePointLineString(geometry.as<Point>(),
+                                   lineString); // symetric
 
   case TYPE_LINESTRING:
-    return distanceLineStringLineString(gA, gB.as<LineString>());
+    return distanceLineStringLineString(lineString, geometry.as<LineString>());
 
   case TYPE_NURBSCURVE: {
-    auto lineString = gB.as<NURBSCurve>().toLineString(); // default parameters
-    if (!lineString || lineString->isEmpty()) {
+    auto lineStringFromCurve =
+        geometry.as<NURBSCurve>().toLineString(); // default parameters
+    if (!lineStringFromCurve || lineStringFromCurve->isEmpty()) {
       return std::numeric_limits<double>::infinity();
     }
-    return distanceLineStringLineString(gA, *lineString);
+    return distanceLineStringLineString(lineString, *lineStringFromCurve);
   }
 
   case TYPE_POLYGON:
-    return distanceLineStringPolygon(gA, gB.as<Polygon>());
+    return distanceLineStringPolygon(lineString, geometry.as<Polygon>());
 
   case TYPE_TRIANGLE:
-    return distanceLineStringTriangle(gA, gB.as<Triangle>());
+    return distanceLineStringTriangle(lineString, geometry.as<Triangle>());
 
     // collection dispatch
   case TYPE_MULTIPOINT:
@@ -244,12 +252,12 @@ distanceLineStringGeometry(const LineString &gA, const Geometry &gB) -> double
   case TYPE_GEOMETRYCOLLECTION:
   case TYPE_TRIANGULATEDSURFACE:
   case TYPE_POLYHEDRALSURFACE:
-    return distanceGeometryCollectionToGeometry(gB, gA);
+    return distanceGeometryCollectionToGeometry(geometry, lineString);
 
   case TYPE_SOLID:
     BOOST_THROW_EXCEPTION(NotImplementedException(
         (boost::format("distance(%s,%s) is not implemented") %
-         gA.geometryType() % gB.geometryType())
+         lineString.geometryType() % geometry.geometryType())
             .str()));
   }
 
@@ -258,23 +266,24 @@ distanceLineStringGeometry(const LineString &gA, const Geometry &gB) -> double
 }
 
 auto
-distanceLineStringLineString(const LineString &gA, const LineString &gB)
-    -> double
+distanceLineStringLineString(const LineString &lineString1,
+                             const LineString &lineString2) -> double
 {
-  if (gA.isEmpty() || gB.isEmpty()) {
+  if (lineString1.isEmpty() || lineString2.isEmpty()) {
     return std::numeric_limits<double>::infinity();
   }
 
-  size_t const nsA = gA.numSegments();
-  size_t const nsB = gB.numSegments();
+  size_t const ns1 = lineString1.numSegments();
+  size_t const ns2 = lineString2.numSegments();
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < nsA; i++) {
-    for (size_t j = 0; j < nsB; j++) {
-      dMin = std::min(dMin,
-                      distanceSegmentSegment(gA.pointN(i), gA.pointN(i + 1),
-                                             gB.pointN(j), gB.pointN(j + 1)));
+  for (size_t i = 0; i < ns1; i++) {
+    for (size_t j = 0; j < ns2; j++) {
+      dMin = std::min(dMin, distanceSegmentSegment(lineString1.pointN(i),
+                                                   lineString1.pointN(i + 1),
+                                                   lineString2.pointN(j),
+                                                   lineString2.pointN(j + 1)));
     }
   }
 
@@ -282,21 +291,22 @@ distanceLineStringLineString(const LineString &gA, const LineString &gB)
 }
 
 auto
-distanceLineStringPolygon(const LineString &gA, const Polygon &gB) -> double
+distanceLineStringPolygon(const LineString &lineString, const Polygon &polygon)
+    -> double
 {
-  if (gA.isEmpty() || gB.isEmpty()) {
+  if (lineString.isEmpty() || polygon.isEmpty()) {
     return std::numeric_limits<double>::infinity();
   }
 
-  if (intersects(gA, gB, NoValidityCheck())) {
+  if (intersects(lineString, polygon, NoValidityCheck())) {
     return 0.0;
   }
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < gB.numRings(); i++) {
+  for (size_t i = 0; i < polygon.numRings(); i++) {
     double const lineStringDistance =
-        distanceLineStringLineString(gA, gB.ringN(i));
+        distanceLineStringLineString(lineString, polygon.ringN(i));
 
     dMin = std::min(lineStringDistance, dMin);
   }
@@ -305,38 +315,42 @@ distanceLineStringPolygon(const LineString &gA, const Polygon &gB) -> double
 }
 
 auto
-distanceLineStringTriangle(const LineString &gA, const Triangle &gB) -> double
+distanceLineStringTriangle(const LineString &lineString,
+                           const Triangle   &triangle) -> double
 {
-  return distanceLineStringPolygon(gA, gB.toPolygon());
+  return distanceLineStringPolygon(lineString, triangle.toPolygon());
 }
 
 auto
-distancePolygonGeometry(const Polygon &gA, const Geometry &gB) -> double
+distancePolygonGeometry(const Polygon &polygon, const Geometry &geometry)
+    -> double
 {
-  if (gA.isEmpty() || gB.isEmpty()) {
+  if (polygon.isEmpty() || geometry.isEmpty()) {
     return std::numeric_limits<double>::infinity();
   }
 
-  switch (gB.geometryTypeId()) {
+  switch (geometry.geometryTypeId()) {
   case TYPE_POINT:
-    return distancePointPolygon(gB.as<Point>(), gA); // symetric
+    return distancePointPolygon(geometry.as<Point>(), polygon); // symetric
 
   case TYPE_LINESTRING:
-    return distanceLineStringPolygon(gB.as<LineString>(), gA); // symetric
+    return distanceLineStringPolygon(geometry.as<LineString>(),
+                                     polygon); // symetric
 
   case TYPE_NURBSCURVE: {
-    auto lineString = gB.as<NURBSCurve>().toLineString(); // default parameters
+    auto lineString =
+        geometry.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return std::numeric_limits<double>::infinity();
     }
-    return distanceLineStringPolygon(*lineString, gA); // symetric
+    return distanceLineStringPolygon(*lineString, polygon); // symetric
   }
 
   case TYPE_POLYGON:
-    return distancePolygonPolygon(gA, gB.as<Polygon>());
+    return distancePolygonPolygon(polygon, geometry.as<Polygon>());
 
   case TYPE_TRIANGLE:
-    return distancePolygonTriangle(gA, gB.as<Triangle>());
+    return distancePolygonTriangle(polygon, geometry.as<Triangle>());
 
     // collection dispatch
   case TYPE_MULTIPOINT:
@@ -346,12 +360,12 @@ distancePolygonGeometry(const Polygon &gA, const Geometry &gB) -> double
   case TYPE_GEOMETRYCOLLECTION:
   case TYPE_TRIANGULATEDSURFACE:
   case TYPE_POLYHEDRALSURFACE:
-    return distanceGeometryCollectionToGeometry(gB, gA);
+    return distanceGeometryCollectionToGeometry(geometry, polygon);
 
   case TYPE_SOLID:
     BOOST_THROW_EXCEPTION(NotImplementedException(
         (boost::format("distance(%s,%s) is not implemented") %
-         gA.geometryType() % gB.geometryType())
+         polygon.geometryType() % geometry.geometryType())
             .str()));
   }
 
@@ -360,25 +374,25 @@ distancePolygonGeometry(const Polygon &gA, const Geometry &gB) -> double
 }
 
 auto
-distancePolygonPolygon(const Polygon &gA, const Polygon &gB) -> double
+distancePolygonPolygon(const Polygon &polygon1, const Polygon &polygon2)
+    -> double
 {
-  if (gA.isEmpty() || gB.isEmpty()) {
+  if (polygon1.isEmpty() || polygon2.isEmpty()) {
     return std::numeric_limits<double>::infinity();
   }
 
-  if (intersects(gA, gB, NoValidityCheck())) {
+  if (intersects(polygon1, polygon2, NoValidityCheck())) {
     return 0.0;
   }
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < gA.numRings(); i++) {
-    for (size_t j = 0; j < gB.numRings(); j++) {
-      double const d = distanceLineStringLineString(gA.ringN(i), gB.ringN(j));
+  for (size_t i = 0; i < polygon1.numRings(); i++) {
+    for (size_t j = 0; j < polygon2.numRings(); j++) {
+      double const d =
+          distanceLineStringLineString(polygon1.ringN(i), polygon2.ringN(j));
 
-      if (d < dMin) {
-        dMin = d;
-      }
+      dMin = std::min(d, dMin);
     }
   }
 
@@ -386,15 +400,17 @@ distancePolygonPolygon(const Polygon &gA, const Polygon &gB) -> double
 }
 
 auto
-distancePolygonTriangle(const Polygon &gA, const Triangle &gB) -> double
+distancePolygonTriangle(const Polygon &polygon, const Triangle &triangle)
+    -> double
 {
-  return distancePolygonPolygon(gA, gB.toPolygon());
+  return distancePolygonPolygon(polygon, triangle.toPolygon());
 }
 
 auto
-distanceTriangleGeometry(const Triangle &gA, const Geometry &gB) -> double
+distanceTriangleGeometry(const Triangle &triangle, const Geometry &geometry)
+    -> double
 {
-  return distancePolygonGeometry(gA.toPolygon(), gB);
+  return distancePolygonGeometry(triangle.toPolygon(), geometry);
 }
 
 /**
@@ -509,110 +525,116 @@ boundingCircle(const Geometry &geom) -> const Circle
 /// \endcond
 
 auto
-distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
-    -> double
+distanceGeometryCollectionToGeometry(const Geometry &geometryCollection,
+                                     const Geometry &geometry) -> double
 {
-  if (gA.isEmpty() || gB.isEmpty()) {
+  if (geometryCollection.isEmpty() || geometry.isEmpty()) {
     return std::numeric_limits<double>::infinity();
   }
 
-  // if bounding spheres (BS) of gB and gAi don't intersect and
-  // if the closest point of BS(gAj) is further than the farest
-  // point of BS(gAi) there is no need to compute the distance(gAj, gB)
-  // since it will be greater than distance(gAi, gB)
+  // if bounding spheres (BS) of geometry and geometryCollectioni don't
+  // intersect and if the closest point of BS(geometryCollectionj) is further
+  // than the farest point of BS(geometryCollectioni) there is no need to
+  // compute the distance(geometryCollectionj, geometry) since it will be
+  // greater than distance(geometryCollectioni, geometry)
   //
   // The aim is not to find the minimal bounding sphere, but a good enough
   // sphere than encloses all points
   std::set<size_t> noTest;
 
   if (true) {
-    std::vector<Circle> bcA;
+    std::vector<Circle> bcCollection;
 
-    for (size_t i = 0; i < gA.numGeometries(); i++) {
-      bcA.push_back(boundingCircle(gA.geometryN(i)));
+    bcCollection.reserve(geometryCollection.numGeometries());
+    for (size_t i = 0; i < geometryCollection.numGeometries(); i++) {
+      bcCollection.push_back(boundingCircle(geometryCollection.geometryN(i)));
     }
 
-    Circle const bcB(boundingCircle(gB));
+    Circle const bcGeometry(boundingCircle(geometry));
 
-    if (bcB.isEmpty()) {
+    if (bcGeometry.isEmpty()) {
       return std::numeric_limits<double>::infinity();
     }
 
     std::vector<size_t> noIntersect;
 
-    for (size_t i = 0; i < gA.numGeometries(); i++) {
-      if (bcA[i].isEmpty()) {
+    for (size_t i = 0; i < geometryCollection.numGeometries(); i++) {
+      if (bcCollection[i].isEmpty()) {
         continue;
       }
 
-      const double l2 =
-          CGAL::to_double((bcB.center() - bcA[i].center()).squared_length());
+      const double l2 = CGAL::to_double(
+          (bcGeometry.center() - bcCollection[i].center()).squared_length());
 
-      if (std::pow(bcB.radius() + bcA[i].radius(), 2) < l2) {
+      if (std::pow(bcGeometry.radius() + bcCollection[i].radius(), 2) < l2) {
         noIntersect.push_back(i);
       }
     }
 
     for (size_t i = 0; i < noIntersect.size(); i++) {
       const double li = std::sqrt(CGAL::to_double(
-          (bcA[noIntersect[i]].center() - bcB.center()).squared_length()));
+          (bcCollection[noIntersect[i]].center() - bcGeometry.center())
+              .squared_length()));
 
       for (size_t j = i; j < noIntersect.size(); j++) {
         const double lj = std::sqrt(CGAL::to_double(
-            (bcA[noIntersect[j]].center() - bcB.center()).squared_length()));
+            (bcCollection[noIntersect[j]].center() - bcGeometry.center())
+                .squared_length()));
 
-        if (li + bcA[noIntersect[i]].radius() <
-            lj - bcA[noIntersect[j]].radius()) {
+        if (li + bcCollection[noIntersect[i]].radius() <
+            lj - bcCollection[noIntersect[j]].radius()) {
           noTest.insert(noIntersect[j]);
-        } else if (lj + bcA[noIntersect[j]].radius() <
-                   li - bcA[noIntersect[i]].radius()) {
+        } else if (lj + bcCollection[noIntersect[j]].radius() <
+                   li - bcCollection[noIntersect[i]].radius()) {
           noTest.insert(noIntersect[i]);
         }
       }
     }
 
     // if (!noTest.empty()) std::cout << "pruning " << noTest.size() << "/" <<
-    // gA.numGeometries() << "\n";
+    // geometryCollection.numGeometries() << "\n";
   }
 
   double dMin = std::numeric_limits<double>::infinity();
 
-  for (size_t i = 0; i < gA.numGeometries(); i++) {
+  for (size_t i = 0; i < geometryCollection.numGeometries(); i++) {
     if (noTest.end() != noTest.find(i)) {
       continue;
     }
 
-    dMin = std::min(dMin, distance(gA.geometryN(i), gB));
+    dMin = std::min(dMin, distance(geometryCollection.geometryN(i), geometry));
   }
 
   return dMin;
 }
 
 auto
-distancePointSegment(const Point &p, const Point &a, const Point &b) -> double
+distancePointSegment(const Point &point, const Point &segmentStart,
+                     const Point &segmentEnd) -> double
 {
   // empty already checked
-  BOOST_ASSERT(!p.isEmpty());
-  BOOST_ASSERT(!a.isEmpty());
-  BOOST_ASSERT(!b.isEmpty());
+  BOOST_ASSERT(!point.isEmpty());
+  BOOST_ASSERT(!segmentStart.isEmpty());
+  BOOST_ASSERT(!segmentEnd.isEmpty());
 
   return CGAL::sqrt(CGAL::to_double(CGAL::squared_distance(
-      p.toPoint_2(), Segment_2(a.toPoint_2(), b.toPoint_2()))));
+      point.toPoint_2(),
+      Segment_2(segmentStart.toPoint_2(), segmentEnd.toPoint_2()))));
 }
 
 auto
-distanceSegmentSegment(const Point &a, const Point &b, const Point &c,
-                       const Point &d) -> double
+distanceSegmentSegment(const Point &point1, const Point &point2,
+                       const Point &point3, const Point &point4) -> double
 {
   // empty already checked
-  BOOST_ASSERT(!a.isEmpty());
-  BOOST_ASSERT(!b.isEmpty());
-  BOOST_ASSERT(!c.isEmpty());
-  BOOST_ASSERT(!d.isEmpty());
+  BOOST_ASSERT(!point1.isEmpty());
+  BOOST_ASSERT(!point2.isEmpty());
+  BOOST_ASSERT(!point3.isEmpty());
+  BOOST_ASSERT(!point4.isEmpty());
 
   return CGAL::sqrt(CGAL::to_double(CGAL::squared_distance(
-      CGAL::Segment_2<Kernel>(a.toPoint_2(), b.toPoint_2()),
-      CGAL::Segment_2<Kernel>(c.toPoint_2(), d.toPoint_2()))));
+      CGAL::Segment_2<Kernel>(point1.toPoint_2(), point2.toPoint_2()),
+      CGAL::Segment_2<Kernel>(point3.toPoint_2(), point4.toPoint_2()))));
 }
 
 #endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
