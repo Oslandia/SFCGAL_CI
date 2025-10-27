@@ -9,14 +9,14 @@
 namespace SFCGAL::transform {
 
 void
-Force2D::transform(Point &p)
+Force2D::transform(Point &point)
 {
-  if (!p.isEmpty() && p.is3D()) {
-    Point pt(p.x(), p.y());
-    if (p.isMeasured()) {
-      pt.setM(p.m());
+  if (!point.isEmpty() && point.is3D()) {
+    Point pt(point.x(), point.y());
+    if (point.isMeasured()) {
+      pt.setM(point.m());
     }
-    p = pt;
+    point = pt;
   }
 }
 
