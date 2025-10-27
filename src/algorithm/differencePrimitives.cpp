@@ -8,6 +8,7 @@
 // CGAL
 
 namespace SFCGAL::algorithm {
+/// @private
 auto
 intersection(const CGAL::Triangle_3<Kernel> &a,
              const CGAL::Triangle_3<Kernel> &b) -> CGAL::Object
