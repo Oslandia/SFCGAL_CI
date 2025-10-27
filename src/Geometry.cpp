@@ -112,12 +112,12 @@ Geometry::geometryN(size_t const &n) -> Geometry &
 }
 
 void
-Geometry::setGeometryN(const Geometry &, size_t const &)
+Geometry::setGeometryN(const Geometry & /*unused*/, size_t const & /*unused*/)
 {
 }
 
 void
-Geometry::setGeometryN(Geometry *, size_t const &)
+Geometry::setGeometryN(Geometry * /*unused*/, size_t const & /*unused*/)
 {
 }
 
@@ -184,7 +184,7 @@ Geometry::centroid() const -> Point
 {
   std::unique_ptr<Point> out = algorithm::centroid(*this);
 
-  return *(out.get());
+  return *(out);
 }
 
 auto
@@ -192,7 +192,7 @@ Geometry::centroid3D() const -> Point
 {
   std::unique_ptr<Point> out = algorithm::centroid3D(*this);
 
-  return *(out.get());
+  return *(out);
 }
 
 /// Function used to compare geometries
