@@ -10,23 +10,25 @@
 
 #include "SFCGAL/Geometry.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * Compute the 2D convex hull for a geometry
+ * @param geometry the input geometry
+ * @return the 2D convex hull as a unique_ptr<Geometry>
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           convexHull(const Geometry &g);
+           convexHull(const Geometry &geometry);
 
 /**
  * Compute the 3D convex hull for a geometry
+ * @param geometry the input geometry
+ * @return the 3D convex hull as a unique_ptr<Geometry>
  * @todo improve to handle collinear points and coplanar points
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           convexHull3D(const Geometry &g);
+           convexHull3D(const Geometry &geometry);
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
