@@ -507,6 +507,19 @@ private:
   }
 };
 
+template <typename T>
+class AbstractMethod {};
+
+template <typename Derived, typename Base>
+class SFCGAL_API GeometryImpl<AbstractMethod<Derived>, Base> : public Base {
+public:
+  virtual ~GeometryImpl() = default;
+
+private:
+  virtual auto
+  cloneImpl() const -> GeometryImpl * = 0;
+};
+
 } // namespace SFCGAL
 
 #endif
