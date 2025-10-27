@@ -22,9 +22,7 @@
 
 using namespace SFCGAL::detail;
 
-namespace SFCGAL {
-
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 // ----------------------------------------------------------------------------------
 // -- private interface
@@ -58,18 +56,19 @@ dispatch_intersection_sym(const PrimitiveHandle<Dim> &pa,
 
 template <int Dim>
 void
-intersection(const PrimitiveHandle<Dim> &pa, const PrimitiveHandle<Dim> &pb,
-             GeometrySet<Dim> &output)
+intersection(const PrimitiveHandle<Dim> &primitiveHandle1,
+             const PrimitiveHandle<Dim> &primitiveHandle2,
+             GeometrySet<Dim>           &output)
 {
-  dispatch_intersection_sym(pa, pb, output);
+  dispatch_intersection_sym(primitiveHandle1, primitiveHandle2, output);
 }
 
 template void
-intersection<2>(const PrimitiveHandle<2> &a, const PrimitiveHandle<2> &b,
-                GeometrySet<2> &);
+intersection<2>(const PrimitiveHandle<2> &primitiveHandle1,
+                const PrimitiveHandle<2> &primitiveHandle2, GeometrySet<2> &);
 template void
-intersection<3>(const PrimitiveHandle<3> &a, const PrimitiveHandle<3> &b,
-                GeometrySet<3> &);
+intersection<3>(const PrimitiveHandle<3> &primitiveHandle1,
+                const PrimitiveHandle<3> &primitiveHandle2, GeometrySet<3> &);
 
 template <int Dim>
 struct intersection_cb {
@@ -134,16 +133,17 @@ post_intersection(const GeometrySet<3> &input, GeometrySet<3> &output)
 /// @publicsection
 
 template <int Dim>
-void
-intersection(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
-             GeometrySet<Dim> &output)
+auto
+intersection(const GeometrySet<Dim> &geometrySet1,
+             const GeometrySet<Dim> &geometrySet2, GeometrySet<Dim> &output)
+    -> void
 {
   typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles;
   typename SFCGAL::detail::HandleCollection<Dim>::Type bhandles;
   typename SFCGAL::detail::BoxCollection<Dim>::Type    aboxes;
   typename SFCGAL::detail::BoxCollection<Dim>::Type    bboxes;
-  a.computeBoundingBoxes(ahandles, aboxes);
-  b.computeBoundingBoxes(bhandles, bboxes);
+  geometrySet1.computeBoundingBoxes(ahandles, aboxes);
+  geometrySet2.computeBoundingBoxes(bhandles, bboxes);
 
   GeometrySet<Dim>           temp;
   GeometrySet<Dim>           temp2;
@@ -157,19 +157,20 @@ intersection(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
 
 /// @private
 template void
-intersection<2>(const GeometrySet<2> &a, const GeometrySet<2> &b,
-                GeometrySet<2> &);
+intersection<2>(const GeometrySet<2> &geometrySet1,
+                const GeometrySet<2> &geometrySet2, GeometrySet<2> &);
 /// @private
 template void
-intersection<3>(const GeometrySet<3> &a, const GeometrySet<3> &b,
-                GeometrySet<3> &);
+intersection<3>(const GeometrySet<3> &geometrySet1,
+                const GeometrySet<3> &geometrySet2, GeometrySet<3> &);
 
+/// @private
 auto
-intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
-    -> std::unique_ptr<Geometry>
+intersection(const Geometry &geometry1, const Geometry &geometry2,
+             NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
-  GeometrySet<2> const gsa(ga);
-  GeometrySet<2> const gsb(gb);
+  GeometrySet<2> const gsa(geometry1);
+  GeometrySet<2> const gsb(geometry2);
   GeometrySet<2>       output;
   algorithm::intersection(gsa, gsb, output);
 
@@ -178,22 +179,24 @@ intersection(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
   return filtered.recompose();
 }
 
+/// @private
 auto
-intersection(const Geometry &ga, const Geometry &gb)
+intersection(const Geometry &geometry1, const Geometry &geometry2)
     -> std::unique_ptr<Geometry>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ga);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gb);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry1);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry2);
 
-  return intersection(ga, gb, NoValidityCheck());
+  return intersection(geometry1, geometry2, NoValidityCheck());
 }
 
+/// @private
 auto
-intersection3D(const Geometry &ga, const Geometry &gb,
+intersection3D(const Geometry &geometry1, const Geometry &geometry2,
                NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
-  GeometrySet<3> const gsa(ga);
-  GeometrySet<3> const gsb(gb);
+  GeometrySet<3> const gsa(geometry1);
+  GeometrySet<3> const gsb(geometry2);
   GeometrySet<3>       output;
   algorithm::intersection(gsa, gsb, output);
 
@@ -203,14 +206,14 @@ intersection3D(const Geometry &ga, const Geometry &gb,
   return filtered.recompose();
 }
 
+/// @private
 auto
-intersection3D(const Geometry &ga, const Geometry &gb)
+intersection3D(const Geometry &geometry1, const Geometry &geometry2)
     -> std::unique_ptr<Geometry>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(ga);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gb);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(geometry1);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(geometry2);
 
-  return intersection3D(ga, gb, NoValidityCheck());
+  return intersection3D(geometry1, geometry2, NoValidityCheck());
 }
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
