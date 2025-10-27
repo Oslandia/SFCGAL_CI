@@ -33,13 +33,14 @@ public:
    * @brief Constructs a Sphere object
    * @param radius The radius of the sphere
    * @param center The center point of the sphere
-   * @param num_subdivisions The number of icosahedron subdivisions (0=12 vertices, 1=42, 2=162, etc.)
+   * @param num_subdivisions The number of icosahedron subdivisions (0=12
+   * vertices, 1=42, 2=162, etc.)
    * @param direction The direction vector for sphere orientation
    */
-  Sphere(const Kernel::FT      &radius = 1.0,
-         const Kernel::Point_3 &center = Kernel::Point_3(0, 0, 0),
-         unsigned int num_subdivisions = 2,
-         const Kernel::Vector_3 &direction = Kernel::Vector_3(0, 0, 1));
+  Sphere(const Kernel::FT       &radius           = 1.0,
+         const Kernel::Point_3  &center           = Kernel::Point_3(0, 0, 0),
+         unsigned int            num_subdivisions = 2,
+         const Kernel::Vector_3 &direction        = Kernel::Vector_3(0, 0, 1));
 
   /**
    * @brief Copy constructor
