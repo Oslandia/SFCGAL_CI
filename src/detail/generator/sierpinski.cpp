@@ -10,6 +10,7 @@
 
 namespace SFCGAL::generator {
 
+/// @private
 auto
 _sierpinski(const std::vector<Kernel::Triangle_2> &triangles)
     -> std::vector<Kernel::Triangle_2>
