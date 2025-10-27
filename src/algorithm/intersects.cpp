@@ -37,26 +37,27 @@ namespace SFCGAL::algorithm {
 
 /// Type of pa must be of larger dimension than type of pb
 auto
-_intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
+_intersects(const PrimitiveHandle<2> &handle1,
+            const PrimitiveHandle<2> &handle2) -> bool
 {
   //
   // Point vs. Point
   //
 
-  if (pa.handle.which() == PrimitivePoint &&
-      pb.handle.which() == PrimitivePoint) {
-    return *boost::get<const CGAL::Point_2<Kernel> *>(pa.handle) ==
-           *boost::get<const CGAL::Point_2<Kernel> *>(pb.handle);
+  if (handle1.handle.which() == PrimitivePoint &&
+      handle2.handle.which() == PrimitivePoint) {
+    return *boost::get<const CGAL::Point_2<Kernel> *>(handle1.handle) ==
+           *boost::get<const CGAL::Point_2<Kernel> *>(handle2.handle);
   }
 
   //
   // Segment vs. Point
   //
 
-  if (pa.handle.which() == PrimitiveSegment &&
-      pb.handle.which() == PrimitivePoint) {
-    const auto *seg = pa.as<CGAL::Segment_2<Kernel>>();
-    const auto *pt  = pb.as<CGAL::Point_2<Kernel>>();
+  if (handle1.handle.which() == PrimitiveSegment &&
+      handle2.handle.which() == PrimitivePoint) {
+    const auto *seg = handle1.as<CGAL::Segment_2<Kernel>>();
+    const auto *pt  = handle2.as<CGAL::Point_2<Kernel>>();
     return seg->has_on(*pt);
   }
 
@@ -64,10 +65,10 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Segment vs. Segment
   //
 
-  if (pa.handle.which() == PrimitiveSegment &&
-      pb.handle.which() == PrimitiveSegment) {
-    const auto *seg1 = pa.as<CGAL::Segment_2<Kernel>>();
-    const auto *seg2 = pb.as<CGAL::Segment_2<Kernel>>();
+  if (handle1.handle.which() == PrimitiveSegment &&
+      handle2.handle.which() == PrimitiveSegment) {
+    const auto *seg1 = handle1.as<CGAL::Segment_2<Kernel>>();
+    const auto *seg2 = handle2.as<CGAL::Segment_2<Kernel>>();
     return CGAL::do_intersect(*seg1, *seg2);
   }
 
@@ -75,11 +76,11 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Polygon vs. Point
   //
 
-  if (pa.handle.which() == PrimitiveSurface &&
-      pb.handle.which() == PrimitivePoint) {
+  if (handle1.handle.which() == PrimitiveSurface &&
+      handle2.handle.which() == PrimitivePoint) {
     // Polygon versus Point
-    const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
-    const auto *pt   = pb.as<CGAL::Point_2<Kernel>>();
+    const auto *poly = handle1.as<CGAL::Polygon_with_holes_2<Kernel>>();
+    const auto *pt   = handle2.as<CGAL::Point_2<Kernel>>();
 
     int const b1 = poly->outer_boundary().bounded_side(*pt);
 
@@ -108,10 +109,10 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Polygon vs. Segment
   //
 
-  if (pa.handle.which() == PrimitiveSurface &&
-      pb.handle.which() == PrimitiveSegment) {
-    const auto *poly = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
-    const auto *seg  = pb.as<CGAL::Segment_2<Kernel>>();
+  if (handle1.handle.which() == PrimitiveSurface &&
+      handle2.handle.which() == PrimitiveSegment) {
+    const auto *poly = handle1.as<CGAL::Polygon_with_holes_2<Kernel>>();
+    const auto *seg  = handle2.as<CGAL::Segment_2<Kernel>>();
 
     // 1. if the segment intersects a boundary of the polygon, returns true
     // 2. else, if one of the point of the segment intersects the polygon,
@@ -151,10 +152,10 @@ _intersects(const PrimitiveHandle<2> &pa, const PrimitiveHandle<2> &pb) -> bool
   // Polygon vs. Polygon
   //
 
-  if (pa.handle.which() == PrimitiveSurface &&
-      pb.handle.which() == PrimitiveSurface) {
-    const auto *poly1 = pa.as<CGAL::Polygon_with_holes_2<Kernel>>();
-    const auto *poly2 = pb.as<CGAL::Polygon_with_holes_2<Kernel>>();
+  if (handle1.handle.which() == PrimitiveSurface &&
+      handle2.handle.which() == PrimitiveSurface) {
+    const auto *poly1 = handle1.as<CGAL::Polygon_with_holes_2<Kernel>>();
+    const auto *poly2 = handle2.as<CGAL::Polygon_with_holes_2<Kernel>>();
 
     // 1. if rings intersects, returns true
     // 2. else, if poly1 is inside poly2 or poly1 inside poly2 (but not in
@@ -277,49 +278,50 @@ struct intersects_volume_x : public boost::static_visitor<bool> {
 
 /// Type of pa must be of larger dimension than type of pb
 auto
-_intersects(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb) -> bool
+_intersects(const PrimitiveHandle<3> &handle1,
+            const PrimitiveHandle<3> &handle2) -> bool
 {
-  if (pa.handle.which() == PrimitivePoint &&
-      pb.handle.which() == PrimitivePoint) {
-    return *boost::get<const CGAL::Point_3<Kernel> *>(pa.handle) ==
-           *boost::get<const CGAL::Point_3<Kernel> *>(pb.handle);
+  if (handle1.handle.which() == PrimitivePoint &&
+      handle2.handle.which() == PrimitivePoint) {
+    return *boost::get<const CGAL::Point_3<Kernel> *>(handle1.handle) ==
+           *boost::get<const CGAL::Point_3<Kernel> *>(handle2.handle);
   }
-  if (pa.handle.which() == PrimitiveSegment &&
-      pb.handle.which() == PrimitivePoint) {
-    const auto *seg = pa.as<CGAL::Segment_3<Kernel>>();
-    const auto *pt  = pb.as<CGAL::Point_3<Kernel>>();
+  if (handle1.handle.which() == PrimitiveSegment &&
+      handle2.handle.which() == PrimitivePoint) {
+    const auto *seg = handle1.as<CGAL::Segment_3<Kernel>>();
+    const auto *pt  = handle2.as<CGAL::Point_3<Kernel>>();
     return seg->has_on(*pt);
   }
-  if (pa.handle.which() == PrimitiveSegment &&
-      pb.handle.which() == PrimitiveSegment) {
-    const auto *sega = pa.as<CGAL::Segment_3<Kernel>>();
-    const auto *segb = pb.as<CGAL::Segment_3<Kernel>>();
+  if (handle1.handle.which() == PrimitiveSegment &&
+      handle2.handle.which() == PrimitiveSegment) {
+    const auto *sega = handle1.as<CGAL::Segment_3<Kernel>>();
+    const auto *segb = handle2.as<CGAL::Segment_3<Kernel>>();
     return CGAL::do_intersect(*sega, *segb);
   }
 
-  if (pa.handle.which() == PrimitiveVolume) {
-    intersects_volume_x visitor(pa.as<MarkedPolyhedron>());
-    return boost::apply_visitor(visitor, pb.handle);
+  if (handle1.handle.which() == PrimitiveVolume) {
+    intersects_volume_x visitor(handle1.as<MarkedPolyhedron>());
+    return boost::apply_visitor(visitor, handle2.handle);
   }
 
-  if (pa.handle.which() == PrimitiveSurface &&
-      pb.handle.which() == PrimitivePoint) {
-    const auto *tri = pa.as<CGAL::Triangle_3<Kernel>>();
-    const auto *pt  = pb.as<CGAL::Point_3<Kernel>>();
+  if (handle1.handle.which() == PrimitiveSurface &&
+      handle2.handle.which() == PrimitivePoint) {
+    const auto *tri = handle1.as<CGAL::Triangle_3<Kernel>>();
+    const auto *pt  = handle2.as<CGAL::Point_3<Kernel>>();
     return tri->has_on(*pt);
   }
 
-  if (pa.handle.which() == PrimitiveSurface &&
-      pb.handle.which() == PrimitiveSegment) {
-    const auto *tri = pa.as<CGAL::Triangle_3<Kernel>>();
-    const auto *seg = pb.as<CGAL::Segment_3<Kernel>>();
+  if (handle1.handle.which() == PrimitiveSurface &&
+      handle2.handle.which() == PrimitiveSegment) {
+    const auto *tri = handle1.as<CGAL::Triangle_3<Kernel>>();
+    const auto *seg = handle2.as<CGAL::Segment_3<Kernel>>();
     return CGAL::do_intersect(*tri, *seg);
   }
 
-  if (pa.handle.which() == PrimitiveSurface &&
-      pb.handle.which() == PrimitiveSurface) {
-    const auto *tri1 = pa.as<CGAL::Triangle_3<Kernel>>();
-    const auto *tri2 = pb.as<CGAL::Triangle_3<Kernel>>();
+  if (handle1.handle.which() == PrimitiveSurface &&
+      handle2.handle.which() == PrimitiveSurface) {
+    const auto *tri1 = handle1.as<CGAL::Triangle_3<Kernel>>();
+    const auto *tri2 = handle2.as<CGAL::Triangle_3<Kernel>>();
     return CGAL::do_intersect(*tri1, *tri2);
   }
 
@@ -330,14 +332,14 @@ _intersects(const PrimitiveHandle<3> &pa, const PrimitiveHandle<3> &pb) -> bool
 // We deal here with symmetric call
 template <int Dim>
 auto
-dispatch_intersects_sym(const PrimitiveHandle<Dim> &pa,
-                        const PrimitiveHandle<Dim> &pb) -> bool
+dispatch_intersects_sym(const PrimitiveHandle<Dim> &handle1,
+                        const PrimitiveHandle<Dim> &handle2) -> bool
 {
   // assume types are ordered by dimension within the boost::variant
-  if (pa.handle.which() >= pb.handle.which()) {
-    return _intersects(pa, pb);
+  if (handle1.handle.which() >= handle2.handle.which()) {
+    return _intersects(handle1, handle2);
   }
-  return _intersects(pb, pa);
+  return _intersects(handle2, handle1);
 }
 
 struct found_an_intersection {};
@@ -345,40 +347,36 @@ struct found_an_intersection {};
 template <int Dim>
 struct intersects_callback {
   void
-  operator()(const typename PrimitiveBox<Dim>::Type &a,
-             const typename PrimitiveBox<Dim>::Type &b)
+  operator()(const typename PrimitiveBox<Dim>::Type &box1,
+             const typename PrimitiveBox<Dim>::Type &box2)
   {
-    if (dispatch_intersects_sym(*a.handle(), *b.handle())) {
+    if (dispatch_intersects_sym(*box1.handle(), *box2.handle())) {
       throw found_an_intersection();
     }
   }
 };
 
-/// @} end of private section
-
-// ----------------------------------------------------------------------------------
-// -- public interface
-// ----------------------------------------------------------------------------------
-/// @publicsection
-
+/// @private
 template <int Dim>
 auto
-intersects(const PrimitiveHandle<Dim> &pa, const PrimitiveHandle<Dim> &pb)
-    -> bool
+intersects(const PrimitiveHandle<Dim> &handle1,
+           const PrimitiveHandle<Dim> &handle2) -> bool
 {
-  return dispatch_intersects_sym(pa, pb);
+  return dispatch_intersects_sym(handle1, handle2);
 }
 
+/// @private
 template <int Dim>
 auto
-intersects(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
+intersects(const GeometrySet<Dim> &geometrySet1,
+           const GeometrySet<Dim> &geometrySet2) -> bool
 {
   typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles;
   typename SFCGAL::detail::HandleCollection<Dim>::Type bhandles;
   typename SFCGAL::detail::BoxCollection<Dim>::Type    aboxes;
   typename SFCGAL::detail::BoxCollection<Dim>::Type    bboxes;
-  a.computeBoundingBoxes(ahandles, aboxes);
-  b.computeBoundingBoxes(bhandles, bboxes);
+  geometrySet1.computeBoundingBoxes(ahandles, aboxes);
+  geometrySet2.computeBoundingBoxes(bhandles, bboxes);
 
   try {
     intersects_callback<Dim> const callback;
@@ -393,58 +391,66 @@ intersects(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
 
 /// @private
 template bool
-intersects<2>(const GeometrySet<2> &a, const GeometrySet<2> &b);
+intersects<2>(const GeometrySet<2> &geometrySet1,
+              const GeometrySet<2> &geometrySet2);
 /// @private
 template bool
-intersects<3>(const GeometrySet<3> &a, const GeometrySet<3> &b);
+intersects<3>(const GeometrySet<3> &geometrySet1,
+              const GeometrySet<3> &geometrySet2);
 
 /// @private
 template bool
-intersects<2>(const PrimitiveHandle<2> &a, const PrimitiveHandle<2> &b);
+intersects<2>(const PrimitiveHandle<2> &handle1,
+              const PrimitiveHandle<2> &handle2);
 /// @private
 template bool
-intersects<3>(const PrimitiveHandle<3> &a, const PrimitiveHandle<3> &b);
+intersects<3>(const PrimitiveHandle<3> &handle1,
+              const PrimitiveHandle<3> &handle2);
 
+/// @private
 auto
-intersects(const Geometry &ga, const Geometry &gb) -> bool
+intersects(const Geometry &geometry1, const Geometry &geometry2) -> bool
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ga);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gb);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry1);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry2);
 
-  GeometrySet<2> const gsa(ga);
-  GeometrySet<2> const gsb(gb);
+  GeometrySet<2> const gsa(geometry1);
+  GeometrySet<2> const gsb(geometry2);
 
   return intersects(gsa, gsb);
 }
 
+/// @private
 auto
-intersects3D(const Geometry &ga, const Geometry &gb) -> bool
+intersects3D(const Geometry &geometry1, const Geometry &geometry2) -> bool
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(ga);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gb);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(geometry1);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(geometry2);
 
-  GeometrySet<3> const gsa(ga);
-  GeometrySet<3> const gsb(gb);
+  GeometrySet<3> const gsa(geometry1);
+  GeometrySet<3> const gsb(geometry2);
 
   return intersects(gsa, gsb);
 }
 
+/// @private
 auto
-intersects(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
-    -> bool
+intersects(const Geometry &geometry1, const Geometry &geometry2,
+           NoValidityCheck /*unused*/) -> bool
 {
-  GeometrySet<2> const gsa(ga);
-  GeometrySet<2> const gsb(gb);
+  GeometrySet<2> const gsa(geometry1);
+  GeometrySet<2> const gsb(geometry2);
 
   return intersects(gsa, gsb);
 }
 
+/// @private
 auto
-intersects3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
-    -> bool
+intersects3D(const Geometry &geometry1, const Geometry &geometry2,
+             NoValidityCheck /*unused*/) -> bool
 {
-  GeometrySet<3> const gsa(ga);
-  GeometrySet<3> const gsb(gb);
+  GeometrySet<3> const gsa(geometry1);
+  GeometrySet<3> const gsb(geometry2);
 
   return intersects(gsa, gsb);
 }
@@ -452,21 +458,21 @@ intersects3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
 /// @private
 template <int Dim>
 auto
-selfIntersectsImpl(const LineString &line) -> bool
+selfIntersectsImpl(const LineString &lineString) -> bool
 {
 
-  if (line.numSegments() < 2) {
+  if (lineString.numSegments() < 2) {
     return false; // one segment cannot intersect
   }
 
   // note: zero length segments are a pain, to avoid algorithm complexity
   // we start by filtering them out
-  const size_t numPoints = line.numPoints();
+  const size_t numPoints = lineString.numPoints();
   LineString   l;
 
   for (size_t i = 0; i != numPoints; ++i) {
-    if (i == 0 || l.endPoint() != line.pointN(i)) {
-      l.addPoint(line.pointN(i));
+    if (i == 0 || l.endPoint() != lineString.pointN(i)) {
+      l.addPoint(lineString.pointN(i));
     }
   }
 
@@ -531,29 +537,31 @@ selfIntersectsImpl(const LineString &line) -> bool
   return false;
 }
 
+/// @private
 auto
-selfIntersects(const LineString &l) -> bool
+selfIntersects(const LineString &lineString) -> bool
 {
-  return selfIntersectsImpl<2>(l);
+  return selfIntersectsImpl<2>(lineString);
 }
+/// @private
 auto
-selfIntersects3D(const LineString &l) -> bool
+selfIntersects3D(const LineString &lineString) -> bool
 {
-  return selfIntersectsImpl<3>(l);
+  return selfIntersectsImpl<3>(lineString);
 }
 
 /// @private
 template <int Dim>
 auto
-selfIntersectsImpl(const PolyhedralSurface &s, const SurfaceGraph &graph)
+selfIntersectsImpl(const PolyhedralSurface &surface, const SurfaceGraph &graph)
     -> bool
 {
-  size_t const numPatches = s.numPatches();
+  size_t const numPatches = surface.numPatches();
 
   for (size_t pi = 0; pi != numPatches; ++pi) {
-    GeometrySet<Dim> geomSetI(s.patchN(pi));
+    GeometrySet<Dim> geomSetI(surface.patchN(pi));
     for (size_t pj = pi + 1; pj < numPatches; ++pj) {
-      GeometrySet<Dim> geomSetJ(s.patchN(pj));
+      GeometrySet<Dim> geomSetJ(surface.patchN(pj));
       bool             hasIntersection = intersects<Dim>(geomSetI, geomSetJ);
       if (hasIntersection) {
         GeometrySet<Dim> geomSetInter;
@@ -594,30 +602,34 @@ selfIntersectsImpl(const PolyhedralSurface &s, const SurfaceGraph &graph)
   return false;
 }
 
+/// @private
 auto
-selfIntersects(const PolyhedralSurface &s, const SurfaceGraph &g) -> bool
+selfIntersects(const PolyhedralSurface &surface, const SurfaceGraph &graph)
+    -> bool
 {
-  return selfIntersectsImpl<2>(s, g);
+  return selfIntersectsImpl<2>(surface, graph);
 }
 
+/// @private
 auto
-selfIntersects3D(const PolyhedralSurface &s, const SurfaceGraph &g) -> bool
+selfIntersects3D(const PolyhedralSurface &surface, const SurfaceGraph &graph)
+    -> bool
 {
-  return selfIntersectsImpl<3>(s, g);
+  return selfIntersectsImpl<3>(surface, graph);
 }
 
 /// @private
 template <int Dim>
 auto
-selfIntersectsImpl(const TriangulatedSurface &tin, const SurfaceGraph &graph)
-    -> bool
+selfIntersectsImpl(const TriangulatedSurface &triangulatedSurface,
+                   const SurfaceGraph        &graph) -> bool
 {
-  size_t const numPatches = tin.numPatches();
+  size_t const numPatches = triangulatedSurface.numPatches();
 
   for (size_t ti = 0; ti != numPatches; ++ti) {
-    GeometrySet<Dim> geomSetI(tin.patchN(ti));
+    GeometrySet<Dim> geomSetI(triangulatedSurface.patchN(ti));
     for (size_t tj = ti + 1; tj < numPatches; ++tj) {
-      GeometrySet<Dim> geomSetJ(tin.patchN(tj));
+      GeometrySet<Dim> geomSetJ(triangulatedSurface.patchN(tj));
       bool             hasIntersection = intersects<Dim>(geomSetI, geomSetJ);
 
       if (hasIntersection) {
@@ -659,16 +671,20 @@ selfIntersectsImpl(const TriangulatedSurface &tin, const SurfaceGraph &graph)
   return false;
 }
 
+/// @private
 auto
-selfIntersects(const TriangulatedSurface &tin, const SurfaceGraph &g) -> bool
+selfIntersects(const TriangulatedSurface &triangulatedSurface,
+               const SurfaceGraph        &graph) -> bool
 {
-  return selfIntersectsImpl<2>(tin, g);
+  return selfIntersectsImpl<2>(triangulatedSurface, graph);
 }
 
+/// @private
 auto
-selfIntersects3D(const TriangulatedSurface &tin, const SurfaceGraph &g) -> bool
+selfIntersects3D(const TriangulatedSurface &triangulatedSurface,
+                 const SurfaceGraph        &graph) -> bool
 {
-  return selfIntersectsImpl<3>(tin, g);
+  return selfIntersectsImpl<3>(triangulatedSurface, graph);
 }
 
 } // namespace SFCGAL::algorithm
