@@ -480,7 +480,7 @@ public:
 
   // makes all handles observing a observe 'this' instead
   void
-  registerObservers(Handle a)
+  registerObservers(const Handle &a)
   {
     if (*a._p == *_p) {
       return; // both aready observing the same primitive
@@ -1018,13 +1018,13 @@ collectPrimitives(const typename HandledBox<Dim>::Vector &boxes,
 }
 
 auto
-union_(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
-    -> std::unique_ptr<Geometry>
+union_(const Geometry &geometry1, const Geometry &geometry2,
+       NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
   HandledBox<2>::Vector boxes;
-  compute_bboxes(detail::GeometrySet<2>(ga), std::back_inserter(boxes));
+  compute_bboxes(detail::GeometrySet<2>(geometry1), std::back_inserter(boxes));
   const unsigned numBoxA = boxes.size();
-  compute_bboxes(detail::GeometrySet<2>(gb), std::back_inserter(boxes));
+  compute_bboxes(detail::GeometrySet<2>(geometry2), std::back_inserter(boxes));
 
   CGAL::box_intersection_d(boxes.begin(), boxes.begin() + numBoxA,
                            boxes.begin() + numBoxA, boxes.end(),
@@ -1036,11 +1036,13 @@ union_(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
 }
 
 auto
-union_(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
+union_(const Geometry &geometry1, const Geometry &geometry2)
+    -> std::unique_ptr<Geometry>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ga);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gb);
-  std::unique_ptr<Geometry> result(union_(ga, gb, NoValidityCheck()));
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry1);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry2);
+  std::unique_ptr<Geometry> result(
+      union_(geometry1, geometry2, NoValidityCheck()));
   return result;
 }
 
@@ -1051,14 +1053,15 @@ union_(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/// @private
 auto
-union3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
-    -> std::unique_ptr<Geometry>
+union3D(const Geometry &geometry1, const Geometry &geometry2,
+        NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
   HandledBox<3>::Vector boxes;
-  compute_bboxes(detail::GeometrySet<3>(ga), std::back_inserter(boxes));
+  compute_bboxes(detail::GeometrySet<3>(geometry1), std::back_inserter(boxes));
   const unsigned numBoxA = boxes.size();
-  compute_bboxes(detail::GeometrySet<3>(gb), std::back_inserter(boxes));
+  compute_bboxes(detail::GeometrySet<3>(geometry2), std::back_inserter(boxes));
 
   CGAL::box_intersection_d(boxes.begin(), boxes.begin() + numBoxA,
                            boxes.begin() + numBoxA, boxes.end(),
@@ -1069,12 +1072,15 @@ union3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
   return output.recompose();
 }
 
+/// @private
 auto
-union3D(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
+union3D(const Geometry &geometry1, const Geometry &geometry2)
+    -> std::unique_ptr<Geometry>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(ga);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gb);
-  std::unique_ptr<Geometry> result(union3D(ga, gb, NoValidityCheck()));
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(geometry1);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(geometry2);
+  std::unique_ptr<Geometry> result(
+      union3D(geometry1, geometry2, NoValidityCheck()));
   return result;
 }
 
