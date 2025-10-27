@@ -32,8 +32,7 @@ namespace SFCGAL::algorithm {
 // ----------------------------------------------------------------------------------
 // -- private interface
 // ----------------------------------------------------------------------------------
-/// @{
-/// @privatesection
+/** @cond */
 
 using Vb              = CGAL::Alpha_shape_vertex_base_2<Kernel>;
 using Fb              = CGAL::Alpha_shape_face_base_2<Kernel>;
@@ -140,7 +139,7 @@ alpha_to_geometry(const Alpha_shape_2 &A, bool allow_holes)
   return result;
 }
 
-/// @} end of private section
+/** @endcond */
 
 // ----------------------------------------------------------------------------------
 // -- public interface
