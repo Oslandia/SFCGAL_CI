@@ -10,28 +10,29 @@
 
 #include "SFCGAL/Geometry.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 struct NoValidityCheck;
 
 /**
  * Tesselate a geometry: this will triangulate surfaces (including polyhedral
  * and solid's surfaces) and keep untouched points, lines, etc.
+ * @return tessellated geometry
  * @pre g is a valid geometry
  */
-SFCGAL_API std::unique_ptr<SFCGAL::Geometry>
-           tesselate(const Geometry &);
+SFCGAL_API auto
+tesselate(const Geometry &) -> std::unique_ptr<SFCGAL::Geometry>;
 
 /**
  * Tesselate a geometry: this will triangulate surfaces (including polyhedral
  * and solid's surfaces) and keep untouched points, lines, etc.
+ * @return tessellated geometry
  * @pre g is a valid geometry
  * @warning No actual validity check is done.
  */
-SFCGAL_API std::unique_ptr<SFCGAL::Geometry>
-           tesselate(const Geometry &, NoValidityCheck);
+SFCGAL_API auto
+tesselate(const Geometry &, NoValidityCheck)
+    -> std::unique_ptr<SFCGAL::Geometry>;
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
