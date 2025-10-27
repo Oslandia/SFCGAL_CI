@@ -33,9 +33,6 @@ namespace SFCGAL::algorithm {
 /// @{
 /// @privatesection
 
-/**
- * dispatch gA+gB sum
- */
 void
 minkowskiSum(const Geometry &gA, const Polygon_2 &gB,
              CGAL::Polygon_set_2<Kernel> &polygonSet);
@@ -78,28 +75,39 @@ minkowskiSum(const Geometry &gA, const Polygon_2 &gB,
   }
 
   switch (gA.geometryTypeId()) {
-  case TYPE_POINT:
-    return minkowskiSum(gA.as<Point>(), gB, polygonSet);
+  case TYPE_POINT: {
+    minkowskiSum(gA.as<Point>(), gB, polygonSet);
+    return;
+  }
 
-  case TYPE_LINESTRING:
-    return minkowskiSum(gA.as<LineString>(), gB, polygonSet);
+  case TYPE_LINESTRING: {
+    minkowskiSum(gA.as<LineString>(), gB, polygonSet);
+    return;
+  }
 
   case TYPE_NURBSCURVE: {
     auto lineString = gA.as<NURBSCurve>().toLineString(); // default parameters
     if (!lineString || lineString->isEmpty()) {
       return; // empty result
     }
-    return minkowskiSum(*lineString, gB, polygonSet);
+    minkowskiSum(*lineString, gB, polygonSet);
+    return;
   }
 
-  case TYPE_POLYGON:
-    return minkowskiSum(gA.as<Polygon>(), gB, polygonSet);
+  case TYPE_POLYGON: {
+    minkowskiSum(gA.as<Polygon>(), gB, polygonSet);
+    return;
+  }
 
-  case TYPE_TRIANGLE:
-    return minkowskiSum(gA.as<Triangle>().toPolygon(), gB, polygonSet);
+  case TYPE_TRIANGLE: {
+    minkowskiSum(gA.as<Triangle>().toPolygon(), gB, polygonSet);
+    return;
+  }
 
-  case TYPE_SOLID:
-    return minkowskiSum(gA.as<Solid>(), gB, polygonSet);
+  case TYPE_SOLID: {
+    minkowskiSum(gA.as<Solid>(), gB, polygonSet);
+    return;
+  }
 
   case TYPE_MULTIPOINT:
   case TYPE_MULTILINESTRING:
@@ -107,8 +115,10 @@ minkowskiSum(const Geometry &gA, const Polygon_2 &gB,
   case TYPE_MULTISOLID:
   case TYPE_GEOMETRYCOLLECTION:
   case TYPE_TRIANGULATEDSURFACE:
-  case TYPE_POLYHEDRALSURFACE:
-    return minkowskiSumCollection(gA, gB, polygonSet);
+  case TYPE_POLYHEDRALSURFACE: {
+    minkowskiSumCollection(gA, gB, polygonSet);
+    return;
+  }
   }
 
   BOOST_THROW_EXCEPTION(
@@ -249,17 +259,7 @@ minkowskiSumCollection(const Geometry &gA, const Polygon_2 &gB,
   }
 }
 
-/// @} end of private section
-
-// ----------------------------------------------------------------------------------
-// -- public interface
-// ----------------------------------------------------------------------------------
-/// @publicsection
-
-/** Compute Minkowski sum without validity check
- * @param gA First geometry
- * @param gB Second polygon
- * @return Minkowski sum geometry */
+/// @private
 auto
 minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck /*unused*/)
     -> std::unique_ptr<Geometry>
@@ -274,10 +274,7 @@ minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck /*unused*/)
       detail::polygonSetToMultiPolygon(polygonSet).release());
 }
 
-/** Compute Minkowski sum
- * @param gA First geometry
- * @param gB Second polygon
- * @return Minkowski sum geometry */
+/// @private
 auto
 minkowskiSum(const Geometry &gA, const Polygon &gB) -> std::unique_ptr<Geometry>
 {
