@@ -115,6 +115,7 @@ find_position(const LineString &ls, const long N, const double target_length,
 
 } // namespace
 
+/// @private
 auto
 lineSubstring(const LineString &ls, double start, double end)
     -> std::unique_ptr<LineString>
