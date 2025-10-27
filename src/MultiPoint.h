@@ -28,38 +28,49 @@ public:
   MultiPoint();
   /**
    * Copy constructor
+   * @param other The multi-point to copy from
    */
   MultiPoint(const MultiPoint &other);
   /**
    * assign operator
+   * @param other The multi-point to assign from
+   * @return Reference to this multi-point
    */
-  MultiPoint &
-  operator=(MultiPoint other);
+  auto
+  operator=(MultiPoint other) -> MultiPoint &;
   /**
    * destructor
    */
-  virtual ~MultiPoint();
+  ~MultiPoint() override;
 
   //-- SFCGAL::Geometry
-  std::string
-  geometryType() const override;
+  /// @brief Get the geometry type as string
+  /// @return "MultiPoint"
+  [[nodiscard]] auto
+  geometryType() const -> std::string override;
   //-- SFCGAL::Geometry
-  GeometryType
-  geometryTypeId() const override;
+  /// @brief Get the geometry type identifier
+  /// @return TYPE_MULTIPOINT
+  [[nodiscard]] auto
+  geometryTypeId() const -> GeometryType override;
 
   /**
    * returns the n-th Geometry as a Point
+   * @param n The index of the point to get
+   * @return Reference to the nth point
    */
-  inline Point &
-  pointN(const size_t &n)
+  inline auto
+  pointN(const size_t &n) -> Point &
   {
     return geometryN(n).as<Point>();
   }
   /**
    * returns the n-th Geometry as a Point
+   * @param n The index of the point to get
+   * @return Const reference to the nth point
    */
-  inline const Point &
-  pointN(const size_t &n) const
+  inline auto
+  pointN(const size_t &n) const -> const Point &
   {
     return geometryN(n).as<Point>();
   }
@@ -67,14 +78,19 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
+  /// @brief Accept a geometry visitor
+  /// @param visitor Visitor to accept
   void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
+  /// @brief Accept a const geometry visitor
+  /// @param visitor Const visitor to accept
   void
   accept(ConstGeometryVisitor &visitor) const override;
 
   /**
-   * Serializer
+   * @brief Serializer
+   * @param ar Archive for serialization
    */
   template <class Archive>
   void
@@ -85,8 +101,11 @@ public:
 
 protected:
   //-- SFCGAL::GeometryCollection
-  bool
-  isAllowed(Geometry const &g) override;
+  /// @brief Check if geometry is allowed in this collection
+  /// @param geometry Geometry to test
+  /// @return true if geometry is a Point
+  auto
+  isAllowed(Geometry const &geometry) -> bool override;
 };
 
 } // namespace SFCGAL
