@@ -21,6 +21,10 @@
 #include <CGAL/convex_hull_3.h>
 #include <CGAL/minkowski_sum_3.h>
 
+#include <array>
+#include <limits>
+#include <vector>
+
 namespace SFCGAL::algorithm {
 
 // ----------------------------------------------------------------------------------
@@ -59,33 +63,60 @@ geometryToNef(const Geometry &g) -> Nef_polyhedron_3
             result = Nef_polyhedron_3();
           } else {
             std::vector<Kernel::Point_3> points;
+            points.reserve(ls.numPoints());
             for (size_t i = 0; i < ls.numPoints(); ++i) {
               points.push_back(ls.pointN(i).toPoint_3());
             }
-            Kernel::FT   radius(0.001);
-            Polyhedron_3 poly;
-            for (size_t i = 0; i < points.size() - 1; ++i) {
-              Kernel::Vector_3 dir   = points[i + 1] - points[i];
+
+            Nef_polyhedron_3 accumulated_segments;
+            bool             has_segment = false;
+            Kernel::FT       radius(0.001);
+
+            for (size_t i = 0; i + 1 < points.size(); ++i) {
+              const Kernel::Vector_3 dir = points[i + 1] - points[i];
+              if (dir.squared_length() == 0) {
+                continue; // skip degenerate segment
+              }
+
               Kernel::Vector_3 perp1 = perpendicular_vector(dir);
               Kernel::Vector_3 perp2 = CGAL::cross_product(dir, perp1);
 
-              double perp1_length =
+              const double perp1_length =
                   std::sqrt(CGAL::to_double(perp1.squared_length()));
-              double perp2_length =
+              const double perp2_length =
                   std::sqrt(CGAL::to_double(perp2.squared_length()));
+
+              if (perp1_length <= std::numeric_limits<double>::epsilon() ||
+                  perp2_length <= std::numeric_limits<double>::epsilon()) {
+                continue;
+              }
 
               perp1 = perp1 * (radius / Kernel::FT(perp1_length));
               perp2 = perp2 * (radius / Kernel::FT(perp2_length));
 
-              std::vector<Kernel::Point_3> segment_points = {
+              std::array<Kernel::Point_3, 8> segment_points = {
                   points[i] + perp1,     points[i] - perp1,
                   points[i] + perp2,     points[i] - perp2,
                   points[i + 1] + perp1, points[i + 1] - perp1,
                   points[i + 1] + perp2, points[i + 1] - perp2};
-              CGAL::convex_hull_3(segment_points.begin(), segment_points.end(),
-                                  poly);
+              Polyhedron_3 segment_poly;
+              CGAL::convex_hull_3(segment_points.begin(),
+                                  segment_points.end(), segment_poly);
+
+              if (segment_poly.is_empty()) {
+                continue;
+              }
+
+              Nef_polyhedron_3 segment_nef(segment_poly);
+              if (!has_segment) {
+                accumulated_segments = segment_nef;
+                has_segment          = true;
+              } else {
+                accumulated_segments += segment_nef;
+              }
             }
-            result = Nef_polyhedron_3(poly);
+
+            result = has_segment ? accumulated_segments : Nef_polyhedron_3();
           }
           break;
         }
