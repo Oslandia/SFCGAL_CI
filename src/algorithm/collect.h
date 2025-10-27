@@ -11,17 +11,21 @@
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/GeometryCollection.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 /**
  * Returns an aggregate of ga and gb
+ * @param ga the first geometry
+ * @param gb the second geometry
+ * @return an aggregate of the two geometries as a unique_ptr<Geometry>
  */
 SFCGAL_API std::unique_ptr<Geometry>
            collect(const Geometry &ga, const Geometry &gb);
 
 /**
  * Returns an aggregate of a list of geometries
- * @ingroup detail
+ * @param begin iterator to the beginning of the geometry list
+ * @param end iterator to the end of the geometry list
+ * @return an aggregate of all geometries as a unique_ptr<Geometry>
  */
 template <typename GeometryIterator>
 std::unique_ptr<Geometry>
@@ -38,7 +42,6 @@ collect(GeometryIterator begin, GeometryIterator end)
 
   return std::unique_ptr<Geometry>(coll);
 }
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
