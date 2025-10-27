@@ -15,8 +15,7 @@
 #include "SFCGAL/detail/SegmentStore.h"
 #include "SFCGAL/detail/algorithm/simplification.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * @brief Main entry point for geometry simplification
@@ -92,5 +91,4 @@ simplify(const Geometry &geometry, double threshold, bool preserveTopology,
   }
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
