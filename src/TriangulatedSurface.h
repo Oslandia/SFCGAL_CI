@@ -29,8 +29,10 @@ namespace SFCGAL {
 class SFCGAL_API TriangulatedSurface
     : public GeometryImpl<TriangulatedSurface, Surface> {
 public:
+  /// @brief Iterator type for triangulated surface patches
   using iterator =
       DereferenceIterator<std::vector<std::unique_ptr<Triangle>>::iterator>;
+  /// @brief Const iterator type for triangulated surface patches
   using const_iterator = DereferenceIterator<
       std::vector<std::unique_ptr<Triangle>>::const_iterator>;
 
@@ -40,69 +42,97 @@ public:
   TriangulatedSurface();
   /**
    * Constructor with a vector of triangles
+   * @param triangle Vector of triangles to initialize the surface
    */
   TriangulatedSurface(const std::vector<Triangle> &triangle);
   /**
    * Copy constructor
+   * @param other The triangulated surface to copy from
    */
   TriangulatedSurface(const TriangulatedSurface &other);
   /**
    * assign operator
+   * @param other The triangulated surface to assign from
+   * @return Reference to this triangulated surface
    */
-  TriangulatedSurface &
-  operator=(TriangulatedSurface other);
+  auto
+  operator=(TriangulatedSurface other) -> TriangulatedSurface &;
   /**
    * destructor
    */
-  ~TriangulatedSurface();
+  ~TriangulatedSurface() override;
 
   //-- SFCGAL::Geometry
-  std::string
-  geometryType() const override;
+  /// @brief Get the geometry type as string
+  /// @return "TriangulatedSurface"
+  [[nodiscard]] auto
+  geometryType() const -> std::string override;
   //-- SFCGAL::Geometry
-  GeometryType
-  geometryTypeId() const override;
+  /// @brief Get the geometry type identifier
+  /// @return TYPE_TRIANGULATEDSURFACE
+  [[nodiscard]] auto
+  geometryTypeId() const -> GeometryType override;
   //-- SFCGAL::Geometry
-  int
-  dimension() const override;
+  /// @brief Get the dimension of the surface
+  /// @return 2 (surfaces are 2-dimensional)
+  [[nodiscard]] auto
+  dimension() const -> int override;
   //-- SFCGAL::Geometry
-  int
-  coordinateDimension() const override;
+  /// @brief Get the coordinate dimension
+  /// @return Number of coordinates per point
+  [[nodiscard]] auto
+  coordinateDimension() const -> int override;
   //-- SFCGAL::Geometry
-  bool
-  isEmpty() const override;
+  /// @brief Check if the surface is empty
+  /// @return true if empty, false otherwise
+  [[nodiscard]] auto
+  isEmpty() const -> bool override;
   //-- SFCGAL::Geometry
-  bool
-  is3D() const override;
+  /// @brief Check if the surface has 3D coordinates
+  /// @return true if 3D, false otherwise
+  [[nodiscard]] auto
+  is3D() const -> bool override;
   //-- SFCGAL::Geometry
-  bool
-  isMeasured() const override;
+  /// @brief Check if the surface has measured coordinates
+  /// @return true if measured, false otherwise
+  [[nodiscard]] auto
+  isMeasured() const -> bool override;
 
+  /// @brief Drop Z coordinate from all points
+  /// @return true if Z was dropped, false otherwise
   auto
   dropZ() -> bool override;
 
+  /// @brief Drop M coordinate from all points
+  /// @return true if M was dropped, false otherwise
   auto
   dropM() -> bool override;
 
+  /// @brief Swap X and Y coordinates of all points
   auto
   swapXY() -> void override;
 
   /**
    * [SFA/OGC]Returns the number of patches
+   * @return Number of triangular patches
    * @deprecated see numGeometries()
    */
-  inline auto
+  [[nodiscard]] auto
   numPatches() const -> size_t
   {
     return _triangles.size();
   }
   /**
    * [SFA/OGC]Returns the n-th patch
+   * @param n The index of the patch to get
+   * @return Const reference to the nth triangle patch
    */
-  auto
+  [[nodiscard]] auto
   patchN(size_t const &n) const -> const Triangle &;
   /**
    * [SFA/OGC]Returns the n-th patch
+   * @param n The index of the patch to get
+   * @return Reference to the nth triangle patch
    */
   auto
   patchN(size_t const &n) -> Triangle &;
@@ -141,72 +171,82 @@ public:
   void
   addPatch(std::unique_ptr<Triangle> patch)
   {
-    _triangles.push_back(std::move(patch));
+    _triangles.emplace_back(std::move(patch));
   }
   /**
    * add patchs from an other TriangulatedSurface
+   * @param other The triangulated surface to add patches from
    */
   void
   addPatchs(const TriangulatedSurface &other);
 
   /**
-   * [SFA/OGC]Returns the number of points
+   * [SFA/OGC]Returns the number of triangles
+   * @return Number of triangles in the surface
    * @deprecated see numPatches()
    */
-  inline size_t
-  numTriangles() const
+  [[nodiscard]] auto
+  numTriangles() const -> size_t
   {
     return _triangles.size();
   }
   /**
-   * [SFA/OGC]Returns the n-th point
+   * [SFA/OGC]Returns the n-th triangle
+   * @param n The triangle index
+   * @return Const reference to the nth triangle
    * @deprecated see patchN()
    */
-  inline const Triangle &
-  triangleN(size_t const &n) const
+  [[nodiscard]] auto
+  triangleN(size_t const &n) const -> const Triangle &
   {
     BOOST_ASSERT(n < _triangles.size());
     return *_triangles[n];
   }
   /**
-   * [SFA/OGC]Returns the n-th point
+   * [SFA/OGC]Returns the n-th triangle
+   * @param n The triangle index
+   * @return Reference to the nth triangle
    * @deprecated see patchN()
    */
-  inline Triangle &
-  triangleN(size_t const &n)
+  auto
+  triangleN(size_t const &n) -> Triangle &
   {
     BOOST_ASSERT(n < _triangles.size());
     return *_triangles[n];
   }
   /**
    * add a Triangle to the TriangulatedSurface
+   * @param triangle The triangle to add
    * @deprecated see addPatch()
    */
-  inline void
+  void
   addTriangle(const Triangle &triangle)
   {
     addTriangle(triangle.clone());
   }
   /**
    * add a Triangle to the TriangulatedSurface
+   * @param triangle Pointer to the triangle to add
    * @deprecated see addPatch()
    */
-  inline void
+  void
   addTriangle(Triangle *triangle)
   {
     addTriangle(std::unique_ptr<Triangle>(triangle));
   }
   /**
    * add a Triangle to the TriangulatedSurface
+   * @param triangle Unique pointer to the triangle to add
    * @deprecated see addPatch()
    */
   void
   addTriangle(std::unique_ptr<Triangle> triangle)
   {
-    _triangles.push_back(std::move(triangle));
+    _triangles.emplace_back(std::move(triangle));
   }
   /**
    * add triangles from an other TriangulatedSurface
+   * @param other The triangulated surface to copy triangles from
    * @deprecated see addPatchs()
    */
   void
@@ -215,6 +255,8 @@ public:
   /**
    * Sets the n-th Geometry, starting at zero
    * It needs to be a triangle.
+   * @param geometry The geometry to set (must be a triangle)
+   * @param idx The index of the patch to set
    */
   void
   setPatchN(const Geometry &geometry, size_t const &idx);
@@ -224,6 +266,8 @@ public:
    * It needs to be a triangle.
    * The ownership of the polygon is taken. The caller is not responsible
    * anymore of its deallocation.
+   * @param geometry Pointer to the geometry to set (must be a triangle)
+   * @param idx The index of the patch to set
    */
   void
   setPatchN(Geometry *geometry, size_t const &idx);
@@ -244,6 +288,8 @@ public:
 
   /**
    * Sets the n-th Patch, starting at zero
+   * @param triangle The triangle to set
+   * @param idx The index of the patch to set
    */
   void
   setPatchN(const Triangle &triangle, size_t const &idx);
@@ -252,7 +298,8 @@ public:
    * Sets the n-th Patch, starting at zero
    * The ownership of the polygon is taken. The caller is not responsible
    * anymore of its deallocation.
-   *
+   * @param triangle Pointer to the triangle to set
+   * @param idx The index of the patch to set
    * @deprecated The unique_ptr version should be used instead
    */
   void
@@ -274,29 +321,49 @@ public:
 
   //-- optimization
 
+  /**
+   * @brief Reserve space for triangles
+   * @param n Number of triangles to reserve space for
+   */
   void
   reserve(const size_t &n);
 
   //-- iterators
 
-  inline iterator
-  begin()
+  /**
+   * @brief Get iterator to beginning of patches
+   * @return Iterator to first patch
+   */
+  auto
+  begin() -> iterator
   {
     return dereference_iterator(_triangles.begin());
   }
-  inline const_iterator
-  begin() const
+  /**
+   * @brief Get const iterator to beginning of patches
+   * @return Const iterator to first patch
+   */
+  [[nodiscard]] auto
+  begin() const -> const_iterator
   {
     return dereference_iterator(_triangles.begin());
   }
 
-  inline iterator
-  end()
+  /**
+   * @brief Get iterator to end of patches
+   * @return Iterator to past-the-end
+   */
+  auto
+  end() -> iterator
   {
     return dereference_iterator(_triangles.end());
   }
-  inline const_iterator
-  end() const
+  /**
+   * @brief Get const iterator to end of patches
+   * @return Const iterator to past-the-end
+   */
+  [[nodiscard]] auto
+  end() const -> const_iterator
   {
     return dereference_iterator(_triangles.end());
   }
@@ -304,9 +371,13 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
+  /// @brief Accept a geometry visitor
+  /// @param visitor Visitor to accept
   void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
+  /// @brief Accept a const geometry visitor
+  /// @param visitor Const visitor to accept
   void
   accept(ConstGeometryVisitor &visitor) const override;
 
@@ -329,6 +400,7 @@ public:
 
   /**
    * Serializer
+   * @param ar Archive for serialization
    */
   template <class Archive>
   void
@@ -342,7 +414,7 @@ private:
   std::vector<std::unique_ptr<Triangle>> _triangles;
 
   void
-  swap(TriangulatedSurface &other)
+  swap(TriangulatedSurface &other) noexcept
   {
     std::swap(_triangles, other._triangles);
   }
