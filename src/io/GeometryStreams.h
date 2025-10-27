@@ -16,16 +16,22 @@ class Envelope;
 class Geometry;
 
 /**
- * Ostream operator for Envelope;
+ * @brief Ostream operator for Envelope
+ * @param os Output stream
+ * @param envelope Envelope to output
+ * @return Reference to the output stream
  */
-SFCGAL_API std::ostream            &
-operator<<(std::ostream &, const Envelope &);
+SFCGAL_API auto
+operator<<(std::ostream &os, const Envelope &envelope) -> std::ostream &;
 
 /**
- * Ostream operator for Geometry;
+ * @brief Ostream operator for Geometry
+ * @param os Output stream
+ * @param geometry Geometry to output
+ * @return Reference to the output stream
  */
-SFCGAL_API std::ostream            &
-operator<<(std::ostream &, const Geometry &);
+SFCGAL_API auto
+operator<<(std::ostream &os, const Geometry &geometry) -> std::ostream &;
 } // namespace SFCGAL
 
 #endif
