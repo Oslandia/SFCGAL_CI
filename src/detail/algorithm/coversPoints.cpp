@@ -11,6 +11,7 @@
 #include "SFCGAL/detail/GetPointsVisitor.h"
 
 namespace SFCGAL::detail::algorithm {
+/// @private
 template <int Dim>
 auto
 _coversPoints(const Geometry &ga, const Geometry &gb) -> bool
