@@ -15,10 +15,10 @@ namespace SFCGAL {
 TriangulatedSurface::TriangulatedSurface() = default;
 
 TriangulatedSurface::TriangulatedSurface(const std::vector<Triangle> &triangles)
-
 {
+  _triangles.reserve(triangles.size());
   for (const auto &triangle : triangles) {
-    _triangles.push_back(triangle.clone());
+    _triangles.emplace_back(triangle.clone());
   }
 }
 
@@ -134,7 +134,7 @@ TriangulatedSurface::addPatchs(const TriangulatedSurface &other)
 void
 TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
 {
-  return addPatchs(other);
+  addPatchs(other);
 }
 
 auto
@@ -229,13 +229,13 @@ TriangulatedSurface::reserve(const size_t &n)
 void
 TriangulatedSurface::accept(GeometryVisitor &visitor)
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 void
 TriangulatedSurface::accept(ConstGeometryVisitor &visitor) const
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 /// @{
