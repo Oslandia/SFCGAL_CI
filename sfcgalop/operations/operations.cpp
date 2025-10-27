@@ -6,9 +6,8 @@
 #include "../constructors.hpp"
 #include <SFCGAL/Kernel.h>
 
-
 #if !defined(_MSC_VER)
-#include <SFCGAL/algorithm/alphaShapes.h>
+  #include <SFCGAL/algorithm/alphaShapes.h>
 #endif
 #include <SFCGAL/algorithm/alphaWrapping3D.h>
 #include <SFCGAL/algorithm/area.h>
@@ -869,24 +868,28 @@ const std::vector<Operation> operations = {
      }},
 
     // Constructors
-    {"make_sphere", "Constructors", "Create a 3D sphere primitive using icosahedron subdivision", false,
+    {"make_sphere", "Constructors",
+     "Create a 3D sphere primitive using icosahedron subdivision", false,
      "Parameters:\n  x=X_COORD: X coordinate of center (default: 0.0)\n  "
      "y=Y_COORD: Y coordinate of center (default: 0.0)\n  z=Z_COORD: Z "
      "coordinate of center (default: 0.0)\n  radius=VALUE: Sphere radius "
-     "(default: 1.0)\n  num_subdivisions=N: Number of icosahedron subdivisions (default: 2)\n\n"
-     "Example:\n  sfcgalop make_sphere \"x=0,y=0,z=0,radius=2.5,num_subdivisions=3\"",
+     "(default: 1.0)\n  num_subdivisions=N: Number of icosahedron subdivisions "
+     "(default: 2)\n\n"
+     "Example:\n  sfcgalop make_sphere "
+     "\"x=0,y=0,z=0,radius=2.5,num_subdivisions=3\"",
      "params", "G",
      [](const std::string &args, const SFCGAL::Geometry *,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto   params       = parse_params(args);
-       double x            = params.count("x") ? params["x"] : 0.0;
-       double y            = params.count("y") ? params["y"] : 0.0;
-       double z            = params.count("z") ? params["z"] : 0.0;
-       double radius       = params.count("radius") ? params["radius"] : 1.0;
+       auto   params = parse_params(args);
+       double x      = params.count("x") ? params["x"] : 0.0;
+       double y      = params.count("y") ? params["y"] : 0.0;
+       double z      = params.count("z") ? params["z"] : 0.0;
+       double radius = params.count("radius") ? params["radius"] : 1.0;
 
        unsigned int num_subdivisions = 2; // default
        if (params.count("num_subdivisions")) {
-         num_subdivisions = static_cast<unsigned int>(params["num_subdivisions"]);
+         num_subdivisions =
+             static_cast<unsigned int>(params["num_subdivisions"]);
        }
 
        return Constructors::make_sphere(x, y, z, radius, num_subdivisions);

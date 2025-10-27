@@ -21,6 +21,10 @@
 #include <CGAL/convex_hull_3.h>
 #include <CGAL/minkowski_sum_3.h>
 
+#include <array>
+#include <limits>
+#include <vector>
+
 namespace SFCGAL::algorithm {
 
 // ----------------------------------------------------------------------------------
@@ -46,110 +50,134 @@ geometryToNef(const Geometry &g) -> Nef_polyhedron_3
 {
   Nef_polyhedron_3                      result;
   std::function<void(const Geometry &)> process_geometry =
-      [&](const Geometry &geom) -> void {
-    switch (geom.geometryTypeId()) {
-    case TYPE_POINT: {
-      const auto &p = geom.as<Point>();
-      result        = Nef_polyhedron_3(p.toPoint_3());
-      break;
-    }
-    case TYPE_LINESTRING: {
-      const auto &ls = geom.as<LineString>();
-      if (ls.numPoints() < 2) {
-        result = Nef_polyhedron_3();
-      } else {
-        std::vector<Kernel::Point_3> points;
-        points.reserve(ls.numPoints());
-        for (size_t i = 0; i < ls.numPoints(); ++i) {
-          points.push_back(ls.pointN(i).toPoint_3());
+      [&](const Geometry &geom) {
+        switch (geom.geometryTypeId()) {
+        case TYPE_POINT: {
+          const auto &p = geom.as<Point>();
+          result        = Nef_polyhedron_3(p.toPoint_3());
+          break;
         }
-        Kernel::FT   radius(0.001);
-        Polyhedron_3 poly;
-        for (size_t i = 0; i < points.size() - 1; ++i) {
-          Kernel::Vector_3 dir   = points[i + 1] - points[i];
-          Kernel::Vector_3 perp1 = perpendicular_vector(dir);
-          Kernel::Vector_3 perp2 = CGAL::cross_product(dir, perp1);
+        case TYPE_LINESTRING: {
+          const auto &ls = geom.as<LineString>();
+          if (ls.numPoints() < 2) {
+            result = Nef_polyhedron_3();
+          } else {
+            std::vector<Kernel::Point_3> points;
+            points.reserve(ls.numPoints());
+            for (size_t i = 0; i < ls.numPoints(); ++i) {
+              points.push_back(ls.pointN(i).toPoint_3());
+            }
 
-          double perp1_length =
-              std::sqrt(CGAL::to_double(perp1.squared_length()));
-          double perp2_length =
-              std::sqrt(CGAL::to_double(perp2.squared_length()));
+            Nef_polyhedron_3 accumulated_segments;
+            bool             has_segment = false;
+            Kernel::FT       radius(0.001);
 
-          perp1 = perp1 * (radius / Kernel::FT(perp1_length));
-          perp2 = perp2 * (radius / Kernel::FT(perp2_length));
+            for (size_t i = 0; i + 1 < points.size(); ++i) {
+              const Kernel::Vector_3 dir = points[i + 1] - points[i];
+              if (dir.squared_length() == 0) {
+                continue; // skip degenerate segment
+              }
 
-          std::vector<Kernel::Point_3> segment_points = {
-              points[i] + perp1,     points[i] - perp1,
-              points[i] + perp2,     points[i] - perp2,
-              points[i + 1] + perp1, points[i + 1] - perp1,
-              points[i + 1] + perp2, points[i + 1] - perp2};
-          CGAL::convex_hull_3(segment_points.begin(), segment_points.end(),
-                              poly);
+              Kernel::Vector_3 perp1 = perpendicular_vector(dir);
+              Kernel::Vector_3 perp2 = CGAL::cross_product(dir, perp1);
+
+              const double perp1_length =
+                  std::sqrt(CGAL::to_double(perp1.squared_length()));
+              const double perp2_length =
+                  std::sqrt(CGAL::to_double(perp2.squared_length()));
+
+              if (perp1_length <= std::numeric_limits<double>::epsilon() ||
+                  perp2_length <= std::numeric_limits<double>::epsilon()) {
+                continue;
+              }
+
+              perp1 = perp1 * (radius / Kernel::FT(perp1_length));
+              perp2 = perp2 * (radius / Kernel::FT(perp2_length));
+
+              std::array<Kernel::Point_3, 8> segment_points = {
+                  points[i] + perp1,     points[i] - perp1,
+                  points[i] + perp2,     points[i] - perp2,
+                  points[i + 1] + perp1, points[i + 1] - perp1,
+                  points[i + 1] + perp2, points[i + 1] - perp2};
+              Polyhedron_3 segment_poly;
+              CGAL::convex_hull_3(segment_points.begin(), segment_points.end(),
+                                  segment_poly);
+
+              if (segment_poly.is_empty()) {
+                continue;
+              }
+
+              Nef_polyhedron_3 segment_nef(segment_poly);
+              if (!has_segment) {
+                accumulated_segments = segment_nef;
+                has_segment          = true;
+              } else {
+                accumulated_segments += segment_nef;
+              }
+            }
+
+            result = has_segment ? accumulated_segments : Nef_polyhedron_3();
+          }
+          break;
         }
-        result = Nef_polyhedron_3(poly);
-      }
-      break;
-    }
-    case TYPE_TRIANGLE: {
-      const auto  &tri = geom.as<Triangle>();
-      Polyhedron_3 poly;
-      poly.make_triangle(tri.vertex(0).toPoint_3(), tri.vertex(1).toPoint_3(),
-                         tri.vertex(2).toPoint_3());
-      result = Nef_polyhedron_3(poly);
-      break;
-    }
-    case TYPE_POLYGON: {
-      const auto                  &poly = geom.as<Polygon>();
-      std::vector<Kernel::Point_3> points;
-      points.reserve(poly.exteriorRing().numPoints() - 1);
-      for (size_t i = 0; i < poly.exteriorRing().numPoints() - 1; ++i) {
-        points.push_back(poly.exteriorRing().pointN(i).toPoint_3());
-      }
-      Polyhedron_3 cgal_poly;
-      CGAL::convex_hull_3(points.begin(), points.end(), cgal_poly);
-      result = Nef_polyhedron_3(cgal_poly);
-      break;
-    }
-    case TYPE_TRIANGULATEDSURFACE:
-    case TYPE_POLYHEDRALSURFACE: {
-      const auto  &ps = geom.as<PolyhedralSurface>();
-      Polyhedron_3 poly;
-      for (size_t i = 0; i < ps.numPatches(); ++i) {
-        Nef_polyhedron_3 temp_nef = geometryToNef(ps.patchN(i));
-        if (i == 0) {
-          result = temp_nef;
-        } else {
-          result += temp_nef;
+        case TYPE_TRIANGLE: {
+          const auto  &tri = geom.as<Triangle>();
+          Polyhedron_3 poly;
+          poly.make_triangle(tri.vertex(0).toPoint_3(),
+                             tri.vertex(1).toPoint_3(),
+                             tri.vertex(2).toPoint_3());
+          result = Nef_polyhedron_3(poly);
+          break;
         }
-      }
-      break;
-    }
-    case TYPE_SOLID: {
-      const auto &solid = geom.as<Solid>();
-      process_geometry(solid.exteriorShell());
-      break;
-    }
-    case TYPE_MULTIPOINT:
-    case TYPE_MULTILINESTRING:
-    case TYPE_MULTIPOLYGON:
-    case TYPE_MULTISOLID:
-    case TYPE_GEOMETRYCOLLECTION: {
-      const auto &gc = geom.as<GeometryCollection>();
-      for (size_t i = 0; i < gc.numGeometries(); ++i) {
-        Nef_polyhedron_3 temp = geometryToNef(gc.geometryN(i));
-        if (i == 0) {
-          result = temp;
-        } else {
-          result += temp;
+        case TYPE_POLYGON: {
+          const auto                  &poly = geom.as<Polygon>();
+          std::vector<Kernel::Point_3> points;
+          for (size_t i = 0; i < poly.exteriorRing().numPoints() - 1; ++i) {
+            points.push_back(poly.exteriorRing().pointN(i).toPoint_3());
+          }
+          Polyhedron_3 cgal_poly;
+          CGAL::convex_hull_3(points.begin(), points.end(), cgal_poly);
+          result = Nef_polyhedron_3(cgal_poly);
+          break;
         }
-      }
-      break;
-    }
-    default:
-      BOOST_THROW_EXCEPTION(GeometryInvalidityException(
-          "Unsupported geometry type: " + geom.geometryType()));
-    }
-  };
+        case TYPE_TRIANGULATEDSURFACE:
+        case TYPE_POLYHEDRALSURFACE: {
+          const auto                   &ps = geom.as<PolyhedralSurface>();
+          std::unique_ptr<Polyhedron_3> poly_ptr =
+              ps.toPolyhedron_3<Polyhedron_3>();
+          if (poly_ptr && !poly_ptr->is_empty()) {
+            result = Nef_polyhedron_3(*poly_ptr);
+          } else {
+            result = Nef_polyhedron_3();
+          }
+          break;
+        }
+        case TYPE_SOLID: {
+          const auto &solid = geom.as<Solid>();
+          process_geometry(solid.exteriorShell());
+          break;
+        }
+        case TYPE_MULTIPOINT:
+        case TYPE_MULTILINESTRING:
+        case TYPE_MULTIPOLYGON:
+        case TYPE_MULTISOLID:
+        case TYPE_GEOMETRYCOLLECTION: {
+          const auto &gc = geom.as<GeometryCollection>();
+          for (size_t i = 0; i < gc.numGeometries(); ++i) {
+            Nef_polyhedron_3 temp = geometryToNef(gc.geometryN(i));
+            if (i == 0) {
+              result = temp;
+            } else {
+              result += temp;
+            }
+          }
+          break;
+        }
+        default:
+          BOOST_THROW_EXCEPTION(GeometryInvalidityException(
+              "Unsupported geometry type: " + geom.geometryType()));
+        }
+      };
 
   process_geometry(g);
   return result;
@@ -181,12 +209,10 @@ nefToGeometry(const Nef_polyhedron_3 &nef) -> std::unique_ptr<Geometry>
 /// @publicsection
 
 /**
- * @brief 3D Minkowski sum (p+q)
- * @param gA the first geometry
- * @param gB the second geometry
- * @return the 3D Minkowski sum as a unique_ptr<Geometry>
- * @pre gA and gB are valid 3D geometries
- * @warning No actual validity check is done.
+ * @brief Computes the 3D Minkowski sum of two geometries without validity check
+ * @param gA First geometry
+ * @param gB Second geometry
+ * @return A unique pointer to the resulting geometry
  */
 auto
 minkowskiSum3D(const Geometry &gA, const Geometry &gB,
@@ -213,11 +239,10 @@ minkowskiSum3D(const Geometry &gA, const Geometry &gB,
 }
 
 /**
- * @brief 3D Minkowski sum (p+q)
- * @param gA the first geometry
- * @param gB the second geometry
- * @return the 3D Minkowski sum as a unique_ptr<Geometry>
- * @pre gA and gB are valid 3D geometries
+ * @brief Computes the 3D Minkowski sum of two geometries with validity check
+ * @param gA First geometry
+ * @param gB Second geometry
+ * @return A unique pointer to the resulting geometry
  */
 auto
 minkowskiSum3D(const Geometry &gA, const Geometry &gB)

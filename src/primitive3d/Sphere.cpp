@@ -30,8 +30,8 @@ class Sphere_builder : public CGAL::Modifier_base<HDS> {
 public:
   Sphere_builder(double radius, unsigned int num_subdivisions, Point_3 center,
                  const Kernel::Vector_3 &direction)
-      : radius(radius), num_subdivisions(num_subdivisions), center(std::move(center)),
-        direction(normalizeVector(direction))
+      : radius(radius), num_subdivisions(num_subdivisions),
+        center(std::move(center)), direction(normalizeVector(direction))
   {
   }
 
@@ -39,51 +39,50 @@ public:
   operator()(HDS &hds) override
   {
     // Create subdivided icosahedron based on num_vertical and num_horizontal
-    // num_vertical controls latitude subdivisions, num_horizontal controls longitude subdivisions
+    // num_vertical controls latitude subdivisions, num_horizontal controls
+    // longitude subdivisions
 
     CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
 
     // Create icosahedron vertices
-    const double phi = (1.0 + std::sqrt(5.0)) / 2.0; // golden ratio
+    const double phi      = (1.0 + std::sqrt(5.0)) / 2.0; // golden ratio
     const double inv_norm = 1.0 / std::sqrt(1.0 + phi * phi);
 
     // 12 base icosahedron vertices
     std::vector<Point_3> base_vertices = {
-        Point_3(-1*inv_norm, phi*inv_norm, 0),
-        Point_3(1*inv_norm, phi*inv_norm, 0),
-        Point_3(-1*inv_norm, -phi*inv_norm, 0),
-        Point_3(1*inv_norm, -phi*inv_norm, 0),
-        Point_3(0, -1*inv_norm, phi*inv_norm),
-        Point_3(0, 1*inv_norm, phi*inv_norm),
-        Point_3(0, -1*inv_norm, -phi*inv_norm),
-        Point_3(0, 1*inv_norm, -phi*inv_norm),
-        Point_3(phi*inv_norm, 0, -1*inv_norm),
-        Point_3(phi*inv_norm, 0, 1*inv_norm),
-        Point_3(-phi*inv_norm, 0, -1*inv_norm),
-        Point_3(-phi*inv_norm, 0, 1*inv_norm)
-    };
+        Point_3(-1 * inv_norm, phi * inv_norm, 0),
+        Point_3(1 * inv_norm, phi * inv_norm, 0),
+        Point_3(-1 * inv_norm, -phi * inv_norm, 0),
+        Point_3(1 * inv_norm, -phi * inv_norm, 0),
+        Point_3(0, -1 * inv_norm, phi * inv_norm),
+        Point_3(0, 1 * inv_norm, phi * inv_norm),
+        Point_3(0, -1 * inv_norm, -phi * inv_norm),
+        Point_3(0, 1 * inv_norm, -phi * inv_norm),
+        Point_3(phi * inv_norm, 0, -1 * inv_norm),
+        Point_3(phi * inv_norm, 0, 1 * inv_norm),
+        Point_3(-phi * inv_norm, 0, -1 * inv_norm),
+        Point_3(-phi * inv_norm, 0, 1 * inv_norm)};
 
     // 20 base icosahedron faces
     std::vector<std::array<int, 3>> base_faces = {
-        {0, 11, 5}, {0, 5, 1}, {0, 1, 7}, {0, 7, 10}, {0, 10, 11},
-        {1, 5, 9}, {5, 11, 4}, {11, 10, 2}, {10, 7, 6}, {7, 1, 8},
-        {3, 9, 4}, {3, 4, 2}, {3, 2, 6}, {3, 6, 8}, {3, 8, 9},
-        {4, 9, 5}, {2, 4, 11}, {6, 2, 10}, {8, 6, 7}, {9, 8, 1}
-    };
+        {0, 11, 5}, {0, 5, 1},  {0, 1, 7},   {0, 7, 10}, {0, 10, 11},
+        {1, 5, 9},  {5, 11, 4}, {11, 10, 2}, {10, 7, 6}, {7, 1, 8},
+        {3, 9, 4},  {3, 4, 2},  {3, 2, 6},   {3, 6, 8},  {3, 8, 9},
+        {4, 9, 5},  {2, 4, 11}, {6, 2, 10},  {8, 6, 7},  {9, 8, 1}};
 
     // Use the subdivision level directly from parameter
     unsigned int subdivision_level = num_subdivisions;
 
     // Subdivide the icosahedron
-    std::vector<Point_3> vertices = base_vertices;
-    std::vector<std::array<int, 3>> faces = base_faces;
+    std::vector<Point_3>            vertices = base_vertices;
+    std::vector<std::array<int, 3>> faces    = base_faces;
 
     for (unsigned int level = 0; level < subdivision_level; ++level) {
       subdivideIcosahedron(vertices, faces);
     }
 
     // Project all vertices to sphere surface, scale, orient and translate
-    for (auto& v : vertices) {
+    for (auto &v : vertices) {
       // Normalize to unit sphere
       Kernel::Vector_3 vec(v.x(), v.y(), v.z());
       double length = std::sqrt(CGAL::to_double(vec.squared_length()));
@@ -98,19 +97,20 @@ public:
       // In future, could apply rotation matrix based on direction vector
 
       // Translate to center
-      v = Point_3(center.x() + vec.x(), center.y() + vec.y(), center.z() + vec.z());
+      v = Point_3(center.x() + vec.x(), center.y() + vec.y(),
+                  center.z() + vec.z());
     }
 
     B.begin_surface(vertices.size(), faces.size());
 
     try {
       // Add vertices
-      for (const auto& v : vertices) {
+      for (const auto &v : vertices) {
         B.add_vertex(v);
       }
 
       // Add faces
-      for (const auto& face : faces) {
+      for (const auto &face : faces) {
         B.begin_facet();
         B.add_vertex_to_facet(face[0]);
         B.add_vertex_to_facet(face[1]);
@@ -121,31 +121,35 @@ public:
       B.end_surface();
 
       if (B.error()) {
-        throw std::runtime_error("CGAL polyhedron builder reported an error during icosahedron construction");
+        throw std::runtime_error("CGAL polyhedron builder reported an error "
+                                 "during icosahedron construction");
       }
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
       if (!B.error()) {
         B.rollback();
       }
-      throw std::runtime_error(std::string("Failed to build subdivided icosahedron: ") + e.what());
+      throw std::runtime_error(
+          std::string("Failed to build subdivided icosahedron: ") + e.what());
     }
   }
 
 private:
-
   double           radius;
   unsigned int     num_subdivisions;
   Point_3          center;
   Kernel::Vector_3 direction;
 
-  void subdivideIcosahedron(std::vector<Point_3>& vertices, std::vector<std::array<int, 3>>& faces) {
-    std::vector<std::array<int, 3>> new_faces;
+  void
+  subdivideIcosahedron(std::vector<Point_3>            &vertices,
+                       std::vector<std::array<int, 3>> &faces)
+  {
+    std::vector<std::array<int, 3>>    new_faces;
     std::map<std::pair<int, int>, int> edge_to_vertex;
 
     // Helper function to get or create a midpoint vertex
     auto getMidpoint = [&](int v1, int v2) -> int {
       auto key = std::make_pair(std::min(v1, v2), std::max(v1, v2));
-      auto it = edge_to_vertex.find(key);
+      auto it  = edge_to_vertex.find(key);
       if (it != edge_to_vertex.end()) {
         return it->second;
       }
@@ -153,7 +157,8 @@ private:
       // Create new midpoint vertex
       Point_3 p1 = vertices[v1];
       Point_3 p2 = vertices[v2];
-      Point_3 midpoint((p1.x() + p2.x()) / 2.0, (p1.y() + p2.y()) / 2.0, (p1.z() + p2.z()) / 2.0);
+      Point_3 midpoint((p1.x() + p2.x()) / 2.0, (p1.y() + p2.y()) / 2.0,
+                       (p1.z() + p2.z()) / 2.0);
 
       int new_index = static_cast<int>(vertices.size());
       vertices.push_back(midpoint);
@@ -162,7 +167,7 @@ private:
     };
 
     // Subdivide each triangle into 4 smaller triangles
-    for (const auto& face : faces) {
+    for (const auto &face : faces) {
       int v0 = face[0], v1 = face[1], v2 = face[2];
 
       // Get midpoints of each edge
@@ -189,8 +194,7 @@ private:
 /// @publicsection
 
 Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
-               unsigned int num_subdivisions,
-               const Kernel::Vector_3 &direction)
+               unsigned int num_subdivisions, const Kernel::Vector_3 &direction)
 {
   m_parameters["radius"]           = Kernel::FT(radius);
   m_parameters["num_subdivisions"] = num_subdivisions;
@@ -245,7 +249,8 @@ Sphere::validateParameters(
       std::get<unsigned int>(tempParameters.at("num_subdivisions"));
 
   if (num_subdivisions > 6) {
-    BOOST_THROW_EXCEPTION(Exception("Sphere subdivisions should not exceed 6 (too many vertices)."));
+    BOOST_THROW_EXCEPTION(Exception(
+        "Sphere subdivisions should not exceed 6 (too many vertices)."));
   }
 }
 
@@ -255,8 +260,7 @@ Sphere::generateSpherePolyhedron() const -> Polyhedron_3
 {
   Polyhedron_3                             P;
   Sphere_builder<Polyhedron_3::HalfedgeDS> builder(
-      CGAL::to_double(radius()), numSubdivisions(), center(),
-      direction());
+      CGAL::to_double(radius()), numSubdivisions(), center(), direction());
   P.delegate(builder);
   return P;
 }
@@ -305,8 +309,9 @@ Sphere::generatePolyhedralSurface() const -> PolyhedralSurface
     m_polyhedral_surface = PolyhedralSurface(polyhedron);
 
     return *m_polyhedral_surface;
-  } catch (const std::exception& e) {
-    throw std::runtime_error(std::string("Sphere surface generation failed: ") + e.what());
+  } catch (const std::exception &e) {
+    throw std::runtime_error(std::string("Sphere surface generation failed: ") +
+                             e.what());
   }
 }
 
@@ -315,7 +320,7 @@ auto
 Sphere::generateSpherePoints() const -> std::vector<Point_3>
 {
   // Generate the same vertices as the polyhedron
-  Polyhedron_3 poly = generatePolyhedron();
+  Polyhedron_3         poly = generatePolyhedron();
   std::vector<Point_3> points;
   points.reserve(poly.size_of_vertices());
 
