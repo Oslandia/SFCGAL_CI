@@ -15,12 +15,15 @@
 #include "SFCGAL/algorithm/normal.h"
 #include "SFCGAL/detail/GetPointsVisitor.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * @brief Test if a 3D plane can be extracted from a Polygon
- * @ingroup detail
+ * @param polygon The input polygon
+ * @param a Output parameter for first point
+ * @param b Output parameter for second point
+ * @param c Output parameter for third point
+ * @return true if a plane can be extracted, false otherwise
  */
 template <typename Kernel>
 bool
@@ -55,7 +58,9 @@ hasPlane3D(const Polygon &polygon, CGAL::Point_3<Kernel> &a,
 }
 
 /**
- * Test if a 3D plane can be extracted from a Polygon
+ * @brief Test if a 3D plane can be extracted from a Polygon
+ * @param polygon The input polygon
+ * @return true if a plane can be extracted, false otherwise
  */
 template <typename Kernel>
 bool
@@ -67,7 +72,11 @@ hasPlane3D(const Polygon &polygon)
 }
 
 /**
- * Get 3 non collinear points from a Polygon
+ * @brief Get 3 non collinear points from a Polygon
+ * @param polygon The input polygon
+ * @param a Output parameter for first point
+ * @param b Output parameter for second point
+ * @param c Output parameter for third point
  */
 template <typename Kernel>
 void
@@ -83,9 +92,10 @@ plane3D(const Polygon &polygon, CGAL::Point_3<Kernel> &a,
 }
 
 /**
- * Returns the oriented 3D plane of a polygon (supposed to be planar).
+ * @brief Returns the oriented 3D plane of a polygon (supposed to be planar).
  * May return degenerate plane.
- * @ingroup detail
+ * @param polygon The input polygon
+ * @return The 3D plane of the polygon
  */
 template <typename Kernel>
 CGAL::Plane_3<Kernel>
@@ -100,11 +110,12 @@ plane3D(const Polygon &polygon)
 struct Plane3DInexactUnsafe {};
 
 /**
- * Returns the oriented 3D plane of a polygon (supposed to be planar) - inexact
- * version.
+ * @brief Returns the oriented 3D plane of a polygon (supposed to be planar) -
+ * inexact version.
+ * @param polygon The input polygon
+ * @return The 3D plane of the polygon
  * @warning Will divide by zero if polygon is degenerate.
  * @warning result is rounded to double (avoid huge expression tree).
- * @ingroup detail
  */
 template <typename Kernel>
 CGAL::Plane_3<Kernel>
@@ -120,8 +131,11 @@ plane3D(const Polygon &polygon, const Plane3DInexactUnsafe &)
 }
 
 /**
- * Returns the oriented 3D plane of a polygon (supposed to be planar).
+ * @brief Returns the oriented 3D plane of a polygon (supposed to be planar).
  * This is legacy code for SFCGAL users and should be deprecated.
+ * @param polygon The input polygon
+ * @param exact Whether to use exact computation
+ * @return The 3D plane of the polygon
  * @warning result is rounded to double if exact is false (avoid huge expression
  * tree).
  * @warning Will divide by zero if polygon is degenerate. This maintains the
@@ -138,8 +152,10 @@ plane3D(const Polygon &polygon, bool exact)
 }
 
 /**
- * Test if all points of a geometry lie in the same plane
- * @ingroup detail
+ * @brief Test if all points of a geometry lie in the same plane
+ * @param geom The input geometry
+ * @param toleranceAbs The absolute tolerance for planarity test
+ * @return true if all points lie in the same plane, false otherwise
  */
 template <typename Kernel>
 bool
@@ -167,7 +183,7 @@ isPlane3D(const Geometry &geom, const double &toleranceAbs)
   // note that we could compute the covarence matrix of the points and use SVD
   // but we would need a lib for that, and it may be overkill
 
-  typedef CGAL::Vector_3<Kernel> Vector_3;
+  using Vector_3 = CGAL::Vector_3<Kernel>;
 
   const GetPointsVisitor::const_iterator end = v.points.end();
 
@@ -241,7 +257,6 @@ isPlane3D(const Geometry &geom, const double &toleranceAbs)
   return true;
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
