@@ -41,8 +41,9 @@ namespace algorithm {
  * @throws If either {@code start} or {@code end} have an absolute value
  *   greater than 1.
  */
-SFCGAL_API std::unique_ptr<LineString>
-           lineSubstring(const LineString &ls, double start, double end);
+SFCGAL_API auto
+lineSubstring(const LineString &ls, double start, double end)
+    -> std::unique_ptr<LineString>;
 
 } // namespace algorithm
 
