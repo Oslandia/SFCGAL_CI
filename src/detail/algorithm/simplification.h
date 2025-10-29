@@ -27,8 +27,7 @@
 #include <memory>
 #include <vector>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /**
  * @brief Simplifies a LineString
@@ -83,5 +82,4 @@ simplifyGeometryCollection(const GeometryCollection &collection,
                            double threshold, bool preserveTopology)
     -> std::unique_ptr<Geometry>;
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
