@@ -36,9 +36,9 @@ MultiLineString::geometryTypeId() const -> GeometryType
 }
 
 auto
-MultiLineString::isAllowed(Geometry const &g) -> bool
+MultiLineString::isAllowed(Geometry const &geometry) -> bool
 {
-  return g.geometryTypeId() == TYPE_LINESTRING;
+  return geometry.geometryTypeId() == TYPE_LINESTRING;
 }
 
 void
