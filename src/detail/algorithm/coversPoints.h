@@ -10,8 +10,9 @@
 
 namespace SFCGAL {
 class Geometry;
-namespace detail {
-namespace algorithm {
+}
+
+namespace SFCGAL::detail::algorithm {
 
 /**
  * Pseudo cover test on 2D geometries. Collect points of gb and tests if no
@@ -32,8 +33,6 @@ coversPoints(const Geometry &ga, const Geometry &gb) -> bool;
  */
 SFCGAL_API auto
 coversPoints3D(const Geometry &ga, const Geometry &gb) -> bool;
-} // namespace algorithm
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::algorithm
 
 #endif
