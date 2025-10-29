@@ -29,70 +29,70 @@ public:
    * Concrete visitors can override this to provide a common fallback for
    * any Geometry not handled by the type-specific overloads.
    *
-   * @param g The geometry to visit.
+   * @param geometry The geometry to visit.
    */
   virtual void
-  visit(Geometry &g);
+  visit(Geometry &geometry);
 
   /**
    * Visit a Point geometry
-   * @param g The Point geometry to visit
+   * @param geometry The Point geometry to visit
    */
   virtual void
-  visit(Point &g) = 0;
+  visit(Point &geometry) = 0;
   /** Visit a LineString geometry
-   * @param g The LineString geometry to visit */
+   * @param geometry The LineString geometry to visit */
   virtual void
-  visit(LineString &g) = 0;
+  visit(LineString &geometry) = 0;
   /** Visit a Polygon geometry
-   * @param g The Polygon geometry to visit */
+   * @param geometry The Polygon geometry to visit */
   virtual void
-  visit(Polygon &g) = 0;
+  visit(Polygon &geometry) = 0;
   /** Visit a Triangle geometry
-   * @param g The Triangle geometry to visit */
+   * @param geometry The Triangle geometry to visit */
   virtual void
-  visit(Triangle &g) = 0;
+  visit(Triangle &geometry) = 0;
   /** Visit a Solid geometry
-   * @param g The Solid geometry to visit */
+   * @param geometry The Solid geometry to visit */
   virtual void
-  visit(Solid &g) = 0;
+  visit(Solid &geometry) = 0;
   /** Visit a MultiPoint geometry
-   * @param g The MultiPoint geometry to visit */
+   * @param geometry The MultiPoint geometry to visit */
   virtual void
-  visit(MultiPoint &g) = 0;
+  visit(MultiPoint &geometry) = 0;
   /** Visit a MultiLineString geometry
-   * @param g The MultiLineString geometry to visit */
+   * @param geometry The MultiLineString geometry to visit */
   virtual void
-  visit(MultiLineString &g) = 0;
+  visit(MultiLineString &geometry) = 0;
   /** Visit a MultiPolygon geometry
-   * @param g The MultiPolygon geometry to visit */
+   * @param geometry The MultiPolygon geometry to visit */
   virtual void
-  visit(MultiPolygon &g) = 0;
+  visit(MultiPolygon &geometry) = 0;
   /** Visit a MultiSolid geometry
-   * @param g The MultiSolid geometry to visit */
+   * @param geometry The MultiSolid geometry to visit */
   virtual void
-  visit(MultiSolid &g) = 0;
+  visit(MultiSolid &geometry) = 0;
   /** Visit a GeometryCollection geometry
-   * @param g The GeometryCollection geometry to visit */
+   * @param geometry The GeometryCollection geometry to visit */
   virtual void
-  visit(GeometryCollection &g) = 0;
+  visit(GeometryCollection &geometry) = 0;
   /** Visit a PolyhedralSurface geometry
-   * @param g The PolyhedralSurface geometry to visit */
+   * @param geometry The PolyhedralSurface geometry to visit */
   virtual void
-  visit(PolyhedralSurface &g) = 0;
+  visit(PolyhedralSurface &geometry) = 0;
   /** Visit a TriangulatedSurface geometry
-   * @param g The TriangulatedSurface geometry to visit */
+   * @param geometry The TriangulatedSurface geometry to visit */
   virtual void
-  visit(TriangulatedSurface &g) = 0;
+  visit(TriangulatedSurface &geometry) = 0;
   /**
    * Visit a NURBSCurve geometry.
    *
    * Default implementation provides no-op; override to handle NURBSCurve.
    *
-   * @param g The NURBSCurve to visit.
+   * @param geometry The NURBSCurve to visit.
    */
   virtual void
-  visit(NURBSCurve &g);
+  visit(NURBSCurve &geometry);
 };
 
 /**
@@ -112,68 +112,68 @@ public:
    * Concrete visitors can override this to provide a common fallback for
    * any const Geometry not handled by the type-specific overloads.
    *
-   * @param g The const geometry to visit.
+   * @param geometry The const geometry to visit.
    */
   virtual void
-  visit(const Geometry &g);
+  visit(const Geometry &geometry);
 
   /** Visit a const Point geometry
-   * @param g The const Point geometry to visit */
+   * @param geometry The const Point geometry to visit */
   virtual void
-  visit(const Point &g) = 0;
+  visit(const Point &geometry) = 0;
   /** Visit a const LineString geometry
-   * @param g The const LineString geometry to visit */
+   * @param geometry The const LineString geometry to visit */
   virtual void
-  visit(const LineString &g) = 0;
+  visit(const LineString &geometry) = 0;
   /** Visit a const Polygon geometry
-   * @param g The const Polygon geometry to visit */
+   * @param geometry The const Polygon geometry to visit */
   virtual void
-  visit(const Polygon &g) = 0;
+  visit(const Polygon &geometry) = 0;
   /** Visit a const Triangle geometry
-   * @param g The const Triangle geometry to visit */
+   * @param geometry The const Triangle geometry to visit */
   virtual void
-  visit(const Triangle &g) = 0;
+  visit(const Triangle &geometry) = 0;
   /** Visit a const Solid geometry
-   * @param g The const Solid geometry to visit */
+   * @param geometry The const Solid geometry to visit */
   virtual void
-  visit(const Solid &g) = 0;
+  visit(const Solid &geometry) = 0;
   /** Visit a const MultiPoint geometry
-   * @param g The const MultiPoint geometry to visit */
+   * @param geometry The const MultiPoint geometry to visit */
   virtual void
-  visit(const MultiPoint &g) = 0;
+  visit(const MultiPoint &geometry) = 0;
   /** Visit a const MultiLineString geometry
-   * @param g The const MultiLineString geometry to visit */
+   * @param geometry The const MultiLineString geometry to visit */
   virtual void
-  visit(const MultiLineString &g) = 0;
+  visit(const MultiLineString &geometry) = 0;
   /** Visit a const MultiPolygon geometry
-   * @param g The const MultiPolygon geometry to visit */
+   * @param geometry The const MultiPolygon geometry to visit */
   virtual void
-  visit(const MultiPolygon &g) = 0;
+  visit(const MultiPolygon &geometry) = 0;
   /** Visit a const MultiSolid geometry
-   * @param g The const MultiSolid geometry to visit */
+   * @param geometry The const MultiSolid geometry to visit */
   virtual void
-  visit(const MultiSolid &g) = 0;
+  visit(const MultiSolid &geometry) = 0;
   /** Visit a const GeometryCollection geometry
-   * @param g The const GeometryCollection geometry to visit */
+   * @param geometry The const GeometryCollection geometry to visit */
   virtual void
-  visit(const GeometryCollection &g) = 0;
+  visit(const GeometryCollection &geometry) = 0;
   /** Visit a const PolyhedralSurface geometry
-   * @param g The const PolyhedralSurface geometry to visit */
+   * @param geometry The const PolyhedralSurface geometry to visit */
   virtual void
-  visit(const PolyhedralSurface &g) = 0;
+  visit(const PolyhedralSurface &geometry) = 0;
   /** Visit a const TriangulatedSurface geometry
-   * @param g The const TriangulatedSurface geometry to visit */
+   * @param geometry The const TriangulatedSurface geometry to visit */
   virtual void
-  visit(const TriangulatedSurface &g) = 0;
+  visit(const TriangulatedSurface &geometry) = 0;
   /**
    * Visit a const NURBSCurve geometry.
    *
    * Default implementation provides no-op; override to handle const NURBSCurve.
    *
-   * @param g The const NURBSCurve to visit.
+   * @param geometry The const NURBSCurve to visit.
    */
   virtual void
-  visit(const NURBSCurve &g);
+  visit(const NURBSCurve &geometry);
 };
 
 } // namespace SFCGAL
