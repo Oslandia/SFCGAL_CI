@@ -10,8 +10,7 @@
 
 #include <complex>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /**
  * lexicographic order on complex
@@ -27,10 +26,10 @@ struct SFCGAL_API ComplexComparator{
                                                  const std::complex<T> &b)
         const {return (a.real() < b.real()) ||
                       (a.real() == b.real() && a.imag() < b.imag());
-} // namespace detail
-}; // namespace SFCGAL
+} // namespace SFCGAL::detail
+}
+; // namespace SFCGAL
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif
