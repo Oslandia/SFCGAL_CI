@@ -49,9 +49,9 @@ ConsistentOrientationBuilder::triangleN(const size_t &n) const -> Triangle
   const edge_descriptor &bc = _triangles[n][1];
   const edge_descriptor &ca = _triangles[n][2];
 
-  return Triangle(Point(_graph[_graph.source(ab)].coordinate),
-                  Point(_graph[_graph.source(bc)].coordinate),
-                  Point(_graph[_graph.source(ca)].coordinate));
+  return {Point(_graph[_graph.source(ab)].coordinate),
+          Point(_graph[_graph.source(bc)].coordinate),
+          Point(_graph[_graph.source(ca)].coordinate)};
 }
 
 void
