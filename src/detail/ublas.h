@@ -9,10 +9,8 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 namespace ublas = boost::numeric::ublas;
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif
