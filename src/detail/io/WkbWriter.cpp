@@ -27,62 +27,64 @@
 namespace SFCGAL::detail::io {
 
 void
-WkbWriter::writeRec(const Geometry &g, boost::endian::order wkbOrder)
+WkbWriter::writeRec(const Geometry &geometry, boost::endian::order wkbOrder)
 {
-  switch (g.geometryTypeId()) {
+  switch (geometry.geometryTypeId()) {
   case TYPE_POINT:
-    writeInner(g.as<Point>(), wkbOrder);
+    writeInner(geometry.as<Point>(), wkbOrder);
     return;
 
   case TYPE_LINESTRING:
-    writeInner(g.as<LineString>(), wkbOrder);
+    writeInner(geometry.as<LineString>(), wkbOrder);
     return;
 
   case TYPE_POLYGON:
-    writeInner(g.as<Polygon>(), wkbOrder);
+    writeInner(geometry.as<Polygon>(), wkbOrder);
     return;
 
   case TYPE_GEOMETRYCOLLECTION:
-    writeInner(g.as<GeometryCollection>(), wkbOrder);
+    writeInner(geometry.as<GeometryCollection>(), wkbOrder);
     return;
 
   case TYPE_MULTIPOINT:
-    writeInner<MultiPoint, Point>(g.as<MultiPoint>(), wkbOrder);
+    writeInner<MultiPoint, Point>(geometry.as<MultiPoint>(), wkbOrder);
     return;
 
   case TYPE_MULTILINESTRING:
-    writeInner<MultiLineString, LineString>(g.as<MultiLineString>(), wkbOrder);
+    writeInner<MultiLineString, LineString>(geometry.as<MultiLineString>(),
+                                            wkbOrder);
     return;
 
   case TYPE_MULTIPOLYGON:
-    writeInner<MultiPolygon, Polygon>(g.as<MultiPolygon>(), wkbOrder);
+    writeInner<MultiPolygon, Polygon>(geometry.as<MultiPolygon>(), wkbOrder);
     return;
 
   case TYPE_TRIANGLE:
-    writeInner(g.as<Triangle>(), wkbOrder);
+    writeInner(geometry.as<Triangle>(), wkbOrder);
     return;
 
   case TYPE_TRIANGULATEDSURFACE:
-    writeInner(g.as<TriangulatedSurface>(), wkbOrder);
+    writeInner(geometry.as<TriangulatedSurface>(), wkbOrder);
     return;
 
   case TYPE_POLYHEDRALSURFACE:
-    writeInner(g.as<PolyhedralSurface>(), wkbOrder);
+    writeInner(geometry.as<PolyhedralSurface>(), wkbOrder);
     return;
 
   case TYPE_NURBSCURVE:
-    writeInner(g.as<NURBSCurve>(), wkbOrder);
+    writeInner(geometry.as<NURBSCurve>(), wkbOrder);
     return;
 
   default:
     std::ostringstream oss;
-    oss << "WkbWriter: type '" << g.geometryType() << "' is not supported";
+    oss << "WkbWriter: type '" << geometry.geometryType()
+        << "' is not supported";
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 }
 
 void
-WkbWriter::write(const Geometry &g, const srid_t &srid,
+WkbWriter::write(const Geometry &geometry, const srid_t &srid,
                  boost::endian::order wkbOrder)
 {
 
@@ -90,47 +92,48 @@ WkbWriter::write(const Geometry &g, const srid_t &srid,
   _isEWKB  = true;
   _srid    = srid;
 
-  write(g, wkbOrder);
+  write(geometry, wkbOrder);
 }
 
 void
-WkbWriter::write(const Geometry &g, boost::endian::order wkbOrder)
+WkbWriter::write(const Geometry &geometry, boost::endian::order wkbOrder)
 {
-  writeRec(g, wkbOrder);
+  writeRec(geometry, wkbOrder);
 }
 
 void
-WkbWriter::writeCoordinate(const Point &g, boost::endian::order wkbOrder)
+WkbWriter::writeCoordinate(const Point &geometry, boost::endian::order wkbOrder)
 {
   // x
-  toByte(CGAL::to_double(g.x()), wkbOrder);
+  toByte(CGAL::to_double(geometry.x()), wkbOrder);
 
   // y
-  toByte(CGAL::to_double(g.y()), wkbOrder);
+  toByte(CGAL::to_double(geometry.y()), wkbOrder);
 
   // z
-  if (g.is3D()) {
-    toByte(CGAL::to_double(g.z()), wkbOrder);
+  if (geometry.is3D()) {
+    toByte(CGAL::to_double(geometry.z()), wkbOrder);
   }
 
   // m coordinate
-  if (g.isMeasured()) {
-    toByte(CGAL::to_double(g.m()), wkbOrder);
+  if (geometry.isMeasured()) {
+    toByte(CGAL::to_double(geometry.m()), wkbOrder);
   }
 }
 
 void
-WkbWriter::writeGeometryType(const Geometry &g, boost::endian::order wkbOrder)
+WkbWriter::writeGeometryType(const Geometry      &geometry,
+                             boost::endian::order wkbOrder)
 {
 
   if (_isEWKB) {
 
-    uint32_t ewkbtype = g.geometryTypeId();
+    uint32_t ewkbtype = geometry.geometryTypeId();
 
-    if (g.is3D()) {
+    if (geometry.is3D()) {
       ewkbtype |= wkbZ;
     }
-    if (g.isMeasured()) {
+    if (geometry.isMeasured()) {
       ewkbtype |= wkbM;
     }
     if (_useSrid) {
@@ -146,110 +149,111 @@ WkbWriter::writeGeometryType(const Geometry &g, boost::endian::order wkbOrder)
       _useSrid = false;
     }
   } else {
-    toByte(static_cast<uint32_t>(g.geometryTypeId() +
-                                 static_cast<int>(g.is3D()) * COORDINATE_XYZ +
-                                 static_cast<int>(g.isMeasured()) *
-                                     COORDINATE_XYM),
+    toByte(static_cast<uint32_t>(
+               geometry.geometryTypeId() +
+               static_cast<int>(geometry.is3D()) * COORDINATE_XYZ +
+               static_cast<int>(geometry.isMeasured()) * COORDINATE_XYM),
            wkbOrder);
   }
 }
 
 void
-WkbWriter::writeInner(const Point &g, boost::endian::order wkbOrder)
+WkbWriter::writeInner(const Point &geometry, boost::endian::order wkbOrder)
 {
   // Endianness
   toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
 
   // WkbType
-  writeGeometryType(g, wkbOrder);
+  writeGeometryType(geometry, wkbOrder);
 
-  if (g.isEmpty()) {
+  if (geometry.isEmpty()) {
     toByte(std::numeric_limits<double>::quiet_NaN(), wkbOrder);
     toByte(std::numeric_limits<double>::quiet_NaN(), wkbOrder);
-    if (g.is3D()) {
+    if (geometry.is3D()) {
       toByte(std::numeric_limits<double>::quiet_NaN(), wkbOrder);
     }
-    if (g.isMeasured()) {
+    if (geometry.isMeasured()) {
       toByte(std::numeric_limits<double>::quiet_NaN(), wkbOrder);
     }
   } else {
-    writeCoordinate(g, wkbOrder);
+    writeCoordinate(geometry, wkbOrder);
   }
 }
 
 void
-WkbWriter::writeInner(const LineString &g, boost::endian::order wkbOrder)
+WkbWriter::writeInner(const LineString &geometry, boost::endian::order wkbOrder)
 {
   // Endianness
   toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
 
   // WkbType
-  writeGeometryType(g, wkbOrder);
+  writeGeometryType(geometry, wkbOrder);
 
-  writeInnerRing(g, wkbOrder);
+  writeInnerRing(geometry, wkbOrder);
 }
 void
-WkbWriter::writeInnerRing(const LineString &g, boost::endian::order wkbOrder)
+WkbWriter::writeInnerRing(const LineString    &geometry,
+                          boost::endian::order wkbOrder)
 {
-  toByte(static_cast<uint32_t>(g.numPoints()), wkbOrder);
+  toByte(static_cast<uint32_t>(geometry.numPoints()), wkbOrder);
 
-  for (size_t i = 0; i < g.numPoints(); i++) {
-    writeCoordinate(g.pointN(i), wkbOrder);
+  for (size_t i = 0; i < geometry.numPoints(); i++) {
+    writeCoordinate(geometry.pointN(i), wkbOrder);
   }
 }
 
 void
-WkbWriter::writeInner(const Polygon &g, boost::endian::order wkbOrder)
+WkbWriter::writeInner(const Polygon &geometry, boost::endian::order wkbOrder)
 {
   // Endianness
   toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
 
   // WkbType
-  writeGeometryType(g, wkbOrder);
+  writeGeometryType(geometry, wkbOrder);
 
-  toByte(static_cast<uint32_t>(g.numRings()), wkbOrder);
+  toByte(static_cast<uint32_t>(geometry.numRings()), wkbOrder);
 
-  writeInnerRing(g.exteriorRing(), wkbOrder);
-  for (size_t i = 0; i < g.numInteriorRings(); i++) {
-    writeInnerRing(g.interiorRingN(i), wkbOrder);
+  writeInnerRing(geometry.exteriorRing(), wkbOrder);
+  for (size_t i = 0; i < geometry.numInteriorRings(); i++) {
+    writeInnerRing(geometry.interiorRingN(i), wkbOrder);
   }
 }
 
 void
-WkbWriter::writeInner(const Triangle &g, boost::endian::order wkbOrder)
+WkbWriter::writeInner(const Triangle &geometry, boost::endian::order wkbOrder)
 {
   // Endianness
   toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
 
   // WkbType
-  writeGeometryType(g, wkbOrder);
+  writeGeometryType(geometry, wkbOrder);
 
-  if (!g.isEmpty()) {
+  if (!geometry.isEmpty()) {
     // One Ring
     toByte(static_cast<uint32_t>(1), wkbOrder);
     // 4 points
     toByte(static_cast<uint32_t>(4), wkbOrder);
     for (int i = 0; i < 4; i++) {
-      writeCoordinate(g.vertex(i), wkbOrder);
+      writeCoordinate(geometry.vertex(i), wkbOrder);
     }
   }
 }
 
 void
-WkbWriter::writeInner(const GeometryCollection &g,
+WkbWriter::writeInner(const GeometryCollection &geometry,
                       boost::endian::order      wkbOrder)
 {
   // Endianness
   toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
 
   // WkbType
-  writeGeometryType(g, wkbOrder);
+  writeGeometryType(geometry, wkbOrder);
 
   // Number of Geometries
-  toByte(static_cast<uint32_t>(g.numGeometries()), wkbOrder);
+  toByte(static_cast<uint32_t>(geometry.numGeometries()), wkbOrder);
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
-    writeRec(g.geometryN(i), wkbOrder);
+  for (size_t i = 0; i < geometry.numGeometries(); i++) {
+    writeRec(geometry.geometryN(i), wkbOrder);
   }
 }
 
@@ -290,24 +294,24 @@ WkbWriter::writeInner(const TriangulatedSurface &triangulatedSurface,
 }
 
 void
-WkbWriter::writeInner(const NURBSCurve &g, boost::endian::order wkbOrder)
+WkbWriter::writeInner(const NURBSCurve &geometry, boost::endian::order wkbOrder)
 {
   // Endianness
   toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
 
   // WkbType
-  writeGeometryType(g, wkbOrder);
+  writeGeometryType(geometry, wkbOrder);
 
   // Degree (WKB standard format)
-  toByte(static_cast<uint32_t>(g.degree()), wkbOrder);
+  toByte(static_cast<uint32_t>(geometry.degree()), wkbOrder);
 
   // Number of control points
-  toByte(static_cast<uint32_t>(g.numControlPoints()), wkbOrder);
+  toByte(static_cast<uint32_t>(geometry.numControlPoints()), wkbOrder);
 
   // Write each control point with ISO WKB standard structure: [byte
   // order][coordinates][flag][weight?]
-  for (size_t i = 0; i < g.numControlPoints(); i++) {
-    auto weight          = g.weight(i);
+  for (size_t i = 0; i < geometry.numControlPoints(); i++) {
+    auto weight          = geometry.weight(i);
     bool hasCustomWeight = (std::abs(CGAL::to_double(weight) - 1.0) > 1e-10);
 
     // Write byte order for this control point (required by ISO/IEC
@@ -315,7 +319,7 @@ WkbWriter::writeInner(const NURBSCurve &g, boost::endian::order wkbOrder)
     toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
 
     // Write coordinates
-    writeCoordinate(g.controlPointN(i), wkbOrder);
+    writeCoordinate(geometry.controlPointN(i), wkbOrder);
 
     // Write weight flag (0 = default weight, 1 = custom weight follows)
     toByte(static_cast<uint8_t>(hasCustomWeight ? 1 : 0), wkbOrder);
@@ -327,7 +331,7 @@ WkbWriter::writeInner(const NURBSCurve &g, boost::endian::order wkbOrder)
   }
 
   // Knot vector
-  const auto &knots = g.knotVector();
+  const auto &knots = geometry.knotVector();
   toByte(static_cast<uint32_t>(knots.size()), wkbOrder);
 
   for (const auto &knot : knots) {
@@ -337,19 +341,19 @@ WkbWriter::writeInner(const NURBSCurve &g, boost::endian::order wkbOrder)
 
 template <typename M, typename G>
 void
-WkbWriter::writeInner(const M &g, boost::endian::order wkbOrder)
+WkbWriter::writeInner(const M &geometry, boost::endian::order wkbOrder)
 {
   // Endianness
   toStream(std::array<std::byte, 1>{static_cast<std::byte>(wkbOrder)});
 
   // WkbType
-  writeGeometryType(g, wkbOrder);
+  writeGeometryType(geometry, wkbOrder);
 
   // Number of Geometries
-  toByte(static_cast<uint32_t>(g.numGeometries()), wkbOrder);
+  toByte(static_cast<uint32_t>(geometry.numGeometries()), wkbOrder);
 
-  for (size_t i = 0; i < g.numGeometries(); i++) {
-    writeInner(g.geometryN(i).template as<G>(), wkbOrder);
+  for (size_t i = 0; i < geometry.numGeometries(); i++) {
+    writeInner(geometry.geometryN(i).template as<G>(), wkbOrder);
   }
 }
 
