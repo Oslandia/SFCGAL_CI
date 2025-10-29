@@ -25,8 +25,7 @@
  *
  * Use the const_iterator typedef to iterate over the collected point pointers.
  */
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /**
  * Get the list of points from a Geometry
@@ -116,7 +115,6 @@ public:
   std::vector<const Point *> points;         ///< Collection of collected points
 };
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif
