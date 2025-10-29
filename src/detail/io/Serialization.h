@@ -28,9 +28,7 @@
  * @todo SHOULD BE IN io FOLDER OR ADD MISSING detail NAMESPACE
  */
 
-namespace SFCGAL {
-
-namespace io {
+namespace SFCGAL::io {
 
 /**
  * @brief Binary serialization wrapper for SFCGAL geometries
@@ -97,45 +95,43 @@ readBinaryGeometry(const std::string &str) -> std::unique_ptr<SFCGAL::Geometry>;
 SFCGAL_API auto
 readBinaryPrepared(const std::string &str)
     -> std::unique_ptr<SFCGAL::PreparedGeometry>;
-} // namespace io
-} // namespace SFCGAL
+} // namespace SFCGAL::io
 
-namespace boost {
-namespace serialization {
+namespace boost::serialization {
 
 /**
  * Serialization of Gmpz for text archives
  */
 SFCGAL_API void
-save(boost::archive::text_oarchive &ar, const CGAL::Gmpz &z,
+save(boost::archive::text_oarchive &ar, const CGAL::Gmpz &integerValue,
      const unsigned int version);
 
 /**
  * Serialization of Gmpz for binary archives
  */
 SFCGAL_API void
-save(boost::archive::binary_oarchive &ar, const CGAL::Gmpz &z,
+save(boost::archive::binary_oarchive &ar, const CGAL::Gmpz &integerValue,
      const unsigned int version);
 
 /**
  * Unserialization of Gmpz for text archives
  */
 SFCGAL_API void
-load(boost::archive::text_iarchive &ar, CGAL::Gmpz &z,
+load(boost::archive::text_iarchive &ar, CGAL::Gmpz &integerValue,
      const unsigned int version);
 
 /**
  * Unserialization of Gmpz for binary archives
  */
 SFCGAL_API void
-load(boost::archive::binary_iarchive &ar, CGAL::Gmpz &z,
+load(boost::archive::binary_iarchive &ar, CGAL::Gmpz &integerValue,
      const unsigned int version);
 
 template <class Archive>
 void
-serialize(Archive &ar, CGAL::Gmpz &z, const unsigned int version)
+serialize(Archive &ar, CGAL::Gmpz &integerValue, const unsigned int version)
 {
-  split_free(ar, z, version);
+  split_free(ar, integerValue, version);
 }
 
 /**
@@ -143,10 +139,11 @@ serialize(Archive &ar, CGAL::Gmpz &z, const unsigned int version)
  */
 template <class Archive>
 void
-save(Archive &ar, const CGAL::Gmpq &q, const unsigned int /*version*/)
+save(Archive &ar, const CGAL::Gmpq &rationalValue,
+     const unsigned int /*version*/)
 {
-  CGAL::Gmpz n = q.numerator();
-  CGAL::Gmpz d = q.denominator();
+  CGAL::Gmpz n = rationalValue.numerator();
+  CGAL::Gmpz d = rationalValue.denominator();
   ar & n;
   ar & d;
 }
@@ -156,19 +153,19 @@ save(Archive &ar, const CGAL::Gmpq &q, const unsigned int /*version*/)
  */
 template <class Archive>
 void
-load(Archive &ar, CGAL::Gmpq &q, const unsigned int /*version*/)
+load(Archive &ar, CGAL::Gmpq &rationalValue, const unsigned int /*version*/)
 {
   CGAL::Gmpz n;
   CGAL::Gmpz d;
   ar & n;
   ar & d;
-  q = CGAL::Gmpq(n, d);
+  rationalValue = CGAL::Gmpq(n, d);
 }
 template <class Archive>
 void
-serialize(Archive &ar, CGAL::Gmpq &q, const unsigned int version)
+serialize(Archive &ar, CGAL::Gmpq &rationalValue, const unsigned int version)
 {
-  split_free(ar, q, version);
+  split_free(ar, rationalValue, version);
 }
 
 #ifdef CGAL_USE_GMPXX
@@ -176,35 +173,35 @@ serialize(Archive &ar, CGAL::Gmpq &q, const unsigned int version)
  * Serialization of mpz_class for text archives
  */
 SFCGAL_API void
-save(boost::archive::text_oarchive &ar, const mpz_class &z,
+save(boost::archive::text_oarchive &ar, const mpz_class &integerValue,
      const unsigned int version);
 
 /**
  * Serialization of mpz_class for binary archives
  */
 SFCGAL_API void
-save(boost::archive::binary_oarchive &ar, const mpz_class &z,
+save(boost::archive::binary_oarchive &ar, const mpz_class &integerValue,
      const unsigned int version);
 
 /**
  * Unserialization of mpz_class for text archives
  */
 SFCGAL_API void
-load(boost::archive::text_iarchive &ar, mpz_class &z,
+load(boost::archive::text_iarchive &ar, mpz_class &integerValue,
      const unsigned int version);
 
 /**
  * Unserialization of mpz_class for binary archives
  */
 SFCGAL_API void
-load(boost::archive::binary_iarchive &ar, mpz_class &z,
+load(boost::archive::binary_iarchive &ar, mpz_class &integerValue,
      const unsigned int version);
 
 template <class Archive>
 void
-serialize(Archive &ar, mpz_class &z, const unsigned int version)
+serialize(Archive &ar, mpz_class &integerValue, const unsigned int version)
 {
-  split_free(ar, z, version);
+  split_free(ar, integerValue, version);
 }
 
 /**
@@ -212,10 +209,11 @@ serialize(Archive &ar, mpz_class &z, const unsigned int version)
  */
 template <class Archive>
 void
-save(Archive &ar, const mpq_class &q, const unsigned int /*version*/)
+save(Archive &ar, const mpq_class &rationalValue,
+     const unsigned int /*version*/)
 {
-  mpz_class n = q.get_num();
-  mpz_class d = q.get_den();
+  mpz_class n = rationalValue.get_num();
+  mpz_class d = rationalValue.get_den();
   ar & n;
   ar & d;
 }
@@ -225,19 +223,19 @@ save(Archive &ar, const mpq_class &q, const unsigned int /*version*/)
  */
 template <class Archive>
 void
-load(Archive &ar, mpq_class &q, const unsigned int /*version*/)
+load(Archive &ar, mpq_class &rationalValue, const unsigned int /*version*/)
 {
   mpz_class n;
   mpz_class d;
   ar & n;
   ar & d;
-  q = mpq_class(n, d);
+  rationalValue = mpq_class(n, d);
 }
 template <class Archive>
 void
-serialize(Archive &ar, mpq_class &q, const unsigned int version)
+serialize(Archive &ar, mpq_class &rationalValue, const unsigned int version)
 {
-  split_free(ar, q, version);
+  split_free(ar, rationalValue, version);
 }
 #endif
 
@@ -246,9 +244,10 @@ serialize(Archive &ar, mpq_class &q, const unsigned int version)
  */
 template <class Archive>
 void
-save(Archive &ar, const SFCGAL::Kernel::FT &q, const unsigned int /*version*/)
+save(Archive &ar, const SFCGAL::Kernel::FT &rationalValue,
+     const unsigned int /*version*/)
 {
-  SFCGAL::Kernel::Exact_kernel::FT eq = CGAL::exact(q);
+  SFCGAL::Kernel::Exact_kernel::FT eq = CGAL::exact(rationalValue);
   ar << eq;
 }
 
@@ -257,20 +256,21 @@ save(Archive &ar, const SFCGAL::Kernel::FT &q, const unsigned int /*version*/)
  */
 template <class Archive>
 void
-load(Archive &ar, SFCGAL::Kernel::FT &q, const unsigned int /*version*/)
+load(Archive &ar, SFCGAL::Kernel::FT &rationalValue,
+     const unsigned int /*version*/)
 {
   SFCGAL::Kernel::Exact_kernel::FT eq;
   ar >> eq;
-  q = eq;
+  rationalValue = eq;
 }
 template <class Archive>
 void
-serialize(Archive &ar, SFCGAL::Kernel::FT &q, const unsigned int version)
+serialize(Archive &ar, SFCGAL::Kernel::FT &rationalValue,
+          const unsigned int version)
 {
-  split_free(ar, q, version);
+  split_free(ar, rationalValue, version);
 }
 
-} // namespace serialization
-} // namespace boost
+} // namespace boost::serialization
 
 #endif
