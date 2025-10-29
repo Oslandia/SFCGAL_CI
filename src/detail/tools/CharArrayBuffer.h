@@ -10,8 +10,7 @@
 
 #include <streambuf>
 
-namespace SFCGAL {
-namespace tools {
+namespace SFCGAL::tools {
 /// Streambuf on a char*
 /// http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
 class SFCGAL_API CharArrayBuffer : public std::streambuf {
@@ -29,26 +28,27 @@ public:
   explicit CharArrayBuffer(const char *str);
 
 private:
-  int_type
-  underflow() override;
-  int_type
-  uflow() override;
-  int_type
-  pbackfail(int_type ch) override;
-  std::streamsize
-  showmanyc() override;
+  auto
+  underflow() -> int_type override;
+  auto
+  uflow() -> int_type override;
+  auto
+  pbackfail(int_type ch) -> int_type override;
+  auto
+  showmanyc() -> std::streamsize override;
 
   // copy ctor and assignment not implemented;
   // copying not allowed
-  CharArrayBuffer(const CharArrayBuffer &);
-  CharArrayBuffer &
-  operator=(const CharArrayBuffer &);
+  CharArrayBuffer(const CharArrayBuffer &) = delete;
+  auto
+  operator=(const CharArrayBuffer &) -> CharArrayBuffer & = delete;
 
-  std::streampos
-  seekpos(std::streampos pos, std::ios_base::openmode) override;
-  std::streampos
+  auto
+  seekpos(std::streampos pos, std::ios_base::openmode)
+      -> std::streampos override;
+  auto
   seekoff(std::streamoff off, std::ios_base::seekdir way,
-          std::ios_base::openmode) override;
+          std::ios_base::openmode) -> std::streampos override;
 
 private:
   const char *const begin_;
@@ -56,7 +56,6 @@ private:
   const char       *current_;
 };
 
-} // namespace tools
-} // namespace SFCGAL
+} // namespace SFCGAL::tools
 
 #endif
