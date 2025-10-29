@@ -29,9 +29,9 @@ BOOST_AUTO_TEST_CASE(defaultConstructor)
   BOOST_CHECK_EQUAL(g.numGeometries(), 0U);
 
   // no more access to double
-  BOOST_CHECK_THROW(g.x(), Exception);
-  BOOST_CHECK_THROW(g.y(), Exception);
-  BOOST_CHECK_THROW(g.z(), Exception);
+  BOOST_CHECK_THROW(static_cast<void>(g.x()), Exception);
+  BOOST_CHECK_THROW(static_cast<void>(g.y()), Exception);
+  BOOST_CHECK_THROW(static_cast<void>(g.z()), Exception);
   BOOST_CHECK(std::isnan(g.m()));
 }
 
