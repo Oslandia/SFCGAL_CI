@@ -62,7 +62,7 @@ auto
 building(const Polygon &g, const Kernel::FT &wallHeight,
          const Kernel::FT &roofSlope) -> std::unique_ptr<Geometry>
 {
-  // typedef Straight_skeleton_2::Vertex_const_handle     Vertex_const_handle ;
+  // using = Straight_skeleton_2::Vertex_const_handle     Vertex_const_handle;
   using Halfedge_const_handle = Straight_skeleton_2::Halfedge_const_handle;
   // typedef Straight_skeleton_2::Halfedge_const_iterator
   // Halfedge_const_iterator ;
