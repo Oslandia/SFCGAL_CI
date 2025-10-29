@@ -12,9 +12,7 @@
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/config.h"
 
-namespace SFCGAL {
-namespace detail {
-namespace io {
+namespace SFCGAL::detail::io {
 
 /**
  * Writer for Well-Known Text (WKT) geometry format.
@@ -161,20 +159,20 @@ protected:
    * Outputs the complete WKT representation including geometry type
    * and coordinate information.
    *
-   * @param g The NURBSCurve geometry to write.
+   * @param nurbsCurve The NURBSCurve geometry to write.
    */
   void
-  write(const NURBSCurve &g);
+  write(const NURBSCurve &nurbsCurve);
   /**
    * Write inner content of NURBSCurve to WKT format.
    *
    * Outputs only the coordinate content without the geometry type prefix,
    * used for nested geometry structures.
    *
-   * @param g The NURBSCurve geometry to write.
+   * @param nurbsCurve The NURBSCurve geometry to write.
    */
   void
-  writeInner(const NURBSCurve &g);
+  writeInner(const NURBSCurve &nurbsCurve);
 
   // for recursive call use
   /**
@@ -254,8 +252,6 @@ private:
   bool          _exactWrite = false;
 };
 
-} // namespace io
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::io
 
 #endif
