@@ -13,8 +13,7 @@
 #include <CGAL/Triangle_2.h>
 #include <CGAL/Triangle_3.h>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /*
 /// Type traits for CGAL types.
@@ -29,21 +28,21 @@ struct SFCGAL_API NoVolume{};
 /// Generic traits, default dimension is 2
 template <int Dim>
 struct TypeForDimension {
-  typedef CGAL::Bbox_2                       Bbox; ///< Bounding box type for 2D
-  typedef Kernel::Point_2                    Point;    ///< Point type for 2D
-  typedef Kernel::Segment_2                  Segment;  ///< Segment type for 2D
-  typedef Kernel::Triangle_2                 Triangle; ///< Triangle type for 2D
-  typedef CGAL::Polygon_with_holes_2<Kernel> Surface;  ///< Surface type for 2D
-  typedef NoVolume Volume; ///< Volume type for 2D (none)
+  using Bbox     = CGAL::Bbox_2;       ///< Bounding box type for 2D
+  using Point    = Kernel::Point_2;    ///< Point type for 2D
+  using Segment  = Kernel::Segment_2;  ///< Segment type for 2D
+  using Triangle = Kernel::Triangle_2; ///< Triangle type for 2D
+  using Surface  = CGAL::Polygon_with_holes_2<Kernel>; ///< Surface type for 2D
+  using Volume   = NoVolume; ///< Volume type for 2D (none)
 };
 
 /// Extended polyhedron_3 type with a boolean marker on halfedges
 /// This is used internally for polyhedra boolean operations
 template <class Refs>
 struct Halfedge_with_mark : public CGAL::HalfedgeDS_halfedge_base<Refs> {
-  Halfedge_with_mark() : CGAL::HalfedgeDS_halfedge_base<Refs>(), mark(false) {}
+  Halfedge_with_mark() : CGAL::HalfedgeDS_halfedge_base<Refs>() {}
 
-  bool mark; ///< A boundary marker for faces with different status
+  bool mark{false}; ///< A boundary marker for faces with different status
   /**
    * @brief Set the boundary marker to true
    *
@@ -63,48 +62,48 @@ struct SFCGAL_API Items_with_mark_on_hedge : public CGAL::Polyhedron_items_3 {
    * @brief Wrapper for halfedges with mark functionality
    */
   struct Halfedge_wrapper {
-    typedef Halfedge_with_mark<Refs>
-        Halfedge; ///< Halfedge type with marking capability
+    using Halfedge =
+        Halfedge_with_mark<Refs>; ///< Halfedge type with marking capability
   };
 };
 
 /// @brief CGAL 3D polyhedron with marked half-edges
-typedef CGAL::Polyhedron_3<Kernel, Items_with_mark_on_hedge> MarkedPolyhedron;
+using MarkedPolyhedron = CGAL::Polyhedron_3<Kernel, Items_with_mark_on_hedge>;
 
 /// Specialization for dimension = 3
 template <>
 struct TypeForDimension<3> {
-  typedef CGAL::Bbox_3       Bbox;     ///< Bounding box type for 3D
-  typedef Kernel::Point_3    Point;    ///< Point type for 3D
-  typedef Kernel::Segment_3  Segment;  ///< Segment type for 3D
-  typedef Kernel::Triangle_3 Triangle; ///< Triangle type for 3D
-  typedef Kernel::Triangle_3 Surface;  ///< Surface type for 3D
-  typedef MarkedPolyhedron   Volume; ///< Volume type for 3D (marked polyhedron)
+  using Bbox     = CGAL::Bbox_3;       ///< Bounding box type for 3D
+  using Point    = Kernel::Point_3;    ///< Point type for 3D
+  using Segment  = Kernel::Segment_3;  ///< Segment type for 3D
+  using Triangle = Kernel::Triangle_3; ///< Triangle type for 3D
+  using Surface  = Kernel::Triangle_3; ///< Surface type for 3D
+  using Volume   = MarkedPolyhedron; ///< Volume type for 3D (marked polyhedron)
 };
 
 /// Another way of looking at TypeForDimension<Dim>::Point
 template <int Dim>
 struct Point_d {
-  typedef typename TypeForDimension<Dim>::Point
-      Type; ///< Point type for given dimension
+  using Type =
+      typename TypeForDimension<Dim>::Point; ///< Point type for given dimension
 };
 /// Another way of looking at TypeForDimension<Dim>::Segment
 template <int Dim>
 struct Segment_d {
-  typedef typename TypeForDimension<Dim>::Segment
-      Type; ///< Segment type for given dimension
+  using Type = typename TypeForDimension<Dim>::Segment; ///< Segment type for
+                                                        ///< given dimension
 };
 /// Another way of looking at TypeForDimension<Dim>::Surface
 template <int Dim>
 struct Surface_d {
-  typedef typename TypeForDimension<Dim>::Surface
-      Type; ///< Surface type for given dimension
+  using Type = typename TypeForDimension<Dim>::Surface; ///< Surface type for
+                                                        ///< given dimension
 };
 /// Another way of looking at TypeForDimension<Dim>::Volume
 template <int Dim>
 struct Volume_d {
-  typedef typename TypeForDimension<Dim>::Volume
-      Type; ///< Volume type for given dimension
+  using Type = typename TypeForDimension<Dim>::Volume; ///< Volume type for
+                                                       ///< given dimension
 };
 
 /// Create a distinct type for each dimension
@@ -171,7 +170,6 @@ struct IsPrimitiveLarger {
       PrimitiveDimension<Y>::value; ///< True if X has larger dimension than Y
 };
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif
