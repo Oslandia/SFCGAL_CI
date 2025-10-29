@@ -32,9 +32,9 @@ namespace SFCGAL {
 GeometryVisitor::~GeometryVisitor() = default;
 
 void
-GeometryVisitor::visit(Geometry &g)
+GeometryVisitor::visit(Geometry &geometry)
 {
-  g.accept(*this);
+  geometry.accept(*this);
 }
 //
 /////
@@ -109,9 +109,9 @@ GeometryVisitor::visit(Geometry &g)
 ConstGeometryVisitor::~ConstGeometryVisitor() = default;
 
 void
-ConstGeometryVisitor::visit(const Geometry &g)
+ConstGeometryVisitor::visit(const Geometry &geometry)
 {
-  g.accept(*this);
+  geometry.accept(*this);
 }
 //
 /////
@@ -188,7 +188,7 @@ ConstGeometryVisitor::visit(const Geometry &g)
  * is not implemented.
  */
 void
-GeometryVisitor::visit(NURBSCurve & /*g*/)
+GeometryVisitor::visit(NURBSCurve & /*geometry*/)
 {
   // Default implementation: convert to LineString and visit that
   // Derived classes should override this method for proper NURBS handling
@@ -207,7 +207,7 @@ GeometryVisitor::visit(NURBSCurve & /*g*/)
  * visitor not implemented".
  */
 void
-ConstGeometryVisitor::visit(const NURBSCurve & /*g*/)
+ConstGeometryVisitor::visit(const NURBSCurve & /*geometry*/)
 {
   // Default implementation: convert to LineString and visit that
   // Derived classes should override this method for proper NURBS handling
