@@ -18,9 +18,9 @@ BOOST_AUTO_TEST_CASE(testDefaultConstructor)
 {
   Coordinate const g;
   BOOST_CHECK(g.isEmpty());
-  BOOST_CHECK_THROW(g.x(), Exception);
-  BOOST_CHECK_THROW(g.y(), Exception);
-  BOOST_CHECK_THROW(g.z(), Exception);
+  BOOST_CHECK_THROW(static_cast<void>(g.x()), Exception);
+  BOOST_CHECK_THROW(static_cast<void>(g.y()), Exception);
+  BOOST_CHECK_THROW(static_cast<void>(g.z()), Exception);
 }
 
 /// Coordinate( const Kernel::FT & x, const Kernel::FT & y ) ;
@@ -168,11 +168,12 @@ BOOST_AUTO_TEST_CASE(testAlmostEqual)
   BOOST_CHECK(!Coordinate(0.0, 0.1).almostEqual(Coordinate(0.0, 0.0), 0.0));
   BOOST_CHECK(!Coordinate(0.0, 0.0).almostEqual(Coordinate(0.1, 0.0), 0.0));
   BOOST_CHECK(!Coordinate(0.0, 0.0).almostEqual(Coordinate(0.0, 0.1), 0.0));
+  BOOST_CHECK_THROW(static_cast<void>(Coordinate(0.0, 0.0).almostEqual(
+                        Coordinate(0.0, 0.0, 0.0), 0.0)),
+                    Exception);
   BOOST_CHECK_THROW(
-      Coordinate(0.0, 0.0).almostEqual(Coordinate(0.0, 0.0, 0.0), 0.0),
-      Exception);
-  BOOST_CHECK_THROW(
-      Coordinate(0.0, 0.0, 0.0).almostEqual(Coordinate(0.0, 0.0), 0.0),
+      static_cast<void>(
+          Coordinate(0.0, 0.0, 0.0).almostEqual(Coordinate(0.0, 0.0), 0.0)),
       Exception);
   BOOST_CHECK(
       Coordinate(0.0, 0.0, 0.0).almostEqual(Coordinate(0.0, 0.0, 0.0), 0.0));
