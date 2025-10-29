@@ -18,8 +18,7 @@ namespace SFCGAL {
 class Geometry;
 }
 
-namespace SFCGAL {
-namespace tools {
+namespace SFCGAL::tools {
 
 /**
  * Registry for dynamic information about SFCGAL library
@@ -146,7 +145,6 @@ private:
   Registry();
 };
 
-} // namespace tools
-} // namespace SFCGAL
+} // namespace SFCGAL::tools
 
 #endif
