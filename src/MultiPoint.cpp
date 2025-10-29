@@ -34,9 +34,9 @@ MultiPoint::geometryTypeId() const -> GeometryType
 }
 
 auto
-MultiPoint::isAllowed(Geometry const &g) -> bool
+MultiPoint::isAllowed(Geometry const &geometry) -> bool
 {
-  return g.geometryTypeId() == TYPE_POINT;
+  return geometry.geometryTypeId() == TYPE_POINT;
 }
 
 void
