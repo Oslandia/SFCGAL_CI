@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(testCentroid_Empty)
     std::unique_ptr<Geometry> const g(registry.newGeometryByTypeName(typeName));
     BOOST_REQUIRE(g.get() != nullptr);
     try {
-      g->centroid();
+      static_cast<void>(g->centroid());
       BOOST_CHECK_MESSAGE(false, typeName);
     } catch (Exception &) {
       // ok
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(testCentroid2D_Square3D1x1)
                       "POLYGON Z ((0.0 0.0 0.0,0.0 0.0 1.0,0.0 1.0 "
                       "1.0,0.0 1.0 0.0,0.0 0.0 0.0))");
     try {
-      g->centroid();
+      static_cast<void>(g->centroid());
       BOOST_CHECK_MESSAGE(false,
                           "vertical geometry (no 2D surface) should fail");
     } catch (InappropriateGeometryException &) {
