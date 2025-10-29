@@ -8,8 +8,7 @@
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/config.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 struct NoValidityCheck;
 
 /**
@@ -39,7 +38,6 @@ SFCGAL_API auto
 simplify(const Geometry &geometry, double threshold, bool preserveTopology,
          NoValidityCheck) -> std::unique_ptr<Geometry>;
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
