@@ -9,18 +9,69 @@
 #include <iostream>
 #include <stack>
 
-#include <boost/timer/timer.hpp>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 
 #include <boost/format.hpp>
 
 namespace SFCGAL {
 
 /**
+ * @brief Simple timer
+ */
+class CpuTimer {
+
+public:
+  CpuTimer() = default;
+
+  /**
+   * @brief Start the timer
+   */
+  void
+  start()
+  {
+    _start_time = std::chrono::high_resolution_clock::now();
+    _is_running = true;
+  }
+
+  /**
+   * @brief Stop the timer
+   */
+  void
+  stop()
+  {
+    _stop_time  = std::chrono::high_resolution_clock::now();
+    _is_running = false;
+  }
+
+  /**
+   * @brief Returns elapsed time in nanoseconds
+   *
+   * @return Elapsed time in nanoseconds since start() was called
+   */
+  [[nodiscard]] auto
+  elapsed() const -> long long
+  {
+    auto end =
+        _is_running ? std::chrono::high_resolution_clock::now() : _stop_time;
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(end -
+                                                                _start_time)
+        .count();
+  }
+
+private:
+  std::chrono::high_resolution_clock::time_point _start_time;
+  std::chrono::high_resolution_clock::time_point _stop_time;
+  bool                                           _is_running = false;
+};
+
+/**
  * @brief helper class to write formated benchs
  */
 class Bench {
 public:
-  typedef boost::timer::cpu_timer timer_t;
+  using timer_t = CpuTimer;
 
   /**
    * destructor
