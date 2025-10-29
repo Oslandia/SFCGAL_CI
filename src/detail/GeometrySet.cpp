@@ -35,25 +35,25 @@
 #include <map>
 
 auto
-operator<(const CGAL::Segment_2<SFCGAL::Kernel> &sega,
-          const CGAL::Segment_2<SFCGAL::Kernel> &segb) -> bool
+operator<(const CGAL::Segment_2<SFCGAL::Kernel> &segmentA,
+          const CGAL::Segment_2<SFCGAL::Kernel> &segmentB) -> bool
 {
-  if (sega.source() == segb.source()) {
-    return sega.target() < segb.target();
+  if (segmentA.source() == segmentB.source()) {
+    return segmentA.target() < segmentB.target();
   }
 
-  return sega.source() < segb.source();
+  return segmentA.source() < segmentB.source();
 }
 
 auto
-operator<(const CGAL::Segment_3<SFCGAL::Kernel> &sega,
-          const CGAL::Segment_3<SFCGAL::Kernel> &segb) -> bool
+operator<(const CGAL::Segment_3<SFCGAL::Kernel> &segmentA,
+          const CGAL::Segment_3<SFCGAL::Kernel> &segmentB) -> bool
 {
-  if (sega.source() == segb.source()) {
-    return sega.target() < segb.target();
+  if (segmentA.source() == segmentB.source()) {
+    return segmentA.target() < segmentB.target();
   }
 
-  return sega.source() < segb.source();
+  return segmentA.source() < segmentB.source();
 }
 
 namespace SFCGAL::detail {
@@ -198,25 +198,26 @@ GeometrySet<Dim>::addGeometry(const Geometry &g)
 
 /**
  * Add primitive to 2D geometry set from primitive handle
- * @param p The primitive handle to add
+ * @param primitiveHandle The primitive handle to add
  */
 template <>
 void
-GeometrySet<2>::addPrimitive(const PrimitiveHandle<2> &p)
+GeometrySet<2>::addPrimitive(const PrimitiveHandle<2> &primitiveHandle)
 {
-  switch (p.handle.which()) {
+  switch (primitiveHandle.handle.which()) {
   case PrimitivePoint:
-    _points.insert(*boost::get<const TypeForDimension<2>::Point *>(p.handle));
+    _points.insert(*boost::get<const TypeForDimension<2>::Point *>(
+        primitiveHandle.handle));
     break;
 
   case PrimitiveSegment:
-    _segments.insert(
-        *boost::get<const TypeForDimension<2>::Segment *>(p.handle));
+    _segments.insert(*boost::get<const TypeForDimension<2>::Segment *>(
+        primitiveHandle.handle));
     break;
 
   case PrimitiveSurface:
-    _surfaces.emplace_back(
-        *boost::get<const TypeForDimension<2>::Surface *>(p.handle));
+    _surfaces.emplace_back(*boost::get<const TypeForDimension<2>::Surface *>(
+        primitiveHandle.handle));
     break;
 
   default:
@@ -226,32 +227,34 @@ GeometrySet<2>::addPrimitive(const PrimitiveHandle<2> &p)
 
 /**
  * Add primitive to 3D geometry set from primitive handle
- * @param p The primitive handle to add
+ * @param primitiveHandle The primitive handle to add
  */
 template <>
 void
-GeometrySet<3>::addPrimitive(const PrimitiveHandle<3> &p)
+GeometrySet<3>::addPrimitive(const PrimitiveHandle<3> &primitiveHandle)
 {
-  switch (p.handle.which()) {
+  switch (primitiveHandle.handle.which()) {
   case PrimitivePoint:
-    _points.insert(*boost::get<const TypeForDimension<3>::Point *>(p.handle));
+    _points.insert(*boost::get<const TypeForDimension<3>::Point *>(
+        primitiveHandle.handle));
     break;
 
   case PrimitiveSegment:
-    _segments.insert(
-        *boost::get<const TypeForDimension<3>::Segment *>(p.handle));
+    _segments.insert(*boost::get<const TypeForDimension<3>::Segment *>(
+        primitiveHandle.handle));
     break;
 
   case PrimitiveSurface:
-    _surfaces.emplace_back(
-        *boost::get<const TypeForDimension<3>::Surface *>(p.handle));
+    _surfaces.emplace_back(*boost::get<const TypeForDimension<3>::Surface *>(
+        primitiveHandle.handle));
     break;
 
   case PrimitiveVolume: {
-    const TypeForDimension<3>::Volume &vol =
-        *boost::get<const TypeForDimension<3>::Volume *>(p.handle);
-    BOOST_ASSERT(!vol.empty());
-    _volumes.emplace_back(vol);
+    const TypeForDimension<3>::Volume &volume =
+        *boost::get<const TypeForDimension<3>::Volume *>(
+            primitiveHandle.handle);
+    BOOST_ASSERT(!volume.empty());
+    _volumes.emplace_back(volume);
     break;
   }
   }
@@ -259,21 +262,22 @@ GeometrySet<3>::addPrimitive(const PrimitiveHandle<3> &p)
 
 /**
  * Add primitive to 3D geometry set from CGAL object
- * @param o The CGAL object to add as primitive
+ * @param object The CGAL object to add as primitive
  * @param pointsAsRing If true, build polygon from point vector
  */
 template <>
 void
-GeometrySet<3>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
+GeometrySet<3>::addPrimitive(const CGAL::Object &object, bool pointsAsRing)
 {
   using TPoint   = TypeForDimension<3>::Point;
   using TSegment = TypeForDimension<3>::Segment;
   using TSurface = TypeForDimension<3>::Surface;
   using TVolume  = TypeForDimension<3>::Volume;
 
-  if (const auto *p = CGAL::object_cast<TPoint>(&o)) {
-    _points.insert(TPoint(*p));
-  } else if (const auto *pts = CGAL::object_cast<std::vector<TPoint>>(&o)) {
+  if (const auto *point = CGAL::object_cast<TPoint>(&object)) {
+    _points.insert(TPoint(*point));
+  } else if (const auto *pts =
+                 CGAL::object_cast<std::vector<TPoint>>(&object)) {
     if (pointsAsRing) {
       // if pointsAsRing is true, build a polygon out of points
       // FIXME : we use triangulation here, which is not needed
@@ -292,33 +296,34 @@ GeometrySet<3>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
       std::copy(pts->begin(), pts->end(),
                 std::inserter(_points, _points.end()));
     }
-  } else if (const auto *p = CGAL::object_cast<TSegment>(&o)) {
-    _segments.insert(TSegment(*p));
-  } else if (const auto *p = CGAL::object_cast<TSurface>(&o)) {
-    _surfaces.emplace_back(TSurface(*p));
-  } else if (const auto *p = CGAL::object_cast<TVolume>(&o)) {
-    BOOST_ASSERT(!p->empty());
-    _volumes.emplace_back(TVolume(*p));
+  } else if (const auto *segment = CGAL::object_cast<TSegment>(&object)) {
+    _segments.insert(TSegment(*segment));
+  } else if (const auto *surface = CGAL::object_cast<TSurface>(&object)) {
+    _surfaces.emplace_back(TSurface(*surface));
+  } else if (const auto *volume = CGAL::object_cast<TVolume>(&object)) {
+    BOOST_ASSERT(!volume->empty());
+    _volumes.emplace_back(TVolume(*volume));
   }
 }
 
 /**
  * Add primitive to 2D geometry set from CGAL object
- * @param o The CGAL object to add as primitive
+ * @param object The CGAL object to add as primitive
  * @param pointsAsRing If true, build polygon from point vector
  */
 template <>
 void
-GeometrySet<2>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
+GeometrySet<2>::addPrimitive(const CGAL::Object &object, bool pointsAsRing)
 {
   using TPoint   = TypeForDimension<2>::Point;
   using TSegment = TypeForDimension<2>::Segment;
   using TSurface = TypeForDimension<2>::Surface;
   using TVolume  = TypeForDimension<2>::Volume;
 
-  if (const auto *p = CGAL::object_cast<TPoint>(&o)) {
-    _points.insert(TPoint(*p));
-  } else if (const auto *pts = CGAL::object_cast<std::vector<TPoint>>(&o)) {
+  if (const auto *point = CGAL::object_cast<TPoint>(&object)) {
+    _points.insert(TPoint(*point));
+  } else if (const auto *pts =
+                 CGAL::object_cast<std::vector<TPoint>>(&object)) {
     if (pointsAsRing) {
       // if pointsAsRing is true, build a polygon out of points
       CGAL::Polygon_2<Kernel> poly;
@@ -334,7 +339,7 @@ GeometrySet<2>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
                 std::inserter(_points, _points.end()));
     }
   } else if (const auto *tri =
-                 CGAL::object_cast<CGAL::Triangle_2<Kernel>>(&o)) {
+                 CGAL::object_cast<CGAL::Triangle_2<Kernel>>(&object)) {
     // convert to a polygon
     CGAL::Polygon_2<Kernel> poly;
     poly.push_back(tri->vertex(0));
@@ -342,55 +347,58 @@ GeometrySet<2>::addPrimitive(const CGAL::Object &o, bool pointsAsRing)
     poly.push_back(tri->vertex(2));
     CGAL::Polygon_with_holes_2<Kernel> const polyh(poly);
     _surfaces.emplace_back(polyh);
-  } else if (const auto *p = CGAL::object_cast<TSegment>(&o)) {
-    _segments.insert(TSegment(*p));
-  } else if (const auto *p = CGAL::object_cast<TSurface>(&o)) {
-    BOOST_ASSERT(!p->is_unbounded());
-    _surfaces.emplace_back(TSurface(*p));
-  } else if (const auto *p = CGAL::object_cast<TVolume>(&o)) {
-    _volumes.emplace_back(TVolume(*p));
+  } else if (const auto *segment = CGAL::object_cast<TSegment>(&object)) {
+    _segments.insert(TSegment(*segment));
+  } else if (const auto *surface = CGAL::object_cast<TSurface>(&object)) {
+    BOOST_ASSERT(!surface->is_unbounded());
+    _surfaces.emplace_back(TSurface(*surface));
+  } else if (const auto *volume = CGAL::object_cast<TVolume>(&object)) {
+    _volumes.emplace_back(TVolume(*volume));
   }
 }
 
 template <int Dim>
 void
-GeometrySet<Dim>::addPrimitive(const typename TypeForDimension<Dim>::Point &p,
-                               int flags)
+GeometrySet<Dim>::addPrimitive(
+    const typename TypeForDimension<Dim>::Point &point, int flags)
 {
-  _points.insert(CollectionElement<typename Point_d<Dim>::Type>(p, flags));
+  _points.insert(CollectionElement<typename Point_d<Dim>::Type>(point, flags));
 }
 
 template <int Dim>
 void
-GeometrySet<Dim>::addPrimitive(const typename TypeForDimension<Dim>::Segment &p,
-                               int flags)
+GeometrySet<Dim>::addPrimitive(
+    const typename TypeForDimension<Dim>::Segment &segment, int flags)
 {
-  _segments.insert(CollectionElement<typename Segment_d<Dim>::Type>(p, flags));
+  _segments.insert(
+      CollectionElement<typename Segment_d<Dim>::Type>(segment, flags));
 }
 
 /**
  * Add 2D surface primitive to geometry set
- * @param p The surface to add
+ * @param surface The surface to add
  * @param flags Optional flags for the surface
  */
 template <>
 void
-GeometrySet<2>::addPrimitive(const TypeForDimension<2>::Surface &p, int flags)
+GeometrySet<2>::addPrimitive(const TypeForDimension<2>::Surface &surface,
+                             int                                 flags)
 {
-  BOOST_ASSERT(!p.is_unbounded());
-  _surfaces.emplace_back(p);
+  BOOST_ASSERT(!surface.is_unbounded());
+  _surfaces.emplace_back(surface);
   _surfaces.back().setFlags(flags);
 }
 /**
  * Add 3D surface primitive to geometry set
- * @param p The surface to add
+ * @param surface The surface to add
  * @param flags Optional flags for the surface
  */
 template <>
 void
-GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Surface &p, int flags)
+GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Surface &surface,
+                             int                                 flags)
 {
-  _surfaces.emplace_back(p);
+  _surfaces.emplace_back(surface);
   _surfaces.back().setFlags(flags);
 }
 
@@ -409,34 +417,35 @@ GeometrySet<2>::addPrimitive(
 
 /**
  * Add 3D volume primitive to geometry set
- * @param p The volume to add
+ * @param volume The volume to add
  * @param flags Optional flags for the volume
  */
 template <>
 void
-GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Volume &p, int flags)
+GeometrySet<3>::addPrimitive(const TypeForDimension<3>::Volume &volume,
+                             int                                flags)
 {
-  BOOST_ASSERT(!p.empty());
+  BOOST_ASSERT(!volume.empty());
 
-  if (p.is_closed()) {
-    _volumes.emplace_back(p, flags);
+  if (volume.is_closed()) {
+    _volumes.emplace_back(volume, flags);
   } else {
     // it is an unclosed volume, i.e. a surface
-    BOOST_ASSERT(p.is_pure_triangle());
-    CGAL::Point_3<Kernel> p1;
-    CGAL::Point_3<Kernel> p2;
-    CGAL::Point_3<Kernel> p3;
+    BOOST_ASSERT(volume.is_pure_triangle());
+    CGAL::Point_3<Kernel> point1;
+    CGAL::Point_3<Kernel> point2;
+    CGAL::Point_3<Kernel> point3;
 
-    for (MarkedPolyhedron::Facet_const_iterator fit = p.facets_begin();
-         fit != p.facets_end(); ++fit) {
+    for (MarkedPolyhedron::Facet_const_iterator fit = volume.facets_begin();
+         fit != volume.facets_end(); ++fit) {
       MarkedPolyhedron::Halfedge_around_facet_const_circulator cit =
           fit->facet_begin();
-      p1 = cit->vertex()->point();
+      point1 = cit->vertex()->point();
       cit++;
-      p2 = cit->vertex()->point();
+      point2 = cit->vertex()->point();
       cit++;
-      p3 = cit->vertex()->point();
-      CGAL::Triangle_3<Kernel> const tri(p1, p2, p3);
+      point3 = cit->vertex()->point();
+      CGAL::Triangle_3<Kernel> const tri(point1, point2, point3);
       _surfaces.emplace_back(tri);
     }
   }
@@ -1025,34 +1034,37 @@ _collect_points(const MarkedPolyhedron          &poly,
 
 template <int Dim>
 void
-GeometrySet<Dim>::collectPoints(const PrimitiveHandle<Dim> &pa)
+GeometrySet<Dim>::collectPoints(const PrimitiveHandle<Dim> &primitiveHandle)
 {
   using TPoint   = typename TypeForDimension<Dim>::Point;
   using TSegment = typename TypeForDimension<Dim>::Segment;
   using TSurface = typename TypeForDimension<Dim>::Surface;
   using TVolume  = typename TypeForDimension<Dim>::Volume;
 
-  switch (pa.handle.which()) {
+  switch (primitiveHandle.handle.which()) {
   case PrimitivePoint: {
-    const TPoint *pt = boost::get<const TPoint *>(pa.handle);
-    _points.insert(*pt);
+    const TPoint *point = boost::get<const TPoint *>(primitiveHandle.handle);
+    _points.insert(*point);
     break;
   }
 
   case PrimitiveSegment: {
-    const TSegment *seg = boost::get<const TSegment *>(pa.handle);
-    _points.insert(seg->source());
-    _points.insert(seg->target());
+    const TSegment *segment =
+        boost::get<const TSegment *>(primitiveHandle.handle);
+    _points.insert(segment->source());
+    _points.insert(segment->target());
     break;
   }
 
   case PrimitiveSurface: {
-    _collect_points(*boost::get<const TSurface *>(pa.handle), _points);
+    _collect_points(*boost::get<const TSurface *>(primitiveHandle.handle),
+                    _points);
     break;
   }
 
   case PrimitiveVolume: {
-    _collect_points(*boost::get<const TVolume *>(pa.handle), _points);
+    _collect_points(*boost::get<const TVolume *>(primitiveHandle.handle),
+                    _points);
     break;
   }
   }
