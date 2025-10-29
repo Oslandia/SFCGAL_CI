@@ -15,8 +15,7 @@
 
   #include <osgDB/WriteFile>
 
-namespace SFCGAL {
-namespace io {
+namespace SFCGAL::io {
 
 void
 osgWriteFile(const Geometry &g, const std::string &filepath)
@@ -36,7 +35,6 @@ toOsgGeometry(const Geometry &g)
   return factory.createGeometry(g);
 }
 
-} // namespace io
-} // namespace SFCGAL
+} // namespace SFCGAL::io
 
 #endif // SFCGAL_WITH_OSG
