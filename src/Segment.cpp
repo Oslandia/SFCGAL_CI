@@ -44,24 +44,24 @@ validatePointDimensions(const Point &point1, const Point &point2,
   }
 }
 
-Segment::Segment(const Point &p1, const Point &p2)
+Segment::Segment(const Point &point1, const Point &point2)
 {
   // Check for emptiness first
-  if (p1.isEmpty() || p2.isEmpty()) {
+  if (point1.isEmpty() || point2.isEmpty()) {
     _source = Point(); // Empty point
     _target = Point(); // Empty point
     return;
   }
 
   // Use the helper method for dimension validation
-  validatePointDimensions(p1, p2, "First point", "second point");
+  validatePointDimensions(point1, point2, "First point", "second point");
 
-  _source = p1;
-  _target = p2;
+  _source = point1;
+  _target = point2;
 }
 
 auto
-Segment::setSource(const Point &p) -> void
+Segment::setSource(const Point &point) -> void
 {
   // If segment is empty, refuse to set just one point
   if (isEmpty()) {
@@ -69,12 +69,12 @@ Segment::setSource(const Point &p) -> void
                     "setPoints to define both endpoints.");
   }
 
-  validatePointDimensions(p, _target, "New point", "target");
-  _source = p;
+  validatePointDimensions(point, _target, "New point", "target");
+  _source = point;
 }
 
 auto
-Segment::setTarget(const Point &p) -> void
+Segment::setTarget(const Point &point) -> void
 {
   // If segment is empty, refuse to set just one point
   if (isEmpty()) {
@@ -82,8 +82,8 @@ Segment::setTarget(const Point &p) -> void
                     "setPoints to define both endpoints.");
   }
 
-  validatePointDimensions(p, _source, "New point", "source");
-  _target = p;
+  validatePointDimensions(point, _source, "New point", "source");
+  _target = point;
 }
 
 auto
@@ -181,7 +181,7 @@ auto
 Segment::interpolate(double t) const -> Point
 {
   if (isEmpty()) {
-    return Point();
+    return {};
   }
 
   // Clamp parameter to [0,1]
