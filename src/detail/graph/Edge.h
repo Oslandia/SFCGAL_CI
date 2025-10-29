@@ -8,8 +8,7 @@
 
 #include "SFCGAL/config.h"
 
-namespace SFCGAL {
-namespace graph {
+namespace SFCGAL::graph {
 
 /**
  * @brief [private]An edge in a GeometryGraph with minimal requirements (some
@@ -25,7 +24,6 @@ struct SFCGAL_API Edge {
   int face; ///< Face identifier for this edge
 };
 
-} // namespace graph
-} // namespace SFCGAL
+} // namespace SFCGAL::graph
 
 #endif
