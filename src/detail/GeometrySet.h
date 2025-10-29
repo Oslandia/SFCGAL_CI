@@ -19,18 +19,20 @@
 #include <CGAL/Box_intersection_d/Box_with_handle_d.h>
 
 /// comparison operator on 2D segments, for use in a std::set
-bool
-operator<(const CGAL::Segment_2<SFCGAL::Kernel> &sega,
-          const CGAL::Segment_2<SFCGAL::Kernel> &segb);
+auto
+operator<(const CGAL::Segment_2<SFCGAL::Kernel> &segmentA,
+          const CGAL::Segment_2<SFCGAL::Kernel> &segmentB) -> bool;
 
 /// comparison operator on 3D segments, for use in a std::set
-bool
-operator<(const CGAL::Segment_3<SFCGAL::Kernel> &sega,
-          const CGAL::Segment_3<SFCGAL::Kernel> &segb);
+auto
+operator<(const CGAL::Segment_3<SFCGAL::Kernel> &segmentA,
+          const CGAL::Segment_3<SFCGAL::Kernel> &segmentB) -> bool;
 
 namespace SFCGAL {
 class Geometry;
-namespace detail {
+}
+
+namespace SFCGAL::detail {
 
 /// Primitive type enumeration. Note that the value is the dimension !
 enum PrimitiveType {
@@ -55,10 +57,10 @@ struct PrimitiveHandle {
 
   /**
    * @brief Constructor from primitive pointer
-   * @param p Pointer to the primitive to store
+   * @param primitivePointer Pointer to the primitive to store
    */
   template <class T>
-  PrimitiveHandle(const T *p) : handle(p)
+  PrimitiveHandle(const T *primitivePointer) : handle(primitivePointer)
   {
   }
 
@@ -67,8 +69,8 @@ struct PrimitiveHandle {
    * @return Pointer to primitive of specified type
    */
   template <class T>
-  inline const T *
-  as() const
+  inline auto
+  as() const -> const T *
   {
     return boost::get<const T *>(handle);
   }
@@ -112,8 +114,8 @@ public:
    * @brief Get element flags
    * @return The flags associated with this element
    */
-  int
-  flags() const
+  [[nodiscard]] auto
+  flags() const -> int
   {
     return _flags;
   }
@@ -121,8 +123,8 @@ public:
    * @brief Set element flags
    * @param flags The flags to set for this element
    */
-  void
-  setFlags(int flags)
+  auto
+  setFlags(int flags) -> void
   {
     _flags = flags;
   }
@@ -131,8 +133,8 @@ public:
    * @brief Get mutable reference to primitive
    * @return Reference to the underlying primitive
    */
-  Primitive &
-  primitive()
+  [[nodiscard]] auto
+  primitive() -> Primitive &
   {
     return _primitive;
   }
@@ -140,8 +142,8 @@ public:
    * @brief Get const reference to primitive
    * @return Const reference to the underlying primitive
    */
-  const Primitive &
-  primitive() const
+  [[nodiscard]] auto
+  primitive() const -> const Primitive &
   {
     return _primitive;
   }
@@ -153,16 +155,22 @@ public:
 
   /**
    * @brief Constructor from primitive
-   * @param p The primitive to wrap
+   * @param primitive The primitive to wrap
    */
-  CollectionElement(const Primitive &p) : _primitive(p), _flags(0) {}
+  CollectionElement(const Primitive &primitive)
+      : _primitive(primitive), _flags(0)
+  {
+  }
 
   /**
    * @brief Constructor from primitive with flags
-   * @param p The primitive to wrap
-   * @param f The initial flags
+   * @param primitive The primitive to wrap
+   * @param flags The initial flags
    */
-  CollectionElement(const Primitive &p, int f) : _primitive(p), _flags(f) {}
+  CollectionElement(const Primitive &primitive, int flags)
+      : _primitive(primitive), _flags(flags)
+  {
+  }
 
   /**
    * @brief Copy constructor
@@ -177,8 +185,8 @@ public:
    * @param other The element to compare with
    * @return True if this element is less than other
    */
-  bool
-  operator<(const CollectionElement &other) const
+  auto
+  operator<(const CollectionElement &other) const -> bool
   {
     return _primitive < other._primitive;
   }
@@ -198,8 +206,9 @@ private:
  * @return The output stream after writing the CollectionElement.
  */
 template <class Primitive>
-std::ostream &
+auto
 operator<<(std::ostream &ostr, const CollectionElement<Primitive> &collection)
+    -> std::ostream &
 {
   ostr << collection.primitive() << " flags: " << collection.flags();
   return ostr;
@@ -263,8 +272,8 @@ public:
    * Add primitives from another set
    * @param g The geometry set to merge from
    */
-  void
-  merge(const GeometrySet<Dim> &g);
+  auto
+  merge(const GeometrySet<Dim> &g) -> void;
 
   /**
    * Add a geometry by decomposing it into CGAL primitives
@@ -381,8 +390,8 @@ public:
    * 3 : there are volumes
    * @return The maximum dimension of geometries in the set
    */
-  int
-  dimension() const;
+  [[nodiscard]] auto
+  dimension() const -> int;
 
   /**
    * Add the boundary (segments) of a surface
@@ -411,8 +420,8 @@ public:
    * @brief Get mutable reference to point collection
    * @return Reference to the point collection
    */
-  inline PointCollection &
-  points()
+  [[nodiscard]] inline auto
+  points() -> PointCollection &
   {
     return _points;
   }
@@ -420,8 +429,8 @@ public:
    * @brief Get const reference to point collection
    * @return Const reference to the point collection
    */
-  inline const PointCollection &
-  points() const
+  [[nodiscard]] inline auto
+  points() const -> const PointCollection &
   {
     return _points;
   }
@@ -430,8 +439,8 @@ public:
    * @brief Get mutable reference to segment collection
    * @return Reference to the segment collection
    */
-  inline SegmentCollection &
-  segments()
+  [[nodiscard]] inline auto
+  segments() -> SegmentCollection &
   {
     return _segments;
   }
@@ -439,8 +448,8 @@ public:
    * @brief Get const reference to segment collection
    * @return Const reference to the segment collection
    */
-  inline const SegmentCollection &
-  segments() const
+  [[nodiscard]] inline auto
+  segments() const -> const SegmentCollection &
   {
     return _segments;
   }
@@ -449,8 +458,8 @@ public:
    * @brief Get mutable reference to surface collection
    * @return Reference to the surface collection
    */
-  inline SurfaceCollection &
-  surfaces()
+  [[nodiscard]] inline auto
+  surfaces() -> SurfaceCollection &
   {
     return _surfaces;
   }
@@ -458,8 +467,8 @@ public:
    * @brief Get const reference to surface collection
    * @return Const reference to the surface collection
    */
-  inline const SurfaceCollection &
-  surfaces() const
+  [[nodiscard]] inline auto
+  surfaces() const -> const SurfaceCollection &
   {
     return _surfaces;
   }
@@ -468,8 +477,8 @@ public:
    * @brief Get mutable reference to volume collection
    * @return Reference to the volume collection
    */
-  inline VolumeCollection &
-  volumes()
+  [[nodiscard]] inline auto
+  volumes() -> VolumeCollection &
   {
     return _volumes;
   }
@@ -477,8 +486,8 @@ public:
    * @brief Get const reference to volume collection
    * @return Const reference to the volume collection
    */
-  inline const VolumeCollection &
-  volumes() const
+  [[nodiscard]] inline auto
+  volumes() const -> const VolumeCollection &
   {
     return _volumes;
   }
@@ -557,32 +566,31 @@ operator<<(std::ostream &ostr, const GeometrySet<3> &geomSet) -> std::ostream &;
 inline auto
 compute_solid_bbox(const NoVolume &, dim_t<2>) -> CGAL::Bbox_2
 {
-  return CGAL::Bbox_2();
+  return {};
 }
 
 /**
  * Compute the bounding box of a 3D volume.
  *
- * @param vol The volume whose bounding box is to be computed.
+ * @param volume The volume whose bounding box is to be computed.
  * @return The bounding box of the volume as a CGAL::Bbox_3.
  *
  */
 inline auto
-compute_solid_bbox(const TypeForDimension<3>::Volume &vol, dim_t<3>)
+compute_solid_bbox(const TypeForDimension<3>::Volume &volume, dim_t<3>)
     -> CGAL::Bbox_3
 {
-  BOOST_ASSERT(vol.size_of_vertices());
-  MarkedPolyhedron::Point_const_iterator pit = vol.points_begin();
+  BOOST_ASSERT(volume.size_of_vertices());
+  MarkedPolyhedron::Point_const_iterator pit = volume.points_begin();
   CGAL::Bbox_3                           ret(pit->bbox());
   ++pit;
 
-  for (; pit != vol.points_end(); ++pit) {
+  for (; pit != volume.points_end(); ++pit) {
     ret = ret + pit->bbox();
   }
 
   return ret;
 }
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif
