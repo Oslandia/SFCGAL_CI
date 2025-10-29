@@ -20,8 +20,7 @@
   #include "SFCGAL/Exception.h"
   #include "SFCGAL/triangulate/triangulatePolygon.h"
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 namespace io {
 
 void
