@@ -28,7 +28,7 @@
 #include "SFCGAL/algorithm/convexHull.h"
 #include "SFCGAL/io/wkt.h"
 
-#include <boost/chrono.hpp>
+#include <chrono>
 
 using namespace SFCGAL;
 
@@ -98,9 +98,7 @@ main(int argc, char *argv[]) -> int
     return 1;
   }
 
-  // boost::timer timer ;
-  boost::chrono::system_clock::time_point const start =
-      boost::chrono::system_clock::now();
+  const auto start = std::chrono::system_clock::now();
 
   /*
    * process file
@@ -126,9 +124,11 @@ main(int argc, char *argv[]) -> int
 
     if (progress && lineNumber % 1000 == 0) {
       std::cout.width(12);
-      boost::chrono::duration<double> const elapsed =
-          boost::chrono::system_clock::now() - start;
-      std::cout << std::left << lineNumber << "(" << elapsed << " s)" << '\n';
+      const auto elapsed = std::chrono::system_clock::now() - start;
+      const auto seconds =
+          std::chrono::duration_cast<std::chrono::duration<double>>(elapsed);
+      std::cout << std::left << lineNumber << "(" << seconds.count() << " s)"
+                << '\n';
     }
 
     std::vector<std::string> tokens;
@@ -181,9 +181,8 @@ main(int argc, char *argv[]) -> int
   ofs_error.close();
   ofs_result.close();
 
-  boost::chrono::duration<double> const elapsed =
-      boost::chrono::system_clock::now() - start;
-  std::cout << filename << " complete (" << elapsed << " s)---" << '\n';
+  const auto elapsed = std::chrono::system_clock::now() - start;
+  std::cout << filename << " complete (" << elapsed.count() << " s)---" << '\n';
   std::cout << numFailed << " failed /" << (numFailed + numSuccess) << '\n';
 
   if (numFailed == 0) {
