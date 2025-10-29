@@ -15,8 +15,7 @@
 
 #include "SFCGAL/detail/graph/GeometryGraph.h"
 
-namespace SFCGAL {
-namespace graph {
+namespace SFCGAL::graph {
 
 /**
  * @brief [private]Convert Geometries to a GeometryGraph. Identifier in the
@@ -29,7 +28,7 @@ namespace graph {
 template <typename Graph>
 class GeometryGraphBuilderT {
 public:
-  typedef Graph graph_t; ///< Graph type being used
+  using graph_t = Graph; ///< Graph type being used
 
   typedef typename graph_t::vertex_properties
       vertex_properties; ///< Vertex properties type
@@ -43,7 +42,7 @@ public:
   /**
    * allows to match duplicates
    */
-  typedef std::map<Coordinate, vertex_descriptor> coordinate_list;
+  using coordinate_list = std::map<Coordinate, vertex_descriptor>;
 
   /**
    * @brief Default constructor
@@ -220,7 +219,6 @@ private:
 typedef GeometryGraphBuilderT<GeometryGraph>
     GeometryGraphBuilder; ///< Geometry graph builder type
 
-} // namespace graph
-} // namespace SFCGAL
+} // namespace SFCGAL::graph
 
 #endif
