@@ -15,39 +15,37 @@ class Geometry;
 class MultiPolygon;
 } // namespace SFCGAL
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 struct NoValidityCheck;
 
 /**
  * @brief [experimental]compute polygon offset
  *
- * @param g The input geometry
- * @param r The offset radius
+ * @param geometry The input geometry
+ * @param radius The offset radius
  * @return The offset polygon as a MultiPolygon
  * @warning test in order to compare with minkowski sum
- * @pre g is a valid Geometry
+ * @pre geometry is a valid Geometry
  * @note When applied to NURBSCurve geometries, the offset
  *   is internally computed on a LineString obtained via
  *   toLineString() with its default parameters.
  */
 SFCGAL_API std::unique_ptr<MultiPolygon>
-           offset(const Geometry &g, const double &r);
+           offset(const Geometry &geometry, const double &radius);
 
 /**
  * @brief [experimental]compute polygon offset
  *
- * @param g The input geometry
- * @param r The offset radius
+ * @param geometry The input geometry
+ * @param radius The offset radius
  * @return The offset polygon as a MultiPolygon
  * @warning test in order to compare with minkowski sum
- * @pre g is a valid Geometry
+ * @pre geometry is a valid Geometry
  * @warning No actual validity check is done.
  */
 SFCGAL_API std::unique_ptr<MultiPolygon>
-           offset(const Geometry &g, const double &r, NoValidityCheck);
+offset(const Geometry &geometry, const double &radius, NoValidityCheck);
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif
