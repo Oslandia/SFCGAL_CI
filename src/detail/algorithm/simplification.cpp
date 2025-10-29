@@ -30,8 +30,7 @@
 #include <memory>
 #include <vector>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 namespace PS = CGAL::Polyline_simplification_2;
 
@@ -60,8 +59,9 @@ using ConstraintInfoType = ConstraintOrderInfo<Constraint_id>;
  * @param lineString The source LineString
  * @return Vector of CGALPoints
  */
-static std::vector<CGALPoint>
+static auto
 extractPointsFromLineString(const LineString &lineString)
+    -> std::vector<CGALPoint>
 {
   std::vector<CGALPoint> points;
   points.reserve(lineString.numPoints());
@@ -80,8 +80,8 @@ extractPointsFromLineString(const LineString &lineString)
  * @param ring The source ring (LineString)
  * @return Vector of CGALPoints
  */
-static std::vector<CGALPoint>
-extractPointsFromRing(const LineString &ring)
+static auto
+extractPointsFromRing(const LineString &ring) -> std::vector<CGALPoint>
 {
   return extractPointsFromLineString(ring);
 }
@@ -94,10 +94,10 @@ extractPointsFromRing(const LineString &ring)
  * @param dimension The coordinate dimension type
  * @return A LineString built from the simplified constraint
  */
-static LineString
+static auto
 buildLineStringFromConstraint(const CT &ct, const Constraint_id &cid,
                               const SegmentStore &store,
-                              CoordinateType      dimension)
+                              CoordinateType      dimension) -> LineString
 {
   LineString result;
 
@@ -120,10 +120,10 @@ buildLineStringFromConstraint(const CT &ct, const Constraint_id &cid,
  * @param geomIdx The geometry index
  * @return true if constraint was added, false otherwise
  */
-static bool
+static auto
 extractLineStringConstraints(const LineString &lineString, CT &ct,
                              std::vector<ConstraintInfoType> &constraintInfos,
-                             std::size_t                      geomIdx)
+                             std::size_t                      geomIdx) -> bool
 {
   if (lineString.numPoints() < 2)
     return false;
@@ -148,11 +148,11 @@ extractLineStringConstraints(const LineString &lineString, CT &ct,
  * @param type The constraint type
  * @return true if constraint was added, false otherwise
  */
-static bool
+static auto
 extractPolygonExteriorConstraint(
     const LineString &ring, CT &ct,
     std::vector<ConstraintInfoType> &constraintInfos, std::size_t geomIdx,
-    std::size_t polyIdx, ConstraintInfo::Type type)
+    std::size_t polyIdx, ConstraintInfo::Type type) -> bool
 {
   if (ring.numPoints() < 4)
     return false;
@@ -588,7 +588,7 @@ reconstructPolyhedralSurface(
  * @param polyhedralSurfaceRings Map of simplified polyhedral surface rings
  * @return A unique_ptr to a GeometryCollection with reconstructed geometries
  */
-static std::unique_ptr<GeometryCollection>
+static auto
 reconstructAllGeometries(
     const GeometryCollection                             &collection,
     const std::map<size_t, std::unique_ptr<LineString>>  &linestrings,
@@ -596,7 +596,7 @@ reconstructAllGeometries(
     const std::map<size_t, std::map<size_t, std::map<size_t, LineString>>>
         &multiPolygonRings,
     const std::map<size_t, std::map<size_t, std::map<size_t, LineString>>>
-        &polyhedralSurfaceRings)
+        &polyhedralSurfaceRings) -> std::unique_ptr<GeometryCollection>
 {
 
   auto result = std::make_unique<GeometryCollection>();
@@ -1071,5 +1071,4 @@ simplifyGeometryCollection(const GeometryCollection &collection,
   }
 }
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
