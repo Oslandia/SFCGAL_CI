@@ -507,45 +507,45 @@ WktWriter::writeInner(const Solid &solid)
 }
 
 void
-WktWriter::write(const NURBSCurve &g)
+WktWriter::write(const NURBSCurve &nurbsCurve)
 {
   _s << "NURBSCURVE ";
-  writeCoordinateType(g);
+  writeCoordinateType(nurbsCurve);
 
-  if (g.isEmpty()) {
+  if (nurbsCurve.isEmpty()) {
     _s << "EMPTY";
     return;
   }
 
-  writeInner(g);
+  writeInner(nurbsCurve);
 }
 
 void
-WktWriter::writeInner(const NURBSCurve &g)
+WktWriter::writeInner(const NURBSCurve &nurbsCurve)
 {
   _s << "(";
 
   // NEW FORMAT: Always write degree first (ISO compliant)
-  _s << g.degree();
+  _s << nurbsCurve.degree();
 
   // Write control points
   _s << ",(";
-  for (size_t i = 0; i < g.numControlPoints(); i++) {
+  for (size_t i = 0; i < nurbsCurve.numControlPoints(); i++) {
     if (i != 0) {
       _s << ",";
     }
-    writeCoordinate(g.controlPointN(i));
+    writeCoordinate(nurbsCurve.controlPointN(i));
   }
   _s << ")";
 
   // Always write weights if they exist to ensure round-trip consistency
-  if (!g.weights().empty()) {
+  if (!nurbsCurve.weights().empty()) {
     _s << ",";
-    writeWeights(g.weights());
+    writeWeights(nurbsCurve.weights());
   }
 
   // Always write knot vector if available to ensure round-trip consistency
-  const auto &knots = g.knotVector();
+  const auto &knots = nurbsCurve.knotVector();
   if (!knots.empty()) {
     _s << ",";
     writeKnots(knots);
