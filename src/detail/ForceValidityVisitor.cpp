@@ -117,14 +117,6 @@ ForceValidityVisitor::visit(PolyhedralSurface &g)
   }
 }
 
-/**
- * @brief Forces the validity flag for a TriangulatedSurface and propagates the
- * change to its patches.
- *
- * Sets the TriangulatedSurface's validity flag to the visitor's configured
- * value and recursively visits each patch (invoking this visitor on every
- * patch) so the same validity state is applied to all contained geometry.
- */
 void
 ForceValidityVisitor::visit(TriangulatedSurface &g)
 {
@@ -134,16 +126,6 @@ ForceValidityVisitor::visit(TriangulatedSurface &g)
   }
 }
 
-/**
- * @brief Force the validity flag for a NURBSCurve and recursively apply to its
- * control points.
- *
- * Marks the provided NURBSCurve's validity flag to the visitor's configured
- * value and then visits each control point so the same validity flag is applied
- * recursively to contained point geometries.
- *
- * @param g The NURBSCurve to update and traverse.
- */
 void
 ForceValidityVisitor::visit(NURBSCurve &g)
 {
