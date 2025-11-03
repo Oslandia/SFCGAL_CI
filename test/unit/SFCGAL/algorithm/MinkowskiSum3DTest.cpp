@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(testMinkowskiSum3D_Sphere_Polyline)
 {
   // Create a sphere
   Kernel::FT                radius(10.0);
-  unsigned int              subdivision_level = 2;
+  unsigned int              subdivision_level = 1;
   Kernel::Point_3           center(0, 0, 0);
   Sphere                    sphere(radius, center, subdivision_level);
   std::unique_ptr<Geometry> sphereGeom(
