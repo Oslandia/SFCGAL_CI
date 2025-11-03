@@ -14,61 +14,73 @@
 #include <CGAL/Polygon_2.h>
 #include <CGAL/Polygon_with_holes_2.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * Make valid 2D orientation
+ * @param polygon the CGAL polygon to fix orientation for
  */
-SFCGAL_API void
-makeValidOrientation(CGAL::Polygon_2<Kernel> &polygon);
+SFCGAL_API auto
+makeValidOrientation(CGAL::Polygon_2<Kernel> &polygon) -> void;
 /**
  * Make valid 2D orientation
+ * @param polygon the CGAL polygon with holes to fix orientation for
  */
-SFCGAL_API void
-makeValidOrientation(CGAL::Polygon_with_holes_2<Kernel> &polygon);
+SFCGAL_API auto
+makeValidOrientation(CGAL::Polygon_with_holes_2<Kernel> &polygon) -> void;
 /**
  * Make valid 2D orientation
+ * @param polygon the polygon to fix orientation for
  */
-SFCGAL_API void
-makeValidOrientation(Polygon &polygon);
+SFCGAL_API auto
+makeValidOrientation(Polygon &polygon) -> void;
 
 /**
  * Test if a Geometry has a consistent orientation
+ * @param g the triangulated surface to test
+ * @return true if the surface has consistent orientation, false otherwise
  */
-SFCGAL_API bool
-hasConsistentOrientation3D(const TriangulatedSurface &g);
+SFCGAL_API auto
+hasConsistentOrientation3D(const TriangulatedSurface &g) -> bool;
 /**
  * Test if a PolyhedralSurface has a consistent orientation
+ * @param g the polyhedral surface to test
+ * @return true if the surface has consistent orientation, false otherwise
  */
-SFCGAL_API bool
-hasConsistentOrientation3D(const PolyhedralSurface &g);
+SFCGAL_API auto
+hasConsistentOrientation3D(const PolyhedralSurface &g) -> bool;
 
 /**
  * Try to make consistent orientation in a TriangulatedSurface
+ * @param g the triangulated surface to fix orientation for
  */
-SFCGAL_API void
-makeConsistentOrientation3D(TriangulatedSurface &g);
+SFCGAL_API auto
+makeConsistentOrientation3D(TriangulatedSurface &g) -> void;
 
 /**
  * Test if a 2D surface is oriented counter clockwise
+ * @param polygon the polygon to test
+ * @return true if counter clockwise oriented, false otherwise
  */
-SFCGAL_API bool
-isCounterClockWiseOriented(const Polygon &);
+SFCGAL_API auto
+isCounterClockWiseOriented(const Polygon &polygon) -> bool;
 
 /**
  * Test if a 2D surface is oriented counter clockwise
+ * @param triangle the triangle to test
+ * @return true if counter clockwise oriented, false otherwise
  */
-SFCGAL_API bool
-isCounterClockWiseOriented(const Triangle &);
+SFCGAL_API auto
+isCounterClockWiseOriented(const Triangle &triangle) -> bool;
 
 /**
  * Test if a 2D surface is oriented counter clockwise
+ * @param lineString the line string to test
+ * @return true if counter clockwise oriented, false otherwise
  */
-SFCGAL_API bool
-isCounterClockWiseOriented(const LineString &);
+SFCGAL_API auto
+isCounterClockWiseOriented(const LineString &lineString) -> bool;
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif

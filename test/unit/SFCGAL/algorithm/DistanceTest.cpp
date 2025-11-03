@@ -113,7 +113,8 @@ BOOST_AUTO_TEST_CASE(
   Point const point(3.0, 4.0);
   LineString  lineString;
   lineString.addPoint(Point(0.0, 0.0));
-  BOOST_CHECK_THROW(point.distance(lineString), GeometryInvalidityException);
+  BOOST_CHECK_THROW(static_cast<void>(point.distance(lineString)),
+                    GeometryInvalidityException);
 }
 BOOST_AUTO_TEST_CASE(
     testDistancePointLineString_pointOnLineString_collapsedSegments)
@@ -122,7 +123,8 @@ BOOST_AUTO_TEST_CASE(
   LineString  lineString;
   lineString.addPoint(Point(0.0, 0.0));
   lineString.addPoint(Point(0.0, 0.0));
-  BOOST_CHECK_THROW(point.distance(lineString), GeometryInvalidityException);
+  BOOST_CHECK_THROW(static_cast<void>(point.distance(lineString)),
+                    GeometryInvalidityException);
 }
 BOOST_AUTO_TEST_CASE(
     testDistancePointLineString3D_pointOnLineString_collapsedSegments)

@@ -37,8 +37,10 @@ namespace SFCGAL {
 class SFCGAL_API PolyhedralSurface
     : public GeometryImpl<PolyhedralSurface, Surface> {
 public:
+  /// @brief Iterator type for polyhedral surface patches
   using iterator =
       DereferenceIterator<std::vector<std::unique_ptr<Polygon>>::iterator>;
+  /// @brief Const iterator type for polyhedral surface patches
   using const_iterator = DereferenceIterator<
       std::vector<std::unique_ptr<Polygon>>::const_iterator>;
 
@@ -48,17 +50,21 @@ public:
   PolyhedralSurface();
   /**
    * Constructor with a vector of polygons
+   * @param polygons Vector of polygons to initialize the surface
    */
   PolyhedralSurface(const std::vector<Polygon> &polygons);
 
   /**
    * Constructor with a Geometry
+   * @param geometry The geometry to convert to polyhedral surface
    */
   PolyhedralSurface(const std::unique_ptr<Geometry> &geometry);
 
   /**
    * Constructor from a Polyhedron (detail::MarkedPolyhedron or
    * CGAL::Polyhedron_3)
+   * @tparam Polyhedron The CGAL polyhedron type
+   * @param poly The polyhedron to convert
    */
   template <typename Polyhedron>
   PolyhedralSurface(const Polyhedron &poly)
@@ -80,100 +86,133 @@ public:
 
   /**
    * Constructor from a CGAL::Surface_mesh
+   * @param sm The surface mesh to convert
    */
   PolyhedralSurface(const Mesh &sm);
 
+  /**
+   * Constructor from an inexact CGAL::Surface_mesh
+   * @param inexactMesh The inexact surface mesh to convert
+   */
   PolyhedralSurface(const InexactMesh &inexactMesh);
   /**
    * Copy constructor
+   * @param other The polyhedral surface to copy from
    */
   PolyhedralSurface(const PolyhedralSurface &other);
   /**
    * assign operator
+   * @param other The polyhedral surface to assign from
+   * @return Reference to this polyhedral surface
    */
-  PolyhedralSurface &
-  operator=(PolyhedralSurface other);
+  auto
+  operator=(PolyhedralSurface other) -> PolyhedralSurface &;
   /**
    * destructor
    */
-  ~PolyhedralSurface();
+  ~PolyhedralSurface() override;
 
   //-- SFCGAL::Geometry
-  std::string
-  geometryType() const override;
+  /// @brief Get the geometry type as string
+  /// @return "PolyhedralSurface"
+  [[nodiscard]] auto
+  geometryType() const -> std::string override;
   //-- SFCGAL::Geometry
-  GeometryType
-  geometryTypeId() const override;
+  /// @brief Get the geometry type identifier
+  /// @return TYPE_POLYHEDRALSURFACE
+  [[nodiscard]] auto
+  geometryTypeId() const -> GeometryType override;
   //-- SFCGAL::Geometry
-  int
-  dimension() const override;
+  /// @brief Get the dimension of the polyhedral surface
+  /// @return 2 (surfaces are 2-dimensional)
+  [[nodiscard]] auto
+  dimension() const -> int override;
   //-- SFCGAL::Geometry
-  int
-  coordinateDimension() const override;
+  /// @brief Get the coordinate dimension
+  /// @return Number of coordinates per point
+  [[nodiscard]] auto
+  coordinateDimension() const -> int override;
   //-- SFCGAL::Geometry
-  bool
-  isEmpty() const override;
+  /// @brief Check if the polyhedral surface is empty
+  /// @return true if empty, false otherwise
+  [[nodiscard]] auto
+  isEmpty() const -> bool override;
   //-- SFCGAL::Geometry
-  bool
-  is3D() const override;
+  /// @brief Check if the polyhedral surface has 3D coordinates
+  /// @return true if 3D, false otherwise
+  [[nodiscard]] auto
+  is3D() const -> bool override;
   //-- SFCGAL::Geometry
-  bool
-  isMeasured() const override;
+  /// @brief Check if the polyhedral surface has measured coordinates
+  /// @return true if measured, false otherwise
+  [[nodiscard]] auto
+  isMeasured() const -> bool override;
 
+  /// @brief Drop Z coordinate from all polygons
+  /// @return true if Z was dropped, false otherwise
   auto
   dropZ() -> bool override;
 
+  /// @brief Drop M coordinate from all polygons
+  /// @return true if M was dropped, false otherwise
   auto
   dropM() -> bool override;
 
+  /// @brief Swap X and Y coordinates of all polygons
   auto
   swapXY() -> void override;
 
   /**
    * Convert PolyhedralSurface to TriangulatedSurface
+   * @return A triangulated surface representation
    */
-  TriangulatedSurface
-  toTriangulatedSurface() const;
+  [[nodiscard]] auto
+  toTriangulatedSurface() const -> TriangulatedSurface;
 
   /**
    * [SFA/OGC]Returns the number of patches
+   * @return Number of polygonal patches in the surface
    * @warning PolyhedralSurface is treated as one geometry. numGeometries
    * returns 1 or 0 for empty PolyhedralSurface
    */
-  inline auto
+  [[nodiscard]] auto
   numPatches() const -> size_t
   {
     return _polygons.size();
   }
 
   /**
-   * [SFA/OGC]Returns the number of polygons
-   *
+   * @brief [SFA/OGC]Returns the number of polygons
+   * @return Number of polygons in the surface
    * @warning PolyhedralSurface is treated as one geometry. numGeometries
    * returns 1 or 0 for empty PolyhedralSurface
    * @deprecated see numPatches
    * @see numGeometries()
    */
-  inline size_t
-  numPolygons() const
+  [[nodiscard]] auto
+  numPolygons() const -> size_t
   {
     return numPatches();
   }
 
   /**
    * [SFA/OGC]Returns the n-th patch
+   * @param n The index of the patch to get
+   * @return Const reference to the nth patch
    */
-  inline const Polygon &
-  patchN(size_t const &n) const
+  [[nodiscard]] auto
+  patchN(size_t const &n) const -> const Polygon &
   {
     BOOST_ASSERT(n < _polygons.size());
     return *_polygons[n];
   }
   /**
    * [SFA/OGC]Returns the n-th patch
+   * @param n The index of the patch to get
+   * @return Reference to the nth patch
    */
-  inline Polygon &
-  patchN(size_t const &n)
+  auto
+  patchN(size_t const &n) -> Polygon &
   {
     BOOST_ASSERT(n < _polygons.size());
     return *_polygons[n];
@@ -205,60 +244,69 @@ public:
   addPatch(std::unique_ptr<Polygon> patch);
   /**
    * add patches from an other PolyhedralSurface
+   * @param polyhedralSurface The polyhedral surface to add patches from
    */
   void
   addPatchs(const PolyhedralSurface &polyhedralSurface);
 
   /**
-   * [SFA/OGC]Returns the n-th polygon
+   * @brief [SFA/OGC]Returns the n-th polygon
+   * @param n Index of the polygon to get
+   * @return Const reference to the nth polygon
    * @deprecated see patchN()
    */
-  inline const Polygon &
-  polygonN(size_t const &n) const
+  [[nodiscard]] auto
+  polygonN(size_t const &n) const -> const Polygon &
   {
     return patchN(n);
   }
   /**
-   * [SFA/OGC]Returns the n-th polygon
+   * @brief [SFA/OGC]Returns the n-th polygon
+   * @param n Index of the polygon to get
+   * @return Reference to the nth polygon
    * @deprecated see patchN()
    */
-  inline Polygon &
-  polygonN(size_t const &n)
+  auto
+  polygonN(size_t const &n) -> Polygon &
   {
     return patchN(n);
   }
   /**
    * add a polygon to the PolyhedralSurface
+   * @param polygon The polygon to add
    * @deprecated see addPatch()
    */
   void
   addPolygon(const Polygon &polygon);
   /**
    * add a polygon to the PolyhedralSurface
+   * @param polygon The polygon to add
    * @deprecated see addPatch()
    */
   void
   addPolygon(Polygon *polygon);
   /**
-   * add polygons from an other PolyhedralSurface
+   * @brief add polygons from an other PolyhedralSurface
+   * @param polyhedralSurface The polyhedral surface to add polygons from
    * @deprecated see addPatchs()
    */
   void
   addPolygons(const PolyhedralSurface &polyhedralSurface);
 
   /**
-   * Sets the n-th Geometry, starting at zero
-   * It needs to be a polygon.
+   * @brief Sets the n-th Geometry, starting at zero
+   * @param geometry Geometry to set (must be a polygon)
+   * @param idx Index of the patch to set
    */
   void
   setPatchN(const Geometry &geometry, size_t const &idx);
 
   /**
-   * Sets the n-th Geometry, starting at zero
-   * It needs to be a polygon.
-   * The ownership of the polygon is taken. The caller is not responsible
+   * @brief Sets the n-th Geometry, starting at zero
+   * @param geometry Pointer to geometry (must be a polygon)
+   * @param idx Index of the patch to set
+   * @note The ownership of the polygon is taken. The caller is not responsible
    * anymore of its deallocation.
-   *
    * @deprecated The unique_ptr version should be used instead
    */
   void
@@ -279,16 +327,19 @@ public:
   setPatchN(std::unique_ptr<Geometry> geometry, size_t const &idx);
 
   /**
-   * Sets the n-th Patch, starting at zero
+   * @brief Sets the n-th Patch, starting at zero
+   * @param patch Polygon patch to set
+   * @param idx Index of the patch to set
    */
   void
   setPatchN(const Polygon &patch, size_t const &idx);
 
   /**
-   * Sets the n-th Patch, starting at zero
-   * The ownership of the polygon is taken. The caller is not responsible
+   * @brief Sets the n-th Patch, starting at zero
+   * @param patch Pointer to polygon patch
+   * @param idx Index of the patch to set
+   * @note The ownership of the polygon is taken. The caller is not responsible
    * anymore of its deallocation.
-   *
    * @deprecated The unique_ptr version should be used instead
    */
   void
@@ -309,7 +360,8 @@ public:
   setPatchN(std::unique_ptr<Polygon> patch, size_t const &idx);
 
   /**
-   * Convert to CGAL::Polyhedron_3
+   * @brief Convert to CGAL::Polyhedron_3
+   * @return Unique pointer to CGAL polyhedron representation
    */
   template <typename Polyhedron>
   auto
@@ -322,24 +374,40 @@ public:
 
   //-- iterators
 
-  inline iterator
-  begin()
+  /**
+   * @brief Get iterator to beginning of patches
+   * @return Iterator to first patch
+   */
+  auto
+  begin() -> iterator
   {
     return dereference_iterator(_polygons.begin());
   }
-  inline const_iterator
-  begin() const
+  /**
+   * @brief Get const iterator to beginning of patches
+   * @return Const iterator to first patch
+   */
+  [[nodiscard]] auto
+  begin() const -> const_iterator
   {
     return dereference_iterator(_polygons.begin());
   }
 
-  inline iterator
-  end()
+  /**
+   * @brief Get iterator to end of patches
+   * @return Iterator to past-the-end
+   */
+  auto
+  end() -> iterator
   {
     return dereference_iterator(_polygons.end());
   }
-  inline const_iterator
-  end() const
+  /**
+   * @brief Get const iterator to end of patches
+   * @return Const iterator to past-the-end
+   */
+  [[nodiscard]] auto
+  end() const -> const_iterator
   {
     return dereference_iterator(_polygons.end());
   }
@@ -347,14 +415,19 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
+  /// @brief Accept a geometry visitor
+  /// @param visitor Visitor to accept
   void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
+  /// @brief Accept a const geometry visitor
+  /// @param visitor Const visitor to accept
   void
   accept(ConstGeometryVisitor &visitor) const override;
 
   /**
-   * Serializer
+   * @brief Serializer
+   * @param ar Archive for serialization
    */
   template <class Archive>
   void
@@ -365,10 +438,17 @@ public:
   }
 
   //-- iterators
-  using value_type      = Polygon;
-  using reference       = Polygon &;
+  /// @brief Value type for container compatibility
+  using value_type = Polygon;
+  /// @brief Reference type for container compatibility
+  using reference = Polygon &;
+  /// @brief Const reference type for container compatibility
   using const_reference = const Polygon &;
 
+  /**
+   * @brief Add a polygon patch (container compatibility)
+   * @param polygon The polygon to add as a patch
+   */
   void
   push_back(const Polygon &polygon)
   {
@@ -379,7 +459,7 @@ private:
   std::vector<std::unique_ptr<Polygon>> _polygons;
 
   void
-  swap(PolyhedralSurface &other)
+  swap(PolyhedralSurface &other) noexcept
   {
     std::swap(_polygons, other._polygons);
   }

@@ -28,38 +28,49 @@ public:
   MultiSolid();
   /**
    * Copy constructor
+   * @param other The multi-solid to copy from
    */
   MultiSolid(const MultiSolid &other);
   /**
    * assign operator
+   * @param other The multi-solid to assign from
+   * @return Reference to this multi-solid
    */
-  MultiSolid &
-  operator=(MultiSolid other);
+  auto
+  operator=(MultiSolid other) -> MultiSolid &;
   /**
    * destructor
    */
-  virtual ~MultiSolid();
+  ~MultiSolid() override;
 
   //-- SFCGAL::Geometry
-  std::string
-  geometryType() const override;
+  /// @brief Get the geometry type as string
+  /// @return "MultiSolid"
+  [[nodiscard]] auto
+  geometryType() const -> std::string override;
   //-- SFCGAL::Geometry
-  GeometryType
-  geometryTypeId() const override;
+  /// @brief Get the geometry type identifier
+  /// @return TYPE_MULTISOLID
+  [[nodiscard]] auto
+  geometryTypeId() const -> GeometryType override;
 
   /**
    * returns the n-th Geometry as a Solid
+   * @param n The index of the solid to get
+   * @return Reference to the nth solid
    */
-  inline Solid &
-  solidN(const size_t &n)
+  inline auto
+  solidN(const size_t &n) -> Solid &
   {
     return geometryN(n).as<Solid>();
   }
   /**
    * returns the n-th Geometry as a Solid
+   * @param n The index of the solid to get
+   * @return Const reference to the nth solid
    */
-  inline const Solid &
-  solidN(const size_t &n) const
+  inline auto
+  solidN(const size_t &n) const -> const Solid &
   {
     return geometryN(n).as<Solid>();
   }
@@ -67,14 +78,19 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
-  void
-  accept(GeometryVisitor &visitor) override;
+  /// @brief Accept a geometry visitor
+  /// @param visitor Visitor to accept
+  auto
+  accept(GeometryVisitor &visitor) -> void override;
   //-- SFCGAL::Geometry
-  void
-  accept(ConstGeometryVisitor &visitor) const override;
+  /// @brief Accept a const geometry visitor
+  /// @param visitor Const visitor to accept
+  auto
+  accept(ConstGeometryVisitor &visitor) const -> void override;
 
   /**
-   * Serializer
+   * @brief Serializer
+   * @param ar Archive for serialization
    */
   template <class Archive>
   void
@@ -85,8 +101,11 @@ public:
 
 protected:
   //-- SFCGAL::GeometryCollection
-  bool
-  isAllowed(Geometry const &g) override;
+  /// @brief Check if geometry is allowed in this collection
+  /// @param geometry Geometry to test
+  /// @return true if geometry is a Solid
+  auto
+  isAllowed(Geometry const &geometry) -> bool override;
 };
 
 } // namespace SFCGAL

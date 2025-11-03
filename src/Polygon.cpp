@@ -180,13 +180,13 @@ Polygon::reverse()
 void
 Polygon::accept(GeometryVisitor &visitor)
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 void
 Polygon::accept(ConstGeometryVisitor &visitor) const
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 auto

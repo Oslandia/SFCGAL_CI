@@ -12,8 +12,7 @@
 
 #include <CGAL/Aff_transformation_2.h>
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 /**
  * Wrapper for CGAL::Aff_transform_2
@@ -38,7 +37,6 @@ private:
   CGAL::Aff_transformation_2<Kernel> _transform;
 };
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform
 
 #endif

@@ -9,9 +9,7 @@
 #include <ostream>
 #include <string>
 
-namespace SFCGAL {
-namespace io {
-namespace OBJ {
+namespace SFCGAL::io::OBJ {
 
 /**
  * @brief Saves a geometry to an OBJ format stream.
@@ -41,8 +39,8 @@ save(const Geometry &geom, const std::string &filename);
  * @return The OBJ format string
  * @throws SFCGAL::Exception If the geometry is invalid or unsupported
  */
-SFCGAL_API std::string
-           saveToString(const Geometry &geom);
+SFCGAL_API auto
+saveToString(const Geometry &geom) -> std::string;
 
 /**
  * @brief Saves a geometry to an OBJ format buffer (C API).
@@ -56,8 +54,6 @@ SFCGAL_API std::string
 SFCGAL_API void
 saveToBuffer(const Geometry &geom, char *buffer, size_t *size);
 
-} // namespace OBJ
-} // namespace io
-} // namespace SFCGAL
+} // namespace SFCGAL::io::OBJ
 
 #endif

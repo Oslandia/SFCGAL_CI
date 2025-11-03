@@ -312,11 +312,15 @@ offset(const Geometry &g, const double &radius,
   }
 
   switch (g.geometryTypeId()) {
-  case TYPE_POINT:
-    return offset(g.as<Point>(), radius, polygonSet);
+  case TYPE_POINT: {
+    offset(g.as<Point>(), radius, polygonSet);
+    return;
+  }
 
-  case TYPE_LINESTRING:
-    return offset(g.as<LineString>(), radius, polygonSet);
+  case TYPE_LINESTRING: {
+    offset(g.as<LineString>(), radius, polygonSet);
+    return;
+  }
 
   case TYPE_NURBSCURVE: {
     // Convert NURBS curve to LineString and apply offset
@@ -328,14 +332,20 @@ offset(const Geometry &g, const double &radius,
     return;
   }
 
-  case TYPE_POLYGON:
-    return offset(g.as<Polygon>(), radius, polygonSet);
+  case TYPE_POLYGON: {
+    offset(g.as<Polygon>(), radius, polygonSet);
+    return;
+  }
 
-  case TYPE_TRIANGLE:
-    return offset(g.as<Triangle>().toPolygon(), radius, polygonSet);
+  case TYPE_TRIANGLE: {
+    offset(g.as<Triangle>().toPolygon(), radius, polygonSet);
+    return;
+  }
 
-  case TYPE_SOLID:
-    return offset(g.as<Solid>().exteriorShell(), radius, polygonSet);
+  case TYPE_SOLID: {
+    offset(g.as<Solid>().exteriorShell(), radius, polygonSet);
+    return;
+  }
 
   case TYPE_MULTISOLID:
   case TYPE_MULTIPOINT:
@@ -343,8 +353,10 @@ offset(const Geometry &g, const double &radius,
   case TYPE_MULTIPOLYGON:
   case TYPE_GEOMETRYCOLLECTION:
   case TYPE_TRIANGULATEDSURFACE:
-  case TYPE_POLYHEDRALSURFACE:
-    return offsetCollection(g, radius, polygonSet);
+  case TYPE_POLYHEDRALSURFACE: {
+    offsetCollection(g, radius, polygonSet);
+    return;
+  }
   }
 }
 

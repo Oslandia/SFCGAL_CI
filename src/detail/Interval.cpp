@@ -14,8 +14,8 @@ Interval::Interval() : _lower(NaN()), _upper(NaN()) {}
 
 Interval::Interval(const double &value) : _lower(value), _upper(value) {}
 
-Interval::Interval(const double &v1, const double &v2)
-    : _lower(std::min(v1, v2)), _upper(std::max(v1, v2))
+Interval::Interval(const double &value1, const double &value2)
+    : _lower(std::min(value1, value2)), _upper(std::max(value1, value2))
 {
 }
 
@@ -33,14 +33,14 @@ Interval::isEmpty() const -> bool
 }
 
 void
-Interval::expandBy(const double &d)
+Interval::expandBy(const double &expandAmount)
 {
   if (isEmpty()) {
     return;
   }
 
-  _lower = _lower - d;
-  _upper = _upper + d;
+  _lower = _lower - expandAmount;
+  _upper = _upper + expandAmount;
 }
 
 void

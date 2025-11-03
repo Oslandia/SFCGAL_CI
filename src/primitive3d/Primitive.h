@@ -31,10 +31,10 @@ enum class PrimitiveType : std::int8_t {
  * parameter.
  *
  * A primitive parameter can be one of the following types:
- * - SFCGAL::Kernel::FT        : a scalar floating-point value
- * - SFCGAL::Kernel::Point_3   : a 3D point
- * - SFCGAL::Kernel::Vector_3  : a 3D vector
- * - unsigned int              : an integer value
+ * - SFCGAL::Kernel::FT : a scalar floating-point value
+ * - SFCGAL::Kernel::Point_3 : a 3D point
+ * - SFCGAL::Kernel::Vector_3 : a 3D vector
+ * - unsigned int : an integer value
  */
 using PrimitiveParameter =
     std::variant<Kernel::FT, Kernel::Point_3, Kernel::Vector_3, unsigned int>;
@@ -48,13 +48,13 @@ using PrimitiveParameter =
  *
  * \code{.cpp}
  * SubClass::SubClass(const Kernel::FT &radius, const Kernel::FT &height,
- *                    unsigned int num)
+ * unsigned int num)
  * {
- *   m_parameters["radius"] = radius;
- *   m_parameters["height"] = height;
- *   m_parameters["num"]    = num;
+ * m_parameters["radius"] = radius;
+ * m_parameters["height"] = height;
+ * m_parameters["num"] = num;
  *
- *   SubClass::validateParameters(m_parameters);
+ * SubClass::validateParameters(m_parameters);
  * }
  * \endcode
  */

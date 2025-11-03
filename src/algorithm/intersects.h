@@ -27,140 +27,136 @@ struct NoValidityCheck;
 
 /**
  * Robust intersection test on 2D geometries. Force projection to z=0 if needed
- * @pre ga and gb are valid geometries
- * @param ga first geometry to operate
- * @param gb second geometry to operate
- * @return true when @p ga intersects @p gb
+ * @pre geometry1 and geometry2 are valid geometries
+ * @param geometry1 first geometry to operate
+ * @param geometry2 second geometry to operate
+ * @return true when @p geometry1 intersects @p geometry2
  */
-SFCGAL_API bool
-intersects(const Geometry &ga, const Geometry &gb);
+SFCGAL_API auto
+intersects(const Geometry &geometry1, const Geometry &geometry2) -> bool;
 
 /**
  * Robust intersection test on 3D geometries. Assume z = 0 if needed
- * @pre ga and gb are valid geometries
- * @param ga first geometry to operate
- * @param gb second geometry to operate
- * @return true when @p ga intersects @p gb
+ * @pre geometry1 and geometry2 are valid geometries
+ * @param geometry1 first geometry to operate
+ * @param geometry2 second geometry to operate
+ * @return true when @p geometry1 intersects @p geometry2
  */
-SFCGAL_API bool
-intersects3D(const Geometry &ga, const Geometry &gb);
+SFCGAL_API auto
+intersects3D(const Geometry &geometry1, const Geometry &geometry2) -> bool;
 
 /**
  * Intersection test on 2D geometries. Force projection to z=0 if needed
- * @pre ga and gb are valid geometries
- * @param ga first geometry to operate
- * @param gb second geometry to operate
- * @return true when @p ga intersects @p gb
+ * @pre geometry1 and geometry2 are valid geometries
+ * @param geometry1 first geometry to operate
+ * @param geometry2 second geometry to operate
+ * @return true when @p geometry1 intersects @p geometry2
  *
- * @ingroup detail
  * @warning the validity is assumed, no actual check is done
  */
-SFCGAL_API bool
-intersects(const Geometry &ga, const Geometry &gb, NoValidityCheck);
+SFCGAL_API auto
+intersects(const Geometry &geometry1, const Geometry &geometry2,
+           NoValidityCheck) -> bool;
 
 /**
  * Intersection test on 3D geometries. Assume z = 0 if needed
- * @pre ga and gb are valid geometries
- * @param ga first geometry to operate
- * @param gb second geometry to operate
- * @return true when @p ga intersects @p gb
+ * @pre geometry1 and geometry2 are valid geometries
+ * @param geometry1 first geometry to operate
+ * @param geometry2 second geometry to operate
+ * @return true when @p geometry1 intersects @p geometry2
  *
- * @ingroup detail
  * @warning the validity is assumed, no actual check is done
  */
-SFCGAL_API bool
-intersects3D(const Geometry &ga, const Geometry &gb, NoValidityCheck);
+SFCGAL_API auto
+intersects3D(const Geometry &geometry1, const Geometry &geometry2,
+             NoValidityCheck) -> bool;
 
 /**
  * Intersection test on GeometrySet
- * @param a first geometry set to operate
- * @param b second geometry set to operate
- * @return true when @p a intersects @p b
+ * @param geometrySet1 first geometry set to operate
+ * @param geometrySet2 second geometry set to operate
+ * @return true when @p geometrySet1 intersects @p geometrySet2
  *
- * @ingroup detail
  */
 template <int Dim>
-bool
-intersects(const detail::GeometrySet<Dim> &a,
-           const detail::GeometrySet<Dim> &b);
+auto
+intersects(const detail::GeometrySet<Dim> &geometrySet1,
+           const detail::GeometrySet<Dim> &geometrySet2) -> bool;
 
 /**
  * Intersection test on a PrimitiveHandle
- * @param a first primitive handle to operate
- * @param b second primitive handle to operate
- * @return true when @p a intersects @p b
+ * @param handle1 first primitive handle to operate
+ * @param handle2 second primitive handle to operate
+ * @return true when @p handle1 intersects @p handle2
  *
- * @ingroup detail
  */
 template <int Dim>
-bool
-intersects(const detail::PrimitiveHandle<Dim> &a,
-           const detail::PrimitiveHandle<Dim> &b);
+auto
+intersects(const detail::PrimitiveHandle<Dim> &handle1,
+           const detail::PrimitiveHandle<Dim> &handle2) -> bool;
 
 /**
  * Self intersection test for 2D LineString (false if only endpoint touch)
- * @param l geometry to check self intersection with
- * @return true when @p l self intersects
+ * @param lineString geometry to check self intersection with
+ * @return true when @p lineString self intersects
  *
- * @ingroup detail
  */
-bool
-selfIntersects(const LineString &l);
+auto
+selfIntersects(const LineString &lineString) -> bool;
 
 /**
  * Self intersection test for 3D LineString (false if only endpoints touch)
- * @param l geometry to check self intersection with
- * @return true when @p l self intersects
+ * @param lineString geometry to check self intersection with
+ * @return true when @p lineString self intersects
  *
- * @ingroup detail
  */
-bool
-selfIntersects3D(const LineString &l);
+auto
+selfIntersects3D(const LineString &lineString) -> bool;
 
 /**
  * Self intersection test for 2D PolyhedralSurface (false if only point touch)
- * @param s geometry to check self intersection with
- * @param g surface graph matching @p s
- * @return true when @p s self intersects
+ * @param surface geometry to check self intersection with
+ * @param graph surface graph matching @p surface
+ * @return true when @p surface self intersects
  *
- * @ingroup detail
  */
-bool
-selfIntersects(const PolyhedralSurface &s, const SurfaceGraph &g);
+auto
+selfIntersects(const PolyhedralSurface &surface, const SurfaceGraph &graph)
+    -> bool;
 
 /**
  * Self intersection test for 3D PolyhedralSurface (false if only point touch)
- * @param s geometry to check self intersection with
- * @param g surface graph matching @p s
- * @return true when @p s self intersects
+ * @param surface geometry to check self intersection with
+ * @param graph surface graph matching @p surface
+ * @return true when @p surface self intersects
  *
- * @ingroup detail
  */
 
-bool
-selfIntersects3D(const PolyhedralSurface &s, const SurfaceGraph &g);
+auto
+selfIntersects3D(const PolyhedralSurface &surface, const SurfaceGraph &graph)
+    -> bool;
 
 /**
  * Self intersection test for 2D TriangulatedSurface (false if only point touch)
- * @param s geometry to check self intersection with
- * @param g surface graph matching @p s
- * @return true when @p s self intersects
+ * @param triangulatedSurface geometry to check self intersection with
+ * @param graph surface graph matching @p triangulatedSurface
+ * @return true when @p triangulatedSurface self intersects
  *
- * @ingroup detail
  */
-bool
-selfIntersects(const TriangulatedSurface &s, const SurfaceGraph &g);
+auto
+selfIntersects(const TriangulatedSurface &triangulatedSurface,
+               const SurfaceGraph        &graph) -> bool;
 
 /**
  * Self intersection test for 3D TriangulatedSurface (false if only point touch)
- * @param s geometry to check self intersection with
- * @param g surface graph matching @p s
- * @return true when @p s self intersects
+ * @param triangulatedSurface geometry to check self intersection with
+ * @param graph surface graph matching @p triangulatedSurface
+ * @return true when @p triangulatedSurface self intersects
  *
- * @ingroup detail
  */
-bool
-selfIntersects3D(const TriangulatedSurface &s, const SurfaceGraph &g);
+auto
+selfIntersects3D(const TriangulatedSurface &triangulatedSurface,
+                 const SurfaceGraph        &graph) -> bool;
 } // namespace algorithm
 } // namespace SFCGAL
 #endif

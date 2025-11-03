@@ -19,10 +19,10 @@ ForceZOrderPoints::ForceZOrderPoints(Kernel::FT defaultZ)
 }
 
 void
-ForceZOrderPoints::transform(Point &p)
+ForceZOrderPoints::transform(Point &point)
 {
-  if (!p.is3D()) {
-    p = Point(p.x(), p.y(), _defaultZ);
+  if (!point.is3D()) {
+    point = Point(point.x(), point.y(), _defaultZ);
   }
 }
 

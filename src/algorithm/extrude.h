@@ -11,8 +11,7 @@
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/config.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 // Class forward declarations.
 struct NoValidityCheck;
@@ -39,9 +38,10 @@ struct NoValidityCheck;
  *   is internally performed on a LineString obtained via
  *   toLineString() with its default parameters.
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           extrude(const Geometry &geometry, const Kernel::FT &deltaX,
-                   const Kernel::FT &deltaY, const Kernel::FT &deltaZ);
+SFCGAL_API auto
+extrude(const Geometry &geometry, const Kernel::FT &deltaX,
+        const Kernel::FT &deltaY, const Kernel::FT &deltaZ)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * @brief Extrude geometry without validity check.
@@ -53,10 +53,10 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @return Extruded geometry.
  * @warning No actual validity check is conducted.
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           extrude(const Geometry &inputGeom, const Kernel::FT &displacementX,
-                   const Kernel::FT &displacementY, const Kernel::FT &displacementZ,
-                   NoValidityCheck &nvc);
+SFCGAL_API auto
+extrude(const Geometry &inputGeom, const Kernel::FT &displacementX,
+        const Kernel::FT &displacementY, const Kernel::FT &displacementZ,
+        NoValidityCheck &nvc) -> std::unique_ptr<Geometry>;
 
 /**
  * @brief Extrude geometry with double precision parameters.
@@ -65,12 +65,12 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @param displacementY Component of displacement in y-direction.
  * @param displacementZ Component of displacement in z-direction.
  * @return Extruded geometry.
- * @ingroup detail
  * @warning No actual validity check is conducted.
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           extrude(const Geometry &geom, const double &displacementX,
-                   const double &displacementY, const double &displacementZ);
+SFCGAL_API auto
+extrude(const Geometry &geom, const double &displacementX,
+        const double &displacementY, const double &displacementZ)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * @brief Extrude geometry using a displacement vector.
@@ -79,7 +79,6 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @return A Geometry equal to inputGeometry extruded by the displacement
  * vector.
  * @pre inputGeometry must be a valid geometry.
- * @ingroup detail
  * @note When applied to NURBSCurve geometries, the extrusion
  *   is internally performed on a LineString obtained via
  *   toLineString() with its default parameters.
@@ -88,8 +87,9 @@ SFCGAL_API std::unique_ptr<Geometry>
  *   Polyhedron union to get output geometries with a clean
  *   topology.
  */
-SFCGAL_API std::unique_ptr<Geometry>
-extrude(const Geometry &inputGeometry, const Kernel::Vector_3 &vector);
+SFCGAL_API auto
+extrude(const Geometry &inputGeometry, const Kernel::Vector_3 &vector)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * @brief Extrude polygon with specified height.
@@ -97,9 +97,9 @@ extrude(const Geometry &inputGeometry, const Kernel::Vector_3 &vector);
  * @param height The extrusion height.
  * @return Extruded geometry.
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           extrude(const Polygon &polygon, const double &height);
-} // namespace algorithm
-} // namespace SFCGAL
+SFCGAL_API auto
+extrude(const Polygon &polygon, const double &height)
+    -> std::unique_ptr<Geometry>;
+} // namespace SFCGAL::algorithm
 
 #endif // ! SFCGAL_ALGORITHM_EXTRUDE_H_

@@ -19,12 +19,16 @@ namespace SFCGAL {
 namespace generator {
 
 /**
- * Generate a discrete circle
+ * @brief Generate a discrete circle
+ * @param center The center point of the circle
+ * @param radius The radius of the circle
+ * @param nQuadrantSegments Number of segments per quadrant
+ * @return A unique pointer to the generated polygon
  * @todo unittest
  */
-SFCGAL_API std::unique_ptr<Polygon>
-           disc(const Point &center, const double &radius,
-                const unsigned int &nQuadrantSegments = 8U);
+SFCGAL_API auto
+disc(const Point &center, const double &radius,
+     const unsigned int &nQuadrantSegments = 8U) -> std::unique_ptr<Polygon>;
 
 } // namespace generator
 } // namespace SFCGAL

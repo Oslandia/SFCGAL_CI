@@ -12,12 +12,14 @@ const char _sfcgal_version[] = SFCGAL_VERSION;
 /// @private
 const char _sfcgal_full_version[] = SFCGAL_FULL_VERSION;
 
+/// @private
 auto
 Version() -> const char *
 {
   return _sfcgal_version;
 }
 
+/// @private
 auto
 Full_Version() -> const char *
 {

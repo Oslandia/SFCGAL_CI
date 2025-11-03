@@ -14,18 +14,18 @@ namespace SFCGAL {
 class Geometry;
 }
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * @brief force a 2D geometry to be 3D (replace undefined Z by defaultZ,
  * existing Z values remains unchanged)
+ * @param g the geometry to force to 3D
+ * @param defaultZ the default Z value to use (default: 0)
  * @warning ignore empty geometries
  */
 SFCGAL_API void
 force3D(Geometry &g, const Kernel::FT &defaultZ = 0);
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif

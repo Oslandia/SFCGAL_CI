@@ -22,9 +22,9 @@ namespace SFCGAL::triangulate {
 
 using Vertex_handle = ConstraintDelaunayTriangulation::Vertex_handle;
 
-void
+auto
 triangulatePolygon3D(const Geometry      &g,
-                     TriangulatedSurface &triangulatedSurface)
+                     TriangulatedSurface &triangulatedSurface) -> void
 {
   if (g.isEmpty()) {
     return;
@@ -33,21 +33,30 @@ triangulatePolygon3D(const Geometry      &g,
   SFCGAL_ASSERT_GEOMETRY_VALIDITY(g);
 
   switch (g.geometryTypeId()) {
-  case TYPE_TRIANGLE:
-    return triangulatePolygon3D(g.as<Triangle>(), triangulatedSurface);
+  case TYPE_TRIANGLE: {
+    triangulatePolygon3D(g.as<Triangle>(), triangulatedSurface);
+    return;
+  }
 
-  case TYPE_POLYGON:
-    return triangulatePolygon3D(g.as<Polygon>(), triangulatedSurface);
+  case TYPE_POLYGON: {
+    triangulatePolygon3D(g.as<Polygon>(), triangulatedSurface);
+    return;
+  }
 
-  case TYPE_TRIANGULATEDSURFACE:
-    return triangulatePolygon3D(g.as<TriangulatedSurface>(),
-                                triangulatedSurface);
+  case TYPE_TRIANGULATEDSURFACE: {
+    triangulatePolygon3D(g.as<TriangulatedSurface>(), triangulatedSurface);
+    return;
+  }
 
-  case TYPE_POLYHEDRALSURFACE:
-    return triangulatePolygon3D(g.as<PolyhedralSurface>(), triangulatedSurface);
+  case TYPE_POLYHEDRALSURFACE: {
+    triangulatePolygon3D(g.as<PolyhedralSurface>(), triangulatedSurface);
+    return;
+  }
 
-  case TYPE_SOLID:
-    return triangulatePolygon3D(g.as<Solid>(), triangulatedSurface);
+  case TYPE_SOLID: {
+    triangulatePolygon3D(g.as<Solid>(), triangulatedSurface);
+    return;
+  }
 
   case TYPE_MULTIPOLYGON:
   case TYPE_MULTISOLID:
@@ -88,6 +97,11 @@ triangulatePolygon3D(const TriangulatedSurface &g,
   triangulatedSurface.addPatchs(g);
 }
 
+/**
+ * @brief Triangulate a geometry collection in 3D
+ * @param g The geometry collection to triangulate
+ * @param triangulatedSurface The resulting triangulated surface
+ */
 void
 triangulatePolygon3D(const GeometryCollection &g,
                      TriangulatedSurface      &triangulatedSurface)

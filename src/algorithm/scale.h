@@ -9,31 +9,30 @@
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/config.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * Scale a geometry by a given factor
- * @param g input geometry
- * @param s scale factor
+ * @param geometry input geometry
+ * @param scaleFactor scale factor
  */
 SFCGAL_API void
-scale(Geometry &g, double s);
+scale(Geometry &geometry, double scaleFactor);
 
 /**
  * Scale a geometry by different factors for each dimension
- * @param g input geometry
+ * @param geometry input geometry
  * @param sx scale factor for x dimension
  * @param sy scale factor for y dimension
  * @param sz scale factor for z dimension
  */
 SFCGAL_API void
-scale(Geometry &g, double sx, double sy, double sz = 0.0);
+scale(Geometry &geometry, double sx, double sy, double sz = 0.0);
 
 /**
  * Scale a geometry by different factors for each dimension around a center
  * point
- * @param g input geometry
+ * @param geometry input geometry
  * @param sx scale factor for x dimension
  * @param sy scale factor for y dimension
  * @param sz scale factor for z dimension
@@ -42,10 +41,9 @@ scale(Geometry &g, double sx, double sy, double sz = 0.0);
  * @param cz z-coordinate of the center point
  */
 SFCGAL_API void
-scale(Geometry &g, double sx, double sy, double sz, double cx, double cy,
+scale(Geometry &geometry, double sx, double sy, double sz, double cx, double cy,
       double cz);
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif

@@ -20,8 +20,7 @@
 #include "SFCGAL/Segment.h"
 #include "SFCGAL/numeric.h"
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /**
  * @brief Collection of segments from a geometry for interpolation
@@ -252,7 +251,6 @@ public:
   }
 };
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif // SFCGAL_DETAIL_SEGMENTSTORE_H_

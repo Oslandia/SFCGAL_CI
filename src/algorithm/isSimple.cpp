@@ -25,9 +25,7 @@
 
 using namespace SFCGAL::detail::algorithm;
 
-namespace SFCGAL {
-
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 // ----------------------------------------------------------------------------------
 // -- private interface
@@ -204,17 +202,7 @@ isSimple(const GeometryCollection &collection, const double &toleranceAbs)
   return Simplicity::simple();
 }
 
-/// @} end of private section
-
-// ----------------------------------------------------------------------------------
-// -- public interface
-// ----------------------------------------------------------------------------------
-/// @publicsection
-
-/** Check if geometry is simple
- * @param g Geometry to check
- * @param toleranceAbs Absolute tolerance for the check
- * @return Simplicity status */
+/// @private
 auto
 isSimple(const Geometry &g, const double &toleranceAbs) -> const Simplicity
 {
@@ -275,5 +263,4 @@ isSimple(const Geometry &g, const double &toleranceAbs) -> const Simplicity
           .str()); // to avoid warning
 }
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm

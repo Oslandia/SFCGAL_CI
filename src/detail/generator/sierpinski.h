@@ -18,11 +18,13 @@ namespace SFCGAL {
 namespace generator {
 
 /**
- * generate hoch snowflake
+ * @brief generate sierpinski triangle
+ * @param order The order of the sierpinski triangle
+ * @return A unique pointer to the generated multipolygon
  * @todo unittest
  */
-SFCGAL_API std::unique_ptr<MultiPolygon>
-           sierpinski(const unsigned int &order);
+SFCGAL_API auto
+sierpinski(const unsigned int &order) -> std::unique_ptr<MultiPolygon>;
 
 } // namespace generator
 } // namespace SFCGAL

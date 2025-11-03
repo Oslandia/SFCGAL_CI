@@ -13,19 +13,20 @@
 #include "SFCGAL/detail/graph/GeometryGraph.h"
 #include "SFCGAL/detail/graph/GeometryGraphBuilder.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * Make orientation consistent in a triangle set
- * @ingroup detail
  */
 class SFCGAL_API ConsistentOrientationBuilder {
 public:
-  typedef graph::GeometryGraph::vertex_descriptor vertex_descriptor;
-  typedef graph::GeometryGraph::edge_descriptor   edge_descriptor;
-  typedef graph::GeometryGraph::directed_edge_descriptor
-      directed_edge_descriptor;
+  /// Vertex descriptor type for geometry graph
+  using vertex_descriptor = graph::GeometryGraph::vertex_descriptor;
+  /// Edge descriptor type for geometry graph
+  using edge_descriptor = graph::GeometryGraph::edge_descriptor;
+  /// Directed edge descriptor type for geometry graph
+  using directed_edge_descriptor =
+      graph::GeometryGraph::directed_edge_descriptor;
 
   /**
    * default constructor
@@ -33,27 +34,31 @@ public:
   ConsistentOrientationBuilder();
 
   /**
-   * add a Triangle
+   * @brief Add a Triangle to the builder
+   * @param triangle The triangle to add
    */
   void
   addTriangle(const Triangle &triangle);
   /**
-   * add a TriangulatedSurface
+   * @brief Add a TriangulatedSurface to the builder
+   * @param triangulatedSurface The triangulated surface to add
    */
   void
   addTriangulatedSurface(const TriangulatedSurface &triangulatedSurface);
 
   /**
-   * get the resulting TriangulatedSurface where each connected part
+   * @brief Get the resulting TriangulatedSurface where each connected part
    * has consistent orientation.
    *
+   * @return TriangulatedSurface with consistent orientation
    * @throw SFCGAL::Exception if such a TriangulatedSurface can't be built
    */
   TriangulatedSurface
   buildTriangulatedSurface();
 
   /**
-   * returns the number of triangles
+   * @brief Returns the number of triangles
+   * @return The number of triangles in the builder
    */
   inline size_t
   numTriangles() const
@@ -61,13 +66,18 @@ public:
     return _triangles.size();
   }
   /**
-   * returns the n-th triangle
+   * @brief Returns the n-th triangle
+   * @param n Index of the triangle to retrieve
+   * @return The triangle at index n
    */
   Triangle
   triangleN(const size_t &n) const;
 
   /**
-   * [advanced]use after buildTriangulatedSurface
+   * @brief Get the neighbors of the n-th triangle (advanced usage)
+   * @param n Index of the triangle
+   * @return Set of indices of neighboring triangles
+   * @note Use after buildTriangulatedSurface
    */
   const std::set<size_t> &
   neighbors(const size_t &n) const;
@@ -100,7 +110,6 @@ private:
   _findNextTriangle();
 };
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif

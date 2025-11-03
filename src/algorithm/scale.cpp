@@ -12,30 +12,30 @@
 namespace SFCGAL::algorithm {
 
 void
-scale(Geometry &g, double s)
+scale(Geometry &geometry, double scaleFactor)
 {
-  scale(g, s, s, s);
+  scale(geometry, scaleFactor, scaleFactor, scaleFactor);
 }
 
 void
-scale(Geometry &g, double sx, double sy, double sz)
+scale(Geometry &geometry, double sx, double sy, double sz)
 {
-  if (g.is3D()) {
+  if (geometry.is3D()) {
     CGAL::Aff_transformation_3<Kernel> transform(sx, 0, 0, 0, sy, 0, 0, 0, sz);
     transform::AffineTransform3        scaleTransform(transform);
-    g.accept(scaleTransform);
+    geometry.accept(scaleTransform);
   } else {
     CGAL::Aff_transformation_2<Kernel> transform(sx, 0, 0, sy);
     transform::AffineTransform2        scaleTransform(transform);
-    g.accept(scaleTransform);
+    geometry.accept(scaleTransform);
   }
 }
 
 void
-scale(Geometry &g, double sx, double sy, double sz, double cx, double cy,
+scale(Geometry &geometry, double sx, double sy, double sz, double cx, double cy,
       double cz)
 {
-  if (g.is3D()) {
+  if (geometry.is3D()) {
     CGAL::Aff_transformation_3<Kernel> toOrigin(
         CGAL::TRANSLATION, Kernel::Vector_3(-cx, -cy, -cz));
     CGAL::Aff_transformation_3<Kernel> scaleTransform(sx, 0, 0, 0, sy, 0, 0, 0,
@@ -47,7 +47,7 @@ scale(Geometry &g, double sx, double sy, double sz, double cx, double cy,
         fromOrigin * scaleTransform * toOrigin;
 
     transform::AffineTransform3 affineTransform(combinedTransform);
-    g.accept(affineTransform);
+    geometry.accept(affineTransform);
   } else {
     CGAL::Aff_transformation_2<Kernel> toOrigin(CGAL::TRANSLATION,
                                                 Kernel::Vector_2(-cx, -cy));
@@ -59,7 +59,7 @@ scale(Geometry &g, double sx, double sy, double sz, double cx, double cy,
         fromOrigin * scaleTransform * toOrigin;
 
     transform::AffineTransform2 affineTransform(combinedTransform);
-    g.accept(affineTransform);
+    geometry.accept(affineTransform);
   }
 }
 

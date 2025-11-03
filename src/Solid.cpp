@@ -19,17 +19,17 @@ Solid::Solid(const PolyhedralSurface &exteriorShell)
 
 Solid::Solid(PolyhedralSurface *exteriorShell)
 {
-  _shells.push_back(std::unique_ptr<PolyhedralSurface>(exteriorShell));
+  _shells.emplace_back(exteriorShell);
 }
 
 Solid::Solid(const std::vector<PolyhedralSurface> &shells)
 {
   if (shells.empty()) {
-    _shells.resize(1);
-    _shells[0] = std::make_unique<PolyhedralSurface>();
+    _shells.emplace_back(std::make_unique<PolyhedralSurface>());
   } else {
+    _shells.reserve(shells.size());
     for (const auto &shell : shells) {
-      _shells.push_back(shell.clone());
+      _shells.emplace_back(shell.clone());
     }
   }
 }
@@ -100,8 +100,8 @@ Solid::dropZ() -> bool
     return false;
   }
 
-  for (auto &_shell : _shells) {
-    _shell->dropZ();
+  for (auto &shell : _shells) {
+    shell->dropZ();
   }
 
   return true;
@@ -114,8 +114,8 @@ Solid::dropM() -> bool
     return false;
   }
 
-  for (auto &_shell : _shells) {
-    _shell->dropM();
+  for (auto &shell : _shells) {
+    shell->dropM();
   }
 
   return true;
@@ -124,21 +124,21 @@ Solid::dropM() -> bool
 auto
 Solid::swapXY() -> void
 {
-  for (auto &_shell : _shells) {
-    _shell->swapXY();
+  for (auto &shell : _shells) {
+    shell->swapXY();
   }
 }
 
 void
 Solid::accept(GeometryVisitor &visitor)
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 void
 Solid::accept(ConstGeometryVisitor &visitor) const
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 } // namespace SFCGAL

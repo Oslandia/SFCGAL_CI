@@ -26,7 +26,7 @@ using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
  * Quotient type
  * @private
  */
-typedef CGAL::Gmpq QT;
+using QT = CGAL::Gmpq;
 
 using Point_2              = CGAL::Point_2<SFCGAL::Kernel>;
 using Triangle_2           = CGAL::Triangle_2<SFCGAL::Kernel>;

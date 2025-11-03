@@ -14,17 +14,17 @@ namespace SFCGAL {
 class Polygon;
 }
 
-namespace SFCGAL {
-namespace generator {
+namespace SFCGAL::generator {
 
 /**
- * generate hoch snowflake
+ * @brief generate hoch snowflake
+ * @param order The order of the snowflake
+ * @return A unique pointer to the generated polygon
  * @todo unittest
  */
-SFCGAL_API std::unique_ptr<Polygon>
-           hoch(const unsigned int &order);
+SFCGAL_API auto
+hoch(const unsigned int &order) -> std::unique_ptr<Polygon>;
 
-} // namespace generator
-} // namespace SFCGAL
+} // namespace SFCGAL::generator
 
 #endif

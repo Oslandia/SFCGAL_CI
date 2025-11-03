@@ -6,6 +6,7 @@
 #ifndef SFCGAL_TRIANGLE_H_
 #define SFCGAL_TRIANGLE_H_
 
+#include <array>
 #include <boost/shared_ptr.hpp>
 
 #include <boost/serialization/base_object.hpp>
@@ -35,56 +36,81 @@ public:
    */
   Triangle();
   /**
-   * Constructor with a CGAL triangle
+   * @brief Constructor with a CGAL triangle
+   * @param triangle CGAL 2D triangle to construct from
    */
   Triangle(const Kernel::Triangle_2 &triangle);
   /**
-   * Constructor with a CGAL triangle
+   * @brief Constructor with a CGAL triangle
+   * @param triangle CGAL 3D triangle to construct from
    */
   Triangle(const Kernel::Triangle_3 &triangle);
   /**
    * constructor with 3 points
+   * @param point1 First point of the triangle
+   * @param point2 Second point of the triangle
+   * @param point3 Third point of the triangle
    */
-  Triangle(const Point &p, const Point &q, const Point &r);
+  Triangle(const Point &point1, const Point &point2, const Point &point3);
   /**
    * copy constructor
+   * @param other Triangle to copy from
    */
   Triangle(const Triangle &other);
   /**
-   * assign operator
+   * @brief assign operator
+   * @param other Triangle to assign from
+   * @return Reference to this triangle
    */
-  Triangle &
-  operator=(const Triangle &other);
+  auto
+  operator=(const Triangle &other) -> Triangle &;
   /**
    * destructor
    */
-  ~Triangle();
+  ~Triangle() override;
 
   //-- SFCGAL::Geometry
-  std::string
-  geometryType() const override;
+  /// @brief Get the geometry type as string
+  /// @return Geometry type string
+  [[nodiscard]] auto
+  geometryType() const -> std::string override;
   //-- SFCGAL::Geometry
-  GeometryType
-  geometryTypeId() const override;
+  /// @brief Get the geometry type identifier
+  /// @return Geometry type ID
+  [[nodiscard]] auto
+  geometryTypeId() const -> GeometryType override;
   //-- SFCGAL::Geometry
-  int
-  coordinateDimension() const override;
+  /// @brief Get the coordinate dimension
+  /// @return Coordinate dimension
+  [[nodiscard]] auto
+  coordinateDimension() const -> int override;
   //-- SFCGAL::Geometry
-  bool
-  isEmpty() const override;
+  /// @brief Check if the triangle is empty
+  /// @return true if empty, false otherwise
+  [[nodiscard]] auto
+  isEmpty() const -> bool override;
   //-- SFCGAL::Geometry
-  bool
-  is3D() const override;
+  /// @brief Check if the triangle is 3D
+  /// @return true if 3D, false otherwise
+  [[nodiscard]] auto
+  is3D() const -> bool override;
   //-- SFCGAL::Geometry
-  bool
-  isMeasured() const override;
+  /// @brief Check if the triangle has measured coordinates
+  /// @return true if measured, false otherwise
+  [[nodiscard]] auto
+  isMeasured() const -> bool override;
 
+  /// @brief Drop Z coordinate from all points
+  /// @return true if Z was dropped, false otherwise
   auto
   dropZ() -> bool override;
 
+  /// @brief Drop M coordinate from all points
+  /// @return true if M was dropped, false otherwise
   auto
   dropM() -> bool override;
 
+  /// @brief Swap X and Y coordinates
   auto
   swapXY() -> void override;
 
@@ -95,54 +121,63 @@ public:
   reverse();
 
   /**
-   * convert a triangle to a polygon
+   * @brief convert a triangle to a polygon
+   * @return Polygon representation of the triangle
    */
-  Polygon
-  toPolygon() const;
+  [[nodiscard]] auto
+  toPolygon() const -> Polygon;
 
   /**
    * returns the i-th vertex
+   * @param i The vertex index (modulo 3)
+   * @return Const reference to the vertex
    */
-  inline const Point &
-  vertex(const int &i) const
+  [[nodiscard]] auto
+  vertex(const int &i) const -> const Point &
   {
     return _vertices[i % 3];
   }
   /**
    * returns the i-th vertex
+   * @param i The vertex index (modulo 3)
+   * @return Reference to the vertex
    */
-  inline Point &
-  vertex(const int &i)
+  auto
+  vertex(const int &i) -> Point &
   {
     return _vertices[i % 3];
   }
 
   /**
    * Convert to CGAL::Triangle_2
+   * @return 2D triangle representation
    */
-  inline Kernel::Triangle_2
-  toTriangle_2() const
+  [[nodiscard]] auto
+  toTriangle_2() const -> Kernel::Triangle_2
   {
-    return Kernel::Triangle_2(vertex(0).toPoint_2(), vertex(1).toPoint_2(),
-                              vertex(2).toPoint_2());
+    return {vertex(0).toPoint_2(), vertex(1).toPoint_2(),
+            vertex(2).toPoint_2()};
   }
 
   /**
    * Convert to CGAL::Triangle_3
+   * @return 3D triangle representation
    */
-  inline Kernel::Triangle_3
-  toTriangle_3() const
+  [[nodiscard]] auto
+  toTriangle_3() const -> Kernel::Triangle_3
   {
-    return Kernel::Triangle_3(vertex(0).toPoint_3(), vertex(1).toPoint_3(),
-                              vertex(2).toPoint_3());
+    return {vertex(0).toPoint_3(), vertex(1).toPoint_3(),
+            vertex(2).toPoint_3()};
   }
 
   /**
-   * Convert to CGAL::Triangle_2 or CGAL::Triangle_2
+   * Convert to CGAL::Triangle_2 or CGAL::Triangle_3
+   * @tparam D Dimension (2 or 3)
+   * @return Triangle in specified dimension
    */
   template <int D>
-  inline typename detail::TypeForDimension<D>::Triangle
-  toTriangle_d() const
+  auto
+  toTriangle_d() const -> typename detail::TypeForDimension<D>::Triangle
   {
     return typename detail::TypeForDimension<D>::Triangle(
         vertex(0).toPoint_d<D>(), vertex(1).toPoint_d<D>(),
@@ -152,14 +187,19 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
+  /// @brief Accept a geometry visitor
+  /// @param visitor Visitor to accept
   void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
+  /// @brief Accept a const geometry visitor
+  /// @param visitor Const visitor to accept
   void
   accept(ConstGeometryVisitor &visitor) const override;
 
   /**
    * Serializer
+   * @param ar Archive for serialization
    */
   template <class Archive>
   void
@@ -173,7 +213,7 @@ private:
   /**
    * point forming the triangle
    */
-  Point _vertices[3];
+  std::array<Point, 3> _vertices;
 };
 
 } // namespace SFCGAL

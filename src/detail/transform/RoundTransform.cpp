@@ -12,9 +12,9 @@ namespace SFCGAL::transform {
 RoundTransform::RoundTransform(const long &scale) : _scale(scale) {}
 
 void
-RoundTransform::transform(Point &p)
+RoundTransform::transform(Point &point)
 {
-  p.coordinate().round(_scale);
+  point.coordinate().round(_scale);
 }
 
 } // namespace SFCGAL::transform

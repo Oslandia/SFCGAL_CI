@@ -30,16 +30,16 @@ public:
 
   /**
    * @brief Constructor with two points
-   * @param p1 The first endpoint of the segment
-   * @param p2 The second endpoint of the segment
+   * @param point1 The first endpoint of the segment
+   * @param point2 The second endpoint of the segment
    * @throws Exception if points have inconsistent dimensions
    */
-  Segment(const Point &p1, const Point &p2);
+  Segment(const Point &point1, const Point &point2);
 
   /**
    * @brief Constructor with CGAL points (2D or 3D)
-   * @param p1 The first endpoint of the segment
-   * @param p2 The second endpoint of the segment
+   * @param point1 The first endpoint of the segment
+   * @param point2 The second endpoint of the segment
    * @note For CGAL points, dimensional consistency is guaranteed by the type
    * system
    */
@@ -47,7 +47,8 @@ public:
       typename PointType,
       typename = std::enable_if_t<std::is_same_v<PointType, Kernel::Point_2> ||
                                   std::is_same_v<PointType, Kernel::Point_3>>>
-  Segment(const PointType &p1, const PointType &p2) : _source(p1), _target(p2)
+  Segment(const PointType &point1, const PointType &point2)
+      : _source(point1), _target(point2)
   {
   }
 
@@ -68,11 +69,14 @@ public:
 
   /**
    * @brief Copy constructor
+   * @param other Segment to copy from
    */
   Segment(const Segment &other) = default;
 
   /**
    * @brief Assignment operator
+   * @param other Segment to assign from
+   * @return Reference to this segment
    */
   auto
   operator=(const Segment &other) -> Segment & = default;
@@ -104,21 +108,21 @@ public:
 
   /**
    * @brief Sets the first endpoint
-   * @param p The new first endpoint
+   * @param point The new first endpoint
    * @throws Exception if the segment is empty
    * @throws Exception if the new point has inconsistent dimensions with target
    */
   auto
-  setSource(const Point &p) -> void;
+  setSource(const Point &point) -> void;
 
   /**
    * @brief Sets the second endpoint
-   * @param p The new second endpoint
+   * @param point The new second endpoint
    * @throws Exception if the segment is empty
    * @throws Exception if the new point has inconsistent dimensions with source
    */
   auto
-  setTarget(const Point &p) -> void;
+  setTarget(const Point &point) -> void;
 
   /**
    * @brief Sets both endpoints at once
@@ -221,18 +225,18 @@ public:
 
   /**
    * @brief Gets the squared distance from a point to the segment
-   * @param p The point (SFCGAL::Point, CGAL::Point_2, or CGAL::Point_3)
+   * @param point The point (SFCGAL::Point, CGAL::Point_2, or CGAL::Point_3)
    * @return The squared distance (exact calculation)
    * @throws Exception if the segment is empty
    */
   template <typename PointType>
   auto
-  squaredDistanceToPoint(const PointType &p) const -> Kernel::FT;
+  squaredDistanceToPoint(const PointType &point) const -> Kernel::FT;
 
   /**
-   * @brief Distance from a point to the segment
-   * @param p The point (can be SFCGAL::Point, coordinate pair, or CGAL points)
-   * @return The shortest distance from the point to the segment
+   * @brief Calculate distance from segment to a point
+   * @param args Forwarded arguments for point (supports various point types)
+   * @return Distance value
    * @throws Exception if the segment is empty
    */
   template <typename... Args>
@@ -241,14 +245,14 @@ public:
 
   /**
    * @brief Calculates the exact parameter for a projected point on the segment
-   * @param p The point to project (SFCGAL::Point, CGAL::Point_2, or
+   * @param point The point to project (SFCGAL::Point, CGAL::Point_2, or
    * CGAL::Point_3)
    * @return Parameter value between 0.0 and 1.0 (clamped)
    * @throws Exception if the segment is empty
    */
   template <typename PointType>
   auto
-  exactInterpolationParameter(const PointType &p) const -> Kernel::FT;
+  exactInterpolationParameter(const PointType &point) const -> Kernel::FT;
 
   /**
    * @brief Calculates the parameter for a projected point on the segment
@@ -271,14 +275,14 @@ public:
 
   /**
    * @brief Checks if a point is on the segment (works in 2D or 3D)
-   * @param p The point to check
+   * @param point The point to check
    * @param tolerance Optional tolerance value
    * @return True if the point lies on the segment
    * @throws Exception if the segment is empty
    */
   template <typename PointType>
   auto
-  hasOn(const PointType &p, double tolerance = EPSILON) const -> bool;
+  hasOn(const PointType &point, double tolerance = EPSILON) const -> bool;
 
   /**
    * @brief Returns the midpoint of the segment
@@ -368,7 +372,7 @@ Segment::applyByDimension(Func2D func2D, Func3D func3D) const
 
 template <typename PointType>
 auto
-Segment::squaredDistanceToPoint(const PointType &p) const -> Kernel::FT
+Segment::squaredDistanceToPoint(const PointType &point) const -> Kernel::FT
 {
   if (isEmpty()) {
     return 0;
@@ -376,20 +380,20 @@ Segment::squaredDistanceToPoint(const PointType &p) const -> Kernel::FT
 
   if constexpr (std::is_same_v<PointType, Point>) {
     return applyByDimension(
-        [this, &p]() { return squaredDistanceToPoint(p.toPoint_2()); },
-        [this, &p]() { return squaredDistanceToPoint(p.toPoint_3()); });
+        [this, &point]() { return squaredDistanceToPoint(point.toPoint_2()); },
+        [this, &point]() { return squaredDistanceToPoint(point.toPoint_3()); });
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_2>) {
     const auto segment = toSegment_2();
     if (segment.is_degenerate()) {
-      return CGAL::squared_distance(p, segment.source());
+      return CGAL::squared_distance(point, segment.source());
     }
-    return CGAL::squared_distance(p, segment);
+    return CGAL::squared_distance(point, segment);
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_3>) {
     const auto segment = toSegment_3();
     if (segment.is_degenerate()) {
-      return CGAL::squared_distance(p, segment.source());
+      return CGAL::squared_distance(point, segment.source());
     }
-    return CGAL::squared_distance(p, segment);
+    return CGAL::squared_distance(point, segment);
   }
 }
 
@@ -421,15 +425,15 @@ auto
 Segment::calculateParameterFromPoint(const SegmentType &segment,
                                      const PointType &point) const -> Kernel::FT
 {
-  const auto v = segment.to_vector();
-  const auto w = point - segment.source();
-  auto       t = (w * v) / v.squared_length();
+  const auto vector        = segment.to_vector();
+  const auto vectorToPoint = point - segment.source();
+  auto       t             = (vectorToPoint * vector) / vector.squared_length();
   return std::clamp(t, Kernel::FT(0), Kernel::FT(1));
 }
 
 template <typename PointType>
 auto
-Segment::exactInterpolationParameter(const PointType &p) const -> Kernel::FT
+Segment::exactInterpolationParameter(const PointType &point) const -> Kernel::FT
 {
   if (isEmpty()) {
     return 0;
@@ -437,15 +441,19 @@ Segment::exactInterpolationParameter(const PointType &p) const -> Kernel::FT
 
   if constexpr (std::is_same_v<PointType, Point>) {
     return applyByDimension(
-        [this, &p]() { return exactInterpolationParameter(p.toPoint_2()); },
-        [this, &p]() { return exactInterpolationParameter(p.toPoint_3()); });
+        [this, &point]() {
+          return exactInterpolationParameter(point.toPoint_2());
+        },
+        [this, &point]() {
+          return exactInterpolationParameter(point.toPoint_3());
+        });
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_2>) {
     const auto segment = toSegment_2();
     if (segment.is_degenerate()) {
       return 0; // Return source point parameter
     }
 
-    return calculateParameterFromPoint(segment, p);
+    return calculateParameterFromPoint(segment, point);
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_3>) {
     const auto segment = toSegment_3();
     if (segment.is_degenerate()) {
@@ -453,7 +461,7 @@ Segment::exactInterpolationParameter(const PointType &p) const -> Kernel::FT
     }
 
     const auto line       = segment.supporting_line();
-    const auto projection = line.projection(p);
+    const auto projection = line.projection(point);
 
     return calculateParameterFromPoint(segment, projection);
   }
@@ -499,7 +507,7 @@ Segment::checkPointOnSegment(const SegmentType &segment, const PointType &point,
 
 template <typename PointType>
 auto
-Segment::hasOn(const PointType &p, double tolerance) const -> bool
+Segment::hasOn(const PointType &point, double tolerance) const -> bool
 {
   if (isEmpty()) {
     return false;
@@ -507,12 +515,16 @@ Segment::hasOn(const PointType &p, double tolerance) const -> bool
 
   if constexpr (std::is_same_v<PointType, Point>) {
     return applyByDimension(
-        [this, &p, tolerance]() { return hasOn(p.toPoint_2(), tolerance); },
-        [this, &p, tolerance]() { return hasOn(p.toPoint_3(), tolerance); });
+        [this, &point, tolerance]() {
+          return hasOn(point.toPoint_2(), tolerance);
+        },
+        [this, &point, tolerance]() {
+          return hasOn(point.toPoint_3(), tolerance);
+        });
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_2>) {
-    return checkPointOnSegment(toSegment_2(), p, tolerance);
+    return checkPointOnSegment(toSegment_2(), point, tolerance);
   } else if constexpr (std::is_same_v<PointType, Kernel::Point_3>) {
-    return checkPointOnSegment(toSegment_3(), p, tolerance);
+    return checkPointOnSegment(toSegment_3(), point, tolerance);
   }
 
   return false;

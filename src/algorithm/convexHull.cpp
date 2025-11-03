@@ -26,17 +26,18 @@
 
 namespace SFCGAL::algorithm {
 
+/// @private
 auto
-convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
+convexHull(const Geometry &geometry) -> std::unique_ptr<Geometry>
 {
   using CGAL::object_cast;
 
-  if (g.isEmpty()) {
-    return g.clone();
+  if (geometry.isEmpty()) {
+    return geometry.clone();
   }
 
   SFCGAL::detail::GetPointsVisitor getPointVisitor;
-  const_cast<Geometry &>(g).accept(getPointVisitor);
+  const_cast<Geometry &>(geometry).accept(getPointVisitor);
 
   // collect points
 
@@ -87,13 +88,14 @@ convexHull(const Geometry &g) -> std::unique_ptr<Geometry>
       Exception("unexpected CGAL output type in CGAL::convex_hull_2"));
 }
 
+/// @private
 auto
-convexHull3D(const Geometry &g) -> std::unique_ptr<Geometry>
+convexHull3D(const Geometry &geometry) -> std::unique_ptr<Geometry>
 {
   using CGAL::object_cast;
 
   SFCGAL::detail::GetPointsVisitor getPointVisitor;
-  const_cast<Geometry &>(g).accept(getPointVisitor);
+  const_cast<Geometry &>(geometry).accept(getPointVisitor);
 
   // collect points
 

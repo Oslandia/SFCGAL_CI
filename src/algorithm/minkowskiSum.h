@@ -11,12 +11,14 @@
 #include "SFCGAL/Geometry.h"
 #include <memory>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 struct NoValidityCheck;
 
 /**
  * @brief 2D minkowski sum (p+q)
+ * @param gA the first geometry
+ * @param gB the polygon for the minkowski sum
+ * @return the minkowski sum as a unique_ptr<Geometry>
  *
  * @warning If gA is a polygon, its orientation is taken into account. A
  * "reversed" polygon (with a clockwise-oriented exterior ring) will involve a
@@ -33,6 +35,9 @@ SFCGAL_API std::unique_ptr<Geometry>
 
 /**
  * @brief 2D minkowski sum (p+q)
+ * @param gA the first geometry
+ * @param gB the polygon for the minkowski sum
+ * @return the minkowski sum as a unique_ptr<Geometry>
  *
  * @warning If gA is a polygon, its orientation is taken into account. A
  * "reversed" polygon (with a clockwise-oriented exterior ring) will involve a
@@ -43,12 +48,11 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @note When applied to NURBSCurve geometries, the Minkowski sum
  *   is internally performed on a LineString obtained via
  *   toLineString() with its default parameters.
- * @warning@ No actual validity check is done.
+ * @warning No actual validity check is done.
  */
 SFCGAL_API std::unique_ptr<Geometry>
            minkowskiSum(const Geometry &gA, const Polygon &gB, NoValidityCheck);
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif

@@ -25,7 +25,7 @@ public:
    * Virtual destructor to allow safe cleanup of derived Transform
    * implementations.
    */
-  virtual ~Transform();
+  ~Transform() override;
   /**
    * Apply the coordinate transformation to a single Point in place.
    *

@@ -12,8 +12,7 @@
 #include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/config.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * @brief Calculate the volume of a closed PolyhedralSurface
@@ -49,7 +48,6 @@ volume(const Solid &solid, NoValidityCheck noValidityCheck = NoValidityCheck())
 SFCGAL_API auto
 volume(const Geometry &g) -> Kernel::FT;
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif // SFCGAL_ALGORITHM_VOLUME_H_

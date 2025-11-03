@@ -8,8 +8,7 @@
 
 #include "SFCGAL/config.h"
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /**
  * Represents an interval
@@ -27,10 +26,10 @@ public:
   Interval(const double &value);
   /**
    * constructor with two values
-   * @param v1 First boundary value
-   * @param v2 Second boundary value
+   * @param value1 First boundary value
+   * @param value2 Second boundary value
    */
-  Interval(const double &v1, const double &v2);
+  Interval(const double &value1, const double &value2);
   /**
    * copy constructor
    * @param other The interval to copy from
@@ -41,8 +40,8 @@ public:
    * @param other The interval to assign from
    * @return Reference to this interval
    */
-  Interval &
-  operator=(const Interval &other);
+  auto
+  operator=(const Interval &other) -> Interval &;
 
   /**
    * indicates if the interval is empty
@@ -83,10 +82,10 @@ public:
    * expand the interval
    *
    * @warning no effect if isEmpty()
-   * @param d The amount to expand by
+   * @param expandAmount The amount to expand by
    */
   void
-  expandBy(const double &d);
+  expandBy(const double &expandAmount);
   /**
    * expand the interval to include an other interval.
    *
@@ -134,7 +133,6 @@ private:
   double _upper;
 };
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif

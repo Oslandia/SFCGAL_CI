@@ -23,8 +23,7 @@ namespace SFCGAL {
 class Geometry;
 }
 
-namespace SFCGAL {
-namespace io {
+namespace SFCGAL::io {
 
 /**
  * @brief [helper] write an OSG geometry in a file. The format depends on the
@@ -32,6 +31,8 @@ namespace io {
  * (http://www.openscenegraph.org/projects/osg/wiki/Support/UserGuides/Plugins)
  * Note that osgviewer command line executable allows the visualization of the
  * resulting files, screenshots and co
+ * @param g The geometry to write
+ * @param filepath The file path to write to
  * @warning requires OpenSceneGraph
  * @todo list of geometries?
  */
@@ -40,11 +41,12 @@ osgWriteFile(const Geometry &g, const std::string &filepath);
 
 /**
  * @brief [helper] converts a SFCGAL::Geometry to an OSG geometry
+ * @param g The SFCGAL geometry to convert
+ * @return A pointer to the OSG geometry
  */
 SFCGAL_API osg::Geometry            *
 toOsgGeometry(const Geometry &g);
 
-} // namespace io
-} // namespace SFCGAL
+} // namespace SFCGAL::io
 
 #endif

@@ -46,8 +46,8 @@ public:
      * @brief Check if face is in the domain
      * @return True if face is in the domain (odd nesting level)
      */
-    bool
-    in_domain()
+    auto
+    in_domain() -> bool
     {
       return nestingLevel % 2 == 1;
     }
@@ -70,8 +70,8 @@ public:
       CDT; ///< CGAL constrained Delaunay triangulation type
 
   typedef CDT::Vertex_handle
-                           Vertex_handle; ///< Handle to vertex in triangulation
-  typedef CDT::Face_handle Face_handle;   ///< Handle to face in triangulation
+      Vertex_handle;                    ///< Handle to vertex in triangulation
+  using Face_handle = CDT::Face_handle; ///< Handle to face in triangulation
   typedef CDT::All_faces_iterator
       All_faces_iterator; ///< Iterator over all faces
   typedef CDT::Finite_faces_iterator
@@ -87,41 +87,41 @@ public:
    * @param position The coordinate position of the vertex
    * @return Handle to the added vertex
    */
-  Vertex_handle
-  addVertex(const Coordinate &position);
+  auto
+  addVertex(const Coordinate &position) -> Vertex_handle;
   /**
    * @brief Add a constraint edge to the triangulation
    * @param source The source vertex handle
    * @param target The target vertex handle
    */
-  void
-  addConstraint(Vertex_handle source, Vertex_handle target);
+  auto
+  addConstraint(Vertex_handle source, Vertex_handle target) -> void;
 
   /**
    * @brief clear the triangulation
    */
-  void
-  clear();
+  auto
+  clear() -> void;
 
   /**
    * @brief Returns the number of finite vertices
    * @return The number of finite vertices in the triangulation
    */
-  size_t
-  numVertices() const;
+  auto
+  numVertices() const -> size_t;
   /**
    * @brief Returns the number of finite faces
    * @return The number of finite triangles in the triangulation
    */
-  size_t
-  numTriangles() const;
+  auto
+  numTriangles() const -> size_t;
 
   /**
    * @brief test if a projection plane is defined
    * @return True if a projection plane has been set
    */
-  inline bool
-  hasProjectionPlane() const
+  inline auto
+  hasProjectionPlane() const -> bool
   {
     return _projectionPlane.has_value();
   }
@@ -129,22 +129,22 @@ public:
    * @brief define projection plane
    * @param projectionPlane The 3D plane to use for projection
    */
-  void
-  setProjectionPlane(const Kernel::Plane_3 &projectionPlane);
+  auto
+  setProjectionPlane(const Kernel::Plane_3 &projectionPlane) -> void;
   /**
    * @brief get the projection plane (OXY if not defined)
    * @return The projection plane (defaults to OXY plane if not set)
    */
-  Kernel::Plane_3
-  projectionPlane() const;
+  auto
+  projectionPlane() const -> Kernel::Plane_3;
 
   /**
    * @brief test if the vertex is infinite
    * @param vertex The vertex handle to test
    * @return True if the vertex is infinite
    */
-  inline bool
-  isInfinite(Vertex_handle vertex) const
+  inline auto
+  isInfinite(Vertex_handle vertex) const -> bool
   {
     return _cdt.is_infinite(vertex);
   }
@@ -153,8 +153,8 @@ public:
    * @param face The face handle to test
    * @return True if the face has an infinite vertex
    */
-  inline bool
-  isInfinite(Face_handle face) const
+  inline auto
+  isInfinite(Face_handle face) const -> bool
   {
     return _cdt.is_infinite(face);
   }
@@ -164,22 +164,22 @@ public:
    * @param triangulatedSurface The surface to append triangles to
    * @param filterExteriorParts If true, exclude exterior triangles
    */
-  void
+  auto
   getTriangles(TriangulatedSurface &triangulatedSurface,
-               bool                 filterExteriorParts = false) const;
+               bool                 filterExteriorParts = false) const -> void;
   /**
    * get the resulting TriangulatedSurface
    * @return Unique pointer to the triangulated surface
    */
-  std::unique_ptr<TriangulatedSurface>
-  getTriangulatedSurface() const;
+  auto
+  getTriangulatedSurface() const -> std::unique_ptr<TriangulatedSurface>;
 
   /**
    * @brief get finite face iterator
    * @return Iterator to beginning of finite faces
    */
-  inline Finite_faces_iterator
-  finite_faces_begin() const
+  inline auto
+  finite_faces_begin() const -> Finite_faces_iterator
   {
     return _cdt.finite_faces_begin();
   }
@@ -187,8 +187,8 @@ public:
    * @brief get finite face iterator
    * @return Iterator to end of finite faces
    */
-  inline Finite_faces_iterator
-  finite_faces_end() const
+  inline auto
+  finite_faces_end() const -> Finite_faces_iterator
   {
     return _cdt.finite_faces_end();
   }
@@ -197,8 +197,8 @@ public:
    * @brief get all face iterator
    * @return Iterator to beginning of all faces
    */
-  inline All_faces_iterator
-  all_faces_begin() const
+  inline auto
+  all_faces_begin() const -> All_faces_iterator
   {
     return _cdt.all_faces_begin();
   }
@@ -206,8 +206,8 @@ public:
    * @brief get all face iterator
    * @return Iterator to end of all faces
    */
-  inline All_faces_iterator
-  all_faces_end() const
+  inline auto
+  all_faces_end() const -> All_faces_iterator
   {
     return _cdt.all_faces_end();
   }
@@ -215,15 +215,15 @@ public:
   /**
    * @brief fill nesting_level info in face info
    */
-  void
-  markDomains();
+  auto
+  markDomains() -> void;
 
   /**
    * @brief [advanced]get the CGAL object
    * @return Reference to the underlying CGAL triangulation
    */
-  inline CDT &
-  cdt()
+  inline auto
+  cdt() -> CDT &
   {
     return _cdt;
   }
@@ -231,8 +231,8 @@ public:
    * @brief [advanced]get the CGAL object
    * @return Const reference to the underlying CGAL triangulation
    */
-  inline const CDT &
-  cdt() const
+  inline auto
+  cdt() const -> const CDT &
   {
     return _cdt;
   }

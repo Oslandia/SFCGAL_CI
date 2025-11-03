@@ -17,8 +17,7 @@
 
 #include "SFCGAL/Geometry.h"
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 namespace io {
 
 /**

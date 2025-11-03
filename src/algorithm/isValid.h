@@ -19,26 +19,34 @@ namespace SFCGAL {
  * reason for invalidity before its text representation (that can be very long)
  */
 
-/** Assert geometry validity without context
+/**
+ * @brief Assert geometry validity without context
  * @param geometry The geometry to validate
+ * @return void
  */
 void SFCGAL_API
 SFCGAL_ASSERT_GEOMETRY_VALIDITY(const Geometry &geometry);
-void SFCGAL_API
 
-/** Assert 2D geometry validity
+/**
+ * @brief Assert 2D geometry validity
  * @param geometry The geometry to validate in 2D
+ * @return void
  */
+void SFCGAL_API
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(const Geometry &geometry);
 
-/** Assert 3D geometry validity
+/**
+ * @brief Assert 3D geometry validity
  * @param geometry The geometry to validate in 3D
+ * @return void
  */
 void SFCGAL_API
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(const Geometry &geometry);
 
-/** Assert geometry validity on a plane (not implemented)
+/**
+ * @brief Assert geometry validity on a plane (not implemented)
  * @param geometry The geometry to validate
+ * @return void
  */
 void SFCGAL_API
 SFCGAL_ASSERT_GEOMETRY_VALIDITY_ON_PLANE(const Geometry &geometry);

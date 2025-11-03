@@ -12,7 +12,6 @@ namespace SFCGAL::io::STL {
 
 /**
  * @brief Saves a geometry to an STL format stream.
- * @ingroup io
  *
  * @param[in] geom The geometry to save
  * @param[out] out The output stream
@@ -23,7 +22,6 @@ save(const Geometry &geom, std::ostream &out) -> void;
 
 /**
  * @brief Saves a geometry to an STL file.
- * @ingroup io
  *
  * @param[in] geom The geometry to save
  * @param[in] filename The name of the file to save to
@@ -35,7 +33,6 @@ save(const Geometry &geom, const std::string &filename) -> void;
 
 /**
  * @brief Saves a geometry to an STL format string.
- * @ingroup io
  *
  * @param[in] geom The geometry to save
  * @return The STL format string
@@ -46,7 +43,6 @@ saveToString(const Geometry &geom) -> std::string;
 
 /**
  * @brief Saves a geometry to an STL format buffer (C API).
- * @ingroup io
  *
  * @param[in] geom The geometry to save
  * @param[out] buffer The buffer to write to

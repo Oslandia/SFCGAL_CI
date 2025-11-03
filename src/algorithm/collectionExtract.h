@@ -11,17 +11,17 @@
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/GeometryCollection.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 /**
  * Given a geometry collection
  * returns a MultiPolygon from triangles, polygons, polyhedral and polygons
- *
+ * @param g the geometry collection to extract polygons from
+ * @return a MultiPolygon containing extracted polygons as a
+ * unique_ptr<Geometry>
  * @warning Ownership is taken from the parameter
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           collectionExtractPolygons(std::unique_ptr<Geometry> coll);
-} // namespace algorithm
-} // namespace SFCGAL
+           collectionExtractPolygons(std::unique_ptr<Geometry> g);
+} // namespace SFCGAL::algorithm
 
 #endif

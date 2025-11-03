@@ -13,18 +13,17 @@
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/GeometryCollection.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 /**
  * Given a geometry collection, returns the "simplest" representation of the
  * contents. Singletons will be returned as singletons. Collections that are
  * homogeneous will be returned as the appropriate multi-type.
- *
+ * @param g the geometry collection to homogenize
+ * @return the homogenized geometry as a unique_ptr<Geometry>
  * @warning Ownership is taken from the parameter
  */
 SFCGAL_API std::unique_ptr<Geometry>
-           collectionHomogenize(std::unique_ptr<Geometry> coll);
-} // namespace algorithm
-} // namespace SFCGAL
+           collectionHomogenize(std::unique_ptr<Geometry> g);
+} // namespace SFCGAL::algorithm
 
 #endif

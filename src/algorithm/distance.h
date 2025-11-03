@@ -10,243 +10,232 @@
 
 #include "SFCGAL/Geometry.h"
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 struct NoValidityCheck;
 
 /**
  * @brief Compute the distance between two Geometries.
  *
- * @param gA First geometry
- * @param gB Second geometry
+ * @param geometry1 First geometry
+ * @param geometry2 Second geometry
  * @return Distance between the geometries
  * @note When applied to NURBSCurve geometries, the distance
  *   is internally computed on a LineString obtained via
  *   toLineString() with its default parameters.
  * @warning No actual validity check is done
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distance(const Geometry &gA, const Geometry &gB) -> double;
+distance(const Geometry &geometry1, const Geometry &geometry2) -> double;
 
 /**
  * @brief Dispatch distance between two Geometries.
  *
- * @pre gA is a valid geometry
- * @pre gB is a valid geometry
+ * @pre geometry1 is a valid geometry
+ * @pre geometry2 is a valid geometry
  *
- * @param gA First geometry
- * @param gB Second geometry
+ * @param geometry1 First geometry
+ * @param geometry2 Second geometry
  * @param noCheck Validity check parameter
  * @return Distance between the geometries
  * @warning No actual validity check is done
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distance(const Geometry &gA, const Geometry &gB, NoValidityCheck noCheck)
-    -> double;
+distance(const Geometry &geometry1, const Geometry &geometry2,
+         NoValidityCheck noCheck) -> double;
 
 /**
  * @brief Dispatch distance from Point to Geometry
  *
- * @param gA The input Point.
- * @param gB The second Geometry.
+ * @param point The input Point.
+ * @param geometry The second Geometry.
  * @return The distance between the two Geometries.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distancePointGeometry(const Point &gA, const Geometry &gB) -> double;
+distancePointGeometry(const Point &point, const Geometry &geometry) -> double;
 
 /**
  * @brief Computes the distance between two Points.
  *
- * @param gA The first Point.
- * @param gB The second Point.
+ * @param point1 The first Point.
+ * @param point2 The second Point.
  * @return The distance between the two Points.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distancePointPoint(const Point &gA, const Point &gB) -> double;
+distancePointPoint(const Point &point1, const Point &point2) -> double;
 
 /**
  * @brief Computes the distance between a Point and a LineString.
  *
- * @param gA The input Point.
- * @param gB The input LineString.
+ * @param point The input Point.
+ * @param lineString The input LineString.
  * @return The distance between the point and the LineString.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distancePointLineString(const Point &gA, const LineString &gB) -> double;
+distancePointLineString(const Point &point, const LineString &lineString)
+    -> double;
 
 /**
  * @brief Computes the distance between a Point and a Polygon.
  *
- * @param gA The input Point.
- * @param gB The input Polygon.
+ * @param point The input Point.
+ * @param polygon The input Polygon.
  * @return The distance between the Point and the Polygon.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distancePointPolygon(const Point &gA, const Polygon &gB) -> double;
+distancePointPolygon(const Point &point, const Polygon &polygon) -> double;
 
 /**
  * @brief Computes the distance between a Point and a Triangle.
  *
- * @param gA The input Point.
- * @param gB The input Triangle.
+ * @param point The input Point.
+ * @param triangle The input Triangle.
  * @return The distance between the Point and the Triangle.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distancePointTriangle(const Point &gA, const Triangle &gB) -> double;
+distancePointTriangle(const Point &point, const Triangle &triangle) -> double;
 
 /**
  * @brief Dispatch distance from LineString to Geometry
  *
- * @param gA The input LineString.
- * @param gB The input Geometry.
+ * @param lineString The input LineString.
+ * @param geometry The input Geometry.
  * @return The distance between the LineString and the Geometry
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distanceLineStringGeometry(const LineString &gA, const Geometry &gB) -> double;
+distanceLineStringGeometry(const LineString &lineString,
+                           const Geometry   &geometry) -> double;
 
 /**
  * @brief Computes the distance between two LineStrings.
  *
- * @param gA The first LineString.
- * @param gB The second LineString.
+ * @param lineString1 The first LineString.
+ * @param lineString2 The second LineString.
  * @return The distance between the two LineStrings.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distanceLineStringLineString(const LineString &gA, const LineString &gB)
-    -> double;
+distanceLineStringLineString(const LineString &lineString1,
+                             const LineString &lineString2) -> double;
 
 /**
  * @brief Computes the distance between a LineString and a Polygon.
  *
- * @param gA The input LineString.
- * @param gB The input Polygon.
+ * @param lineString The input LineString.
+ * @param polygon The input Polygon.
  * @return The distance between the LineString and the Polygon.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distanceLineStringPolygon(const LineString &gA, const Polygon &gB) -> double;
+distanceLineStringPolygon(const LineString &lineString, const Polygon &polygon)
+    -> double;
 
 /**
  * @brief Computes the distance between a LineString and a Triangle.
  *
- * @param gA The input LineString.
- * @param gB The input Triangle.
+ * @param lineString The input LineString.
+ * @param triangle The input Triangle.
  * @return The distance between the LineString and the Triangle.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distanceLineStringTriangle(const LineString &gA, const Triangle &gB) -> double;
+distanceLineStringTriangle(const LineString &lineString,
+                           const Triangle   &triangle) -> double;
 
 /**
  * @brief Dispatch distance from Polygon to Geometry
  *
- * @param gA The Polygon.
- * @param gB The input Geometry.
+ * @param polygon The Polygon.
+ * @param geometry The input Geometry.
  * @return The distance between the Polygon and the Geometry
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distancePolygonGeometry(const Polygon &gA, const Geometry &gB) -> double;
+distancePolygonGeometry(const Polygon &polygon, const Geometry &geometry)
+    -> double;
 
 /**
  * @brief Computes the distance between two Polygons.
  *
- * @param gA The first Polygon.
- * @param gB The second Polygon.
+ * @param polygon1 The first Polygon.
+ * @param polygon2 The second Polygon.
  * @return The distance between the two Polygons.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distancePolygonPolygon(const Polygon &gA, const Polygon &gB) -> double;
+distancePolygonPolygon(const Polygon &polygon1, const Polygon &polygon2)
+    -> double;
 
 /**
  * @brief Computes the distance between a Polygon and a Triangle.
  *
- * @param gA The input Polygon.
- * @param gB The input Triangle.
+ * @param polygon The input Polygon.
+ * @param triangle The input Triangle.
  * @return The distance between the Polygon and the Triangle.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distancePolygonTriangle(const Polygon &gA, const Triangle &gB) -> double;
+distancePolygonTriangle(const Polygon &polygon, const Triangle &triangle)
+    -> double;
 
 /**
  * @brief Dispatch distance from a Triangle to a Geometry
  *
- * @param gA The Triangle.
- * @param gB The input Geometry.
+ * @param triangle The Triangle.
+ * @param geometry The input Geometry.
  * @return The distance between the Triangle and the Geometry
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distanceTriangleGeometry(const Triangle &gA, const Geometry &gB) -> double;
+distanceTriangleGeometry(const Triangle &triangle, const Geometry &geometry)
+    -> double;
 
 /**
  * @brief Computes the distance from a GeometryCollection to a Geometry
  *
- * @param gA The GeometryCollection.
- * @param gB The input Geometry.
+ * @param geometryCollection The GeometryCollection.
+ * @param geometry The input Geometry.
  * @return The distance between the GeometryCollection and the Geometry
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distanceGeometryCollectionToGeometry(const Geometry &gA, const Geometry &gB)
-    -> double;
+distanceGeometryCollectionToGeometry(const Geometry &geometryCollection,
+                                     const Geometry &geometry) -> double;
 
 /**
  * @brief Computes the distance between a Point and a Segment.
  *
- * @param p The input Point.
- * @param a The start Point of the segment.
- * @param b The end Point of the segment.
+ * @param point The input Point.
+ * @param segmentStart The start Point of the segment.
+ * @param segmentEnd The end Point of the segment.
  * @return The distance between the Point and the Segment.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distancePointSegment(const Point &p, const Point &a, const Point &b) -> double;
+distancePointSegment(const Point &point, const Point &segmentStart,
+                     const Point &segmentEnd) -> double;
 
 /**
  * @brief Computes the distance between two Segments.
  *
- * @param a The start Point of the first segment.
- * @param b The end Point of the first segment.
- * @param c The start Point of the second segment.
- * @param d The end Point of the second segment.
+ * @param point1 The start Point of the first segment.
+ * @param point2 The end Point of the first segment.
+ * @param point3 The start Point of the second segment.
+ * @param point4 The end Point of the second segment.
  * @return The distance between the two Segments.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
-distanceSegmentSegment(const Point &a, const Point &b, const Point &c,
-                       const Point &d) -> double;
+distanceSegmentSegment(const Point &point1, const Point &point2,
+                       const Point &point3, const Point &point4) -> double;
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif

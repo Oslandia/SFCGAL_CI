@@ -23,14 +23,18 @@ namespace algorithm {
 /**
  * @brief [private]Test if a bidirectional graph is an half-edge (in order to
  * validate orientation)
+ * @tparam V Vertex type
+ * @tparam E Edge type
+ * @param graph The geometry graph to test
+ * @return true if the graph represents a half-edge, false otherwise
  */
 template <typename V, typename E>
-bool
-isHalfEdge(const GeometryGraphT<V, E> &graph)
+auto
+isHalfEdge(const GeometryGraphT<V, E> &graph) -> bool
 {
-  typedef typename GeometryGraphT<V, E>::vertex_descriptor vertex_descriptor;
-  // typedef typename GeometryGraphT<V,E>::edge_descriptor   edge_descriptor ;
-  typedef typename GeometryGraphT<V, E>::edge_iterator edge_iterator;
+  using vertex_descriptor = typename GeometryGraphT<V, E>::vertex_descriptor;
+  // using = typename GeometryGraphT<V,E>::edge_descriptor   edge_descriptor;
+  using edge_iterator = typename GeometryGraphT<V, E>::edge_iterator;
 
   /*
    * try to insert all edges in a map, return false if an edge already exists

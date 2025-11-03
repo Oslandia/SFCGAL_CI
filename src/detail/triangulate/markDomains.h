@@ -12,16 +12,21 @@ namespace detail {
 
 /**
  * @brief fill nestingLevel
+ * @tparam CDT Constrained Delaunay Triangulation type
+ * @param cdt The triangulation
+ * @param start Starting face handle
+ * @param index Nesting level index
+ * @param border List of border edges
  *
  * Adapted from CGAL-4.1/examples/Triangulation_2/polygon_triangulation.cpp
  */
 template <typename CDT>
-void
+auto
 markDomains(CDT &cdt, typename CDT::Face_handle start, int index,
-            std::list<typename CDT::Edge> &border)
+            std::list<typename CDT::Edge> &border) -> void
 {
-  typedef typename CDT::Face_handle Face_handle;
-  typedef typename CDT::Edge        Edge;
+  using Face_handle = typename CDT::Face_handle;
+  using Edge        = typename CDT::Edge;
 
   if (start->info().nestingLevel != -1) {
     return;
@@ -55,16 +60,18 @@ markDomains(CDT &cdt, typename CDT::Face_handle start, int index,
 
 /**
  * @brief fill nestingLevel
+ * @tparam CDT Constrained Delaunay Triangulation type
+ * @param cdt The triangulation to mark
  *
  * Adapted from CGAL-4.1/examples/Triangulation_2/polygon_triangulation.cpp
  */
 template <typename CDT>
-void
-markDomains(CDT &cdt)
+auto
+markDomains(CDT &cdt) -> void
 {
-  typedef typename CDT::All_faces_iterator All_faces_iterator;
-  typedef typename CDT::Face_handle        Face_handle;
-  typedef typename CDT::Edge               Edge;
+  using All_faces_iterator = typename CDT::All_faces_iterator;
+  using Face_handle        = typename CDT::Face_handle;
+  using Edge               = typename CDT::Edge;
 
   for (All_faces_iterator it = cdt.all_faces_begin(); it != cdt.all_faces_end();
        ++it) {

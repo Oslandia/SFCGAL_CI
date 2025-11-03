@@ -24,36 +24,37 @@
 namespace SFCGAL::algorithm {
 
 void
-translate(Geometry &g, const Kernel::Vector_3 &v)
+translate(Geometry &geometry, const Kernel::Vector_3 &vector)
 {
   transform::AffineTransform3 visitor(
-      CGAL::Aff_transformation_3<Kernel>(CGAL::TRANSLATION, v));
-  g.accept(visitor);
+      CGAL::Aff_transformation_3<Kernel>(CGAL::TRANSLATION, vector));
+  geometry.accept(visitor);
 }
 
 void
-translate(Geometry &g, const Kernel::Vector_2 &v)
+translate(Geometry &geometry, const Kernel::Vector_2 &vector)
 {
   transform::AffineTransform2 visitor(
-      CGAL::Aff_transformation_2<Kernel>(CGAL::TRANSLATION, v));
-  g.accept(visitor);
+      CGAL::Aff_transformation_2<Kernel>(CGAL::TRANSLATION, vector));
+  geometry.accept(visitor);
 }
 
 void
-translate(Geometry &g, const Kernel::FT &dx, const Kernel::FT &dy,
+translate(Geometry &geometry, const Kernel::FT &dx, const Kernel::FT &dy,
           const Kernel::FT &dz)
 {
-  translate(g, Kernel::Vector_3(dx, dy, dz));
+  translate(geometry, Kernel::Vector_3(dx, dy, dz));
 }
 
 void
-translate(Geometry &g, const double &dx, const double &dy, const double &dz)
+translate(Geometry &geometry, const double &dx, const double &dy,
+          const double &dz)
 {
   if (!std::isfinite(dx) || !std::isfinite(dy) || !std::isfinite(dz)) {
     BOOST_THROW_EXCEPTION(NonFiniteValueException(
         "trying to translate with non finite value in direction"));
   }
 
-  return translate(g, Kernel::FT(dx), Kernel::FT(dy), Kernel::FT(dz));
+  translate(geometry, Kernel::FT(dx), Kernel::FT(dy), Kernel::FT(dz));
 }
 } // namespace SFCGAL::algorithm

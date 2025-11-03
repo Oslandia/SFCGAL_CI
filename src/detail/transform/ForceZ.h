@@ -11,8 +11,7 @@
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/Transform.h"
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 /**
  * Force Z definitions
@@ -36,7 +35,6 @@ private:
   Kernel::FT _defaultZ;
 };
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform
 
 #endif

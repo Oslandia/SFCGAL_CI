@@ -82,7 +82,7 @@ public:
   /**
    * log level
    */
-  typedef enum { Debug, Info, Warning, Error, Critical } Level;
+  using Level = enum { Debug, Info, Warning, Error, Critical };
 
   /**
    * singleton accessor
@@ -149,11 +149,11 @@ private:
 };
 
 /**
- * get the logger
+ * @brief get the logger
  * @return Reference to the global logger instance
  */
-SFCGAL_API Logger &
-logger();
+SFCGAL_API auto
+logger() -> Logger &;
 
 } // namespace SFCGAL
 

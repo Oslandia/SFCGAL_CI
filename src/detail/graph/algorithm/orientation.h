@@ -15,7 +15,12 @@ namespace algorithm {
 
 /**
  * @brief [private]Study orientation between two EdgeStrings
- * @return true on success
+ * @tparam Graph The graph type
+ * @param graph The geometry graph
+ * @param reference Reference edge vector
+ * @param target Target edge vector
+ * @param hasOppositeEdge Output flag for opposite edge detection
+ * @param hasParallelEdge Output flag for parallel edge detection
  */
 template <typename Graph>
 void
@@ -44,14 +49,18 @@ studyOrientation(Graph                                        &graph,
 }
 
 /**
- * Try to build consistent orientation between two edge string
+ * @brief Try to build consistent orientation between two edge string
+ * @tparam Graph The graph type
+ * @param graph The geometry graph
+ * @param reference Reference edge vector
+ * @param target Target edge vector
  * @return true on success
  */
 template <typename Graph>
-bool
+auto
 makeConsistentOrientation(
     Graph &graph, std::vector<typename Graph::edge_descriptor> &reference,
-    std::vector<typename Graph::edge_descriptor> &target)
+    std::vector<typename Graph::edge_descriptor> &target) -> bool
 {
   /*
    * look for opposite or parallel edges in "reference" and "target" edge sets

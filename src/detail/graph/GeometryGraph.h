@@ -11,14 +11,15 @@
 #include "SFCGAL/detail/graph/Edge.h"
 #include "SFCGAL/detail/graph/Vertex.h"
 
-namespace SFCGAL {
-namespace graph {
+namespace SFCGAL::graph {
 
 /**
- * @enum EdgeDirection
  * @brief Specifies the direction of an edge in a graph.
  */
-typedef enum { DIRECT = 0, REVERSE = 1 } EdgeDirection;
+using EdgeDirection = enum {
+  DIRECT  = 0, ///< Direct edge direction (source to target)
+  REVERSE = 1  ///< Reverse edge direction (target to source)
+};
 
 /**
  * @brief Returns the reverse of the given EdgeDirection.
@@ -48,8 +49,8 @@ reverse(const EdgeDirection &direction)
 template <typename VertexProperties, typename EdgeProperties>
 class GeometryGraphT {
 public:
-  typedef VertexProperties vertex_properties; ///< Vertex properties type
-  typedef EdgeProperties   edge_properties;   ///< Edge properties type
+  using vertex_properties = VertexProperties; ///< Vertex properties type
+  using edge_properties   = EdgeProperties;   ///< Edge properties type
 
   /**
    * the wrapped graphEdgeProperties
@@ -74,7 +75,7 @@ public:
    *
    * From the vertex point of view, out edges are DIRECT, in edges are REVERSE.
    */
-  typedef std::pair<edge_descriptor, EdgeDirection> directed_edge_descriptor;
+  using directed_edge_descriptor = std::pair<edge_descriptor, EdgeDirection>;
 
   typedef typename boost::graph_traits<graph_t>::in_edge_iterator
       in_edge_iterator; ///< Incoming edge iterator type
@@ -537,9 +538,8 @@ private:
  * Default GeometryGraph with predefined Vertex and Edge properties for general
  * usage
  */
-typedef GeometryGraphT<Vertex, Edge> GeometryGraph;
+using GeometryGraph = GeometryGraphT<Vertex, Edge>;
 
-} // namespace graph
-} // namespace SFCGAL
+} // namespace SFCGAL::graph
 
 #endif

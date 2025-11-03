@@ -24,9 +24,9 @@
 
 #include "SFCGAL/export.h"
 
-#define SFCGAL_VERSION_MAJOR @SFCGAL_VERSION_MAJOR@
-#define SFCGAL_VERSION_MINOR @SFCGAL_VERSION_MINOR@
-#define SFCGAL_VERSION_PATCH @SFCGAL_VERSION_PATCH@
+#define SFCGAL_VERSION_MAJOR @SFCGAL_VERSION_MAJOR @
+#define SFCGAL_VERSION_MINOR @SFCGAL_VERSION_MINOR @
+#define SFCGAL_VERSION_PATCH @SFCGAL_VERSION_PATCH @
 
 #define SFCGAL_VERSION "@SFCGAL_VERSION@"
 
@@ -34,10 +34,10 @@
   "SFCGAL @SFCGAL_VERSION@, CGAL @CGAL_VERSION@, BOOST @Boost_VERSION_STRING@"
 
 namespace SFCGAL {
-SFCGAL_API const char *
-Version();
-SFCGAL_API const char *
-Full_Version();
+SFCGAL_API auto
+Version() -> const char *;
+SFCGAL_API auto
+Full_Version() -> const char *;
 } // namespace SFCGAL
 
 #endif

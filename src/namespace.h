@@ -51,7 +51,6 @@ namespace algorithm {
 
 /**
  * @brief Implementation details namespace
- * @ingroup detail
  */
 namespace detail {
 
@@ -127,7 +126,6 @@ namespace transform {
 namespace triangulate {
 /**
  * @brief Triangulate detail namespace
- * @ingroup detail
  */
 namespace detail {
 }

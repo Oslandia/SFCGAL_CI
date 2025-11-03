@@ -51,8 +51,8 @@ GeometryCollection::dimension() const -> int
 {
   int maxDimension = 0;
 
-  for (const auto &_geometry : _geometries) {
-    maxDimension = std::max(maxDimension, _geometry->dimension());
+  for (const auto &geometry : _geometries) {
+    maxDimension = std::max(maxDimension, geometry->dimension());
   }
 
   return maxDimension;
@@ -92,8 +92,8 @@ GeometryCollection::dropZ() -> bool
     return false;
   }
 
-  for (auto &_geometry : _geometries) {
-    _geometry->dropZ();
+  for (auto &geometry : _geometries) {
+    geometry->dropZ();
   }
 
   return true;
@@ -106,8 +106,8 @@ GeometryCollection::dropM() -> bool
     return false;
   }
 
-  for (auto &_geometry : _geometries) {
-    _geometry->dropM();
+  for (auto &geometry : _geometries) {
+    geometry->dropM();
   }
 
   return true;
@@ -116,8 +116,8 @@ GeometryCollection::dropM() -> bool
 auto
 GeometryCollection::swapXY() -> void
 {
-  for (auto &_geometry : _geometries) {
-    _geometry->swapXY();
+  for (auto &geometry : _geometries) {
+    geometry->swapXY();
   }
 }
 
@@ -203,7 +203,7 @@ GeometryCollection::addGeometry(std::unique_ptr<Geometry> geometry)
     BOOST_THROW_EXCEPTION(InappropriateGeometryException(oss.str()));
   }
 
-  _geometries.push_back(std::move(geometry));
+  _geometries.emplace_back(std::move(geometry));
 }
 
 void

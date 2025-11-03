@@ -124,8 +124,8 @@ solidsVolume(const GeometrySet<2> & /*unused*/) -> double
 
 template <int Dim>
 auto
-equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
-    -> bool
+equalLength(const GeometrySet<Dim> &geometrySet1,
+            const GeometrySet<Dim> &geometrySet2, int dim) -> bool
 {
   // compare 'length' of primitives in A with 'length' of primitives in B
   // 'length' is :
@@ -138,7 +138,7 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
 
   switch (dim) {
   case 0: {
-    if (a.points().size() != b.points().size()) {
+    if (geometrySet1.points().size() != geometrySet2.points().size()) {
       return false;
     }
   } break;
@@ -147,8 +147,8 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
 
     //
     // Compare lengths
-    double const lengthA = segmentsLength(a);
-    double const lengthB = segmentsLength(b);
+    double const lengthA = segmentsLength(geometrySet1);
+    double const lengthB = segmentsLength(geometrySet2);
     double const cmp     = (lengthA - lengthB) * (lengthA - lengthB);
 
     if (cmp > tol) {
@@ -159,8 +159,8 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
   case 2: {
     //
     // Compare areas
-    double const areaA = surfacesArea(a);
-    double const areaB = surfacesArea(b);
+    double const areaA = surfacesArea(geometrySet1);
+    double const areaB = surfacesArea(geometrySet2);
     double const cmp   = (areaA - areaB) * (areaA - areaB);
 
     if (cmp > tol) {
@@ -170,8 +170,8 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
 
   case 3: {
     // Compare volumes
-    double const volA = solidsVolume(a);
-    double const volB = solidsVolume(b);
+    double const volA = solidsVolume(geometrySet1);
+    double const volB = solidsVolume(geometrySet2);
     double const cmp  = (volA - volB) * (volA - volB);
 
     if (cmp > tol) {
@@ -185,10 +185,11 @@ equalLength(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b, int dim)
 
 template <int Dim>
 auto
-covers(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
+covers(const GeometrySet<Dim> &geometrySet1,
+       const GeometrySet<Dim> &geometrySet2) -> bool
 {
-  int const dimA = a.dimension();
-  int const dimB = b.dimension();
+  int const dimA = geometrySet1.dimension();
+  int const dimB = geometrySet2.dimension();
 
   if (dimA == -1 || dimB == -1) {
     return false;
@@ -205,21 +206,21 @@ covers(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
   // '==' is here implemented with comparison of length, area and volumes
   // TODO use only predicates if possible
   GeometrySet<Dim> inter;
-  algorithm::intersection(a, b, inter);
+  algorithm::intersection(geometrySet1, geometrySet2, inter);
 
-  if (b.hasPoints() && !equalLength(b, inter, 0)) {
+  if (geometrySet2.hasPoints() && !equalLength(geometrySet2, inter, 0)) {
     return false;
   }
 
-  if (b.hasSegments() && !equalLength(b, inter, 1)) {
+  if (geometrySet2.hasSegments() && !equalLength(geometrySet2, inter, 1)) {
     return false;
   }
 
-  if (b.hasSurfaces() && !equalLength(b, inter, 2)) {
+  if (geometrySet2.hasSurfaces() && !equalLength(geometrySet2, inter, 2)) {
     return false;
   }
 
-  if (b.hasVolumes() && !equalLength(b, inter, 3)) {
+  if (geometrySet2.hasVolumes() && !equalLength(geometrySet2, inter, 3)) {
     return false;
   }
 
@@ -227,9 +228,11 @@ covers(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b) -> bool
 }
 
 template bool
-covers<2>(const GeometrySet<2> &a, const GeometrySet<2> &b);
+covers<2>(const GeometrySet<2> &geometrySet1,
+          const GeometrySet<2> &geometrySet2);
 template bool
-covers<3>(const GeometrySet<3> &a, const GeometrySet<3> &b);
+covers<3>(const GeometrySet<3> &geometrySet1,
+          const GeometrySet<3> &geometrySet2);
 
 /// @} end of private section
 
@@ -238,28 +241,30 @@ covers<3>(const GeometrySet<3> &a, const GeometrySet<3> &b);
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/// @private
 auto
-covers(const Geometry &ga, const Geometry &gb) -> bool
+covers(const Geometry &geometry1, const Geometry &geometry2) -> bool
 {
-  if (ga.isEmpty() || gb.isEmpty()) {
+  if (geometry1.isEmpty() || geometry2.isEmpty()) {
     return false;
   }
 
-  GeometrySet<2> const gsa(ga);
-  GeometrySet<2> const gsb(gb);
+  GeometrySet<2> const gsa(geometry1);
+  GeometrySet<2> const gsb(geometry2);
 
   return covers(gsa, gsb);
 }
 
+/// @private
 auto
-covers3D(const Geometry &ga, const Geometry &gb) -> bool
+covers3D(const Geometry &geometry1, const Geometry &geometry2) -> bool
 {
-  if (ga.isEmpty() || gb.isEmpty()) {
+  if (geometry1.isEmpty() || geometry2.isEmpty()) {
     return false;
   }
 
-  GeometrySet<3> const gsa(ga);
-  GeometrySet<3> const gsb(gb);
+  GeometrySet<3> const gsa(geometry1);
+  GeometrySet<3> const gsb(geometry2);
 
   return covers(gsa, gsb);
 }

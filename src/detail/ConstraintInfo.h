@@ -8,8 +8,7 @@
 #include <cstddef>
 #include <vector>
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /**
  * @brief Structure to identify constraint sources for topology-preserving mode
@@ -34,12 +33,14 @@ struct ConstraintInfo {
 
   /**
    * @brief Constructor for constraint info
-   * @param t The constraint type
-   * @param gIdx Index of the source geometry
-   * @param rIdx Index of the ring within the geometry
+   * @param constraintType The constraint type
+   * @param geometryIndex Index of the source geometry
+   * @param ringIndexParam Index of the ring within the geometry
    */
-  ConstraintInfo(Type t, size_t gIdx, size_t rIdx = 0)
-      : type(t), geomIndex(gIdx), ringIndex(rIdx)
+  ConstraintInfo(Type constraintType, size_t geometryIndex,
+                 size_t ringIndexParam = 0)
+      : type(constraintType), geomIndex(geometryIndex),
+        ringIndex(ringIndexParam)
   {
   }
 };
@@ -84,25 +85,24 @@ template <typename Constraint_id>
 struct ConstraintInfoCompare {
   /**
    * @brief Compare two constraint order infos
-   * @param a First constraint order info
-   * @param b Second constraint order info
-   * @return True if a should be ordered before b
+   * @param lhs First constraint order info
+   * @param rhs Second constraint order info
+   * @return True if lhs should be ordered before rhs
    */
   bool
-  operator()(const ConstraintOrderInfo<Constraint_id> &a,
-             const ConstraintOrderInfo<Constraint_id> &b) const
+  operator()(const ConstraintOrderInfo<Constraint_id> &lhs,
+             const ConstraintOrderInfo<Constraint_id> &rhs) const
   {
-    if (a.geomIndex != b.geomIndex)
-      return a.geomIndex < b.geomIndex;
-    if (a.polyIndex != b.polyIndex)
-      return a.polyIndex < b.polyIndex;
-    if (a.ringIndex != b.ringIndex)
-      return a.ringIndex < b.ringIndex;
-    return a.order < b.order;
+    if (lhs.geomIndex != rhs.geomIndex)
+      return lhs.geomIndex < rhs.geomIndex;
+    if (lhs.polyIndex != rhs.polyIndex)
+      return lhs.polyIndex < rhs.polyIndex;
+    if (lhs.ringIndex != rhs.ringIndex)
+      return lhs.ringIndex < rhs.ringIndex;
+    return lhs.order < rhs.order;
   }
 };
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif // SFCGAL_DETAIL_CONSTRAINTINFO_H_

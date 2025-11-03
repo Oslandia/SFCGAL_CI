@@ -40,31 +40,31 @@ class SFCGAL_API WkbWriter {
 public:
   /**
    * @brief Construct WKB writer
-   * @param s Output stream to write WKB data to
+   * @param outputStream Output stream to write WKB data to
    * @param asHexString If true, output as hexadecimal string, otherwise binary
    */
-  WkbWriter(std::ostream &s, bool asHexString = false)
-      : _s(s), _asHexString(asHexString) {};
+  WkbWriter(std::ostream &outputStream, bool asHexString = false)
+      : _s(outputStream), _asHexString(asHexString) {};
 
   /**
    * write WKB for a geometry
    * wkbOrder is the native endianness by default.
-   * @param g Geometry to write as WKB
+   * @param geometry Geometry to write as WKB
    * @param wkbOrder Byte order for WKB output
    */
   void
-  write(const Geometry      &g,
+  write(const Geometry      &geometry,
         boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**
    * write EWKB for a geometry
    * wkbOrder is the native endianness by default.
-   * @param g Geometry to write as EWKB
+   * @param geometry Geometry to write as EWKB
    * @param srid Spatial reference identifier to include in EWKB
    * @param wkbOrder Byte order for WKB output
    */
   void
-  write(const Geometry &g, const srid_t &srid,
+  write(const Geometry &geometry, const srid_t &srid,
         boost::endian::order wkbOrder = boost::endian::order::native);
 
 private:
@@ -72,21 +72,21 @@ private:
    * Dedicated method to write the geometry type into _wkb data
    */
   void
-  writeGeometryType(const Geometry &g, boost::endian::order wkbOrder =
-                                           boost::endian::order::native);
+  writeGeometryType(const Geometry &geometry, boost::endian::order wkbOrder =
+                                                  boost::endian::order::native);
 
   /**
    * Dedicated method to write Point into _wkb data
    */
   void
-  writeInner(const Point         &g,
+  writeInner(const Point         &geometry,
              boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**
    * Dedicated method to write LineString into _wkb data
    */
   void
-  writeInner(const LineString    &g,
+  writeInner(const LineString    &geometry,
              boost::endian::order wkbOrder = boost::endian::order::native);
   /**
    * Dedicated method to write Ring into _wkb data
@@ -94,21 +94,21 @@ private:
    * This method is shared by LineString and Polygon.
    */
   void
-  writeInnerRing(const LineString    &g,
+  writeInnerRing(const LineString    &geometry,
                  boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**
    * Dedicated method to write Polygon into _wkb data
    */
   void
-  writeInner(const Polygon       &g,
+  writeInner(const Polygon       &geometry,
              boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**
    * Dedicated method to write GeometryCollection into _wkb data
    */
   void
-  writeInner(const GeometryCollection &g,
+  writeInner(const GeometryCollection &geometry,
              boost::endian::order      wkbOrder = boost::endian::order::native);
 
   /**
@@ -131,27 +131,27 @@ private:
    */
   template <typename M, typename G>
   void
-  writeInner(const M &g, boost::endian::order wkbOrder);
+  writeInner(const M &geometry, boost::endian::order wkbOrder);
 
   /**
    * Dedicated method to write Triangle into _wkb data
    */
   void
-  writeInner(const Triangle      &g,
+  writeInner(const Triangle      &geometry,
              boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**
    * Dedicated method to write NURBSCurve into _wkb data
    */
   void
-  writeInner(const NURBSCurve    &g,
+  writeInner(const NURBSCurve    &geometry,
              boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**
    * Dedicated method to write Point into _wkb data
    */
   void
-  writeCoordinate(const Point         &g,
+  writeCoordinate(const Point         &geometry,
                   boost::endian::order wkbOrder = boost::endian::order::native);
 
   /**
@@ -159,7 +159,7 @@ private:
    * Only for recursive call use
    */
   void
-  writeRec(const Geometry      &g,
+  writeRec(const Geometry      &geometry,
            boost::endian::order wkbOrder = boost::endian::order::native);
 
   std::ostream &_s;
@@ -188,13 +188,14 @@ private:
 
   template <typename T>
   auto
-  toByte(const T x, boost::endian::order byteOrder) -> void
+  toByte(const T value, boost::endian::order byteOrder) -> void
   {
-    T y = x;
+    T valueSwapped = value;
     if (boost::endian::order::native != byteOrder) {
-      boost::endian::endian_reverse_inplace(y);
+      boost::endian::endian_reverse_inplace(valueSwapped);
     }
-    toStream(*reinterpret_cast<std::array<std::byte, sizeof(T)> *>(&y));
+    toStream(
+        *reinterpret_cast<std::array<std::byte, sizeof(T)> *>(&valueSwapped));
   }
 
   srid_t _srid;

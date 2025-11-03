@@ -18,17 +18,34 @@ struct Simplicity {
    * invalid(reason) that are clearer in the code than to remember that "Valid
    * constructed with a reason is invalid"
    */
+  /**
+   * @brief Create a simple (valid) geometry state
+   * @return Simplicity object representing simple geometry
+   */
   static const Simplicity
   simple()
   {
     return Simplicity();
   }
+  /**
+   * @brief Create a complex (invalid) geometry state with reason
+   * @param reason The reason why the geometry is complex
+   * @return Simplicity object representing complex geometry
+   */
   static const Simplicity
   complex(const std::string &reason)
   {
     return Simplicity(reason);
   }
+  /**
+   * @brief Convert to boolean indicating if geometry is simple
+   * @return true if simple, false if complex
+   */
   operator bool() const { return _simple; }
+  /**
+   * @brief Get the reason why geometry is complex
+   * @return The reason string (empty if simple)
+   */
   const std::string &
   reason() const
   {

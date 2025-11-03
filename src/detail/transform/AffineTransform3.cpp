@@ -31,14 +31,14 @@ AffineTransform3::AffineTransform3(CGAL::Aff_transformation_3<Kernel> transform)
 }
 
 void
-AffineTransform3::transform(Point &p)
+AffineTransform3::transform(Point &point)
 {
-  if (!p.isEmpty()) {
-    Point pt(p.toPoint_3().transform(_transform));
-    if (p.isMeasured()) {
-      pt.setM(p.m());
+  if (!point.isEmpty()) {
+    Point pt(point.toPoint_3().transform(_transform));
+    if (point.isMeasured()) {
+      pt.setM(point.m());
     }
-    p = pt;
+    point = pt;
   }
 }
 

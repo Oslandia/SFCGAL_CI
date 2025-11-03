@@ -15,6 +15,7 @@
 
 namespace SFCGAL {
 
+/// @brief Default epsilon value for floating point comparisons
 constexpr double EPSILON = 1e-8;
 
 #if defined(__clang__)
@@ -24,47 +25,62 @@ constexpr double EPSILON = 1e-8;
   #pragma gcc diagnostic push
   #pragma gcc diagnostic ignored "-Wfloat-equal"
 #endif
+/**
+ * @brief Check if two double values are almost equal within epsilon
+ * @param first First value to compare
+ * @param second Second value to compare
+ * @param epsilon Tolerance for comparison
+ * @return true if values are almost equal, false otherwise
+ */
 inline auto
-almostEqual(const double a, const double b, const double epsilon) -> bool
-{
-  // shortcut and handles inf values
-  if (a == b) {
-    return true;
-  }
-
-  if (std::isnan(a) || std::isnan(b)) {
-    return std::isnan(a) && std::isnan(b);
-  }
-
-  const double absA = std::fabs(a);
-  const double absB = std::fabs(b);
-  const double diff = std::fabs(a - b);
-  // fixed epsilon
-  if (diff <= epsilon) {
-    return true;
-  }
-
-  return diff <= epsilon * std::max(absA, absB); // adaptative epsilon
-}
-
-inline auto
-almostEqual(const Kernel::FT &a, const Kernel::FT &b, const Kernel::FT &epsilon)
+almostEqual(const double first, const double second, const double epsilon)
     -> bool
 {
   // shortcut and handles inf values
-  if (a == b) {
+  if (first == second) {
     return true;
   }
 
-  const Kernel::FT absA = abs(a);
-  const Kernel::FT absB = abs(b);
-  const Kernel::FT diff = abs(a - b);
+  if (std::isnan(first) || std::isnan(second)) {
+    return std::isnan(first) && std::isnan(second);
+  }
+
+  const double absFirst  = std::fabs(first);
+  const double absSecond = std::fabs(second);
+  const double diff      = std::fabs(first - second);
   // fixed epsilon
   if (diff <= epsilon) {
     return true;
   }
 
-  return diff <= epsilon * std::max(absA, absB); // adaptative epsilon
+  return diff <= epsilon * std::max(absFirst, absSecond); // adaptative epsilon
+}
+
+/**
+ * @brief Check if two Kernel::FT values are almost equal within epsilon
+ * @param first First value to compare
+ * @param second Second value to compare
+ * @param epsilon Tolerance for comparison
+ * @return true if values are almost equal, false otherwise
+ */
+inline auto
+almostEqual(const Kernel::FT &first, const Kernel::FT &second,
+            const Kernel::FT &epsilon) -> bool
+{
+  // shortcut and handles inf values
+  if (first == second) {
+    return true;
+  }
+
+  const Kernel::FT absFirst  = abs(first);
+  const Kernel::FT absSecond = abs(second);
+  const Kernel::FT diff      = abs(first - second);
+  // fixed epsilon
+  if (diff <= epsilon) {
+    return true;
+  }
+
+  return diff <= epsilon * std::max(absFirst, absSecond); // adaptative epsilon
 }
 
 #if defined(__clang__)
@@ -74,72 +90,87 @@ almostEqual(const Kernel::FT &a, const Kernel::FT &b, const Kernel::FT &epsilon)
 #endif
 
 /**
- * shortcut to get NaN for double
+ * @brief shortcut to get NaN for double
+ * @return NaN (Not a Number) value for double
  */
-inline double
-NaN()
+inline auto
+NaN() -> double
 {
   return std::numeric_limits<double>::quiet_NaN();
 }
 
 /**
  * @brief round a double to the nearest integer
+ * @param value Value to round
+ * @return Rounded value
  */
-inline double
-round(const double &v)
+inline auto
+round(const double &value) -> double
 {
-  if (v < 0.0) {
-    return ::ceil(v - 0.5);
+  if (value < 0.0) {
+    return ::ceil(value - 0.5);
   } else {
-    return ::floor(v + 0.5);
+    return ::floor(value + 0.5);
   }
 }
 
 #ifdef CGAL_USE_GMPXX
 /**
  * @brief floor a rational to an integer
+ * @param value Rational value to floor
+ * @return Floor of the rational as integer
  */
-SFCGAL_API ::mpz_class
-floor(const ::mpq_class &v);
+SFCGAL_API auto
+floor(const ::mpq_class &value) -> ::mpz_class;
 /**
  * @brief ceil a rational to an integer
+ * @param value Rational value to ceil
+ * @return Ceiling of the rational as integer
  */
-SFCGAL_API ::mpz_class
-ceil(const ::mpq_class &v);
+SFCGAL_API auto
+ceil(const ::mpq_class &value) -> ::mpz_class;
 /**
  * @brief round a rational to an integer
+ * @param value Rational value to round
+ * @return Rounded rational as integer
  */
-SFCGAL_API ::mpz_class
-round(const ::mpq_class &v);
+SFCGAL_API auto
+round(const ::mpq_class &value) -> ::mpz_class;
 #endif
 
 /**
  * @brief floor a rational to an integer
+ * @param value CGAL rational value to floor
+ * @return Floor of the rational as CGAL integer
  */
-SFCGAL_API CGAL::Gmpz
-           floor(const CGAL::Gmpq &v);
+SFCGAL_API auto
+floor(const CGAL::Gmpq &value) -> CGAL::Gmpz;
 /**
  * @brief ceil a rational to an integer
+ * @param value CGAL rational value to ceil
+ * @return Ceiling of the rational as CGAL integer
  */
-SFCGAL_API CGAL::Gmpz
-           ceil(const CGAL::Gmpq &v);
+SFCGAL_API auto
+ceil(const CGAL::Gmpq &value) -> CGAL::Gmpz;
 /**
  * @brief round a rational to an integer
+ * @param value CGAL rational value to round
+ * @return Rounded rational as CGAL integer
  */
-SFCGAL_API CGAL::Gmpz
-           round(const CGAL::Gmpq &v);
+SFCGAL_API auto
+round(const CGAL::Gmpq &value) -> CGAL::Gmpz;
 
 /**
  * @brief Normalizes a vector
- * @param vec The vector to normalize
+ * @param vector The vector to normalize
  * @return The normalized vector
  */
-inline Kernel::Vector_3
-normalizeVector(const Kernel::Vector_3 &vec)
+inline auto
+normalizeVector(const Kernel::Vector_3 &vector) -> Kernel::Vector_3
 {
-  Kernel::FT length = CGAL::sqrt(CGAL::to_double(vec.squared_length()));
-  // clang-tidy wrongly assumes that vec / length might leak
-  return (length > 0) ? vec / length : vec;
+  Kernel::FT length = CGAL::sqrt(CGAL::to_double(vector.squared_length()));
+  // clang-tidy wrongly assumes that vector / length might leak
+  return (length > 0) ? vector / length : vector;
 } // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
 } // namespace SFCGAL
 

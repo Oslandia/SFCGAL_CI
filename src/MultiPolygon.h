@@ -29,27 +29,36 @@ public:
   MultiPolygon();
   /**
    * Copy constructor
+   * @param other The multi-polygon to copy from
    */
   MultiPolygon(MultiPolygon const &other);
   /**
    * assign operator
+   * @param other The multi-polygon to assign from
+   * @return Reference to this multi-polygon
    */
-  MultiPolygon &
-  operator=(MultiPolygon other);
+  auto
+  operator=(MultiPolygon other) -> MultiPolygon &;
   /**
    * destructor
    */
-  virtual ~MultiPolygon();
+  ~MultiPolygon() override;
 
   //-- SFCGAL::Geometry
-  std::string
-  geometryType() const override;
+  /// @brief Get the geometry type as string
+  /// @return "MultiPolygon"
+  [[nodiscard]] auto
+  geometryType() const -> std::string override;
   //-- SFCGAL::Geometry
-  GeometryType
-  geometryTypeId() const override;
+  /// @brief Get the geometry type identifier
+  /// @return TYPE_MULTIPOLYGON
+  [[nodiscard]] auto
+  geometryTypeId() const -> GeometryType override;
 
   /**
    * returns the n-th Geometry as a Polygon
+   * @param n The index of the polygon to get
+   * @return Reference to the nth polygon
    */
   inline Polygon &
   polygonN(const size_t &n)
@@ -58,6 +67,8 @@ public:
   }
   /**
    * returns the n-th Geometry as a Polygon
+   * @param n The index of the polygon to get
+   * @return Const reference to the nth polygon
    */
   inline const Polygon &
   polygonN(const size_t &n) const
@@ -68,14 +79,19 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
+  /// @brief Accept a geometry visitor
+  /// @param visitor Visitor to accept
   void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
+  /// @brief Accept a const geometry visitor
+  /// @param visitor Const visitor to accept
   void
   accept(ConstGeometryVisitor &visitor) const override;
 
   /**
-   * Serializer
+   * @brief Serializer
+   * @param ar Archive for serialization
    */
   template <class Archive>
   void
@@ -86,8 +102,11 @@ public:
 
 protected:
   //-- SFCGAL::GeometryCollection
+  /// @brief Check if geometry is allowed in this collection
+  /// @param geometry Geometry to test
+  /// @return true if geometry is a Polygon
   bool
-  isAllowed(Geometry const &g) override;
+  isAllowed(Geometry const &geometry) override;
 };
 
 } // namespace SFCGAL

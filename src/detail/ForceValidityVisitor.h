@@ -10,8 +10,7 @@
 
 #include "SFCGAL/GeometryVisitor.h"
 
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /**
  * @brief Visitor that forces the validity flag on geometries
@@ -99,9 +98,8 @@ public:
   void
   visit(TriangulatedSurface &g) override;
   /**
-   * Process NURBSCurve to set validity state.
-   *
-   * Sets the validity flag of the NURBSCurve to the configured state.
+   * @brief Visit and set validity flag on NURBSCurve
+   * @param g The triangulated surface to visit
    */
   void
   visit(NURBSCurve &g) override;
@@ -110,7 +108,6 @@ private:
   bool valid_;
 };
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif

@@ -34,10 +34,8 @@
  * @warning GeometryCollection is not supported in the general case.
  * @todo Improve support for Solid, MultiPolygon, PolyhedralSurface,
  *       TriangulatedSurface and heterogeneous GeometryCollection.
- * @ingroup detail
  */
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * Compute the boundary for a Geometry
@@ -63,33 +61,56 @@ namespace algorithm {
  * @todo GeometryCollection : complex for heterogeneous collection (not
  * supported in GEOS)
  * @todo MultiSolid : faced elimination
- * @ingroup detail
  *
  */
 class SFCGAL_API BoundaryVisitor : public ConstGeometryVisitor {
 public:
+  /// @brief Visit a Point geometry to compute its boundary
+  /// @param g The Point geometry to visit
   void
   visit(const Point &g) override;
+  /// @brief Visit a LineString geometry to compute its boundary
+  /// @param g The LineString geometry to visit
   void
   visit(const LineString &g) override;
+  /// @brief Visit a Polygon geometry to compute its boundary
+  /// @param g The Polygon geometry to visit
   void
   visit(const Polygon &g) override;
+  /// @brief Visit a Triangle geometry to compute its boundary
+  /// @param g The Triangle geometry to visit
   void
   visit(const Triangle &g) override;
+  /// @brief Visit a Solid geometry to compute its boundary
+  /// @param g The Solid geometry to visit
   void
   visit(const Solid &g) override;
+  /// @brief Visit a MultiPoint geometry to compute its boundary
+  /// @param g The MultiPoint geometry to visit
   void
   visit(const MultiPoint &g) override;
+  /// @brief Visit a MultiLineString geometry to compute its boundary
+  /// @param g The MultiLineString geometry to visit
   void
   visit(const MultiLineString &g) override;
+  /// @brief Visit a MultiPolygon geometry to compute its boundary
+  /// @param g The MultiPolygon geometry to visit
   void
   visit(const MultiPolygon &g) override;
+  /// @brief Visit a MultiSolid geometry to compute its boundary
+  /// @param g The MultiSolid geometry to visit
   void
   visit(const MultiSolid &g) override;
+  /// @brief Visit a GeometryCollection to compute its boundary
+  /// @param g The GeometryCollection to visit
   void
   visit(const GeometryCollection &g) override;
+  /// @brief Visit a PolyhedralSurface geometry to compute its boundary
+  /// @param g The PolyhedralSurface geometry to visit
   void
   visit(const PolyhedralSurface &g) override;
+  /// @brief Visit a TriangulatedSurface geometry to compute its boundary
+  /// @param g The TriangulatedSurface geometry to visit
   void
   visit(const TriangulatedSurface &g) override;
   /// @brief Process NURBSCurve for boundary calculation
@@ -124,7 +145,6 @@ private:
   std::unique_ptr<Geometry> _boundary;
 };
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif

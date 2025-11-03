@@ -52,73 +52,73 @@ WktReader::readGeometry() -> Geometry *
 
   switch (geometryType) {
   case TYPE_POINT: {
-    std::unique_ptr<Point> geom(new Point());
+    auto geom = std::make_unique<Point>();
     readInnerPoint(*geom);
     return geom.release();
   }
 
   case TYPE_LINESTRING: {
-    std::unique_ptr<LineString> geom(new LineString());
+    auto geom = std::make_unique<LineString>();
     readInnerLineString(*geom);
     return geom.release();
   }
 
   case TYPE_TRIANGLE: {
-    std::unique_ptr<Triangle> geom(new Triangle());
+    auto geom = std::make_unique<Triangle>();
     readInnerTriangle(*geom);
     return geom.release();
   }
 
   case TYPE_POLYGON: {
-    std::unique_ptr<Polygon> geom(new Polygon());
+    auto geom = std::make_unique<Polygon>();
     readInnerPolygon(*geom);
     return geom.release();
   }
 
   case TYPE_MULTIPOINT: {
-    std::unique_ptr<MultiPoint> geom(new MultiPoint());
+    auto geom = std::make_unique<MultiPoint>();
     readInnerMultiPoint(*geom);
     return geom.release();
   }
 
   case TYPE_MULTILINESTRING: {
-    std::unique_ptr<MultiLineString> geom(new MultiLineString());
+    auto geom = std::make_unique<MultiLineString>();
     readInnerMultiLineString(*geom);
     return geom.release();
   }
 
   case TYPE_MULTIPOLYGON: {
-    std::unique_ptr<MultiPolygon> geom(new MultiPolygon());
+    auto geom = std::make_unique<MultiPolygon>();
     readInnerMultiPolygon(*geom);
     return geom.release();
   }
 
   case TYPE_GEOMETRYCOLLECTION: {
-    std::unique_ptr<GeometryCollection> geom(new GeometryCollection());
+    auto geom = std::make_unique<GeometryCollection>();
     readInnerGeometryCollection(*geom);
     return geom.release();
   }
 
   case TYPE_TRIANGULATEDSURFACE: {
-    std::unique_ptr<TriangulatedSurface> geom(new TriangulatedSurface());
+    auto geom = std::make_unique<TriangulatedSurface>();
     readInnerTriangulatedSurface(*geom);
     return geom.release();
   }
 
   case TYPE_POLYHEDRALSURFACE: {
-    std::unique_ptr<PolyhedralSurface> geom(new PolyhedralSurface());
+    auto geom = std::make_unique<PolyhedralSurface>();
     readInnerPolyhedralSurface(*geom);
     return geom.release();
   }
 
   case TYPE_SOLID: {
-    std::unique_ptr<Solid> geom(new Solid());
+    auto geom = std::make_unique<Solid>();
     readInnerSolid(*geom);
     return geom.release();
   }
 
   case TYPE_MULTISOLID: {
-    std::unique_ptr<MultiSolid> geom(new MultiSolid());
+    auto geom = std::make_unique<MultiSolid>();
     readInnerMultiSolid(*geom);
     return geom.release();
   }

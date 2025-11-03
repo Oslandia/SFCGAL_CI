@@ -15,16 +15,16 @@
 
 namespace SFCGAL::algorithm {
 
-void
-makeValidOrientation(CGAL::Polygon_2<Kernel> &polygon)
+auto
+makeValidOrientation(CGAL::Polygon_2<Kernel> &polygon) -> void
 {
   if (polygon.orientation() != CGAL::COUNTERCLOCKWISE) {
     polygon.reverse_orientation();
   }
 }
 
-void
-makeValidOrientation(CGAL::Polygon_with_holes_2<Kernel> &polygon)
+auto
+makeValidOrientation(CGAL::Polygon_with_holes_2<Kernel> &polygon) -> void
 {
   if (polygon.outer_boundary().orientation() != CGAL::COUNTERCLOCKWISE) {
     polygon.outer_boundary().reverse_orientation();
@@ -37,8 +37,8 @@ makeValidOrientation(CGAL::Polygon_with_holes_2<Kernel> &polygon)
   }
 }
 
-void
-makeValidOrientation(Polygon &polygon)
+auto
+makeValidOrientation(Polygon &polygon) -> void
 {
   for (size_t i = 0; i < polygon.numRings(); i++) {
     LineString &ring = polygon.ringN(i);
@@ -55,6 +55,7 @@ makeValidOrientation(Polygon &polygon)
   }
 }
 
+/// @private
 auto
 hasConsistentOrientation3D(const TriangulatedSurface &g) -> bool
 {
@@ -70,6 +71,7 @@ hasConsistentOrientation3D(const TriangulatedSurface &g) -> bool
   return graph::algorithm::isHalfEdge(graph);
 }
 
+/// @private
 auto
 hasConsistentOrientation3D(const PolyhedralSurface &g) -> bool
 {
@@ -85,46 +87,49 @@ hasConsistentOrientation3D(const PolyhedralSurface &g) -> bool
   return graph::algorithm::isHalfEdge(graph);
 }
 
-void
-makeConsistentOrientation3D(TriangulatedSurface &g)
+auto
+makeConsistentOrientation3D(TriangulatedSurface &g) -> void
 {
   ConsistentOrientationBuilder builder;
   builder.addTriangulatedSurface(g);
   g = builder.buildTriangulatedSurface();
 }
 
+/// @private
 auto
-isCounterClockWiseOriented(const LineString &ls) -> bool
+isCounterClockWiseOriented(const LineString &lineString) -> bool
 {
   // Compute the 'z' part of the Newell's formula
   // and test against 0
   Kernel::FT z = 0;
 
-  for (size_t i = 0; i < ls.numSegments(); ++i) {
-    const Point &pi = ls.pointN(i);
-    const Point &pj = ls.pointN(i + 1);
+  for (size_t i = 0; i < lineString.numSegments(); ++i) {
+    const Point &pi = lineString.pointN(i);
+    const Point &pj = lineString.pointN(i + 1);
     z += (pi.x() - pj.x()) * (pi.y() + pj.y());
   }
 
   return z > 0;
 }
 
+/// @private
 auto
-isCounterClockWiseOriented(const Triangle &tri) -> bool
+isCounterClockWiseOriented(const Triangle &triangle) -> bool
 {
   // Compute the 'z' part of the cross product
 
-  return (tri.vertex(2).x() - tri.vertex(1).x()) *
-                 (tri.vertex(0).y() - tri.vertex(1).y()) -
-             (tri.vertex(2).y() - tri.vertex(1).y()) *
-                 (tri.vertex(0).x() - tri.vertex(1).x()) >
+  return (triangle.vertex(2).x() - triangle.vertex(1).x()) *
+                 (triangle.vertex(0).y() - triangle.vertex(1).y()) -
+             (triangle.vertex(2).y() - triangle.vertex(1).y()) *
+                 (triangle.vertex(0).x() - triangle.vertex(1).x()) >
          0;
 }
 
+/// @private
 auto
-isCounterClockWiseOriented(const Polygon &poly) -> bool
+isCounterClockWiseOriented(const Polygon &polygon) -> bool
 {
-  return isCounterClockWiseOriented(poly.exteriorRing());
+  return isCounterClockWiseOriented(polygon.exteriorRing());
 }
 
 } // namespace SFCGAL::algorithm

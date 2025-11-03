@@ -15,6 +15,8 @@ namespace SFCGAL::algorithm {
 /**
  * @brief force a 2D or M geometry to be M (replace undefined M by defaultM,
  * existing M values remains unchanged)
+ * @param geometry the geometry to force to measured
+ * @param defaultM the default M value to use (default: 0)
  * @warning ignore empty geometries
  */
 SFCGAL_API void

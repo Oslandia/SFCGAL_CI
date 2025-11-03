@@ -155,13 +155,13 @@ LineString::reserve(const size_t &n)
 void
 LineString::accept(GeometryVisitor &visitor)
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 void
 LineString::accept(ConstGeometryVisitor &visitor) const
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 auto
@@ -171,27 +171,28 @@ LineString::toPolygon_2(bool fixOrientation) const -> CGAL::Polygon_2<Kernel>
     return {};
   }
 
-  Point_2_const_iterator pend = points_2_end();
+  Point_2_const_iterator pointEndIterator = points_2_end();
   // skip the last point
-  pend--;
+  pointEndIterator--;
 
   // skip double points
   // TODO: what to do with cycles ?
   std::list<Kernel::Point_2> points;
-  Kernel::Point_2            lastP;
+  Kernel::Point_2            lastPoint;
 
-  for (Point_2_const_iterator pit = points_2_begin(); pit != pend; ++pit) {
-    if (pit == points_2_begin()) {
-      lastP = *pit;
-      points.push_back(*pit);
+  for (Point_2_const_iterator pointIterator = points_2_begin();
+       pointIterator != pointEndIterator; ++pointIterator) {
+    if (pointIterator == points_2_begin()) {
+      lastPoint = *pointIterator;
+      points.push_back(*pointIterator);
       continue;
     }
 
-    if (lastP != *pit) {
-      points.push_back(*pit);
+    if (lastPoint != *pointIterator) {
+      points.push_back(*pointIterator);
     }
 
-    lastP = *pit;
+    lastPoint = *pointIterator;
   }
 
   CGAL::Polygon_2<Kernel> result(points.begin(), points.end());

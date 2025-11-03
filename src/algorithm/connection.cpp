@@ -137,6 +137,7 @@ SurfaceGraph::SurfaceGraph(const TriangulatedSurface &tin)
   }
 }
 
+/// @private
 auto
 isConnected(const SurfaceGraph &graph) -> bool
 {
@@ -147,6 +148,7 @@ isConnected(const SurfaceGraph &graph) -> bool
   return 1 == numComponents;
 }
 
+/// @private
 auto
 isClosed(const SurfaceGraph &graph) -> bool
 {

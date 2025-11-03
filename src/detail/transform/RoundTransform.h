@@ -11,8 +11,7 @@
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/Transform.h"
 
-namespace SFCGAL {
-namespace transform {
+namespace SFCGAL::transform {
 
 /**
  * Round the coordinates of a Geometry
@@ -36,7 +35,6 @@ private:
   long _scale;
 };
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform
 
 #endif

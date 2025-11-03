@@ -13,8 +13,7 @@
 #include <stack>
 #include <string>
 
-namespace SFCGAL {
-namespace tools {
+namespace SFCGAL::tools {
 
 template <typename CharType>
 class BasicInputStreamReader;
@@ -22,11 +21,11 @@ class BasicInputStreamReader;
 /**
  * typedef for std::istream
  */
-typedef BasicInputStreamReader<char> InputStreamReader;
+using InputStreamReader = BasicInputStreamReader<char>;
 /**
  * typedef for std::wistream
  */
-typedef BasicInputStreamReader<wchar_t> WInputStreamReader;
+using WInputStreamReader = BasicInputStreamReader<wchar_t>;
 
 /**
  * Helper class to parse data from stream.
@@ -34,13 +33,14 @@ typedef BasicInputStreamReader<wchar_t> WInputStreamReader;
 template <typename CharType>
 class BasicInputStreamReader {
 public:
-  typedef CharType char_type; ///< Character type for the reader
-  typedef typename std::basic_string<char_type>
-      string_type; ///< String type for the reader
-  typedef typename std::basic_istream<char_type>
-      istream_type; ///< Input stream type
-  typedef typename std::basic_istream<char_type>::pos_type
-      pos_type; ///< Stream position type
+  using char_type = CharType; ///< Character type for the reader
+  using string_type =
+      typename std::basic_string<char_type>; ///< String type for the reader
+  using istream_type =
+      typename std::basic_istream<char_type>; ///< Input stream type
+  using pos_type =
+      typename std::basic_istream<char_type>::pos_type; ///< Stream position
+                                                        ///< type
 
   /**
    * @brief Constructor with an input stream
@@ -58,8 +58,8 @@ public:
    * @param c The character to match
    * @return True if character matches
    */
-  bool
-  match(char_type const &c)
+  auto
+  match(char_type const &c) -> bool
   {
     begin();
 
@@ -81,8 +81,8 @@ public:
    * @param c The character to match
    * @return True if character matches (case-insensitive)
    */
-  bool
-  imatch(char_type const &c)
+  auto
+  imatch(char_type const &c) -> bool
   {
     begin();
 
@@ -104,8 +104,8 @@ public:
    * @param str The string to match
    * @return True if string matches
    */
-  bool
-  match(string_type const &str)
+  auto
+  match(string_type const &str) -> bool
   {
     begin();
 
@@ -132,8 +132,8 @@ public:
    * @param str The string to match
    * @return True if string matches (case-insensitive)
    */
-  bool
-  imatch(string_type const &str)
+  auto
+  imatch(string_type const &str) -> bool
   {
     begin();
 
@@ -293,7 +293,6 @@ private:
   BasicInputStreamReader(BasicInputStreamReader const &other);
 };
 
-} // namespace tools
-} // namespace SFCGAL
+} // namespace SFCGAL::tools
 
 #endif

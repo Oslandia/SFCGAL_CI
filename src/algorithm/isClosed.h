@@ -63,7 +63,7 @@ private:
 };
 /**
  * @brief Check if a geometry is closed
- * @param g The geometry to check
+ * @param geometry The geometry to check
  * @return Closure object with status and optional reason
  *
  * @note Definition of "closed" varies by geometry type:
@@ -81,6 +81,6 @@ private:
  * - GeometryCollection: Closed if all contained geometries are closed
  */
 SFCGAL_API auto
-isClosed(const Geometry &g) -> Closure;
+isClosed(const Geometry &geometry) -> Closure;
 } // namespace SFCGAL::algorithm
 #endif // SFCGAL_ALGORITHM_ISCLOSED_H_

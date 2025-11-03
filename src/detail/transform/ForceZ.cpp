@@ -13,14 +13,14 @@ namespace SFCGAL::transform {
 ForceZ::ForceZ(Kernel::FT defaultZ) : _defaultZ(std::move(defaultZ)) {}
 
 void
-ForceZ::transform(Point &p)
+ForceZ::transform(Point &point)
 {
-  if (!p.isEmpty() && !p.is3D()) {
-    Point pt(p.x(), p.y(), _defaultZ);
-    if (p.isMeasured()) {
-      pt.setM(p.m());
+  if (!point.isEmpty() && !point.is3D()) {
+    Point pt(point.x(), point.y(), _defaultZ);
+    if (point.isMeasured()) {
+      pt.setM(point.m());
     }
-    p = pt;
+    point = pt;
   }
 }
 

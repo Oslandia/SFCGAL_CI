@@ -16,6 +16,7 @@ namespace SFCGAL::algorithm {
 // If nothing has to be built, g will be moved to the result without
 // copying and a new allocation. Otherwise, a new geometry is built and
 // the old one is deleted.
+/// @private
 auto
 collectionHomogenize(std::unique_ptr<Geometry> g) -> std::unique_ptr<Geometry>
 {

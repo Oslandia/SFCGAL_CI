@@ -36,12 +36,15 @@ Envelope::Envelope(const double &xmin, const double &xmax, const double &ymin,
   _bounds[2] = detail::Interval(zmin, zmax);
 }
 
-Envelope::Envelope(const Coordinate &p) { expandToInclude(p); }
-
-Envelope::Envelope(const Coordinate &p1, const Coordinate &p2)
+Envelope::Envelope(const Coordinate &coordinate)
 {
-  expandToInclude(p1);
-  expandToInclude(p2);
+  expandToInclude(coordinate);
+}
+
+Envelope::Envelope(const Coordinate &coordinate1, const Coordinate &coordinate2)
+{
+  expandToInclude(coordinate1);
+  expandToInclude(coordinate2);
 }
 
 Envelope::Envelope(const Envelope &other)
@@ -87,45 +90,50 @@ Envelope::expandToInclude(const Coordinate &coordinate)
 }
 
 auto
-Envelope::contains(const Envelope &a, const Envelope &b) -> bool
+Envelope::contains(const Envelope &envelopeA, const Envelope &envelopeB) -> bool
 {
-  if (a.is3D()) {
-    return b.xMin() >= a.xMin() && b.xMax() <= a.xMax() &&
-           b.yMin() >= a.yMin() && b.yMax() <= a.yMax() &&
-           b.zMin() >= a.zMin() && b.zMax() <= a.zMax();
+  if (envelopeA.is3D()) {
+    return envelopeB.xMin() >= envelopeA.xMin() &&
+           envelopeB.xMax() <= envelopeA.xMax() &&
+           envelopeB.yMin() >= envelopeA.yMin() &&
+           envelopeB.yMax() <= envelopeA.yMax() &&
+           envelopeB.zMin() >= envelopeA.zMin() &&
+           envelopeB.zMax() <= envelopeA.zMax();
   }
 
-  return b.xMin() >= a.xMin() && b.xMax() <= a.xMax() && b.yMin() >= a.yMin() &&
-         b.yMax() <= a.yMax();
+  return envelopeB.xMin() >= envelopeA.xMin() &&
+         envelopeB.xMax() <= envelopeA.xMax() &&
+         envelopeB.yMin() >= envelopeA.yMin() &&
+         envelopeB.yMax() <= envelopeA.yMax();
 }
 
 auto
-Envelope::overlaps(const Envelope &a, const Envelope &b) -> bool
+Envelope::overlaps(const Envelope &envelopeA, const Envelope &envelopeB) -> bool
 {
-  if (a.is3D()) {
-    CGAL::Bbox_3 const abox = a.toBbox_3();
-    CGAL::Bbox_3 const bbox = b.toBbox_3();
+  if (envelopeA.is3D()) {
+    CGAL::Bbox_3 const abox = envelopeA.toBbox_3();
+    CGAL::Bbox_3 const bbox = envelopeB.toBbox_3();
     return CGAL::do_overlap(abox, bbox);
   }
 
-  CGAL::Bbox_2 const abox = a.toBbox_2();
-  CGAL::Bbox_2 const bbox = b.toBbox_2();
+  CGAL::Bbox_2 const abox = envelopeA.toBbox_2();
+  CGAL::Bbox_2 const bbox = envelopeB.toBbox_2();
   return CGAL::do_overlap(abox, bbox);
 }
 
 auto
 Envelope::toRing() const -> std::unique_ptr<LineString>
 {
-  std::unique_ptr<LineString> ring(new LineString());
+  auto ring = std::make_unique<LineString>();
 
   if (isEmpty()) {
     return ring;
   }
 
-  ring->addPoint(new Point(xMin(), yMin()));
-  ring->addPoint(new Point(xMax(), yMin()));
-  ring->addPoint(new Point(xMax(), yMax()));
-  ring->addPoint(new Point(xMin(), yMax()));
+  ring->addPoint(std::make_unique<Point>(xMin(), yMin()));
+  ring->addPoint(std::make_unique<Point>(xMax(), yMin()));
+  ring->addPoint(std::make_unique<Point>(xMax(), yMax()));
+  ring->addPoint(std::make_unique<Point>(xMin(), yMax()));
   ring->addPoint(ring->startPoint());
 
   return ring;
@@ -140,7 +148,7 @@ Envelope::toPolygon() const -> std::unique_ptr<Polygon>
 auto
 Envelope::toShell() const -> std::unique_ptr<PolyhedralSurface>
 {
-  std::unique_ptr<PolyhedralSurface> shell(new PolyhedralSurface());
+  auto shell = std::make_unique<PolyhedralSurface>();
 
   if (!is3D()) {
     return shell;
@@ -253,16 +261,17 @@ Envelope::print(std::ostream &ostr) const -> std::ostream &
   return ostr;
 }
 
+/// @private
 auto
-operator==(const Envelope &a, const Envelope &b) -> bool
+operator==(const Envelope &lhs, const Envelope &rhs) -> bool
 {
-  if (a.is3D()) {
-    return a.xMin() == b.xMin() && a.yMin() == b.yMin() &&
-           a.zMin() == b.zMin() && a.xMax() == b.xMax() &&
-           a.yMax() == b.yMax() && a.zMax() == b.zMax();
+  if (lhs.is3D()) {
+    return lhs.xMin() == rhs.xMin() && lhs.yMin() == rhs.yMin() &&
+           lhs.zMin() == rhs.zMin() && lhs.xMax() == rhs.xMax() &&
+           lhs.yMax() == rhs.yMax() && lhs.zMax() == rhs.zMax();
   }
 
-  return a.xMin() == b.xMin() && a.yMin() == b.yMin() && a.xMax() == b.xMax() &&
-         a.yMax() == b.yMax();
+  return lhs.xMin() == rhs.xMin() && lhs.yMin() == rhs.yMin() &&
+         lhs.xMax() == rhs.xMax() && lhs.yMax() == rhs.yMax();
 }
 } // namespace SFCGAL

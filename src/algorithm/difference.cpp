@@ -344,16 +344,16 @@ post_difference(const GeometrySet<3> &input, GeometrySet<3> &output)
 
 template <int Dim>
 void
-difference(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
-           GeometrySet<Dim> &output)
+difference(const GeometrySet<Dim> &geometrySet1,
+           const GeometrySet<Dim> &geometrySet2, GeometrySet<Dim> &output)
 {
   using BoxCollection = typename SFCGAL::detail::BoxCollection<Dim>::Type;
   typename SFCGAL::detail::HandleCollection<Dim>::Type ahandles;
   typename SFCGAL::detail::HandleCollection<Dim>::Type bhandles;
   BoxCollection                                        aboxes;
   BoxCollection                                        bboxes;
-  a.computeBoundingBoxes(ahandles, aboxes);
-  b.computeBoundingBoxes(bhandles, bboxes);
+  geometrySet1.computeBoundingBoxes(ahandles, aboxes);
+  geometrySet2.computeBoundingBoxes(bhandles, bboxes);
 
   // here we use box_intersection_d to build the list of operations
   // that actually need to be performed
@@ -394,11 +394,11 @@ difference(const GeometrySet<Dim> &a, const GeometrySet<Dim> &b,
 }
 
 template void
-difference<2>(const GeometrySet<2> &a, const GeometrySet<2> &b,
-              GeometrySet<2> &);
+difference<2>(const GeometrySet<2> &geometrySet1,
+              const GeometrySet<2> &geometrySet2, GeometrySet<2> &);
 template void
-difference<3>(const GeometrySet<3> &a, const GeometrySet<3> &b,
-              GeometrySet<3> &);
+difference<3>(const GeometrySet<3> &geometrySet1,
+              const GeometrySet<3> &geometrySet2, GeometrySet<3> &);
 
 /// @} end of private section
 
@@ -407,12 +407,13 @@ difference<3>(const GeometrySet<3> &a, const GeometrySet<3> &b,
 // ----------------------------------------------------------------------------------
 /// @publicsection
 
+/// @private
 auto
-difference(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
-    -> std::unique_ptr<Geometry>
+difference(const Geometry &geometry1, const Geometry &geometry2,
+           NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
-  GeometrySet<2> const gsa(ga);
-  GeometrySet<2> const gsb(gb);
+  GeometrySet<2> const gsa(geometry1);
+  GeometrySet<2> const gsb(geometry2);
   GeometrySet<2>       output;
   algorithm::difference(gsa, gsb, output);
 
@@ -421,21 +422,24 @@ difference(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
   return filtered.recompose();
 }
 
+/// @private
 auto
-difference(const Geometry &ga, const Geometry &gb) -> std::unique_ptr<Geometry>
-{
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ga);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(gb);
-
-  return difference(ga, gb, NoValidityCheck());
-}
-
-auto
-difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
+difference(const Geometry &geometry1, const Geometry &geometry2)
     -> std::unique_ptr<Geometry>
 {
-  GeometrySet<3> const gsa(ga);
-  GeometrySet<3> const gsb(gb);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry1);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry2);
+
+  return difference(geometry1, geometry2, NoValidityCheck());
+}
+
+/// @private
+auto
+difference3D(const Geometry &geometry1, const Geometry &geometry2,
+             NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
+{
+  GeometrySet<3> const gsa(geometry1);
+  GeometrySet<3> const gsb(geometry2);
   GeometrySet<3>       output;
   algorithm::difference(gsa, gsb, output);
 
@@ -445,13 +449,14 @@ difference3D(const Geometry &ga, const Geometry &gb, NoValidityCheck /*unused*/)
   return filtered.recompose();
 }
 
+/// @private
 auto
-difference3D(const Geometry &ga, const Geometry &gb)
+difference3D(const Geometry &geometry1, const Geometry &geometry2)
     -> std::unique_ptr<Geometry>
 {
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(ga);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(gb);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(geometry1);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_3D(geometry2);
 
-  return difference3D(ga, gb, NoValidityCheck());
+  return difference3D(geometry1, geometry2, NoValidityCheck());
 }
 } // namespace SFCGAL::algorithm

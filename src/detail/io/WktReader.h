@@ -16,9 +16,7 @@
 
 #include "SFCGAL/detail/tools/InputStreamReader.h"
 
-namespace SFCGAL {
-namespace detail {
-namespace io {
+namespace SFCGAL::detail::io {
 
 /**
  * Reader for Well-Known Text (WKT) geometry format.
@@ -244,8 +242,6 @@ private:
   parseErrorMessage() -> std::string;
 };
 
-} // namespace io
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail::io
 
 #endif

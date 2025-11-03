@@ -162,13 +162,13 @@ Point::swapXY() -> void
 void
 Point::accept(GeometryVisitor &visitor)
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 void
 Point::accept(ConstGeometryVisitor &visitor) const
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 auto
@@ -225,9 +225,11 @@ Point::toPoint_d() const -> typename TypeForDimension<Dim>::Point
   return do_toPoint_d<Dim>::toPoint(this);
 }
 // template instanciations
+/// @cond DOXYGEN_SHOULD_SKIP_THIS
 template CGAL::Point_2<Kernel>
 Point::toPoint_d<2>() const;
 template CGAL::Point_3<Kernel>
 Point::toPoint_d<3>() const;
+/// @endcond
 
 } // namespace SFCGAL

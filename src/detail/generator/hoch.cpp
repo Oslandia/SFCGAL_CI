@@ -10,6 +10,7 @@
 
 namespace SFCGAL::generator {
 
+/// @private
 auto
 _hoch(const std::vector<Kernel::Vector_2> &points)
     -> std::vector<Kernel::Vector_2>

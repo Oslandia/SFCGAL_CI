@@ -34,19 +34,19 @@ MultiSolid::geometryTypeId() const -> GeometryType
 }
 
 auto
-MultiSolid::isAllowed(Geometry const &g) -> bool
+MultiSolid::isAllowed(Geometry const &geometry) -> bool
 {
-  return g.geometryTypeId() == TYPE_SOLID;
+  return geometry.geometryTypeId() == TYPE_SOLID;
 }
 
-void
-MultiSolid::accept(GeometryVisitor &visitor)
+auto
+MultiSolid::accept(GeometryVisitor &visitor) -> void
 {
   return visitor.visit(*this);
 }
 
-void
-MultiSolid::accept(ConstGeometryVisitor &visitor) const
+auto
+MultiSolid::accept(ConstGeometryVisitor &visitor) const -> void
 {
   return visitor.visit(*this);
 }

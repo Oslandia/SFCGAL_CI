@@ -36,9 +36,9 @@ MultiPolygon::geometryTypeId() const -> GeometryType
 }
 
 auto
-MultiPolygon::isAllowed(Geometry const &g) -> bool
+MultiPolygon::isAllowed(Geometry const &geometry) -> bool
 {
-  return g.geometryTypeId() == TYPE_POLYGON;
+  return geometry.geometryTypeId() == TYPE_POLYGON;
 }
 
 void

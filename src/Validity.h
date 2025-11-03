@@ -18,19 +18,36 @@ struct Validity {
    * invalid(reason) that are clearer in the code than to remember that "Valid
    * constructed with a reason is invalid"
    */
-  static const Validity
-  valid()
+  /**
+   * @brief Create a valid geometry status
+   * @return Valid geometry status
+   */
+  static auto
+  valid() -> const Validity
   {
     return Validity();
   }
-  static const Validity
-  invalid(const std::string &reason)
+  /**
+   * @brief Create an invalid geometry status with reason
+   * @param reason The reason why the geometry is invalid
+   * @return Invalid geometry status
+   */
+  static auto
+  invalid(const std::string &reason) -> const Validity
   {
     return Validity(reason);
   }
+  /**
+   * @brief Convert to bool (check if geometry is valid)
+   * @return true if geometry is valid, false otherwise
+   */
   operator bool() const { return _valid; }
-  const std::string &
-  reason() const
+  /**
+   * @brief Get the reason why geometry is invalid
+   * @return The reason string (empty if valid)
+   */
+  [[nodiscard]] auto
+  reason() const -> const std::string &
   {
     return _reason;
   }

@@ -26,8 +26,7 @@
  * `envelope`). Use an instance of this visitor to traverse a Geometry with
  * the goal of computing or extending its bounding envelope.
  */
-namespace SFCGAL {
-namespace detail {
+namespace SFCGAL::detail {
 
 /**
  * Get the list of points from a Geometry
@@ -123,7 +122,6 @@ public:
   Envelope &envelope; ///< Reference to the envelope being computed
 };
 
-} // namespace detail
-} // namespace SFCGAL
+} // namespace SFCGAL::detail
 
 #endif

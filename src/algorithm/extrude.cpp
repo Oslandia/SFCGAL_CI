@@ -56,22 +56,11 @@ extrude(const MultiLineString &g, const Kernel::Vector_3 &v)
 auto
 extrude(const MultiPolygon &g, const Kernel::Vector_3 &v) -> MultiSolid *;
 
-/**
- * @warning suppose that the TriangulatedSurface is connected
- * @todo take orientation in account
- */
 auto
 extrude(const TriangulatedSurface &g, const Kernel::Vector_3 &v) -> Solid *;
-/**
- * @warning doesn't take orientation in account
- * @todo take orientation in account
- */
 auto
 extrude(const PolyhedralSurface &g, const Kernel::Vector_3 &v) -> Solid *;
 
-/**
- * extrude each geometry in a GeometryCollection
- */
 auto
 extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
     -> GeometryCollection *;
@@ -284,13 +273,7 @@ extrude(const GeometryCollection &g, const Kernel::Vector_3 &v)
   return result.release();
 }
 
-/// @} end of private section
-
-// ----------------------------------------------------------------------------------
-// -- public interface
-// ----------------------------------------------------------------------------------
-/// @publicsection
-
+/// @private
 auto
 extrude(const Geometry &inputGeometry, const Kernel::Vector_3 &vector)
     -> std::unique_ptr<Geometry>
@@ -357,12 +340,7 @@ extrude(const Geometry &inputGeometry, const Kernel::Vector_3 &vector)
           .str()));
 }
 
-/** Implementation of extrude without validity check using vector conversion
- * @param inputGeom Geometry to extrude
- * @param displacementX X displacement
- * @param displacementY Y displacement
- * @param displacementZ Z displacement
- * @return Extruded geometry */
+/// @private
 auto
 extrude(const Geometry &inputGeom, const Kernel::FT &displacementX,
         const Kernel::FT &displacementY, const Kernel::FT &displacementZ,
@@ -372,6 +350,7 @@ extrude(const Geometry &inputGeom, const Kernel::FT &displacementX,
                  Kernel::Vector_3(displacementX, displacementY, displacementZ));
 }
 
+/// @private
 auto
 extrude(const Geometry &geometry, const Kernel::FT &deltaX,
         const Kernel::FT &deltaY, const Kernel::FT &deltaZ)
@@ -384,6 +363,7 @@ extrude(const Geometry &geometry, const Kernel::FT &deltaX,
   return result;
 }
 
+/// @private
 SFCGAL_API auto
 extrude(const Geometry &geom, const double &displacementX,
         const double &displacementY, const double &displacementZ)
@@ -399,6 +379,7 @@ extrude(const Geometry &geom, const double &displacementX,
                  Kernel::FT(displacementZ));
 }
 
+/// @private
 SFCGAL_API auto
 extrude(const Polygon &polygon, const double &height)
     -> std::unique_ptr<Geometry>

@@ -5,8 +5,7 @@
 
 #include "SFCGAL/detail/tools/CharArrayBuffer.h"
 
-namespace SFCGAL {
-namespace tools {
+namespace SFCGAL::tools {
 
 CharArrayBuffer::CharArrayBuffer(const char *begin, const char *end)
     : begin_(begin), end_(end), current_(begin_)
@@ -87,5 +86,4 @@ CharArrayBuffer::showmanyc() -> std::streamsize
   return end_ - current_;
 }
 
-} // namespace tools
-} // namespace SFCGAL
+} // namespace SFCGAL::tools

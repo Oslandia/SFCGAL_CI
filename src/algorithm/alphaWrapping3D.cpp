@@ -19,9 +19,7 @@ using Mesh            = CGAL::Surface_mesh<Inexact_Point_3>;
 using ExactMesh       = CGAL::Surface_mesh<Kernel::Point_3>;
 using EK_to_IK        = CGAL::Cartesian_converter<Kernel, InexactKernel>;
 using IK_to_EK        = CGAL::Cartesian_converter<InexactKernel, Kernel>;
-/// @} end of private section
-/// @publicsection
-
+/// @private
 auto
 alphaWrapping3D(const Geometry &geom, size_t relativeAlpha,
                 size_t relativeOffset) -> std::unique_ptr<PolyhedralSurface>

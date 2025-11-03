@@ -845,6 +845,7 @@ distanceGeometryCollectionToGeometry3D(const Geometry &gA, const Geometry &gB)
   if (true) {
     std::vector<Sphere> bsA;
 
+    bsA.reserve(gA.numGeometries());
     for (size_t i = 0; i < gA.numGeometries(); i++) {
       bsA.push_back(boundingSphere(gA.geometryN(i)));
     }

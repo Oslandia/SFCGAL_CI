@@ -13,8 +13,7 @@ namespace SFCGAL {
 class Curve;
 }
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * Holds weighted data used to compute a centroid for a Geometry.
@@ -22,7 +21,6 @@ namespace algorithm {
  * Contains accumulated weight (area or length), centroid vector, and
  * weighted average of measured values for centroid computation.
  *
- * @ingroup detail
  */
 class SFCGAL_API WeightedCentroid {
 public:
@@ -65,8 +63,8 @@ public:
  * @pre geom is a valid geometry in 2D
  * @return A Point representing the 2D geometry centroid
  */
-SFCGAL_API std::unique_ptr<Point>
-           centroid(const Geometry &geom);
+SFCGAL_API auto
+centroid(const Geometry &geom) -> std::unique_ptr<Point>;
 
 /**
  * @brief Returns the 3D centroid for a Geometry
@@ -79,8 +77,8 @@ SFCGAL_API std::unique_ptr<Point>
  * @pre geom is a valid geometry
  * @return A Point representing the 3D geometry centroid
  */
-SFCGAL_API std::unique_ptr<Point>
-           centroid3D(const Geometry &geom);
+SFCGAL_API auto
+centroid3D(const Geometry &geom) -> std::unique_ptr<Point>;
 
 /**
  * @brief Compute a weighted centroid for a Geometry by dispatching to the
@@ -98,10 +96,10 @@ SFCGAL_API std::unique_ptr<Point>
  *        formulas (when available); otherwise 2D computations are used.
  * @return WeightedCentroid Aggregated area, centroid vector, and M value
  *         for the input geometry.
- * @ingroup detail
  */
-SFCGAL_API WeightedCentroid
-weightedCentroid(const Geometry &geom, bool enable3DComputation = false);
+SFCGAL_API auto
+weightedCentroid(const Geometry &geom, bool enable3DComputation = false)
+    -> WeightedCentroid;
 
 /**
  * @brief Computes the weighted centroid of a Triangle.
@@ -113,10 +111,10 @@ weightedCentroid(const Geometry &geom, bool enable3DComputation = false);
  *        the centroid for 3D geometries.
  *
  * @return WeightedCentroid The weighted centroid of the input geometry.
- * @ingroup detail
  */
-SFCGAL_API WeightedCentroid
-weightedCentroid(const Triangle &triangle, bool enable3DComputation = false);
+SFCGAL_API auto
+weightedCentroid(const Triangle &triangle, bool enable3DComputation = false)
+    -> WeightedCentroid;
 
 /**
  * @brief Compute the weighted centroid contribution of a triangle defined by
@@ -140,7 +138,6 @@ weightedCentroid(const Triangle &triangle, bool enable3DComputation = false);
  * signed area.
  * @return WeightedCentroid Area, centroid vector, and M value for the triangle.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 weightedCentroid(const Point &pta, const Point &ptb, const Point &ptc,
@@ -169,11 +166,10 @@ weightedCentroid(const Point &pta, const Point &ptb, const Point &ptc,
  * @throws InappropriateGeometryException Thrown when the aggregated total
  * area/length is zero (invalid LineString for centroid computation).
  *
- * @ingroup detail
  */
-SFCGAL_API WeightedCentroid
-weightedCentroid(const LineString &lineString,
-                 bool              enable3DComputation = false);
+SFCGAL_API auto
+weightedCentroid(const LineString &lineString, bool enable3DComputation = false)
+    -> WeightedCentroid;
 
 /**
  * @brief Computes the area/length-weighted centroid of a parametric Curve by
@@ -196,7 +192,6 @@ weightedCentroid(const LineString &lineString,
  * @return WeightedCentroid Empty if the curve cannot be approximated as a
  * non-empty LineString, otherwise the computed weighted centroid.
  *
- * @ingroup detail
  */
 SFCGAL_API auto
 weightedCentroid(const Curve &curve, bool enable3DComputation = false)
@@ -208,10 +203,10 @@ weightedCentroid(const Curve &curve, bool enable3DComputation = false)
  * @param polygon Input polygon
  * @param enable3DComputation Whether to use 3D computation
  * @return WeightedCentroid result
- * @ingroup detail
  */
-SFCGAL_API WeightedCentroid
-weightedCentroid(const Polygon &polygon, bool enable3DComputation = false);
+SFCGAL_API auto
+weightedCentroid(const Polygon &polygon, bool enable3DComputation = false)
+    -> WeightedCentroid;
 
 /**
  * @brief Computes the weighted centroid of a GeometryCollection.
@@ -225,11 +220,10 @@ weightedCentroid(const Polygon &polygon, bool enable3DComputation = false);
  *
  * @return WeightedCentroid The weighted centroid of the input geometry.
  *
- * @ingroup detail
  */
-SFCGAL_API WeightedCentroid
+SFCGAL_API auto
 weightedCentroid(const GeometryCollection &collection,
-                 bool                      enable3DComputation = false);
+                 bool enable3DComputation = false) -> WeightedCentroid;
 
 /**
  * @brief Computes the weighted centroid of a TriangulatedSurface.
@@ -241,7 +235,6 @@ weightedCentroid(const GeometryCollection &collection,
  *
  * @return WeightedCentroid The weighted centroid of the input geometry.
  *
- * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
 weightedCentroid(const TriangulatedSurface &tin,
@@ -258,7 +251,6 @@ weightedCentroid(const TriangulatedSurface &tin,
  *
  * @return WeightedCentroid The weighted centroid of the input geometry.
  *
- * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
 weightedCentroid(const PolyhedralSurface &surface,
@@ -275,12 +267,10 @@ weightedCentroid(const PolyhedralSurface &surface,
  *
  * @return WeightedCentroid The weighted centroid of the input geometry.
  *
- * @ingroup detail
  */
 SFCGAL_API WeightedCentroid
 weightedCentroid(const Solid &solid, bool enable3DComputation = false);
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif

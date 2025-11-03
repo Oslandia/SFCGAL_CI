@@ -14,14 +14,14 @@ class Geometry;
 class Polygon;
 } // namespace SFCGAL
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 struct NoValidityCheck;
 
 /**
  * @brief build the visibility polygon of a Point inside a Polygon
  * @param polygon input geometry
  * @param point input geometry
+ * @return visibility polygon
  * @pre polygon is a valid geometry
  * @pre point must be inside polygon or on the boundary
  */
@@ -33,6 +33,7 @@ visibility(const Geometry &polygon, const Geometry &point)
  * @brief build the visibility polygon of a Point inside a Polygon
  * @param polygon input geometry
  * @param point input geometry
+ * @return visibility polygon
  * @pre polygon is a valid geometry
  * @pre point must be inside polygon or on the boundary
  * @warning No actual validity check is done
@@ -47,6 +48,7 @@ visibility(const Geometry &polygon, const Geometry &point, NoValidityCheck)
  * @param polygon input geometry
  * @param pointA input geometry
  * @param pointB input geometry
+ * @return visibility polygon
  * @pre polygon is a valid geometry
  * @pre pointA and pointB must be vertices of poly, adjacents and respect the
  * direction
@@ -60,6 +62,7 @@ visibility(const Geometry &polygon, const Geometry &pointA,
  * @param polygon input geometry
  * @param pointA input geometry
  * @param pointB input geometry
+ * @return visibility polygon
  * @pre polygon is a valid geometry
  * @warning No actual validity check is done
  * @pre pointA and pointB must be vertices of poly, adjacents and respect the
@@ -69,7 +72,6 @@ SFCGAL_API auto
 visibility(const Geometry &polygon, const Geometry &pointA,
            const Geometry &pointB, NoValidityCheck) -> std::unique_ptr<Polygon>;
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif

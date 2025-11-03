@@ -16,8 +16,7 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>
 
-namespace SFCGAL {
-namespace algorithm {
+namespace SFCGAL::algorithm {
 
 /**
  * @brief Computes a 3D buffer around a Point or LineString.
@@ -84,7 +83,6 @@ private:
                           const CGAL::Plane_3<Kernel> &plane) const;
 };
 
-} // namespace algorithm
-} // namespace SFCGAL
+} // namespace SFCGAL::algorithm
 
 #endif // SFCGAL_BUFFER3D_ALGORITHM

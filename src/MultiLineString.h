@@ -28,38 +28,49 @@ public:
   MultiLineString();
   /**
    * Copy constructor
+   * @param other The multi-linestring to copy from
    */
   MultiLineString(const MultiLineString &other);
   /**
    * assign operator
+   * @param other The multi-linestring to assign from
+   * @return Reference to this multi-linestring
    */
   MultiLineString &
   operator=(MultiLineString other);
   /**
    * destructor
    */
-  virtual ~MultiLineString();
+  ~MultiLineString() override;
 
   //-- SFCGAL::Geometry
-  std::string
-  geometryType() const override;
+  /// @brief Get the geometry type as string
+  /// @return "MultiLineString"
+  [[nodiscard]] auto
+  geometryType() const -> std::string override;
   //-- SFCGAL::Geometry
-  GeometryType
-  geometryTypeId() const override;
+  /// @brief Get the geometry type identifier
+  /// @return TYPE_MULTILINESTRING
+  [[nodiscard]] auto
+  geometryTypeId() const -> GeometryType override;
 
   /**
-   * returns the n-th Geometry as a Polygon
+   * returns the n-th Geometry as a LineString
+   * @param n The index of the linestring to get
+   * @return Reference to the nth linestring
    */
-  inline LineString &
-  lineStringN(const size_t &n)
+  inline auto
+  lineStringN(const size_t &n) -> LineString &
   {
     return geometryN(n).as<LineString>();
   }
   /**
-   * returns the n-th Geometry as a Polygon
+   * returns the n-th Geometry as a LineString
+   * @param n The index of the linestring to get
+   * @return Const reference to the nth linestring
    */
-  inline const LineString &
-  lineStringN(const size_t &n) const
+  inline auto
+  lineStringN(const size_t &n) const -> const LineString &
   {
     return geometryN(n).as<LineString>();
   }
@@ -67,14 +78,19 @@ public:
   //-- visitors
 
   //-- SFCGAL::Geometry
+  /// @brief Accept a geometry visitor
+  /// @param visitor Visitor to accept
   void
   accept(GeometryVisitor &visitor) override;
   //-- SFCGAL::Geometry
+  /// @brief Accept a const geometry visitor
+  /// @param visitor Const visitor to accept
   void
   accept(ConstGeometryVisitor &visitor) const override;
 
   /**
-   * Serializer
+   * @brief Serializer
+   * @param ar Archive for serialization
    */
   template <class Archive>
   void
@@ -85,8 +101,11 @@ public:
 
 protected:
   //-- SFCGAL::GeometryCollection
-  bool
-  isAllowed(Geometry const &g) override;
+  /// @brief Check if geometry is allowed in this collection
+  /// @param geometry Geometry to test
+  /// @return true if geometry is a LineString
+  auto
+  isAllowed(Geometry const &geometry) -> bool override;
 };
 
 } // namespace SFCGAL

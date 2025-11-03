@@ -31,11 +31,12 @@ Triangle::Triangle(const Kernel::Triangle_3 &triangle)
   }
 }
 
-Triangle::Triangle(const Point &p, const Point &q, const Point &r)
+Triangle::Triangle(const Point &point1, const Point &point2,
+                   const Point &point3)
 {
-  _vertices[0] = p;
-  _vertices[1] = q;
-  _vertices[2] = r;
+  _vertices[0] = point1;
+  _vertices[1] = point2;
+  _vertices[2] = point3;
 }
 
 Triangle::Triangle(const Triangle &other) : GeometryImpl(other)
@@ -144,23 +145,24 @@ Triangle::toPolygon() const -> Polygon
 
   std::vector<Point> points;
 
+  points.reserve(4);
   for (size_t i = 0; i < 4; i++) {
     points.push_back(vertex(i));
   }
 
-  return Polygon(LineString(points));
+  return {LineString(points)};
 }
 
 void
 Triangle::accept(GeometryVisitor &visitor)
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 void
 Triangle::accept(ConstGeometryVisitor &visitor) const
 {
-  return visitor.visit(*this);
+  visitor.visit(*this);
 }
 
 } // namespace SFCGAL

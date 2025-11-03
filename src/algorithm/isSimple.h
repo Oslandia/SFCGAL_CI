@@ -23,6 +23,10 @@ namespace algorithm {
 
 /**
  * Check simplicity of a geometry
+ * @param g the geometry to check for simplicity
+ * @param toleranceAbs the absolute tolerance for simplicity check (default:
+ * 1e-9)
+ * @return the simplicity status of the geometry
  * @note When applied to NURBSCurve geometries, simplicity
  *   is internally checked on a LineString obtained via
  *   toLineString() with its default parameters.
