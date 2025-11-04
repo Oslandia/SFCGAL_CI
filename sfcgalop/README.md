@@ -1,4 +1,4 @@
-# SFCGALOP - SFCGAL Geometry Operations CLI
+#SFCGALOP - SFCGAL Geometry Operations CLI
 
 A command-line interface for performing geometric operations using the SFCGAL library.
 
@@ -59,14 +59,14 @@ sfcgalop [options] -a <WKT/WKB> [-b <WKT/WKB>] [operation] [params]
 
 ```bash
 sfcgalop -a "POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))" area
-# Output: 100
+#Output : 100
 ```
 
 #### Calculate distance between two points
 
 ```bash
 sfcgalop -a "POINT(0 0)" -b "POINT(3 4)" distance
-# Output: 5
+#Output : 5
 ```
 
 #### Compute intersection with validation
@@ -76,7 +76,7 @@ sfcgalop --validate \
   -a "POLYGON((0 0, 4 0, 4 4, 0 4, 0 0))" \
   -b "POLYGON((2 2, 6 2, 6 6, 2 6, 2 2))" \
   intersection
-# Output: POLYGON ((2 2,2 4,4 4,4 2,2 2))
+#Output : POLYGON((2 2, 2 4, 4 4, 4 2, 2 2))
 ```
 
 #### Read from stdin
@@ -90,14 +90,14 @@ echo "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))" | \
 
 ```bash
 sfcgalop -a "POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))" -f wkb
-# Output: Binary WKB representation
+#Output : Binary WKB representation
 ```
 
 #### Display geometry from file
 
 ```bash
 sfcgalop -a geometry.wkt
-# Output: Geometry displayed in WKT format
+#Output : Geometry displayed in WKT format
 ```
 
 #### 3D operations
@@ -109,7 +109,7 @@ sfcgalop -a "SOLID((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),
   ((1 1 1, 0 1 1, 0 0 1, 1 0 1, 1 1 1)),
   ((1 1 1, 1 0 1, 1 0 0, 1 1 0, 1 1 1)),
   ((1 1 1, 1 1 0, 0 1 0, 0 1 1, 1 1 1))))" volume
-# Output: 1
+#Output : 1
 ```
 
 ## Available Operations
@@ -168,6 +168,7 @@ sfcgalop -a "SOLID((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),
 - `force3d` - Add Z coordinates to create 3D geometry (params: [z_value])
 - `forcemeasured` - Add measure coordinates to geometry (params: [m_value])
 - `simplify` - Simplify geometry by removing vertices within tolerance (params: tolerance)
+- `polygonRepair` - Repairs invalid polygons using repair's method (params: method)
 
 ### Collections
 - `collect` - Combine two geometries into a collection
@@ -202,14 +203,14 @@ sfcgalop -a "SOLID((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),
 The tool provides detailed error messages with context:
 
 ```bash
-# Invalid geometry
+#Invalid geometry
 sfcgalop --validate -a "POLYGON((0 0, 0 10, 10 10, 10 0, 1 0))" area
-# Output:
+#Output:
 # ⚠ Geometry A validation issues:
-# Validation Error: ring 0 is not closed
-# Details:
-# Geometry type: Polygon
-# WKT: POLYGON((0 0, 0 10, 10 10, 10 0, 1 0))
+#Validation Error : ring 0 is not closed
+#Details:
+#Geometry type : Polygon
+#WKT : POLYGON((0 0, 0 10, 10 10, 10 0, 1 0))
 ```
 
 ## Contributing

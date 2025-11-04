@@ -6,9 +6,8 @@
 #include "../constructors.hpp"
 #include <SFCGAL/Kernel.h>
 
-
 #if !defined(_MSC_VER)
-#include <SFCGAL/algorithm/alphaShapes.h>
+  #include <SFCGAL/algorithm/alphaShapes.h>
 #endif
 #include <SFCGAL/algorithm/alphaWrapping3D.h>
 #include <SFCGAL/algorithm/area.h>
@@ -42,6 +41,7 @@
 #include <SFCGAL/algorithm/orientation.h>
 #include <SFCGAL/algorithm/partition_2.h>
 #include <SFCGAL/algorithm/plane.h>
+#include <SFCGAL/algorithm/polygonRepair.h>
 #include <SFCGAL/algorithm/rotate.h>
 #include <SFCGAL/algorithm/scale.h>
 #include <SFCGAL/algorithm/simplification.h>
@@ -725,6 +725,38 @@ const std::vector<Operation> operations = {
        double tolerance = params.count("tolerance") ? params["tolerance"] : 1.0;
        bool   preserveTopology = true;
        return SFCGAL::algorithm::simplify(*geom_a, tolerance, preserveTopology);
+     }},
+
+    {"polygonrepair", "Transformations", "Repair invalid polygons with rules",
+     false,
+     "Parameters:\n  method=0|1|2|3 (default: 0)\n\nMethods:\n  0 = "
+     "Even-odd\n  1 = Non-zero winding\n  2 = Union of all polygons\n  3 = "
+     "Intersection of all polygons\n\n"
+     "Example:\n  sfcgalop -a \"POLYGON((0 0, 2 2, 2 0, 0 2, 0 0)) "
+     "polygonrepair \"method=1\"",
+     "A, params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto params = parse_params(args);
+       int  method =
+           static_cast<int>(params.count("method") ? params["method"] : 0);
+
+       SFCGAL::algorithm::PolygonRepairRule rule;
+       switch (method) {
+       case 1:
+         rule = SFCGAL::algorithm::PolygonRepairRule::NON_ZERO_RULE;
+         break;
+       case 2:
+         rule = SFCGAL::algorithm::PolygonRepairRule::UNION_RULE;
+         break;
+       case 3:
+         rule = SFCGAL::algorithm::PolygonRepairRule::INTERSECTION_RULE;
+         break;
+       default:
+         rule = SFCGAL::algorithm::PolygonRepairRule::EVEN_ODD_RULE;
+       }
+
+       return SFCGAL::algorithm::polygonRepair(*geom_a, rule);
      }},
 
     // Collection operations
