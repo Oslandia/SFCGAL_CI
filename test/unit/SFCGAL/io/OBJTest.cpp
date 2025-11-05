@@ -4,6 +4,15 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/io/OBJ.h"
+#include "SFCGAL/Exception.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/io/wkt.h"
 #include <filesystem>
 #include <fstream>
@@ -187,6 +196,191 @@ BOOST_AUTO_TEST_CASE(test_complex_geometry)
   std::string expected = "v 1 1 0\nv 0 0 0\nv 1 1 0\nv 0 0 0\nv 1 0 0\nv 1 1 "
                          "0\nv 0 1 0\np 1\nl 2 3\nf 4 5 6 7\n";
   BOOST_CHECK_EQUAL(result, expected);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(SFCGAL_io_OBJReaderTest)
+
+BOOST_AUTO_TEST_CASE(test_load_from_string_point)
+{
+  std::string obj_content = "v 1 2 3\np 1\n";
+
+  std::unique_ptr<SFCGAL::Geometry> geom =
+      SFCGAL::io::OBJ::loadFromString(obj_content);
+
+  BOOST_CHECK_EQUAL(geom->geometryType(), "MultiPoint");
+  const auto &multipoint = geom->as<SFCGAL::MultiPoint>();
+  BOOST_CHECK_EQUAL(multipoint.numGeometries(), 1);
+
+  const auto &point = multipoint.geometryN(0).as<SFCGAL::Point>();
+  BOOST_CHECK_EQUAL(point.x(), 1.0);
+  BOOST_CHECK_EQUAL(point.y(), 2.0);
+  BOOST_CHECK_EQUAL(point.z(), 3.0);
+}
+
+BOOST_AUTO_TEST_CASE(test_load_from_string_line)
+{
+  std::string obj_content = "v 0 0 0\nv 1 1 1\nl 1 2\n";
+
+  std::unique_ptr<SFCGAL::Geometry> geom =
+      SFCGAL::io::OBJ::loadFromString(obj_content);
+
+  BOOST_CHECK_EQUAL(geom->geometryType(), "MultiLineString");
+  const auto &multilinestring = geom->as<SFCGAL::MultiLineString>();
+  BOOST_CHECK_EQUAL(multilinestring.numGeometries(), 1);
+
+  const auto &linestring =
+      multilinestring.geometryN(0).as<SFCGAL::LineString>();
+  BOOST_CHECK_EQUAL(linestring.numPoints(), 2);
+
+  const auto &p0 = linestring.pointN(0);
+  BOOST_CHECK_EQUAL(p0.x(), 0.0);
+  BOOST_CHECK_EQUAL(p0.y(), 0.0);
+  BOOST_CHECK_EQUAL(p0.z(), 0.0);
+
+  const auto &p1 = linestring.pointN(1);
+  BOOST_CHECK_EQUAL(p1.x(), 1.0);
+  BOOST_CHECK_EQUAL(p1.y(), 1.0);
+  BOOST_CHECK_EQUAL(p1.z(), 1.0);
+}
+
+BOOST_AUTO_TEST_CASE(test_load_from_string_triangle)
+{
+  std::string obj_content = "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n";
+
+  std::unique_ptr<SFCGAL::Geometry> geom =
+      SFCGAL::io::OBJ::loadFromString(obj_content);
+
+  BOOST_CHECK_EQUAL(geom->geometryType(), "TriangulatedSurface");
+  const auto &triangulated_surface = geom->as<SFCGAL::TriangulatedSurface>();
+  BOOST_CHECK_EQUAL(triangulated_surface.numPatches(), 1);
+
+  const auto &triangle = triangulated_surface.patchN(0).as<SFCGAL::Triangle>();
+
+  const auto &v0 = triangle.vertex(0);
+  BOOST_CHECK_EQUAL(v0.x(), 0.0);
+  BOOST_CHECK_EQUAL(v0.y(), 0.0);
+  BOOST_CHECK_EQUAL(v0.z(), 0.0);
+
+  const auto &v1 = triangle.vertex(1);
+  BOOST_CHECK_EQUAL(v1.x(), 1.0);
+  BOOST_CHECK_EQUAL(v1.y(), 0.0);
+  BOOST_CHECK_EQUAL(v1.z(), 0.0);
+
+  const auto &v2 = triangle.vertex(2);
+  BOOST_CHECK_EQUAL(v2.x(), 0.0);
+  BOOST_CHECK_EQUAL(v2.y(), 1.0);
+  BOOST_CHECK_EQUAL(v2.z(), 0.0);
+}
+
+BOOST_AUTO_TEST_CASE(test_load_from_string_quad)
+{
+  std::string obj_content = "v 0 0 0\nv 1 0 0\nv 1 1 0\nv 0 1 0\nf 1 2 3 4\n";
+
+  std::unique_ptr<SFCGAL::Geometry> geom =
+      SFCGAL::io::OBJ::loadFromString(obj_content);
+
+  BOOST_CHECK_EQUAL(geom->geometryType(), "PolyhedralSurface");
+  const auto &polyhedral_surface = geom->as<SFCGAL::PolyhedralSurface>();
+  BOOST_CHECK_EQUAL(polyhedral_surface.numPatches(), 1);
+
+  const auto &polygon = polyhedral_surface.patchN(0).as<SFCGAL::Polygon>();
+  BOOST_CHECK_EQUAL(polygon.exteriorRing().numPoints(),
+                    5); // 4 vertices + closing
+}
+
+BOOST_AUTO_TEST_CASE(test_load_2d_vertices)
+{
+  std::string obj_content = "v 1 2\nv 3 4\nl 1 2\n";
+
+  std::unique_ptr<SFCGAL::Geometry> geom =
+      SFCGAL::io::OBJ::loadFromString(obj_content);
+
+  BOOST_CHECK_EQUAL(geom->geometryType(), "MultiLineString");
+  const auto &multilinestring = geom->as<SFCGAL::MultiLineString>();
+  const auto &linestring =
+      multilinestring.geometryN(0).as<SFCGAL::LineString>();
+
+  const auto &p0 = linestring.pointN(0);
+  BOOST_CHECK_EQUAL(p0.x(), 1.0);
+  BOOST_CHECK_EQUAL(p0.y(), 2.0);
+  BOOST_CHECK_EQUAL(p0.z(), 0.0); // Default Z
+
+  const auto &p1 = linestring.pointN(1);
+  BOOST_CHECK_EQUAL(p1.x(), 3.0);
+  BOOST_CHECK_EQUAL(p1.y(), 4.0);
+  BOOST_CHECK_EQUAL(p1.z(), 0.0); // Default Z
+}
+
+BOOST_AUTO_TEST_CASE(test_load_with_comments)
+{
+  std::string obj_content = "# This is a comment\nv 0 0 0\n# Another "
+                            "comment\nv 1 0 0\nv 0 1 0\nf 1 2 3\n";
+
+  std::unique_ptr<SFCGAL::Geometry> geom =
+      SFCGAL::io::OBJ::loadFromString(obj_content);
+
+  BOOST_CHECK_EQUAL(geom->geometryType(), "TriangulatedSurface");
+  const auto &triangulated_surface = geom->as<SFCGAL::TriangulatedSurface>();
+  BOOST_CHECK_EQUAL(triangulated_surface.numPatches(), 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_face_with_texture_coordinates)
+{
+  std::string obj_content = "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1/1/1 2/2/2 3/3/3\n";
+
+  std::unique_ptr<SFCGAL::Geometry> geom =
+      SFCGAL::io::OBJ::loadFromString(obj_content);
+
+  BOOST_CHECK_EQUAL(geom->geometryType(), "TriangulatedSurface");
+  const auto &triangulated_surface = geom->as<SFCGAL::TriangulatedSurface>();
+  BOOST_CHECK_EQUAL(triangulated_surface.numPatches(), 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_roundtrip_triangle)
+{
+  std::string wkt = "TRIANGLE ((0 0 0, 1 0 0, 0 1 0, 0 0 0))";
+  std::unique_ptr<SFCGAL::Geometry> original_geom(SFCGAL::io::readWkt(wkt));
+
+  // Save to OBJ string
+  std::string obj_content = SFCGAL::io::OBJ::saveToString(*original_geom);
+
+  // Load back from OBJ string
+  std::unique_ptr<SFCGAL::Geometry> loaded_geom =
+      SFCGAL::io::OBJ::loadFromString(obj_content);
+
+  // Both should be TriangulatedSurface (Triangle gets converted)
+  BOOST_CHECK_EQUAL(loaded_geom->geometryType(), "TriangulatedSurface");
+  const auto &triangulated_surface =
+      loaded_geom->as<SFCGAL::TriangulatedSurface>();
+  BOOST_CHECK_EQUAL(triangulated_surface.numPatches(), 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_error_invalid_vertex_index)
+{
+  std::string obj_content =
+      "v 0 0 0\nf 1 2 3\n"; // Face references non-existent vertices
+
+  BOOST_CHECK_THROW(SFCGAL::io::OBJ::loadFromString(obj_content),
+                    SFCGAL::Exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_error_zero_vertex_index)
+{
+  std::string obj_content =
+      "v 0 0 0\nf 0 1 2\n"; // OBJ indices start at 1, not 0
+
+  BOOST_CHECK_THROW(SFCGAL::io::OBJ::loadFromString(obj_content),
+                    SFCGAL::Exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_error_no_geometry)
+{
+  std::string obj_content = "# Just comments\n";
+
+  BOOST_CHECK_THROW(SFCGAL::io::OBJ::loadFromString(obj_content),
+                    SFCGAL::Exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
