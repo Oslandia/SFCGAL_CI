@@ -38,10 +38,6 @@ public:
   void
   operator()(HDS &hds) override
   {
-    // Create subdivided icosahedron based on num_vertical and num_horizontal
-    // num_vertical controls latitude subdivisions, num_horizontal controls
-    // longitude subdivisions
-
     CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
 
     // Create icosahedron vertices
@@ -70,14 +66,11 @@ public:
         {3, 9, 4},  {3, 4, 2},  {3, 2, 6},   {3, 6, 8},  {3, 8, 9},
         {4, 9, 5},  {2, 4, 11}, {6, 2, 10},  {8, 6, 7},  {9, 8, 1}};
 
-    // Use the subdivision level directly from parameter
-    unsigned int subdivision_level = num_subdivisions;
-
     // Subdivide the icosahedron
     std::vector<Point_3>            vertices = base_vertices;
     std::vector<std::array<int, 3>> faces    = base_faces;
 
-    for (unsigned int level = 0; level < subdivision_level; ++level) {
+    for (unsigned int level = 0; level < num_subdivisions; ++level) {
       subdivideIcosahedron(vertices, faces);
     }
 
