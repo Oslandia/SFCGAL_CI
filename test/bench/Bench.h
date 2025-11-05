@@ -71,6 +71,9 @@ private:
  */
 class Bench {
 public:
+  /**
+   * @brief Type alias for the timer used in benchmarks
+   */
   using timer_t = CpuTimer;
 
   /**
@@ -79,12 +82,14 @@ public:
   ~Bench();
 
   /**
-   * start a bench
+   * @brief Start a bench
+   * @param description Description of the benchmark
    */
   void
   start(const std::string &description);
   /**
-   * start a bench
+   * @brief Start a bench
+   * @param description Description of the benchmark as formatted string
    */
   void
   start(const boost::basic_format<char> &description);
@@ -95,13 +100,15 @@ public:
   stop();
 
   /**
-   * get bench instance
+   * @brief Get bench instance
+   * @return Reference to the singleton bench instance
    */
   static Bench &
   instance();
 
   /**
-   * Get output stream
+   * @brief Get output stream
+   * @return Reference to the output stream
    */
   std::ostream &
   s();
@@ -127,7 +134,8 @@ private:
 };
 
 /**
- * @Get bench instance
+ * @brief Get bench instance
+ * @return Reference to the singleton bench instance
  */
 inline Bench &
 bench()
