@@ -3,8 +3,8 @@
 
 #include "SFCGAL/algorithm/surfaceSimplification.h"
 
-#include "SFCGAL/Kernel.h"
 #include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/MultiSolid.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Solid.h"
@@ -22,11 +22,11 @@
 #include <CGAL/Surface_mesh_simplification/edge_collapse.h>
 
 #ifdef SFCGAL_WITH_EIGEN
-#include <CGAL/Cartesian_converter.h>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/GarlandHeckbert_plane_policies.h>
-#include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/LindstromTurk_cost.h>
-#include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/LindstromTurk_placement.h>
+  #include <CGAL/Cartesian_converter.h>
+  #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+  #include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/GarlandHeckbert_plane_policies.h>
+  #include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/LindstromTurk_cost.h>
+  #include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/LindstromTurk_placement.h>
 #endif // SFCGAL_WITH_EIGEN
 
 #include <map>
@@ -40,36 +40,40 @@ namespace detail {
 
 #ifdef SFCGAL_WITH_EIGEN
 // Inexact kernel types for advanced strategies
-using InexactKernel   = CGAL::Exact_predicates_inexact_constructions_kernel;
-using InexactMesh     = CGAL::Surface_mesh<InexactKernel::Point_3>;
-using EK_to_IK        = CGAL::Cartesian_converter<Kernel, InexactKernel>;
-using IK_to_EK        = CGAL::Cartesian_converter<InexactKernel, Kernel>;
+using InexactKernel = CGAL::Exact_predicates_inexact_constructions_kernel;
+using InexactMesh   = CGAL::Surface_mesh<InexactKernel::Point_3>;
+using EK_to_IK      = CGAL::Cartesian_converter<Kernel, InexactKernel>;
+using IK_to_EK      = CGAL::Cartesian_converter<InexactKernel, Kernel>;
 #endif // SFCGAL_WITH_EIGEN
 
 /**
- * @brief Apply edge collapse simplification using Edge Length cost and Midpoint placement
+ * @brief Apply edge collapse simplification using Edge Length cost and Midpoint
+ * placement
  */
 template <typename StopPredicate>
 auto
 simplifyMesh(Surface_mesh_3 &mesh, const StopPredicate &stop) -> size_t
 {
-  using Cost = SMS::Edge_length_cost<Surface_mesh_3>;
+  using Cost      = SMS::Edge_length_cost<Surface_mesh_3>;
   using Placement = SMS::Midpoint_placement<Surface_mesh_3>;
 
-  return SMS::edge_collapse(mesh, stop,
-                            CGAL::parameters::get_cost(Cost())
-                                .get_placement(Placement()));
+  return SMS::edge_collapse(
+      mesh, stop,
+      CGAL::parameters::get_cost(Cost()).get_placement(Placement()));
 }
 
 #ifdef SFCGAL_WITH_EIGEN
 /**
- * @brief Apply edge collapse simplification using Garland-Heckbert strategy on inexact mesh
+ * @brief Apply edge collapse simplification using Garland-Heckbert strategy on
+ * inexact mesh
  */
 template <typename StopPredicate>
 auto
-simplifyMeshGarlandHeckbert(InexactMesh &mesh, const StopPredicate &stop) -> size_t
+simplifyMeshGarlandHeckbert(InexactMesh &mesh, const StopPredicate &stop)
+    -> size_t
 {
-  using Policies = SMS::GarlandHeckbert_plane_policies<InexactMesh, InexactKernel>;
+  using Policies =
+      SMS::GarlandHeckbert_plane_policies<InexactMesh, InexactKernel>;
   Policies policies(mesh);
 
   return SMS::edge_collapse(mesh, stop,
@@ -78,18 +82,20 @@ simplifyMeshGarlandHeckbert(InexactMesh &mesh, const StopPredicate &stop) -> siz
 }
 
 /**
- * @brief Apply edge collapse simplification using Lindstrom-Turk strategy on inexact mesh
+ * @brief Apply edge collapse simplification using Lindstrom-Turk strategy on
+ * inexact mesh
  */
 template <typename StopPredicate>
 auto
-simplifyMeshLindstromTurk(InexactMesh &mesh, const StopPredicate &stop) -> size_t
+simplifyMeshLindstromTurk(InexactMesh &mesh, const StopPredicate &stop)
+    -> size_t
 {
-  using Cost = SMS::LindstromTurk_cost<InexactMesh>;
+  using Cost      = SMS::LindstromTurk_cost<InexactMesh>;
   using Placement = SMS::LindstromTurk_placement<InexactMesh>;
 
-  return SMS::edge_collapse(mesh, stop,
-                            CGAL::parameters::get_cost(Cost())
-                                .get_placement(Placement()));
+  return SMS::edge_collapse(
+      mesh, stop,
+      CGAL::parameters::get_cost(Cost()).get_placement(Placement()));
 }
 #endif // SFCGAL_WITH_EIGEN
 
@@ -97,9 +103,9 @@ simplifyMeshLindstromTurk(InexactMesh &mesh, const StopPredicate &stop) -> size_
  * @brief Simplify a surface mesh
  */
 auto
-simplifySurfaceMesh(Surface_mesh_3                     &mesh,
+simplifySurfaceMesh(Surface_mesh_3                    &mesh,
                     const SimplificationStopPredicate &stopPredicate,
-                    SimplificationStrategy              strategy) -> size_t
+                    SimplificationStrategy             strategy) -> size_t
 {
   // For advanced strategies, convert to inexact mesh
 #ifdef SFCGAL_WITH_EIGEN
@@ -116,15 +122,15 @@ simplifySurfaceMesh(Surface_mesh_3                     &mesh,
     }
 
     // Convert exact mesh to inexact mesh
-    EK_to_IK toInexact;
+    EK_to_IK    toInexact;
     InexactMesh inexactMesh;
 
     // Copy vertices
     std::map<Surface_mesh_3::Vertex_index, InexactMesh::Vertex_index> vertexMap;
     for (auto vh : mesh.vertices()) {
       auto inexactPoint = toInexact(mesh.point(vh));
-      auto newVh = inexactMesh.add_vertex(inexactPoint);
-      vertexMap[vh] = newVh;
+      auto newVh        = inexactMesh.add_vertex(inexactPoint);
+      vertexMap[vh]     = newVh;
     }
 
     // Copy faces
@@ -139,7 +145,8 @@ simplifySurfaceMesh(Surface_mesh_3                     &mesh,
     size_t result;
 
     if (stopPredicate.type == SimplificationStopPredicate::Type::EDGE_COUNT) {
-      auto const initialEdgeCount = static_cast<size_t>(inexactMesh.number_of_edges());
+      auto const initialEdgeCount =
+          static_cast<size_t>(inexactMesh.number_of_edges());
       auto const targetEdgeCount = static_cast<size_t>(stopPredicate.value);
 
       if (targetEdgeCount >= initialEdgeCount) {
@@ -176,17 +183,19 @@ simplifySurfaceMesh(Surface_mesh_3                     &mesh,
     IK_to_EK toExact;
 
     // Copy vertices back
-    std::map<InexactMesh::Vertex_index, Surface_mesh_3::Vertex_index> backVertexMap;
+    std::map<InexactMesh::Vertex_index, Surface_mesh_3::Vertex_index>
+        backVertexMap;
     for (auto vh : inexactMesh.vertices()) {
-      auto exactPoint = toExact(inexactMesh.point(vh));
-      auto newVh = mesh.add_vertex(exactPoint);
+      auto exactPoint   = toExact(inexactMesh.point(vh));
+      auto newVh        = mesh.add_vertex(exactPoint);
       backVertexMap[vh] = newVh;
     }
 
     // Copy faces back
     for (auto fh : inexactMesh.faces()) {
       std::vector<Surface_mesh_3::Vertex_index> exactVertices;
-      for (auto vh : inexactMesh.vertices_around_face(inexactMesh.halfedge(fh))) {
+      for (auto vh :
+           inexactMesh.vertices_around_face(inexactMesh.halfedge(fh))) {
         exactVertices.push_back(backVertexMap[vh]);
       }
       mesh.add_face(exactVertices);
@@ -199,9 +208,8 @@ simplifySurfaceMesh(Surface_mesh_3                     &mesh,
   // Default EDGE_LENGTH strategy with exact mesh
   if (stopPredicate.type == SimplificationStopPredicate::Type::EDGE_COUNT) {
     // Stop after collapsing a specific number of edges
-    auto const initialEdgeCount =
-        static_cast<size_t>(mesh.number_of_edges());
-    auto const targetEdgeCount = static_cast<size_t>(stopPredicate.value);
+    auto const initialEdgeCount = static_cast<size_t>(mesh.number_of_edges());
+    auto const targetEdgeCount  = static_cast<size_t>(stopPredicate.value);
 
     if (targetEdgeCount >= initialEdgeCount) {
       return 0; // No simplification needed
@@ -231,9 +239,9 @@ simplifySurfaceMesh(Surface_mesh_3                     &mesh,
  * @brief Simplify a TriangulatedSurface
  */
 auto
-simplifyTriangulatedSurface(const TriangulatedSurface &surface,
+simplifyTriangulatedSurface(const TriangulatedSurface         &surface,
                             const SimplificationStopPredicate &stopPredicate,
-                            SimplificationStrategy strategy)
+                            SimplificationStrategy             strategy)
     -> std::unique_ptr<TriangulatedSurface>
 {
   if (surface.isEmpty()) {
@@ -256,9 +264,9 @@ simplifyTriangulatedSurface(const TriangulatedSurface &surface,
  * @brief Simplify a PolyhedralSurface
  */
 auto
-simplifyPolyhedralSurface(const PolyhedralSurface &surface,
+simplifyPolyhedralSurface(const PolyhedralSurface           &surface,
                           const SimplificationStopPredicate &stopPredicate,
-                          SimplificationStrategy strategy)
+                          SimplificationStrategy             strategy)
     -> std::unique_ptr<PolyhedralSurface>
 {
   if (surface.isEmpty()) {
@@ -279,9 +287,9 @@ simplifyPolyhedralSurface(const PolyhedralSurface &surface,
  * @brief Simplify a Solid (only exterior shell)
  */
 auto
-simplifySolid(const Solid &solid, const SimplificationStopPredicate &stopPredicate,
-              SimplificationStrategy strategy)
-    -> std::unique_ptr<Solid>
+simplifySolid(const Solid                       &solid,
+              const SimplificationStopPredicate &stopPredicate,
+              SimplificationStrategy strategy) -> std::unique_ptr<Solid>
 {
   if (solid.isEmpty()) {
     return std::make_unique<Solid>(solid);
@@ -306,9 +314,9 @@ simplifySolid(const Solid &solid, const SimplificationStopPredicate &stopPredica
  * @brief Simplify a MultiSolid
  */
 auto
-simplifyMultiSolid(const MultiSolid &multiSolid,
+simplifyMultiSolid(const MultiSolid                  &multiSolid,
                    const SimplificationStopPredicate &stopPredicate,
-                   SimplificationStrategy strategy)
+                   SimplificationStrategy             strategy)
     -> std::unique_ptr<MultiSolid>
 {
   auto result = std::make_unique<MultiSolid>();
@@ -334,9 +342,9 @@ simplifyMultiSolid(const MultiSolid &multiSolid,
  * @pre The geometry must be 3-dimensional
  */
 auto
-surfaceSimplification(const Geometry                 &geometry,
+surfaceSimplification(const Geometry                    &geometry,
                       const SimplificationStopPredicate &stopPredicate,
-                      SimplificationStrategy strategy)
+                      SimplificationStrategy             strategy)
     -> std::unique_ptr<Geometry>
 {
   // Validate geometry
@@ -351,16 +359,16 @@ surfaceSimplification(const Geometry                 &geometry,
     break;
   }
 
-  std::unique_ptr<Geometry> result(
-      surfaceSimplification(geometry, stopPredicate, strategy, NoValidityCheck()));
+  std::unique_ptr<Geometry> result(surfaceSimplification(
+      geometry, stopPredicate, strategy, NoValidityCheck()));
   propagateValidityFlag(*result, true);
   return result;
 }
 
 auto
-surfaceSimplification(const Geometry                 &geometry,
+surfaceSimplification(const Geometry                    &geometry,
                       const SimplificationStopPredicate &stopPredicate,
-                      SimplificationStrategy strategy,
+                      SimplificationStrategy             strategy,
                       NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
 {
   if (geometry.isEmpty()) {
@@ -368,7 +376,8 @@ surfaceSimplification(const Geometry                 &geometry,
   }
 
   // Validate ratio for EDGE_COUNT_RATIO
-  if (stopPredicate.type == SimplificationStopPredicate::Type::EDGE_COUNT_RATIO) {
+  if (stopPredicate.type ==
+      SimplificationStopPredicate::Type::EDGE_COUNT_RATIO) {
     if (stopPredicate.value <= 0.0 || stopPredicate.value >= 1.0) {
       throw std::invalid_argument(
           "Edge count ratio must be in the range (0.0, 1.0)");
@@ -388,7 +397,8 @@ surfaceSimplification(const Geometry                 &geometry,
     return detail::simplifySolid(geometry.as<Solid>(), stopPredicate, strategy);
 
   case TYPE_MULTISOLID:
-    return detail::simplifyMultiSolid(geometry.as<MultiSolid>(), stopPredicate, strategy);
+    return detail::simplifyMultiSolid(geometry.as<MultiSolid>(), stopPredicate,
+                                      strategy);
 
   default:
     throw std::invalid_argument(
