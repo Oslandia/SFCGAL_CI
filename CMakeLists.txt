@@ -46,6 +46,7 @@ option( SFCGAL_BUILD_BENCH "Build benchmarks" OFF )
 option( SFCGAL_BUILD_DOC "Build documentation" OFF )
 
 option( SFCGAL_WITH_OSG "Compile with OpenSceneGraph support" OFF )
+option( SFCGAL_WITH_EIGEN "Compile with Eigen support for advanced simplification strategies" OFF )
 option( SFCGAL_VALGRIND "Compile with Valgrind support" OFF )
 option( SFCGAL_TSAN "Enable ThreadSanitizer (Debug only)" OFF)
 
@@ -190,11 +191,25 @@ if ( SFCGAL_WITH_OSG )
   endif()
 endif()
 
+#-- Eigen3 -----------------------------------------
+if ( SFCGAL_WITH_EIGEN )
+  find_package( Eigen3 3.3 REQUIRED )
+  if( ${Eigen3_FOUND} )
+    message( STATUS "Eigen3 ${Eigen3_VERSION} found" )
+    message( STATUS "EIGEN3_INCLUDE_DIR = ${EIGEN3_INCLUDE_DIR}" )
+  endif()
+endif()
+
 #-- note that SYSTEM turns -I/path to -isystem and avoid warnings in CGAL and Boost
 include_directories( SYSTEM
 	${CGAL_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIRS}
 )
+
+if ( SFCGAL_WITH_EIGEN AND Eigen3_FOUND )
+  include_directories( SYSTEM ${EIGEN3_INCLUDE_DIR} )
+  add_definitions( "-DSFCGAL_WITH_EIGEN" )
+endif()
 link_directories(
 	${CGAL_LIBRARY_DIRS}
 	${Boost_LIBRARY_DIRS}
