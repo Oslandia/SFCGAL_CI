@@ -4,12 +4,12 @@
 #include "SFCGAL/algorithm/surfaceSimplification.h"
 
 #include "SFCGAL/MultiSolid.h"
-#include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/io/wkt.h"
 
 #include <boost/test/unit_test.hpp>
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(testSimplify_PolyhedralSurface_LindstromTurk)
 // Test Solid simplification
 BOOST_AUTO_TEST_CASE(testSimplify_Solid)
 {
-  auto exteriorShell = createCubePolyhedralSurface();
+  auto  exteriorShell = createCubePolyhedralSurface();
   Solid solid(*exteriorShell);
 
   auto simplified = surfaceSimplification(
@@ -237,9 +237,9 @@ BOOST_AUTO_TEST_CASE(testSimplify_EdgeCountPredicate)
   // manifold)
 
   // Simplify to a specific edge count (keep 10 edges)
-  auto simplified = surfaceSimplification(
-      *cube, SimplificationStopPredicate::edgeCount(10),
-      SimplificationStrategy::EDGE_LENGTH);
+  auto simplified =
+      surfaceSimplification(*cube, SimplificationStopPredicate::edgeCount(10),
+                            SimplificationStrategy::EDGE_LENGTH);
 
   BOOST_CHECK(simplified);
   BOOST_CHECK(simplified->is<TriangulatedSurface>());
@@ -266,11 +266,10 @@ BOOST_AUTO_TEST_CASE(testSimplify_InvalidRatio_TooLow)
 {
   auto cube = createCubeTriangulatedSurface();
 
-  BOOST_CHECK_THROW(
-      surfaceSimplification(*cube,
-                            SimplificationStopPredicate::edgeCountRatio(0.0),
-                            SimplificationStrategy::EDGE_LENGTH),
-      std::invalid_argument);
+  BOOST_CHECK_THROW(surfaceSimplification(
+                        *cube, SimplificationStopPredicate::edgeCountRatio(0.0),
+                        SimplificationStrategy::EDGE_LENGTH),
+                    std::invalid_argument);
 }
 
 // Test invalid ratio (too high)
@@ -278,11 +277,10 @@ BOOST_AUTO_TEST_CASE(testSimplify_InvalidRatio_TooHigh)
 {
   auto cube = createCubeTriangulatedSurface();
 
-  BOOST_CHECK_THROW(
-      surfaceSimplification(*cube,
-                            SimplificationStopPredicate::edgeCountRatio(1.0),
-                            SimplificationStrategy::EDGE_LENGTH),
-      std::invalid_argument);
+  BOOST_CHECK_THROW(surfaceSimplification(
+                        *cube, SimplificationStopPredicate::edgeCountRatio(1.0),
+                        SimplificationStrategy::EDGE_LENGTH),
+                    std::invalid_argument);
 }
 
 // Test invalid ratio (negative)
@@ -302,22 +300,20 @@ BOOST_AUTO_TEST_CASE(testSimplify_UnsupportedGeometry)
 {
   Point point(0, 0, 0);
 
-  BOOST_CHECK_THROW(
-      surfaceSimplification(point,
-                            SimplificationStopPredicate::edgeCountRatio(0.5),
-                            SimplificationStrategy::EDGE_LENGTH),
-      std::invalid_argument);
+  BOOST_CHECK_THROW(surfaceSimplification(
+                        point, SimplificationStopPredicate::edgeCountRatio(0.5),
+                        SimplificationStrategy::EDGE_LENGTH),
+                    std::invalid_argument);
 }
 
 // Test simplification with WKT geometries
 BOOST_AUTO_TEST_CASE(testSimplify_WKT_TriangulatedSurface)
 {
   // Create a connected triangulated surface (a tetrahedron)
-  std::string wkt =
-      "TIN Z(((0 0 0, 1 0 0, 0.5 0.5 1, 0 0 0)),"
-      "((1 0 0, 0 1 0, 0.5 0.5 1, 1 0 0)),"
-      "((0 1 0, 0 0 0, 0.5 0.5 1, 0 1 0)),"
-      "((0 0 0, 0 1 0, 1 0 0, 0 0 0)))";
+  std::string wkt = "TIN Z(((0 0 0, 1 0 0, 0.5 0.5 1, 0 0 0)),"
+                    "((1 0 0, 0 1 0, 0.5 0.5 1, 1 0 0)),"
+                    "((0 1 0, 0 0 0, 0.5 0.5 1, 0 1 0)),"
+                    "((0 0 0, 0 1 0, 1 0 0, 0 0 0)))";
 
   std::unique_ptr<Geometry> geom(io::readWkt(wkt));
   BOOST_CHECK(geom->is<TriangulatedSurface>());
@@ -350,11 +346,11 @@ BOOST_AUTO_TEST_CASE(testSimplify_Maintains3D)
 // Test Solid with interior shells
 BOOST_AUTO_TEST_CASE(testSimplify_SolidWithInteriorShells)
 {
-  auto exteriorShell = createCubePolyhedralSurface();
+  auto  exteriorShell = createCubePolyhedralSurface();
   Solid solid(*exteriorShell);
 
   // Add a smaller interior shell (void)
-  auto interiorShell = std::make_unique<PolyhedralSurface>();
+  auto interiorShell   = std::make_unique<PolyhedralSurface>();
   auto createSmallFace = [](double x1, double y1, double z1, double x2,
                             double y2, double z2, double x3, double y3,
                             double z3, double x4, double y4,
@@ -370,35 +366,30 @@ BOOST_AUTO_TEST_CASE(testSimplify_SolidWithInteriorShells)
 
   // Small cube inside (0.25 to 0.75 range) - all 6 faces
   // Bottom (z=0.25)
-  interiorShell->addPatch(
-      createSmallFace(0.25, 0.25, 0.25, 0.75, 0.25, 0.25, 0.75, 0.75, 0.25,
-                      0.25, 0.75, 0.25));
+  interiorShell->addPatch(createSmallFace(0.25, 0.25, 0.25, 0.75, 0.25, 0.25,
+                                          0.75, 0.75, 0.25, 0.25, 0.75, 0.25));
   // Top (z=0.75)
-  interiorShell->addPatch(
-      createSmallFace(0.25, 0.25, 0.75, 0.25, 0.75, 0.75, 0.75, 0.75, 0.75,
-                      0.75, 0.25, 0.75));
+  interiorShell->addPatch(createSmallFace(0.25, 0.25, 0.75, 0.25, 0.75, 0.75,
+                                          0.75, 0.75, 0.75, 0.75, 0.25, 0.75));
   // Front (y=0.25)
-  interiorShell->addPatch(
-      createSmallFace(0.25, 0.25, 0.25, 0.25, 0.25, 0.75, 0.75, 0.25, 0.75,
-                      0.75, 0.25, 0.25));
+  interiorShell->addPatch(createSmallFace(0.25, 0.25, 0.25, 0.25, 0.25, 0.75,
+                                          0.75, 0.25, 0.75, 0.75, 0.25, 0.25));
   // Back (y=0.75)
-  interiorShell->addPatch(
-      createSmallFace(0.25, 0.75, 0.25, 0.75, 0.75, 0.25, 0.75, 0.75, 0.75,
-                      0.25, 0.75, 0.75));
+  interiorShell->addPatch(createSmallFace(0.25, 0.75, 0.25, 0.75, 0.75, 0.25,
+                                          0.75, 0.75, 0.75, 0.25, 0.75, 0.75));
   // Left (x=0.25)
-  interiorShell->addPatch(
-      createSmallFace(0.25, 0.25, 0.25, 0.25, 0.75, 0.25, 0.25, 0.75, 0.75,
-                      0.25, 0.25, 0.75));
+  interiorShell->addPatch(createSmallFace(0.25, 0.25, 0.25, 0.25, 0.75, 0.25,
+                                          0.25, 0.75, 0.75, 0.25, 0.25, 0.75));
   // Right (x=0.75)
-  interiorShell->addPatch(
-      createSmallFace(0.75, 0.25, 0.25, 0.75, 0.25, 0.75, 0.75, 0.75, 0.75,
-                      0.75, 0.75, 0.25));
+  interiorShell->addPatch(createSmallFace(0.75, 0.25, 0.25, 0.75, 0.25, 0.75,
+                                          0.75, 0.75, 0.75, 0.75, 0.75, 0.25));
 
   solid.addInteriorShell(std::move(interiorShell));
 
   BOOST_CHECK_EQUAL(solid.numInteriorShells(), 1);
 
-  // Use NoValidityCheck because SFCGAL's isValid for interior shells is not fully implemented
+  // Use NoValidityCheck because SFCGAL's isValid for interior shells is not
+  // fully implemented
   auto simplified = surfaceSimplification(
       solid, SimplificationStopPredicate::edgeCountRatio(0.5),
       SimplificationStrategy::EDGE_LENGTH, NoValidityCheck());
