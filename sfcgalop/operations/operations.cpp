@@ -23,6 +23,7 @@
 #include <SFCGAL/algorithm/covers.h>
 #include <SFCGAL/algorithm/difference.h>
 #include <SFCGAL/algorithm/distance.h>
+#include <SFCGAL/algorithm/roofGeneration.h>
 #include <SFCGAL/algorithm/distance3d.h>
 #include <SFCGAL/algorithm/extrude.h>
 #include <SFCGAL/algorithm/force2D.h>
@@ -1027,6 +1028,96 @@ const std::vector<Operation> operations = {
        // Clone the input geometry to pass ownership to make_solid
        auto geom_copy = geom_a->clone();
        return Constructors::make_solid(std::move(geom_copy));
+     }},
+
+    // Roof Generation
+    {"generate_pitched_roof", "Roof Generation", "Generate a pitched roof from polygon and ridge line", true,
+     "Generate a pitched roof from a polygon footprint and ridge line.\n"
+     "Parameters:\n  slope_angle=DEGREES: Roof slope angle in degrees (default: 30.0)\n"
+     "  ridge_position=interior|edge|exterior: Ridge line position (default: interior)\n\n"
+     "Input A: Polygon footprint\n"
+     "Input B: LineString ridge line\n\n"
+     "Example:\n  sfcgalop generate_pitched_roof \"slope_angle=35,ridge_position=interior\" polygon.wkt ridge.wkt",
+     "params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
+       if (!geom_a || !geom_b) {
+         return std::nullopt;
+       }
+
+       auto polygon = dynamic_cast<const SFCGAL::Polygon*>(geom_a);
+       auto linestring = dynamic_cast<const SFCGAL::LineString*>(geom_b);
+
+       if (!polygon || !linestring) {
+         throw SFCGAL::Exception("First geometry must be Polygon, second must be LineString");
+       }
+
+       auto params = parse_params(args);
+       double slope_angle = params.count("slope_angle") ? params["slope_angle"] : 30.0;
+
+       SFCGAL::algorithm::RidgePosition ridge_pos = SFCGAL::algorithm::RidgePosition::INTERIOR;
+       // Parse ridge_position from args string directly since parse_params only handles numbers
+       if (args.find("ridge_position=edge") != std::string::npos) {
+         ridge_pos = SFCGAL::algorithm::RidgePosition::EDGE;
+       } else if (args.find("ridge_position=exterior") != std::string::npos) {
+         ridge_pos = SFCGAL::algorithm::RidgePosition::EXTERIOR;
+       }
+
+       return SFCGAL::algorithm::generatePitchedRoof(*polygon, *linestring, slope_angle, ridge_pos);
+     }},
+
+    {"generate_gable_roof", "Roof Generation", "Generate a gable roof from polygon and ridge line", true,
+     "Generate a gable roof from a polygon footprint and ridge line.\n"
+     "Parameters:\n  slope_angle=DEGREES: Roof slope angle in degrees (default: 30.0)\n"
+     "  add_hips=true|false: Add hip treatment at gable ends (default: false)\n\n"
+     "Input A: Polygon footprint\n"
+     "Input B: LineString ridge line\n\n"
+     "Example:\n  sfcgalop generate_gable_roof \"slope_angle=35,add_hips=false\" polygon.wkt ridge.wkt",
+     "params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
+       if (!geom_a || !geom_b) {
+         return std::nullopt;
+       }
+
+       auto polygon = dynamic_cast<const SFCGAL::Polygon*>(geom_a);
+       auto linestring = dynamic_cast<const SFCGAL::LineString*>(geom_b);
+
+       if (!polygon || !linestring) {
+         throw SFCGAL::Exception("First geometry must be Polygon, second must be LineString");
+       }
+
+       auto params = parse_params(args);
+       double slope_angle = params.count("slope_angle") ? params["slope_angle"] : 30.0;
+       bool add_hips = params.count("add_hips") ? (params["add_hips"] > 0.5) : false;
+
+       return SFCGAL::algorithm::generateGableRoof(*polygon, *linestring, slope_angle, add_hips);
+     }},
+
+    {"generate_skillion_roof", "Roof Generation", "Generate a skillion roof from polygon and ridge line", true,
+     "Generate a skillion roof from a polygon footprint and ridge line.\n"
+     "Parameters:\n  slope_angle=DEGREES: Roof slope angle in degrees (default: 30.0)\n\n"
+     "Input A: Polygon footprint\n"
+     "Input B: LineString ridge line\n\n"
+     "Example:\n  sfcgalop generate_skillion_roof \"slope_angle=25\" polygon.wkt ridge.wkt",
+     "params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
+       if (!geom_a || !geom_b) {
+         return std::nullopt;
+       }
+
+       auto polygon = dynamic_cast<const SFCGAL::Polygon*>(geom_a);
+       auto linestring = dynamic_cast<const SFCGAL::LineString*>(geom_b);
+
+       if (!polygon || !linestring) {
+         throw SFCGAL::Exception("First geometry must be Polygon, second must be LineString");
+       }
+
+       auto params = parse_params(args);
+       double slope_angle = params.count("slope_angle") ? params["slope_angle"] : 30.0;
+
+       return SFCGAL::algorithm::generateSkillionRoof(*polygon, *linestring, slope_angle);
      }}};
 
 } // namespace
