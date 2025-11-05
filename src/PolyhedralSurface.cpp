@@ -299,6 +299,14 @@ PolyhedralSurface::accept(ConstGeometryVisitor &visitor) const
   visitor.visit(*this);
 }
 
+auto
+PolyhedralSurface::toSurfaceMesh() const -> Surface_mesh_3
+{
+  // Convert to triangulated surface first, then to surface mesh
+  TriangulatedSurface triangulated = toTriangulatedSurface();
+  return triangulated.toSurfaceMesh();
+}
+
 // Explicit instantiations
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 template PolyhedralSurface::PolyhedralSurface(const detail::MarkedPolyhedron &);
