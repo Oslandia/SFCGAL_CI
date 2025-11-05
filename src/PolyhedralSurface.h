@@ -426,6 +426,13 @@ public:
   accept(ConstGeometryVisitor &visitor) const override;
 
   /**
+   * @brief Convert PolyhedralSurface to CGAL::Surface_mesh
+   * @return CGAL Surface_mesh representation of the polyhedral surface
+   */
+  auto
+  toSurfaceMesh() const -> Surface_mesh_3;
+
+  /**
    * @brief Serializer
    * @param ar Archive for serialization
    */
