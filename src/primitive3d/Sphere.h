@@ -61,9 +61,17 @@ public:
    */
   ~Sphere() override = default;
 
+  /**
+   * @brief Returns the primitive type
+   * @return The primitive type as string
+   */
   [[nodiscard]] auto
   primitiveType() const -> std::string override;
 
+  /**
+   * @brief Returns the primitive type ID
+   * @return The primitive type ID
+   */
   [[nodiscard]] auto
   primitiveTypeId() const -> PrimitiveType override;
 
@@ -170,14 +178,20 @@ public:
   generatePolyhedralSurface() const -> PolyhedralSurface override;
 
   /**
-   * @copydoc SFCGAL::Primitive::volume
+   * @brief Returns the primitive volume
+   * @param withDiscretization Computes volume with discretization (true) or as
+   * perfect primitive (false). Defaults to false.
+   * @return The sphere volume
    * @note only perfect primitive version is available
    */
   auto
   volume(bool withDiscretization = false) const -> double override;
 
   /**
-   * @copydoc SFCGAL::Primitive::area3D
+   * @brief Returns the primitive area
+   * @param withDiscretization Computes area with discretization (true) or as
+   * perfect primitive (false). Defaults to false.
+   * @return The sphere area
    * @note only perfect primitive version is available
    */
   auto
