@@ -15,6 +15,7 @@
 #include <boost/serialization/vector.hpp>
 
 #include "SFCGAL/DereferenceIterator.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/PolyhedralSurface.h"
 
 namespace SFCGAL {
@@ -323,6 +324,13 @@ public:
   /// @param visitor Const visitor to accept
   void
   accept(ConstGeometryVisitor &visitor) const override;
+
+  /**
+   * @brief Convert Solid to CGAL::Surface_mesh (only exterior shell)
+   * @return CGAL Surface_mesh representation of the solid's exterior shell
+   */
+  auto
+  toSurfaceMesh() const -> Surface_mesh_3;
 
   /**
    * @brief Serializer
