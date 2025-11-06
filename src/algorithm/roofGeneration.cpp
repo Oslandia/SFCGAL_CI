@@ -21,6 +21,7 @@
 #include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/length.h"
 #include "SFCGAL/algorithm/translate.h"
+#include "SFCGAL/algorithm/offset.h"
 #include "SFCGAL/triangulate/triangulate2DZ.h"
 
 #include <map>
@@ -1093,9 +1094,10 @@ static auto generateGableRoofImpl(const Polygon &footprint,
     }
 
     // Elevate ridge vertices and create roof triangle
-    Point newV1 = v1;
-    Point newV2 = v2;
-    Point newV3 = v3;
+    // Ensure all points have explicit Z coordinate (start with 0.0 for base)
+    Point newV1(v1.x(), v1.y(), 0.0);
+    Point newV2(v2.x(), v2.y(), 0.0);
+    Point newV3(v3.x(), v3.y(), 0.0);
 
     // Check if each vertex is a ridge point and elevate it
     auto isRidgePoint = [&ridgePointsSet](const Point &p) -> bool {
@@ -1177,7 +1179,7 @@ static auto generateGableRoofImpl(const Polygon &footprint,
 }
 
 auto
-generateGableRoof(const Polygon &footprint, double slopeAngle, bool addVerticalFaces)
+generateGableRoof(const Polygon &footprint, double slopeAngle, bool addVerticalFaces, double overhang)
     -> std::unique_ptr<PolyhedralSurface>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(footprint);
@@ -1185,15 +1187,31 @@ generateGableRoof(const Polygon &footprint, double slopeAngle, bool addVerticalF
   if (slopeAngle <= 0.0 || slopeAngle >= 90.0) {
     BOOST_THROW_EXCEPTION(Exception("Slope angle must be between 0 and 90 degrees"));
   }
+  if (overhang < 0.0) {
+    BOOST_THROW_EXCEPTION(Exception("Overhang must be non-negative"));
+  }
+
+  // Create extended footprint for overhang if needed
+  Polygon workingFootprint = footprint;
+  if (overhang > 0.0) {
+    auto extendedGeom = offset(footprint, overhang);
+    if (extendedGeom && extendedGeom->numGeometries() > 0) {
+      // Take the largest polygon from the multipolygon result
+      const auto* largest = dynamic_cast<const Polygon*>(&extendedGeom->geometryN(0));
+      if (largest) {
+        workingFootprint = *largest;
+      }
+    }
+  }
 
   // Calculate ridge height from slope angle
   // Get the projected medial axis to find maximum distance
-  auto projectedMedialAxis = projectMedialAxisToEdges(footprint);
+  auto projectedMedialAxis = projectMedialAxisToEdges(workingFootprint);
   if (!projectedMedialAxis || projectedMedialAxis->isEmpty()) {
     BOOST_THROW_EXCEPTION(Exception("Could not compute projected medial axis for gable roof"));
   }
 
-  auto exteriorRing = footprint.exteriorRing();
+  auto exteriorRing = workingFootprint.exteriorRing();
   double maxPerpDistance = 0.0;
 
   // Calculate maximum perpendicular distance from ridge line to polygon edge
@@ -1255,18 +1273,18 @@ generateGableRoof(const Polygon &footprint, double slopeAngle, bool addVerticalF
 
   double ridgeHeight = calculateRidgeHeight(maxPerpDistance, slopeAngle);
 
-  return generateGableRoofImpl(footprint, ridgeHeight, addVerticalFaces);
+  return generateGableRoofImpl(workingFootprint, ridgeHeight, addVerticalFaces);
 }
 
 auto
 generateGableRoof(const Polygon &footprint, double slopeAngle)
     -> std::unique_ptr<PolyhedralSurface>
 {
-  return generateGableRoof(footprint, slopeAngle, false);
+  return generateGableRoof(footprint, slopeAngle, false, 0.0);
 }
 
 auto
-generateGableRoofWithHeight(const Polygon &footprint, double roofHeight, bool addVerticalFaces)
+generateGableRoofWithHeight(const Polygon &footprint, double roofHeight, bool addVerticalFaces, double overhang)
     -> std::unique_ptr<PolyhedralSurface>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(footprint);
@@ -1274,13 +1292,29 @@ generateGableRoofWithHeight(const Polygon &footprint, double roofHeight, bool ad
   if (roofHeight <= 0.0) {
     BOOST_THROW_EXCEPTION(Exception("Roof height must be positive"));
   }
+  if (overhang < 0.0) {
+    BOOST_THROW_EXCEPTION(Exception("Overhang must be non-negative"));
+  }
 
-  return generateGableRoofImpl(footprint, roofHeight, addVerticalFaces);
+  // Create extended footprint for overhang if needed
+  Polygon workingFootprint = footprint;
+  if (overhang > 0.0) {
+    auto extendedGeom = offset(footprint, overhang);
+    if (extendedGeom && extendedGeom->numGeometries() > 0) {
+      // Take the largest polygon from the multipolygon result
+      const auto* largest = dynamic_cast<const Polygon*>(&extendedGeom->geometryN(0));
+      if (largest) {
+        workingFootprint = *largest;
+      }
+    }
+  }
+
+  return generateGableRoofImpl(workingFootprint, roofHeight, addVerticalFaces);
 }
 
 auto
 generateGableRoofWithBuilding(const Polygon &footprint, double buildingHeight, double roofHeight,
-                             double slopeAngle, bool addVerticalFaces)
+                             double slopeAngle, bool addVerticalFaces, double overhang)
     -> std::unique_ptr<PolyhedralSurface>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(footprint);
@@ -1294,6 +1328,9 @@ generateGableRoofWithBuilding(const Polygon &footprint, double buildingHeight, d
   if (slopeAngle <= 0.0 || slopeAngle >= 90.0) {
     BOOST_THROW_EXCEPTION(Exception("Slope angle must be between 0 and 90 degrees"));
   }
+  if (overhang < 0.0) {
+    BOOST_THROW_EXCEPTION(Exception("Overhang must be non-negative"));
+  }
 
   std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
 
@@ -1302,7 +1339,7 @@ generateGableRoofWithBuilding(const Polygon &footprint, double buildingHeight, d
   }
 
   // Create complete roof using our unified implementation
-  auto completeRoof = generateGableRoofWithHeight(footprint, roofHeight, addVerticalFaces);
+  auto completeRoof = generateGableRoofWithHeight(footprint, roofHeight, addVerticalFaces, overhang);
 
   // Create new roof surface (excluding base faces)
   auto roof = std::make_unique<PolyhedralSurface>();
@@ -1311,10 +1348,13 @@ generateGableRoofWithBuilding(const Polygon &footprint, double buildingHeight, d
   auto isNotBaseFace = [](const Polygon &patch) -> bool {
     const LineString &exterior = patch.exteriorRing();
 
-    // Check if any point has z != 0 (not a base face)
-    return std::any_of(
+    // Check if all points are at z=0 (pure base face)
+    bool allPointsAtZero = std::all_of(
         exterior.begin(), exterior.end(),
-        [](const Point &point) -> bool { return point.z() != 0.0; });
+        [](const Point &point) -> bool { return point.z() == 0.0; });
+
+    // If all points are at z=0, it's a base face
+    return !allPointsAtZero;
   };
 
   // Copy roof patches (excluding base)
@@ -1325,10 +1365,11 @@ generateGableRoofWithBuilding(const Polygon &footprint, double buildingHeight, d
         roof->addPatch(*polygon);
       }
     } else if (auto triangle = dynamic_cast<const Triangle*>(&patch)) {
-      // For triangles, check if any vertex has z != 0
-      if (triangle->vertex(0).z() != 0.0 ||
-          triangle->vertex(1).z() != 0.0 ||
-          triangle->vertex(2).z() != 0.0) {
+      // For triangles, check if all vertices are at z=0 (pure base triangle)
+      bool allVerticesAtZero = (triangle->vertex(0).z() == 0.0 &&
+                               triangle->vertex(1).z() == 0.0 &&
+                               triangle->vertex(2).z() == 0.0);
+      if (!allVerticesAtZero) {
         roof->addPatch(*triangle);
       }
     }

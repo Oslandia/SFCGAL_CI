@@ -1302,16 +1302,16 @@ const std::vector<Operation> operations = {
        bool add_vertical_faces = params.count("add_vertical_faces") ? (params["add_vertical_faces"] > 0.5) : false;
        double building_height = params.count("building_height") ? params["building_height"] : 0.0;
        double roof_height = params.count("roof_height") ? params["roof_height"] : 0.0;
+       double overhang = params.count("overhang") ? params["overhang"] : 0.0;
 
        // Use the new automatic medial axis functions
        if (roof_height > 0.0 || building_height > 0.0) {
          if (roof_height <= 0.0) {
            roof_height = 3.0; // Default roof height
          }
-         // Note: Building height version still uses addHips for now - will be refactored later
-         return SFCGAL::algorithm::generateGableRoof(*polygon, building_height, roof_height, slope_angle, add_vertical_faces);
+         return SFCGAL::algorithm::generateGableRoofWithBuilding(*polygon, building_height, roof_height, slope_angle, add_vertical_faces, overhang);
        } else {
-         return SFCGAL::algorithm::generateGableRoof(*polygon, slope_angle, add_vertical_faces);
+         return SFCGAL::algorithm::generateGableRoof(*polygon, slope_angle, add_vertical_faces, overhang);
        }
      }},
 

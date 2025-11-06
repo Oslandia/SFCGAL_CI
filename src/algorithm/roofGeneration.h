@@ -215,12 +215,14 @@ generateGableRoof(const Polygon &footprint, double slopeAngle, bool addVerticalF
  * @param footprint The building footprint polygon
  * @param roofHeight The maximum height of the roof
  * @param addVerticalFaces Whether to add vertical faces at ridge line ends
+ * @param overhang Roof overhang distance beyond building walls (default: 0.0)
  * @return A PolyhedralSurface representing the gable roof
  * @pre footprint must be a valid polygon
  * @pre roofHeight must be positive
+ * @pre overhang >= 0.0
  */
 SFCGAL_API auto
-generateGableRoofWithHeight(const Polygon &footprint, double roofHeight, bool addVerticalFaces = false)
+generateGableRoofWithHeight(const Polygon &footprint, double roofHeight, bool addVerticalFaces = false, double overhang = 0.0)
     -> std::unique_ptr<PolyhedralSurface>;
 
 /**
@@ -234,15 +236,17 @@ generateGableRoofWithHeight(const Polygon &footprint, double roofHeight, bool ad
  * @param roofHeight Maximum height of the roof above the building base
  * @param slopeAngle The roof slope angle in degrees (0-90)
  * @param addVerticalFaces Whether to add vertical faces at ridge line ends
+ * @param overhang Roof overhang distance beyond building walls (default: 0.0)
  * @return A PolyhedralSurface representing the complete building with roof
  * @pre footprint must be a valid polygon
  * @pre buildingHeight >= 0
  * @pre roofHeight > 0
  * @pre slopeAngle must be between 0 and 90 degrees
+ * @pre overhang >= 0.0
  */
 SFCGAL_API auto
 generateGableRoofWithBuilding(const Polygon &footprint, double buildingHeight, double roofHeight,
-                             double slopeAngle, bool addVerticalFaces = false)
+                             double slopeAngle, bool addVerticalFaces = false, double overhang = 0.0)
     -> std::unique_ptr<PolyhedralSurface>;
 
 /**
@@ -260,7 +264,7 @@ generateGableRoofWithBuilding(const Polygon &footprint, double buildingHeight, d
  */
 SFCGAL_API auto
 generateGableRoof(const Polygon &footprint, double buildingHeight, double roofHeight,
-                  double slopeAngle, bool addHips = false)
+                  double slopeAngle, bool addHips = false, double overhang = 0.0)
     -> std::unique_ptr<Geometry>;
 
 /**
@@ -279,7 +283,7 @@ generateGableRoof(const Polygon &footprint, double buildingHeight, double roofHe
  */
 SFCGAL_API auto
 generateGableRoof(const Polygon &footprint, double buildingHeight, double roofHeight,
-                  double slopeAngle, bool addHips, bool addVerticalFaces)
+                  double slopeAngle, bool addHips, bool addVerticalFaces, double overhang = 0.0)
     -> std::unique_ptr<Geometry>;
 
 /**
