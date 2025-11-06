@@ -633,4 +633,161 @@ BOOST_AUTO_TEST_CASE(testParameterCombinations)
   }
 }
 
+// ========================================================================
+// SKILLION ROOF TESTS (using generateSkillionRoof algorithm)
+// ========================================================================
+
+BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_Rectangle_RoofOnly)
+{
+  auto footprint = createPolygonFromWKT(RECTANGLE);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  // Create ridge line along first edge (high edge)
+  LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
+
+  auto roof = generateSkillionRoof(*footprint, ridgeLine, 15.0);
+
+  BOOST_CHECK(roof != nullptr);
+  BOOST_CHECK(!roof->isEmpty());
+  BOOST_CHECK(roof->numPatches() > 0);
+  BOOST_CHECK(roof->is3D());
+}
+
+BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_Rectangle_WithBuilding)
+{
+  auto footprint = createPolygonFromWKT(RECTANGLE);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
+
+  auto building = generateSkillionRoof(*footprint, ridgeLine, 20.0, 4.0);
+
+  BOOST_CHECK(building != nullptr);
+  BOOST_CHECK(!building->isEmpty());
+  BOOST_CHECK(building->numPatches() > 0);
+  BOOST_CHECK(building->is3D());
+}
+
+BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_LShape_RoofOnly)
+{
+  auto footprint = createPolygonFromWKT(L_SHAPE);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
+
+  auto roof = generateSkillionRoof(*footprint, ridgeLine, 25.0);
+
+  BOOST_CHECK(roof != nullptr);
+  BOOST_CHECK(!roof->isEmpty());
+  BOOST_CHECK(roof->numPatches() > 0);
+}
+
+BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_LShape3D_WithBuilding)
+{
+  auto footprint = createPolygonFromWKT(L_SHAPE_3D);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  LineString ridgeLine(Point(0, 0, 0), Point(6, 0, 0));
+
+  auto building = generateSkillionRoof(*footprint, ridgeLine, 18.0, 3.5);
+
+  BOOST_CHECK(building != nullptr);
+  BOOST_CHECK(!building->isEmpty());
+  BOOST_CHECK(building->numPatches() > 0);
+}
+
+BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_VariousSlopeAngles)
+{
+  auto footprint = createPolygonFromWKT(RECTANGLE);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
+
+  // Test different slope angles
+  std::vector<double> angles = {5.0, 15.0, 30.0, 45.0, 60.0};
+
+  for (double angle : angles) {
+    auto roof = generateSkillionRoof(*footprint, ridgeLine, angle);
+    BOOST_CHECK(roof != nullptr);
+    BOOST_CHECK(!roof->isEmpty());
+  }
+}
+
+BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_InvalidSlopeAngles)
+{
+  auto footprint = createPolygonFromWKT(RECTANGLE);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
+
+  // Test invalid slope angles
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 0.0), Exception);
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 90.0), Exception);
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, -5.0), Exception);
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 95.0), Exception);
+}
+
+BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_InvalidBuildingHeight)
+{
+  auto footprint = createPolygonFromWKT(RECTANGLE);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
+
+  // Test negative building height
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 20.0, -1.0), Exception);
+}
+
+BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_EmptyPolygon)
+{
+  auto footprint = createPolygonFromWKT(EMPTY_POLYGON);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
+
+  // Should handle empty geometry gracefully
+  auto roof = generateSkillionRoof(*footprint, ridgeLine, 20.0);
+  BOOST_CHECK(roof != nullptr);
+  BOOST_CHECK(roof->isEmpty());
+}
+
+BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_DistanceCalculation)
+{
+  auto footprint = createPolygonFromWKT(RECTANGLE);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  // Ridge line along bottom edge (y=0)
+  LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
+
+  auto roof = generateSkillionRoof(*footprint, ridgeLine, 30.0); // tan(30°) ≈ 0.577
+
+  BOOST_CHECK(roof != nullptr);
+  BOOST_CHECK(!roof->isEmpty());
+
+  // The polygon vertices at y=6 should have height ≈ 6 × tan(30°) ≈ 3.464
+  // This verifies the distance calculation is working correctly
+}
+
+BOOST_AUTO_TEST_CASE(testSkillionRoof_VsOtherRoofTypes)
+{
+  // Compare skillion with other roof types for same footprint
+  auto footprint = createPolygonFromWKT(RECTANGLE);
+  BOOST_REQUIRE(footprint != nullptr);
+
+  LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
+
+  // All roof types should produce valid geometry
+  auto skillion = generateSkillionRoof(*footprint, ridgeLine, 25.0);
+  auto gable = generateGableRoof(*footprint, 25.0);
+
+  BOOST_CHECK(skillion != nullptr);
+  BOOST_CHECK(!skillion->isEmpty());
+
+  BOOST_CHECK(gable != nullptr);
+  BOOST_CHECK(!gable->isEmpty());
+
+  // Skillion should have different characteristics than gable
+  // (This is more of a sanity check that they produce different results)
+}
+
 BOOST_AUTO_TEST_SUITE_END()

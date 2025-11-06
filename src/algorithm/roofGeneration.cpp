@@ -44,6 +44,54 @@ namespace SFCGAL::algorithm {
 namespace {
 
 /**
+ * @brief Calculate perpendicular distance from a point to a 2D line
+ */
+auto
+distanceToLine2D(const Point &point, const Point &lineStart, const Point &lineEnd) -> double
+{
+  auto dx = CGAL::to_double(lineEnd.x() - lineStart.x());
+  auto dy = CGAL::to_double(lineEnd.y() - lineStart.y());
+
+  // If line is degenerate (start == end), return distance to point
+  auto lineLength = std::sqrt(dx * dx + dy * dy);
+  if (lineLength < 1e-10) {
+    auto px = CGAL::to_double(point.x() - lineStart.x());
+    auto py = CGAL::to_double(point.y() - lineStart.y());
+    return std::sqrt(px * px + py * py);
+  }
+
+  // Calculate perpendicular distance using cross product formula
+  auto px = CGAL::to_double(point.x() - lineStart.x());
+  auto py = CGAL::to_double(point.y() - lineStart.y());
+
+  return std::abs(dx * py - dy * px) / lineLength;
+}
+
+/**
+ * @brief Calculate signed distance from point to line (positive on one side, negative on other)
+ */
+auto
+signedDistanceToLine2D(const Point &point, const Point &lineStart, const Point &lineEnd) -> double
+{
+  auto dx = CGAL::to_double(lineEnd.x() - lineStart.x());
+  auto dy = CGAL::to_double(lineEnd.y() - lineStart.y());
+
+  // If line is degenerate, return distance to start point
+  auto lineLength = std::sqrt(dx * dx + dy * dy);
+  if (lineLength < 1e-10) {
+    auto px = CGAL::to_double(point.x() - lineStart.x());
+    auto py = CGAL::to_double(point.y() - lineStart.y());
+    return std::sqrt(px * px + py * py);
+  }
+
+  // Calculate signed perpendicular distance using cross product
+  auto px = CGAL::to_double(point.x() - lineStart.x());
+  auto py = CGAL::to_double(point.y() - lineStart.y());
+
+  return (dx * py - dy * px) / lineLength;
+}
+
+/**
  * @brief Calculate 3D point projected from base point with given height and slope
  */
 auto
@@ -368,11 +416,179 @@ generateGableRoof(const Polygon &footprint, const LineString &ridgeLine,
 
 auto
 generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
+                     double slopeAngle, bool addVerticalFaces) -> std::unique_ptr<PolyhedralSurface>
+{
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(footprint);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ridgeLine);
+
+  if (slopeAngle <= 0.0 || slopeAngle >= 90.0) {
+    BOOST_THROW_EXCEPTION(Exception("Slope angle must be between 0 and 90 degrees"));
+  }
+
+  auto result = std::make_unique<PolyhedralSurface>();
+
+  if (footprint.isEmpty() || ridgeLine.isEmpty()) {
+    return result; // Return empty surface for empty input
+  }
+
+  if (ridgeLine.numPoints() < 2) {
+    BOOST_THROW_EXCEPTION(Exception("Ridge line must have at least 2 points"));
+  }
+
+  // Get ridge line endpoints for distance calculation
+  auto ridgeStart = ridgeLine.pointN(0);
+  auto ridgeEnd = ridgeLine.pointN(ridgeLine.numPoints() - 1);
+
+  // Create sloped roof surface
+  auto &exteriorRing = footprint.exteriorRing();
+  size_t numPoints = exteriorRing.numPoints();
+
+  if (numPoints < 4) { // Need at least 3 + closing point
+    return result; // Invalid polygon
+  }
+
+  std::vector<Point> elevatedVertices;
+  elevatedVertices.reserve(numPoints);
+
+  // Calculate elevation for each vertex based on distance from ridge line
+  for (size_t i = 0; i < numPoints - 1; ++i) { // Skip closing point
+    auto vertex = exteriorRing.pointN(i);
+
+    // Calculate perpendicular distance from vertex to ridge line
+    double distance = distanceToLine2D(vertex, ridgeStart, ridgeEnd);
+
+    // Calculate height based on slope angle and distance
+    double height = distance * std::tan(slopeAngle * M_PI / 180.0);
+
+    // Create elevated point
+    Point elevatedVertex(vertex.x(), vertex.y(), height);
+    elevatedVertices.push_back(elevatedVertex);
+  }
+
+  // Close the ring
+  if (!elevatedVertices.empty()) {
+    elevatedVertices.push_back(elevatedVertices[0]);
+  }
+
+  // Create the sloped roof surface as a single polygon
+  if (elevatedVertices.size() >= 4) {
+    LineString elevatedRing(elevatedVertices);
+    Polygon slopedSurface(elevatedRing);
+    result->addPatch(slopedSurface);
+  }
+
+  // Add vertical end faces perpendicular to ridge line if needed
+  // This creates the proper "shed roof" appearance with triangular ends
+
+  // Find vertices that are furthest from ridge line (highest points)
+  double maxDistance = 0.0;
+  std::vector<size_t> highVertices;
+
+  for (size_t i = 0; i < numPoints - 1; ++i) {
+    auto vertex = exteriorRing.pointN(i);
+    double distance = distanceToLine2D(vertex, ridgeStart, ridgeEnd);
+
+    if (distance > maxDistance) {
+      maxDistance = distance;
+      highVertices.clear();
+      highVertices.push_back(i);
+    } else if (std::abs(distance - maxDistance) < 1e-9) {
+      highVertices.push_back(i);
+    }
+  }
+
+  // Create vertical faces for each edge when requested
+  if (addVerticalFaces) {
+    // For each edge of the base polygon, create a quadrilateral face
+    // connecting the base edge to the corresponding elevated edge
+    // Only create faces where there is actually a height difference
+    for (size_t i = 0; i < numPoints - 1; ++i) {
+      size_t nextI = (i + 1) % (numPoints - 1);
+
+      // Base edge points (at z=0)
+      auto baseVertex1 = exteriorRing.pointN(i);
+      auto baseVertex2 = exteriorRing.pointN(nextI);
+      auto basePt1 = Point(CGAL::to_double(baseVertex1.x()), CGAL::to_double(baseVertex1.y()), 0.0);
+      auto basePt2 = Point(CGAL::to_double(baseVertex2.x()), CGAL::to_double(baseVertex2.y()), 0.0);
+
+      // Corresponding elevated points on the roof
+      auto roofPt1 = elevatedVertices[i];
+      auto roofPt2 = elevatedVertices[nextI];
+
+      // Check if there's meaningful height difference for this edge
+      double roofHeight1 = CGAL::to_double(roofPt1.z());
+      double roofHeight2 = CGAL::to_double(roofPt2.z());
+      double baseHeight1 = CGAL::to_double(basePt1.z());
+      double baseHeight2 = CGAL::to_double(basePt2.z());
+
+      bool hasHeightDiff1 = std::abs(roofHeight1 - baseHeight1) > 1e-6;
+      bool hasHeightDiff2 = std::abs(roofHeight2 - baseHeight2) > 1e-6;
+
+      if (hasHeightDiff1 && hasHeightDiff2) {
+        // Both points have height difference - create quadrilateral face
+        std::vector<Point> verticalFace = {basePt1, basePt2, roofPt2, roofPt1, basePt1};
+        result->addPatch(Polygon(LineString(verticalFace)));
+      }
+      else if (hasHeightDiff1 && !hasHeightDiff2) {
+        // Only point 1 has height difference - create triangular face
+        // Reorder for proper exterior orientation
+        std::vector<Point> triangularFace = {basePt1, roofPt1, basePt2, basePt1};
+        result->addPatch(Polygon(LineString(triangularFace)));
+      }
+      else if (!hasHeightDiff1 && hasHeightDiff2) {
+        // Only point 2 has height difference - create triangular face
+        // Reorder for proper exterior orientation
+        std::vector<Point> triangularFace = {basePt1, basePt2, roofPt2, basePt1};
+        result->addPatch(Polygon(LineString(triangularFace)));
+      }
+      // If both points have no height difference, skip (would be degenerate)
+    }
+  }
+
+  propagateValidityFlag(*result, true);
+  return result;
+}
+
+auto
+generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
                      double slopeAngle) -> std::unique_ptr<PolyhedralSurface>
 {
-  // Skillion roof is essentially a pitched roof with edge ridge position
-  return generatePitchedRoof(footprint, ridgeLine, slopeAngle,
-                            RidgePosition::EDGE);
+  return generateSkillionRoof(footprint, ridgeLine, slopeAngle, false);
+}
+
+auto
+generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
+                     double slopeAngle, double buildingHeight) -> std::unique_ptr<PolyhedralSurface>
+{
+  return generateSkillionRoof(footprint, ridgeLine, slopeAngle, false, buildingHeight);
+}
+
+auto
+generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
+                     double slopeAngle, bool addVerticalFaces, double buildingHeight) -> std::unique_ptr<PolyhedralSurface>
+{
+  if (buildingHeight < 0.0) {
+    BOOST_THROW_EXCEPTION(Exception("Building height must be non-negative"));
+  }
+
+  if (buildingHeight == 0.0) {
+    // Just generate the roof
+    return generateSkillionRoof(footprint, ridgeLine, slopeAngle, addVerticalFaces);
+  }
+
+  // Generate building walls
+  auto building = extrude(footprint, 0.0, 0.0, buildingHeight);
+
+  // Generate roof and translate it to building height
+  auto roof = generateSkillionRoof(footprint, ridgeLine, slopeAngle, addVerticalFaces);
+  translate(*roof, 0.0, 0.0, buildingHeight);
+
+  // Combine building and roof
+  auto result = std::make_unique<PolyhedralSurface>(building->as<Solid>().exteriorShell());
+  result->addPatchs(*roof);
+
+  propagateValidityFlag(*result, true);
+  return result;
 }
 
 auto

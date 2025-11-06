@@ -1211,6 +1211,82 @@ const std::vector<Operation> operations = {
          }
          return result;
        }
+     }},
+
+    {"generate_skillion_roof", "Roof Generation",
+     "Generate a skillion (shed) roof with single slope from ridge line", false,
+     "Parameters:\\n"
+     "  slope_angle=ANGLE         - Roof slope angle in degrees (required)\\n"
+     "  add_vertical_faces=1      - Add vertical triangular faces at roof ends (optional, default=0)\\n"
+     "  building_height=HEIGHT    - Building height in units (optional, default=0.0)\\n"
+     "  ridge_edge=INDEX          - Edge index to use as ridge line (optional, default=0)\\n\\n"
+     "Examples:\\n"
+     "  sfcgalop -a \\\"POLYGON((0 0,10 0,10 6,0 6,0 0))\\\" generate_skillion_roof \\\"slope_angle=15.0\\\"\\n"
+     "  sfcgalop -a \\\"POLYGON((0 0,10 0,10 6,0 6,0 0))\\\" generate_skillion_roof \\\"slope_angle=15.0,add_vertical_faces=1\\\"\\n"
+     "  sfcgalop -a \\\"POLYGON((0 0,10 0,10 6,0 6,0 0))\\\" generate_skillion_roof \\\"slope_angle=15.0,building_height=3.0,ridge_edge=1\\\"",
+     "A, params", "G",
+     [](const std::string &params_str, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+
+       const auto *polygon = dynamic_cast<const SFCGAL::Polygon *>(geom_a);
+       if (!polygon) {
+         std::cerr << "Error: generate_skillion_roof requires a POLYGON input\\n";
+         return std::nullopt;
+       }
+
+       auto params = parse_params(params_str);
+
+       auto slope_angle_it = params.find("slope_angle");
+       if (slope_angle_it == params.end()) {
+         std::cerr << "Error: slope_angle parameter is required\\n";
+         return std::nullopt;
+       }
+       double slope_angle = slope_angle_it->second;
+
+       bool add_vertical_faces = false;
+       auto add_vertical_faces_it = params.find("add_vertical_faces");
+       if (add_vertical_faces_it != params.end()) {
+         add_vertical_faces = (add_vertical_faces_it->second != 0.0);
+       }
+
+       double building_height = 0.0;
+       auto building_height_it = params.find("building_height");
+       if (building_height_it != params.end()) {
+         building_height = building_height_it->second;
+       }
+
+       int ridge_edge = 0;
+       auto ridge_edge_it = params.find("ridge_edge");
+       if (ridge_edge_it != params.end()) {
+         ridge_edge = static_cast<int>(ridge_edge_it->second);
+       }
+
+       // Create a ridge line along specified edge of the polygon
+       const auto &ring = polygon->exteriorRing();
+       if (ring.numPoints() < 4) {
+         std::cerr << "Error: Polygon must have at least 3 vertices\\n";
+         return std::nullopt;
+       }
+
+       // Validate ridge_edge index
+       int num_edges = static_cast<int>(ring.numPoints()) - 1;
+       if (ridge_edge < 0 || ridge_edge >= num_edges) {
+         std::cerr << "Error: ridge_edge must be between 0 and " << (num_edges - 1) << "\\n";
+         return std::nullopt;
+       }
+
+       // Use the specified edge as the ridge line (high edge)
+       auto point1 = ring.pointN(ridge_edge);
+       auto point2 = ring.pointN(ridge_edge + 1);
+       SFCGAL::LineString ridgeLine(point1, point2);
+
+       if (building_height == 0.0) {
+         // Just generate the skillion roof
+         return SFCGAL::algorithm::generateSkillionRoof(*polygon, ridgeLine, slope_angle, add_vertical_faces);
+       } else {
+         // Generate with building integration
+         return SFCGAL::algorithm::generateSkillionRoof(*polygon, ridgeLine, slope_angle, add_vertical_faces, building_height);
+       }
      }}};
 
 } // namespace
