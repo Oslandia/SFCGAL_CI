@@ -15,6 +15,7 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
+#include "SFCGAL/numeric.h"
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -27,26 +28,43 @@ namespace SFCGAL::io::OBJ {
 void
 save(const Geometry &geom, std::ostream &out)
 {
-  std::vector<Point>               all_points;
+  std::vector<Point>               unique_points;
   std::vector<std::vector<size_t>> all_faces;
   std::vector<std::vector<size_t>> all_lines;
   std::vector<size_t>              all_points_indices;
+
+  const auto epsilon_ft = SFCGAL::Kernel::FT(SFCGAL::EPSILON);
+
+  auto find_or_add_point = [&](const Point &p) -> size_t {
+    for (size_t i = 0; i < unique_points.size(); ++i) {
+      const auto &existing = unique_points[i];
+
+      if (almostEqual(p.x(), existing.x(), epsilon_ft) &&
+          almostEqual(p.y(), existing.y(), epsilon_ft) &&
+          almostEqual(p.is3D() ? p.z() : SFCGAL::Kernel::FT(0),
+                     existing.is3D() ? existing.z() : SFCGAL::Kernel::FT(0), epsilon_ft)) {
+        return i + 1; // OBJ uses 1-based indexing
+      }
+    }
+    unique_points.push_back(p);
+    return unique_points.size(); // OBJ uses 1-based indexing
+  };
 
   std::function<void(const Geometry &)> process_geometry =
       [&](const Geometry &g) {
         switch (g.geometryTypeId()) {
         case TYPE_POINT: {
           const auto &p = g.as<Point>();
-          all_points.push_back(p);
-          all_points_indices.push_back(all_points.size());
+          size_t idx = find_or_add_point(p);
+          all_points_indices.push_back(idx);
           break;
         }
         case TYPE_LINESTRING: {
           const auto         &ls = g.as<LineString>();
           std::vector<size_t> line;
           for (size_t i = 0; i < ls.numPoints(); ++i) {
-            all_points.push_back(ls.pointN(i));
-            line.push_back(all_points.size());
+            size_t idx = find_or_add_point(ls.pointN(i));
+            line.push_back(idx);
           }
           all_lines.push_back(line);
           break;
@@ -55,8 +73,8 @@ save(const Geometry &geom, std::ostream &out)
           const auto         &tri = g.as<Triangle>();
           std::vector<size_t> face;
           for (int i = 0; i < 3; ++i) {
-            all_points.push_back(tri.vertex(i));
-            face.push_back(all_points.size());
+            size_t idx = find_or_add_point(tri.vertex(i));
+            face.push_back(idx);
           }
           all_faces.push_back(face);
           break;
@@ -65,8 +83,8 @@ save(const Geometry &geom, std::ostream &out)
           const auto         &poly = g.as<Polygon>();
           std::vector<size_t> face;
           for (size_t i = 0; i < poly.exteriorRing().numPoints() - 1; ++i) {
-            all_points.push_back(poly.exteriorRing().pointN(i));
-            face.push_back(all_points.size());
+            size_t idx = find_or_add_point(poly.exteriorRing().pointN(i));
+            face.push_back(idx);
           }
           all_faces.push_back(face);
           break;
@@ -109,7 +127,7 @@ save(const Geometry &geom, std::ostream &out)
 
   process_geometry(geom);
 
-  for (const auto &p : all_points) {
+  for (const auto &p : unique_points) {
     out << "v " << p.x() << " " << p.y() << " " << (p.is3D() ? p.z() : 0.0)
         << "\n";
   }
