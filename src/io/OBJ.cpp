@@ -35,19 +35,51 @@ save(const Geometry &geom, std::ostream &out)
 
   const auto epsilon_ft = SFCGAL::Kernel::FT(SFCGAL::EPSILON);
 
-  auto find_or_add_point = [&](const Point &p) -> size_t {
-    for (size_t i = 0; i < unique_points.size(); ++i) {
-      const auto &existing = unique_points[i];
+  // Use spatial hashing for O(1) average lookup instead of O(n) linear search
+  std::map<std::tuple<long, long, long>, size_t> point_hash_map;
 
-      if (almostEqual(p.x(), existing.x(), epsilon_ft) &&
-          almostEqual(p.y(), existing.y(), epsilon_ft) &&
-          almostEqual(p.is3D() ? p.z() : SFCGAL::Kernel::FT(0),
-                     existing.is3D() ? existing.z() : SFCGAL::Kernel::FT(0), epsilon_ft)) {
-        return i + 1; // OBJ uses 1-based indexing
+  // Hash function that discretizes coordinates for epsilon-based comparison
+  auto hash_point = [&](const Point &p) -> std::tuple<long, long, long> {
+    constexpr double scale = 1e9; // Scale factor for hashing
+    auto x_hash = static_cast<long>(CGAL::to_double(p.x()) * scale);
+    auto y_hash = static_cast<long>(CGAL::to_double(p.y()) * scale);
+    auto z_hash = static_cast<long>(CGAL::to_double(p.is3D() ? p.z() : SFCGAL::Kernel::FT(0)) * scale);
+    return std::make_tuple(x_hash, y_hash, z_hash);
+  };
+
+  auto find_or_add_point = [&](const Point &p) -> size_t {
+    auto hash = hash_point(p);
+
+    // Check if we have points in nearby hash buckets (for epsilon tolerance)
+    for (int dx = -1; dx <= 1; ++dx) {
+      for (int dy = -1; dy <= 1; ++dy) {
+        for (int dz = -1; dz <= 1; ++dz) {
+          auto nearby_hash = std::make_tuple(
+            std::get<0>(hash) + dx,
+            std::get<1>(hash) + dy,
+            std::get<2>(hash) + dz
+          );
+
+          auto it = point_hash_map.find(nearby_hash);
+          if (it != point_hash_map.end()) {
+            const auto &existing = unique_points[it->second - 1]; // Convert from 1-based
+
+            if (almostEqual(p.x(), existing.x(), epsilon_ft) &&
+                almostEqual(p.y(), existing.y(), epsilon_ft) &&
+                almostEqual(p.is3D() ? p.z() : SFCGAL::Kernel::FT(0),
+                           existing.is3D() ? existing.z() : SFCGAL::Kernel::FT(0), epsilon_ft)) {
+              return it->second; // Already 1-based
+            }
+          }
+        }
       }
     }
+
+    // Add new point
     unique_points.push_back(p);
-    return unique_points.size(); // OBJ uses 1-based indexing
+    size_t index = unique_points.size(); // 1-based indexing
+    point_hash_map[hash] = index;
+    return index;
   };
 
   std::function<void(const Geometry &)> process_geometry =
@@ -127,30 +159,41 @@ save(const Geometry &geom, std::ostream &out)
 
   process_geometry(geom);
 
+  // Use buffered output for better I/O performance with large meshes
+  std::ostringstream buffer;
+  buffer.precision(out.precision());
+
+  // Write vertices
   for (const auto &p : unique_points) {
-    out << "v " << p.x() << " " << p.y() << " " << (p.is3D() ? p.z() : 0.0)
-        << "\n";
+    buffer << "v " << p.x() << " " << p.y() << " " << (p.is3D() ? p.z() : 0.0)
+           << "\n";
   }
 
+  // Write points
   for (size_t idx : all_points_indices) {
-    out << "p " << idx << "\n";
+    buffer << "p " << idx << "\n";
   }
 
+  // Write lines
   for (const auto &line : all_lines) {
-    out << "l";
+    buffer << "l";
     for (size_t idx : line) {
-      out << " " << idx;
+      buffer << " " << idx;
     }
-    out << "\n";
+    buffer << "\n";
   }
 
+  // Write faces
   for (const auto &face : all_faces) {
-    out << "f";
+    buffer << "f";
     for (size_t idx : face) {
-      out << " " << idx;
+      buffer << " " << idx;
     }
-    out << "\n";
+    buffer << "\n";
   }
+
+  // Write all buffered content at once
+  out << buffer.str();
 }
 
 void
