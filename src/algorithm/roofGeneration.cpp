@@ -14,6 +14,7 @@
 #include "SFCGAL/Triangle.h"
 
 #include "SFCGAL/Exception.h"
+#include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/extrude.h"
 #include "SFCGAL/algorithm/force2D.h"
 #include "SFCGAL/algorithm/intersection.h"
@@ -498,6 +499,15 @@ generateGableRoofAuto(const Polygon &footprint, double slopeAngle,
       const auto &v1 = triangle->vertex(0);
       const auto &v2 = triangle->vertex(1);
       const auto &v3 = triangle->vertex(2);
+
+      // Check if triangle centroid is inside the original polygon
+      Point centroid((v1.x() + v2.x() + v3.x()) / 3.0,
+                     (v1.y() + v2.y() + v3.y()) / 3.0, 0.0);
+
+      // Use SFCGAL's covers algorithm to check if centroid is inside footprint
+      if (!SFCGAL::algorithm::covers(footprint, centroid)) {
+        continue; // Skip triangles outside the original polygon
+      }
 
       // Create new vertices with proper Z coordinates
       Point newV1(v1.x(), v1.y(), 0.0);
