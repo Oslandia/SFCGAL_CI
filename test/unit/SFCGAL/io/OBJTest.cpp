@@ -193,8 +193,7 @@ BOOST_AUTO_TEST_CASE(test_complex_geometry)
 
   std::string result = SFCGAL::io::OBJ::saveToString(*geom);
 
-  std::string expected = "v 1 1 0\nv 0 0 0\nv 1 1 0\nv 0 0 0\nv 1 0 0\nv 1 1 "
-                         "0\nv 0 1 0\np 1\nl 2 3\nf 4 5 6 7\n";
+  std::string expected = "v 1 1 0\nv 0 0 0\nv 1 0 0\nv 0 1 0\np 1\nl 2 1\nf 2 3 1 4\n";
   BOOST_CHECK_EQUAL(result, expected);
 }
 
