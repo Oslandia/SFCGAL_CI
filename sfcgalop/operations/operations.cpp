@@ -68,6 +68,7 @@
 #include <SFCGAL/TriangulatedSurface.h>
 
 #include <CGAL/number_utils.h>
+#include <cctype>
 #include <cmath>
 
 #ifndef M_PI
@@ -122,6 +123,86 @@ parse_double(const std::string &str, double default_val = 0.0) -> double
   } catch (...) {
     return default_val;
   }
+}
+
+/**
+ * @brief Parse a string as a boolean value.
+ *
+ * Accepts various boolean representations in a case-insensitive manner:
+ * - "true", "t", "1" -> true
+ * - "false", "f", "0" -> false
+ *
+ * @param str String to parse as boolean
+ * @param default_val Default value to return if parsing fails
+ * @return Boolean value or default_val if parsing fails
+ */
+auto
+parse_boolean(const std::string &str, bool default_val = false) -> bool
+{
+  std::string lower_str = str;
+  std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(),
+                 [](unsigned char c) { return std::tolower(c); });
+
+  if (lower_str == "true" || lower_str == "t" || lower_str == "1") {
+    return true;
+  } else if (lower_str == "false" || lower_str == "f" || lower_str == "0") {
+    return false;
+  } else {
+    return default_val;
+  }
+}
+
+// Forward declaration for trim function
+auto
+trim(const std::string &str) -> std::string;
+
+/**
+ * @brief Extract and parse a boolean parameter from the parameter map.
+ *
+ * This function handles both string-based boolean parameters and legacy
+ * double-based parameters (where 0.0 = false, non-zero = true).
+ *
+ * @param params Parameter map from parse_params
+ * @param key Parameter name to extract
+ * @param param_str Original parameter string for string-based parsing
+ * @param default_val Default value if parameter not found
+ * @return Boolean value
+ */
+auto
+parse_boolean_param(const std::map<std::string, double> &params,
+                    const std::string &key, const std::string &param_str,
+                    bool default_val = false) -> bool
+{
+  auto it = params.find(key);
+  if (it == params.end()) {
+    return default_val;
+  }
+
+  // Try to extract the original string value from param_str for proper boolean
+  // parsing
+  std::string search_key = key + "=";
+  auto        key_pos    = param_str.find(search_key);
+  if (key_pos != std::string::npos) {
+    auto value_start = key_pos + search_key.length();
+    auto value_end   = param_str.find(',', value_start);
+    if (value_end == std::string::npos) {
+      value_end = param_str.length();
+    }
+    std::string value_str =
+        param_str.substr(value_start, value_end - value_start);
+    value_str = trim(value_str);
+
+    // If it looks like a string boolean, parse it as such
+    if (value_str == "true" || value_str == "false" || value_str == "t" ||
+        value_str == "f" || value_str == "T" || value_str == "F" ||
+        value_str == "True" || value_str == "False" || value_str == "TRUE" ||
+        value_str == "FALSE") {
+      return parse_boolean(value_str, default_val);
+    }
+  }
+
+  // Fallback to legacy double-based boolean conversion
+  return it->second != 0.0;
 }
 
 /**
@@ -432,14 +513,18 @@ const std::vector<Operation> operations = {
 
     {"straightskeleton", "Construction",
      "Compute the straight skeleton of a polygon", false,
-     "Parameters:\n  auto_orientation=0|1: Enable automatic orientation "
-     "correction (default: 0)\n\nExample:\n  sfcgalop -a \"POLYGON((0 0,4 0,4 "
-     "4,0 4,0 0))\" straightskeleton \"auto_orientation=1\"",
+     "Parameters:\n  auto_orientation=BOOL: Enable automatic orientation "
+     "correction (default: false)\n"
+     "                         Accepts: true/false, t/f, 1/0, TRUE/FALSE "
+     "(case-insensitive)\n\n"
+     "Example:\n  sfcgalop -a \"POLYGON((0 0,4 0,4 "
+     "4,0 4,0 0))\" straightskeleton \"auto_orientation=true\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto params          = parse_params(args);
-       bool autoOrientation = params["auto_orientation"] != 0.0;
+       auto params = parse_params(args);
+       bool autoOrientation =
+           parse_boolean_param(params, "auto_orientation", args, false);
        return SFCGAL::algorithm::straightSkeleton(*geom_a, autoOrientation);
      }},
 
@@ -1069,13 +1154,15 @@ const std::vector<Operation> operations = {
      "  slope_angle=ANGLE         - Roof slope angle in degrees (required)\n"
      "  building_height=HEIGHT    - Building height in units (optional, "
      "default=0.0)\n"
-     "  add_vertical_faces=1      - Add vertical triangular faces at ridge "
-     "endpoints (optional, default=0)\n\n"
+     "  add_vertical_faces=BOOL   - Add vertical triangular faces at ridge "
+     "endpoints (optional, default=false)\n"
+     "                              Accepts: true/false, t/f, 1/0, TRUE/FALSE "
+     "(case-insensitive)\n\n"
      "Examples:\n"
      "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" generate_gable_roof "
      "\"slope_angle=30.0\"\n"
      "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" generate_gable_roof "
-     "\"slope_angle=30.0,building_height=5.0,add_vertical_faces=1\"",
+     "\"slope_angle=30.0,building_height=5.0,add_vertical_faces=true\"",
      "A, params", "G",
      [](const std::string &params_str, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -1100,11 +1187,8 @@ const std::vector<Operation> operations = {
          building_height = building_height_it->second;
        }
 
-       bool add_vertical_faces = false;
-       auto vertical_faces_it  = params.find("add_vertical_faces");
-       if (vertical_faces_it != params.end()) {
-         add_vertical_faces = vertical_faces_it->second != 0.0;
-       }
+       bool add_vertical_faces =
+           parse_boolean_param(params, "add_vertical_faces", params_str, false);
 
        return SFCGAL::algorithm::generateGableRoof(
            *polygon, slope_angle, add_vertical_faces, building_height);
@@ -1234,8 +1318,10 @@ const std::vector<Operation> operations = {
      "Generate a skillion (shed) roof with single slope from ridge line", false,
      "Parameters:\\n"
      "  slope_angle=ANGLE         - Roof slope angle in degrees (required)\\n"
-     "  add_vertical_faces=1      - Add vertical triangular faces at roof ends "
-     "(optional, default=0)\\n"
+     "  add_vertical_faces=BOOL   - Add vertical triangular faces at roof ends "
+     "(optional, default=false)\\n"
+     "                              Accepts: true/false, t/f, 1/0, TRUE/FALSE "
+     "(case-insensitive)\\n"
      "  building_height=HEIGHT    - Building height in units (optional, "
      "default=0.0)\\n"
      "  ridge_edge=INDEX          - Edge index to use as ridge line (optional, "
@@ -1244,7 +1330,8 @@ const std::vector<Operation> operations = {
      "  sfcgalop -a \\\"POLYGON((0 0,10 0,10 6,0 6,0 0))\\\" "
      "generate_skillion_roof \\\"slope_angle=15.0\\\"\\n"
      "  sfcgalop -a \\\"POLYGON((0 0,10 0,10 6,0 6,0 0))\\\" "
-     "generate_skillion_roof \\\"slope_angle=15.0,add_vertical_faces=1\\\"\\n"
+     "generate_skillion_roof "
+     "\\\"slope_angle=15.0,add_vertical_faces=true\\\"\\n"
      "  sfcgalop -a \\\"POLYGON((0 0,10 0,10 6,0 6,0 0))\\\" "
      "generate_skillion_roof "
      "\\\"slope_angle=15.0,building_height=3.0,ridge_edge=1\\\"",
@@ -1280,11 +1367,8 @@ const std::vector<Operation> operations = {
          return std::nullopt;
        }
 
-       bool add_vertical_faces    = false;
-       auto add_vertical_faces_it = params.find("add_vertical_faces");
-       if (add_vertical_faces_it != params.end()) {
-         add_vertical_faces = (add_vertical_faces_it->second != 0.0);
-       }
+       bool add_vertical_faces =
+           parse_boolean_param(params, "add_vertical_faces", params_str, false);
 
        double building_height    = 0.0;
        auto   building_height_it = params.find("building_height");
