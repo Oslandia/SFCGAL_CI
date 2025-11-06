@@ -1309,7 +1309,7 @@ const std::vector<Operation> operations = {
            roof_height = 3.0; // Default roof height
          }
          // Note: Building height version still uses addHips for now - will be refactored later
-         return SFCGAL::algorithm::generateGableRoof(*polygon, building_height, roof_height, slope_angle, false, add_vertical_faces);
+         return SFCGAL::algorithm::generateGableRoof(*polygon, building_height, roof_height, slope_angle, add_vertical_faces);
        } else {
          return SFCGAL::algorithm::generateGableRoof(*polygon, slope_angle, add_vertical_faces);
        }

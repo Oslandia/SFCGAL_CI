@@ -20,6 +20,7 @@
 #include "SFCGAL/algorithm/straightSkeleton.h"
 #include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/length.h"
+#include "SFCGAL/algorithm/translate.h"
 #include "SFCGAL/triangulate/triangulate2DZ.h"
 
 #include <map>
@@ -1278,116 +1279,77 @@ generateGableRoofWithHeight(const Polygon &footprint, double roofHeight, bool ad
 }
 
 auto
-generateGableRoof(const Polygon &footprint, double buildingHeight, double roofHeight,
-                  double slopeAngle, bool addHips, bool addVerticalFaces)
-    -> std::unique_ptr<Geometry>
+generateGableRoofWithBuilding(const Polygon &footprint, double buildingHeight, double roofHeight,
+                             double slopeAngle, bool addVerticalFaces)
+    -> std::unique_ptr<PolyhedralSurface>
 {
-  // First generate the roof without vertical faces
-  auto result = generateGableRoof(footprint, buildingHeight, roofHeight, slopeAngle, addHips);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(footprint);
 
-  if (!addVerticalFaces) {
+  if (buildingHeight < 0.0) {
+    BOOST_THROW_EXCEPTION(Exception("Building height must be non-negative"));
+  }
+  if (roofHeight <= 0.0) {
+    BOOST_THROW_EXCEPTION(Exception("Roof height must be positive"));
+  }
+  if (slopeAngle <= 0.0 || slopeAngle >= 90.0) {
+    BOOST_THROW_EXCEPTION(Exception("Slope angle must be between 0 and 90 degrees"));
+  }
+
+  std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
+
+  if (footprint.isEmpty()) {
     return result;
   }
 
+  // Create complete roof using our unified implementation
+  auto completeRoof = generateGableRoofWithHeight(footprint, roofHeight, addVerticalFaces);
 
-  // For building+roof case, we need to extract the roof part and add vertical faces
-  // This is more complex as the result is a Solid, not just a PolyhedralSurface
-  // For now, we'll use the simpler approach and then combine with building
-  auto roof = generateGableRoof(footprint, slopeAngle, addVerticalFaces);
+  // Create new roof surface (excluding base faces)
+  auto roof = std::make_unique<PolyhedralSurface>();
 
-  // Scale the roof height to match the desired roofHeight
-  // Get the projected medial axis for ridge line computation
-  auto medialAxisProjected = projectMedialAxisToEdges(footprint);
-  if (medialAxisProjected && !medialAxisProjected->isEmpty()) {
-    LineString ridgeLine;
-    double maxLength = 0;
+  // Predicate to identify non-base faces (roof slopes and vertical faces)
+  auto isNotBaseFace = [](const Polygon &patch) -> bool {
+    const LineString &exterior = patch.exteriorRing();
 
-    for (size_t i = 0; i < medialAxisProjected->numGeometries(); ++i) {
-      const auto *line = dynamic_cast<const LineString *>(&medialAxisProjected->geometryN(i));
-      if (line && line->numPoints() >= 2) {
-        double length = algorithm::length(*line);
-        if (length > maxLength) {
-          maxLength = length;
-          ridgeLine = LineString();
-          for (size_t j = 0; j < line->numPoints(); ++j) {
-            ridgeLine.addPoint(line->pointN(j));
-          }
-        }
+    // Check if any point has z != 0 (not a base face)
+    return std::any_of(
+        exterior.begin(), exterior.end(),
+        [](const Point &point) -> bool { return point.z() != 0.0; });
+  };
+
+  // Copy roof patches (excluding base)
+  for (size_t i = 0; i < completeRoof->numPatches(); ++i) {
+    const auto &patch = completeRoof->patchN(i);
+    if (auto polygon = dynamic_cast<const Polygon*>(&patch)) {
+      if (isNotBaseFace(*polygon)) {
+        roof->addPatch(*polygon);
       }
-    }
-
-    if (ridgeLine.numPoints() >= 2) {
-      auto ridgeStart = ridgeLine.pointN(0);
-      auto exteriorRing = footprint.exteriorRing();
-
-      // Calculate the natural ridge height that was generated
-      double maxPerpDistance = 0.0;
-      auto ridgeEnd = ridgeLine.pointN(ridgeLine.numPoints() - 1);
-
-      for (size_t i = 0; i < exteriorRing.numPoints() - 1; ++i) {
-        auto edgeStart = exteriorRing.pointN(i);
-        auto edgeEnd = exteriorRing.pointN((i + 1) % (exteriorRing.numPoints() - 1));
-
-        auto ridgeVecX = ridgeEnd.x() - ridgeStart.x();
-        auto ridgeVecY = ridgeEnd.y() - ridgeStart.y();
-        double ridgeLength = std::sqrt(CGAL::to_double(ridgeVecX * ridgeVecX + ridgeVecY * ridgeVecY));
-
-        if (ridgeLength > 1e-10) {
-          auto ridgeNormX = ridgeVecX / ridgeLength;
-          auto ridgeNormY = ridgeVecY / ridgeLength;
-
-          auto dx1 = edgeStart.x() - ridgeStart.x();
-          auto dy1 = edgeStart.y() - ridgeStart.y();
-          double dist1 = std::abs(CGAL::to_double(dx1 * (-ridgeNormY) + dy1 * ridgeNormX));
-
-          auto dx2 = edgeEnd.x() - ridgeStart.x();
-          auto dy2 = edgeEnd.y() - ridgeStart.y();
-          double dist2 = std::abs(CGAL::to_double(dx2 * (-ridgeNormY) + dy2 * ridgeNormX));
-
-          maxPerpDistance = std::max({maxPerpDistance, dist1, dist2});
-        }
+    } else if (auto triangle = dynamic_cast<const Triangle*>(&patch)) {
+      // For triangles, check if any vertex has z != 0
+      if (triangle->vertex(0).z() != 0.0 ||
+          triangle->vertex(1).z() != 0.0 ||
+          triangle->vertex(2).z() != 0.0) {
+        roof->addPatch(*triangle);
       }
-
-      maxPerpDistance = std::max(maxPerpDistance, 1.0);
-      double naturalRidgeHeight = calculateRidgeHeight(maxPerpDistance, slopeAngle);
-      double heightScale = (naturalRidgeHeight > 0.0) ? roofHeight / naturalRidgeHeight : 1.0;
-
-      // Create a new roof with scaled z-coordinates - scale ALL patches including vertical faces
-      auto scaledRoof = std::make_unique<PolyhedralSurface>();
-      for (size_t i = 0; i < roof->numPatches(); ++i) {
-        auto& patch = roof->patchN(i);
-
-        // Handle both Polygon and Triangle patches
-        if (auto polygon = dynamic_cast<const Polygon*>(&patch)) {
-          auto& ring = polygon->exteriorRing();
-          std::vector<Point> scaledPoints;
-
-          for (size_t j = 0; j < ring.numPoints(); ++j) {
-            auto point = ring.pointN(j);
-            double newZ = CGAL::to_double(point.z()) * heightScale;
-            scaledPoints.emplace_back(point.x(), point.y(), newZ);
-          }
-
-          scaledRoof->addPatch(Polygon(LineString(scaledPoints)));
-        } else if (auto triangle = dynamic_cast<const Triangle*>(&patch)) {
-          // Scale triangle vertices too
-          auto v1 = triangle->vertex(0);
-          auto v2 = triangle->vertex(1);
-          auto v3 = triangle->vertex(2);
-
-          Point scaledV1(v1.x(), v1.y(), CGAL::to_double(v1.z()) * heightScale);
-          Point scaledV2(v2.x(), v2.y(), CGAL::to_double(v2.z()) * heightScale);
-          Point scaledV3(v3.x(), v3.y(), CGAL::to_double(v3.z()) * heightScale);
-
-          scaledRoof->addPatch(Triangle(scaledV1, scaledV2, scaledV3));
-        }
-      }
-      roof = std::move(scaledRoof);
     }
   }
 
-  // Combine with building base
-  return createBuildingWithRoof(footprint, buildingHeight, std::move(roof));
+  // Translate roof to building height
+  translate(*roof, 0.0, 0.0, buildingHeight);
+
+  // Create building walls
+  auto building = extrude(footprint, buildingHeight);
+
+  // Create result from building exterior shell
+  result = std::make_unique<PolyhedralSurface>(
+      building->as<Solid>().exteriorShell());
+
+  // Add filtered roof patches
+  result->addPatchs(*roof);
+
+  propagateValidityFlag(*result, true);
+
+  return result;
 }
 
 } // namespace SFCGAL::algorithm

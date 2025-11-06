@@ -51,6 +51,7 @@ struct RoofParameters {
   bool          addHips        = false;  ///< Add hip treatment for gable roofs
   bool          closeBase      = true;   ///< Include base polygon in output
   bool          generateSolid  = true;   ///< Generate closed Solid instead of PolyhedralSurface
+  double        overhang       = 0.0;    ///< Roof overhang distance beyond building walls
 };
 
 /**
@@ -195,12 +196,14 @@ generateGableRoof(const Polygon &footprint, double slopeAngle)
  * @param footprint The building footprint polygon
  * @param slopeAngle The roof slope angle in degrees (0-90)
  * @param addVerticalFaces Whether to add vertical faces at ridge line ends
+ * @param overhang Roof overhang distance beyond building walls (default: 0.0)
  * @return A PolyhedralSurface representing the gable roof
  * @pre footprint must be a valid polygon
  * @pre slopeAngle must be between 0 and 90 degrees
+ * @pre overhang >= 0.0
  */
 SFCGAL_API auto
-generateGableRoof(const Polygon &footprint, double slopeAngle, bool addVerticalFaces = false)
+generateGableRoof(const Polygon &footprint, double slopeAngle, bool addVerticalFaces = false, double overhang = 0.0)
     -> std::unique_ptr<PolyhedralSurface>;
 
 /**
@@ -218,6 +221,28 @@ generateGableRoof(const Polygon &footprint, double slopeAngle, bool addVerticalF
  */
 SFCGAL_API auto
 generateGableRoofWithHeight(const Polygon &footprint, double roofHeight, bool addVerticalFaces = false)
+    -> std::unique_ptr<PolyhedralSurface>;
+
+/**
+ * @brief Generate a complete building with gable roof.
+ *
+ * Creates a building with walls and a gable roof on top. The roof is positioned
+ * at the specified building height and has the specified roof height.
+ *
+ * @param footprint The building footprint polygon
+ * @param buildingHeight Height of the building walls
+ * @param roofHeight Maximum height of the roof above the building base
+ * @param slopeAngle The roof slope angle in degrees (0-90)
+ * @param addVerticalFaces Whether to add vertical faces at ridge line ends
+ * @return A PolyhedralSurface representing the complete building with roof
+ * @pre footprint must be a valid polygon
+ * @pre buildingHeight >= 0
+ * @pre roofHeight > 0
+ * @pre slopeAngle must be between 0 and 90 degrees
+ */
+SFCGAL_API auto
+generateGableRoofWithBuilding(const Polygon &footprint, double buildingHeight, double roofHeight,
+                             double slopeAngle, bool addVerticalFaces = false)
     -> std::unique_ptr<PolyhedralSurface>;
 
 /**
