@@ -511,7 +511,8 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesRectangle)
   std::unique_ptr<Geometry> g(
       io::readWkt("POLYGON ((0 0, 10 0, 10 6, 0 6, 0 0))"));
 
-  std::unique_ptr<MultiLineString> result(algorithm::projectMedialAxisToEdges(*g));
+  std::unique_ptr<MultiLineString> result(
+      algorithm::projectMedialAxisToEdges(*g));
 
   // Should have one continuous line from left edge to right edge
   BOOST_CHECK_EQUAL(result->numGeometries(), 1U);
@@ -539,7 +540,8 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesLShape)
   std::unique_ptr<Geometry> g(
       io::readWkt("POLYGON ((0 0, 6 0, 6 4, 3 4, 3 6, 0 6, 0 0))"));
 
-  std::unique_ptr<MultiLineString> result(algorithm::projectMedialAxisToEdges(*g));
+  std::unique_ptr<MultiLineString> result(
+      algorithm::projectMedialAxisToEdges(*g));
 
   // Should have 3 segments (vertical, horizontal connectors, and horizontal)
   BOOST_CHECK_EQUAL(result->numGeometries(), 3U);
@@ -554,7 +556,7 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesLShape)
   // - Vertical segment from top edge to junction
   // - Junction connection
   // - Horizontal segment from right edge to junction
-  bool foundVerticalExtension = false;
+  bool foundVerticalExtension   = false;
   bool foundHorizontalExtension = false;
 
   for (size_t i = 0; i < result->numGeometries(); ++i) {
@@ -563,7 +565,7 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesLShape)
     // Check for vertical extension (should reach y=6)
     if (line.numPoints() >= 3) {
       double maxY = std::max(CGAL::to_double(line.startPoint().y()),
-                            CGAL::to_double(line.endPoint().y()));
+                             CGAL::to_double(line.endPoint().y()));
       if (maxY > 5.9) {
         foundVerticalExtension = true;
       }
@@ -572,7 +574,7 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesLShape)
     // Check for horizontal extension (should reach x=6)
     if (line.numPoints() >= 3) {
       double maxX = std::max(CGAL::to_double(line.startPoint().x()),
-                            CGAL::to_double(line.endPoint().x()));
+                             CGAL::to_double(line.endPoint().x()));
       if (maxX > 5.9) {
         foundHorizontalExtension = true;
       }
@@ -588,36 +590,37 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesTShape)
   std::unique_ptr<Geometry> g(
       io::readWkt("POLYGON ((0 0, 10 0, 10 3, 6 3, 6 6, 3 6, 3 3, 0 3, 0 0))"));
 
-  std::unique_ptr<MultiLineString> result(algorithm::projectMedialAxisToEdges(*g));
+  std::unique_ptr<MultiLineString> result(
+      algorithm::projectMedialAxisToEdges(*g));
 
   // Should have 3 segments for T-shape
   BOOST_CHECK_EQUAL(result->numGeometries(), 3U);
 
   // Check that we have extensions to all 3 branches
-  bool foundLeftExtension = false;
+  bool foundLeftExtension  = false;
   bool foundRightExtension = false;
-  bool foundTopExtension = false;
+  bool foundTopExtension   = false;
 
   for (size_t i = 0; i < result->numGeometries(); ++i) {
     const auto &line = result->geometryN(i).as<LineString>();
 
     // Check for left extension (should reach x=0)
     double minX = std::min(CGAL::to_double(line.startPoint().x()),
-                          CGAL::to_double(line.endPoint().x()));
+                           CGAL::to_double(line.endPoint().x()));
     if (minX < 0.1) {
       foundLeftExtension = true;
     }
 
     // Check for right extension (should reach x=10)
     double maxX = std::max(CGAL::to_double(line.startPoint().x()),
-                          CGAL::to_double(line.endPoint().x()));
+                           CGAL::to_double(line.endPoint().x()));
     if (maxX > 9.9) {
       foundRightExtension = true;
     }
 
     // Check for top extension (should reach y=6)
     double maxY = std::max(CGAL::to_double(line.startPoint().y()),
-                          CGAL::to_double(line.endPoint().y()));
+                           CGAL::to_double(line.endPoint().y()));
     if (maxY > 5.9) {
       foundTopExtension = true;
     }
@@ -630,8 +633,9 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesTShape)
 
 BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesEmptyPolygon)
 {
-  std::unique_ptr<Geometry> g(io::readWkt("POLYGON EMPTY"));
-  std::unique_ptr<MultiLineString> result(algorithm::projectMedialAxisToEdges(*g));
+  std::unique_ptr<Geometry>        g(io::readWkt("POLYGON EMPTY"));
+  std::unique_ptr<MultiLineString> result(
+      algorithm::projectMedialAxisToEdges(*g));
 
   BOOST_CHECK(result->isEmpty());
   BOOST_CHECK_EQUAL(result->numGeometries(), 0U);

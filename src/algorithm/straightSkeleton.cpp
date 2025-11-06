@@ -407,7 +407,6 @@ approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>
   return mx;
 }
 
-
 /**
  * @brief Find intersection of ray from point in direction with polygon boundary
  * @param point Starting point of the ray
@@ -416,10 +415,11 @@ approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>
  * @return Point of intersection with boundary
  */
 Point
-findBoundaryIntersection(const Point &point, const Point &direction, const LineString &boundary)
+findBoundaryIntersection(const Point &point, const Point &direction,
+                         const LineString &boundary)
 {
-  Point closestIntersection = point;
-  Kernel::FT minDistance = std::numeric_limits<double>::max();
+  Point      closestIntersection = point;
+  Kernel::FT minDistance         = std::numeric_limits<double>::max();
 
   // Extract direction components
   Kernel::FT dirX = direction.x();
@@ -437,7 +437,7 @@ findBoundaryIntersection(const Point &point, const Point &direction, const LineS
   // Check intersection with each edge of the boundary
   for (size_t i = 0; i < boundary.numPoints() - 1; ++i) {
     const Point &edgeStart = boundary.pointN(i);
-    const Point &edgeEnd = boundary.pointN(i + 1);
+    const Point &edgeEnd   = boundary.pointN(i + 1);
 
     // Edge vector
     Kernel::FT edgeX = edgeEnd.x() - edgeStart.x();
@@ -459,14 +459,15 @@ findBoundaryIntersection(const Point &point, const Point &direction, const LineS
     Kernel::FT t = (dx * edgeY - dy * edgeX) / det;
     Kernel::FT s = (dx * dirY - dy * dirX) / det;
 
-    // Check if intersection is valid (t > 0 means forward direction, 0 <= s <= 1 means on edge)
+    // Check if intersection is valid (t > 0 means forward direction, 0 <= s <=
+    // 1 means on edge)
     if (t > 1e-10 && s >= -1e-10 && s <= 1 + 1e-10) {
       // Calculate intersection point
       Point intersection(point.x() + t * dirX, point.y() + t * dirY);
 
       Kernel::FT dist = t;
       if (dist < minDistance) {
-        minDistance = dist;
+        minDistance         = dist;
         closestIntersection = intersection;
       }
     }
@@ -476,7 +477,8 @@ findBoundaryIntersection(const Point &point, const Point &direction, const LineS
 }
 
 auto
-projectMedialAxisToEdges(const Geometry &geom) -> std::unique_ptr<MultiLineString>
+projectMedialAxisToEdges(const Geometry &geom)
+    -> std::unique_ptr<MultiLineString>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geom);
 
@@ -497,7 +499,7 @@ projectMedialAxisToEdges(const Geometry &geom) -> std::unique_ptr<MultiLineStrin
   }
 
   // Step 2: Identify free endpoints and calculate their extensions
-  std::map<Point, int> pointCount; // Count how many segments use each point
+  std::map<Point, int>   pointCount; // Count how many segments use each point
   std::map<Point, Point> pointDirections; // Direction for each endpoint
   std::map<Point, Point> projectedPoints; // Extensions for free endpoints
 
@@ -507,25 +509,25 @@ projectMedialAxisToEdges(const Geometry &geom) -> std::unique_ptr<MultiLineStrin
     if (const auto *ls = dynamic_cast<const LineString *>(&geomRef)) {
       if (ls->numPoints() >= 2) {
         const Point &start = ls->startPoint();
-        const Point &end = ls->endPoint();
+        const Point &end   = ls->endPoint();
 
         pointCount[start]++;
         pointCount[end]++;
 
         // Store direction for start point (away from segment)
         if (ls->numPoints() >= 2) {
-          Point second = ls->pointN(1);
-          Kernel::FT dirX = start.x() - second.x();
-          Kernel::FT dirY = start.y() - second.y();
+          Point      second      = ls->pointN(1);
+          Kernel::FT dirX        = start.x() - second.x();
+          Kernel::FT dirY        = start.y() - second.y();
           pointDirections[start] = Point(dirX, dirY);
         }
 
         // Store direction for end point (away from segment)
         if (ls->numPoints() >= 2) {
-          Point secondLast = ls->pointN(ls->numPoints() - 2);
-          Kernel::FT dirX = end.x() - secondLast.x();
-          Kernel::FT dirY = end.y() - secondLast.y();
-          pointDirections[end] = Point(dirX, dirY);
+          Point      secondLast = ls->pointN(ls->numPoints() - 2);
+          Kernel::FT dirX       = end.x() - secondLast.x();
+          Kernel::FT dirY       = end.y() - secondLast.y();
+          pointDirections[end]  = Point(dirX, dirY);
         }
       }
     }
@@ -536,11 +538,12 @@ projectMedialAxisToEdges(const Geometry &geom) -> std::unique_ptr<MultiLineStrin
 
   for (const auto &pair : pointCount) {
     if (pair.second == 1) { // Free endpoint
-      const Point &endpoint = pair.first;
+      const Point &endpoint  = pair.first;
       const Point &direction = pointDirections[endpoint];
 
       // Find closest intersection with polygon boundary in the direction
-      Point projection = findBoundaryIntersection(endpoint, direction, boundary);
+      Point projection =
+          findBoundaryIntersection(endpoint, direction, boundary);
 
       if (distance(endpoint, projection) > 1e-10) {
         projectedPoints[endpoint] = projection;
@@ -558,7 +561,7 @@ projectMedialAxisToEdges(const Geometry &geom) -> std::unique_ptr<MultiLineStrin
         std::unique_ptr<LineString> extendedLine(new LineString);
 
         const Point &start = ls->startPoint();
-        const Point &end = ls->endPoint();
+        const Point &end   = ls->endPoint();
 
         // Add projection at start if it's a free endpoint
         if (projectedPoints.find(start) != projectedPoints.end()) {

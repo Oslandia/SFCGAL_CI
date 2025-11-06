@@ -16,19 +16,22 @@ using namespace SFCGAL::algorithm;
 BOOST_AUTO_TEST_SUITE(RoofGenerationTests)
 
 // Utility function to create polygon from WKT
-auto createPolygonFromWKT(const std::string &wkt) -> std::unique_ptr<Polygon>
+auto
+createPolygonFromWKT(const std::string &wkt) -> std::unique_ptr<Polygon>
 {
   auto geom = io::readWkt(wkt);
   if (geom->geometryTypeId() == TYPE_POLYGON) {
-    return std::unique_ptr<Polygon>(static_cast<Polygon*>(geom.release()));
+    return std::unique_ptr<Polygon>(static_cast<Polygon *>(geom.release()));
   }
   return nullptr;
 }
 
 // Test geometry shapes
-const std::string L_SHAPE = "POLYGON((0 0, 10 0, 10 3, 6 3, 6 6, 3 6, 3 3, 0 3, 0 0))";
-const std::string L_SHAPE_3D = "POLYGON((0 0 0, 6 0 0, 6 4 0, 3 4 0, 3 6 0, 0 6 0, 0 0 0))";
-const std::string RECTANGLE = "POLYGON((0 0,10 0,10 6,0 6,0 0))";
+const std::string L_SHAPE =
+    "POLYGON((0 0, 10 0, 10 3, 6 3, 6 6, 3 6, 3 3, 0 3, 0 0))";
+const std::string L_SHAPE_3D =
+    "POLYGON((0 0 0, 6 0 0, 6 4 0, 3 4 0, 3 6 0, 0 6 0, 0 0 0))";
+const std::string RECTANGLE     = "POLYGON((0 0,10 0,10 6,0 6,0 0))";
 const std::string EMPTY_POLYGON = "POLYGON EMPTY";
 
 // ========================================================================
@@ -39,10 +42,10 @@ BOOST_AUTO_TEST_CASE(testCalculateRidgeHeight)
 {
   // Test basic height calculation
   double height = calculateRidgeHeight(10.0, 30.0); // 10m distance, 30° slope
-  BOOST_CHECK_CLOSE(height, 5.773, 0.1); // tan(30°) ≈ 0.577
+  BOOST_CHECK_CLOSE(height, 5.773, 0.1);            // tan(30°) ≈ 0.577
 
   height = calculateRidgeHeight(10.0, 45.0); // 10m distance, 45° slope
-  BOOST_CHECK_CLOSE(height, 10.0, 0.1); // tan(45°) = 1.0
+  BOOST_CHECK_CLOSE(height, 10.0, 0.1);      // tan(45°) = 1.0
 
   // Test edge cases
   BOOST_CHECK_THROW(calculateRidgeHeight(10.0, 0.0), Exception);
@@ -54,11 +57,12 @@ BOOST_AUTO_TEST_CASE(testCalculateRidgeHeight)
 BOOST_AUTO_TEST_CASE(testCalculateHorizontalDistance)
 {
   // Test basic distance calculation
-  double distance = calculateHorizontalDistance(10.0, 45.0); // 10m height, 45° slope
-  BOOST_CHECK_CLOSE(distance, 10.0, 0.1); // cot(45°) = 1.0
+  double distance =
+      calculateHorizontalDistance(10.0, 45.0); // 10m height, 45° slope
+  BOOST_CHECK_CLOSE(distance, 10.0, 0.1);      // cot(45°) = 1.0
 
   distance = calculateHorizontalDistance(5.773, 30.0); // height for 30° slope
-  BOOST_CHECK_CLOSE(distance, 10.0, 0.1); // cot(30°) ≈ 1.732
+  BOOST_CHECK_CLOSE(distance, 10.0, 0.1);              // cot(30°) ≈ 1.732
 
   // Test edge cases
   BOOST_CHECK_THROW(calculateHorizontalDistance(10.0, 0.0), Exception);
@@ -178,7 +182,8 @@ BOOST_AUTO_TEST_CASE(testGenerateGableRoof_InvalidBuildingHeight)
   BOOST_REQUIRE(footprint != nullptr);
 
   // Test negative building height
-  BOOST_CHECK_THROW(generateGableRoof(*footprint, 30.0, false, -1.0), Exception);
+  BOOST_CHECK_THROW(generateGableRoof(*footprint, 30.0, false, -1.0),
+                    Exception);
 }
 
 BOOST_AUTO_TEST_CASE(testGenerateGableRoof_EmptyPolygon)
@@ -216,7 +221,7 @@ BOOST_AUTO_TEST_CASE(testGenerateFlatRoof_Rectangle_RoofOnly)
 
   // Test flat roof using generateRoof with FLAT type
   RoofParameters params;
-  params.type = RoofType::FLAT;
+  params.type   = RoofType::FLAT;
   params.height = 2.0;
 
   auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -234,7 +239,7 @@ BOOST_AUTO_TEST_CASE(testGenerateFlatRoof_LShape_RoofOnly)
   LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::FLAT;
+  params.type   = RoofType::FLAT;
   params.height = 1.8;
 
   auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -252,7 +257,7 @@ BOOST_AUTO_TEST_CASE(testGenerateFlatRoof_LShape3D_RoofOnly)
   LineString ridgeLine(Point(0, 3, 0), Point(6, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::FLAT;
+  params.type   = RoofType::FLAT;
   params.height = 2.2;
 
   auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -273,7 +278,7 @@ BOOST_AUTO_TEST_CASE(testGenerateFlatRoof_VariousHeights)
 
   for (double height : heights) {
     RoofParameters params;
-    params.type = RoofType::FLAT;
+    params.type   = RoofType::FLAT;
     params.height = height;
 
     auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -290,7 +295,7 @@ BOOST_AUTO_TEST_CASE(testGenerateFlatRoof_InvalidHeight)
   LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::FLAT;
+  params.type   = RoofType::FLAT;
   params.height = -1.0; // Invalid negative height
 
   // Negative height may be handled gracefully or throw exception
@@ -298,7 +303,7 @@ BOOST_AUTO_TEST_CASE(testGenerateFlatRoof_InvalidHeight)
   try {
     auto roof = generateRoof(*footprint, ridgeLine, params);
     BOOST_CHECK(roof != nullptr);
-  } catch (const Exception&) {
+  } catch (const Exception &) {
     // Exception is also acceptable for invalid input
     BOOST_CHECK(true);
   }
@@ -312,14 +317,14 @@ BOOST_AUTO_TEST_CASE(testGenerateFlatRoof_EmptyPolygon)
   LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::FLAT;
+  params.type   = RoofType::FLAT;
   params.height = 2.0;
 
   // Should handle empty geometry gracefully
   try {
     auto roof = generateRoof(*footprint, ridgeLine, params);
     BOOST_CHECK(roof != nullptr);
-  } catch (const Exception&) {
+  } catch (const Exception &) {
     // Exception is also acceptable for empty input
     BOOST_CHECK(true);
   }
@@ -339,7 +344,7 @@ BOOST_AUTO_TEST_CASE(testGenerateHippedRoof_Rectangle_RoofOnly)
 
   // Test hipped roof using generateRoof with HIPPED type
   RoofParameters params;
-  params.type = RoofType::HIPPED;
+  params.type   = RoofType::HIPPED;
   params.height = 3.0;
 
   auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -357,7 +362,7 @@ BOOST_AUTO_TEST_CASE(testGenerateHippedRoof_LShape_RoofOnly)
   LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::HIPPED;
+  params.type   = RoofType::HIPPED;
   params.height = 2.8;
 
   auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -375,7 +380,7 @@ BOOST_AUTO_TEST_CASE(testGenerateHippedRoof_LShape3D_RoofOnly)
   LineString ridgeLine(Point(0, 3, 0), Point(6, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::HIPPED;
+  params.type   = RoofType::HIPPED;
   params.height = 3.2;
 
   auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -396,7 +401,7 @@ BOOST_AUTO_TEST_CASE(testGenerateHippedRoof_VariousHeights)
 
   for (double height : heights) {
     RoofParameters params;
-    params.type = RoofType::HIPPED;
+    params.type   = RoofType::HIPPED;
     params.height = height;
 
     auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -413,14 +418,14 @@ BOOST_AUTO_TEST_CASE(testGenerateHippedRoof_InvalidHeight)
   LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::HIPPED;
+  params.type   = RoofType::HIPPED;
   params.height = -1.0; // Invalid negative height
 
   // Negative height may be handled gracefully or throw exception
   try {
     auto roof = generateRoof(*footprint, ridgeLine, params);
     BOOST_CHECK(roof != nullptr);
-  } catch (const Exception&) {
+  } catch (const Exception &) {
     // Exception is also acceptable for invalid input
     BOOST_CHECK(true);
   }
@@ -434,14 +439,14 @@ BOOST_AUTO_TEST_CASE(testGenerateHippedRoof_EmptyPolygon)
   LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::HIPPED;
+  params.type   = RoofType::HIPPED;
   params.height = 3.0;
 
   // Should handle empty geometry gracefully
   try {
     auto roof = generateRoof(*footprint, ridgeLine, params);
     BOOST_CHECK(roof != nullptr);
-  } catch (const Exception&) {
+  } catch (const Exception &) {
     // Exception is also acceptable for empty input
     BOOST_CHECK(true);
   }
@@ -460,8 +465,8 @@ BOOST_AUTO_TEST_CASE(testGeneratePitchedRoof_Rectangle_RoofOnly)
   LineString ridgeLine(Point(2, 3, 0), Point(8, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::PITCHED;
-  params.slopeAngle = 30.0;
+  params.type          = RoofType::PITCHED;
+  params.slopeAngle    = 30.0;
   params.ridgePosition = RidgePosition::INTERIOR;
 
   auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -480,8 +485,8 @@ BOOST_AUTO_TEST_CASE(testGeneratePitchedRoof_LShape_RoofOnly)
   LineString ridgeLine(Point(1, 3, 0), Point(5, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::PITCHED;
-  params.slopeAngle = 25.0;
+  params.type          = RoofType::PITCHED;
+  params.slopeAngle    = 25.0;
   params.ridgePosition = RidgePosition::INTERIOR;
 
   auto roof = generateRoof(*footprint, ridgeLine, params);
@@ -497,20 +502,19 @@ BOOST_AUTO_TEST_CASE(testGeneratePitchedRoof_VariousRidgePositions)
 
   // Test different ridge positions
   struct TestCase {
-    LineString ridgeLine;
+    LineString    ridgeLine;
     RidgePosition position;
   };
 
   std::vector<TestCase> testCases = {
-    {LineString(Point(2, 3, 0), Point(8, 3, 0)), RidgePosition::INTERIOR},
-    {LineString(Point(0, 0, 0), Point(10, 0, 0)), RidgePosition::EDGE},
-    {LineString(Point(-1, 3, 0), Point(11, 3, 0)), RidgePosition::EXTERIOR}
-  };
+      {LineString(Point(2, 3, 0), Point(8, 3, 0)), RidgePosition::INTERIOR},
+      {LineString(Point(0, 0, 0), Point(10, 0, 0)), RidgePosition::EDGE},
+      {LineString(Point(-1, 3, 0), Point(11, 3, 0)), RidgePosition::EXTERIOR}};
 
-  for (const auto& testCase : testCases) {
+  for (const auto &testCase : testCases) {
     RoofParameters params;
-    params.type = RoofType::PITCHED;
-    params.slopeAngle = 30.0;
+    params.type          = RoofType::PITCHED;
+    params.slopeAngle    = 30.0;
     params.ridgePosition = testCase.position;
 
     auto roof = generateRoof(*footprint, testCase.ridgeLine, params);
@@ -527,7 +531,7 @@ BOOST_AUTO_TEST_CASE(testGeneratePitchedRoof_InvalidSlopeAngle)
   LineString ridgeLine(Point(2, 3, 0), Point(8, 3, 0));
 
   RoofParameters params;
-  params.type = RoofType::PITCHED;
+  params.type       = RoofType::PITCHED;
   params.slopeAngle = -10.0; // Invalid negative angle
 
   BOOST_CHECK_THROW(generateRoof(*footprint, ridgeLine, params), Exception);
@@ -542,8 +546,9 @@ BOOST_AUTO_TEST_CASE(testUnsupportedGeometryTypes)
   // Test with Point geometry (unsupported) - generateRoof expects Polygon
   Point point(0, 0);
 
-  // Note: generateRoof expects Polygon as parameter, so Point test would be compilation error
-  // This test validates that the function signature enforces correct geometry types
+  // Note: generateRoof expects Polygon as parameter, so Point test would be
+  // compilation error This test validates that the function signature enforces
+  // correct geometry types
   BOOST_CHECK(true); // Compilation itself validates type safety
 }
 
@@ -556,27 +561,24 @@ BOOST_AUTO_TEST_CASE(testZeroHeightParameters)
 
   // Test zero height for flat roof
   RoofParameters flatParams;
-  flatParams.type = RoofType::FLAT;
+  flatParams.type   = RoofType::FLAT;
   flatParams.height = 0.0;
 
   // Should this be allowed? Depends on implementation
   // auto flatRoof = generateRoof(*footprint, ridgeLine, flatParams);
 
   // Test gable roof (roof only mode)
-  auto gableRoof = generateGableRoof(*footprint, 30.0, false, 0.0); // building_height = 0 (roof only)
-  BOOST_CHECK(gableRoof != nullptr); // Should work (roof only mode)
+  auto gableRoof = generateGableRoof(*footprint, 30.0, false,
+                                     0.0); // building_height = 0 (roof only)
+  BOOST_CHECK(gableRoof != nullptr);       // Should work (roof only mode)
 }
 
 BOOST_AUTO_TEST_CASE(testComplexPolygonShapes)
 {
   // Test with various complex polygon shapes
-  std::vector<std::string> complex_shapes = {
-    L_SHAPE,
-    L_SHAPE_3D,
-    RECTANGLE
-  };
+  std::vector<std::string> complex_shapes = {L_SHAPE, L_SHAPE_3D, RECTANGLE};
 
-  for (const auto& shape_wkt : complex_shapes) {
+  for (const auto &shape_wkt : complex_shapes) {
     auto footprint = createPolygonFromWKT(shape_wkt);
     BOOST_REQUIRE(footprint != nullptr);
 
@@ -586,14 +588,14 @@ BOOST_AUTO_TEST_CASE(testComplexPolygonShapes)
     auto gable = generateGableRoof(*footprint, 30.0);
 
     RoofParameters flatParams;
-    flatParams.type = RoofType::FLAT;
+    flatParams.type   = RoofType::FLAT;
     flatParams.height = 2.0;
-    auto flat = generateRoof(*footprint, ridgeLine, flatParams);
+    auto flat         = generateRoof(*footprint, ridgeLine, flatParams);
 
     RoofParameters hippedParams;
-    hippedParams.type = RoofType::HIPPED;
+    hippedParams.type   = RoofType::HIPPED;
     hippedParams.height = 3.0;
-    auto hipped = generateRoof(*footprint, ridgeLine, hippedParams);
+    auto hipped         = generateRoof(*footprint, ridgeLine, hippedParams);
 
     BOOST_CHECK(gable != nullptr);
     BOOST_CHECK(flat != nullptr);
@@ -613,21 +615,22 @@ BOOST_AUTO_TEST_CASE(testParameterCombinations)
   // Test various parameter combinations for gable roof
   struct TestParams {
     double slope_angle;
-    bool add_vertical_faces;
+    bool   add_vertical_faces;
     double building_height;
   };
 
   std::vector<TestParams> test_cases = {
-    {15.0, false, 0.0},   // low slope, roof only
-    {30.0, true, 0.0},    // medium slope, roof with vertical faces
-    {45.0, false, 3.0},   // high slope, with building
-    {60.0, true, 5.0},    // steep slope, with building and vertical faces
-    {25.0, false, 2.5}    // mixed parameters
+      {15.0, false, 0.0}, // low slope, roof only
+      {30.0, true, 0.0},  // medium slope, roof with vertical faces
+      {45.0, false, 3.0}, // high slope, with building
+      {60.0, true, 5.0},  // steep slope, with building and vertical faces
+      {25.0, false, 2.5}  // mixed parameters
   };
 
-  for (const auto& params : test_cases) {
-    auto result = generateGableRoof(*footprint, params.slope_angle,
-                                   params.add_vertical_faces, params.building_height);
+  for (const auto &params : test_cases) {
+    auto result =
+        generateGableRoof(*footprint, params.slope_angle,
+                          params.add_vertical_faces, params.building_height);
     BOOST_CHECK(result != nullptr);
     BOOST_CHECK(!result->isEmpty());
   }
@@ -721,10 +724,14 @@ BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_InvalidSlopeAngles)
   LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
 
   // Test invalid slope angles
-  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 0.0), Exception);
-  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 90.0), Exception);
-  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, -5.0), Exception);
-  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 95.0), Exception);
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 0.0),
+                    Exception);
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 90.0),
+                    Exception);
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, -5.0),
+                    Exception);
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 95.0),
+                    Exception);
 }
 
 BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_InvalidBuildingHeight)
@@ -735,7 +742,8 @@ BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_InvalidBuildingHeight)
   LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
 
   // Test negative building height
-  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 20.0, -1.0), Exception);
+  BOOST_CHECK_THROW(generateSkillionRoof(*footprint, ridgeLine, 20.0, -1.0),
+                    Exception);
 }
 
 BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_EmptyPolygon)
@@ -759,7 +767,8 @@ BOOST_AUTO_TEST_CASE(testGenerateSkillionRoof_DistanceCalculation)
   // Ridge line along bottom edge (y=0)
   LineString ridgeLine(Point(0, 0, 0), Point(10, 0, 0));
 
-  auto roof = generateSkillionRoof(*footprint, ridgeLine, 30.0); // tan(30°) ≈ 0.577
+  auto roof =
+      generateSkillionRoof(*footprint, ridgeLine, 30.0); // tan(30°) ≈ 0.577
 
   BOOST_CHECK(roof != nullptr);
   BOOST_CHECK(!roof->isEmpty());
@@ -778,7 +787,7 @@ BOOST_AUTO_TEST_CASE(testSkillionRoof_VsOtherRoofTypes)
 
   // All roof types should produce valid geometry
   auto skillion = generateSkillionRoof(*footprint, ridgeLine, 25.0);
-  auto gable = generateGableRoof(*footprint, 25.0);
+  auto gable    = generateGableRoof(*footprint, 25.0);
 
   BOOST_CHECK(skillion != nullptr);
   BOOST_CHECK(!skillion->isEmpty());

@@ -41,7 +41,8 @@ approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>;
  * @throws Exception if geom is not a valid polygon
  */
 SFCGAL_API auto
-projectMedialAxisToEdges(const Geometry &geom) -> std::unique_ptr<MultiLineString>;
+projectMedialAxisToEdges(const Geometry &geom)
+    -> std::unique_ptr<MultiLineString>;
 
 /**
  * @brief build a 2D straight skeleton for a Polygon
