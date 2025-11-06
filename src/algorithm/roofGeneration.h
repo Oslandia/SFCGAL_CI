@@ -203,18 +203,22 @@ calculateHorizontalDistance(double height, double slopeAngle) -> double;
  * @brief Generate a gable roof automatically using medial axis
  *
  * This function automatically generates a gable roof by computing the
- * medial axis of the polygon and using it as the ridge line.
+ * medial axis of the polygon and using it as the ridge line. It can optionally
+ * combine with building extrusion to create a complete building with gable roof.
  *
  * @param footprint The building footprint polygon
  * @param slopeAngle The roof slope angle in degrees
  * @param addVerticalFaces Whether to add vertical triangular faces at ridge endpoints
- * @return A PolyhedralSurface representing the gable roof
+ * @param buildingHeight Height of the building walls (0 = roof only)
+ * @return A PolyhedralSurface representing the gable roof or complete building
  * @pre footprint must be a valid polygon
  * @pre slopeAngle must be between 0 and 90 degrees
+ * @pre buildingHeight must be non-negative
  */
 SFCGAL_API auto
-generateGableRoofAuto(const Polygon &footprint, double slopeAngle,
-                      bool addVerticalFaces = false) -> std::unique_ptr<PolyhedralSurface>;
+generateGableRoof(const Polygon &footprint, double slopeAngle,
+                  bool addVerticalFaces = false, double buildingHeight = 0.0)
+    -> std::unique_ptr<PolyhedralSurface>;
 
 } // namespace SFCGAL::algorithm
 

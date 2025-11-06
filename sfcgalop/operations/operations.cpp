@@ -1059,21 +1059,23 @@ const std::vector<Operation> operations = {
        return Constructors::make_solid(std::move(geom_copy));
      }},
 
-    // Roof Generation (only generateGableRoofAuto is implemented)
-    {"generate_gable_roof_auto", "Roof Generation",
+    // Roof Generation
+    {"generate_gable_roof", "Roof Generation",
      "Generate a gable roof using automatic medial axis ridge", false,
      "Parameters:\n"
-     "  slope_angle=ANGLE     - Roof slope angle in degrees (required)\n"
-     "  add_vertical_faces=1  - Add vertical triangular faces at ridge endpoints (optional, default=0)\n\n"
-     "Example:\n"
-     "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" generate_gable_roof_auto \"slope_angle=30.0,add_vertical_faces=1\"",
+     "  slope_angle=ANGLE         - Roof slope angle in degrees (required)\n"
+     "  building_height=HEIGHT    - Building height in units (optional, default=0.0)\n"
+     "  add_vertical_faces=1      - Add vertical triangular faces at ridge endpoints (optional, default=0)\n\n"
+     "Examples:\n"
+     "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" generate_gable_roof \"slope_angle=30.0\"\n"
+     "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" generate_gable_roof \"slope_angle=30.0,building_height=5.0,add_vertical_faces=1\"",
      "A, params", "G",
      [](const std::string &params_str, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
 
        const auto *polygon = dynamic_cast<const SFCGAL::Polygon *>(geom_a);
        if (!polygon) {
-         std::cerr << "Error: generate_gable_roof_auto requires a POLYGON input\n";
+         std::cerr << "Error: generate_gable_roof requires a POLYGON input\n";
          return std::nullopt;
        }
 
@@ -1086,13 +1088,129 @@ const std::vector<Operation> operations = {
        }
        double slope_angle = slope_angle_it->second;
 
+       double building_height = 0.0;
+       auto building_height_it = params.find("building_height");
+       if (building_height_it != params.end()) {
+         building_height = building_height_it->second;
+       }
+
        bool add_vertical_faces = false;
        auto vertical_faces_it = params.find("add_vertical_faces");
        if (vertical_faces_it != params.end()) {
          add_vertical_faces = vertical_faces_it->second != 0.0;
        }
 
-       return SFCGAL::algorithm::generateGableRoofAuto(*polygon, slope_angle, add_vertical_faces);
+       return SFCGAL::algorithm::generateGableRoof(*polygon, slope_angle, add_vertical_faces, building_height);
+     }},
+
+    {"generate_flat_roof", "Roof Generation",
+     "Generate a flat roof by extruding a polygon", false,
+     "Parameters:\n"
+     "  height=VALUE              - Roof height in units (required)\n"
+     "  building_height=HEIGHT    - Building height in units (optional, default=0.0)\n\n"
+     "Examples:\n"
+     "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" generate_flat_roof \"height=2.0\"\n"
+     "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" generate_flat_roof \"height=2.0,building_height=5.0\"",
+     "A, params", "G",
+     [](const std::string &params_str, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+
+       const auto *polygon = dynamic_cast<const SFCGAL::Polygon *>(geom_a);
+       if (!polygon) {
+         std::cerr << "Error: generate_flat_roof requires a POLYGON input\n";
+         return std::nullopt;
+       }
+
+       auto params = parse_params(params_str);
+
+       auto height_it = params.find("height");
+       if (height_it == params.end()) {
+         std::cerr << "Error: height parameter is required\n";
+         return std::nullopt;
+       }
+       double roof_height = height_it->second;
+
+       double building_height = 0.0;
+       auto building_height_it = params.find("building_height");
+       if (building_height_it != params.end()) {
+         building_height = building_height_it->second;
+       }
+
+       if (building_height == 0.0) {
+         // Just extrude the roof
+         return SFCGAL::algorithm::extrude(*polygon, 0, 0, roof_height);
+       } else {
+         // Combine with building
+         auto building = SFCGAL::algorithm::extrude(*polygon, 0, 0, building_height);
+         auto roof = SFCGAL::algorithm::extrude(*polygon, 0, 0, roof_height);
+
+         // Translate roof to building height
+         SFCGAL::algorithm::translate(*roof, 0, 0, building_height);
+
+         // Create combined result
+         auto result = std::make_unique<SFCGAL::PolyhedralSurface>(building->as<SFCGAL::Solid>().exteriorShell());
+         if (roof->geometryTypeId() == SFCGAL::TYPE_POLYHEDRALSURFACE) {
+           result->addPatchs(roof->as<SFCGAL::PolyhedralSurface>());
+         } else if (roof->geometryTypeId() == SFCGAL::TYPE_SOLID) {
+           result->addPatchs(roof->as<SFCGAL::Solid>().exteriorShell());
+         }
+         return result;
+       }
+     }},
+
+    {"generate_hipped_roof", "Roof Generation",
+     "Generate a hipped roof using straight skeleton extrusion", false,
+     "Parameters:\n"
+     "  height=VALUE              - Roof height in units (required)\n"
+     "  building_height=HEIGHT    - Building height in units (optional, default=0.0)\n\n"
+     "Examples:\n"
+     "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" generate_hipped_roof \"height=3.0\"\n"
+     "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" generate_hipped_roof \"height=3.0,building_height=5.0\"",
+     "A, params", "G",
+     [](const std::string &params_str, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+
+       const auto *polygon = dynamic_cast<const SFCGAL::Polygon *>(geom_a);
+       if (!polygon) {
+         std::cerr << "Error: generate_hipped_roof requires a POLYGON input\n";
+         return std::nullopt;
+       }
+
+       auto params = parse_params(params_str);
+
+       auto height_it = params.find("height");
+       if (height_it == params.end()) {
+         std::cerr << "Error: height parameter is required\n";
+         return std::nullopt;
+       }
+       double roof_height = height_it->second;
+
+       double building_height = 0.0;
+       auto building_height_it = params.find("building_height");
+       if (building_height_it != params.end()) {
+         building_height = building_height_it->second;
+       }
+
+       if (building_height == 0.0) {
+         // Just generate the hipped roof using straight skeleton
+         return SFCGAL::algorithm::extrudeStraightSkeleton(*polygon, roof_height);
+       } else {
+         // Combine with building
+         auto building = SFCGAL::algorithm::extrude(*polygon, 0, 0, building_height);
+         auto roof = SFCGAL::algorithm::extrudeStraightSkeleton(*polygon, roof_height);
+
+         // Translate roof to building height
+         SFCGAL::algorithm::translate(*roof, 0, 0, building_height);
+
+         // Create combined result
+         auto result = std::make_unique<SFCGAL::PolyhedralSurface>(building->as<SFCGAL::Solid>().exteriorShell());
+         if (roof->geometryTypeId() == SFCGAL::TYPE_POLYHEDRALSURFACE) {
+           result->addPatchs(roof->as<SFCGAL::PolyhedralSurface>());
+         } else if (roof->geometryTypeId() == SFCGAL::TYPE_SOLID) {
+           result->addPatchs(roof->as<SFCGAL::Solid>().exteriorShell());
+         }
+         return result;
+       }
      }}};
 
 } // namespace

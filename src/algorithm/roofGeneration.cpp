@@ -20,6 +20,7 @@
 #include "SFCGAL/algorithm/intersection.h"
 #include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/algorithm/straightSkeleton.h"
+#include "SFCGAL/algorithm/translate.h"
 #include "SFCGAL/triangulate/triangulate2DZ.h"
 
 #include <CGAL/Boolean_set_operations_2.h>
@@ -383,7 +384,7 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
   switch (params.type) {
   case RoofType::FLAT: {
     // Use extrude to create flat roof
-    auto extruded = extrude(footprint, params.height);
+    auto extruded = extrude(footprint, 0.0, 0.0, params.height);
     if (auto solid = dynamic_cast<const Solid*>(extruded.get())) {
       return std::make_unique<PolyhedralSurface>(solid->exteriorShell());
     }
@@ -416,7 +417,7 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
 {
   switch (params.type) {
   case RoofType::FLAT: {
-    auto extruded = extrude(footprint, params.height);
+    auto extruded = extrude(footprint, 0.0, 0.0, params.height);
     if (auto solid = dynamic_cast<const Solid*>(extruded.get())) {
       return std::make_unique<PolyhedralSurface>(solid->exteriorShell());
     }
@@ -440,13 +441,24 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
 }
 
 auto
-generateGableRoofAuto(const Polygon &footprint, double slopeAngle,
-                      bool addVerticalFaces) -> std::unique_ptr<PolyhedralSurface>
+generateGableRoof(const Polygon &footprint, double slopeAngle,
+                  bool addVerticalFaces, double buildingHeight)
+    -> std::unique_ptr<PolyhedralSurface>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(footprint);
 
   if (slopeAngle <= 0.0 || slopeAngle >= 90.0) {
     BOOST_THROW_EXCEPTION(Exception("Slope angle must be between 0 and 90 degrees"));
+  }
+
+  if (buildingHeight < 0.0) {
+    BOOST_THROW_EXCEPTION(Exception("Building height must be non-negative"));
+  }
+
+  std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
+
+  if (footprint.isEmpty()) {
+    return result;
   }
 
   // 1. Get projected medial axis to edges (this gives us the ridge line)
@@ -463,8 +475,6 @@ generateGableRoofAuto(const Polygon &footprint, double slopeAngle,
   SFCGAL::triangulate::triangulate2DZ(*projectedMedialAxis_clone, triangulation);
 
   auto triangulated_surface = triangulation.getTriangulatedSurface();
-
-  std::unique_ptr<PolyhedralSurface> result(new PolyhedralSurface);
 
   // 3. Collect all ridge points from projected medial axis
   std::vector<Point> ridgePoints;
@@ -491,6 +501,9 @@ generateGableRoofAuto(const Polygon &footprint, double slopeAngle,
 
   // Calculate ridge height from slope angle
   double ridgeHeight = std::tan(slopeAngle * M_PI / 180.0);
+
+  // Create roof surface
+  auto roof = std::make_unique<PolyhedralSurface>();
 
   // 4. Process triangulation and elevate ridge points
   for (size_t i = 0; i < triangulated_surface->numPatches(); ++i) {
@@ -527,7 +540,7 @@ generateGableRoofAuto(const Polygon &footprint, double slopeAngle,
 
       // Create roof triangle with elevated vertices
       std::unique_ptr<Triangle> roofTriangle(new Triangle(newV1, newV2, newV3));
-      result->addPatch(*roofTriangle);
+      roof->addPatch(*roofTriangle);
     }
   }
 
@@ -578,9 +591,29 @@ generateGableRoofAuto(const Polygon &footprint, double slopeAngle,
 
         // Create triangle: ridge_base -> ridge_top -> edge_base -> ridge_base
         std::unique_ptr<Triangle> verticalTri(new Triangle(ridgeBase, ridgeTop, edgeBase));
-        result->addPatch(*verticalTri);
+        roof->addPatch(*verticalTri);
       }
     }
+  }
+
+  // 6. Handle building integration
+  if (buildingHeight == 0.0) {
+    // Just return the roof
+    result = std::move(roof);
+  } else {
+    // Combine with building
+    // Translate roof to building height
+    translate(*roof, 0.0, 0.0, buildingHeight);
+
+    // Create building walls
+    auto building = extrude(footprint, buildingHeight);
+
+    // Create result from building exterior shell
+    result = std::make_unique<PolyhedralSurface>(
+        building->as<Solid>().exteriorShell());
+
+    // Add translated roof patches
+    result->addPatchs(*roof);
   }
 
   propagateValidityFlag(*result, true);
