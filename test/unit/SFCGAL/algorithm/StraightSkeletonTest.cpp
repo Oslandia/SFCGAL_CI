@@ -506,4 +506,141 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionNonPolygonGeometry)
   BOOST_CHECK_THROW(algorithm::straightSkeletonPartition(*g), std::exception);
 }
 
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesRectangle)
+{
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 6, 0 6, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result(algorithm::projectMedialAxisToEdges(*g));
+
+  // Should have one continuous line from left edge to right edge
+  BOOST_CHECK_EQUAL(result->numGeometries(), 1U);
+
+  const auto &line = result->geometryN(0).as<LineString>();
+  BOOST_CHECK_EQUAL(line.numPoints(), 4U);
+
+  // Check start point (left edge projection)
+  BOOST_CHECK_CLOSE(CGAL::to_double(line.startPoint().x()), 0.0, 1e-6);
+  BOOST_CHECK_CLOSE(CGAL::to_double(line.startPoint().y()), 3.0, 1e-6);
+
+  // Check end point (right edge projection)
+  BOOST_CHECK_CLOSE(CGAL::to_double(line.endPoint().x()), 10.0, 1e-6);
+  BOOST_CHECK_CLOSE(CGAL::to_double(line.endPoint().y()), 3.0, 1e-6);
+
+  // Check that medial axis points are included
+  BOOST_CHECK_CLOSE(CGAL::to_double(line.pointN(1).x()), 3.0, 1e-6);
+  BOOST_CHECK_CLOSE(CGAL::to_double(line.pointN(1).y()), 3.0, 1e-6);
+  BOOST_CHECK_CLOSE(CGAL::to_double(line.pointN(2).x()), 7.0, 1e-6);
+  BOOST_CHECK_CLOSE(CGAL::to_double(line.pointN(2).y()), 3.0, 1e-6);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesLShape)
+{
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 6 0, 6 4, 3 4, 3 6, 0 6, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result(algorithm::projectMedialAxisToEdges(*g));
+
+  // Should have 3 segments (vertical, horizontal connectors, and horizontal)
+  BOOST_CHECK_EQUAL(result->numGeometries(), 3U);
+
+  // Verify each segment has extensions
+  for (size_t i = 0; i < result->numGeometries(); ++i) {
+    const auto &line = result->geometryN(i).as<LineString>();
+    BOOST_CHECK_GE(line.numPoints(), 2U);
+  }
+
+  // Expected structure should contain:
+  // - Vertical segment from top edge to junction
+  // - Junction connection
+  // - Horizontal segment from right edge to junction
+  bool foundVerticalExtension = false;
+  bool foundHorizontalExtension = false;
+
+  for (size_t i = 0; i < result->numGeometries(); ++i) {
+    const auto &line = result->geometryN(i).as<LineString>();
+
+    // Check for vertical extension (should reach y=6)
+    if (line.numPoints() >= 3) {
+      double maxY = std::max(CGAL::to_double(line.startPoint().y()),
+                            CGAL::to_double(line.endPoint().y()));
+      if (maxY > 5.9) {
+        foundVerticalExtension = true;
+      }
+    }
+
+    // Check for horizontal extension (should reach x=6)
+    if (line.numPoints() >= 3) {
+      double maxX = std::max(CGAL::to_double(line.startPoint().x()),
+                            CGAL::to_double(line.endPoint().x()));
+      if (maxX > 5.9) {
+        foundHorizontalExtension = true;
+      }
+    }
+  }
+
+  BOOST_CHECK(foundVerticalExtension);
+  BOOST_CHECK(foundHorizontalExtension);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesTShape)
+{
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 3, 6 3, 6 6, 3 6, 3 3, 0 3, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result(algorithm::projectMedialAxisToEdges(*g));
+
+  // Should have 3 segments for T-shape
+  BOOST_CHECK_EQUAL(result->numGeometries(), 3U);
+
+  // Check that we have extensions to all 3 branches
+  bool foundLeftExtension = false;
+  bool foundRightExtension = false;
+  bool foundTopExtension = false;
+
+  for (size_t i = 0; i < result->numGeometries(); ++i) {
+    const auto &line = result->geometryN(i).as<LineString>();
+
+    // Check for left extension (should reach x=0)
+    double minX = std::min(CGAL::to_double(line.startPoint().x()),
+                          CGAL::to_double(line.endPoint().x()));
+    if (minX < 0.1) {
+      foundLeftExtension = true;
+    }
+
+    // Check for right extension (should reach x=10)
+    double maxX = std::max(CGAL::to_double(line.startPoint().x()),
+                          CGAL::to_double(line.endPoint().x()));
+    if (maxX > 9.9) {
+      foundRightExtension = true;
+    }
+
+    // Check for top extension (should reach y=6)
+    double maxY = std::max(CGAL::to_double(line.startPoint().y()),
+                          CGAL::to_double(line.endPoint().y()));
+    if (maxY > 5.9) {
+      foundTopExtension = true;
+    }
+  }
+
+  BOOST_CHECK(foundLeftExtension);
+  BOOST_CHECK(foundRightExtension);
+  BOOST_CHECK(foundTopExtension);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesEmptyPolygon)
+{
+  std::unique_ptr<Geometry> g(io::readWkt("POLYGON EMPTY"));
+  std::unique_ptr<MultiLineString> result(algorithm::projectMedialAxisToEdges(*g));
+
+  BOOST_CHECK(result->isEmpty());
+  BOOST_CHECK_EQUAL(result->numGeometries(), 0U);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesInvalidGeometry)
+{
+  std::unique_ptr<Geometry> g(io::readWkt("LINESTRING (0 0, 1 1, 2 2)"));
+  BOOST_CHECK_THROW(algorithm::projectMedialAxisToEdges(*g), Exception);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

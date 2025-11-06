@@ -34,6 +34,16 @@ SFCGAL_API auto
 approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>;
 
 /**
+ * @brief Project medial axis segments to polygon edges
+ * @param geom input polygon geometry
+ * @return medial axis segments extended to polygon boundary as MultiLineString
+ * @pre geom must be a valid polygon
+ * @throws Exception if geom is not a valid polygon
+ */
+SFCGAL_API auto
+projectMedialAxisToEdges(const Geometry &geom) -> std::unique_ptr<MultiLineString>;
+
+/**
  * @brief build a 2D straight skeleton for a Polygon
  * @todo add supports for TriangulatedSurface and PolyhedralSurface
  * @param geom input geometry

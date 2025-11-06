@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(testGenerateRoofWithParameters)
 
   // Test hipped roof (should use existing implementation)
   params.type = RoofType::HIPPED;
-  params.height = 5.0;
+  params.roofHeight = 5.0;
   auto hippedRoof = generateRoof(footprint, ridgeLine, params);
   BOOST_CHECK(hippedRoof != nullptr);
   BOOST_CHECK(!hippedRoof->isEmpty());
@@ -213,6 +213,117 @@ BOOST_AUTO_TEST_CASE(testComplexPolygon)
   auto roof = generatePitchedRoof(footprint, ridgeLine, 25.0);
   BOOST_CHECK(roof != nullptr);
   // Complex polygons may result in more patches
+}
+
+BOOST_AUTO_TEST_CASE(testBuildingHeights)
+{
+  // Test new building height and roof height parameters
+  std::vector<Point> points = {
+      Point(0, 0, 0), Point(10, 0, 0), Point(10, 6, 0), Point(0, 6, 0), Point(0, 0, 0)
+  };
+  LineString ring(points);
+  Polygon footprint(ring);
+
+  LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
+
+  // Test pitched roof with building height
+  auto building1 = generatePitchedRoof(footprint, ridgeLine, 3.0, 2.0, 30.0);
+  BOOST_CHECK(building1 != nullptr);
+
+  // Test gable roof with building height
+  auto building2 = generateGableRoof(footprint, ridgeLine, 4.0, 3.0, 25.0);
+  BOOST_CHECK(building2 != nullptr);
+
+  // Test skillion roof with building height
+  auto building3 = generateSkillionRoof(footprint, ridgeLine, 2.5, 1.5, 20.0);
+  BOOST_CHECK(building3 != nullptr);
+
+  // Test parameter validation
+  BOOST_CHECK_THROW(generatePitchedRoof(footprint, ridgeLine, -1.0, 2.0, 30.0), Exception);
+  BOOST_CHECK_THROW(generatePitchedRoof(footprint, ridgeLine, 3.0, 0.0, 30.0), Exception);
+}
+
+BOOST_AUTO_TEST_CASE(testRoofParameters)
+{
+  std::vector<Point> points = {
+      Point(0, 0, 0), Point(10, 0, 0), Point(10, 6, 0), Point(0, 6, 0), Point(0, 0, 0)
+  };
+  LineString ring(points);
+  Polygon footprint(ring);
+
+  LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
+
+  // Test new RoofParameters structure
+  RoofParameters params;
+  params.type = RoofType::PITCHED;
+  params.buildingHeight = 5.0;
+  params.roofHeight = 3.0;
+  params.slopeAngle = 35.0;
+  params.generateSolid = true;
+
+  auto building = generateBuildingWithRoof(footprint, ridgeLine, params);
+  BOOST_CHECK(building != nullptr);
+
+  // Test flat roof with new parameters
+  params.type = RoofType::FLAT;
+  params.buildingHeight = 4.0;
+  params.roofHeight = 1.0;
+  auto flatBuilding = generateBuildingWithRoof(footprint, ridgeLine, params);
+  BOOST_CHECK(flatBuilding != nullptr);
+
+  // Test hipped roof with building height
+  params.type = RoofType::HIPPED;
+  params.buildingHeight = 6.0;
+  params.roofHeight = 4.0;
+  auto hippedBuilding = generateBuildingWithRoof(footprint, ridgeLine, params);
+  BOOST_CHECK(hippedBuilding != nullptr);
+}
+
+BOOST_AUTO_TEST_CASE(testSolidGeneration)
+{
+  std::vector<Point> points = {
+      Point(0, 0, 0), Point(5, 0, 0), Point(5, 5, 0), Point(0, 5, 0), Point(0, 0, 0)
+  };
+  LineString ring(points);
+  Polygon footprint(ring);
+
+  LineString ridgeLine(Point(0, 2.5, 0), Point(5, 2.5, 0));
+
+  // Test that we can generate Solid geometry
+  RoofParameters params;
+  params.type = RoofType::GABLE;
+  params.buildingHeight = 3.0;
+  params.roofHeight = 2.0;
+  params.slopeAngle = 30.0;
+  params.generateSolid = true;
+
+  auto building = generateBuildingWithRoof(footprint, ridgeLine, params);
+  BOOST_CHECK(building != nullptr);
+
+  // The result should be a valid geometry (Solid or PolyhedralSurface)
+  BOOST_CHECK(!building->isEmpty());
+}
+
+BOOST_AUTO_TEST_CASE(testBackwardCompatibility)
+{
+  // Test that existing code still works with new RoofParameters
+  std::vector<Point> points = {
+      Point(0, 0, 0), Point(10, 0, 0), Point(10, 6, 0), Point(0, 6, 0), Point(0, 0, 0)
+  };
+  LineString ring(points);
+  Polygon footprint(ring);
+
+  LineString ridgeLine(Point(0, 3, 0), Point(10, 3, 0));
+
+  // Old-style parameters should still work
+  RoofParameters params;
+  params.type = RoofType::PITCHED;
+  params.roofHeight = 3.0;  // This should be used for backward compatibility
+  params.slopeAngle = 30.0;
+
+  auto roof = generateRoof(footprint, ridgeLine, params);
+  BOOST_CHECK(roof != nullptr);
+  BOOST_CHECK(!roof->isEmpty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

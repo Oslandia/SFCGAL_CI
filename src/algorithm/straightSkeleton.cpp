@@ -184,6 +184,7 @@ straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &ss,
       }
     }
 
+    // Simple medial axis segment
     std::unique_ptr<LineString> ls(
         new LineString(Point(it->opposite()->vertex()->point()),
                        Point(it->vertex()->point())));
@@ -404,6 +405,183 @@ approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>
 
   propagateValidityFlag(*mx, true);
   return mx;
+}
+
+
+/**
+ * @brief Find intersection of ray from point in direction with polygon boundary
+ * @param point Starting point of the ray
+ * @param direction Direction vector (not necessarily normalized)
+ * @param boundary Polygon boundary
+ * @return Point of intersection with boundary
+ */
+Point
+findBoundaryIntersection(const Point &point, const Point &direction, const LineString &boundary)
+{
+  Point closestIntersection = point;
+  Kernel::FT minDistance = std::numeric_limits<double>::max();
+
+  // Extract direction components
+  Kernel::FT dirX = direction.x();
+  Kernel::FT dirY = direction.y();
+
+  // Normalize direction (using double only for sqrt)
+  Kernel::FT dirLenSq = dirX * dirX + dirY * dirY;
+  if (dirLenSq < 1e-20) {
+    return point; // No direction
+  }
+  double dirLen = std::sqrt(CGAL::to_double(dirLenSq));
+  dirX /= dirLen;
+  dirY /= dirLen;
+
+  // Check intersection with each edge of the boundary
+  for (size_t i = 0; i < boundary.numPoints() - 1; ++i) {
+    const Point &edgeStart = boundary.pointN(i);
+    const Point &edgeEnd = boundary.pointN(i + 1);
+
+    // Edge vector
+    Kernel::FT edgeX = edgeEnd.x() - edgeStart.x();
+    Kernel::FT edgeY = edgeEnd.y() - edgeStart.y();
+
+    // Solve intersection: point + t*dir = edgeStart + s*edge
+    // point.x + t*dirX = edgeStart.x + s*edgeX
+    // point.y + t*dirY = edgeStart.y + s*edgeY
+
+    Kernel::FT det = dirX * edgeY - dirY * edgeX;
+    if (CGAL::abs(det) < 1e-15) {
+      continue; // Parallel lines
+    }
+
+    // Calculate parameters
+    Kernel::FT dx = edgeStart.x() - point.x();
+    Kernel::FT dy = edgeStart.y() - point.y();
+
+    Kernel::FT t = (dx * edgeY - dy * edgeX) / det;
+    Kernel::FT s = (dx * dirY - dy * dirX) / det;
+
+    // Check if intersection is valid (t > 0 means forward direction, 0 <= s <= 1 means on edge)
+    if (t > 1e-10 && s >= -1e-10 && s <= 1 + 1e-10) {
+      // Calculate intersection point
+      Point intersection(point.x() + t * dirX, point.y() + t * dirY);
+
+      Kernel::FT dist = t;
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIntersection = intersection;
+      }
+    }
+  }
+
+  return closestIntersection;
+}
+
+auto
+projectMedialAxisToEdges(const Geometry &geom) -> std::unique_ptr<MultiLineString>
+{
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geom);
+
+  const auto *polygon = dynamic_cast<const Polygon *>(&geom);
+  if (!polygon) {
+    BOOST_THROW_EXCEPTION(
+        Exception("projectMedialAxisToEdges() only supports Polygon input"));
+  }
+
+  if (polygon->isEmpty()) {
+    return std::make_unique<MultiLineString>();
+  }
+
+  // Step 1: Get the standard medial axis
+  auto medialAxis = approximateMedialAxis(*polygon);
+  if (!medialAxis || medialAxis->isEmpty()) {
+    return std::make_unique<MultiLineString>();
+  }
+
+  // Step 2: Identify free endpoints and calculate their extensions
+  std::map<Point, int> pointCount; // Count how many segments use each point
+  std::map<Point, Point> pointDirections; // Direction for each endpoint
+  std::map<Point, Point> projectedPoints; // Extensions for free endpoints
+
+  // Count point usage and collect directions
+  for (size_t i = 0; i < medialAxis->numGeometries(); ++i) {
+    const auto &geomRef = medialAxis->geometryN(i);
+    if (const auto *ls = dynamic_cast<const LineString *>(&geomRef)) {
+      if (ls->numPoints() >= 2) {
+        const Point &start = ls->startPoint();
+        const Point &end = ls->endPoint();
+
+        pointCount[start]++;
+        pointCount[end]++;
+
+        // Store direction for start point (away from segment)
+        if (ls->numPoints() >= 2) {
+          Point second = ls->pointN(1);
+          Kernel::FT dirX = start.x() - second.x();
+          Kernel::FT dirY = start.y() - second.y();
+          pointDirections[start] = Point(dirX, dirY);
+        }
+
+        // Store direction for end point (away from segment)
+        if (ls->numPoints() >= 2) {
+          Point secondLast = ls->pointN(ls->numPoints() - 2);
+          Kernel::FT dirX = end.x() - secondLast.x();
+          Kernel::FT dirY = end.y() - secondLast.y();
+          pointDirections[end] = Point(dirX, dirY);
+        }
+      }
+    }
+  }
+
+  // Calculate projections for free endpoints
+  const LineString &boundary = polygon->exteriorRing();
+
+  for (const auto &pair : pointCount) {
+    if (pair.second == 1) { // Free endpoint
+      const Point &endpoint = pair.first;
+      const Point &direction = pointDirections[endpoint];
+
+      // Find closest intersection with polygon boundary in the direction
+      Point projection = findBoundaryIntersection(endpoint, direction, boundary);
+
+      if (distance(endpoint, projection) > 1e-10) {
+        projectedPoints[endpoint] = projection;
+      }
+    }
+  }
+
+  // Step 3: Create extended segments
+  std::unique_ptr<MultiLineString> result(new MultiLineString);
+
+  for (size_t i = 0; i < medialAxis->numGeometries(); ++i) {
+    const auto &geomRef = medialAxis->geometryN(i);
+    if (const auto *ls = dynamic_cast<const LineString *>(&geomRef)) {
+      if (ls->numPoints() >= 2) {
+        std::unique_ptr<LineString> extendedLine(new LineString);
+
+        const Point &start = ls->startPoint();
+        const Point &end = ls->endPoint();
+
+        // Add projection at start if it's a free endpoint
+        if (projectedPoints.find(start) != projectedPoints.end()) {
+          extendedLine->addPoint(projectedPoints[start]);
+        }
+
+        // Add all original points
+        for (size_t j = 0; j < ls->numPoints(); ++j) {
+          extendedLine->addPoint(ls->pointN(j));
+        }
+
+        // Add projection at end if it's a free endpoint
+        if (projectedPoints.find(end) != projectedPoints.end()) {
+          extendedLine->addPoint(projectedPoints[end]);
+        }
+
+        result->addGeometry(extendedLine.release());
+      }
+    }
+  }
+
+  propagateValidityFlag(*result, true);
+  return result;
 }
 
 /// @private
