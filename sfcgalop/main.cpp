@@ -97,7 +97,8 @@ print_help()
   options_table.add_row(
       {"-b, --geom-b=ARG", "Source for geometry B (WKT, WKB, file, stdin)"});
   options_table.add_row(
-      {"-f, --format=ARG", "Output format: wkt, wkb, txt/ewkt (default: wkt)"});
+      {"-f, --format=ARG",
+       "Output format: wkt, wkb, txt/ewkt, obj (default: wkt)"});
   options_table.add_row(
       {"-p, --precision=N", "Decimal precision for output (default: 6)"});
   options_table.add_row({""});
@@ -145,6 +146,11 @@ print_help()
             << TextUI::Colors::RESET << "\n";
   std::cout << "  " << PROGRAM_NAME
             << " -a \"POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))\" -f wkb\n\n";
+
+  std::cout << TextUI::Colors::DIM << "  # Convert geometry to OBJ format"
+            << TextUI::Colors::RESET << "\n";
+  std::cout << "  " << PROGRAM_NAME
+            << " -a \"TRIANGLE((0 0 0, 1 0 0, 0 1 0, 0 0 0))\" -f obj\n\n";
 
   std::cout << TextUI::Colors::DIM << "  # Display geometry from file"
             << TextUI::Colors::RESET << "\n";
@@ -441,6 +447,9 @@ handle_geometry_display(const Options &options) -> bool
       break;
     case OutputFormat::TXT:
       std::cout << "TXT";
+      break;
+    case OutputFormat::OBJ:
+      std::cout << "OBJ";
       break;
     }
     std::cout << TextUI::Colors::RESET << "\n\n";
