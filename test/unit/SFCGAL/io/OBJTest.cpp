@@ -126,7 +126,17 @@ BOOST_AUTO_TEST_CASE(test_all_geometries)
     SFCGAL::io::OBJ::save(*geom, generatedFile.string());
 
     // Compare the files
-    BOOST_CHECK_MESSAGE(compareFiles(expectedFile, generatedFile.string()),
+    bool filesMatch = compareFiles(expectedFile, generatedFile.string());
+    if (!filesMatch) {
+      // Display the generated content for debugging
+      std::ifstream generatedStream(generatedFile.string());
+      std::string   generatedContent(
+          (std::istreambuf_iterator<char>(generatedStream)),
+          std::istreambuf_iterator<char>());
+      std::cout << "Generated content for " << geomType << ":\n"
+                << generatedContent << "\n";
+    }
+    BOOST_CHECK_MESSAGE(filesMatch,
                         "Output for " << geomType
                                       << " does not match the expected file.\n"
                                          "Expected file: "
