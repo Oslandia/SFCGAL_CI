@@ -14,11 +14,11 @@ CheckOptions:
   - key: bugprone-argument-comment.StrictMode
     value: 1
   - key:   readability-identifier-length.IgnoredParameterNames
-    value: 'g|x|y|z|m|to|a|b|t'
+    value: 'g|x|y|z|m|to|a|b|t|dx|dy|dz|it'
   - key:   readability-identifier-length.IgnoredVariableNames
-    value: 'g|x|y|z|m|to|a|b|t'
+    value: 'g|x|y|z|m|to|a|b|t|dx|dy|dz|it'
   - key:   readability-identifier-length.IgnoredLoopCounterNames
-    value: 'i|j|k|x|y|z|m|to|a|b|t'
+    value: 'i|j|k|x|y|z|m|to|a|b|t|dx|dy|dz|it'
 FormatStyle: 'file'
 HeaderFileExtensions:         ['', 'h','hpp']
 ImplementationFileExtensions: ['c','cpp']
