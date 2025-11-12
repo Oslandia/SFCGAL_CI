@@ -200,6 +200,26 @@ link_directories(
 	${Boost_LIBRARY_DIRS}
 )
 
+#-- Extract CGAL version components for SFCGAL headers
+string(REPLACE "." ";" CGAL_VERSION_LIST ${CGAL_VERSION})
+list(GET CGAL_VERSION_LIST 0 SFCGAL_CGAL_VERSION_MAJOR)
+list(GET CGAL_VERSION_LIST 1 SFCGAL_CGAL_VERSION_MINOR)
+list(LENGTH CGAL_VERSION_LIST CGAL_VERSION_LIST_LEN)
+if(CGAL_VERSION_LIST_LEN GREATER 2)
+    list(GET CGAL_VERSION_LIST 2 SFCGAL_CGAL_VERSION_PATCH)
+else()
+    set(SFCGAL_CGAL_VERSION_PATCH 0)
+endif()
+
+#-- Check polygon repair availability (requires CGAL >= 6.0)
+if (CGAL_VERSION VERSION_LESS 6.0)
+    set(SFCGAL_WITH_POLYGON_REPAIR OFF)
+    message(STATUS "polygonRepair requires CGAL 6.0+, disabled (found CGAL ${CGAL_VERSION})")
+else()
+    set(SFCGAL_WITH_POLYGON_REPAIR ON)
+    message(STATUS "polygonRepair enabled with CGAL ${CGAL_VERSION}")
+endif()
+
 #-- Coverage ---------------------------------------------------------------------
 option( SFCGAL_COVERAGE "Generate code coverage report" OFF)
 if( SFCGAL_COVERAGE )
