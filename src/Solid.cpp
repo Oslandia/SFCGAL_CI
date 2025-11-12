@@ -141,4 +141,10 @@ Solid::accept(ConstGeometryVisitor &visitor) const
   visitor.visit(*this);
 }
 
+auto
+Solid::toSurfaceMesh() const -> Surface_mesh_3
+{
+  return exteriorShell().toSurfaceMesh();
+}
+
 } // namespace SFCGAL
