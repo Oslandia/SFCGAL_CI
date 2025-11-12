@@ -197,25 +197,25 @@ public:
 
   /**
    * [SFA/OGC]Returns the n-th patch
-   * @param n The index of the patch to get
+   * @param index The index of the patch to get
    * @return Const reference to the nth patch
    */
   [[nodiscard]] auto
-  patchN(size_t const &n) const -> const Polygon &
+  patchN(size_t const &index) const -> const Polygon &
   {
-    BOOST_ASSERT(n < _polygons.size());
-    return *_polygons[n];
+    BOOST_ASSERT(index < _polygons.size());
+    return *_polygons[index];
   }
   /**
    * [SFA/OGC]Returns the n-th patch
-   * @param n The index of the patch to get
+   * @param index The index of the patch to get
    * @return Reference to the nth patch
    */
   auto
-  patchN(size_t const &n) -> Polygon &
+  patchN(size_t const &index) -> Polygon &
   {
-    BOOST_ASSERT(n < _polygons.size());
-    return *_polygons[n];
+    BOOST_ASSERT(index < _polygons.size());
+    return *_polygons[index];
   }
   /**
    * @brief Adds a polygonal patch to the PolyhedralSurface.
@@ -251,25 +251,25 @@ public:
 
   /**
    * @brief [SFA/OGC]Returns the n-th polygon
-   * @param n Index of the polygon to get
+   * @param index Index of the polygon to get
    * @return Const reference to the nth polygon
    * @deprecated see patchN()
    */
   [[nodiscard]] auto
-  polygonN(size_t const &n) const -> const Polygon &
+  polygonN(size_t const &index) const -> const Polygon &
   {
-    return patchN(n);
+    return patchN(index);
   }
   /**
    * @brief [SFA/OGC]Returns the n-th polygon
-   * @param n Index of the polygon to get
+   * @param index Index of the polygon to get
    * @return Reference to the nth polygon
    * @deprecated see patchN()
    */
   auto
-  polygonN(size_t const &n) -> Polygon &
+  polygonN(size_t const &index) -> Polygon &
   {
-    return patchN(n);
+    return patchN(index);
   }
   /**
    * add a polygon to the PolyhedralSurface
@@ -429,7 +429,7 @@ public:
    * @brief Convert PolyhedralSurface to CGAL::Surface_mesh
    * @return CGAL Surface_mesh representation of the polyhedral surface
    */
-  auto
+  [[nodiscard]] auto
   toSurfaceMesh() const -> Surface_mesh_3;
 
   /**

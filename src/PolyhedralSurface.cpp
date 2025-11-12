@@ -52,12 +52,12 @@ PolyhedralSurface::PolyhedralSurface(const PolyhedralSurface &other)
 PolyhedralSurface::PolyhedralSurface(const Mesh &sm)
 {
 
-  using vertex_descriptor = Mesh::Vertex_index;
+  using vertexDescriptor = Mesh::Vertex_index;
   for (auto face : sm.faces()) {
     auto *new_face = new LineString();
-    for (vertex_descriptor const vd :
+    for (vertexDescriptor const vertexDesc :
          vertices_around_face(sm.halfedge(face), sm)) {
-      new_face->addPoint(Point(sm.point(vd)));
+      new_face->addPoint(Point(sm.point(vertexDesc)));
     }
 
     new_face->addPoint(new_face->startPoint().clone());
@@ -67,15 +67,15 @@ PolyhedralSurface::PolyhedralSurface(const Mesh &sm)
 
 PolyhedralSurface::PolyhedralSurface(const InexactMesh &inexactMesh)
 {
-  using inexact_to_exact  = CGAL::Cartesian_converter<InexactKernel, Kernel>;
-  using vertex_descriptor = Mesh::Vertex_index;
+  using inexact_to_exact = CGAL::Cartesian_converter<InexactKernel, Kernel>;
+  using vertexDescriptor = Mesh::Vertex_index;
 
   inexact_to_exact toExact;
   for (auto face : inexactMesh.faces()) {
     auto *new_face = new LineString();
-    for (vertex_descriptor const vd :
+    for (vertexDescriptor const vertexDesc :
          vertices_around_face(inexactMesh.halfedge(face), inexactMesh)) {
-      new_face->addPoint(Point(toExact(inexactMesh.point(vd))));
+      new_face->addPoint(Point(toExact(inexactMesh.point(vertexDesc))));
     }
 
     new_face->addPoint(new_face->startPoint().clone());
