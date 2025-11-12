@@ -8,7 +8,10 @@
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/GeometryVisitor.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/TriangulatedSurface.h"
+
+#include <map>
 
 namespace SFCGAL {
 
@@ -351,6 +354,45 @@ TriangulatedSurface::toPolyhedron_3() const -> std::unique_ptr<Polyhedron>
                  Plane_from_facet<Polyhedron>());
 
   return std::unique_ptr<Polyhedron>(poly);
+}
+
+auto
+TriangulatedSurface::toSurfaceMesh() const -> Surface_mesh_3
+{
+  Surface_mesh_3 mesh;
+
+  if (isEmpty()) {
+    return mesh;
+  }
+
+  // Map to track unique vertices
+  std::map<Point, Surface_mesh_3::Vertex_index> vertexMap;
+
+  // Add all triangles to the mesh
+  for (size_t i = 0; i < numPatches(); ++i) {
+    const Triangle                             &triangle = patchN(i);
+    std::array<Surface_mesh_3::Vertex_index, 3> vertices;
+
+    for (size_t j = 0; j < 3; ++j) {
+      const Point &pt = triangle.vertex(j);
+
+      // Check if vertex already exists
+      auto it = vertexMap.find(pt);
+      if (it != vertexMap.end()) {
+        vertices[j] = it->second;
+      } else {
+        // Add new vertex
+        Surface_mesh_3::Vertex_index vIdx = mesh.add_vertex(pt.toPoint_3());
+        vertexMap[pt]                     = vIdx;
+        vertices[j]                       = vIdx;
+      }
+    }
+
+    // Add face to the mesh
+    mesh.add_face(vertices[0], vertices[1], vertices[2]);
+  }
+
+  return mesh;
 }
 
 /**

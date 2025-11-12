@@ -14,9 +14,11 @@
 
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <CGAL/Surface_mesh.h>
 
 #include "SFCGAL/DereferenceIterator.h"
 #include "SFCGAL/Exception.h"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Triangle.h"
 
@@ -397,6 +399,13 @@ public:
   template <typename Polyhedron>
   auto
   toPolyhedron_3() const -> std::unique_ptr<Polyhedron>;
+
+  /**
+   * @brief Convert TriangulatedSurface to CGAL::Surface_mesh
+   * @return CGAL Surface_mesh representation of the triangulated surface
+   */
+  auto
+  toSurfaceMesh() const -> Surface_mesh_3;
 
   /**
    * Serializer
