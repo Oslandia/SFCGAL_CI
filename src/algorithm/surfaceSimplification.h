@@ -16,8 +16,15 @@ struct NoValidityCheck;
  * @brief Strategy for surface mesh simplification cost and placement
  *
  * Defines the method used to calculate edge collapse cost and vertex placement
- * during surface mesh simplification. Only strategies compatible with exact
- * kernel are supported.
+ * during surface mesh simplification. Each strategy has different computational
+ * characteristics and memory requirements:
+ *
+ * - EDGE_LENGTH: O(E log E) complexity, low memory, exact arithmetic
+ * - GARLAND_HECKBERT: O(E log E) complexity, higher memory, inexact arithmetic
+ * - LINDSTROM_TURK: O(E log E) complexity, higher memory, inexact arithmetic
+ *
+ * Advanced strategies require Eigen support and automatically convert between
+ * exact and inexact kernels for optimal performance.
  */
 enum class SimplificationStrategy {
   /**
@@ -27,9 +34,56 @@ enum class SimplificationStrategy {
    * positioning. This strategy is compatible with exact kernels and provides
    * good simplification results while maintaining geometric accuracy.
    *
+   * Computational characteristics:
+   * - Time complexity: O(E log E) where E is the number of edges
+   * - Space complexity: O(V + E) where V is the number of vertices
+   * - Kernel: Exact predicates and constructions
+   * - Memory overhead: Minimal
+   * - Best for: General purpose simplification with exact results
+   *
    * @see https://doc.cgal.org/latest/Surface_mesh_simplification/index.html
    */
-  EDGE_LENGTH
+  EDGE_LENGTH,
+
+#ifdef SFCGAL_WITH_EIGEN
+  /**
+   * @brief Garland-Heckbert strategy
+   *
+   * Uses quadric error metrics for cost calculation and optimal vertex
+   * placement. This strategy requires Eigen support and uses inexact
+   * constructions for improved performance on large meshes.
+   *
+   * Computational characteristics:
+   * - Time complexity: O(E log E) where E is the number of edges
+   * - Space complexity: O(V + E) with additional quadric matrix storage
+   * - Kernel: Inexact constructions (automatic conversion from exact)
+   * - Memory overhead: Higher due to quadric error matrices
+   * - Best for: High-quality simplification preserving surface properties
+   *
+   * @note Requires SFCGAL_WITH_EIGEN compilation flag
+   * @see https://doc.cgal.org/latest/Surface_mesh_simplification/index.html
+   */
+  GARLAND_HECKBERT,
+
+  /**
+   * @brief Lindstrom-Turk strategy
+   *
+   * Uses Lindstrom-Turk cost and placement policies optimized for preserving
+   * volume and boundary features. This strategy requires Eigen support and uses
+   * inexact constructions for improved performance on complex meshes.
+   *
+   * Computational characteristics:
+   * - Time complexity: O(E log E) where E is the number of edges
+   * - Space complexity: O(V + E) with additional feature preservation data
+   * - Kernel: Inexact constructions (automatic conversion from exact)
+   * - Memory overhead: Higher due to volume preservation calculations
+   * - Best for: Volume preservation and feature-aware simplification
+   *
+   * @note Requires SFCGAL_WITH_EIGEN compilation flag
+   * @see https://doc.cgal.org/latest/Surface_mesh_simplification/index.html
+   */
+  LINDSTROM_TURK
+#endif // SFCGAL_WITH_EIGEN
 };
 
 /**
@@ -118,11 +172,10 @@ struct SimplificationStopPredicate {
  * );
  * @endcode
  */
-SFCGAL_API auto
-surfaceSimplification(const Geometry                 &geometry,
-                      const SimplificationStopPredicate &stopPredicate,
-                      SimplificationStrategy strategy =
-                          SimplificationStrategy::EDGE_LENGTH)
+[[nodiscard]] SFCGAL_API auto
+surfaceSimplification(
+    const Geometry &geometry, const SimplificationStopPredicate &stopPredicate,
+    SimplificationStrategy strategy = SimplificationStrategy::EDGE_LENGTH)
     -> std::unique_ptr<Geometry>;
 
 /**
@@ -141,8 +194,8 @@ surfaceSimplification(const Geometry                 &geometry,
  * @see surfaceSimplification(const Geometry&, const
  * SimplificationStopPredicate&, SimplificationStrategy)
  */
-SFCGAL_API auto
-surfaceSimplification(const Geometry                 &geometry,
+[[nodiscard]] SFCGAL_API auto
+surfaceSimplification(const Geometry                    &geometry,
                       const SimplificationStopPredicate &stopPredicate,
                       SimplificationStrategy             strategy,
                       NoValidityCheck                    noCheck)
