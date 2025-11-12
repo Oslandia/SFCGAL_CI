@@ -153,23 +153,23 @@ public:
   }
   /**
    * Returns the n-th interior shell
-   * @param n The index of the interior shell to get
+   * @param index The index of the interior shell to get
    * @return Const reference to the nth interior shell
    */
   [[nodiscard]] auto
-  interiorShellN(size_t const &n) const -> const PolyhedralSurface &
+  interiorShellN(size_t const &index) const -> const PolyhedralSurface &
   {
-    return *_shells[n + 1];
+    return *_shells[index + 1];
   }
   /**
    * Returns the n-th interior shell
-   * @param n The index of the interior shell to get
+   * @param index The index of the interior shell to get
    * @return Reference to the nth interior shell
    */
   auto
-  interiorShellN(size_t const &n) -> PolyhedralSurface &
+  interiorShellN(size_t const &index) -> PolyhedralSurface &
   {
-    return *_shells[n + 1];
+    return *_shells[index + 1];
   }
   /**
    * adds an interior shell to the Solid
@@ -249,27 +249,27 @@ public:
   }
   /**
    * @brief Returns the n-th shell, 0 is exteriorShell
-   * @param n Index of the shell to get
+   * @param index Index of the shell to get
    * @return Const reference to the nth shell
    * @warning not standard, avoid conditionnal to access rings
    */
   [[nodiscard]] auto
-  shellN(const size_t &n) const -> const PolyhedralSurface &
+  shellN(const size_t &index) const -> const PolyhedralSurface &
   {
-    BOOST_ASSERT(n < numShells());
-    return *_shells[n];
+    BOOST_ASSERT(index < numShells());
+    return *_shells[index];
   }
   /**
    * @brief Returns the n-th shell, 0 is exteriorShell
-   * @param n Index of the shell to get
+   * @param index Index of the shell to get
    * @return Reference to the nth shell
    * @warning not standard, avoid conditionnal to access rings
    */
   auto
-  shellN(const size_t &n) -> PolyhedralSurface &
+  shellN(const size_t &index) -> PolyhedralSurface &
   {
-    BOOST_ASSERT(n < numShells());
-    return *_shells[n];
+    BOOST_ASSERT(index < numShells());
+    return *_shells[index];
   }
 
   //-- iterators
@@ -329,7 +329,7 @@ public:
    * @brief Convert Solid to CGAL::Surface_mesh (only exterior shell)
    * @return CGAL Surface_mesh representation of the solid's exterior shell
    */
-  auto
+  [[nodiscard]] auto
   toSurfaceMesh() const -> Surface_mesh_3;
 
   /**
