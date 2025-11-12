@@ -12,7 +12,7 @@
 #include <string>
 #include <variant>
 
-enum class OutputFormat : std::uint8_t { WKT = 0, WKB = 1, TXT = 2 };
+enum class OutputFormat : std::uint8_t { WKT = 0, WKB = 1, TXT = 2, OBJ = 3 };
 
 [[nodiscard]] auto
 load_geometry(const std::string &source) -> std::unique_ptr<SFCGAL::Geometry>;
@@ -31,6 +31,7 @@ namespace IO {
  *   - `OutputFormat::WKT` or `OutputFormat::TXT`: prints WKT text using
  * `precision`.
  *   - `OutputFormat::WKB`: prints the geometry's WKB as lowercase hex bytes.
+ *   - `OutputFormat::OBJ`: prints the geometry in OBJ format.
  *   - A null geometry produces no output.
  * - If the variant holds `bool`: prints "true" or "false".
  * - If the variant holds `double`: prints the numeric value with the given
@@ -39,7 +40,8 @@ namespace IO {
  *
  * @param result Optional variant containing the operation result (geometry,
  * bool, double, or string).
- * @param format Output format to use for geometry values (WKT, WKB, or TXT).
+ * @param format Output format to use for geometry values (WKT, WKB, TXT, or
+ * OBJ).
  * @param precision Number of digits of precision for textual numeric output.
  * @param out Output stream to write to (defaults to std::cout).
  */

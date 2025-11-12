@@ -3,6 +3,7 @@
 
 #include "io.hpp"
 
+#include <SFCGAL/io/OBJ.h>
 #include <SFCGAL/io/ewkt.h>
 #include <SFCGAL/io/wkb.h>
 #include <SFCGAL/io/wkt.h>
@@ -72,7 +73,7 @@ load_geometry(const std::string &source) -> std::unique_ptr<SFCGAL::Geometry>
     return str.substr(first, (last - first + 1));
   };
 
-  // Helper to detect and parse WKB (binary/hex) or WKT
+  // Helper to detect and parse WKB (binary/hex), WKT, or OBJ
   // NOLINTBEGIN(readability-function-cognitive-complexity)
   auto try_parse_geometry =
       [&trim](const std::string &input) -> std::unique_ptr<SFCGAL::Geometry> {
@@ -82,6 +83,47 @@ load_geometry(const std::string &source) -> std::unique_ptr<SFCGAL::Geometry>
     }
 
     try {
+      // Check if this looks like an OBJ file
+      // OBJ files typically start with comments (#) or vertex declarations (v)
+      std::istringstream iss(data);
+      std::string        first_line;
+      bool               looks_like_obj = false;
+
+      while (std::getline(iss, first_line)) {
+        first_line = trim(first_line);
+        if (first_line.empty()) {
+          continue; // Skip empty lines
+        }
+        if (first_line[0] == '#') {
+          continue; // Skip comments
+        }
+        if (first_line.size() >= 2 && first_line[0] == 'v' &&
+            first_line[1] == ' ') {
+          looks_like_obj = true;
+          break;
+        }
+        if (first_line.size() >= 2 && first_line[0] == 'f' &&
+            first_line[1] == ' ') {
+          looks_like_obj = true;
+          break;
+        }
+        if (first_line.size() >= 2 && first_line[0] == 'l' &&
+            first_line[1] == ' ') {
+          looks_like_obj = true;
+          break;
+        }
+        if (first_line.size() >= 2 && first_line[0] == 'p' &&
+            first_line[1] == ' ') {
+          looks_like_obj = true;
+          break;
+        }
+        // If we find a line that doesn't look like OBJ, stop checking
+        break;
+      }
+
+      if (looks_like_obj) {
+        return SFCGAL::io::OBJ::loadFromString(data);
+      }
       // First, detect raw (binary) WKB: first byte 0x00/0x01 or presence of
       // NUL/control bytes.
       if (!data.empty() && (static_cast<unsigned char>(data[0]) == 0x00 ||
@@ -201,6 +243,9 @@ print_result(const std::optional<OperationResult> &result, OutputFormat format,
               // Use WKT with full precision as EWKT equivalent
               out << arg->asText(precision) << "\n";
               break;
+            case OutputFormat::OBJ:
+              out << SFCGAL::io::OBJ::saveToString(*arg);
+              break;
             }
           }
         } else if constexpr (std::is_same_v<T, bool>) {
@@ -219,8 +264,9 @@ print_result(const std::optional<OperationResult> &result, OutputFormat format,
 /**
  * @brief Parse a case-insensitive output format name into an OutputFormat enum.
  *
- * Recognizes "wkt" -> OutputFormat::WKT, "wkb" -> OutputFormat::WKB, and
- * "txt" or "ewkt" -> OutputFormat::TXT. Comparison is performed in lowercase.
+ * Recognizes "wkt" -> OutputFormat::WKT, "wkb" -> OutputFormat::WKB,
+ * "txt" or "ewkt" -> OutputFormat::TXT, and "obj" -> OutputFormat::OBJ.
+ * Comparison is performed in lowercase.
  *
  * @param format_str Null-terminated C string containing the format name; if
  * null the function returns false.
@@ -244,6 +290,8 @@ parse_output_format(const char *format_str, OutputFormat &format) -> bool
     format = OutputFormat::WKB;
   } else if (fmt == "txt" || fmt == "ewkt") {
     format = OutputFormat::TXT;
+  } else if (fmt == "obj") {
+    format = OutputFormat::OBJ;
   } else {
     return false;
   }
