@@ -126,18 +126,18 @@ public:
   }
   /**
    * [SFA/OGC]Returns the n-th patch
-   * @param n The index of the patch to get
+   * @param index The index of the patch to get
    * @return Const reference to the nth triangle patch
    */
   [[nodiscard]] auto
-  patchN(size_t const &n) const -> const Triangle &;
+  patchN(size_t const &index) const -> const Triangle &;
   /**
    * [SFA/OGC]Returns the n-th patch
-   * @param n The index of the patch to get
+   * @param index The index of the patch to get
    * @return Reference to the nth triangle patch
    */
   auto
-  patchN(size_t const &n) -> Triangle &;
+  patchN(size_t const &index) -> Triangle &;
 
   /**
    * @brief Adds a patch to the TriangulatedSurface.
@@ -194,27 +194,27 @@ public:
   }
   /**
    * [SFA/OGC]Returns the n-th triangle
-   * @param n The triangle index
+   * @param index The triangle index
    * @return Const reference to the nth triangle
    * @deprecated see patchN()
    */
   [[nodiscard]] auto
-  triangleN(size_t const &n) const -> const Triangle &
+  triangleN(size_t const &index) const -> const Triangle &
   {
-    BOOST_ASSERT(n < _triangles.size());
-    return *_triangles[n];
+    BOOST_ASSERT(index < _triangles.size());
+    return *_triangles[index];
   }
   /**
    * [SFA/OGC]Returns the n-th triangle
-   * @param n The triangle index
+   * @param index The triangle index
    * @return Reference to the nth triangle
    * @deprecated see patchN()
    */
   auto
-  triangleN(size_t const &n) -> Triangle &
+  triangleN(size_t const &index) -> Triangle &
   {
-    BOOST_ASSERT(n < _triangles.size());
-    return *_triangles[n];
+    BOOST_ASSERT(index < _triangles.size());
+    return *_triangles[index];
   }
   /**
    * add a Triangle to the TriangulatedSurface
@@ -325,10 +325,10 @@ public:
 
   /**
    * @brief Reserve space for triangles
-   * @param n Number of triangles to reserve space for
+   * @param count Number of triangles to reserve space for
    */
   void
-  reserve(const size_t &n);
+  reserve(const size_t &count);
 
   //-- iterators
 
@@ -404,7 +404,7 @@ public:
    * @brief Convert TriangulatedSurface to CGAL::Surface_mesh
    * @return CGAL Surface_mesh representation of the triangulated surface
    */
-  auto
+  [[nodiscard]] auto
   toSurfaceMesh() const -> Surface_mesh_3;
 
   /**
