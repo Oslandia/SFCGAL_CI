@@ -25,6 +25,8 @@ struct NoValidityCheck;
  *
  * Advanced strategies require Eigen support and automatically convert between
  * exact and inexact kernels for optimal performance.
+ * during surface mesh simplification. Advanced strategies require Eigen
+ * support.
  */
 enum class SimplificationStrategy {
   /**
@@ -197,8 +199,7 @@ surfaceSimplification(
 [[nodiscard]] SFCGAL_API auto
 surfaceSimplification(const Geometry                    &geometry,
                       const SimplificationStopPredicate &stopPredicate,
-                      SimplificationStrategy             strategy,
-                      NoValidityCheck                    noCheck)
+                      SimplificationStrategy strategy, NoValidityCheck noCheck)
     -> std::unique_ptr<Geometry>;
 
 } // namespace SFCGAL::algorithm

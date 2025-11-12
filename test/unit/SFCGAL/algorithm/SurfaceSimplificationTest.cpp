@@ -93,6 +93,7 @@ createCubePolyhedralSurface() -> std::unique_ptr<PolyhedralSurface>
   return cube;
 }
 
+#ifdef SFCGAL_WITH_EIGEN
 // Test TriangulatedSurface simplification with Garland-Heckbert strategy
 BOOST_AUTO_TEST_CASE(testSimplify_TriangulatedSurface_GarlandHeckbert)
 {
@@ -100,10 +101,10 @@ BOOST_AUTO_TEST_CASE(testSimplify_TriangulatedSurface_GarlandHeckbert)
 
   BOOST_CHECK_EQUAL(cube->numTriangles(), 12);
 
-  // Simplify using edge count ratio
+  // Simplify using edge count ratio with Garland-Heckbert strategy
   auto simplified = surfaceSimplification(
       *cube, SimplificationStopPredicate::edgeCountRatio(0.5),
-      SimplificationStrategy::EDGE_LENGTH);
+      SimplificationStrategy::GARLAND_HECKBERT);
 
   BOOST_CHECK(simplified);
   BOOST_CHECK(simplified->is<TriangulatedSurface>());
@@ -115,7 +116,9 @@ BOOST_AUTO_TEST_CASE(testSimplify_TriangulatedSurface_GarlandHeckbert)
   std::cout << "Simplified triangles: " << simplifiedTin.numTriangles()
             << std::endl;
 }
+#endif // SFCGAL_WITH_EIGEN
 
+#ifdef SFCGAL_WITH_EIGEN
 // Test TriangulatedSurface simplification with Lindstrom-Turk strategy
 BOOST_AUTO_TEST_CASE(testSimplify_TriangulatedSurface_LindstromTurk)
 {
@@ -123,10 +126,10 @@ BOOST_AUTO_TEST_CASE(testSimplify_TriangulatedSurface_LindstromTurk)
 
   BOOST_CHECK_EQUAL(cube->numTriangles(), 12);
 
-  // Simplify using edge count ratio
+  // Simplify using edge count ratio with Lindstrom-Turk strategy
   auto simplified = surfaceSimplification(
       *cube, SimplificationStopPredicate::edgeCountRatio(0.5),
-      SimplificationStrategy::EDGE_LENGTH);
+      SimplificationStrategy::LINDSTROM_TURK);
 
   BOOST_CHECK(simplified);
   BOOST_CHECK(simplified->is<TriangulatedSurface>());
@@ -138,18 +141,20 @@ BOOST_AUTO_TEST_CASE(testSimplify_TriangulatedSurface_LindstromTurk)
   std::cout << "Simplified triangles (LT): " << simplifiedTin.numTriangles()
             << std::endl;
 }
+#endif // SFCGAL_WITH_EIGEN
 
-// Test PolyhedralSurface simplification
+#ifdef SFCGAL_WITH_EIGEN
+// Test PolyhedralSurface simplification with Garland-Heckbert strategy
 BOOST_AUTO_TEST_CASE(testSimplify_PolyhedralSurface_GarlandHeckbert)
 {
   auto cube = createCubePolyhedralSurface();
 
   BOOST_CHECK_EQUAL(cube->numPatches(), 6);
 
-  // Simplify using edge count ratio
+  // Simplify using edge count ratio with Garland-Heckbert strategy
   auto simplified = surfaceSimplification(
       *cube, SimplificationStopPredicate::edgeCountRatio(0.5),
-      SimplificationStrategy::EDGE_LENGTH);
+      SimplificationStrategy::GARLAND_HECKBERT);
 
   BOOST_CHECK(simplified);
   BOOST_CHECK(simplified->is<PolyhedralSurface>());
@@ -158,18 +163,20 @@ BOOST_AUTO_TEST_CASE(testSimplify_PolyhedralSurface_GarlandHeckbert)
   std::cout << "Simplified patches: "
             << simplified->as<PolyhedralSurface>().numPatches() << std::endl;
 }
+#endif // SFCGAL_WITH_EIGEN
 
-// Test PolyhedralSurface simplification with Lindstrom-Turk
+#ifdef SFCGAL_WITH_EIGEN
+// Test PolyhedralSurface simplification with Lindstrom-Turk strategy
 BOOST_AUTO_TEST_CASE(testSimplify_PolyhedralSurface_LindstromTurk)
 {
   auto cube = createCubePolyhedralSurface();
 
   BOOST_CHECK_EQUAL(cube->numPatches(), 6);
 
-  // Simplify using edge count ratio
+  // Simplify using edge count ratio with Lindstrom-Turk strategy
   auto simplified = surfaceSimplification(
       *cube, SimplificationStopPredicate::edgeCountRatio(0.5),
-      SimplificationStrategy::EDGE_LENGTH);
+      SimplificationStrategy::LINDSTROM_TURK);
 
   BOOST_CHECK(simplified);
   BOOST_CHECK(simplified->is<PolyhedralSurface>());
@@ -178,6 +185,7 @@ BOOST_AUTO_TEST_CASE(testSimplify_PolyhedralSurface_LindstromTurk)
   std::cout << "Simplified patches (LT): "
             << simplified->as<PolyhedralSurface>().numPatches() << std::endl;
 }
+#endif // SFCGAL_WITH_EIGEN
 
 // Test Solid simplification
 BOOST_AUTO_TEST_CASE(testSimplify_Solid)
@@ -266,10 +274,11 @@ BOOST_AUTO_TEST_CASE(testSimplify_InvalidRatio_TooLow)
 {
   auto cube = createCubeTriangulatedSurface();
 
-  BOOST_CHECK_THROW(surfaceSimplification(
-                        *cube, SimplificationStopPredicate::edgeCountRatio(0.0),
-                        SimplificationStrategy::EDGE_LENGTH),
-                    std::invalid_argument);
+  BOOST_CHECK_THROW(
+      (void)surfaceSimplification(
+          *cube, SimplificationStopPredicate::edgeCountRatio(0.0),
+          SimplificationStrategy::EDGE_LENGTH),
+      std::invalid_argument);
 }
 
 // Test invalid ratio (too high)
@@ -277,10 +286,11 @@ BOOST_AUTO_TEST_CASE(testSimplify_InvalidRatio_TooHigh)
 {
   auto cube = createCubeTriangulatedSurface();
 
-  BOOST_CHECK_THROW(surfaceSimplification(
-                        *cube, SimplificationStopPredicate::edgeCountRatio(1.0),
-                        SimplificationStrategy::EDGE_LENGTH),
-                    std::invalid_argument);
+  BOOST_CHECK_THROW(
+      (void)surfaceSimplification(
+          *cube, SimplificationStopPredicate::edgeCountRatio(1.0),
+          SimplificationStrategy::EDGE_LENGTH),
+      std::invalid_argument);
 }
 
 // Test invalid ratio (negative)
@@ -289,9 +299,9 @@ BOOST_AUTO_TEST_CASE(testSimplify_InvalidRatio_Negative)
   auto cube = createCubeTriangulatedSurface();
 
   BOOST_CHECK_THROW(
-      surfaceSimplification(*cube,
-                            SimplificationStopPredicate::edgeCountRatio(-0.5),
-                            SimplificationStrategy::EDGE_LENGTH),
+      (void)surfaceSimplification(*cube,
+                                  SimplificationStopPredicate::edgeCountRatio(-0.5),
+                                  SimplificationStrategy::EDGE_LENGTH),
       std::invalid_argument);
 }
 
@@ -300,10 +310,11 @@ BOOST_AUTO_TEST_CASE(testSimplify_UnsupportedGeometry)
 {
   Point point(0, 0, 0);
 
-  BOOST_CHECK_THROW(surfaceSimplification(
-                        point, SimplificationStopPredicate::edgeCountRatio(0.5),
-                        SimplificationStrategy::EDGE_LENGTH),
-                    std::invalid_argument);
+  BOOST_CHECK_THROW(
+      (void)surfaceSimplification(
+          point, SimplificationStopPredicate::edgeCountRatio(0.5),
+          SimplificationStrategy::EDGE_LENGTH),
+      std::invalid_argument);
 }
 
 // Test simplification with WKT geometries
