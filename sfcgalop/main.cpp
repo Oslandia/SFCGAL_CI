@@ -6,7 +6,6 @@
 #include "operations/operations.hpp"
 #include "text_ui.hpp"
 
-#include <CGAL/version.h>
 #include <SFCGAL/version.h>
 #include <boost/version.hpp>
 
@@ -181,7 +180,10 @@ print_version()
 
   version_table.add_row({"sfcgalop", get_program_version()});
   version_table.add_row({"SFCGAL Library", SFCGAL::Version()});
-  version_table.add_row({"CGAL Library", CGAL_VERSION_STR});
+  std::string cgal_version = std::to_string(SFCGAL_CGAL_VERSION_MAJOR) + "." +
+                             std::to_string(SFCGAL_CGAL_VERSION_MINOR) + "." +
+                             std::to_string(SFCGAL_CGAL_VERSION_PATCH);
+  version_table.add_row({"CGAL Library", cgal_version});
 
   // Format Boost version from BOOST_VERSION macro
   std::string boost_version = std::to_string(BOOST_VERSION / 100000) + "." +

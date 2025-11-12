@@ -32,4 +32,9 @@
  */
 #cmakedefine SFCGAL_WITH_OSG
 
+/**
+ * indicates if polygon repair functionality is available (requires CGAL >= 6.0)
+ */
+#cmakedefine SFCGAL_WITH_POLYGON_REPAIR
+
 #endif

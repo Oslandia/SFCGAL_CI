@@ -7,6 +7,9 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/io/wkt.h"
 
+#include "SFCGAL/config.h"
+#include "SFCGAL/version.h"
+
 #include <array>
 #include <boost/test/unit_test.hpp>
 #include <memory>
@@ -1609,7 +1612,7 @@ BOOST_AUTO_TEST_CASE(testAlphaWrapping3DTest)
       sfcgal_geometry_alpha_wrapping_3d(geomInput.get(), 20, 0);
 
   BOOST_REQUIRE(sfcgal_geometry_is_3d(geomAlphaWrapping));
-#if CGAL_VERSION_MAJOR < 6
+#if SFCGAL_CGAL_VERSION_MAJOR < 6
   // 2304 on Linux
   // 2306 on Mac/FreeBSD maybe other
   BOOST_CHECK_GE(sfcgal_polyhedral_surface_num_patches(geomAlphaWrapping),
@@ -2319,6 +2322,7 @@ BOOST_AUTO_TEST_CASE(testConeTest)
   sfcgal_primitive_delete(cone);
 }
 
+#ifdef SFCGAL_WITH_POLYGON_REPAIR
 BOOST_AUTO_TEST_CASE(testPolygonRepairTest)
 {
   std::unique_ptr<Geometry> polygon(
@@ -2338,5 +2342,6 @@ BOOST_AUTO_TEST_CASE(testPolygonRepairTest)
 
   sfcgal_geometry_delete(repaired);
 }
+#endif // SFCGAL_WITH_POLYGON_REPAIR
 
 BOOST_AUTO_TEST_SUITE_END()

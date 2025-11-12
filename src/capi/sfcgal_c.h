@@ -2540,6 +2540,7 @@ typedef enum {
  * @pre geom must be a Polygon or MultiPolygon
  * @post The returned geometry must be deallocated by the caller
  * @note Returns NULL on error
+ * @note CGAL 6.0+ required for polygon repair functionality
  * @note CGAL 6.1+ required for NON_ZERO, UNION, and INTERSECTION rules
  * @ingroup capi
  */

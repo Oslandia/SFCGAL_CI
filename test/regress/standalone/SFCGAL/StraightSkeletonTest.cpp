@@ -26,8 +26,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <CGAL/version.h>
-#include <CGAL/version_macros.h>
+#include "SFCGAL/version.h"
 
 using namespace boost::unit_test;
 
@@ -88,7 +87,7 @@ runTest(const std::filesystem::path::string_type &filename)
     }
     std::string const obt = lbl + obtWkt;
     std::string const exp = lbl + outputWkt;
-    if ((CGAL_VERSION_MAJOR == 5) && (CGAL_VERSION_MINOR >= 2)) {
+    if ((SFCGAL_CGAL_VERSION_MAJOR == 5) && (SFCGAL_CGAL_VERSION_MINOR >= 2)) {
       BOOST_CHECK_EQUAL(exp, obt);
     }
   }

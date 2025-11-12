@@ -3,6 +3,8 @@
 // Copyright (c) 2024-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
+#include "SFCGAL/version.h"
+
 #include "SFCGAL/Geometry.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/Kernel.h"
@@ -65,7 +67,9 @@
 #include "SFCGAL/algorithm/offset.h"
 #include "SFCGAL/algorithm/partition_2.h"
 #include "SFCGAL/algorithm/plane.h"
-#include "SFCGAL/algorithm/polygonRepair.h"
+#ifdef SFCGAL_WITH_POLYGON_REPAIR
+  #include "SFCGAL/algorithm/polygonRepair.h"
+#endif
 #include "SFCGAL/algorithm/rotate.h"
 #include "SFCGAL/algorithm/scale.h"
 #include "SFCGAL/algorithm/simplification.h"
@@ -3201,6 +3205,7 @@ sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
                                sfcgal_polygon_repair_rule_t repair_rule)
     -> sfcgal_geometry_t *
 {
+#ifdef SFCGAL_WITH_POLYGON_REPAIR
   std::unique_ptr<SFCGAL::Geometry> result;
   try {
     const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
@@ -3220,30 +3225,30 @@ sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
       break;
 
     case SFCGAL_POLYGON_REPAIR_NON_ZERO:
-#if CGAL_VERSION_MAJOR == 6 && CGAL_VERSION_MINOR >= 1
+  #if SFCGAL_CGAL_VERSION_MAJOR == 6 && SFCGAL_CGAL_VERSION_MINOR >= 1
       rule = SFCGAL::algorithm::PolygonRepairRule::NON_ZERO_RULE;
-#else
+  #else
       SFCGAL_ERROR("NON_ZERO rule requires CGAL 6.1 or later");
       return nullptr;
-#endif
+  #endif
       break;
 
     case SFCGAL_POLYGON_REPAIR_UNION:
-#if CGAL_VERSION_MAJOR == 6 && CGAL_VERSION_MINOR >= 1
+  #if SFCGAL_CGAL_VERSION_MAJOR == 6 && SFCGAL_CGAL_VERSION_MINOR >= 1
       rule = SFCGAL::algorithm::PolygonRepairRule::UNION_RULE;
-#else
+  #else
       SFCGAL_ERROR("UNION rule requires CGAL 6.1 or later");
       return nullptr;
-#endif
+  #endif
       break;
 
     case SFCGAL_POLYGON_REPAIR_INTERSECTION:
-#if CGAL_VERSION_MAJOR == 6 && CGAL_VERSION_MINOR >= 1
+  #if SFCGAL_CGAL_VERSION_MAJOR == 6 && SFCGAL_CGAL_VERSION_MINOR >= 1
       rule = SFCGAL::algorithm::PolygonRepairRule::INTERSECTION_RULE;
-#else
+  #else
       SFCGAL_ERROR("INTERSECTION rule requires CGAL 6.1 or later");
       return nullptr;
-#endif
+  #endif
       break;
 
     default:
@@ -3262,4 +3267,9 @@ sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
   }
 
   return reinterpret_cast<sfcgal_geometry_t *>(result.release());
+#else
+  // CGAL < 6.0: polygon repair functionality not available
+  SFCGAL_ERROR("polygon_repair functionality requires CGAL 6.0 or later");
+  return nullptr;
+#endif // SFCGAL_WITH_POLYGON_REPAIR
 }
