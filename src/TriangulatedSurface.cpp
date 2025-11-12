@@ -141,31 +141,31 @@ TriangulatedSurface::addTriangles(const TriangulatedSurface &other)
 }
 
 auto
-TriangulatedSurface::patchN(size_t const &n) const -> const Triangle &
+TriangulatedSurface::patchN(size_t const &index) const -> const Triangle &
 {
-  if (n >= numPatches()) {
+  if (index >= numPatches()) {
     BOOST_THROW_EXCEPTION(Exception(
         (boost::format("Cannot access geometry at position %s. "
                        "TriangulatedSurface has only %d geometries.") %
-         n % numGeometries())
+         index % numGeometries())
             .str()));
   }
 
-  return *_triangles[n];
+  return *_triangles[index];
 }
 
 auto
-TriangulatedSurface::patchN(size_t const &n) -> Triangle &
+TriangulatedSurface::patchN(size_t const &index) -> Triangle &
 {
-  if (n >= numPatches()) {
+  if (index >= numPatches()) {
     BOOST_THROW_EXCEPTION(Exception(
         (boost::format("Cannot access geometry at position %s. "
                        "TriangulatedSurface has only %d geometries.") %
-         n % numPatches())
+         index % numPatches())
             .str()));
   }
 
-  return *_triangles[n];
+  return *_triangles[index];
 }
 
 void
@@ -224,9 +224,9 @@ TriangulatedSurface::setPatchN(const Geometry &geometry, size_t const &idx)
 }
 
 void
-TriangulatedSurface::reserve(const size_t &n)
+TriangulatedSurface::reserve(const size_t &count)
 {
-  _triangles.reserve(n);
+  _triangles.reserve(count);
 }
 
 void
@@ -264,10 +264,10 @@ public:
   {
     const size_t nrPatchs = surf.numPatches();
     // Postcondition: `hds' is a valid polyhedral surface.
-    CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
-    B.begin_surface(/* vertices */ nrPatchs * 3,
-                    /* facets */ nrPatchs,
-                    /* halfedges */ nrPatchs * 3);
+    CGAL::Polyhedron_incremental_builder_3<HDS> builder(hds, true);
+    builder.begin_surface(/* vertices */ nrPatchs * 3,
+                          /* facets */ nrPatchs,
+                          /* halfedges */ nrPatchs * 3);
 
     size_t vertex_idx = 0;
 
@@ -275,11 +275,12 @@ public:
     // thanks to a binary tree (PointMap)
     for (size_t i = 0; i < nrPatchs; i++) {
       for (size_t j = 0; j < 3; j++) {
-        Point const p = surf.patchN(i).vertex(j).toPoint_3();
+        Point const point =
+            surf.patchN(i).vertex(static_cast<int>(j)).toPoint_3();
 
-        if (points.find(p) == points.end()) {
-          B.add_vertex(p);
-          points[p] = vertex_idx++;
+        if (points.find(point) == points.end()) {
+          builder.add_vertex(point);
+          points[point] = vertex_idx++;
         }
       }
     }
@@ -292,15 +293,15 @@ public:
     // around facets as seen from the outside of the polyhedron"
 
     for (size_t i = 0; i < nrPatchs; i++) {
-      B.begin_facet();
+      builder.begin_facet();
       CGAL::Triangle_3<K> const tri(surf.patchN(i).toTriangle_3());
-      CGAL::Point_3<K> const    pa(tri[0]);
-      CGAL::Point_3<K> const    pb(tri[1]);
-      CGAL::Point_3<K> const    pc(tri[2]);
+      CGAL::Point_3<K> const    pointA(tri[0]);
+      CGAL::Point_3<K> const    pointB(tri[1]);
+      CGAL::Point_3<K> const    pointC(tri[2]);
 
-      if (edges.find(std::make_pair(pa, pb)) != edges.end() ||
-          edges.find(std::make_pair(pb, pc)) != edges.end() ||
-          edges.find(std::make_pair(pc, pa)) != edges.end()) {
+      if (edges.find(std::make_pair(pointA, pointB)) != edges.end() ||
+          edges.find(std::make_pair(pointB, pointC)) != edges.end() ||
+          edges.find(std::make_pair(pointC, pointA)) != edges.end()) {
         BOOST_THROW_EXCEPTION(
             Exception("When trying to build a CGAL::Polyhedron_3 from a "
                       "TriangulatedSurface: bad orientation for " +
@@ -308,16 +309,16 @@ public:
                       " consider using ConsistentOrientationBuilder first"));
       }
 
-      B.add_vertex_to_facet(points[pa]);
-      B.add_vertex_to_facet(points[pb]);
-      B.add_vertex_to_facet(points[pc]);
-      edges.insert(std::make_pair(pa, pb));
-      edges.insert(std::make_pair(pb, pc));
-      edges.insert(std::make_pair(pc, pa));
-      B.end_facet();
+      builder.add_vertex_to_facet(points[pointA]);
+      builder.add_vertex_to_facet(points[pointB]);
+      builder.add_vertex_to_facet(points[pointC]);
+      edges.insert(std::make_pair(pointA, pointB));
+      edges.insert(std::make_pair(pointB, pointC));
+      edges.insert(std::make_pair(pointC, pointA));
+      builder.end_facet();
     }
 
-    B.end_surface();
+    builder.end_surface();
   }
 
 private:
@@ -329,12 +330,12 @@ private:
 template <typename Polyhedron>
 struct Plane_from_facet {
   auto
-  operator()(typename Polyhedron::Facet &f) -> typename Polyhedron::Plane_3
+  operator()(typename Polyhedron::Facet &facet) -> typename Polyhedron::Plane_3
   {
-    typename Polyhedron::Halfedge_handle const h = f.halfedge();
-    return typename Polyhedron::Plane_3(h->vertex()->point(),
-                                        h->next()->vertex()->point(),
-                                        h->opposite()->vertex()->point());
+    typename Polyhedron::Halfedge_handle const halfedge = facet.halfedge();
+    return typename Polyhedron::Plane_3(
+        halfedge->vertex()->point(), halfedge->next()->vertex()->point(),
+        halfedge->opposite()->vertex()->point());
   }
 };
 
@@ -374,7 +375,7 @@ TriangulatedSurface::toSurfaceMesh() const -> Surface_mesh_3
     std::array<Surface_mesh_3::Vertex_index, 3> vertices;
 
     for (size_t j = 0; j < 3; ++j) {
-      const Point &pt = triangle.vertex(j);
+      const Point &pt = triangle.vertex(static_cast<int>(j));
 
       // Check if vertex already exists
       auto it = vertexMap.find(pt);
