@@ -212,12 +212,12 @@ else()
 endif()
 
 #-- Check polygon repair availability (requires CGAL >= 6.0)
-if (CGAL_VERSION VERSION_LESS 6.0)
+if (SFCGAL_CGAL_VERSION_MAJOR LESS 6)
     set(SFCGAL_WITH_POLYGON_REPAIR OFF)
-    message(STATUS "polygonRepair requires CGAL 6.0+, disabled (found CGAL ${CGAL_VERSION})")
+    message(STATUS "polygonRepair requires CGAL 6.0+, disabled (found CGAL ${SFCGAL_CGAL_VERSION_MAJOR}.${SFCGAL_CGAL_VERSION_MINOR})")
 else()
     set(SFCGAL_WITH_POLYGON_REPAIR ON)
-    message(STATUS "polygonRepair enabled with CGAL ${CGAL_VERSION}")
+    message(STATUS "polygonRepair enabled with CGAL ${SFCGAL_CGAL_VERSION_MAJOR}.${SFCGAL_CGAL_VERSION_MINOR}")
 endif()
 
 #-- Coverage ---------------------------------------------------------------------

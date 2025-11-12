@@ -5,6 +5,7 @@
 
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/GeometryVisitor.h"
+#include "SFCGAL/version.h"
 
 namespace SFCGAL {
 
@@ -14,6 +15,7 @@ MultiPolygon::MultiPolygon(MultiPolygon const &other)
 
     = default;
 
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
 MultiPolygon::MultiPolygon(const CGAL::Multipolygon_with_holes_2<Kernel> &other)
 {
   for (const auto &pwh : other.polygons_with_holes()) {
@@ -53,6 +55,7 @@ MultiPolygon::MultiPolygon(const CGAL::Multipolygon_with_holes_2<Kernel> &other)
     addGeometry(polygon.release());
   }
 }
+#endif
 
 auto
 MultiPolygon::operator=(MultiPolygon other) -> MultiPolygon &
@@ -93,6 +96,7 @@ MultiPolygon::accept(ConstGeometryVisitor &visitor) const
   return visitor.visit(*this);
 }
 
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
 auto
 MultiPolygon::toMultipolygon_with_holes_2(bool fixOrientation) const
     -> CGAL::Multipolygon_with_holes_2<Kernel>
@@ -108,5 +112,6 @@ MultiPolygon::toMultipolygon_with_holes_2(bool fixOrientation) const
 
   return mp;
 }
+#endif
 
 } // namespace SFCGAL

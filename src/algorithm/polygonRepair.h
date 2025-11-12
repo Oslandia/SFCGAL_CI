@@ -4,9 +4,13 @@
 #ifndef SFCGAL_ALGORITHM_POLYGONREPAIR_H_
 #define SFCGAL_ALGORITHM_POLYGONREPAIR_H_
 
-#include "SFCGAL/Geometry.h"
-#include <cstdint>
-#include <memory>
+#include "SFCGAL/config.h"
+
+#ifdef SFCGAL_WITH_POLYGON_REPAIR
+
+  #include "SFCGAL/Geometry.h"
+  #include <cstdint>
+  #include <memory>
 
 namespace SFCGAL {
 
@@ -64,4 +68,6 @@ polygonRepair(const Geometry   &geometry,
 } // namespace algorithm
 } // namespace SFCGAL
 
-#endif
+#endif // SFCGAL_WITH_POLYGON_REPAIR
+
+#endif // SFCGAL_ALGORITHM_POLYGONREPAIR_H_
