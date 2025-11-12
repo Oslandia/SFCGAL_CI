@@ -50,6 +50,7 @@
 #include <SFCGAL/algorithm/scale.h>
 #include <SFCGAL/algorithm/simplification.h>
 #include <SFCGAL/algorithm/straightSkeleton.h>
+#include <SFCGAL/algorithm/surfaceSimplification.h>
 #include <SFCGAL/algorithm/tesselate.h>
 #include <SFCGAL/algorithm/translate.h>
 #include <SFCGAL/algorithm/union.h>
@@ -1065,6 +1066,121 @@ const std::vector<Operation> operations = {
        // Clone the input geometry to pass ownership to make_solid
        auto geom_copy = geom_a->clone();
        return Constructors::make_solid(std::move(geom_copy));
+     }},
+
+    {"surfacesimplification", "Algorithms",
+     "Simplify a 3D surface mesh using edge collapse", false,
+     "Parameters:\n"
+     "  ratio=VALUE: Edge count ratio to keep (0.0 to 1.0, default: 0.5)\n"
+     "  count=VALUE: Target edge count (alternative to ratio)\n"
+     "  strategy=VALUE: Simplification strategy (edge_length, "
+     "garland_heckbert, lindstrom_turk, default: edge_length)\n\n"
+     "Strategies:\n"
+     "  edge_length: Uses edge length cost with midpoint placement (default)\n"
+#ifdef SFCGAL_WITH_EIGEN
+     "  garland_heckbert: Uses quadric error metrics (requires Eigen)\n"
+     "  lindstrom_turk: Uses Lindstrom-Turk cost/placement (requires Eigen)\n"
+#endif
+     "\nExamples:\n"
+     "  sfcgalop -a mesh.obj surfacesimplification \"ratio=0.5\"\n"
+     "  sfcgalop -a mesh.obj surfacesimplification \"count=1000\"\n"
+     "  sfcgalop -a mesh.obj surfacesimplification "
+     "\"ratio=0.3,strategy=edge_length\"",
+     "A, params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       if (!geom_a) {
+         return std::nullopt;
+       }
+
+       // Check if geometry is supported
+       auto geom_type = geom_a->geometryTypeId();
+       if (geom_type != SFCGAL::TYPE_TRIANGULATEDSURFACE &&
+           geom_type != SFCGAL::TYPE_POLYHEDRALSURFACE &&
+           geom_type != SFCGAL::TYPE_SOLID &&
+           geom_type != SFCGAL::TYPE_MULTISOLID) {
+         return std::nullopt;
+       }
+
+       auto params = parse_params(args);
+
+       // Parse stop predicate
+       SFCGAL::algorithm::SimplificationStopPredicate stopPredicate;
+       if (params.count("count")) {
+         double count_value = params["count"];
+         if (count_value < 0 || count_value != std::floor(count_value)) {
+           // Count must be a non-negative integer
+           return std::nullopt;
+         }
+         auto count = static_cast<size_t>(count_value);
+         if (count == 0) {
+           // Edge count must be positive
+           return std::nullopt;
+         }
+         stopPredicate =
+             SFCGAL::algorithm::SimplificationStopPredicate::edgeCount(count);
+       } else {
+         double ratio = params.count("ratio") ? params["ratio"] : 0.5;
+         if (ratio <= 0.0 || ratio >= 1.0) {
+           // Ratio must be in the range (0.0, 1.0)
+           return std::nullopt;
+         }
+         stopPredicate =
+             SFCGAL::algorithm::SimplificationStopPredicate::edgeCountRatio(
+                 ratio);
+       }
+
+       // Parse strategy
+       SFCGAL::algorithm::SimplificationStrategy strategy =
+           SFCGAL::algorithm::SimplificationStrategy::EDGE_LENGTH;
+       if (params.count("strategy")) {
+         std::string strategy_str = "";
+         // We need to parse the string from params, but params only stores
+         // doubles So we need to parse the original args string for the
+         // strategy
+         auto strategy_pos = args.find("strategy=");
+         if (strategy_pos != std::string::npos) {
+           auto start = strategy_pos + 9; // length of "strategy="
+           auto end   = args.find(',', start);
+           if (end == std::string::npos)
+             end = args.length();
+           strategy_str = args.substr(start, end - start);
+           strategy_str = trim(strategy_str);
+         }
+
+         if (strategy_str == "edge_length") {
+           strategy = SFCGAL::algorithm::SimplificationStrategy::EDGE_LENGTH;
+         }
+#ifdef SFCGAL_WITH_EIGEN
+         else if (strategy_str == "garland_heckbert") {
+           strategy =
+               SFCGAL::algorithm::SimplificationStrategy::GARLAND_HECKBERT;
+         } else if (strategy_str == "lindstrom_turk") {
+           strategy = SFCGAL::algorithm::SimplificationStrategy::LINDSTROM_TURK;
+         }
+#endif
+         else if (!strategy_str.empty()) {
+           // Invalid strategy name provided
+           return std::nullopt;
+         }
+       }
+
+       try {
+         return SFCGAL::algorithm::surfaceSimplification(*geom_a, stopPredicate,
+                                                         strategy);
+       } catch (const std::invalid_argument &e) {
+         // Invalid parameters (ratio out of range, etc.)
+         return std::nullopt;
+       } catch (const std::bad_alloc &e) {
+         // Memory allocation failure during simplification
+         return std::nullopt;
+       } catch (const std::runtime_error &e) {
+         // CGAL or geometric algorithm errors
+         return std::nullopt;
+       } catch (const std::exception &e) {
+         // Other standard exceptions
+         return std::nullopt;
+       }
      }}};
 
 } // namespace
