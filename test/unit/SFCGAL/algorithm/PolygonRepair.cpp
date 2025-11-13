@@ -4,7 +4,7 @@
 
 #include "SFCGAL/config.h"
 
-#ifdef SFCGAL_WITH_POLYGON_REPAIR
+#ifdef SFCGAL_CGAL_VERSION_MAJOR >= 6
 
   #include "SFCGAL/version.h"
   #include <memory>
@@ -224,4 +224,4 @@ BOOST_AUTO_TEST_CASE(testPolygonWithDuplicates)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#endif // SFCGAL_WITH_POLYGON_REPAIR
+#endif // SFCGAL_CGAL_VERSION_MAJOR >= 6

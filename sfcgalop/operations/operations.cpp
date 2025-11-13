@@ -5,6 +5,7 @@
 
 #include "../constructors.hpp"
 #include "SFCGAL/config.h"
+#include "SFCGAL/version.h"
 #include <SFCGAL/Kernel.h>
 
 #if !defined(_MSC_VER)
@@ -42,8 +43,8 @@
 #include <SFCGAL/algorithm/orientation.h>
 #include <SFCGAL/algorithm/partition_2.h>
 #include <SFCGAL/algorithm/plane.h>
-#ifdef SFCGAL_WITH_POLYGON_REPAIR
-#include <SFCGAL/algorithm/polygonRepair.h>
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
+  #include <SFCGAL/algorithm/polygonRepair.h>
 #endif
 #include <SFCGAL/algorithm/rotate.h>
 #include <SFCGAL/algorithm/scale.h>
@@ -730,7 +731,7 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::simplify(*geom_a, tolerance, preserveTopology);
      }},
 
-#ifdef SFCGAL_WITH_POLYGON_REPAIR
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
     {"polygonrepair", "Transformations", "Repair invalid polygons with rules",
      false,
      "Parameters:\n  method=0|1|2|3 (default: 0)\n\nMethods:\n  0 = "
@@ -762,7 +763,7 @@ const std::vector<Operation> operations = {
 
        return SFCGAL::algorithm::polygonRepair(*geom_a, rule);
      }},
-#endif // SFCGAL_WITH_POLYGON_REPAIR
+#endif // SFCGAL_CGAL_VERSION_MAJOR >= 6
 
     // Collection operations
     {"collect", "Collections", "Combine two geometries into a collection", true,
