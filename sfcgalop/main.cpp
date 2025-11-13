@@ -469,7 +469,7 @@ handle_geometry_display(const Options &options) -> bool
   if (!options.quiet) {
     // Create an OperationResult from the geometry to use existing print
     // function
-    OperationResult result = geom_a->clone();
+    OperationResult                result = geom_a->clone();
     std::optional<OperationResult> optional_result =
         std::make_optional(std::move(result));
     IO::print_result(optional_result, options.format, options.precision);

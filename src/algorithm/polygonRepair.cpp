@@ -4,7 +4,7 @@
 #include "SFCGAL/config.h"
 #include "SFCGAL/version.h"
 
-#ifdef SFCGAL_WITH_POLYGON_REPAIR
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
 
   #include "SFCGAL/Exception.h"
   #include "SFCGAL/Geometry.h"
@@ -133,4 +133,4 @@ polygonRepair(const Geometry &geometry, PolygonRepairRule repairRule)
 
 } // namespace SFCGAL::algorithm
 
-#endif // SFCGAL_WITH_POLYGON_REPAIR
+#endif // SFCGAL_CGAL_VERSION_MAJOR >= 6

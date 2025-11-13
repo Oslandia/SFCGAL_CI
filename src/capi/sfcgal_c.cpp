@@ -67,7 +67,7 @@
 #include "SFCGAL/algorithm/offset.h"
 #include "SFCGAL/algorithm/partition_2.h"
 #include "SFCGAL/algorithm/plane.h"
-#ifdef SFCGAL_WITH_POLYGON_REPAIR
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
   #include "SFCGAL/algorithm/polygonRepair.h"
 #endif
 #include "SFCGAL/algorithm/rotate.h"
@@ -3205,7 +3205,7 @@ sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
                                sfcgal_polygon_repair_rule_t repair_rule)
     -> sfcgal_geometry_t *
 {
-#ifdef SFCGAL_WITH_POLYGON_REPAIR
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
   std::unique_ptr<SFCGAL::Geometry> result;
   try {
     const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
@@ -3271,5 +3271,5 @@ sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
   // CGAL < 6.0: polygon repair functionality not available
   SFCGAL_ERROR("polygon_repair functionality requires CGAL 6.0 or later");
   return nullptr;
-#endif // SFCGAL_WITH_POLYGON_REPAIR
+#endif // SFCGAL_CGAL_VERSION_MAJOR >= 6
 }

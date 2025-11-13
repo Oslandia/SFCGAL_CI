@@ -11,9 +11,6 @@ if (CGAL_VERSION VERSION_LESS 6.0)
     list(REMOVE_ITEM SFCGAL_SOURCES ${CMAKE_SOURCE_DIR}/src/algorithm/polygonRepair.cpp)
     list(REMOVE_ITEM SFCGAL_HEADERS ${CMAKE_SOURCE_DIR}/src/algorithm/polygonRepair.h)
     message(STATUS "polygonRepair requires CGAL 6.0+, excluding from build (found CGAL ${CGAL_VERSION})")
-    set(SFCGAL_WITH_POLYGON_REPAIR OFF)
-else()
-    set(SFCGAL_WITH_POLYGON_REPAIR ON)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND
