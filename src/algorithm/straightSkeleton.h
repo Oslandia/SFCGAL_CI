@@ -25,13 +25,21 @@ struct NoValidityCheck;
 /**
  * @brief build an approximate medial axis for a Polygon
  * @param geom input geometry
+ * @param projectToEdges if true, project free endpoints to polygon boundary
+ *                       using edge midpoint method
  * @return approximate medial axis as a MultiLineString
  * @pre geom is a valid geometry
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
+ *
+ * When projectToEdges is true, free endpoints of the medial axis are extended
+ * to the polygon boundary. The projection uses the midpoint of the common
+ * defining edge from the straight skeleton, providing a geometrically exact
+ * and symmetric result.
  */
 SFCGAL_API auto
-approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>;
+approximateMedialAxis(const Geometry &geom, bool projectToEdges = false)
+    -> std::unique_ptr<MultiLineString>;
 
 /**
  * @brief build a 2D straight skeleton for a Polygon

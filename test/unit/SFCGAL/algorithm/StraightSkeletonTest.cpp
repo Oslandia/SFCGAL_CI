@@ -109,9 +109,11 @@ BOOST_AUTO_TEST_CASE(testPolygonWithHole)
   // To avoid rounding errors in the results (-3730904090310553/9007199254740992
   // vs -466363011288819/1125899906842624), a text comparison is used. This is
   // not optimal.
-  std::unique_ptr<Geometry> const r(io::readWkt(result->asText(10)));
-  std::unique_ptr<Geometry> const e(io::readWkt(expected->asText(10)));
-  BOOST_CHECK(algorithm::covers(*r, *e));
+  std::unique_ptr<Geometry> const resultGeometry(
+      io::readWkt(result->asText(10)));
+  std::unique_ptr<Geometry> const expectedGeometry(
+      io::readWkt(expected->asText(10)));
+  BOOST_CHECK(algorithm::covers(*resultGeometry, *expectedGeometry));
 }
 
 BOOST_AUTO_TEST_CASE(testPolygonWithHoleTouchingShell)
@@ -504,6 +506,237 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPartitionNonPolygonGeometry)
 {
   std::unique_ptr<Geometry> g(io::readWkt("LINESTRING (0 0, 1 1, 2 2)"));
   BOOST_CHECK_THROW(algorithm::straightSkeletonPartition(*g), std::exception);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesRectangle)
+{
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 6, 0 6, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((0.00 3.00,3.00 3.00,7.00 3.00,10.00 3.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesLShape)
+{
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((3 0, 3 6, 6 6, 6 3, 10 3, 10 0, 3 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((10.00 1.50,8.50 1.50,4.50 1.50),(4.50 1.50,4.50 "
+      "4.50,4.50 6.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesTShape)
+{
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 9 0, 9 3, 6 3, 6 6, 3 6, 3 3, 0 3, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((0.00 1.50,1.50 1.50,4.50 1.50),(9.00 1.50,7.50 "
+      "1.50,4.50 1.50),(4.50 1.50,4.50 4.50,4.50 6.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesEmptyPolygon)
+{
+  std::unique_ptr<Geometry>        g(io::readWkt("POLYGON EMPTY"));
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  BOOST_CHECK(result->isEmpty());
+  BOOST_CHECK_EQUAL(result->numGeometries(), 0U);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesBigTShape)
+{
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 12 0, 12 3, 9 3, 9 9, 3 9, 3 3, 0 3, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((0.00 1.50,1.50 1.50,4.50 1.50),(12.00 1.50,10.50 "
+      "1.50,7.50 1.50),(7.50 1.50,6.00 3.00),(4.50 1.50,6.00 3.00),(6.00 "
+      "9.00,6.00 6.00,6.00 3.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesInvalidGeometry)
+{
+  // Non-polygon geometries should return empty result
+  std::unique_ptr<Geometry>        g(io::readWkt("LINESTRING (0 0, 1 1, 2 2)"));
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  BOOST_CHECK(result->isEmpty());
+  BOOST_CHECK_EQUAL(result->numGeometries(), 0U);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesSimpleRectangle6x3)
+{
+  // Test the user's example: 6x3 rectangle
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 6 0, 6 3, 0 3, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((0.00 1.50,1.50 1.50,4.50 1.50,6.00 1.50))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesUShape)
+{
+  // U-shape: complex structure with 3 branches
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 8, 8 8, 8 2, 2 2, 2 8, 0 8, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((9.00 8.00,9.00 7.00,9.00 1.00),(1.00 8.00,1.00 "
+      "7.00,1.00 1.00),(9.00 1.00,1.00 1.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesSquare)
+{
+  // Square: degenerate case where medial axis collapses to a point
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  // Square's medial axis degenerates to a point, should return empty
+  BOOST_CHECK(result->isEmpty());
+  BOOST_CHECK_EQUAL(result->numGeometries(), 0U);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesElongatedRectangle)
+{
+  // Elongated rectangle: 20x2
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 20 0, 20 2, 0 2, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((0.00 1.00,1.00 1.00,19.00 1.00,20.00 1.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesCrossShape)
+{
+  // Cross/Plus shape: 4 branches meeting at center
+  std::unique_ptr<Geometry> g(io::readWkt(
+      "POLYGON ((4 0, 6 0, 6 4, 10 4, 10 6, 6 6, 6 10, 4 10, 4 6, 0 6, 0 4, "
+      "4 4, 4 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((5.00 0.00,5.00 1.00,5.00 5.00),(10.00 5.00,9.00 "
+      "5.00,5.00 5.00),(0.00 5.00,1.00 5.00,5.00 5.00),(5.00 5.00,5.00 "
+      "9.00,5.00 10.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesCShape)
+{
+  // C-shape: open on one side
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 2, 2 2, 2 8, 10 8, 10 10, 0 10, 0 "
+                  "0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((10.00 1.00,9.00 1.00,1.00 1.00),(1.00 1.00,1.00 "
+      "9.00),(1.00 9.00,9.00 9.00,10.00 9.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesPolygonWithHole)
+{
+  // Polygon with square hole in center
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0), (2 2, 2 8, 8 8, 8 "
+                  "2, 2 2))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((1.00 1.00,9.00 1.00),(1.00 1.00,1.00 9.00),(1.00 "
+      "9.00,9.00 9.00),(9.00 9.00,9.00 1.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesComplexPolygonWithHole)
+{
+  // More complex polygon with hole
+  std::unique_ptr<Geometry> g(io::readWkt(
+      "POLYGON ((0 0, 20 0, 20 10, 0 10, 0 0), (5 3, 5 7, 15 7, 15 3, 5 3))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  // Result should have medial axis around the hole
+  std::string const expectedWKT(
+      "MULTILINESTRING ((3.50 1.50,16.50 1.50),(3.50 1.50,2.50 2.50),(3.50 "
+      "8.50,2.50 7.50),(3.50 8.50,16.50 8.50),(16.50 8.50,17.50 7.50),(16.50 "
+      "1.50,17.50 2.50),(17.50 7.50,17.50 2.50),(2.50 7.50,2.50 2.50))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesNarrowCorridor)
+{
+  // Narrow corridor shape
+  std::unique_ptr<Geometry> g(
+      io::readWkt("POLYGON ((0 0, 1 0, 1 10, 0 10, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((0.50 0.00,0.50 0.50,0.50 9.50,0.50 10.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+}
+
+BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesThinH)
+{
+  // H-shape with thin bars
+  std::unique_ptr<Geometry> g(io::readWkt(
+      "POLYGON ((0 0, 2 0, 2 4, 4 4, 4 0, 6 0, 6 10, 4 10, 4 6, 2 6, 2 10, 0 "
+      "10, 0 0))"));
+
+  std::unique_ptr<MultiLineString> result =
+      algorithm::approximateMedialAxis(*g, true);
+
+  std::string const expectedWKT(
+      "MULTILINESTRING ((1.00 0.00,1.00 1.00,1.00 5.00),(5.00 0.00,5.00 "
+      "1.00,5.00 5.00),(5.00 10.00,5.00 9.00,5.00 5.00),(1.00 5.00,5.00 "
+      "5.00),(1.00 5.00,1.00 9.00,1.00 10.00))");
+  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
