@@ -30,6 +30,8 @@
 #include <CGAL/create_straight_skeleton_from_polygon_with_holes_2.h>
 #include <CGAL/extrude_skeleton.h>
 
+#include <cmath>
+#include <limits>
 #include <memory>
 
 namespace SFCGAL::algorithm {
@@ -55,7 +57,7 @@ namespace { // anonymous
 
 template <class K, bool outputDistanceInM>
 void
-straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
+straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &skeleton,
                                   MultiLineString &result, bool innerOnly,
                                   Kernel::Vector_2 &translate,
                                   const double     &toleranceAbs)
@@ -69,8 +71,8 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
   Halfedge_const_handle const null_halfedge;
   Vertex_const_handle const   null_vertex;
 
-  for (Halfedge_const_iterator it = ss.halfedges_begin();
-       it != ss.halfedges_end(); ++it) {
+  for (Halfedge_const_iterator it = skeleton.halfedges_begin();
+       it != skeleton.halfedges_end(); ++it) {
     // skip contour edge
     if (!it->is_bisector()) {
       continue;
@@ -86,7 +88,7 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
       continue;
     }
 
-    LineString *ls = nullptr;
+    LineString *lineString = nullptr;
     Point       pa(it->opposite()->vertex()->point());
     Point       pb(it->vertex()->point());
     // avoid degenerate cases.https://gitlab.com/Oslandia/SFCGAL/-/issues/143
@@ -94,13 +96,13 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
       if (outputDistanceInM) {
         pa.setM(CGAL::to_double(it->opposite()->vertex()->time()));
         pb.setM(CGAL::to_double(it->vertex()->time()));
-        ls = new LineString(pa, pb);
+        lineString = new LineString(pa, pb);
       } else {
-        ls = new LineString(pa, pb);
+        lineString = new LineString(pa, pb);
       }
 
-      algorithm::translate(*ls, translate);
-      result.addGeometry(ls);
+      algorithm::translate(*lineString, translate);
+      result.addGeometry(lineString);
     }
   }
 }
@@ -109,12 +111,12 @@ straightSkeletonToMultiLineString(const CGAL::Straight_skeleton_2<K> &ss,
  * Return abc angle in radians
  */
 auto
-angle(const Point &a, const Point &b, const Point &c) -> double
+angle(const Point &pointA, const Point &pointB, const Point &pointC) -> double
 {
-  Point const ab(CGAL::to_double(b.x() - a.x()),
-                 CGAL::to_double(b.y() - a.y()));
-  Point const cb(CGAL::to_double(b.x() - c.x()),
-                 CGAL::to_double(b.y() - c.y()));
+  Point const ab(CGAL::to_double(pointB.x() - pointA.x()),
+                 CGAL::to_double(pointB.y() - pointA.y()));
+  Point const cb(CGAL::to_double(pointB.x() - pointC.x()),
+                 CGAL::to_double(pointB.y() - pointC.y()));
 
   double const dot =
       (CGAL::to_double(ab.x() * cb.x() + ab.y() * cb.y())); /* dot product */
@@ -126,14 +128,104 @@ angle(const Point &a, const Point &b, const Point &c) -> double
   return alpha;
 }
 
+/**
+ * @brief Project free endpoint to boundary using edge midpoint method
+ *
+ * For a free endpoint P on medial axis:
+ * 1. Find skeleton bisectors from contour incident to P (exclude inner
+ * bisectors)
+ * 2. Collect BOTH defining contour edges from each bisector
+ * 3. Find the common/repeated edge (appears in multiple bisectors)
+ * 4. Return midpoint of that edge's two vertices
+ *
+ * Example: Rectangle corner with medial axis endpoint at (1.5, 1.5)
+ * - Two corner bisectors converge: from (0,0) and (0,3)
+ * - From (0,0) bisector: left edge + bottom edge
+ * - From (0,3) bisector: left edge + top edge
+ * - Left edge appears twice → midpoint: (0, 1.5)
+ */
+template <class K>
+auto
+findEdgeMidpointProjection(
+    typename CGAL::Straight_skeleton_2<K>::Vertex_const_handle vertex,
+    const CGAL::Straight_skeleton_2<K> &skeleton) -> Point
+{
+  using Ss                    = CGAL::Straight_skeleton_2<K>;
+  using Halfedge_const_handle = typename Ss::Halfedge_const_handle;
+
+  // Collect all bisectors incident to this vertex
+  std::vector<Halfedge_const_handle> incidentBisectors;
+
+  // Traverse circulator around vertex
+  Halfedge_const_handle start   = vertex->halfedge();
+  Halfedge_const_handle current = start;
+
+  do {
+    if (current->is_bisector()) {
+      incidentBisectors.push_back(current);
+    }
+    current = current->opposite()->prev();
+  } while (current != start);
+
+  // Collect defining contour edges and count occurrences
+  // Use sorted pair to normalize edge representation
+  std::map<std::pair<Point, Point>, int> edgeCount;
+
+  for (const auto &bisector : incidentBisectors) {
+    // Skip inner bisectors - only use skeleton bisectors from the contour
+    if (bisector->is_inner_bisector()) {
+      continue;
+    }
+
+    // Each bisector is defined by TWO contour edges
+    // Get first defining edge
+    auto  de1 = bisector->defining_contour_edge();
+    Point v1_1(de1->vertex()->point());
+    Point v1_2(de1->opposite()->vertex()->point());
+    auto  edge1 =
+        (v1_1.x() < v1_2.x() || (v1_1.x() == v1_2.x() && v1_1.y() < v1_2.y()))
+             ? std::make_pair(v1_1, v1_2)
+             : std::make_pair(v1_2, v1_1);
+    edgeCount[edge1]++;
+
+    // Get second defining edge (from opposite halfedge)
+    auto  de2 = bisector->opposite()->defining_contour_edge();
+    Point v2_1(de2->vertex()->point());
+    Point v2_2(de2->opposite()->vertex()->point());
+    auto  edge2 =
+        (v2_1.x() < v2_2.x() || (v2_1.x() == v2_2.x() && v2_1.y() < v2_2.y()))
+             ? std::make_pair(v2_1, v2_2)
+             : std::make_pair(v2_2, v2_1);
+    edgeCount[edge2]++;
+  }
+
+  // Find the most common edge (appears in multiple bisectors)
+  std::pair<Point, Point> dominantEdge;
+  int                     maxCount = 0;
+
+  for (const auto &[edge, count] : edgeCount) {
+    if (count > maxCount) {
+      maxCount     = count;
+      dominantEdge = edge;
+    }
+  }
+
+  // Return midpoint of the dominant edge
+  Kernel::FT midX = (dominantEdge.first.x() + dominantEdge.second.x()) / 2;
+  Kernel::FT midY = (dominantEdge.first.y() + dominantEdge.second.y()) / 2;
+
+  return {midX, midY};
+}
+
 template <class K>
 void
-straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &ss,
+straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &skeleton,
                              MultiLineString                    &result,
-                             Kernel::Vector_2                   &translate)
+                             Kernel::Vector_2 &translate, bool projectToEdges)
 {
   using Ss = CGAL::Straight_skeleton_2<K>;
 
+  using Vertex_const_handle     = typename Ss::Vertex_const_handle;
   using Halfedge_const_handle   = typename Ss::Halfedge_const_handle;
   using Halfedge_const_iterator = typename Ss::Halfedge_const_iterator;
 
@@ -154,8 +246,14 @@ straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &ss,
   //
   const double maxTouchingAngle = CGAL_PI / 8.0 + 1e-13;
 
-  for (Halfedge_const_iterator it = ss.halfedges_begin();
-       it != ss.halfedges_end(); ++it) {
+  // Build connectivity graph to identify free endpoints (degree 1 vertices)
+  std::map<Vertex_const_handle, int> vertexDegree;
+
+  // First pass: identify medial axis bisectors and count vertex degrees
+  std::vector<Halfedge_const_handle> medialAxisBisectors;
+
+  for (Halfedge_const_iterator it = skeleton.halfedges_begin();
+       it != skeleton.halfedges_end(); ++it) {
     // skip contour edge
     if (!it->is_bisector()) {
       continue;
@@ -173,22 +271,52 @@ straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &ss,
       const Halfedge_const_handle &de1 = it->defining_contour_edge();
 
       // We need to check the angle formed by:
-      const Point &p1 = it->vertex()->point();
-      const Point &p2 = de1->vertex()->point();
-      const Point &p3 = de1->opposite()->vertex()->point();
+      const Point &pointA = it->vertex()->point();
+      const Point &pointB = de1->vertex()->point();
+      const Point &pointC = de1->opposite()->vertex()->point();
 
-      double const ang = angle(p1, p2, p3);
+      double const ang = angle(pointA, pointB, pointC);
 
       if (ang > maxTouchingAngle) {
         continue;
       }
     }
 
-    std::unique_ptr<LineString> ls(
-        new LineString(Point(it->opposite()->vertex()->point()),
-                       Point(it->vertex()->point())));
-    algorithm::translate(*ls, translate);
-    result.addGeometry(ls.release());
+    // This is a medial axis bisector
+    medialAxisBisectors.push_back(it);
+    vertexDegree[it->vertex()]++;
+    vertexDegree[it->opposite()->vertex()]++;
+  }
+
+  // Second pass: create linestrings with optional projection
+  for (const auto &it : medialAxisBisectors) {
+    Point startPoint(it->opposite()->vertex()->point());
+    Point endPoint(it->vertex()->point());
+
+    std::unique_ptr<LineString> lineString(new LineString);
+
+    // Project start point if it's a free endpoint
+    if (projectToEdges && vertexDegree[it->opposite()->vertex()] == 1) {
+      Point proj =
+          findEdgeMidpointProjection<K>(it->opposite()->vertex(), skeleton);
+      algorithm::translate(proj, translate);
+      lineString->addPoint(proj);
+    }
+
+    // Add original medial axis segment
+    algorithm::translate(startPoint, translate);
+    algorithm::translate(endPoint, translate);
+    lineString->addPoint(startPoint);
+    lineString->addPoint(endPoint);
+
+    // Project end point if it's a free endpoint
+    if (projectToEdges && vertexDegree[it->vertex()] == 1) {
+      Point proj = findEdgeMidpointProjection<K>(it->vertex(), skeleton);
+      algorithm::translate(proj, translate);
+      lineString->addPoint(proj);
+    }
+
+    result.addGeometry(lineString.release());
   }
 }
 
@@ -196,14 +324,15 @@ auto
 straightSkeleton(const Polygon_with_holes_2 &poly)
     -> SHARED_PTR<Straight_skeleton_2>
 {
-  SHARED_PTR<CGAL::Straight_skeleton_2<CGAL::Epick>> const sk =
+  SHARED_PTR<CGAL::Straight_skeleton_2<CGAL::Epick>> const skeletonEpick =
       CGAL::create_interior_straight_skeleton_2(
           poly.outer_boundary().vertices_begin(),
           poly.outer_boundary().vertices_end(), poly.holes_begin(),
           poly.holes_end(), CGAL::Epick());
   SHARED_PTR<Straight_skeleton_2> ret;
-  if (sk) {
-    ret = CGAL::convert_straight_skeleton_2<Straight_skeleton_2>(*sk);
+  if (skeletonEpick) {
+    ret =
+        CGAL::convert_straight_skeleton_2<Straight_skeleton_2>(*skeletonEpick);
   }
   return ret;
 }
@@ -380,7 +509,8 @@ straightSkeleton(const MultiPolygon &geom, bool /*autoOrientation*/,
 }
 
 auto
-approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>
+approximateMedialAxis(const Geometry &geom, bool projectToEdges)
+    -> std::unique_ptr<MultiLineString>
 {
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geom);
 
@@ -399,7 +529,7 @@ approximateMedialAxis(const Geometry &geom) -> std::unique_ptr<MultiLineString>
           Exception("CGAL failed to create straightSkeleton"));
     }
 
-    straightSkeletonToMedialAxis(*skeleton, *mx, trans);
+    straightSkeletonToMedialAxis(*skeleton, *mx, trans, projectToEdges);
   }
 
   propagateValidityFlag(*mx, true);
@@ -554,8 +684,9 @@ straightSkeletonPartition(const Polygon &geom, bool /*autoOrientation*/)
     Straight_skeleton_2::Halfedge_const_handle start   = face->halfedge();
     Straight_skeleton_2::Halfedge_const_handle current = start;
     do {
-      const Point_2 &p = current->vertex()->point();
-      points.emplace_back(CGAL::to_double(p.x()), CGAL::to_double(p.y()));
+      const Point_2 &point = current->vertex()->point();
+      points.emplace_back(CGAL::to_double(point.x()),
+                          CGAL::to_double(point.y()));
       current = current->next();
     } while (current != start);
 

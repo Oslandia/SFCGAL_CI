@@ -516,15 +516,44 @@ const std::vector<Operation> operations = {
 
     {"straightskeleton", "Construction",
      "Compute the straight skeleton of a polygon", false,
-     "Parameters:\n  auto_orientation=0|1: Enable automatic orientation "
-     "correction (default: 0)\n\nExample:\n  sfcgalop -a \"POLYGON((0 0,4 0,4 "
-     "4,0 4,0 0))\" straightskeleton \"auto_orientation=1\"",
+     "Parameters:\n  auto_orientation=BOOL: Enable automatic orientation "
+     "correction (default: false)\n"
+     "                         Accepts: true/false, t/f, 1/0, TRUE/FALSE "
+     "(case-insensitive)\n\n"
+     "Example:\n  sfcgalop -a \"POLYGON((0 0,4 0,4 "
+     "4,0 4,0 0))\" straightskeleton \"auto_orientation=true\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto params          = parse_params(args);
-       bool autoOrientation = params["auto_orientation"] != 0.0;
+       auto params = parse_params(args);
+       bool autoOrientation =
+           parse_boolean_param(params, "auto_orientation", args, false);
        return SFCGAL::algorithm::straightSkeleton(*geom_a, autoOrientation);
+     }},
+
+    {"medial_axis", "Construction",
+     "Compute the approximate medial axis of a polygon", false,
+     "Computes the approximate medial axis for a polygon as a "
+     "MultiLineString.\n"
+     "The medial axis represents the 'skeleton' of the polygon, where each "
+     "point\n"
+     "is equidistant from the nearest polygon edges.\n\n"
+     "Input A: Polygon geometry\n\n"
+     "Parameters:\n"
+     "  project_to_edges=BOOL: If true, extend free endpoints to polygon "
+     "boundary\n"
+     "                         using edge midpoint method (default: false)\n\n"
+     "Examples:\n"
+     "  sfcgalop -a \"POLYGON((0 0,6 0,6 3,0 3,0 0))\" medial_axis\n"
+     "  sfcgalop -a \"POLYGON((0 0,6 0,6 3,0 3,0 0))\" medial_axis "
+     "\"project_to_edges=true\"",
+     "A, params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto params = parse_params(args);
+       bool projectToEdges =
+           parse_boolean_param(params, "project_to_edges", args, false);
+       return SFCGAL::algorithm::approximateMedialAxis(*geom_a, projectToEdges);
      }},
 
     {"extrude", "Construction", "Extrude a 2D geometry to create a 3D solid",
@@ -1146,7 +1175,7 @@ const std::vector<Operation> operations = {
        // Clone the input geometry to pass ownership to make_solid
        auto geom_copy = geom_a->clone();
        return Constructors::make_solid(std::move(geom_copy));
-     }}};
+     }}}; // end operations array
 
 } // namespace
 
