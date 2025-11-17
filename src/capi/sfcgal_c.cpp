@@ -306,13 +306,13 @@ sfcgal_init(void)
 extern "C" auto
 sfcgal_version(void) -> const char *
 {
-  return SFCGAL::Version();
+  return SFCGAL_Version();
 }
 
 extern "C" auto
 sfcgal_full_version(void) -> const char *
 {
-  return SFCGAL::Full_Version();
+  return SFCGAL_Full_Version();
 }
 
 extern "C" void
@@ -3200,12 +3200,12 @@ sfcgal_nurbs_curve_to_linestring_adaptive(const sfcgal_geometry_t *curve,
       return static_cast<SFCGAL::Geometry *>(lineString.release());)
 }
 
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
 extern "C" auto
 sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
                                sfcgal_polygon_repair_rule_t repair_rule)
     -> sfcgal_geometry_t *
 {
-#if SFCGAL_CGAL_VERSION_MAJOR >= 6
   std::unique_ptr<SFCGAL::Geometry> result;
   try {
     const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
@@ -3267,9 +3267,5 @@ sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
   }
 
   return reinterpret_cast<sfcgal_geometry_t *>(result.release());
-#else
-  // CGAL < 6.0: polygon repair functionality not available
-  SFCGAL_ERROR("polygon_repair functionality requires CGAL 6.0 or later");
-  return nullptr;
-#endif // SFCGAL_CGAL_VERSION_MAJOR >= 6
 }
+#endif // SFCGAL_CGAL_VERSION_MAJOR >= 6

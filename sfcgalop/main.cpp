@@ -41,7 +41,7 @@ constexpr std::string_view PROGRAM_NAME = "sfcgalop";
 auto
 get_program_version() -> std::string
 {
-  return SFCGAL::Version();
+  return SFCGAL_Version();
 }
 
 struct Options {
@@ -179,7 +179,7 @@ print_version()
   version_table.add_column("Version", 30, TextUI::Column::LEFT);
 
   version_table.add_row({"sfcgalop", get_program_version()});
-  version_table.add_row({"SFCGAL Library", SFCGAL::Version()});
+  version_table.add_row({"SFCGAL Library", SFCGAL_Version()});
   std::string cgal_version = std::to_string(SFCGAL_CGAL_VERSION_MAJOR) + "." +
                              std::to_string(SFCGAL_CGAL_VERSION_MINOR) + "." +
                              std::to_string(SFCGAL_CGAL_VERSION_PATCH);

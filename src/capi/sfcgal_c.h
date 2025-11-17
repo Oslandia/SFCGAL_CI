@@ -7,6 +7,7 @@
 #define SFCGAL_CAPI_H_
 
 #include "SFCGAL/config.h"
+#include "SFCGAL/version.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -2517,6 +2518,7 @@ sfcgal_primitive_set_parameter_vector(sfcgal_primitive_t *primitive,
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_primitive_as_polyhedral_surface(const sfcgal_primitive_t *primitive);
 
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
 /**
  * Polygon repair rules
  * @ingroup capi
@@ -2547,6 +2549,8 @@ typedef enum {
 SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
                                sfcgal_polygon_repair_rule_t repair_rule);
+
+#endif // SFCGAL_CGAL_VERSION_MAJOR >= 6
 
 /*--------------------------------------------------------------------------------------*
  *

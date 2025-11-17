@@ -2322,7 +2322,7 @@ BOOST_AUTO_TEST_CASE(testConeTest)
   sfcgal_primitive_delete(cone);
 }
 
-#ifdef SFCGAL_CGAL_VERSION_MAJOR >= 6
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
 BOOST_AUTO_TEST_CASE(testPolygonRepairTest)
 {
   std::unique_ptr<Geometry> polygon(
