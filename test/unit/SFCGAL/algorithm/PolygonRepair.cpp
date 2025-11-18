@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/config.h"
+#include "SFCGAL/version.h"
 
-#ifdef SFCGAL_CGAL_VERSION_MAJOR >= 6
+#if SFCGAL_CGAL_VERSION_MAJOR >= 6
 
   #include "SFCGAL/version.h"
   #include <memory>
