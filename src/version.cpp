@@ -7,20 +7,20 @@
 
 // NOLINTBEGIN(modernize-avoid-c-arrays)
 /// @private
-static const char _sfcgal_version[] = SFCGAL_VERSION;
+static const char sfcgal_version[] = SFCGAL_VERSION;
 
 /// @private
-static const char _sfcgal_full_version[] = SFCGAL_FULL_VERSION;
+static const char sfcgal_full_version[] = SFCGAL_FULL_VERSION;
 // NOLINTEND(modernize-avoid-c-arrays)
 
 auto
 SFCGAL_Version() -> const char *
 {
-  return _sfcgal_version;
+  return sfcgal_version;
 }
 
 auto
 SFCGAL_Full_Version() -> const char *
 {
-  return _sfcgal_full_version;
+  return sfcgal_full_version;
 }

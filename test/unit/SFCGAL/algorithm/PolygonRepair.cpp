@@ -7,7 +7,6 @@
 
 #if SFCGAL_CGAL_VERSION_MAJOR >= 6
 
-  #include "SFCGAL/version.h"
   #include <memory>
 
   #include <SFCGAL/Exception.h>
