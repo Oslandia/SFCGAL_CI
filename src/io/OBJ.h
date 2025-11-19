@@ -67,16 +67,6 @@ SFCGAL_API auto
 load(std::istream &inOBJ) -> std::unique_ptr<Geometry>;
 
 /**
- * @brief Loads a geometry from an OBJ file.
- *
- * @param[in] filename The name of the file to load from
- * @return The loaded geometry
- * @throws SFCGAL::Exception If the file cannot be opened or is invalid
- */
-SFCGAL_API auto
-load(const std::string &filename) -> std::unique_ptr<Geometry>;
-
-/**
  * @brief Loads a geometry from an OBJ format string.
  *
  * @param[in] obj The OBJ format string
@@ -85,7 +75,17 @@ load(const std::string &filename) -> std::unique_ptr<Geometry>;
  * features
  */
 SFCGAL_API auto
-loadFromString(const std::string &obj) -> std::unique_ptr<Geometry>;
+load(const std::string &obj) -> std::unique_ptr<Geometry>;
+
+/**
+ * @brief Loads a geometry from an OBJ file.
+ *
+ * @param[in] filename The name of the file to load from
+ * @return The loaded geometry
+ * @throws SFCGAL::Exception If the file cannot be opened or is invalid
+ */
+SFCGAL_API auto
+loadFromFile(const std::string &filename) -> std::unique_ptr<Geometry>;
 
 } // namespace SFCGAL::io::OBJ
 

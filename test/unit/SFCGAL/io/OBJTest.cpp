@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(test_load_from_string_point)
   std::string obj_content = "v 1 2 3\np 1\n";
 
   std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::loadFromString(obj_content);
+      SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "MultiPoint");
   const auto &multipoint = geom->as<SFCGAL::MultiPoint>();
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(test_load_from_string_line)
   std::string obj_content = "v 0 0 0\nv 1 1 1\nl 1 2\n";
 
   std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::loadFromString(obj_content);
+      SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "MultiLineString");
   const auto &multilinestring = geom->as<SFCGAL::MultiLineString>();
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(test_load_from_string_triangle)
   std::string obj_content = "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n";
 
   std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::loadFromString(obj_content);
+      SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "TriangulatedSurface");
   const auto &triangulated_surface = geom->as<SFCGAL::TriangulatedSurface>();
@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE(test_load_from_string_quad)
   std::string obj_content = "v 0 0 0\nv 1 0 0\nv 1 1 0\nv 0 1 0\nf 1 2 3 4\n";
 
   std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::loadFromString(obj_content);
+      SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "PolyhedralSurface");
   const auto &polyhedral_surface = geom->as<SFCGAL::PolyhedralSurface>();
@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE(test_load_2d_vertices)
   std::string obj_content = "v 1 2\nv 3 4\nl 1 2\n";
 
   std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::loadFromString(obj_content);
+      SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "MultiLineString");
   const auto &multilinestring = geom->as<SFCGAL::MultiLineString>();
@@ -329,7 +329,7 @@ BOOST_AUTO_TEST_CASE(test_load_with_comments)
                             "comment\nv 1 0 0\nv 0 1 0\nf 1 2 3\n";
 
   std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::loadFromString(obj_content);
+      SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "TriangulatedSurface");
   const auto &triangulated_surface = geom->as<SFCGAL::TriangulatedSurface>();
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE(test_face_with_texture_coordinates)
   std::string obj_content = "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1/1/1 2/2/2 3/3/3\n";
 
   std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::loadFromString(obj_content);
+      SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "TriangulatedSurface");
   const auto &triangulated_surface = geom->as<SFCGAL::TriangulatedSurface>();
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE(test_roundtrip_triangle)
 
   // Load back from OBJ string
   std::unique_ptr<SFCGAL::Geometry> loaded_geom =
-      SFCGAL::io::OBJ::loadFromString(obj_content);
+      SFCGAL::io::OBJ::load(obj_content);
 
   // Both should be TriangulatedSurface (Triangle gets converted)
   BOOST_CHECK_EQUAL(loaded_geom->geometryType(), "TriangulatedSurface");
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_CASE(test_error_invalid_vertex_index)
   std::string obj_content =
       "v 0 0 0\nf 1 2 3\n"; // Face references non-existent vertices
 
-  BOOST_CHECK_THROW(SFCGAL::io::OBJ::loadFromString(obj_content),
+  BOOST_CHECK_THROW(SFCGAL::io::OBJ::load(obj_content),
                     SFCGAL::Exception);
 }
 
@@ -381,7 +381,7 @@ BOOST_AUTO_TEST_CASE(test_error_zero_vertex_index)
   std::string obj_content =
       "v 0 0 0\nf 0 1 2\n"; // OBJ indices start at 1, not 0
 
-  BOOST_CHECK_THROW(SFCGAL::io::OBJ::loadFromString(obj_content),
+  BOOST_CHECK_THROW(SFCGAL::io::OBJ::load(obj_content),
                     SFCGAL::Exception);
 }
 
@@ -389,7 +389,7 @@ BOOST_AUTO_TEST_CASE(test_error_no_geometry)
 {
   std::string obj_content = "# Just comments\n";
 
-  BOOST_CHECK_THROW(SFCGAL::io::OBJ::loadFromString(obj_content),
+  BOOST_CHECK_THROW(SFCGAL::io::OBJ::load(obj_content),
                     SFCGAL::Exception);
 }
 

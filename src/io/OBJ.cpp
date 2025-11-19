@@ -377,7 +377,14 @@ load(std::istream &inOBJ) -> std::unique_ptr<Geometry>
 // NOLINTEND(readability-function-cognitive-complexity)
 
 auto
-load(const std::string &filename) -> std::unique_ptr<Geometry>
+load(const std::string &obj) -> std::unique_ptr<Geometry>
+{
+  std::istringstream iss(obj);
+  return load(iss);
+}
+
+auto
+loadFromFile(const std::string &filename) -> std::unique_ptr<Geometry>
 {
   std::ifstream inOBJ(filename);
   if (!inOBJ) {
@@ -385,13 +392,6 @@ load(const std::string &filename) -> std::unique_ptr<Geometry>
         Exception("Unable to open file " + filename + " for reading."));
   }
   return load(inOBJ);
-}
-
-auto
-loadFromString(const std::string &obj) -> std::unique_ptr<Geometry>
-{
-  std::istringstream iss(obj);
-  return load(iss);
 }
 
 } // namespace SFCGAL::io::OBJ
