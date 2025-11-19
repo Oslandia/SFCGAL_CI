@@ -240,13 +240,21 @@ load(std::istream &inOBJ) -> std::unique_ptr<Geometry>
         size_t      slash_pos        = vertex_data.find('/');
         std::string vertex_index_str = vertex_data.substr(0, slash_pos);
 
-        size_t vertex_index = std::stoul(vertex_index_str);
-        if (vertex_index == 0) {
+        try {
+          size_t vertex_index = std::stoul(vertex_index_str);
+          if (vertex_index == 0) {
+            BOOST_THROW_EXCEPTION(
+                Exception("Invalid vertex index 0 in OBJ file"));
+          }
+          // Convert from 1-based to 0-based indexing
+          face.push_back(vertex_index - 1);
+        } catch (const std::invalid_argument &) {
           BOOST_THROW_EXCEPTION(
-              Exception("Invalid vertex index 0 in OBJ file"));
+              Exception("Invalid face vertex index: " + vertex_index_str));
+        } catch (const std::out_of_range &) {
+          BOOST_THROW_EXCEPTION(
+              Exception("Face vertex index out of range: " + vertex_index_str));
         }
-        // Convert from 1-based to 0-based indexing
-        face.push_back(vertex_index - 1);
       }
       if (face.size() < 3) {
         BOOST_THROW_EXCEPTION(Exception("Face must have at least 3 vertices"));
