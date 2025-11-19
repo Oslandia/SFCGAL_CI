@@ -42,6 +42,7 @@ struct ObjData {
  * @return Parsed OBJ data
  * @throws SFCGAL::Exception If parsing fails
  */
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 auto
 parseObjData(std::istream &inOBJ) -> ObjData
 {
@@ -128,6 +129,7 @@ parseObjData(std::istream &inOBJ) -> ObjData
 
   return obj_data;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 /**
  * @brief Create geometry from parsed OBJ data
@@ -136,6 +138,7 @@ parseObjData(std::istream &inOBJ) -> ObjData
  * @return Geometry created from OBJ data
  * @throws SFCGAL::Exception If geometry creation fails
  */
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 auto
 createGeometryFromObjData(const ObjData &obj_data) -> std::unique_ptr<Geometry>
 {
@@ -225,14 +228,14 @@ createGeometryFromObjData(const ObjData &obj_data) -> std::unique_ptr<Geometry>
 
   for (size_t vertex_idx : points) {
     if (vertex_idx >= vertices.size()) {
-      BOOST_THROW_EXCEPTION(
-          Exception("Point references invalid vertex index"));
+      BOOST_THROW_EXCEPTION(Exception("Point references invalid vertex index"));
     }
     multipoint->addGeometry(std::make_unique<Point>(vertices[vertex_idx]));
   }
 
   return std::move(multipoint);
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void
