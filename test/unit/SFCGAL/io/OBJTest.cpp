@@ -14,6 +14,7 @@
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/io/wkt.h"
+#include <array>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -30,31 +31,31 @@ namespace fs = std::filesystem;
 auto
 compareFiles(const std::string &file1, const std::string &file2) -> bool
 {
-  std::ifstream f1(file1, std::ifstream::binary | std::ifstream::ate);
-  std::ifstream f2(file2, std::ifstream::binary | std::ifstream::ate);
+  std::ifstream stream1(file1, std::ifstream::binary | std::ifstream::ate);
+  std::ifstream stream2(file2, std::ifstream::binary | std::ifstream::ate);
 
-  if (f1.fail() || f2.fail()) {
+  if (stream1.fail() || stream2.fail()) {
     return false; // File opening error
   }
 
-  if (f1.tellg() != f2.tellg()) {
+  if (stream1.tellg() != stream2.tellg()) {
     return false; // Different sizes
   }
 
-  f1.seekg(0, std::ifstream::beg);
-  f2.seekg(0, std::ifstream::beg);
-  return std::equal(std::istreambuf_iterator<char>(f1.rdbuf()),
+  stream1.seekg(0, std::ifstream::beg);
+  stream2.seekg(0, std::ifstream::beg);
+  return std::equal(std::istreambuf_iterator<char>(stream1.rdbuf()),
                     std::istreambuf_iterator<char>(),
-                    std::istreambuf_iterator<char>(f2.rdbuf()));
+                    std::istreambuf_iterator<char>(stream2.rdbuf()));
 }
 
 BOOST_AUTO_TEST_CASE(test_all_geometries)
 {
   std::vector<std::string> wkt_examples = {
-      "POINT Z (1 2 3)",
-      "LINESTRING Z (0 0 0, 1 1 1, 2 2 2)",
+      "POINT Z (1 2 3)", "LINESTRING Z (0 0 0, 1 1 1, 2 2 2)",
       "POLYGON Z ((0 0 0, 1 0 0, 1 1 0, 0 1 0, 0 0 0))",
       "TRIANGLE Z ((0 0 0, 1 0 0, 0 1 0, 0 0 0))",
+      // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
       "POLYHEDRALSURFACE Z (((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)), ((0 0 0, 0 "
       "1 "
       "0, 0 1 1, 0 0 1, 0 0 0)))",
@@ -79,14 +80,11 @@ BOOST_AUTO_TEST_CASE(test_all_geometries)
       "GEOMETRYCOLLECTION Z (POINT Z (2.0 3.0 5.0),TRIANGLE Z ((0.0 0.0 "
       "6.0,1.0 "
       "0.0 6.0,1.0 1.0 6.0,0.0 0.0 6.0)))",
-      "POINT (1 2)",
-      "LINESTRING (0 0, 1 1, 2 2)",
-      "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
-      "TRIANGLE ((0 0, 1 0, 0 1, 0 0))",
+      "POINT (1 2)", "LINESTRING (0 0, 1 1, 2 2)",
+      "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))", "TRIANGLE ((0 0, 1 0, 0 1, 0 0))",
       "POLYHEDRALSURFACE (((0 0, 0 1, 1 1, 1 0, 0 0)), ((0 0, 0 1, 0 0)))",
       "TIN (((0 0, 0 1, 1 0, 0 0)), ((0 0, 1 0, 1 1, 0 0)))",
-      "MULTIPOINT ((1 1), (2 2))",
-      "MULTILINESTRING ((0 0, 1 1), (2 2, 3 3))",
+      "MULTIPOINT ((1 1), (2 2))", "MULTILINESTRING ((0 0, 1 1), (2 2, 3 3))",
       "MULTIPOLYGON (((0 0, 1 0, 1 1, 0 1, 0 0)), ((2 2, 3 2, 3 3, 2 3, 2 2)))",
       "MULTISOLID (((((0 0,0 1,1 1,1 0,0 0)),((0 0,1 0,1 0,0 0,0 0)),((0 0,1 "
       "0,1 0,0 0,0 0)),((1 1,0 1,0 1,1 1,1 1)),((1 0,1 1,1 1,1 0,1 0)),((0 0,0 "
@@ -166,11 +164,11 @@ BOOST_AUTO_TEST_CASE(test_save_to_buffer)
   std::string                       wkt = "LINESTRING (0 0, 1 1)";
   std::unique_ptr<SFCGAL::Geometry> geom(SFCGAL::io::readWkt(wkt));
 
-  size_t size = 100;
-  char   buffer[100];
-  SFCGAL::io::OBJ::saveToBuffer(*geom, buffer, &size);
+  size_t                size = 100;
+  std::array<char, 100> buffer{};
+  SFCGAL::io::OBJ::saveToBuffer(*geom, buffer.data(), &size);
 
-  std::string result(buffer, size);
+  std::string result(buffer.data(), size);
   std::string expected = "v 0 0 0\nv 1 1 0\nl 1 2\n";
   BOOST_CHECK_EQUAL(result, expected);
 }
@@ -216,8 +214,7 @@ BOOST_AUTO_TEST_CASE(test_load_from_string_point)
 {
   std::string obj_content = "v 1 2 3\np 1\n";
 
-  std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::load(obj_content);
+  std::unique_ptr<SFCGAL::Geometry> geom = SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "MultiPoint");
   const auto &multipoint = geom->as<SFCGAL::MultiPoint>();
@@ -233,8 +230,7 @@ BOOST_AUTO_TEST_CASE(test_load_from_string_line)
 {
   std::string obj_content = "v 0 0 0\nv 1 1 1\nl 1 2\n";
 
-  std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::load(obj_content);
+  std::unique_ptr<SFCGAL::Geometry> geom = SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "MultiLineString");
   const auto &multilinestring = geom->as<SFCGAL::MultiLineString>();
@@ -259,8 +255,7 @@ BOOST_AUTO_TEST_CASE(test_load_from_string_triangle)
 {
   std::string obj_content = "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n";
 
-  std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::load(obj_content);
+  std::unique_ptr<SFCGAL::Geometry> geom = SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "TriangulatedSurface");
   const auto &triangulated_surface = geom->as<SFCGAL::TriangulatedSurface>();
@@ -288,8 +283,7 @@ BOOST_AUTO_TEST_CASE(test_load_from_string_quad)
 {
   std::string obj_content = "v 0 0 0\nv 1 0 0\nv 1 1 0\nv 0 1 0\nf 1 2 3 4\n";
 
-  std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::load(obj_content);
+  std::unique_ptr<SFCGAL::Geometry> geom = SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "PolyhedralSurface");
   const auto &polyhedral_surface = geom->as<SFCGAL::PolyhedralSurface>();
@@ -304,8 +298,7 @@ BOOST_AUTO_TEST_CASE(test_load_2d_vertices)
 {
   std::string obj_content = "v 1 2\nv 3 4\nl 1 2\n";
 
-  std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::load(obj_content);
+  std::unique_ptr<SFCGAL::Geometry> geom = SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "MultiLineString");
   const auto &multilinestring = geom->as<SFCGAL::MultiLineString>();
@@ -328,8 +321,7 @@ BOOST_AUTO_TEST_CASE(test_load_with_comments)
   std::string obj_content = "# This is a comment\nv 0 0 0\n# Another "
                             "comment\nv 1 0 0\nv 0 1 0\nf 1 2 3\n";
 
-  std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::load(obj_content);
+  std::unique_ptr<SFCGAL::Geometry> geom = SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "TriangulatedSurface");
   const auto &triangulated_surface = geom->as<SFCGAL::TriangulatedSurface>();
@@ -340,8 +332,7 @@ BOOST_AUTO_TEST_CASE(test_face_with_texture_coordinates)
 {
   std::string obj_content = "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1/1/1 2/2/2 3/3/3\n";
 
-  std::unique_ptr<SFCGAL::Geometry> geom =
-      SFCGAL::io::OBJ::load(obj_content);
+  std::unique_ptr<SFCGAL::Geometry> geom = SFCGAL::io::OBJ::load(obj_content);
 
   BOOST_CHECK_EQUAL(geom->geometryType(), "TriangulatedSurface");
   const auto &triangulated_surface = geom->as<SFCGAL::TriangulatedSurface>();
@@ -372,8 +363,7 @@ BOOST_AUTO_TEST_CASE(test_error_invalid_vertex_index)
   std::string obj_content =
       "v 0 0 0\nf 1 2 3\n"; // Face references non-existent vertices
 
-  BOOST_CHECK_THROW(SFCGAL::io::OBJ::load(obj_content),
-                    SFCGAL::Exception);
+  BOOST_CHECK_THROW(SFCGAL::io::OBJ::load(obj_content), SFCGAL::Exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_error_zero_vertex_index)
@@ -381,16 +371,14 @@ BOOST_AUTO_TEST_CASE(test_error_zero_vertex_index)
   std::string obj_content =
       "v 0 0 0\nf 0 1 2\n"; // OBJ indices start at 1, not 0
 
-  BOOST_CHECK_THROW(SFCGAL::io::OBJ::load(obj_content),
-                    SFCGAL::Exception);
+  BOOST_CHECK_THROW(SFCGAL::io::OBJ::load(obj_content), SFCGAL::Exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_error_no_geometry)
 {
   std::string obj_content = "# Just comments\n";
 
-  BOOST_CHECK_THROW(SFCGAL::io::OBJ::load(obj_content),
-                    SFCGAL::Exception);
+  BOOST_CHECK_THROW(SFCGAL::io::OBJ::load(obj_content), SFCGAL::Exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
