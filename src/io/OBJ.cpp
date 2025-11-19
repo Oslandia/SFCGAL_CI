@@ -29,10 +29,10 @@ namespace SFCGAL::io::OBJ {
  * @brief Parsed OBJ data structure
  */
 struct ObjData {
-  std::vector<Point>               vertices;
-  std::vector<std::vector<size_t>> faces;
-  std::vector<std::vector<size_t>> lines;
-  std::vector<size_t>              points;
+  std::vector<Point>               vertices; ///< Vertex positions
+  std::vector<std::vector<size_t>> faces;    ///< Face vertex indices
+  std::vector<std::vector<size_t>> lines;    ///< Line vertex indices
+  std::vector<size_t>              points;   ///< Point vertex indices
 };
 
 /**
