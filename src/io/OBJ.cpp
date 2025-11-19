@@ -25,6 +25,215 @@
 
 namespace SFCGAL::io::OBJ {
 
+/**
+ * @brief Parsed OBJ data structure
+ */
+struct ObjData {
+  std::vector<Point>               vertices;
+  std::vector<std::vector<size_t>> faces;
+  std::vector<std::vector<size_t>> lines;
+  std::vector<size_t>              points;
+};
+
+/**
+ * @brief Parse OBJ data from input stream
+ *
+ * @param[in] inOBJ Input stream containing OBJ data
+ * @return Parsed OBJ data
+ * @throws SFCGAL::Exception If parsing fails
+ */
+auto
+parseObjData(std::istream &inOBJ) -> ObjData
+{
+  ObjData obj_data;
+
+  std::string line;
+  while (std::getline(inOBJ, line)) {
+    // Skip empty lines and comments
+    if (line.empty() || line[0] == '#') {
+      continue;
+    }
+
+    std::istringstream iss(line);
+    std::string        type;
+    iss >> type;
+
+    if (type == "v") {
+      // Vertex: v x y z [w]
+      double x = 0.0;
+      double y = 0.0;
+      double z = 0.0;
+      iss >> x >> y;
+      if (!(iss >> z)) {
+        z = 0.0; // Default to 2D
+      }
+      obj_data.vertices.emplace_back(x, y, z);
+    } else if (type == "f") {
+      // Face: f v1 v2 v3 ...
+      std::vector<size_t> face;
+      std::string         vertex_data;
+      while (iss >> vertex_data) {
+        // Parse vertex index (handle v/vt/vn format by taking only first part)
+        size_t      slash_pos        = vertex_data.find('/');
+        std::string vertex_index_str = vertex_data.substr(0, slash_pos);
+
+        try {
+          size_t vertex_index = std::stoul(vertex_index_str);
+          if (vertex_index == 0) {
+            BOOST_THROW_EXCEPTION(
+                Exception("Invalid vertex index 0 in OBJ file"));
+          }
+          // Convert from 1-based to 0-based indexing
+          face.push_back(vertex_index - 1);
+        } catch (const std::invalid_argument &) {
+          BOOST_THROW_EXCEPTION(
+              Exception("Invalid face vertex index: " + vertex_index_str));
+        } catch (const std::out_of_range &) {
+          BOOST_THROW_EXCEPTION(
+              Exception("Face vertex index out of range: " + vertex_index_str));
+        }
+      }
+      if (face.size() < 3) {
+        BOOST_THROW_EXCEPTION(Exception("Face must have at least 3 vertices"));
+      }
+      obj_data.faces.push_back(face);
+    } else if (type == "l") {
+      // Line: l v1 v2 ...
+      std::vector<size_t> line_indices;
+      size_t              vertex_index;
+      while (iss >> vertex_index) {
+        if (vertex_index == 0) {
+          BOOST_THROW_EXCEPTION(
+              Exception("Invalid vertex index 0 in OBJ file"));
+        }
+        line_indices.push_back(vertex_index - 1);
+      }
+      if (line_indices.size() < 2) {
+        BOOST_THROW_EXCEPTION(Exception("Line must have at least 2 vertices"));
+      }
+      obj_data.lines.push_back(line_indices);
+    } else if (type == "p") {
+      // Point: p v1
+      size_t vertex_index;
+      if (iss >> vertex_index) {
+        if (vertex_index == 0) {
+          BOOST_THROW_EXCEPTION(
+              Exception("Invalid vertex index 0 in OBJ file"));
+        }
+        obj_data.points.push_back(vertex_index - 1);
+      }
+    }
+    // Ignore other OBJ elements (materials, textures, etc.)
+  }
+
+  return obj_data;
+}
+
+/**
+ * @brief Create geometry from parsed OBJ data
+ *
+ * @param[in] obj_data Parsed OBJ data
+ * @return Geometry created from OBJ data
+ * @throws SFCGAL::Exception If geometry creation fails
+ */
+auto
+createGeometryFromObjData(const ObjData &obj_data) -> std::unique_ptr<Geometry>
+{
+  const auto &vertices = obj_data.vertices;
+  const auto &faces    = obj_data.faces;
+  const auto &lines    = obj_data.lines;
+  const auto &points   = obj_data.points;
+
+  // Create geometry based on what we found
+  if (faces.empty() && lines.empty() && points.empty()) {
+    BOOST_THROW_EXCEPTION(Exception("No geometry found in OBJ file"));
+  }
+
+  // If we have faces, create a TriangulatedSurface or PolyhedralSurface
+  if (!faces.empty()) {
+    // Check if all faces are triangles
+    // NOTE: for performance we could use only PolyhedralSurface and avoid this
+    // "if" statement however, we could prefer TIN in most case
+    bool all_triangles = std::all_of(
+        faces.begin(), faces.end(),
+        [](const std::vector<size_t> &face) { return face.size() == 3; });
+
+    if (all_triangles) {
+      // Create TriangulatedSurface
+      auto triangulated_surface = std::make_unique<TriangulatedSurface>();
+
+      for (const auto &face : faces) {
+        if (face[0] >= vertices.size() || face[1] >= vertices.size() ||
+            face[2] >= vertices.size()) {
+          BOOST_THROW_EXCEPTION(
+              Exception("Face references invalid vertex index"));
+        }
+
+        auto triangle = std::make_unique<Triangle>(
+            vertices[face[0]], vertices[face[1]], vertices[face[2]]);
+        triangulated_surface->addPatch(std::move(triangle));
+      }
+
+      return std::move(triangulated_surface);
+    }
+    // Create PolyhedralSurface
+    auto polyhedral_surface = std::make_unique<PolyhedralSurface>();
+
+    for (const auto &face : faces) {
+      auto ring = std::make_unique<LineString>();
+
+      for (size_t vertex_idx : face) {
+        if (vertex_idx >= vertices.size()) {
+          BOOST_THROW_EXCEPTION(
+              Exception("Face references invalid vertex index"));
+        }
+        ring->addPoint(vertices[vertex_idx]);
+      }
+      // Close the ring
+      if (!face.empty()) {
+        ring->addPoint(vertices[face[0]]);
+      }
+
+      auto polygon = std::make_unique<Polygon>(ring.release());
+      polyhedral_surface->addPatch(std::move(polygon));
+    }
+
+    return std::move(polyhedral_surface);
+  }
+
+  // If we only have lines, create a MultiLineString
+  if (!lines.empty()) {
+    auto multilinestring = std::make_unique<MultiLineString>();
+
+    for (const auto &line_indices : lines) {
+      auto linestring = std::make_unique<LineString>();
+      for (size_t vertex_idx : line_indices) {
+        if (vertex_idx >= vertices.size()) {
+          BOOST_THROW_EXCEPTION(
+              Exception("Line references invalid vertex index"));
+        }
+        linestring->addPoint(vertices[vertex_idx]);
+      }
+      multilinestring->addGeometry(std::move(linestring));
+    }
+
+    return std::move(multilinestring);
+  }
+
+  // If we only have points, create a MultiPoint
+  auto multipoint = std::make_unique<MultiPoint>();
+
+  for (size_t vertex_idx : points) {
+    if (vertex_idx >= vertices.size()) {
+      BOOST_THROW_EXCEPTION(
+          Exception("Point references invalid vertex index"));
+    }
+    multipoint->addGeometry(std::make_unique<Point>(vertices[vertex_idx]));
+  }
+
+  return std::move(multipoint);
+}
+
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void
 save(const Geometry &geom, std::ostream &out)
@@ -201,188 +410,12 @@ saveToBuffer(const Geometry &geom, char *buffer, size_t *size)
   }
 }
 
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 auto
 load(std::istream &inOBJ) -> std::unique_ptr<Geometry>
 {
-  std::vector<Point>               vertices;
-  std::vector<std::vector<size_t>> faces;
-  std::vector<std::vector<size_t>> lines;
-  std::vector<size_t>              points;
-
-  std::string line;
-  while (std::getline(inOBJ, line)) {
-    // Skip empty lines and comments
-    if (line.empty() || line[0] == '#') {
-      continue;
-    }
-
-    std::istringstream iss(line);
-    std::string        type;
-    iss >> type;
-
-    if (type == "v") {
-      // Vertex: v x y z [w]
-      double x = 0.0;
-      double y = 0.0;
-      double z = 0.0;
-      iss >> x >> y;
-      if (!(iss >> z)) {
-        z = 0.0; // Default to 2D
-      }
-      vertices.emplace_back(x, y, z);
-    } else if (type == "f") {
-      // Face: f v1 v2 v3 ...
-      std::vector<size_t> face;
-      std::string         vertex_data;
-      while (iss >> vertex_data) {
-        // Parse vertex index (handle v/vt/vn format by taking only first part)
-        size_t      slash_pos        = vertex_data.find('/');
-        std::string vertex_index_str = vertex_data.substr(0, slash_pos);
-
-        try {
-          size_t vertex_index = std::stoul(vertex_index_str);
-          if (vertex_index == 0) {
-            BOOST_THROW_EXCEPTION(
-                Exception("Invalid vertex index 0 in OBJ file"));
-          }
-          // Convert from 1-based to 0-based indexing
-          face.push_back(vertex_index - 1);
-        } catch (const std::invalid_argument &) {
-          BOOST_THROW_EXCEPTION(
-              Exception("Invalid face vertex index: " + vertex_index_str));
-        } catch (const std::out_of_range &) {
-          BOOST_THROW_EXCEPTION(
-              Exception("Face vertex index out of range: " + vertex_index_str));
-        }
-      }
-      if (face.size() < 3) {
-        BOOST_THROW_EXCEPTION(Exception("Face must have at least 3 vertices"));
-      }
-      faces.push_back(face);
-    } else if (type == "l") {
-      // Line: l v1 v2 ...
-      std::vector<size_t> line_indices;
-      size_t              vertex_index;
-      while (iss >> vertex_index) {
-        if (vertex_index == 0) {
-          BOOST_THROW_EXCEPTION(
-              Exception("Invalid vertex index 0 in OBJ file"));
-        }
-        line_indices.push_back(vertex_index - 1);
-      }
-      if (line_indices.size() < 2) {
-        BOOST_THROW_EXCEPTION(Exception("Line must have at least 2 vertices"));
-      }
-      lines.push_back(line_indices);
-    } else if (type == "p") {
-      // Point: p v1
-      size_t vertex_index;
-      if (iss >> vertex_index) {
-        if (vertex_index == 0) {
-          BOOST_THROW_EXCEPTION(
-              Exception("Invalid vertex index 0 in OBJ file"));
-        }
-        points.push_back(vertex_index - 1);
-      }
-    }
-    // Ignore other OBJ elements (materials, textures, etc.)
-  }
-
-  // Create geometry based on what we found
-  if (faces.empty() && lines.empty() && points.empty()) {
-    BOOST_THROW_EXCEPTION(Exception("No geometry found in OBJ file"));
-  }
-
-  // If we have faces, create a TriangulatedSurface or PolyhedralSurface
-  if (!faces.empty()) {
-    // Check if all faces are triangles
-    // NOTE: for performance we could use only PolyhedralSurface and avoid this
-    // "if" statement however, we could prefer TIN in most case
-    bool all_triangles = std::all_of(
-        faces.begin(), faces.end(),
-        [](const std::vector<size_t> &face) { return face.size() == 3; });
-
-    if (all_triangles) {
-      // Create TriangulatedSurface
-      auto triangulated_surface = std::make_unique<TriangulatedSurface>();
-
-      for (const auto &face : faces) {
-        if (face[0] >= vertices.size() || face[1] >= vertices.size() ||
-            face[2] >= vertices.size()) {
-          BOOST_THROW_EXCEPTION(
-              Exception("Face references invalid vertex index"));
-        }
-
-        auto triangle = std::make_unique<Triangle>(
-            vertices[face[0]], vertices[face[1]], vertices[face[2]]);
-        triangulated_surface->addPatch(std::move(triangle));
-      }
-
-      return std::move(triangulated_surface);
-    }
-    // Create PolyhedralSurface
-    auto polyhedral_surface = std::make_unique<PolyhedralSurface>();
-
-    for (const auto &face : faces) {
-      auto ring = std::make_unique<LineString>();
-
-      for (size_t vertex_idx : face) {
-        if (vertex_idx >= vertices.size()) {
-          BOOST_THROW_EXCEPTION(
-              Exception("Face references invalid vertex index"));
-        }
-        ring->addPoint(vertices[vertex_idx]);
-      }
-      // Close the ring
-      if (!face.empty()) {
-        ring->addPoint(vertices[face[0]]);
-      }
-
-      auto polygon = std::make_unique<Polygon>(ring.release());
-      polyhedral_surface->addPatch(std::move(polygon));
-    }
-
-    return std::move(polyhedral_surface);
-  }
-
-  // If we only have lines, create a MultiLineString
-  if (!lines.empty()) {
-    auto multilinestring = std::make_unique<MultiLineString>();
-
-    for (const auto &line_indices : lines) {
-      auto linestring = std::make_unique<LineString>();
-      for (size_t vertex_idx : line_indices) {
-        if (vertex_idx >= vertices.size()) {
-          BOOST_THROW_EXCEPTION(
-              Exception("Line references invalid vertex index"));
-        }
-        linestring->addPoint(vertices[vertex_idx]);
-      }
-      multilinestring->addGeometry(std::move(linestring));
-    }
-
-    return std::move(multilinestring);
-  }
-
-  // If we only have points, create a MultiPoint
-  if (!points.empty()) {
-    auto multipoint = std::make_unique<MultiPoint>();
-
-    for (size_t vertex_idx : points) {
-      if (vertex_idx >= vertices.size()) {
-        BOOST_THROW_EXCEPTION(
-            Exception("Point references invalid vertex index"));
-      }
-      multipoint->addGeometry(std::make_unique<Point>(vertices[vertex_idx]));
-    }
-
-    return std::move(multipoint);
-  }
-
-  BOOST_THROW_EXCEPTION(Exception("No valid geometry found in OBJ file"));
+  ObjData obj_data = parseObjData(inOBJ);
+  return createGeometryFromObjData(obj_data);
 }
-// NOLINTEND(readability-function-cognitive-complexity)
 
 auto
 load(const std::string &obj) -> std::unique_ptr<Geometry>
