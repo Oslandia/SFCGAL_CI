@@ -122,7 +122,7 @@ load_geometry(const std::string &source) -> std::unique_ptr<SFCGAL::Geometry>
       }
 
       if (looks_like_obj) {
-        return SFCGAL::io::OBJ::loadFromString(data);
+        return SFCGAL::io::OBJ::load(data);
       }
       // First, detect raw (binary) WKB: first byte 0x00/0x01 or presence of
       // NUL/control bytes.
