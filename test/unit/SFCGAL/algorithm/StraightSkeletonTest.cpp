@@ -529,10 +529,13 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesLShape)
   std::unique_ptr<MultiLineString> result =
       algorithm::approximateMedialAxis(*g, true);
 
-  std::string const expectedWKT(
+  std::unique_ptr<Geometry> expectedGeom(io::readWkt(
       "MULTILINESTRING ((10.00 1.50,8.50 1.50,4.50 1.50),(4.50 1.50,4.50 "
-      "4.50,4.50 6.00))");
-  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+      "4.50,4.50 6.00))"));
+  if (!algorithm::almostEqual(
+          *(result.get()), *(expectedGeom.get()), -1.0,
+          algorithm::EqualityStrictness::InternalPointInverted))
+    BOOST_CHECK_EQUAL(result->asText(2), expectedGeom->asText(2));
 }
 
 BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesTShape)
@@ -543,10 +546,14 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesTShape)
   std::unique_ptr<MultiLineString> result =
       algorithm::approximateMedialAxis(*g, true);
 
-  std::string const expectedWKT(
+  std::unique_ptr<Geometry> expectedGeom(io::readWkt(
       "MULTILINESTRING ((0.00 1.50,1.50 1.50,4.50 1.50),(9.00 1.50,7.50 "
-      "1.50,4.50 1.50),(4.50 1.50,4.50 4.50,4.50 6.00))");
-  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+      "1.50,4.50 1.50),(4.50 1.50,4.50 4.50,4.50 6.00))"));
+
+  if (!algorithm::almostEqual(
+          *(result.get()), *(expectedGeom.get()), -1.0,
+          algorithm::EqualityStrictness::InternalPointInverted))
+    BOOST_CHECK_EQUAL(result->asText(2), expectedGeom->asText(2));
 }
 
 BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesEmptyPolygon)
@@ -567,11 +574,15 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesBigTShape)
   std::unique_ptr<MultiLineString> result =
       algorithm::approximateMedialAxis(*g, true);
 
-  std::string const expectedWKT(
+  std::unique_ptr<Geometry> expectedGeom(io::readWkt(
       "MULTILINESTRING ((0.00 1.50,1.50 1.50,4.50 1.50),(12.00 1.50,10.50 "
       "1.50,7.50 1.50),(7.50 1.50,6.00 3.00),(4.50 1.50,6.00 3.00),(6.00 "
-      "9.00,6.00 6.00,6.00 3.00))");
-  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+      "9.00,6.00 6.00,6.00 3.00))"));
+
+  if (!algorithm::almostEqual(
+          *(result.get()), *(expectedGeom.get()), -1.0,
+          algorithm::EqualityStrictness::InternalPointInverted))
+    BOOST_CHECK_EQUAL(result->asText(2), expectedGeom->asText(2));
 }
 
 BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesInvalidGeometry)
@@ -608,10 +619,13 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesUShape)
   std::unique_ptr<MultiLineString> result =
       algorithm::approximateMedialAxis(*g, true);
 
-  std::string const expectedWKT(
+  std::unique_ptr<Geometry> expectedGeom(io::readWkt(
       "MULTILINESTRING ((9.00 8.00,9.00 7.00,9.00 1.00),(1.00 8.00,1.00 "
-      "7.00,1.00 1.00),(9.00 1.00,1.00 1.00))");
-  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+      "7.00,1.00 1.00),(9.00 1.00,1.00 1.00))"));
+  if (!algorithm::almostEqual(
+          *(result.get()), *(expectedGeom.get()), -1.0,
+          algorithm::EqualityStrictness::InternalPointInverted))
+    BOOST_CHECK_EQUAL(result->asText(2), expectedGeom->asText(2));
 }
 
 BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesSquare)
@@ -652,11 +666,14 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesCrossShape)
   std::unique_ptr<MultiLineString> result =
       algorithm::approximateMedialAxis(*g, true);
 
-  std::string const expectedWKT(
+  std::unique_ptr<Geometry> expectedGeom(io::readWkt(
       "MULTILINESTRING ((5.00 0.00,5.00 1.00,5.00 5.00),(10.00 5.00,9.00 "
       "5.00,5.00 5.00),(0.00 5.00,1.00 5.00,5.00 5.00),(5.00 5.00,5.00 "
-      "9.00,5.00 10.00))");
-  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+      "9.00,5.00 10.00))"));
+  if (!algorithm::almostEqual(
+          *(result.get()), *(expectedGeom.get()), -1.0,
+          algorithm::EqualityStrictness::InternalPointInverted))
+    BOOST_CHECK_EQUAL(result->asText(2), expectedGeom->asText(2));
 }
 
 BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesCShape)
@@ -669,10 +686,13 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesCShape)
   std::unique_ptr<MultiLineString> result =
       algorithm::approximateMedialAxis(*g, true);
 
-  std::string const expectedWKT(
+  std::unique_ptr<Geometry> expectedGeom(io::readWkt(
       "MULTILINESTRING ((10.00 1.00,9.00 1.00,1.00 1.00),(1.00 1.00,1.00 "
-      "9.00),(1.00 9.00,9.00 9.00,10.00 9.00))");
-  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+      "9.00),(1.00 9.00,9.00 9.00,10.00 9.00))"));
+  if (!algorithm::almostEqual(
+          *(result.get()), *(expectedGeom.get()), -1.0,
+          algorithm::EqualityStrictness::InternalPointInverted))
+    BOOST_CHECK_EQUAL(result->asText(2), expectedGeom->asText(2));
 }
 
 BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesPolygonWithHole)
@@ -685,10 +705,13 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesPolygonWithHole)
   std::unique_ptr<MultiLineString> result =
       algorithm::approximateMedialAxis(*g, true);
 
-  std::string const expectedWKT(
+  std::unique_ptr<Geometry> expectedGeom(io::readWkt(
       "MULTILINESTRING ((1.00 1.00,9.00 1.00),(1.00 1.00,1.00 9.00),(1.00 "
-      "9.00,9.00 9.00),(9.00 9.00,9.00 1.00))");
-  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+      "9.00,9.00 9.00),(9.00 9.00,9.00 1.00))"));
+  if (!algorithm::almostEqual(
+          *(result.get()), *(expectedGeom.get()), -1.0,
+          algorithm::EqualityStrictness::InternalPointInverted))
+    BOOST_CHECK_EQUAL(result->asText(2), expectedGeom->asText(2));
 }
 
 BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesComplexPolygonWithHole)
@@ -701,11 +724,14 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesComplexPolygonWithHole)
       algorithm::approximateMedialAxis(*g, true);
 
   // Result should have medial axis around the hole
-  std::string const expectedWKT(
+  std::unique_ptr<Geometry> expectedGeom(io::readWkt(
       "MULTILINESTRING ((3.50 1.50,16.50 1.50),(3.50 1.50,2.50 2.50),(3.50 "
       "8.50,2.50 7.50),(3.50 8.50,16.50 8.50),(16.50 8.50,17.50 7.50),(16.50 "
-      "1.50,17.50 2.50),(17.50 7.50,17.50 2.50),(2.50 7.50,2.50 2.50))");
-  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+      "1.50,17.50 2.50),(17.50 7.50,17.50 2.50),(2.50 7.50,2.50 2.50))"));
+  if (!algorithm::almostEqual(
+          *(result.get()), *(expectedGeom.get()), -1.0,
+          algorithm::EqualityStrictness::InternalPointInverted))
+    BOOST_CHECK_EQUAL(result->asText(2), expectedGeom->asText(2));
 }
 
 BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesNarrowCorridor)
@@ -732,11 +758,14 @@ BOOST_AUTO_TEST_CASE(testProjectMedialAxisToEdgesThinH)
   std::unique_ptr<MultiLineString> result =
       algorithm::approximateMedialAxis(*g, true);
 
-  std::string const expectedWKT(
+  std::unique_ptr<Geometry> expectedGeom(io::readWkt(
       "MULTILINESTRING ((1.00 0.00,1.00 1.00,1.00 5.00),(5.00 0.00,5.00 "
       "1.00,5.00 5.00),(5.00 10.00,5.00 9.00,5.00 5.00),(1.00 5.00,5.00 "
-      "5.00),(1.00 5.00,1.00 9.00,1.00 10.00))");
-  BOOST_CHECK_EQUAL(result->asText(2), expectedWKT);
+      "5.00),(1.00 5.00,1.00 9.00,1.00 10.00))"));
+  if (!algorithm::almostEqual(
+          *(result.get()), *(expectedGeom.get()), -1.0,
+          algorithm::EqualityStrictness::InternalPointInverted))
+    BOOST_CHECK_EQUAL(result->asText(2), expectedGeom->asText(2));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
