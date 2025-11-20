@@ -29,6 +29,8 @@ public:
     InternalPointOrdered = 1 << 3,
     /// sub geometry points need to be ordered but shifted is allowed
     InternalPointShifted = 1 << 4,
+    /// sub geometry points need to be ordered but inverted sequence is allowed
+    InternalPointInverted = 1 << 5,
   };
   // NOLINTEND(performance-enum-size)
 
@@ -147,15 +149,15 @@ protected:
  * @param geomA geometry to compare with
  * @param geomB geometry to compare with
  * @param tolerance allowed distance between same points.
- * @param strictOrder if true, will first search for matching sub-geometry in
+ * @param strictness if true, will first search for matching sub-geometry in
  * other sub parts and then will search for point by respecting order. If
  * false, will search for a matching point anywhere in the other geom.
- * @return true  when 2 geometries are valid against strictOrder value and
+ * @return true  when 2 geometries are valid against strictness value and
  * tolerance
  */
 SFCGAL_API auto
 almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
-            EqualityStrictness strictOrder =
+            EqualityStrictness strictness =
                 EqualityStrictness::allPointOrdered()) -> bool;
 
 } // namespace algorithm

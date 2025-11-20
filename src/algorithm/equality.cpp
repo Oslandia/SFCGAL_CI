@@ -25,14 +25,14 @@ namespace SFCGAL::algorithm {
 template <class G>
 auto
 compareAnySubPartOrdered(const G &geomA, const G &geomB, const double tolerance,
-                         EqualityStrictness strictOrder) -> bool
+                         EqualityStrictness strictness) -> bool
 {
   // std::cout << "will compareAnySubPartOrdered '" << geomA.asText(1) << "' VS
   // '"
   //           << geomA.asText(1) << "'\n";
   auto iteB = geomB.begin();
   for (auto iteA = geomA.begin(); iteA != geomA.end(); ++iteA) {
-    bool found = almostEqual((*iteA), (*iteB), tolerance, strictOrder);
+    bool found = almostEqual((*iteA), (*iteB), tolerance, strictness);
     if (!found) {
       return false;
     }
@@ -46,7 +46,7 @@ template <class G>
 auto
 compareAnySubPartNonOrdered(size_t numPart, const G &geomA, const G &geomB,
                             const double       tolerance,
-                            EqualityStrictness strictOrder) -> bool
+                            EqualityStrictness strictness) -> bool
 {
   // std::cout << "will compareAnySubPartNonOrdered '" << geomA.asText(1)
   //           << "' VS '" << geomA.asText(1) << "'\n";
@@ -59,7 +59,7 @@ compareAnySubPartNonOrdered(size_t numPart, const G &geomA, const G &geomB,
         ++bIdx;
         continue;
       }
-      found = almostEqual((*iteA), (*iteB), tolerance, strictOrder);
+      found              = almostEqual((*iteA), (*iteB), tolerance, strictness);
       hasGoodMatch[bIdx] = found;
       ++bIdx;
     }
@@ -74,7 +74,7 @@ compareAnySubPartNonOrdered(size_t numPart, const G &geomA, const G &geomB,
 // === Sub part geometries have to be in the same order
 auto
 compareSubPartOrdered(const Geometry &geomA, const Geometry &geomB,
-                      const double tolerance, EqualityStrictness strictOrder)
+                      const double tolerance, EqualityStrictness strictness)
     -> bool
 {
   switch (geomA.geometryTypeId()) {
@@ -90,21 +90,21 @@ compareSubPartOrdered(const Geometry &geomA, const Geometry &geomB,
 
   case TYPE_POLYGON:
     return compareAnySubPartOrdered<Polygon>(
-        geomA.as<Polygon>(), geomB.as<Polygon>(), tolerance, strictOrder);
+        geomA.as<Polygon>(), geomB.as<Polygon>(), tolerance, strictness);
 
   case TYPE_TRIANGULATEDSURFACE:
     return compareAnySubPartOrdered<TriangulatedSurface>(
         geomA.as<TriangulatedSurface>(), geomB.as<TriangulatedSurface>(),
-        tolerance, strictOrder);
+        tolerance, strictness);
 
   case TYPE_POLYHEDRALSURFACE:
     return compareAnySubPartOrdered<PolyhedralSurface>(
         geomA.as<PolyhedralSurface>(), geomB.as<PolyhedralSurface>(), tolerance,
-        strictOrder);
+        strictness);
 
   case TYPE_SOLID:
     return compareAnySubPartOrdered<Solid>(geomA.as<Solid>(), geomB.as<Solid>(),
-                                           tolerance, strictOrder);
+                                           tolerance, strictness);
 
   default:
     BOOST_THROW_EXCEPTION(NotImplementedException(
@@ -116,7 +116,7 @@ compareSubPartOrdered(const Geometry &geomA, const Geometry &geomB,
 // === Sub part geometries can be in any order
 auto
 compareSubPartNonOrdered(const Geometry &geomA, const Geometry &geomB,
-                         const double tolerance, EqualityStrictness strictOrder)
+                         const double tolerance, EqualityStrictness strictness)
     -> bool
 {
   switch (geomA.geometryTypeId()) {
@@ -133,27 +133,27 @@ compareSubPartNonOrdered(const Geometry &geomA, const Geometry &geomB,
   case TYPE_POLYGON: {
     const auto &tempGA = geomA.as<Polygon>();
     return compareAnySubPartNonOrdered<Polygon>(
-        tempGA.numRings(), tempGA, geomB.as<Polygon>(), tolerance, strictOrder);
+        tempGA.numRings(), tempGA, geomB.as<Polygon>(), tolerance, strictness);
   }
 
   case TYPE_TRIANGULATEDSURFACE: {
     const auto &tempGA = geomA.as<TriangulatedSurface>();
     return compareAnySubPartNonOrdered<TriangulatedSurface>(
         tempGA.numPatches(), tempGA, geomB.as<TriangulatedSurface>(), tolerance,
-        strictOrder);
+        strictness);
   }
 
   case TYPE_POLYHEDRALSURFACE: {
     const auto &tempGA = geomA.as<PolyhedralSurface>();
     return compareAnySubPartNonOrdered<PolyhedralSurface>(
         tempGA.numPatches(), tempGA, geomB.as<PolyhedralSurface>(), tolerance,
-        strictOrder);
+        strictness);
   }
 
   case TYPE_SOLID: {
     const auto &tempGA = geomA.as<Solid>();
     return compareAnySubPartNonOrdered<Solid>(
-        tempGA.numShells(), tempGA, geomB.as<Solid>(), tolerance, strictOrder);
+        tempGA.numShells(), tempGA, geomB.as<Solid>(), tolerance, strictness);
   }
 
   default:
@@ -166,15 +166,15 @@ compareSubPartNonOrdered(const Geometry &geomA, const Geometry &geomB,
 // === Sub part geometries have to be in the same order
 auto
 compareSubGeometryOrdered(const Geometry &geomA, const Geometry &geomB,
-                          const double       tolerance,
-                          EqualityStrictness strictOrder) -> bool
+                          const double tolerance, EqualityStrictness strictness)
+    -> bool
 {
   // std::cout << "will compareSubGeometryOrdered '" << geomA.asText(1) << "' VS
   // '"
   //           << geomA.asText(1) << "'\n";
   for (int i = 0; i < geomA.numGeometries(); ++i) {
     bool found = almostEqual(geomA.geometryN(i), geomB.geometryN(i), tolerance,
-                             strictOrder);
+                             strictness);
     if (!found) {
       return false;
     }
@@ -187,7 +187,7 @@ compareSubGeometryOrdered(const Geometry &geomA, const Geometry &geomB,
 auto
 compareSubGeometryNonOrdered(const Geometry &geomA, const Geometry &geomB,
                              const double       tolerance,
-                             EqualityStrictness strictOrder) -> bool
+                             EqualityStrictness strictness) -> bool
 {
   // std::cout << "will compareSubGeometryNonOrdered '" << geomA.asText(1)
   //           << "' VS '" << geomA.asText(1) << "'\n";
@@ -199,7 +199,7 @@ compareSubGeometryNonOrdered(const Geometry &geomA, const Geometry &geomB,
         continue;
       }
       found = almostEqual(geomA.geometryN(i), geomB.geometryN(j), tolerance,
-                          strictOrder);
+                          strictness);
       hasGoodMatch[j] = found;
     }
     if (!found) {
@@ -318,6 +318,28 @@ comparePointsShifted(detail::GetPointsVisitor &getPointsA,
   return true;
 }
 
+// === Sub part points can be inverted but are in the same order
+auto
+comparePointsInverted(detail::GetPointsVisitor &getPointsA,
+                      detail::GetPointsVisitor &getPointsB,
+                      const double              tolerance) -> bool
+{
+  // first try with same order
+  if (!comparePointsOrdered(getPointsA, getPointsB, tolerance)) {
+    // second try with inverted order
+    for (unsigned int i = 0; i < getPointsA.points.size(); ++i) {
+      const Point &pta = *getPointsA.points[getPointsA.points.size() - 1 - i];
+      const Point &ptb = *getPointsB.points[i];
+      bool         found =
+          (tolerance < 0.0 && pta == ptb) || pta.almostEqual(ptb, tolerance);
+      if (!found) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 auto
 hasSubPart(const Geometry &geom) -> bool
 {
@@ -354,7 +376,7 @@ hasSubPart(const Geometry &geom) -> bool
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 auto
 almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
-            EqualityStrictness strictOrder) -> bool
+            EqualityStrictness strictness) -> bool
 {
   if (geomA.geometryTypeId() != geomB.geometryTypeId() &&
       geomA.numGeometries() == geomB.numGeometries()) {
@@ -367,19 +389,19 @@ almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
 
   bool out;
   if (geomA.numGeometries() > 1) {
-    if (strictOrder & EqualityStrictness::SubGeomOrdered) {
-      out = compareSubGeometryOrdered(geomA, geomB, tolerance, strictOrder);
+    if (strictness & EqualityStrictness::SubGeomOrdered) {
+      out = compareSubGeometryOrdered(geomA, geomB, tolerance, strictness);
     } else {
-      out = compareSubGeometryNonOrdered(geomA, geomB, tolerance, strictOrder);
+      out = compareSubGeometryNonOrdered(geomA, geomB, tolerance, strictness);
     }
   } else {
 
     if (hasSubPart(geomB) &&
-        !(strictOrder & EqualityStrictness::CheckCoverOrPoint)) {
-      if (strictOrder & EqualityStrictness::SubPartOrdered) {
-        out = compareSubPartOrdered(geomA, geomB, tolerance, strictOrder);
+        !(strictness & EqualityStrictness::CheckCoverOrPoint)) {
+      if (strictness & EqualityStrictness::SubPartOrdered) {
+        out = compareSubPartOrdered(geomA, geomB, tolerance, strictness);
       } else {
-        out = compareSubPartNonOrdered(geomA, geomB, tolerance, strictOrder);
+        out = compareSubPartNonOrdered(geomA, geomB, tolerance, strictness);
       }
 
     } else {
@@ -393,12 +415,14 @@ almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
       } else {
         // std::cout << "will compare point per point '" << geomA.asText(1)
         //           << "' VS '" << geomA.asText(1) << "'\n";
-        if (strictOrder & EqualityStrictness::CheckCoverOrPoint) {
+        if (strictness & EqualityStrictness::CheckCoverOrPoint) {
           out = algorithm::covers3D(geomA, geomB);
-        } else if (strictOrder & EqualityStrictness::InternalPointOrdered) {
+        } else if (strictness & EqualityStrictness::InternalPointOrdered) {
           out = comparePointsOrdered(getPointsA, getPointsB, tolerance);
-        } else if (strictOrder & EqualityStrictness::InternalPointShifted) {
+        } else if (strictness & EqualityStrictness::InternalPointShifted) {
           out = comparePointsShifted(getPointsA, getPointsB, tolerance);
+        } else if (strictness & EqualityStrictness::InternalPointInverted) {
+          out = comparePointsInverted(getPointsA, getPointsB, tolerance);
         } else {
           out = comparePointsNonOrdered(getPointsA, getPointsB, tolerance);
         }
