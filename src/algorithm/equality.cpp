@@ -511,10 +511,13 @@ almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
     } else {
       out = compareSubGeometryNonOrdered(geomA, geomB, tolerance, strictness);
     }
-  } else {
 
-    if (hasSubPart(geomB) &&
-        !(strictness & EqualityStrictness::CheckCoverOrPoint)) {
+  } else { // no sub geometries
+
+    if (strictness & EqualityStrictness::CheckCoverOrPoint) {
+      out = algorithm::covers3D(geomA, geomB);
+
+    } else if (hasSubPart(geomB)) {
       if (strictness & EqualityStrictness::SubPartOrdered) {
         out = compareSubPartOrdered(geomA, geomB, tolerance, strictness);
       } else {
@@ -530,9 +533,7 @@ almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
       if (getPointsA.points.size() != getPointsB.points.size()) {
         out = false;
       } else {
-        if (strictness & EqualityStrictness::CheckCoverOrPoint) {
-          out = algorithm::covers3D(geomA, geomB);
-        } else if (strictness & EqualityStrictness::InternalPointOrdered) {
+        if (strictness & EqualityStrictness::InternalPointOrdered) {
           out = comparePointsOrdered(getPointsA, getPointsB, tolerance);
         } else if (strictness & EqualityStrictness::InternalPointShifted) {
           out = comparePointsShifted(getPointsA, getPointsB, tolerance);
