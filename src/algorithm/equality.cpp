@@ -39,9 +39,6 @@ auto
 compareAnySubPartOrdered(const G &geomA, const G &geomB, const double tolerance,
                          EqualityStrictness strictness) -> bool
 {
-  // std::cout << "will compareAnySubPartOrdered '" << geomA.asText(1) << "' VS
-  // '"
-  //           << geomA.asText(1) << "'\n";
   auto iteB = geomB.begin();
   for (auto iteA = geomA.begin(); iteA != geomA.end(); ++iteA) {
     bool found = almostEqual((*iteA), (*iteB), tolerance, strictness);
@@ -72,8 +69,6 @@ compareAnySubPartNonOrdered(size_t numPart, const G &geomA, const G &geomB,
                             const double       tolerance,
                             EqualityStrictness strictness) -> bool
 {
-  // std::cout << "will compareAnySubPartNonOrdered '" << geomA.asText(1)
-  //           << "' VS '" << geomA.asText(1) << "'\n";
   std::vector<bool> hasGoodMatch(numPart);
   for (auto iteA = geomA.begin(); iteA != geomA.end(); ++iteA) {
     bool found = false;
@@ -228,9 +223,6 @@ compareSubGeometryOrdered(const Geometry &geomA, const Geometry &geomB,
                           const double tolerance, EqualityStrictness strictness)
     -> bool
 {
-  // std::cout << "will compareSubGeometryOrdered '" << geomA.asText(1) << "' VS
-  // '"
-  //           << geomA.asText(1) << "'\n";
   for (int i = 0; i < geomA.numGeometries(); ++i) {
     bool found = almostEqual(geomA.geometryN(i), geomB.geometryN(i), tolerance,
                              strictness);
@@ -259,8 +251,6 @@ compareSubGeometryNonOrdered(const Geometry &geomA, const Geometry &geomB,
                              const double       tolerance,
                              EqualityStrictness strictness) -> bool
 {
-  // std::cout << "will compareSubGeometryNonOrdered '" << geomA.asText(1)
-  //           << "' VS '" << geomA.asText(1) << "'\n";
   std::vector<bool> hasGoodMatch(geomA.numGeometries());
   for (int i = 0; i < geomA.numGeometries(); ++i) {
     bool found = false;
@@ -540,8 +530,6 @@ almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
       if (getPointsA.points.size() != getPointsB.points.size()) {
         out = false;
       } else {
-        // std::cout << "will compare point per point '" << geomA.asText(1)
-        //           << "' VS '" << geomA.asText(1) << "'\n";
         if (strictness & EqualityStrictness::CheckCoverOrPoint) {
           out = algorithm::covers3D(geomA, geomB);
         } else if (strictness & EqualityStrictness::InternalPointOrdered) {
@@ -553,7 +541,6 @@ almostEqual(const Geometry &geomA, const Geometry &geomB, double tolerance,
         } else {
           out = comparePointsNonOrdered(getPointsA, getPointsB, tolerance);
         }
-        // std::cout << "compare point per point returns " << out << "\n";
       }
     }
   }
