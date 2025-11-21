@@ -18,6 +18,34 @@
 
 namespace SFCGAL::algorithm {
 
+auto
+EqualityStrictness::toString() const -> std::string
+{
+  std::string out;
+  if ((_flags & CheckCoverOrPoint) != 0) {
+    out = "CheckCover";
+  } else {
+    out = "CheckPoint";
+  }
+  if ((_flags & SubGeomOrdered) != 0) {
+    out += " | SubGeomOrdered";
+  }
+  if ((_flags & SubPartOrdered) != 0) {
+    out += " | SubPartOrdered";
+  }
+  if ((_flags & InternalPointOrdered) != 0) {
+    out += " | InternalPointOrdered";
+  }
+  if ((_flags & InternalPointShifted) != 0) {
+    out += " | InternalPointShifted";
+  }
+  if ((_flags & InternalPointInverted) != 0) {
+    out += " | InternalPointInverted";
+  }
+
+  return out;
+}
+
 /// @{
 /// @privatesection
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

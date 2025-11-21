@@ -5,6 +5,7 @@
 #define SFCGAL_ALGORITHM_EQUALITY_H
 
 #include "SFCGAL/config.h"
+#include <string>
 
 namespace SFCGAL {
 class Geometry;
@@ -96,6 +97,12 @@ public:
     _flags = other._flags;
     return *this;
   }
+
+  /**
+   * @return string representation of current flags
+   */
+  [[nodiscard]] auto
+  toString() const -> std::string;
 
   /**
    * point comparison, sub geometries need to be ordered as sub geometry points
