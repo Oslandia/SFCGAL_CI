@@ -17,7 +17,14 @@ namespace algorithm {
 class EqualityStrictness {
 public:
   // NOLINTBEGIN(performance-enum-size)
-  /// Binary enum to define what is allowed when comparing geometries
+
+  /**
+   * @brief Binary enum to define what is allowed when comparing geometries
+   *
+   * Exclusions:
+   * - can not have CheckCoverOrPoint and any of InternalPoint* checks
+   * - can not have multiple InternalPoint* checks
+   */
   enum Flag {
     /// kind of check: point or cover. 1 is cover, 0 is point
     CheckCoverOrPoint = 1 << 0,
@@ -149,9 +156,8 @@ protected:
  * @param geomA geometry to compare with
  * @param geomB geometry to compare with
  * @param tolerance allowed distance between same points.
- * @param strictness if true, will first search for matching sub-geometry in
- * other sub parts and then will search for point by respecting order. If
- * false, will search for a matching point anywhere in the other geom.
+ * @param strictness will refer to EqualityStrictness flags. Default:
+ * EqualityStrictness::allPointOrdered()
  * @return true  when 2 geometries are valid against strictness value and
  * tolerance
  */

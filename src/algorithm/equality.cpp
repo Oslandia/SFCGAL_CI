@@ -22,6 +22,18 @@ namespace SFCGAL::algorithm {
 /// @privatesection
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
+/**
+ * @brief check if the sub parts respect strictness, tolerance and the sub parts
+ * are in the same order.
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @pre geomA and geomB have the same type and this type has sub parts (not a
+ * collection of geometries)
+ * @return true if geomA and geomB are almost equal regard to strictness and
+ * tolerance
+ */
 template <class G>
 auto
 compareAnySubPartOrdered(const G &geomA, const G &geomB, const double tolerance,
@@ -42,6 +54,18 @@ compareAnySubPartOrdered(const G &geomA, const G &geomB, const double tolerance,
   return true;
 }
 
+/**
+ * @brief check if the sub parts respect strictness, tolerance and the sub parts
+ * are in any order.
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @pre geomA and geomB have the same type and this type has sub parts (not a
+ * collection of geometries)
+ * @return true if geomA and geomB are almost equal regard to strictness and
+ * tolerance
+ */
 template <class G>
 auto
 compareAnySubPartNonOrdered(size_t numPart, const G &geomA, const G &geomB,
@@ -71,7 +95,18 @@ compareAnySubPartNonOrdered(size_t numPart, const G &geomA, const G &geomB,
   return true;
 }
 
-// === Sub part geometries have to be in the same order
+/**
+ * @brief check if the sub parts respect strictness, tolerance and the sub parts
+ * are in the same order.
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @return true if geomA and geomB are geometries with sub parts (not a
+ * collection of geometries) and are almost equal regard to strictness and
+ * tolerance
+ * @see hasSubPart()
+ */
 auto
 compareSubPartOrdered(const Geometry &geomA, const Geometry &geomB,
                       const double tolerance, EqualityStrictness strictness)
@@ -86,6 +121,7 @@ compareSubPartOrdered(const Geometry &geomA, const Geometry &geomB,
   case TYPE_MULTILINESTRING:
   case TYPE_MULTIPOLYGON:
   case TYPE_MULTISOLID:
+    // geom type is not valid for this kind of check
     return false;
 
   case TYPE_POLYGON:
@@ -113,7 +149,18 @@ compareSubPartOrdered(const Geometry &geomA, const Geometry &geomB,
   }
 }
 
-// === Sub part geometries can be in any order
+/**
+ * @brief check if the sub parts respect strictness, tolerance and the sub parts
+ * are in any order.
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @return true if geomA and geomB are geometries with sub parts (not a
+ * collection of geometries) and are almost equal regard to strictness and
+ * tolerance
+ * @see hasSubPart()
+ */
 auto
 compareSubPartNonOrdered(const Geometry &geomA, const Geometry &geomB,
                          const double tolerance, EqualityStrictness strictness)
@@ -128,6 +175,7 @@ compareSubPartNonOrdered(const Geometry &geomA, const Geometry &geomB,
   case TYPE_MULTILINESTRING:
   case TYPE_MULTIPOLYGON:
   case TYPE_MULTISOLID:
+    // geom type is not valid for this kind of check
     return false;
 
   case TYPE_POLYGON: {
@@ -163,7 +211,18 @@ compareSubPartNonOrdered(const Geometry &geomA, const Geometry &geomB,
   }
 }
 
-// === Sub part geometries have to be in the same order
+/**
+ * @brief check if the sub geometries respect strictness, tolerance and the sub
+ * geometries are in the same order.
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @pre geomA and geomB have the same type and this type has sub geometries (not
+ * sub parts)
+ * @return true if geomA and geomB are almost equal regard to strictness and
+ * tolerance
+ */
 auto
 compareSubGeometryOrdered(const Geometry &geomA, const Geometry &geomB,
                           const double tolerance, EqualityStrictness strictness)
@@ -183,7 +242,18 @@ compareSubGeometryOrdered(const Geometry &geomA, const Geometry &geomB,
   return true;
 }
 
-// === Sub part geometries can be in any order
+/**
+ * @brief check if the sub geometries respect strictness, tolerance and the sub
+ * geometries are in any order.
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @pre geomA and geomB have the same type and this type has sub geometries (not
+ * sub parts)
+ * @return true if geomA and geomB are almost equal regard to strictness and
+ * tolerance
+ */
 auto
 compareSubGeometryNonOrdered(const Geometry &geomA, const Geometry &geomB,
                              const double       tolerance,
@@ -210,7 +280,17 @@ compareSubGeometryNonOrdered(const Geometry &geomA, const Geometry &geomB,
   return true;
 }
 
-// === Sub part points have to be in the same order
+/**
+ * @brief check if the geometry points respect strictness, tolerance and are in
+ * the same order.
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @pre geomA and geomB have the same type, the same number of point
+ * @return true if geomA and geomB are almost equal regard to strictness and
+ * tolerance
+ */
 auto
 comparePointsOrdered(detail::GetPointsVisitor &getPointsA,
                      detail::GetPointsVisitor &getPointsB,
@@ -229,7 +309,17 @@ comparePointsOrdered(detail::GetPointsVisitor &getPointsA,
   return true;
 }
 
-// === Sub part points can be in any order
+/**
+ * @brief check if the geometry points respect strictness, tolerance and are in
+ * any order.
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @pre geomA and geomB have the same type, the same number of point
+ * @return true if geomA and geomB are almost equal regard to strictness and
+ * tolerance
+ */
 auto
 comparePointsNonOrdered(detail::GetPointsVisitor &getPointsA,
                         detail::GetPointsVisitor &getPointsB,
@@ -265,7 +355,26 @@ comparePointsNonOrdered(detail::GetPointsVisitor &getPointsA,
   return true;
 }
 
-// === Sub part points can be shifted but are in the same order
+/**
+ * @brief check if the geometry points respect strictness, tolerance and can be
+ * shifted.
+ *
+ * Shifted means for opened linestring:
+ * geom(1, 2, 3, 4) <==> geom(2, 3, 4, 1) <==> geom(3, 4, 1, 2) <==> geom(4, 1,
+ * 2, 3)
+ *
+ * or for closed linestring:
+ * geom(1, 2, 3, 4, 1) <==> geom(2, 3, 4, 1, 2) <==> geom(3, 4, 1, 2, 3) <==>
+ * geom(4, 1, 2, 3, 4)
+ *
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @pre geomA and geomB have the same type, the same number of point
+ * @return true if geomA and geomB are almost equal regard to strictness and
+ * tolerance
+ */
 auto
 comparePointsShifted(detail::GetPointsVisitor &getPointsA,
                      detail::GetPointsVisitor &getPointsB,
@@ -318,7 +427,21 @@ comparePointsShifted(detail::GetPointsVisitor &getPointsA,
   return true;
 }
 
-// === Sub part points can be inverted but are in the same order
+/**
+ * @brief check if the geometry points respect strictness, tolerance and are
+ * inverted.
+ *
+ * Inverted means:
+ * geom(1, 2, 3, 4) <==> geom(4, 3, 2, 1)
+ *
+ * @param geomA geometry to compare with
+ * @param geomB geometry to compare with
+ * @param tolerance allowed distance between same points.
+ * @param strictness will refer to EqualityStrictness flags
+ * @pre geomA and geomB have the same type, the same number of point
+ * @return true if geomA and geomB are almost equal regard to strictness and
+ * tolerance
+ */
 auto
 comparePointsInverted(detail::GetPointsVisitor &getPointsA,
                       detail::GetPointsVisitor &getPointsB,
@@ -340,6 +463,10 @@ comparePointsInverted(detail::GetPointsVisitor &getPointsA,
   return true;
 }
 
+/**
+ * @param geom a geometry to check
+ * @return true if geom has sub parts (not a collection of geometries)
+ */
 auto
 hasSubPart(const Geometry &geom) -> bool
 {
