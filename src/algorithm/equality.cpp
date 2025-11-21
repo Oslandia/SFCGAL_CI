@@ -5,11 +5,11 @@
 
 #include "SFCGAL/algorithm/covers.h"
 
+#include "SFCGAL/Exception.h"
 #include "SFCGAL/Polygon.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/TriangulatedSurface.h"
-
 #include "SFCGAL/detail/GetPointsVisitor.h"
 
 #include <boost/format.hpp>
@@ -17,6 +17,34 @@
 #include <vector>
 
 namespace SFCGAL::algorithm {
+
+auto
+EqualityStrictness::operator|(Flag flag) -> EqualityStrictness &
+{
+  // can not have CheckCoverOrPoint and any of InternalPoint* checks
+  if ((((_flags & CheckCoverOrPoint) != 0) &&
+       flag >= InternalPointOrdered) || //
+      (((flag & CheckCoverOrPoint) != 0) && _flags >= InternalPointOrdered)) {
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("Conflict in EqualityStrictness flags: can "
+                                 "not have CheckCoverOrPoint and any of "
+                                 "InternalPoint* checks ('%s' vs '%s')") %
+                   toString() % EqualityStrictness(flag).toString())
+                      .str()));
+  }
+
+  // can not have multiple InternalPoint* checks
+  if (_flags >= InternalPointOrdered && flag >= InternalPointOrdered) {
+    BOOST_THROW_EXCEPTION(Exception(
+        (boost::format("Conflict in EqualityStrictness flags: can not have "
+                       "multiple InternalPoint* checks ('%s' vs '%s')") %
+         toString() % EqualityStrictness(flag).toString())
+            .str()));
+  }
+
+  _flags |= flag;
+  return *this;
+}
 
 auto
 EqualityStrictness::toString() const -> std::string

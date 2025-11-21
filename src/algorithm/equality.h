@@ -57,11 +57,7 @@ public:
    * @return ref on this
    */
   auto
-  operator|(Flag flag) -> EqualityStrictness &
-  {
-    _flags |= flag;
-    return *this;
-  }
+  operator|(Flag flag) -> EqualityStrictness &;
 
   /**
    * Checks if a flag is valid
