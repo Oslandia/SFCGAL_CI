@@ -42,13 +42,13 @@ public:
   // NOLINTEND(performance-enum-size)
 
   /// Default constructor
-  EqualityStrictness() : flags(0) {}
+  EqualityStrictness() : _flags(0) {}
 
   /**
    * Constructor with default value
    * @param flag new flags
    */
-  EqualityStrictness(Flag flag) : flags(flag) {}
+  EqualityStrictness(Flag flag) : _flags(flag) {}
 
   /**
    *  Add flag to active flags
@@ -58,7 +58,7 @@ public:
   auto
   operator|(Flag flag) -> EqualityStrictness &
   {
-    flags |= flag;
+    _flags |= flag;
     return *this;
   }
 
@@ -70,7 +70,7 @@ public:
   auto
   operator&(Flag flag) const -> bool
   {
-    return (flags & flag) != 0;
+    return (_flags & flag) != 0;
   }
 
   /**
@@ -81,7 +81,7 @@ public:
   auto
   operator=(Flag flag) -> EqualityStrictness &
   {
-    flags = flag;
+    _flags = flag;
     return *this;
   }
 
@@ -93,7 +93,7 @@ public:
   auto
   operator=(EqualityStrictness other) -> EqualityStrictness &
   {
-    flags = other.flags;
+    _flags = other._flags;
     return *this;
   }
 
@@ -117,7 +117,7 @@ public:
   pointNonOrdered() -> EqualityStrictness
   {
     EqualityStrictness out;
-    out.flags = 0;
+    out._flags = 0;
     return out;
   }
 
@@ -147,7 +147,7 @@ public:
 
 protected:
   /// Holds all flags
-  int flags;
+  int _flags;
 };
 
 /**
