@@ -1730,6 +1730,19 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_approximate_medial_axis(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns the projected medial axis for the given SFCGAL::Polygon
+ * Projected medial axis is based on approximate medial axis and
+ * extend end lines to polygon edges.
+ * @param geom the input geometry
+ * @pre isValid(geom) == true
+ * @return A SFCGAL::MultiLineString representing the projected medial axis of
+ * geom
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_projected_medial_axis(const sfcgal_geometry_t *geom);
+
+/**
  * Returns the straight skeleton partition for the given SFCGAL::Polygon
  * @param geom the input geometry
  * @param autoOrientation if 1 try to find the best orientation
