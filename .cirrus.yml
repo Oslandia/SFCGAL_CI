@@ -7,7 +7,7 @@ task:
   install_script:
     - sed -i.bak -e 's,pkg+http://pkg.FreeBSD.org/\${ABI}/quarterly,pkg+http://pkg.FreeBSD.org/\${ABI}/latest,' /etc/pkg/FreeBSD.conf
     - ASSUME_ALWAYS_YES=yes pkg bootstrap -f
-    - pkg install -y cgal gmp mpfr boost-libs cmake ninja
+    - pkg install -y cgal gmp mpfr boost-libs cmake ninja nlohmann-json
 
   build_script:
     - export CGAL_VERSION=6.0.1
@@ -32,7 +32,7 @@ task:
   alias: test-macos
   test_script:
     - brew update
-    - brew install cmake boost cgal gmp mpfr
+    - brew install cmake boost cgal gmp mpfr nlohmann-json
     - cmake -DSFCGAL_BUILD_TESTS=ON -S . -B build
     - cmake --build build
     - ctest -VV --test-dir build
