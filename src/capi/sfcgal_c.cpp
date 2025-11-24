@@ -3269,3 +3269,24 @@ sfcgal_geometry_polygon_repair(const sfcgal_geometry_t     *geom,
   return reinterpret_cast<sfcgal_geometry_t *>(result.release());
 }
 #endif // SFCGAL_CGAL_VERSION_MAJOR >= 6
+
+extern "C" auto
+sfcgal_geometry_projected_medial_axis(const sfcgal_geometry_t *geom)
+    -> sfcgal_geometry_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(geom);
+  std::unique_ptr<SFCGAL::MultiLineString> multiLineString;
+
+  try {
+    multiLineString = SFCGAL::algorithm::approximateMedialAxis(*geometry, true);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During projected_medial_axis(A):");
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  return multiLineString.release();
+}

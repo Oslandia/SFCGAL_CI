@@ -2344,4 +2344,25 @@ BOOST_AUTO_TEST_CASE(testPolygonRepairTest)
 }
 #endif // SFCGAL_CGAL_VERSION_MAJOR >= 6
 
+BOOST_AUTO_TEST_CASE(testProjectedMedialAxis)
+{
+
+  std::unique_ptr<Geometry> polygon(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 6, 0 6, 0 0))"));
+
+  sfcgal_geometry_t *result =
+      sfcgal_geometry_projected_medial_axis(polygon.get());
+
+  char  *wkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(result, 2, &wkt, &len);
+  BOOST_CHECK_EQUAL(
+      std::string(wkt),
+      "MULTILINESTRING ((0.00 3.00,3.00 3.00,7.00 3.00,10.00 3.00))");
+
+  sfcgal_free_buffer(wkt);
+
+  sfcgal_geometry_delete(result);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
