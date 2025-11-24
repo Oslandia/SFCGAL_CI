@@ -8,9 +8,9 @@ jobs:
     strategy:
       matrix:
         os:
-          - { name: freebsd, version: '14.2' }
+          - { name: freebsd, version: '14.3' }
           - { name: netbsd, version: '10.1' }
-          - { name: openbsd, version: '7.7' }
+          - { name: openbsd, version: '7.8' }
     steps:
       - uses: actions/checkout@v4
 
@@ -36,10 +36,9 @@ jobs:
                 ;;
             esac
 
-            export CGAL_VERSION=6.0.1
-            curl -L -o CGAL-${CGAL_VERSION}.tar.xz "https://github.com/CGAL/cgal/releases/download/v${CGAL_VERSION}/CGAL-${CGAL_VERSION}.tar.xz"
-            unxz CGAL-${CGAL_VERSION}.tar.xz
-            tar xf CGAL-${CGAL_VERSION}.tar
+            export CGAL_VERSION=6.1
+            curl -L -o CGAL-${CGAL_VERSION}.tar.gz "https://github.com/CGAL/cgal/archive/refs/tags/v${CGAL_VERSION}.tar.gz"
+            tar xzf CGAL-${CGAL_VERSION}.tar.gz
 
             cmake -GNinja -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCGAL_DIR=CGAL-${CGAL_VERSION}
             cmake --build build -j `sysctl -n hw.ncpu`
