@@ -15,7 +15,7 @@ namespace algorithm {
 /**
  * Manages how geometry comparison will be handled
  */
-SFCGAL_API class EqualityStrictness {
+class SFCGAL_API EqualityStrictness {
 public:
   // NOLINTBEGIN(performance-enum-size)
 
