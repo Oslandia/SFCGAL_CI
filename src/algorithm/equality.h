@@ -15,7 +15,7 @@ namespace algorithm {
 /**
  * Manages how geometry comparison will be handled
  */
-class EqualityStrictness {
+SFCGAL_API class EqualityStrictness {
 public:
   // NOLINTBEGIN(performance-enum-size)
 
@@ -44,6 +44,12 @@ public:
 
   /// Default constructor
   EqualityStrictness() : _flags(0) {}
+
+  /**
+   * Copy constructor
+   * @param other other object to copy from
+   */
+  EqualityStrictness(const EqualityStrictness &other) = default;
 
   /**
    * Constructor with default value

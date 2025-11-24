@@ -279,7 +279,7 @@ compareSubGeometryOrdered(const Geometry &geomA, const Geometry &geomB,
                           const double tolerance, EqualityStrictness strictness)
     -> bool
 {
-  for (int i = 0; i < geomA.numGeometries(); ++i) {
+  for (size_t i = 0; i < geomA.numGeometries(); ++i) {
     bool found = almostEqual(geomA.geometryN(i), geomB.geometryN(i), tolerance,
                              strictness);
     if (!found) {
@@ -308,9 +308,9 @@ compareSubGeometryNonOrdered(const Geometry &geomA, const Geometry &geomB,
                              EqualityStrictness strictness) -> bool
 {
   std::vector<bool> hasGoodMatch(geomA.numGeometries());
-  for (int i = 0; i < geomA.numGeometries(); ++i) {
+  for (size_t i = 0; i < geomA.numGeometries(); ++i) {
     bool found = false;
-    for (int j = 0; !found && j < geomA.numGeometries(); ++j) {
+    for (size_t j = 0; !found && j < geomA.numGeometries(); ++j) {
       if (hasGoodMatch[j]) { // already watched this geom
         continue;
       }
@@ -342,7 +342,7 @@ comparePointsOrdered(detail::GetPointsVisitor &getPointsA,
                      detail::GetPointsVisitor &getPointsB,
                      const double              tolerance) -> bool
 {
-  for (unsigned int i = 0; i < getPointsA.points.size(); ++i) {
+  for (size_t i = 0; i < getPointsA.points.size(); ++i) {
     const Point &pta = *getPointsA.points[i];
     const Point &ptb = *getPointsB.points[i];
     bool         found =
@@ -374,13 +374,13 @@ comparePointsNonOrdered(detail::GetPointsVisitor &getPointsA,
   bool isClosed = *(getPointsA.points[0]) ==
                   *(getPointsA.points[getPointsA.points.size() - 1]);
   std::vector<bool> hasGoodMatch(getPointsA.points.size());
-  for (unsigned int i = 0;                                //
+  for (size_t i = 0;                                      //
        i < getPointsA.points.size() - (isClosed ? 1 : 0); //
        ++i) {
     bool         found = false;
     const Point &pta   = *getPointsA.points[i];
 
-    for (unsigned int j = 0; j < getPointsB.points.size(); ++j) {
+    for (size_t j = 0; j < getPointsB.points.size(); ++j) {
       const Point &ptb = *getPointsB.points[j];
       if (hasGoodMatch[j]) { // already watched this point
         continue;
@@ -426,17 +426,17 @@ comparePointsShifted(detail::GetPointsVisitor &getPointsA,
                      detail::GetPointsVisitor &getPointsB,
                      const double              tolerance) -> bool
 {
-  unsigned int startPos = -1;
-  bool         isClosed = *(getPointsA.points[0]) ==
+  long startPos = -1;
+  bool isClosed = *(getPointsA.points[0]) ==
                   *(getPointsA.points[getPointsA.points.size() - 1]);
 
-  for (unsigned int i = 0;                                //
+  for (size_t i = 0;                                      //
        i < getPointsA.points.size() - (isClosed ? 1 : 0); //
        ++i) {
     // search first matching point
     if (startPos == -1) {
       const Point &pta = *getPointsA.points[i];
-      for (unsigned int j = 0; j < getPointsB.points.size(); ++j) {
+      for (size_t j = 0; j < getPointsB.points.size(); ++j) {
 
         const Point &ptb = *getPointsB.points[j];
 
@@ -456,7 +456,7 @@ comparePointsShifted(detail::GetPointsVisitor &getPointsA,
 
     // handle next pos and array limits
     ++startPos;
-    if (startPos == getPointsB.points.size()) {
+    if (static_cast<size_t>(startPos) == getPointsB.points.size()) {
       startPos = (isClosed ? 1 : 0);
     }
 
@@ -496,7 +496,7 @@ comparePointsInverted(detail::GetPointsVisitor &getPointsA,
   // first try with same order
   if (!comparePointsOrdered(getPointsA, getPointsB, tolerance)) {
     // second try with inverted order
-    for (unsigned int i = 0; i < getPointsA.points.size(); ++i) {
+    for (size_t i = 0; i < getPointsA.points.size(); ++i) {
       const Point &pta = *getPointsA.points[getPointsA.points.size() - 1 - i];
       const Point &ptb = *getPointsB.points[i];
       bool         found =
