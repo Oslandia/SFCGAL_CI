@@ -5,5 +5,5 @@
     "cgal",
     "nlohmann-json"
   ],
-  "builtin-baseline": "4ed84798137bcf664989fa432d41d278d7ad3b25"
+  "builtin-baseline": "75cdbf55732bc8f36e8286d0254feb8083a6dd2a"
 }
