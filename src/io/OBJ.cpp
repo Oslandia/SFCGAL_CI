@@ -177,7 +177,7 @@ createGeometryFromObjData(const ObjData &obj_data) -> std::unique_ptr<Geometry>
         triangulated_surface->addPatch(std::move(triangle));
       }
 
-      return std::move(triangulated_surface);
+      return triangulated_surface;
     }
     // Create PolyhedralSurface
     auto polyhedral_surface = std::make_unique<PolyhedralSurface>();
@@ -201,7 +201,7 @@ createGeometryFromObjData(const ObjData &obj_data) -> std::unique_ptr<Geometry>
       polyhedral_surface->addPatch(std::move(polygon));
     }
 
-    return std::move(polyhedral_surface);
+    return polyhedral_surface;
   }
 
   // If we only have lines, create a MultiLineString
@@ -220,7 +220,7 @@ createGeometryFromObjData(const ObjData &obj_data) -> std::unique_ptr<Geometry>
       multilinestring->addGeometry(std::move(linestring));
     }
 
-    return std::move(multilinestring);
+    return multilinestring;
   }
 
   // If we only have points, create a MultiPoint
@@ -233,7 +233,7 @@ createGeometryFromObjData(const ObjData &obj_data) -> std::unique_ptr<Geometry>
     multipoint->addGeometry(std::make_unique<Point>(vertices[vertex_idx]));
   }
 
-  return std::move(multipoint);
+  return multipoint;
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
