@@ -573,6 +573,20 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::extrude(*geom_a, dx, dy, dz);
      }},
 
+    {"extrudeUntil", "Construction",
+     "Extrude a 2D geometry until another"
+     "geometry (tipically roof) to create a 3D solid",
+     true, "", "A, B", "G",
+     [](const std::string &, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
+       if (!geom_b) {
+         return std::nullopt;
+       }
+       return SFCGAL::algorithm::extrudeUntil(
+           geom_a->as<SFCGAL::Polygon>(),
+           geom_b->as<SFCGAL::PolyhedralSurface>());
+     }},
+
     {"tesselate", "Construction", "Tesselate a geometry into triangular faces",
      false,
      "No parameters required.\n\nExample:\n  sfcgalop -a \"POLYGON((0 0,3 0,3 "
