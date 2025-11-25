@@ -54,7 +54,6 @@ namespace {
 // Consistent tolerance constants for geometric operations
 const auto GEOMETRIC_TOLERANCE = 1e-10;
 const auto HEIGHT_TOLERANCE    = 1e-6;
-const auto ANGLE_TOLERANCE     = 1e-9;
 
 /**
  * @brief Calculate perpendicular distance from a point to a 2D line using exact
@@ -85,109 +84,6 @@ distanceToLine2D(const Point &point, const Point &lineStart,
   auto py = CGAL::to_double(point.y() - lineStart.y());
 
   return std::abs(dx * py - dy * px) / std::sqrt(lineLengthSq);
-}
-
-/**
- * @brief Calculate signed distance from point to line (positive on one side,
- * negative on other)
- * @param point The point to measure distance from
- * @param lineStart Starting point of the line
- * @param lineEnd Ending point of the line
- * @return Signed distance value using kernel arithmetic
- */
-auto
-signedDistanceToLine2D(const Point &point, const Point &lineStart,
-                       const Point &lineEnd) -> double
-{
-  // Use high-precision arithmetic for numerical stability
-  auto dx = CGAL::to_double(lineEnd.x() - lineStart.x());
-  auto dy = CGAL::to_double(lineEnd.y() - lineStart.y());
-
-  // If line is degenerate, return distance to start point
-  auto lineLengthSq = dx * dx + dy * dy;
-  if (lineLengthSq < GEOMETRIC_TOLERANCE) {
-    auto px = CGAL::to_double(point.x() - lineStart.x());
-    auto py = CGAL::to_double(point.y() - lineStart.y());
-    return std::sqrt(px * px + py * py);
-  }
-
-  // Calculate signed perpendicular distance using cross product
-  auto px = CGAL::to_double(point.x() - lineStart.x());
-  auto py = CGAL::to_double(point.y() - lineStart.y());
-
-  return (dx * py - dy * px) / std::sqrt(lineLengthSq);
-}
-
-/**
- * @brief Calculate 3D point projected from base point with given height and
- * slope
- */
-auto
-calculateSlopePoint(const Point &basePoint, const Kernel::Vector_3 &normal,
-                    double distance, double slopeAngle) -> Point
-{
-  double height = distance * std::tan(slopeAngle * M_PI / 180.0);
-  return Point(basePoint.x() + normal.x() * height,
-               basePoint.y() + normal.y() * height, basePoint.z() + height);
-}
-
-/**
- * @brief Split a polygon along a line and return the two resulting polygons
- */
-auto
-splitPolygonByLine(const Polygon &polygon, const LineString &line)
-    -> std::pair<std::unique_ptr<Polygon>, std::unique_ptr<Polygon>>
-{
-  if (polygon.isEmpty() || line.isEmpty()) {
-    BOOST_THROW_EXCEPTION(Exception("Cannot split empty geometry"));
-  }
-
-  if (line.numPoints() < 2) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Ridge line must contain at least 2 points"));
-  }
-
-  // For a simplified but more robust implementation,
-  // just return two halves of the polygon split at the midpoint
-  auto  &ring      = polygon.exteriorRing();
-  size_t numPoints = ring.numPoints() - 1; // Excluding closing point
-
-  if (numPoints < 4) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Polygon must have at least 4 vertices for splitting"));
-  }
-
-  // Create two halves by splitting at roughly the middle
-  std::vector<Point> side1, side2;
-
-  size_t midpoint = numPoints / 2;
-
-  // First half
-  for (size_t i = 0; i <= midpoint; ++i) {
-    side1.push_back(ring.pointN(i));
-  }
-
-  // Add ridge line points as connecting points
-  side1.push_back(line.pointN(0));
-  side1.push_back(line.pointN(line.numPoints() - 1));
-  side1.push_back(ring.pointN(0)); // Close the ring
-
-  // Second half
-  for (size_t i = midpoint; i < numPoints; ++i) {
-    side2.push_back(ring.pointN(i));
-  }
-  side2.push_back(ring.pointN(0)); // Back to start
-
-  // Add ridge line points
-  side2.push_back(line.pointN(line.numPoints() - 1));
-  side2.push_back(line.pointN(0));
-  side2.push_back(ring.pointN(midpoint)); // Close the ring
-
-  // Create polygons
-  auto poly1 = std::make_unique<Polygon>(LineString(side1));
-  auto poly2 = std::make_unique<Polygon>(LineString(side2));
-
-  return std::make_pair(std::move(poly1), std::move(poly2));
 }
 
 /**
@@ -357,114 +253,6 @@ createVerticalFaces(const Polygon            &footprint,
   return faces;
 }
 
-/**
- * @brief Robustly orient a PolyhedralSurface using CGAL's polygon mesh
- * processing
- *
- * This function uses CGAL's industrial-strength orientation algorithms to
- * ensure consistent face orientation. It's more robust than simple
- * propagation-based methods for complex topologies.
- *
- * Algorithm:
- * 1. Convert PolyhedralSurface to polygon soup (points + face indices)
- * 2. Use CGAL::Polygon_mesh_processing::orient_polygon_soup() for robust
- * orientation
- * 3. Convert to CGAL::Surface_mesh to validate topology
- * 4. Check and correct orientation to be outward-facing for closed meshes
- * 5. Convert back to SFCGAL PolyhedralSurface
- *
- * @param surface The input polyhedral surface (may have inconsistent
- * orientation)
- * @return A new PolyhedralSurface with consistently oriented faces
- */
-auto
-fixOrientationWithCGAL(const PolyhedralSurface &surface)
-    -> std::unique_ptr<PolyhedralSurface>
-{
-  using K       = SFCGAL::Kernel;
-  using Point_3 = K::Point_3;
-  using Mesh    = CGAL::Surface_mesh<Point_3>;
-
-  // Step 1: Convert PolyhedralSurface to polygon soup
-  std::vector<Point_3>                  points;
-  std::vector<std::vector<std::size_t>> polygons;
-
-  // Build a map from Point to index to avoid duplicate points
-  std::map<Point_3, std::size_t> pointIndexMap;
-
-  auto getOrAddPoint = [&](const Point &sfcgalPoint) -> std::size_t {
-    Point_3 cgalPoint(sfcgalPoint.x(), sfcgalPoint.y(), sfcgalPoint.z());
-    auto    it = pointIndexMap.find(cgalPoint);
-    if (it != pointIndexMap.end()) {
-      return it->second;
-    }
-    std::size_t index = points.size();
-    points.push_back(cgalPoint);
-    pointIndexMap[cgalPoint] = index;
-    return index;
-  };
-
-  // Extract all faces and build the soup
-  for (size_t i = 0; i < surface.numPolygons(); ++i) {
-    const Polygon    &patch = surface.polygonN(i);
-    const LineString &ring  = patch.exteriorRing();
-
-    std::vector<std::size_t> face;
-    // Note: Skip last point if it's a duplicate of first (closed ring)
-    size_t numVertices = ring.numPoints();
-    if (numVertices > 0 && ring.pointN(0) == ring.pointN(numVertices - 1)) {
-      numVertices--;
-    }
-
-    for (size_t j = 0; j < numVertices; ++j) {
-      face.push_back(getOrAddPoint(ring.pointN(j)));
-    }
-
-    if (face.size() >= 3) {
-      polygons.push_back(face);
-    }
-  }
-
-  // Step 2: Orient the polygon soup using CGAL's robust algorithm
-  CGAL::Polygon_mesh_processing::orient_polygon_soup(points, polygons);
-
-  // Step 3: Convert oriented soup to Surface_mesh for validation
-  Mesh mesh;
-  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, polygons,
-                                                              mesh);
-
-  // Step 4: Check if mesh is closed and outward-oriented
-  if (CGAL::is_closed(mesh)) {
-    // For closed meshes, ensure outward orientation
-    if (!CGAL::Polygon_mesh_processing::is_outward_oriented(mesh)) {
-      CGAL::Polygon_mesh_processing::reverse_face_orientations(mesh);
-    }
-  }
-
-  // Step 5: Convert back to SFCGAL PolyhedralSurface
-  // CRITICAL: Preserve exact kernel coordinates - DO NOT convert to double
-  auto result = std::make_unique<PolyhedralSurface>();
-
-  for (auto f : mesh.faces()) {
-    std::vector<Point> vertices;
-    auto               h     = mesh.halfedge(f);
-    auto               start = h;
-    do {
-      auto        v = mesh.target(h);
-      const auto &p = mesh.point(v);
-      // Keep exact kernel coordinates - no to_double conversion
-      vertices.push_back(Point(p.x(), p.y(), p.z()));
-      h = mesh.next(h);
-    } while (h != start);
-
-    // Close the ring
-    vertices.push_back(vertices[0]);
-    result->addPolygon(Polygon(LineString(vertices)));
-  }
-
-  return result;
-}
-
 } // anonymous namespace
 
 /// @} end of private section
@@ -482,111 +270,6 @@ calculateRidgeHeight(double horizontalDistance, double slopeAngle) -> double
         Exception("Slope angle must be between 0 and 90 degrees"));
   }
   return horizontalDistance * std::tan(slopeAngle * M_PI / 180.0);
-}
-
-auto
-calculateHorizontalDistance(double height, double slopeAngle) -> double
-{
-  if (slopeAngle <= 0.0 || slopeAngle >= 90.0) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Slope angle must be between 0 and 90 degrees"));
-  }
-  return height / std::tan(slopeAngle * M_PI / 180.0);
-}
-
-auto
-generatePitchedRoof(const Polygon &footprint, const LineString &ridgeLine,
-                    double slopeAngle, RidgePosition ridgePosition)
-    -> std::unique_ptr<PolyhedralSurface>
-{
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(footprint);
-  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ridgeLine);
-
-  if (slopeAngle <= 0.0 || slopeAngle >= 90.0) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Slope angle must be between 0 and 90 degrees"));
-  }
-
-  auto result = std::make_unique<PolyhedralSurface>();
-
-  if (footprint.isEmpty() || ridgeLine.isEmpty()) {
-    return result; // Return empty surface for empty input
-  }
-
-  try {
-    switch (ridgePosition) {
-    case RidgePosition::INTERIOR: {
-      // Split polygon along ridge line and create two slopes
-      auto [poly1, poly2] = splitPolygonByLine(footprint, ridgeLine);
-
-      auto slope1 = createSlopedSurface(*poly1, ridgeLine, slopeAngle, true);
-      auto slope2 = createSlopedSurface(*poly2, ridgeLine, slopeAngle, true);
-
-      // Combine surfaces
-      for (size_t i = 0; i < slope1->numPatches(); ++i) {
-        result->addPatch(slope1->patchN(i));
-      }
-      for (size_t i = 0; i < slope2->numPatches(); ++i) {
-        result->addPatch(slope2->patchN(i));
-      }
-      break;
-    }
-    case RidgePosition::EDGE:
-    case RidgePosition::EXTERIOR: {
-      // Create single slope from ridge to opposite edges
-      auto surface =
-          createSlopedSurface(footprint, ridgeLine, slopeAngle, true);
-      result = std::move(surface);
-      break;
-    }
-    }
-  } catch (const Exception &e) {
-    // If splitting fails, fall back to single surface
-    auto surface = createSlopedSurface(footprint, ridgeLine, slopeAngle, true);
-    result       = std::move(surface);
-  }
-
-  propagateValidityFlag(*result, true);
-  return result;
-}
-
-auto
-generatePitchedRoof(const Polygon &footprint, const LineString &ridgeLine,
-                    double slopeAngle, RidgePosition ridgePosition,
-                    NoValidityCheck & /*nvc*/)
-    -> std::unique_ptr<PolyhedralSurface>
-{
-  if (slopeAngle <= 0.0 || slopeAngle >= 90.0) {
-    BOOST_THROW_EXCEPTION(
-        Exception("Slope angle must be between 0 and 90 degrees"));
-  }
-
-  auto result = std::make_unique<PolyhedralSurface>();
-
-  switch (ridgePosition) {
-  case RidgePosition::INTERIOR: {
-    auto [poly1, poly2] = splitPolygonByLine(footprint, ridgeLine);
-
-    auto slope1 = createSlopedSurface(*poly1, ridgeLine, slopeAngle, true);
-    auto slope2 = createSlopedSurface(*poly2, ridgeLine, slopeAngle, true);
-
-    for (size_t i = 0; i < slope1->numPatches(); ++i) {
-      result->addPatch(slope1->patchN(i));
-    }
-    for (size_t i = 0; i < slope2->numPatches(); ++i) {
-      result->addPatch(slope2->patchN(i));
-    }
-    break;
-  }
-  case RidgePosition::EDGE:
-  case RidgePosition::EXTERIOR: {
-    auto surface = createSlopedSurface(footprint, ridgeLine, slopeAngle, true);
-    result       = std::move(surface);
-    break;
-  }
-  }
-
-  return result;
 }
 
 /**
@@ -665,9 +348,7 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
       // Add base polygon to create a closed solid
       roof->addPatch(footprint);
 
-      // Use CGAL's robust orientation fixing
-      auto oriented = fixOrientationWithCGAL(*roof);
-      auto solid    = std::make_unique<Solid>(*oriented);
+      auto solid = std::make_unique<Solid>(*roof);
       propagateValidityFlag(*solid, true);
       return solid;
     } else {
@@ -677,10 +358,6 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
     }
   } else {
     // Building + roof mode
-
-    // Fix roof orientation BEFORE combining with building
-    // This ensures the roof has consistent orientation before integration
-    roof = fixOrientationWithCGAL(*roof);
 
     // Translate roof to building height
     translate(*roof, 0.0, 0.0, buildingHeight);
@@ -713,9 +390,7 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
 
     // If addVerticalFaces is true, this should form a closed solid
     if (addVerticalFaces) {
-      // Use CGAL's robust orientation fixing for building + roof
-      auto oriented = fixOrientationWithCGAL(*result);
-      auto solid    = std::make_unique<Solid>(*oriented);
+      auto solid = std::make_unique<Solid>(*result);
       propagateValidityFlag(*solid, true);
       return solid;
     } else {
@@ -755,34 +430,6 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
       // Simple Z-translation of footprint
       auto translated = footprint.clone();
       translate(*translated, 0.0, 0.0, params.roofHeight);
-
-      if (params.closeBase) {
-        // Create closed solid with base and translated top
-        auto shell = std::make_unique<PolyhedralSurface>();
-        shell->addPatch(footprint);                 // Base
-        shell->addPatch(translated->as<Polygon>()); // Top
-
-        // Add vertical walls
-        const auto &baseRing = footprint.exteriorRing();
-        const auto &topRing  = translated->as<Polygon>().exteriorRing();
-        for (size_t i = 0; i < baseRing.numPoints() - 1; ++i) {
-          size_t             next = i + 1;
-          std::vector<Point> wall = {baseRing.pointN(i), baseRing.pointN(next),
-                                     topRing.pointN(next), topRing.pointN(i),
-                                     baseRing.pointN(i)};
-          shell->addPatch(Polygon(LineString(wall)));
-        }
-
-        // Use CGAL's robust orientation fixing
-        auto oriented = fixOrientationWithCGAL(*shell);
-        auto solid    = std::make_unique<Solid>(*oriented);
-        propagateValidityFlag(*solid, true);
-        return solid;
-      } else {
-        // Return just the translated surface
-        propagateValidityFlag(*translated, true);
-        return translated;
-      }
     } else {
       // Extrusion with building
       double totalHeight = params.buildingHeight + params.roofHeight;
@@ -798,38 +445,45 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
     if (params.buildingHeight == 0.0) {
       // Just the roof
       auto roof = extrudeStraightSkeleton(footprint, params.roofHeight);
-      if (params.closeBase) {
-        // The straight skeleton extrusion includes the base, create solid
-        // Use CGAL's robust orientation fixing
-        auto oriented = fixOrientationWithCGAL(*roof);
-        auto solid    = std::make_unique<Solid>(*oriented);
-        propagateValidityFlag(*solid, true);
-        return solid;
-      } else {
-        propagateValidityFlag(*roof, true);
-        return roof;
+
+      // Legacy: extrudeStraightSkeleton returns a closed geometry
+      if (!params.closeBase) {
+        auto roofWithoutBase = std::make_unique<PolyhedralSurface>();
+
+        auto isRoofSlope = [](const Polygon &patch) -> bool {
+          const LineString &exterior = patch.exteriorRing();
+
+          return std::any_of(
+              exterior.begin(), exterior.end(),
+              [](const Point &point) -> bool { return point.z() != 0; }
+
+          );
+        };
+
+        std::copy_if(roof->begin(), roof->end(),
+                     std::back_inserter(*roofWithoutBase), isRoofSlope);
+        propagateValidityFlag(*roofWithoutBase, true);
+        return roofWithoutBase;
       }
+      propagateValidityFlag(*roof, true);
+      return roof;
     } else {
       // Building + roof using the two-parameter version
       auto result = extrudeStraightSkeleton(footprint, params.buildingHeight,
                                             params.roofHeight);
-      // This returns a polyhedral surface that forms a closed solid
-      // Use CGAL's robust orientation fixing
-      auto oriented = fixOrientationWithCGAL(*result);
-      auto solid    = std::make_unique<Solid>(*oriented);
+      auto solid  = std::make_unique<Solid>(*result);
       propagateValidityFlag(*solid, true);
       return solid;
     }
   }
 
   case RoofType::GABLE: {
-    // GABLE roof: uses automatic medial axis approach
+    // GABLE roof: uses automatic projected medial axis approach
     return generateGableRoof(footprint, params.slopeAngle,
                              params.addVerticalFaces, params.buildingHeight,
                              params.closeBase);
   }
 
-  case RoofType::PITCHED:
   case RoofType::SKILLION: {
     // SKILLION roof: requires ridge line
     SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(ridgeLine);
@@ -848,8 +502,6 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
              const RoofParameters &params, NoValidityCheck & /*nvc*/)
     -> std::unique_ptr<Geometry>
 {
-  // For now, just call the main version (no validity check variant)
-  // The NoValidityCheck is used in other functions to skip validation
   return generateRoof(footprint, ridgeLine, params);
 }
 
@@ -957,8 +609,6 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       }
 
       // Create roof triangle with elevated vertices
-      // Keep natural CDT orientation - fixOrientationWithCGAL will handle
-      // global consistency
       auto roofTriangle = std::make_unique<Triangle>(newV1, newV2, newV3);
       roof->addPatch(*roofTriangle);
     }
@@ -1067,8 +717,7 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       roof->addPatch(footprint);
 
       // Use CGAL's robust orientation fixing
-      auto oriented = fixOrientationWithCGAL(*roof);
-      auto solid    = std::make_unique<Solid>(*oriented);
+      auto solid = std::make_unique<Solid>(*roof);
       propagateValidityFlag(*solid, true);
       return solid;
     } else {
@@ -1078,10 +727,6 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
     }
   } else {
     // Building + roof mode
-
-    // Fix roof orientation BEFORE combining with building
-    // This ensures the roof has consistent orientation before integration
-    roof = fixOrientationWithCGAL(*roof);
 
     // Translate roof to building height
     translate(*roof, 0.0, 0.0, buildingHeight);
@@ -1114,8 +759,7 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
     // If addVerticalFaces is true, this should form a closed solid
     if (addVerticalFaces) {
       // Use CGAL's robust orientation fixing for building + roof
-      auto oriented = fixOrientationWithCGAL(*result);
-      auto solid    = std::make_unique<Solid>(*oriented);
+      auto solid = std::make_unique<Solid>(*result);
       propagateValidityFlag(*solid, true);
       return solid;
     } else {
