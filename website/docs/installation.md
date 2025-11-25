@@ -27,6 +27,7 @@ SFCGAL has been successfully compiled and tested on the following platforms:
 - [Boost](https://www.boost.org) version ≥ 1.74
 - [MPFR](https://www.mpfr.org) version ≥ 2.2.1
 - [GMP](https://gmplib.org) version ≥ 4.2
+- [nlohmann_json](https://github.com/nlohmann/json) version 3.11.x
 
 **Optional dependencies for viewer and 3D format export:**
 
