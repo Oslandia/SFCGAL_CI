@@ -100,6 +100,37 @@ extrude(const Geometry &inputGeometry, const Kernel::Vector_3 &vector)
 SFCGAL_API auto
 extrude(const Polygon &polygon, const double &height)
     -> std::unique_ptr<Geometry>;
+
+/**
+ * @brief Extrude a footprint polygon vertically until it intersects a roof
+ * surface.
+ *
+ * This algorithm performs vertical ray-casting from each vertex of the
+ * footprint (at z=0) to find the intersection with the roof PolyhedralSurface.
+ * The resulting Solid has:
+ * - Bottom face: the original footprint at z=0
+ * - Top face: the footprint vertices projected to roof intersection heights
+ * - Lateral faces: vertical walls connecting bottom and top edges
+ *
+ * @param footprint The base polygon at z=0 (can include interior rings/holes).
+ * @param roof The roof surface as a PolyhedralSurface with variable z values.
+ * @return A Solid representing the extruded volume, or an empty Solid if
+ *         any vertex fails to intersect the roof (with error message).
+ *
+ * @pre footprint must be a valid 2D polygon (z coordinates ignored/set to 0).
+ * @pre roof must be a valid PolyhedralSurface above the footprint (z > 0).
+ *
+ * @note If all projected vertices form a nearly planar surface (within 0.01
+ *       tolerance), the top face is a single polygon. Otherwise, the top
+ *       surface is triangulated to handle non-planar cases.
+ * @note Face orientations follow the right-hand rule: normals point outward
+ *       from the Solid.
+ * @note Uses SFCGAL::EPSILON (1e-8) for intersection tolerance.
+ */
+SFCGAL_API auto
+extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
+    -> std::unique_ptr<Solid>;
+
 } // namespace SFCGAL::algorithm
 
 #endif // ! SFCGAL_ALGORITHM_EXTRUDE_H_
