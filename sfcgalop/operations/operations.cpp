@@ -128,6 +128,87 @@ parse_double(const std::string &str, double default_val = 0.0) -> double
 }
 
 /**
+ * @brief Parse a string as a boolean value.
+ *
+ * Accepts various boolean representations in a case-insensitive manner:
+ * - "true", "t", "1" -> true
+ * - "false", "f", "0" -> false
+ *
+ * @param str String to parse as boolean
+ * @param default_val Default value to return if parsing fails
+ * @return Boolean value or default_val if parsing fails
+ */
+auto
+parse_boolean(const std::string &str, bool default_val = false) -> bool
+{
+  std::string lower_str = str;
+  std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(),
+                 [](unsigned char chr) { return std::tolower(chr); });
+
+  if (lower_str == "true" || lower_str == "t" || lower_str == "1") {
+    return true;
+  }
+  if (lower_str == "false" || lower_str == "f" || lower_str == "0") {
+    return false;
+  }
+  return default_val;
+}
+
+// Forward declaration for trim function
+auto
+trim(const std::string &str) -> std::string;
+
+/**
+ * @brief Extract and parse a boolean parameter from the parameter map.
+ *
+ * This function handles both string-based boolean parameters and legacy
+ * double-based parameters (where 0.0 = false, non-zero = true).
+ *
+ * @param params Parameter map from parse_params
+ * @param key Parameter name to extract
+ * @param param_str Original parameter string for string-based parsing
+ * @param default_val Default value if parameter not found
+ * @return Boolean value
+ */
+
+auto
+parse_boolean_param(const std::map<std::string, double> &params,
+                    const std::string &key, const std::string &param_str,
+                    bool default_val = false) -> bool
+{
+  auto it = params.find(key);
+  if (it == params.end()) {
+    return default_val;
+  }
+
+  // Try to extract the original string value from param_str for proper boolean
+  // parsing
+  std::string search_key = key + "=";
+  auto        key_pos    = param_str.find(search_key);
+  if (key_pos != std::string::npos) {
+    auto value_start = key_pos + search_key.length();
+    auto value_end   = param_str.find(',', value_start);
+    if (value_end == std::string::npos) {
+      value_end = param_str.length();
+    }
+    std::string value_str =
+        param_str.substr(value_start, value_end - value_start);
+    value_str = trim(value_str);
+
+    // If it looks like a string boolean, parse it as such
+    if (value_str == "true" || value_str == "false" || value_str == "t" ||
+        value_str == "f" || value_str == "T" || value_str == "F" ||
+        value_str == "True" || value_str == "False" || value_str == "TRUE" ||
+        value_str == "FALSE") {
+      return parse_boolean(value_str, default_val);
+    }
+  }
+
+  // Fallback to standard if it's not 0(.0) it's true
+  return it->second != 0.0;
+}
+
+/**
  * @brief Parse a comma-separated list of key=value pairs into a map.
  *
  * Parses `str` for entries of the form `key=value` separated by commas and
