@@ -5,6 +5,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "SFCGAL/Envelope.h"
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
@@ -21,7 +22,6 @@
 #include "SFCGAL/algorithm/roofGeneration.h"
 #include "SFCGAL/algorithm/volume.h"
 #include "SFCGAL/detail/transform/ForceZ.h"
-#include "SFCGAL/Envelope.h"
 #include "SFCGAL/io/wkt.h"
 
 using namespace SFCGAL;
@@ -329,12 +329,12 @@ BOOST_AUTO_TEST_CASE(testExtrudeUntilRoofOverhang)
 
   BOOST_CHECK(!result->isEmpty());
   BOOST_CHECK_EQUAL(result->numShells(), 1U);
-  
+
   // Check volume (10 * 10 * 5 = 500)
   BOOST_CHECK_CLOSE(CGAL::to_double(algorithm::volume(*result)), 500.0, 0.001);
 
   // Check bounds
-  const Envelope& env = result->envelope();
+  const Envelope &env = result->envelope();
   BOOST_CHECK_CLOSE(env.xMin(), 0.0, 0.001);
   BOOST_CHECK_CLOSE(env.xMax(), 10.0, 0.001);
   BOOST_CHECK_CLOSE(env.yMin(), 0.0, 0.001);
@@ -345,85 +345,74 @@ BOOST_AUTO_TEST_CASE(testExtrudeUntilRoofOverhang)
 
 BOOST_AUTO_TEST_CASE(testExtrudeUntilGableRoofOverhang)
 {
-  // Footprint: 10x10 square at z=0
-  std::vector<Point> points;
-  points.emplace_back(0.0, 0.0, 0.0);
-  points.emplace_back(10.0, 0.0, 0.0);
-  points.emplace_back(10.0, 10.0, 0.0);
-  points.emplace_back(0.0, 10.0, 0.0);
-  points.emplace_back(0.0, 0.0, 0.0);
-  LineString const exteriorRing(points);
-  Polygon const    footprint(exteriorRing);
+  std::string footprintWKT{"POLYGON((0 0,10 0,10 6,0 6,0 0))"};
+  // std::string overhangWKT{"Polygon ((-1 -1, -1 7, 11 7, 11 -1, -1 -1))"};
+  // Generated via: ./build/sfcgalop/sfcgalop -a "Polygon ((-1 -1, -1 7, 11 7,
+  // 11 -1, -1 -1))" generate_gable_roof "slope_angle=30" |
+  // ./build/sfcgalop/sfcgalop translate "dz=5"
+  std::string gableRoofWKT{
+      "POLYHEDRALSURFACE Z (((7.000000 3.000000 5.577350,-1.000000 -1.000000 "
+      "5.000000,11.000000 -1.000000 5.000000,7.000000 3.000000 "
+      "5.577350)),((-1.000000 7.000000 5.000000,-1.000000 3.000000 "
+      "5.577350,3.000000 3.000000 5.577350,-1.000000 7.000000 "
+      "5.000000)),((3.000000 3.000000 5.577350,-1.000000 3.000000 "
+      "5.577350,-1.000000 -1.000000 5.000000,3.000000 3.000000 "
+      "5.577350)),((7.000000 3.000000 5.577350,3.000000 3.000000 "
+      "5.577350,-1.000000 -1.000000 5.000000,7.000000 3.000000 "
+      "5.577350)),((7.000000 3.000000 5.577350,-1.000000 7.000000 "
+      "5.000000,3.000000 3.000000 5.577350,7.000000 3.000000 "
+      "5.577350)),((11.000000 3.000000 5.577350,7.000000 3.000000 "
+      "5.577350,11.000000 -1.000000 5.000000,11.000000 3.000000 "
+      "5.577350)),((11.000000 7.000000 5.000000,-1.000000 7.000000 "
+      "5.000000,7.000000 3.000000 5.577350,11.000000 7.000000 "
+      "5.000000)),((11.000000 7.000000 5.000000,7.000000 3.000000 "
+      "5.577350,11.000000 3.000000 5.577350,11.000000 7.000000 5.000000)))"};
+  std::string expectedWKT{
+      "SOLID Z ((((0.000000 0.000000 0.000000,0.000000 6.000000 "
+      "0.000000,10.000000 6.000000 0.000000,10.000000 0.000000 "
+      "0.000000,0.000000 "
+      "0.000000 0.000000)),((7.000000 3.000000 5.577350,1.000000 0.000000 "
+      "5.144338,10.000000 0.000000 5.144338,7.000000 3.000000 "
+      "5.577350)),((0.000000 6.000000 5.144338,0.000000 3.000000 "
+      "5.577350,3.000000 3.000000 5.577350,0.000000 6.000000 "
+      "5.144338)),((0.000000 3.000000 5.577350,0.000000 0.000000 "
+      "5.144338,3.000000 3.000000 5.577350,0.000000 3.000000 "
+      "5.577350)),((0.000000 0.000000 5.144338,1.000000 0.000000 "
+      "5.144338,7.000000 3.000000 5.577350,3.000000 3.000000 5.577350,0.000000 "
+      "0.000000 5.144338)),((1.000000 6.000000 5.144338,0.000000 6.000000 "
+      "5.144338,3.000000 3.000000 5.577350,7.000000 3.000000 5.577350,1.000000 "
+      "6.000000 5.144338)),((7.000000 3.000000 5.577350,10.000000 0.000000 "
+      "5.144338,10.000000 3.000000 5.577350,7.000000 3.000000 "
+      "5.577350)),((1.000000 6.000000 5.144338,7.000000 3.000000 "
+      "5.577350,10.000000 6.000000 5.144338,1.000000 6.000000 "
+      "5.144338)),((7.000000 3.000000 5.577350,10.000000 3.000000 "
+      "5.577350,10.000000 6.000000 5.144338,7.000000 3.000000 "
+      "5.577350)),((0.000000 3.000000 5.577350,0.000000 3.000000 "
+      "0.000000,0.000000 0.000000 0.000000,0.000000 0.000000 5.144338,0.000000 "
+      "3.000000 5.577350)),((0.000000 0.000000 5.144338,0.000000 0.000000 "
+      "0.000000,1.000000 0.000000 0.000000,1.000000 0.000000 5.144338,0.000000 "
+      "0.000000 5.144338)),((0.000000 6.000000 5.144338,0.000000 6.000000 "
+      "0.000000,0.000000 3.000000 0.000000,0.000000 3.000000 5.577350,0.000000 "
+      "6.000000 5.144338)),((1.000000 6.000000 5.144338,1.000000 6.000000 "
+      "0.000000,0.000000 6.000000 0.000000,0.000000 6.000000 5.144338,1.000000 "
+      "6.000000 5.144338)),((1.000000 0.000000 5.144338,1.000000 0.000000 "
+      "0.000000,10.000000 0.000000 0.000000,10.000000 0.000000 "
+      "5.144338,1.000000 "
+      "0.000000 5.144338)),((10.000000 6.000000 5.144338,10.000000 6.000000 "
+      "0.000000,1.000000 6.000000 0.000000,1.000000 6.000000 "
+      "5.144338,10.000000 "
+      "6.000000 5.144338)),((10.000000 0.000000 5.144338,10.000000 0.000000 "
+      "0.000000,10.000000 3.000000 0.000000,10.000000 3.000000 "
+      "5.577350,10.000000 0.000000 5.144338)),((10.000000 3.000000 "
+      "5.577350,10.000000 3.000000 0.000000,10.000000 6.000000 "
+      "0.000000,10.000000 6.000000 5.144338,10.000000 3.000000 5.577350))))"};
 
-  // Roof Footprint: 20x30 rectangle (to ensure a ridge line is generated)
-  std::vector<Point> roofPoints;
-  roofPoints.emplace_back(-5.0, -5.0, 0.0);
-  roofPoints.emplace_back(15.0, -5.0, 0.0);
-  roofPoints.emplace_back(15.0, 25.0, 0.0);
-  roofPoints.emplace_back(-5.0, 25.0, 0.0);
-  roofPoints.emplace_back(-5.0, -5.0, 0.0);
-  Polygon const roofFootprint{LineString(roofPoints)};
-
-  // Generate Gable Roof
-  // generateGableRoof(footprint, slopeAngle=30.0, addVerticalFaces=false, buildingHeight=5.0, closeBase=false)
-  std::unique_ptr<Geometry> roofGeom = algorithm::generateGableRoof(roofFootprint, 30.0, false, 5.0, false);
-  
-  // The result is a PolyhedralSurface (because addVerticalFaces=false) containing:
-  // - Bottom face at Z=0
-  // - Vertical walls from Z=0 to Z=5
-  // - Sloped roof faces starting at Z=5
-  
-  BOOST_REQUIRE(roofGeom->is<PolyhedralSurface>());
-  const PolyhedralSurface& fullRoof = roofGeom->as<PolyhedralSurface>();
-  
-  // Filter out bottom face (Z=0) and vertical walls to get just the "roof" part for extrudeUntil
-  PolyhedralSurface cleanRoof;
-  for(size_t i=0; i<fullRoof.numPolygons(); ++i) {
-      const Polygon& poly = fullRoof.polygonN(i);
-      
-      // Check if it's the bottom face (all Z=0)
-      bool isBottom = true;
-      const LineString& ring = poly.exteriorRing();
-      for(size_t j=0; j<ring.numPoints(); ++j) {
-          if (std::abs(CGAL::to_double(ring.pointN(j).z())) > 1e-6) {
-              isBottom = false;
-              break;
-          }
-      }
-      
-      if (!isBottom) {
-          cleanRoof.addPolygon(poly);
-      }
-  }
-
+  std::unique_ptr<Geometry> footprint(io::readWkt(footprintWKT));
+  std::unique_ptr<Geometry> gableRoof(io::readWkt(gableRoofWKT));
   // Extrude until roof
-  std::unique_ptr<Solid> result = algorithm::extrudeUntil(footprint, cleanRoof);
-
-  BOOST_CHECK(!result->isEmpty());
-  BOOST_CHECK_EQUAL(result->numShells(), 1U);
-  
-  // Check bounds
-  const Envelope& env = result->envelope();
-  BOOST_CHECK_CLOSE(env.xMin(), 0.0, 0.001);
-  BOOST_CHECK_CLOSE(env.xMax(), 10.0, 0.001);
-  BOOST_CHECK_CLOSE(env.yMin(), 0.0, 0.001);
-  BOOST_CHECK_CLOSE(env.yMax(), 10.0, 0.001);
-  BOOST_CHECK_CLOSE(env.zMin(), 0.0, 0.001);
-  
-  // Max Z should be 5.0 + height of slope at ridge
-  // Ridge is at Y=5 (center of 10x10 footprint relative to roof). 
-  // Roof footprint is -5 to 15. Center is Y=5.
-  // Wait, roof footprint is 20 wide (-5 to 15). Center is 5.
-  // Footprint is 0 to 10. Center is 5.
-  // So ridges align.
-  // Ridge height relative to roof base (Z=5) is:
-  // Distance from edge to ridge = 10.0.
-  // Height = 10.0 * tan(30 deg) = 10.0 * 0.57735 = 5.7735
-  // Total Z = 5.0 + 5.7735 = 10.7735
-  
-  double expectedMaxZ = 5.0 + 10.0 * std::tan(30.0 * M_PI / 180.0);
-  BOOST_CHECK_CLOSE(env.zMax(), expectedMaxZ, 0.001);
+  std::unique_ptr<Solid> result = algorithm::extrudeUntil(
+      footprint->as<Polygon>(), gableRoof->as<PolyhedralSurface>());
+  BOOST_CHECK_EQUAL(result->asText(6), expectedWKT);
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
