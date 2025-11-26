@@ -53,7 +53,6 @@ namespace {
 
 // Consistent tolerance constants for geometric operations
 const auto GEOMETRIC_TOLERANCE = 1e-10;
-const auto HEIGHT_TOLERANCE    = 1e-6;
 
 /**
  * @brief Calculate perpendicular distance from a point to a 2D line using exact
@@ -222,16 +221,9 @@ createVerticalFaces(const Polygon            &footprint,
     auto roofPt1 = elevatedVertices[i];
     auto roofPt2 = elevatedVertices[nextI];
 
-    // Check if there's meaningful height difference for this edge
-    auto roofHeight1 = CGAL::to_double(roofPt1.z());
-    auto roofHeight2 = CGAL::to_double(roofPt2.z());
-    auto baseHeight1 = CGAL::to_double(basePt1.z());
-    auto baseHeight2 = CGAL::to_double(basePt2.z());
-
-    bool hasHeightDiff1 =
-        std::abs(roofHeight1 - baseHeight1) > HEIGHT_TOLERANCE;
-    bool hasHeightDiff2 =
-        std::abs(roofHeight2 - baseHeight2) > HEIGHT_TOLERANCE;
+    // Check if there's height difference for this edge
+    bool hasHeightDiff1 = (roofPt1.z() - basePt1.z()) != 0;
+    bool hasHeightDiff2 = (roofPt2.z() - basePt2.z()) != 0;
 
     if (hasHeightDiff1 && hasHeightDiff2) {
       // Both points have height difference - create quadrilateral face
@@ -373,8 +365,7 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
       bool allAtBuildingHeight =
           std::all_of(exterior.begin(), exterior.end(),
                       [buildingHeight](const Point &point) {
-                        return std::abs(CGAL::to_double(point.z()) -
-                                        buildingHeight) < HEIGHT_TOLERANCE;
+                        return (point.z() - buildingHeight) != 0;
                       });
       return !allAtBuildingHeight; // Keep all faces except the top
     };
@@ -744,8 +735,7 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       bool allAtBuildingHeight =
           std::all_of(exterior.begin(), exterior.end(),
                       [buildingHeight](const Point &point) {
-                        return std::abs(CGAL::to_double(point.z()) -
-                                        buildingHeight) < HEIGHT_TOLERANCE;
+                        return (point.z() - buildingHeight) != 0;
                       });
       return !allAtBuildingHeight; // Keep all faces except the top
     };
