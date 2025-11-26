@@ -1238,8 +1238,13 @@ const std::vector<Operation> operations = {
        bool add_vertical_faces =
            parse_boolean_param(params, "add_vertical_faces", params_str, false);
 
-       return SFCGAL::algorithm::generateGableRoof(
-           *polygon, slope_angle, add_vertical_faces, building_height);
+       SFCGAL::algorithm::RoofParameters roof_params;
+       roof_params.type              = SFCGAL::algorithm::RoofType::GABLE;
+       roof_params.slopeAngle        = slope_angle;
+       roof_params.addVerticalFaces  = add_vertical_faces;
+       roof_params.buildingHeight    = building_height;
+       return SFCGAL::algorithm::generateRoof(*polygon, SFCGAL::LineString(),
+                                              roof_params);
      }},
 
     {"generate_flat_roof", "Roof Generation",
@@ -1440,15 +1445,12 @@ const std::vector<Operation> operations = {
        auto               point2 = ring.pointN(ridge_edge + 1);
        SFCGAL::LineString ridgeLine(point1, point2);
 
-       if (building_height == 0.0) {
-         // Just generate the skillion roof
-         return SFCGAL::algorithm::generateSkillionRoof(
-             *polygon, ridgeLine, slope_angle, add_vertical_faces);
-       }
-       // Generate with building integration
-       return SFCGAL::algorithm::generateSkillionRoof(
-           *polygon, ridgeLine, slope_angle, add_vertical_faces,
-           building_height);
+       SFCGAL::algorithm::RoofParameters roof_params;
+       roof_params.type             = SFCGAL::algorithm::RoofType::SKILLION;
+       roof_params.slopeAngle       = slope_angle;
+       roof_params.addVerticalFaces = add_vertical_faces;
+       roof_params.buildingHeight   = building_height;
+       return SFCGAL::algorithm::generateRoof(*polygon, ridgeLine, roof_params);
      }}}; // end operations array
 
 } // namespace
