@@ -22,6 +22,7 @@
 #include "SFCGAL/algorithm/orientation.h"
 #include "SFCGAL/algorithm/tesselate.h"
 #include "SFCGAL/algorithm/translate.h"
+#include "SFCGAL/algorithm/detail/FaceFilters.h"
 
 #include <CGAL/Arr_segment_traits_2.h>
 #include <CGAL/Arrangement_2.h>
@@ -584,18 +585,9 @@ extrudeStraightSkeleton(const Geometry &geom, double building_height,
   // Create new roof surface
   auto roof = std::make_unique<PolyhedralSurface>();
 
-  // Predicate to identify non-base faces (roof slopes)
-  auto isNotBaseFace = [](const Polygon &patch) -> bool {
-    const LineString &exterior = patch.exteriorRing();
-
-    // Check if any point has z != 0 (not a base face)
-    return std::any_of(
-        exterior.begin(), exterior.end(),
-        [](const Point &point) -> bool { return point.z() != 0.0; });
-  };
-
+  // Copy all non-base faces (roof slopes)
   std::copy_if(completeRoof->begin(), completeRoof->end(),
-               std::back_inserter(*roof), isNotBaseFace);
+               std::back_inserter(*roof), detail::isNotBaseFace);
 
   // Translate roof to building height
   translate(*roof, 0.0, 0.0, building_height);
