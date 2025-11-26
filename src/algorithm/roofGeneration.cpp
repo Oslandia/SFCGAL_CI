@@ -51,9 +51,6 @@ namespace SFCGAL::algorithm {
 
 namespace {
 
-// Consistent tolerance constants for geometric operations
-const auto GEOMETRIC_TOLERANCE = 1e-10;
-
 /**
  * @brief Calculate perpendicular distance from a point to a 2D line using exact
  * arithmetic
@@ -67,22 +64,23 @@ distanceToLine2D(const Point &point, const Point &lineStart,
                  const Point &lineEnd) -> double
 {
   // Use high-precision arithmetic for numerical stability
-  auto dx = CGAL::to_double(lineEnd.x() - lineStart.x());
-  auto dy = CGAL::to_double(lineEnd.y() - lineStart.y());
+  auto dx = lineEnd.x() - lineStart.x();
+  auto dy = lineEnd.y() - lineStart.y();
 
   // If line is degenerate (start == end), return distance to point
   auto lineLengthSq = (dx * dx) + (dy * dy);
-  if (lineLengthSq < GEOMETRIC_TOLERANCE) {
-    auto px = CGAL::to_double(point.x() - lineStart.x());
-    auto py = CGAL::to_double(point.y() - lineStart.y());
-    return std::sqrt((px * px) + (py * py));
+  if (lineLengthSq == 0) {
+    auto px = point.x() - lineStart.x();
+    auto py = point.y() - lineStart.y();
+    return std::sqrt(CGAL::to_double((px * px) + (py * py)));
   }
 
   // Calculate perpendicular distance using cross product formula
-  auto px = CGAL::to_double(point.x() - lineStart.x());
-  auto py = CGAL::to_double(point.y() - lineStart.y());
+  auto px = point.x() - lineStart.x();
+  auto py = point.y() - lineStart.y();
 
-  return std::abs((dx * py) - (dy * px)) / std::sqrt(lineLengthSq);
+  return std::abs(CGAL::to_double((dx * py) - (dy * px))) /
+         std::sqrt(CGAL::to_double(lineLengthSq));
 }
 
 /**
