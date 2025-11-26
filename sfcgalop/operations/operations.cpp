@@ -1239,10 +1239,10 @@ const std::vector<Operation> operations = {
            parse_boolean_param(params, "add_vertical_faces", params_str, false);
 
        SFCGAL::algorithm::RoofParameters roof_params;
-       roof_params.type              = SFCGAL::algorithm::RoofType::GABLE;
-       roof_params.slopeAngle        = slope_angle;
-       roof_params.addVerticalFaces  = add_vertical_faces;
-       roof_params.buildingHeight    = building_height;
+       roof_params.type             = SFCGAL::algorithm::RoofType::GABLE;
+       roof_params.slopeAngle       = slope_angle;
+       roof_params.addVerticalFaces = add_vertical_faces;
+       roof_params.buildingHeight   = building_height;
        return SFCGAL::algorithm::generateRoof(*polygon, SFCGAL::LineString(),
                                               roof_params);
      }},

@@ -29,10 +29,9 @@ isNotFaceAtHeight(const Polygon &patch, double height) -> bool
   const LineString &exterior = patch.exteriorRing();
 
   // Check if all points have z == height
-  bool allAtHeight =
-      std::all_of(exterior.begin(), exterior.end(), [height](const Point &point) {
-        return (point.z() - height) == 0;
-      });
+  bool allAtHeight = std::all_of(
+      exterior.begin(), exterior.end(),
+      [height](const Point &point) { return (point.z() - height) == 0; });
 
   // Return true if not all points are at height (keep all faces except those
   // at height)
