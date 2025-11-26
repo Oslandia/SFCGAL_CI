@@ -248,11 +248,6 @@ createVerticalFaces(const Polygon            &footprint,
 
 /// @} end of private section
 
-// ----------------------------------------------------------------------------------
-// -- public interface
-// ----------------------------------------------------------------------------------
-/// @publicsection
-
 auto
 calculateRidgeHeight(double horizontalDistance, double slopeAngle) -> double
 {
