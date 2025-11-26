@@ -33,6 +33,7 @@ enum class RoofType : std::uint8_t {
  * @brief Parameters for roof generation algorithms.
  *
  * Input parameters:
+ * - type: Roof type (cf. RoofType)
  * - slopeAngle: Roof slope angle in degrees (0-90), used for gable and skillion
  * roofs
  * - roofHeight: Maximum roof height (>= 0), used for flat and hipped roofs
@@ -49,9 +50,9 @@ enum class RoofType : std::uint8_t {
  * - closeBase is forced to false when buildingHeight > 0
  */
 struct RoofParameters {
-  RoofType type       = RoofType::GABLE;
-  double   slopeAngle = 30.0; ///< Slope angle in degrees (0-90) for
-                              ///< gable/skillion roofs
+  RoofType type       = RoofType::GABLE; ///< Roof Type (cf. RoofType)
+  double   slopeAngle = 30.0;            ///< Slope angle in degrees (0-90) for
+                                         ///< gable/skillion roofs
   double roofHeight = 3.0; ///< Maximum roof height for flat/hipped roofs (>= 0)
   double buildingHeight = 0.0;   ///< Building wall height (>= 0), 0 = roof only
   bool   closeBase      = false; ///< Close the base (only if buildingHeight ==
