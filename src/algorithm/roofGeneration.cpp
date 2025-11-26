@@ -412,13 +412,14 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
       // Simple Z-translation of footprint
       auto translated = footprint.clone();
       translate(*translated, 0.0, 0.0, params.roofHeight);
-    } else {
-      // Extrusion with building
-      double totalHeight = params.buildingHeight + params.roofHeight;
-      auto   extruded    = extrude(footprint, 0.0, 0.0, totalHeight);
-      propagateValidityFlag(*extruded, true);
-      return extruded; // Returns a Solid
+      propagateValidityFlag(*translated, true);
+      return translated;
     }
+    // Extrusion with building
+    double totalHeight = params.buildingHeight + params.roofHeight;
+    auto   extruded    = extrude(footprint, 0.0, 0.0, totalHeight);
+    propagateValidityFlag(*extruded, true);
+    return extruded; // Returns a Solid
   }
 
   case RoofType::HIPPED: {
