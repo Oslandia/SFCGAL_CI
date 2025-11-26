@@ -24,6 +24,7 @@
 #include "SFCGAL/algorithm/straightSkeleton.h"
 #include "SFCGAL/algorithm/tesselate.h"
 #include "SFCGAL/algorithm/translate.h"
+#include "SFCGAL/algorithm/detail/FaceFilters.h"
 #include "SFCGAL/triangulate/triangulate2DZ.h"
 
 #include <CGAL/Boolean_set_operations_2.h>
@@ -357,23 +358,15 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
 
     // Filter out the top face of the building (similar to
     // extrudeStraightSkeleton)
-    auto isNotTopFace = [buildingHeight](const Polygon &patch) -> bool {
-      const LineString &exterior = patch.exteriorRing();
-      // Check if all points have z == buildingHeight (top face)
-      bool allAtBuildingHeight =
-          std::all_of(exterior.begin(), exterior.end(),
-                      [buildingHeight](const Point &point) {
-                        return (point.z() - buildingHeight) != 0;
-                      });
-      return !allAtBuildingHeight; // Keep all faces except the top
-    };
-
     auto buildingShell = building->as<Solid>().exteriorShell();
     auto result        = std::make_unique<PolyhedralSurface>();
 
     // Copy all building faces except the top
     std::copy_if(buildingShell.begin(), buildingShell.end(),
-                 std::back_inserter(*result), isNotTopFace);
+                 std::back_inserter(*result),
+                 [buildingHeight](const Polygon &patch) {
+                   return detail::isNotFaceAtHeight(patch, buildingHeight);
+                 });
 
     // Add roof patches
     result->addPatchs(*roof);
@@ -439,18 +432,8 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
       if (!params.closeBase) {
         auto roofWithoutBase = std::make_unique<PolyhedralSurface>();
 
-        auto isRoofSlope = [](const Polygon &patch) -> bool {
-          const LineString &exterior = patch.exteriorRing();
-
-          return std::any_of(
-              exterior.begin(), exterior.end(),
-              [](const Point &point) -> bool { return point.z() != 0; }
-
-          );
-        };
-
         std::copy_if(roof->begin(), roof->end(),
-                     std::back_inserter(*roofWithoutBase), isRoofSlope);
+                     std::back_inserter(*roofWithoutBase), detail::isRoofSlope);
         propagateValidityFlag(*roofWithoutBase, true);
         return roofWithoutBase;
       }
@@ -727,23 +710,15 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
     auto building = extrude(footprint, buildingHeight);
 
     // Filter out the top face of the building
-    auto isNotTopFace = [buildingHeight](const Polygon &patch) -> bool {
-      const LineString &exterior = patch.exteriorRing();
-      // Check if all points have z == buildingHeight (top face)
-      bool allAtBuildingHeight =
-          std::all_of(exterior.begin(), exterior.end(),
-                      [buildingHeight](const Point &point) {
-                        return (point.z() - buildingHeight) != 0;
-                      });
-      return !allAtBuildingHeight; // Keep all faces except the top
-    };
-
     auto buildingShell = building->as<Solid>().exteriorShell();
     auto result        = std::make_unique<PolyhedralSurface>();
 
     // Copy all building faces except the top
     std::copy_if(buildingShell.begin(), buildingShell.end(),
-                 std::back_inserter(*result), isNotTopFace);
+                 std::back_inserter(*result),
+                 [buildingHeight](const Polygon &patch) {
+                   return detail::isNotFaceAtHeight(patch, buildingHeight);
+                 });
 
     // Add translated roof patches
     result->addPatchs(*roof);
