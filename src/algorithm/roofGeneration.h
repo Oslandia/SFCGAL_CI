@@ -22,7 +22,7 @@ struct NoValidityCheck;
 /**
  * @brief Enumeration of roof types supported by the roof generation algorithms.
  */
-enum class RoofType {
+enum class RoofType : std::uint8_t {
   FLAT,     ///< Flat roof (simple extrusion)
   HIPPED,   ///< Hipped roof (straight skeleton extrusion)
   SKILLION, ///< Skillion roof (alias for pitched roof)

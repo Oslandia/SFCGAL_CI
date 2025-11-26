@@ -1444,12 +1444,11 @@ const std::vector<Operation> operations = {
          // Just generate the skillion roof
          return SFCGAL::algorithm::generateSkillionRoof(
              *polygon, ridgeLine, slope_angle, add_vertical_faces);
-       } else {
-         // Generate with building integration
-         return SFCGAL::algorithm::generateSkillionRoof(
-             *polygon, ridgeLine, slope_angle, add_vertical_faces,
-             building_height);
        }
+       // Generate with building integration
+       return SFCGAL::algorithm::generateSkillionRoof(
+           *polygon, ridgeLine, slope_angle, add_vertical_faces,
+           building_height);
      }}}; // end operations array
 
 } // namespace

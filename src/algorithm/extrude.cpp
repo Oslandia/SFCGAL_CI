@@ -22,8 +22,8 @@
 #include "SFCGAL/Exception.h"
 
 #include "SFCGAL/algorithm/force3D.h"
-#include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/algorithm/normal.h"
 #include "SFCGAL/algorithm/plane.h"
 #include "SFCGAL/algorithm/translate.h"
@@ -401,8 +401,8 @@ extrude(const Polygon &polygon, const double &height)
       extrude(polygon, Kernel::Vector_3(0.0, 0.0, height), false));
 }
 
-
 /// @private
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 SFCGAL_API auto
 extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
     -> std::unique_ptr<Solid>
@@ -411,7 +411,8 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
     return std::make_unique<Solid>();
   }
 
-  std::unique_ptr<PolyhedralSurface> shell = std::make_unique<PolyhedralSurface>();
+  std::unique_ptr<PolyhedralSurface> shell =
+      std::make_unique<PolyhedralSurface>();
 
   // 1. Add bottom face (footprint at z=0)
   Polygon bottomFace = footprint;
@@ -420,120 +421,146 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
   shell->addPolygon(bottomFace);
 
   // Helper to lift a 2D polygon to 3D using a plane
-  auto liftPolygon = [](const Polygon& poly2D, const CGAL::Plane_3<Kernel>& plane) -> Polygon {
-      Polygon poly3D = poly2D;
-      for(size_t i=0; i<poly3D.numRings(); ++i) {
-          LineString& ring = poly3D.ringN(i);
-          for(size_t j=0; j<ring.numPoints(); ++j) {
-              Point& p = ring.pointN(j);
-              Kernel::FT x = p.x();
-              Kernel::FT y = p.y();
-              // z = -(ax + by + d) / c
-              if (plane.c() != 0) {
-                  Kernel::FT z = -(plane.a() * x + plane.b() * y + plane.d()) / plane.c();
-                  p = Point(x, y, z);
-              }
-          }
+  auto liftPolygon = [](const Polygon               &poly2D,
+                        const CGAL::Plane_3<Kernel> &plane) -> Polygon {
+    Polygon poly3D = poly2D;
+    for (size_t i = 0; i < poly3D.numRings(); ++i) {
+      LineString &ring = poly3D.ringN(i);
+      for (size_t j = 0; j < ring.numPoints(); ++j) {
+        Point     &point = ring.pointN(j);
+        Kernel::FT x     = point.x();
+        Kernel::FT y     = point.y();
+        // z = -(ax + by + d) / c
+        if (plane.c() != 0) {
+          Kernel::FT z =
+              -(plane.a() * x + plane.b() * y + plane.d()) / plane.c();
+          point = Point(x, y, z);
+        }
       }
-      return poly3D;
+    }
+    return poly3D;
   };
 
   std::vector<Polygon> topPolygons;
 
   // 2. Process roof polygons
-  for(size_t i=0; i<roof.numPolygons(); ++i) {
-    const Polygon& roofPoly = roof.polygonN(i);
-    
+  for (size_t i = 0; i < roof.numPolygons(); ++i) {
+    const Polygon &roofPoly = roof.polygonN(i);
+
     // Get plane
     CGAL::Plane_3<Kernel> plane;
     try {
-        plane = algorithm::plane3D<Kernel>(roofPoly);
+      plane = algorithm::plane3D<Kernel>(roofPoly);
     } catch (...) {
-        continue;
+      continue;
     }
 
     // Ignore vertical faces (normal perpendicular to Z)
-    if (plane.c() == 0) continue;
+    if (plane.c() == 0) {
+      continue;
+    }
 
     // Project roof polygon to 2D
     Polygon roofPoly2D = roofPoly;
-    for(size_t r=0; r<roofPoly2D.numRings(); ++r) {
-        LineString& ring = roofPoly2D.ringN(r);
-        for(size_t p=0; p<ring.numPoints(); ++p) {
-            ring.pointN(p) = Point(ring.pointN(p).x(), ring.pointN(p).y(), 0.0);
-        }
+    for (size_t ringIdx = 0; ringIdx < roofPoly2D.numRings(); ++ringIdx) {
+      LineString &ring = roofPoly2D.ringN(ringIdx);
+      for (size_t pointIdx = 0; pointIdx < ring.numPoints(); ++pointIdx) {
+        ring.pointN(pointIdx) =
+            Point(ring.pointN(pointIdx).x(), ring.pointN(pointIdx).y(), 0.0);
+      }
     }
 
     // Intersect with footprint
     std::unique_ptr<Geometry> intersectionResult;
     try {
-        intersectionResult = intersection(footprint, roofPoly2D);
+      intersectionResult = intersection(footprint, roofPoly2D);
     } catch (...) {
-        continue;
+      continue;
     }
 
-    if (!intersectionResult || intersectionResult->isEmpty()) continue;
+    if (!intersectionResult || intersectionResult->isEmpty()) {
+      continue;
+    }
 
     // Collect result polygons
     std::vector<Polygon> currentPolys;
     if (intersectionResult->is<Polygon>()) {
-        currentPolys.push_back(intersectionResult->as<Polygon>());
+      currentPolys.push_back(intersectionResult->as<Polygon>());
     } else if (intersectionResult->is<Triangle>()) {
-        currentPolys.push_back(Polygon(intersectionResult->as<Triangle>()));
+      currentPolys.emplace_back(intersectionResult->as<Triangle>());
     } else if (intersectionResult->is<MultiPolygon>()) {
-        const MultiPolygon& mp = intersectionResult->as<MultiPolygon>();
-        for(size_t k=0; k<mp.numGeometries(); ++k) {
-            currentPolys.push_back(mp.geometryN(k).as<Polygon>());
-        }
+      const MultiPolygon &mp = intersectionResult->as<MultiPolygon>();
+      for (size_t k = 0; k < mp.numGeometries(); ++k) {
+        currentPolys.push_back(mp.geometryN(k).as<Polygon>());
+      }
     } else if (intersectionResult->is<GeometryCollection>()) {
-         const GeometryCollection& gc = intersectionResult->as<GeometryCollection>();
-         for(size_t k=0; k<gc.numGeometries(); ++k) {
-             if (gc.geometryN(k).is<Polygon>()) {
-                 currentPolys.push_back(gc.geometryN(k).as<Polygon>());
-             }
-         }
+      const GeometryCollection &gc =
+          intersectionResult->as<GeometryCollection>();
+      for (size_t k = 0; k < gc.numGeometries(); ++k) {
+        if (gc.geometryN(k).is<Polygon>()) {
+          currentPolys.push_back(gc.geometryN(k).as<Polygon>());
+        }
+      }
     }
 
     // Lift and add
-    for(const auto& poly : currentPolys) {
-        Polygon poly3D = liftPolygon(poly, plane);
-        topPolygons.push_back(poly3D);
-        shell->addPolygon(poly3D);
+    for (const auto &poly : currentPolys) {
+      Polygon poly3D = liftPolygon(poly, plane);
+      topPolygons.push_back(poly3D);
+      shell->addPolygon(poly3D);
     }
   }
 
   if (topPolygons.empty()) {
-      return std::make_unique<Solid>();
+    return std::make_unique<Solid>();
   }
 
   // 3. Create lateral faces from boundary of top surface
   struct Edge {
-    Point p1, p2;
-    bool operator<(const Edge &other) const {
-      if (p1.x() != other.p1.x()) return p1.x() < other.p1.x();
-      if (p1.y() != other.p1.y()) return p1.y() < other.p1.y();
-      if (p1.z() != other.p1.z()) return p1.z() < other.p1.z();
-      if (p2.x() != other.p2.x()) return p2.x() < other.p2.x();
-      if (p2.y() != other.p2.y()) return p2.y() < other.p2.y();
-      return p2.z() < other.p2.z();
+    Point point1, point2;
+    auto
+    operator<(const Edge &other) const -> bool
+    {
+      if (point1.x() != other.point1.x()) {
+        return point1.x() < other.point1.x();
+      }
+      if (point1.y() != other.point1.y()) {
+        return point1.y() < other.point1.y();
+      }
+      if (point1.z() != other.point1.z()) {
+        return point1.z() < other.point1.z();
+      }
+      if (point2.x() != other.point2.x()) {
+        return point2.x() < other.point2.x();
+      }
+      if (point2.y() != other.point2.y()) {
+        return point2.y() < other.point2.y();
+      }
+      return point2.z() < other.point2.z();
     }
   };
 
   std::map<Edge, int> edgeCount;
 
-  for (const auto& poly : topPolygons) {
+  for (const auto &poly : topPolygons) {
     for (size_t ringIdx = 0; ringIdx < poly.numRings(); ++ringIdx) {
       const LineString &ring = poly.ringN(ringIdx);
       for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
-        Point p1 = ring.pointN(i);
-        Point p2 = ring.pointN(i + 1);
-        
+        Point edgePoint1 = ring.pointN(i);
+        Point edgePoint2 = ring.pointN(i + 1);
+
         Edge edge;
-        if (p1.x() < p2.x() || (p1.x() == p2.x() && p1.y() < p2.y()) ||
-            (p1.x() == p2.x() && p1.y() == p2.y() && p1.z() < p2.z())) {
-          edge.p1 = p1; edge.p2 = p2;
+        if (edgePoint1.x() < edgePoint2.x() ||
+            (edgePoint1.x() == edgePoint2.x() &&
+             edgePoint1.y() < edgePoint2.y()) ||
+            (edgePoint1.x() == edgePoint2.x() &&
+             edgePoint1.y() == edgePoint2.y() &&
+             edgePoint1.z() < edgePoint2.z())) {
+          edge.point1 = edgePoint1;
+          edge.point2 = edgePoint2;
         } else {
-          edge.p1 = p2; edge.p2 = p1;
+          edge.point1 = edgePoint2;
+          edge.point2 = edgePoint1;
         }
         edgeCount[edge]++;
       }
@@ -543,29 +570,29 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
   for (const auto &[edge, count] : edgeCount) {
     if (count == 1) {
       // Boundary edge. Find orientation.
-      Point p1 = edge.p1;
-      Point p2 = edge.p2;
-      bool foundForward = false;
-      
-      for (const auto& poly : topPolygons) {
-          for (size_t ringIdx = 0; ringIdx < poly.numRings(); ++ringIdx) {
-              const LineString &ring = poly.ringN(ringIdx);
-              for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
-                  if (ring.pointN(i) == p1 && ring.pointN(i+1) == p2) {
-                      foundForward = true;
-                      goto found;
-                  }
-              }
+      Point edgeStart    = edge.point1;
+      Point edgeEnd      = edge.point2;
+      bool  foundForward = false;
+
+      for (const auto &poly : topPolygons) {
+        for (size_t ringIdx = 0; ringIdx < poly.numRings(); ++ringIdx) {
+          const LineString &ring = poly.ringN(ringIdx);
+          for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
+            if (ring.pointN(i) == edgeStart && ring.pointN(i + 1) == edgeEnd) {
+              foundForward = true;
+              goto found;
+            }
           }
+        }
       }
-      found:
-      
-      Point start = foundForward ? p1 : p2;
-      Point end = foundForward ? p2 : p1;
-      
+    found:
+
+      Point start = foundForward ? edgeStart : edgeEnd;
+      Point end   = foundForward ? edgeEnd : edgeStart;
+
       Point startBase(start.x(), start.y(), 0.0);
       Point endBase(end.x(), end.y(), 0.0);
-      
+
       LineString wallRing;
       wallRing.addPoint(start);
       wallRing.addPoint(startBase);
@@ -573,7 +600,7 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
       wallRing.addPoint(end);
       wallRing.addPoint(start);
       Polygon wall(wallRing);
-      
+
       shell->addPolygon(wall);
     }
   }
@@ -582,4 +609,5 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
   solid->setExteriorShell(std::move(shell));
   return solid;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 } // namespace SFCGAL::algorithm
