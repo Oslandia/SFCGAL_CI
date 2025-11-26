@@ -76,9 +76,9 @@ intersection3D(const Geometry &geometry1, const Geometry &geometry2,
  */
 template <int Dim>
 auto
-intersection(const detail::GeometrySet<Dim> &geometrySet1,
-             const detail::GeometrySet<Dim> &geometrySet2,
-             detail::GeometrySet<Dim>       &result) -> void;
+intersection(const ::SFCGAL::detail::GeometrySet<Dim> &geometrySet1,
+             const ::SFCGAL::detail::GeometrySet<Dim> &geometrySet2,
+             ::SFCGAL::detail::GeometrySet<Dim>       &result) -> void;
 
 /**
  * Intersection between two primitive handles
@@ -88,9 +88,9 @@ intersection(const detail::GeometrySet<Dim> &geometrySet1,
  */
 template <int Dim>
 auto
-intersection(const detail::PrimitiveHandle<Dim> &primitiveHandle1,
-             const detail::PrimitiveHandle<Dim> &primitiveHandle2,
-             detail::GeometrySet<Dim>           &result) -> void;
+intersection(const ::SFCGAL::detail::PrimitiveHandle<Dim> &primitiveHandle1,
+             const ::SFCGAL::detail::PrimitiveHandle<Dim> &primitiveHandle2,
+             ::SFCGAL::detail::GeometrySet<Dim>           &result) -> void;
 
 } // namespace algorithm
 } // namespace SFCGAL
