@@ -72,18 +72,18 @@ distanceToLine2D(const Point &point, const Point &lineStart,
   auto dy = CGAL::to_double(lineEnd.y() - lineStart.y());
 
   // If line is degenerate (start == end), return distance to point
-  auto lineLengthSq = dx * dx + dy * dy;
+  auto lineLengthSq = (dx * dx) + (dy * dy);
   if (lineLengthSq < GEOMETRIC_TOLERANCE) {
     auto px = CGAL::to_double(point.x() - lineStart.x());
     auto py = CGAL::to_double(point.y() - lineStart.y());
-    return std::sqrt(px * px + py * py);
+    return std::sqrt((px * px) + (py * py));
   }
 
   // Calculate perpendicular distance using cross product formula
   auto px = CGAL::to_double(point.x() - lineStart.x());
   auto py = CGAL::to_double(point.y() - lineStart.y());
 
-  return std::abs(dx * py - dy * px) / std::sqrt(lineLengthSq);
+  return std::abs((dx * py) - (dy * px)) / std::sqrt(lineLengthSq);
 }
 
 /**
@@ -107,7 +107,7 @@ createSlopedSurface(const Polygon &basePolygon, const LineString &ridgeLine,
   // Create elevated ridge line
   std::vector<Point> ridgePoints;
   for (size_t i = 0; i < ridgeLine.numPoints(); ++i) {
-    auto point = ridgeLine.pointN(i);
+    const auto &point = ridgeLine.pointN(i);
     ridgePoints.emplace_back(point.x(), point.y(), slopeUp ? ridgeHeight : 0.0);
   }
 
@@ -116,8 +116,8 @@ createSlopedSurface(const Polygon &basePolygon, const LineString &ridgeLine,
   }
 
   // Create simple triangulated surface
-  auto  &baseRing      = basePolygon.exteriorRing();
-  size_t numBasePoints = baseRing.numPoints() - 1; // Exclude closing point
+  const auto &baseRing      = basePolygon.exteriorRing();
+  size_t      numBasePoints = baseRing.numPoints() - 1; // Exclude closing point
 
   if (numBasePoints < 3) {
     return surface; // Need at least 3 points for a polygon
@@ -152,8 +152,8 @@ createSlopedSurfaceVertices(const Polygon &footprint, const Point &ridgeStart,
                             const Point &ridgeEnd, double slopeTan)
     -> std::vector<Point>
 {
-  auto  &exteriorRing = footprint.exteriorRing();
-  size_t numPoints    = exteriorRing.numPoints();
+  const auto &exteriorRing = footprint.exteriorRing();
+  size_t      numPoints    = exteriorRing.numPoints();
 
   if (numPoints < 4) { // Need at least 3 + closing point
     BOOST_THROW_EXCEPTION(Exception("Polygon must have at least 3 vertices"));
@@ -164,7 +164,7 @@ createSlopedSurfaceVertices(const Polygon &footprint, const Point &ridgeStart,
 
   // Calculate elevation for each vertex based on distance from ridge line
   for (size_t i = 0; i < numPoints - 1; ++i) { // Skip closing point
-    auto vertex = exteriorRing.pointN(i);
+    const auto &vertex = exteriorRing.pointN(i);
 
     // Calculate perpendicular distance from vertex to ridge line
     auto distance = distanceToLine2D(vertex, ridgeStart, ridgeEnd);
@@ -204,8 +204,8 @@ createVerticalFaces(const Polygon            &footprint,
     return faces;
   }
 
-  auto  &exteriorRing = footprint.exteriorRing();
-  size_t numPoints    = exteriorRing.numPoints();
+  const auto &exteriorRing = footprint.exteriorRing();
+  size_t      numPoints    = exteriorRing.numPoints();
 
   // Create vertical faces for each edge when there is meaningful height
   // difference
@@ -213,10 +213,10 @@ createVerticalFaces(const Polygon            &footprint,
     size_t nextI = (i + 1) % (numPoints - 1);
 
     // Base edge points (at z=0)
-    auto baseVertex1 = exteriorRing.pointN(i);
-    auto baseVertex2 = exteriorRing.pointN(nextI);
-    auto basePt1     = Point(baseVertex1.x(), baseVertex1.y(), 0.0);
-    auto basePt2     = Point(baseVertex2.x(), baseVertex2.y(), 0.0);
+    const auto &baseVertex1 = exteriorRing.pointN(i);
+    const auto &baseVertex2 = exteriorRing.pointN(nextI);
+    auto        basePt1     = Point(baseVertex1.x(), baseVertex1.y(), 0.0);
+    auto        basePt2     = Point(baseVertex2.x(), baseVertex2.y(), 0.0);
 
     // Corresponding elevated points on the roof
     auto roofPt1 = elevatedVertices[i];
@@ -336,7 +336,7 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
   auto verticalFaces =
       createVerticalFaces(footprint, elevatedVertices, addVerticalFaces);
   for (const auto &face : verticalFaces) {
-    if (auto polygon = dynamic_cast<const Polygon *>(face.get())) {
+    if (const auto *polygon = dynamic_cast<const Polygon *>(face.get())) {
       roof->addPatch(*polygon);
     }
   }
@@ -351,12 +351,12 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
       auto solid = std::make_unique<Solid>(*roof);
       propagateValidityFlag(*solid, true);
       return solid;
-    } else {
-      // Return as polyhedral surface
-      propagateValidityFlag(*roof, true);
-      return roof;
     }
-  } else {
+    // Return as polyhedral surface
+    propagateValidityFlag(*roof, true);
+    return roof;
+  }
+  {
     // Building + roof mode
 
     // Translate roof to building height
@@ -370,11 +370,12 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
     auto isNotTopFace = [buildingHeight](const Polygon &patch) -> bool {
       const LineString &exterior = patch.exteriorRing();
       // Check if all points have z == buildingHeight (top face)
-      bool allAtBuildingHeight = std::all_of(
-          exterior.begin(), exterior.end(), [buildingHeight](const Point &p) {
-            return std::abs(CGAL::to_double(p.z()) - buildingHeight) <
-                   HEIGHT_TOLERANCE;
-          });
+      bool allAtBuildingHeight =
+          std::all_of(exterior.begin(), exterior.end(),
+                      [buildingHeight](const Point &point) {
+                        return std::abs(CGAL::to_double(point.z()) -
+                                        buildingHeight) < HEIGHT_TOLERANCE;
+                      });
       return !allAtBuildingHeight; // Keep all faces except the top
     };
 
@@ -393,10 +394,9 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
       auto solid = std::make_unique<Solid>(*result);
       propagateValidityFlag(*solid, true);
       return solid;
-    } else {
-      propagateValidityFlag(*result, true);
-      return result;
     }
+    propagateValidityFlag(*result, true);
+    return result;
   }
 }
 
@@ -467,14 +467,13 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
       }
       propagateValidityFlag(*roof, true);
       return roof;
-    } else {
-      // Building + roof using the two-parameter version
-      auto result = extrudeStraightSkeleton(footprint, params.buildingHeight,
-                                            params.roofHeight);
-      auto solid  = std::make_unique<Solid>(*result);
-      propagateValidityFlag(*solid, true);
-      return solid;
     }
+    // Building + roof using the two-parameter version
+    auto result = extrudeStraightSkeleton(footprint, params.buildingHeight,
+                                          params.roofHeight);
+    auto solid  = std::make_unique<Solid>(*result);
+    propagateValidityFlag(*solid, true);
+    return solid;
   }
 
   case RoofType::GABLE: {
@@ -505,6 +504,7 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
   return generateRoof(footprint, ridgeLine, params);
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 auto
 generateGableRoof(const Polygon &footprint, double slopeAngle,
                   bool addVerticalFaces, double buildingHeight, bool closeBase)
@@ -550,7 +550,7 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
   for (size_t i = 0; i < projectedMedialAxis->numGeometries(); ++i) {
     const auto *line =
         dynamic_cast<const LineString *>(&projectedMedialAxis->geometryN(i));
-    if (line) {
+    if (line != nullptr) {
       for (size_t j = 0; j < line->numPoints(); ++j) {
         ridgePoints.push_back(line->pointN(j));
       }
@@ -558,15 +558,13 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
   }
 
   // Helper function to check if a point is a ridge point
-  auto isRidgePoint = [&ridgePoints](const Point &p) -> bool {
-    for (const Point &ridgeP : ridgePoints) {
-      auto dx = p.x() - ridgeP.x();
-      auto dy = p.y() - ridgeP.y();
-      if (dx * dx + dy * dy < Kernel::FT(EPSILON)) {
-        return true;
-      }
-    }
-    return false;
+  auto isRidgePoint = [&ridgePoints](const Point &point) -> bool {
+    return std::any_of(ridgePoints.begin(), ridgePoints.end(),
+                       [&point](const Point &ridgeP) {
+                         auto dx = point.x() - ridgeP.x();
+                         auto dy = point.y() - ridgeP.y();
+                         return dx * dx + dy * dy < Kernel::FT(EPSILON);
+                       });
   };
 
   // Calculate ridge height from slope angle
@@ -578,14 +576,14 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
   // 4. Process triangulation and elevate ridge points
   for (size_t i = 0; i < triangulated_surface->numPatches(); ++i) {
     const auto &patch = triangulated_surface->patchN(i);
-    if (auto triangle = dynamic_cast<const Triangle *>(&patch)) {
-      const auto &v1 = triangle->vertex(0);
-      const auto &v2 = triangle->vertex(1);
-      const auto &v3 = triangle->vertex(2);
+    if (const auto *triangle = dynamic_cast<const Triangle *>(&patch)) {
+      const auto &vertex1 = triangle->vertex(0);
+      const auto &vertex2 = triangle->vertex(1);
+      const auto &vertex3 = triangle->vertex(2);
 
       // Check if triangle centroid is inside the original polygon
-      Point centroid((v1.x() + v2.x() + v3.x()) / 3.0,
-                     (v1.y() + v2.y() + v3.y()) / 3.0, 0.0);
+      Point centroid((vertex1.x() + vertex2.x() + vertex3.x()) / 3.0,
+                     (vertex1.y() + vertex2.y() + vertex3.y()) / 3.0, 0.0);
 
       // Use SFCGAL's covers algorithm to check if centroid is inside footprint
       if (!SFCGAL::algorithm::covers(footprint, centroid)) {
@@ -593,23 +591,24 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       }
 
       // Create new vertices with proper Z coordinates
-      Point newV1(v1.x(), v1.y(), 0.0);
-      Point newV2(v2.x(), v2.y(), 0.0);
-      Point newV3(v3.x(), v3.y(), 0.0);
+      Point newVertex1(vertex1.x(), vertex1.y(), 0.0);
+      Point newVertex2(vertex2.x(), vertex2.y(), 0.0);
+      Point newVertex3(vertex3.x(), vertex3.y(), 0.0);
 
       // Elevate ridge points
-      if (isRidgePoint(v1)) {
-        newV1 = Point(v1.x(), v1.y(), ridgeHeight);
+      if (isRidgePoint(vertex1)) {
+        newVertex1 = Point(vertex1.x(), vertex1.y(), ridgeHeight);
       }
-      if (isRidgePoint(v2)) {
-        newV2 = Point(v2.x(), v2.y(), ridgeHeight);
+      if (isRidgePoint(vertex2)) {
+        newVertex2 = Point(vertex2.x(), vertex2.y(), ridgeHeight);
       }
-      if (isRidgePoint(v3)) {
-        newV3 = Point(v3.x(), v3.y(), ridgeHeight);
+      if (isRidgePoint(vertex3)) {
+        newVertex3 = Point(vertex3.x(), vertex3.y(), ridgeHeight);
       }
 
       // Create roof triangle with elevated vertices
-      auto roofTriangle = std::make_unique<Triangle>(newV1, newV2, newV3);
+      auto roofTriangle =
+          std::make_unique<Triangle>(newVertex1, newVertex2, newVertex3);
       roof->addPatch(*roofTriangle);
     }
   }
@@ -624,7 +623,7 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
     for (size_t i = 0; i < projectedMedialAxis->numGeometries(); ++i) {
       const auto *line =
           dynamic_cast<const LineString *>(&projectedMedialAxis->geometryN(i));
-      if (line && line->numPoints() >= 2) {
+      if ((line != nullptr) && line->numPoints() >= 2) {
         ridgeEndpoints.push_back(line->pointN(0));
         ridgeEndpoints.push_back(line->pointN(line->numPoints() - 1));
       }
@@ -641,33 +640,33 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       std::vector<Point> boundarySegmentPoints;
 
       for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
-        const Point &p1 = ring.pointN(i);
-        const Point &p2 = ring.pointN(i + 1);
+        const Point &segmentPoint1 = ring.pointN(i);
+        const Point &segmentPoint2 = ring.pointN(i + 1);
 
-        // Check if ridgeEndpoint lies on segment [p1, p2]
-        auto dx        = CGAL::to_double(p2.x() - p1.x());
-        auto dy        = CGAL::to_double(p2.y() - p1.y());
-        auto segLength = std::sqrt(dx * dx + dy * dy);
+        // Check if ridgeEndpoint lies on segment [segmentPoint1, segmentPoint2]
+        auto dx        = CGAL::to_double(segmentPoint2.x() - segmentPoint1.x());
+        auto dy        = CGAL::to_double(segmentPoint2.y() - segmentPoint1.y());
+        auto segLength = std::sqrt((dx * dx) + (dy * dy));
 
         if (segLength < BOUNDARY_TOLERANCE) {
           continue; // Skip degenerate segments
         }
 
-        // Vector from p1 to ridgeEndpoint
-        auto rx = CGAL::to_double(ridgeEndpoint.x() - p1.x());
-        auto ry = CGAL::to_double(ridgeEndpoint.y() - p1.y());
+        // Vector from segmentPoint1 to ridgeEndpoint
+        auto rx = CGAL::to_double(ridgeEndpoint.x() - segmentPoint1.x());
+        auto ry = CGAL::to_double(ridgeEndpoint.y() - segmentPoint1.y());
 
         // Project onto segment direction
-        auto t = (rx * dx + ry * dy) / (segLength * segLength);
+        auto t = ((rx * dx) + (ry * dy)) / (segLength * segLength);
 
         // Check if projection is within segment bounds [0, 1]
         if (t >= -BOUNDARY_TOLERANCE && t <= 1.0 + BOUNDARY_TOLERANCE) {
           // Check distance from ridge endpoint to line
-          auto projX = CGAL::to_double(p1.x()) + t * dx;
-          auto projY = CGAL::to_double(p1.y()) + t * dy;
+          auto projX = CGAL::to_double(segmentPoint1.x()) + (t * dx);
+          auto projY = CGAL::to_double(segmentPoint1.y()) + (t * dy);
           auto distX = CGAL::to_double(ridgeEndpoint.x()) - projX;
           auto distY = CGAL::to_double(ridgeEndpoint.y()) - projY;
-          auto dist  = std::sqrt(distX * distX + distY * distY);
+          auto dist  = std::sqrt((distX * distX) + (distY * distY));
 
           if (dist < BOUNDARY_TOLERANCE) {
             // Ridge endpoint is on this boundary segment
@@ -675,17 +674,21 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
 
             // Collect the segment endpoints (excluding ridge endpoint itself)
             auto dist1 = std::sqrt(
-                std::pow(CGAL::to_double(p1.x() - ridgeEndpoint.x()), 2) +
-                std::pow(CGAL::to_double(p1.y() - ridgeEndpoint.y()), 2));
+                std::pow(CGAL::to_double(segmentPoint1.x() - ridgeEndpoint.x()),
+                         2) +
+                std::pow(CGAL::to_double(segmentPoint1.y() - ridgeEndpoint.y()),
+                         2));
             auto dist2 = std::sqrt(
-                std::pow(CGAL::to_double(p2.x() - ridgeEndpoint.x()), 2) +
-                std::pow(CGAL::to_double(p2.y() - ridgeEndpoint.y()), 2));
+                std::pow(CGAL::to_double(segmentPoint2.x() - ridgeEndpoint.x()),
+                         2) +
+                std::pow(CGAL::to_double(segmentPoint2.y() - ridgeEndpoint.y()),
+                         2));
 
             if (dist1 > BOUNDARY_TOLERANCE) {
-              boundarySegmentPoints.push_back(p1);
+              boundarySegmentPoints.push_back(segmentPoint1);
             }
             if (dist2 > BOUNDARY_TOLERANCE) {
-              boundarySegmentPoints.push_back(p2);
+              boundarySegmentPoints.push_back(segmentPoint2);
             }
             break; // Found the segment
           }
@@ -720,12 +723,12 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       auto solid = std::make_unique<Solid>(*roof);
       propagateValidityFlag(*solid, true);
       return solid;
-    } else {
-      // Return as polyhedral surface
-      propagateValidityFlag(*roof, true);
-      return roof;
     }
-  } else {
+    // Return as polyhedral surface
+    propagateValidityFlag(*roof, true);
+    return roof;
+  }
+  {
     // Building + roof mode
 
     // Translate roof to building height
@@ -738,11 +741,12 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
     auto isNotTopFace = [buildingHeight](const Polygon &patch) -> bool {
       const LineString &exterior = patch.exteriorRing();
       // Check if all points have z == buildingHeight (top face)
-      bool allAtBuildingHeight = std::all_of(
-          exterior.begin(), exterior.end(), [buildingHeight](const Point &p) {
-            return std::abs(CGAL::to_double(p.z()) - buildingHeight) <
-                   HEIGHT_TOLERANCE;
-          });
+      bool allAtBuildingHeight =
+          std::all_of(exterior.begin(), exterior.end(),
+                      [buildingHeight](const Point &point) {
+                        return std::abs(CGAL::to_double(point.z()) -
+                                        buildingHeight) < HEIGHT_TOLERANCE;
+                      });
       return !allAtBuildingHeight; // Keep all faces except the top
     };
 
@@ -758,15 +762,14 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
 
     // If addVerticalFaces is true, this should form a closed solid
     if (addVerticalFaces) {
-      // Use CGAL's robust orientation fixing for building + roof
       auto solid = std::make_unique<Solid>(*result);
       propagateValidityFlag(*solid, true);
       return solid;
-    } else {
-      propagateValidityFlag(*result, true);
-      return result;
     }
+    propagateValidityFlag(*result, true);
+    return result;
   }
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 } // namespace SFCGAL::algorithm
