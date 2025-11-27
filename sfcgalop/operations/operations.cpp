@@ -50,6 +50,7 @@
 #include <SFCGAL/algorithm/rotate.h>
 #include <SFCGAL/algorithm/scale.h>
 #include <SFCGAL/algorithm/simplification.h>
+#include <SFCGAL/algorithm/split.h>
 #include <SFCGAL/algorithm/straightSkeleton.h>
 #include <SFCGAL/algorithm/tesselate.h>
 #include <SFCGAL/algorithm/translate.h>
@@ -476,6 +477,24 @@ const std::vector<Operation> operations = {
          return std::nullopt;
        }
        return SFCGAL::algorithm::union3D(*geom_a, *geom_b);
+     }},
+
+    {"split", "Set Operations",
+     "Split a geometry using a linestring (supports Polygon, Triangle, "
+     "MultiPolygon, PolyhedralSurface, TriangulatedSurface, GeometryCollection)",
+     true, "", "A, B", "G",
+     [](const std::string &, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
+       if (!geom_b) {
+         return std::nullopt;
+       }
+       if (geom_b->geometryTypeId() != SFCGAL::TYPE_LINESTRING) {
+         std::cerr << "Error: split requires geometry B to be a LineString"
+                   << std::endl;
+         return std::nullopt;
+       }
+       return SFCGAL::algorithm::split(*geom_a,
+                                       geom_b->as<SFCGAL::LineString>());
      }},
 
     // Construction
