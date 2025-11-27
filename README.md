@@ -15,6 +15,7 @@
   <a href="https://gitlab.com/sfcgal/SFCGAL/-/commits/master"><img alt="GitLab pipeline status" src="https://gitlab.com/sfcgal/SFCGAL/badges/master/pipeline.svg"></a>
   <a href="https://github.com/Oslandia/SFCGAL_CI/actions?query=branch%3Amaster"><img alt="GitHub pipeline status" src="https://github.com/Oslandia/SFCGAL_CI/actions/workflows/msys.yml/badge.svg"></a>
    <a href="http://cirrus-ci.com/github/Oslandia/SFCGAL_CI"><img alt="Cirrus pipeline status" src="https://api.cirrus-ci.com/github/Oslandia/SFCGAL_CI.svg"></a>
+   <a href="https://doi.org/10.5281/zenodo.17734184"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.17734184.svg"></a>
 </div>
 <!-- markdownlint-enable MD033 MD041 -->
 
