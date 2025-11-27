@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025, SFCGAL team.
+// Copyright (c) 2025-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/algorithm/roofGeneration.h"
