@@ -106,3 +106,16 @@ SFCGAL is provided under the following licence LGPL version 2 or later.
 
 > [!warning]
 > Note that the main dependency for SFCGAL is the CGAL library, and SFCGAL uses CGAL modules which are licenced as GPLv3+. Whenever you compile and distribute SFCGAL with the GPL-licenced CGAL, the full packaged result is automatically considered as GPL version 3 or later, due to GPL "viral" property. **If you link and distribute SFCGAL with another software package, be assured to fully understand the implications and check any legal and technical requirements implied by the licence**.
+
+## Citation
+
+If you use this software, please cite it with:
+
+```bibtex
+@misc{SFCGAL,
+  title        = {SFCGAL},
+  author       = {The SFCGAL development team},
+  howpublished = {\url{https://sfcgal.gitlab.io/SFCGAL}},
+  year         = {2025},
+  note         = {Version: 2.2.0, DOI: \url{https://doi.org/10.5281/zenodo.17734184}}
+}
