@@ -5,8 +5,12 @@
 
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/Kernel.h"
@@ -343,6 +347,116 @@ split(const Polygon &polygon, const LineString &linestring)
   SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(linestring);
 
   return split(polygon, linestring, NoValidityCheck());
+}
+
+auto
+split(const Geometry &geometry, const LineString &linestring,
+      NoValidityCheck /*unused*/) -> std::unique_ptr<Geometry>
+{
+  auto result = std::make_unique<GeometryCollection>();
+
+  switch (geometry.geometryTypeId()) {
+  case TYPE_POLYGON:
+    return split(geometry.as<Polygon>(), linestring, NoValidityCheck());
+
+  case TYPE_TRIANGLE: {
+    const auto         &triangle = geometry.as<Triangle>();
+    std::vector<Point> points    = {triangle.vertex(0), triangle.vertex(1),
+                                 triangle.vertex(2), triangle.vertex(0)};
+    LineString         ring(points);
+    Polygon            polygon(ring);
+    return split(polygon, linestring, NoValidityCheck());
+  }
+
+  case TYPE_MULTIPOLYGON: {
+    const auto &multiPolygon = geometry.as<MultiPolygon>();
+    for (size_t i = 0; i < multiPolygon.numGeometries(); ++i) {
+      auto splitResult =
+          split(multiPolygon.polygonN(i), linestring, NoValidityCheck());
+
+      if (splitResult && !splitResult->isEmpty()) {
+        const auto &gc = splitResult->as<GeometryCollection>();
+        for (size_t j = 0; j < gc.numGeometries(); ++j) {
+          result->addGeometry(gc.geometryN(j).clone().release());
+        }
+      }
+    }
+    break;
+  }
+
+  case TYPE_POLYHEDRALSURFACE: {
+    const auto &surface = geometry.as<PolyhedralSurface>();
+    for (size_t i = 0; i < surface.numPolygons(); ++i) {
+      auto splitResult =
+          split(surface.polygonN(i), linestring, NoValidityCheck());
+
+      if (splitResult && !splitResult->isEmpty()) {
+        const auto &gc = splitResult->as<GeometryCollection>();
+        for (size_t j = 0; j < gc.numGeometries(); ++j) {
+          result->addGeometry(gc.geometryN(j).clone().release());
+        }
+      }
+    }
+    break;
+  }
+
+  case TYPE_TRIANGULATEDSURFACE: {
+    const auto &surface = geometry.as<TriangulatedSurface>();
+    for (size_t i = 0; i < surface.numTriangles(); ++i) {
+      const auto         &triangle = surface.triangleN(i);
+      std::vector<Point> points    = {triangle.vertex(0), triangle.vertex(1),
+                                   triangle.vertex(2), triangle.vertex(0)};
+      LineString         ring(points);
+      Polygon            polygon(ring);
+      auto               splitResult = split(polygon, linestring, NoValidityCheck());
+
+      if (splitResult && !splitResult->isEmpty()) {
+        const auto &gc = splitResult->as<GeometryCollection>();
+        for (size_t j = 0; j < gc.numGeometries(); ++j) {
+          result->addGeometry(gc.geometryN(j).clone().release());
+        }
+      }
+    }
+    break;
+  }
+
+  case TYPE_GEOMETRYCOLLECTION: {
+    const auto &collection = geometry.as<GeometryCollection>();
+    for (size_t i = 0; i < collection.numGeometries(); ++i) {
+      auto splitResult =
+          split(collection.geometryN(i), linestring, NoValidityCheck());
+
+      if (splitResult && !splitResult->isEmpty()) {
+        const auto &gc = splitResult->as<GeometryCollection>();
+        for (size_t j = 0; j < gc.numGeometries(); ++j) {
+          result->addGeometry(gc.geometryN(j).clone().release());
+        }
+      }
+    }
+    break;
+  }
+
+  default:
+    BOOST_THROW_EXCEPTION(Exception(
+        "split: unsupported geometry type " + geometry.geometryType()));
+  }
+
+  if (result->isEmpty()) {
+    result->addGeometry(geometry.clone().release());
+  }
+
+  return result;
+}
+
+auto
+split(const Geometry &geometry, const LineString &linestring)
+    -> std::unique_ptr<Geometry>
+{
+  // Validate inputs
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(geometry);
+  SFCGAL_ASSERT_GEOMETRY_VALIDITY_2D(linestring);
+
+  return split(geometry, linestring, NoValidityCheck());
 }
 
 } // namespace SFCGAL::algorithm

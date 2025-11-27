@@ -11,7 +11,11 @@
 namespace SFCGAL {
 class Geometry;
 class Polygon;
+class Triangle;
 class LineString;
+class MultiPolygon;
+class PolyhedralSurface;
+class TriangulatedSurface;
 
 namespace algorithm {
 struct NoValidityCheck;
@@ -109,6 +113,49 @@ split(const Polygon &polygon, const LineString &linestring)
 SFCGAL_API auto
 split(const Polygon &polygon, const LineString &linestring, NoValidityCheck nvc)
     -> std::unique_ptr<Geometry>;
+
+/**
+ * @brief Split a geometry using a linestring.
+ *
+ * Generic split function that dispatches to appropriate implementation based
+ * on geometry type. Supports:
+ * - Polygon: Direct split using arrangement
+ * - Triangle: Converted to polygon, then split
+ * - MultiPolygon: Each polygon split individually
+ * - PolyhedralSurface: Each patch (polygon) split individually
+ * - TriangulatedSurface: Each triangle split individually
+ * - GeometryCollection: Each geometry split individually
+ *
+ * For collection types, all split results are collected into a single
+ * GeometryCollection.
+ *
+ * @param geometry The geometry to split
+ * @param linestring The cutting linestring
+ * @return GeometryCollection containing the split geometries
+ *
+ * @pre geometry is one of the supported types
+ * @note Dimension handling follows the same union strategy as polygon split
+ */
+SFCGAL_API auto
+split(const Geometry &geometry, const LineString &linestring)
+    -> std::unique_ptr<Geometry>;
+
+/**
+ * @brief Split a geometry using a linestring (no validity check variant).
+ *
+ * Same as split(geometry, linestring) but skips input geometry validity
+ * checks.
+ *
+ * @param geometry The geometry to split
+ * @param linestring The cutting linestring
+ * @param nvc NoValidityCheck marker
+ * @return GeometryCollection containing the split geometries
+ *
+ * @warning No input validity check is performed
+ */
+SFCGAL_API auto
+split(const Geometry &geometry, const LineString &linestring,
+      NoValidityCheck nvc) -> std::unique_ptr<Geometry>;
 
 } // namespace algorithm
 } // namespace SFCGAL

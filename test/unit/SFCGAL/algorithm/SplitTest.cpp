@@ -9,8 +9,12 @@
 
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/algorithm/area.h"
 #include "SFCGAL/algorithm/split.h"
 
@@ -485,6 +489,321 @@ BOOST_AUTO_TEST_CASE(test_split_xyzm_polygon_with_xy_line)
       BOOST_CHECK(poly.isMeasured());
     }
   }
+}
+
+// Triangle tests
+BOOST_AUTO_TEST_CASE(test_split_triangle)
+{
+  Triangle   triangle(Point(0, 0), Point(10, 0), Point(5, 8));
+  LineString line(Point(5, -1), Point(5, 10));
+
+  auto result = split(triangle, line);
+
+  BOOST_CHECK_EQUAL(countPolygons(*result), 2);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_split_triangle_3d)
+{
+  Triangle   triangle(Point(0, 0, 10), Point(10, 0, 20), Point(5, 8, 30));
+  LineString line(Point(5, -1), Point(5, 10));
+
+  auto result = split(triangle, line);
+
+  BOOST_CHECK_EQUAL(countPolygons(*result), 2);
+
+  const auto &gc = result->as<GeometryCollection>();
+  for (size_t i = 0; i < gc.numGeometries(); ++i) {
+    const auto &geom = gc.geometryN(i);
+    if (geom.geometryTypeId() == TYPE_POLYGON) {
+      const auto &poly = geom.as<Polygon>();
+      BOOST_CHECK(poly.is3D());
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(test_split_triangle_no_intersection)
+{
+  Triangle   triangle(Point(0, 0), Point(10, 0), Point(5, 8));
+  LineString line(Point(20, -1), Point(20, 10));
+
+  auto result = split(triangle, line);
+
+  BOOST_CHECK_EQUAL(countPolygons(*result), 1);
+}
+
+// MultiPolygon tests
+BOOST_AUTO_TEST_CASE(test_split_multipolygon)
+{
+  auto poly1 = makeRectangle(0, 0, 10, 6);
+  auto poly2 = makeRectangle(15, 0, 25, 6);
+
+  MultiPolygon multiPoly;
+  multiPoly.addGeometry(poly1.release());
+  multiPoly.addGeometry(poly2.release());
+
+  LineString line(Point(5, -1), Point(5, 7));
+
+  auto result = split(multiPoly, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_split_multipolygon_3d)
+{
+  std::vector<Point> points1 = {Point(0, 0, 5), Point(10, 0, 10),
+                                Point(10, 6, 15), Point(0, 6, 8),
+                                Point(0, 0, 5)};
+  auto               poly1   = std::make_unique<Polygon>(LineString(points1));
+
+  std::vector<Point> points2 = {Point(15, 0, 20), Point(25, 0, 25),
+                                Point(25, 6, 30), Point(15, 6, 22),
+                                Point(15, 0, 20)};
+  auto               poly2   = std::make_unique<Polygon>(LineString(points2));
+
+  MultiPolygon multiPoly;
+  multiPoly.addGeometry(poly1.release());
+  multiPoly.addGeometry(poly2.release());
+
+  LineString line(Point(5, -1), Point(5, 7));
+
+  auto result = split(multiPoly, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 3);
+
+  for (size_t i = 0; i < gc.numGeometries(); ++i) {
+    const auto &geom = gc.geometryN(i);
+    if (geom.geometryTypeId() == TYPE_POLYGON) {
+      const auto &poly = geom.as<Polygon>();
+      BOOST_CHECK(poly.is3D());
+    }
+  }
+}
+
+// PolyhedralSurface tests
+BOOST_AUTO_TEST_CASE(test_split_polyhedralsurface)
+{
+  PolyhedralSurface surface;
+
+  auto poly1 = makeRectangle(0, 0, 10, 6);
+  auto poly2 = makeRectangle(10, 0, 20, 6);
+
+  surface.addPolygon(poly1.release());
+  surface.addPolygon(poly2.release());
+
+  LineString line(Point(5, -1), Point(5, 7));
+
+  auto result = split(surface, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_split_polyhedralsurface_3d)
+{
+  PolyhedralSurface surface;
+
+  std::vector<Point> points1 = {Point(0, 0, 5), Point(10, 0, 10),
+                                Point(10, 6, 15), Point(0, 6, 8),
+                                Point(0, 0, 5)};
+  auto               poly1   = std::make_unique<Polygon>(LineString(points1));
+
+  std::vector<Point> points2 = {Point(10, 0, 10), Point(20, 0, 15),
+                                Point(20, 6, 20), Point(10, 6, 15),
+                                Point(10, 0, 10)};
+  auto               poly2   = std::make_unique<Polygon>(LineString(points2));
+
+  surface.addPolygon(poly1.release());
+  surface.addPolygon(poly2.release());
+
+  LineString line(Point(5, -1), Point(5, 7));
+
+  auto result = split(surface, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 3);
+
+  for (size_t i = 0; i < gc.numGeometries(); ++i) {
+    const auto &geom = gc.geometryN(i);
+    if (geom.geometryTypeId() == TYPE_POLYGON) {
+      const auto &poly = geom.as<Polygon>();
+      BOOST_CHECK(poly.is3D());
+    }
+  }
+}
+
+// TriangulatedSurface tests
+BOOST_AUTO_TEST_CASE(test_split_triangulatedsurface)
+{
+  TriangulatedSurface surface;
+
+  Triangle triangle1(Point(0, 0), Point(10, 0), Point(5, 8));
+  Triangle triangle2(Point(5, 8), Point(10, 0), Point(10, 8));
+
+  surface.addTriangle(triangle1);
+  surface.addTriangle(triangle2);
+
+  LineString line(Point(5, -1), Point(5, 10));
+
+  auto result = split(surface, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_split_triangulatedsurface_3d)
+{
+  TriangulatedSurface surface;
+
+  Triangle triangle1(Point(0, 0, 10), Point(10, 0, 20), Point(5, 8, 30));
+  Triangle triangle2(Point(5, 8, 30), Point(10, 0, 20), Point(10, 8, 35));
+
+  surface.addTriangle(triangle1);
+  surface.addTriangle(triangle2);
+
+  LineString line(Point(5, -1), Point(5, 10));
+
+  auto result = split(surface, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 3);
+
+  for (size_t i = 0; i < gc.numGeometries(); ++i) {
+    const auto &geom = gc.geometryN(i);
+    if (geom.geometryTypeId() == TYPE_POLYGON) {
+      const auto &poly = geom.as<Polygon>();
+      BOOST_CHECK(poly.is3D());
+    }
+  }
+}
+
+// GeometryCollection tests
+BOOST_AUTO_TEST_CASE(test_split_geometrycollection)
+{
+  GeometryCollection collection;
+
+  auto poly1 = makeRectangle(0, 0, 10, 6);
+  auto poly2 = makeRectangle(15, 0, 25, 6);
+
+  Triangle triangle(Point(30, 0), Point(40, 0), Point(35, 8));
+
+  collection.addGeometry(poly1.release());
+  collection.addGeometry(poly2.release());
+  collection.addGeometry(triangle.clone().release());
+
+  LineString line(Point(5, -1), Point(5, 10));
+
+  auto result = split(collection, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 4);
+}
+
+BOOST_AUTO_TEST_CASE(test_split_geometrycollection_3d)
+{
+  GeometryCollection collection;
+
+  std::vector<Point> points1 = {Point(0, 0, 5), Point(10, 0, 10),
+                                Point(10, 6, 15), Point(0, 6, 8),
+                                Point(0, 0, 5)};
+  auto               poly1   = std::make_unique<Polygon>(LineString(points1));
+
+  Triangle triangle(Point(15, 0, 20), Point(25, 0, 25), Point(20, 8, 30));
+
+  collection.addGeometry(poly1.release());
+  collection.addGeometry(triangle.clone().release());
+
+  LineString line(Point(5, -1), Point(5, 10));
+
+  auto result = split(collection, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 3);
+
+  for (size_t i = 0; i < gc.numGeometries(); ++i) {
+    const auto &geom = gc.geometryN(i);
+    if (geom.geometryTypeId() == TYPE_POLYGON) {
+      const auto &poly = geom.as<Polygon>();
+      BOOST_CHECK(poly.is3D());
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(test_split_empty_geometrycollection)
+{
+  GeometryCollection emptyCollection;
+  LineString         line(Point(5, -1), Point(5, 7));
+
+  auto result = split(emptyCollection, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 1);
+  BOOST_CHECK(gc.geometryN(0).is<GeometryCollection>());
+}
+
+// Empty geometry tests
+BOOST_AUTO_TEST_CASE(test_split_empty_polygon)
+{
+  Polygon    emptyPolygon;
+  LineString line(Point(5, -1), Point(5, 7));
+
+  auto result = split(emptyPolygon, line);
+
+  BOOST_CHECK(result->is<GeometryCollection>());
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK(gc.isEmpty());
+}
+
+BOOST_AUTO_TEST_CASE(test_split_polygon_with_empty_line)
+{
+  auto       rect = makeRectangle(0, 0, 10, 6);
+  LineString emptyLine;
+
+  auto result = split(*rect, emptyLine);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 1);
+  BOOST_CHECK(gc.geometryN(0).is<Polygon>());
+}
+
+BOOST_AUTO_TEST_CASE(test_split_empty_multipolygon)
+{
+  MultiPolygon emptyMultiPoly;
+  LineString   line(Point(5, -1), Point(5, 7));
+
+  auto result = split(emptyMultiPoly, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 1);
+  BOOST_CHECK(gc.geometryN(0).is<MultiPolygon>());
+}
+
+BOOST_AUTO_TEST_CASE(test_split_empty_polyhedralsurface)
+{
+  PolyhedralSurface emptySurface;
+  LineString        line(Point(5, -1), Point(5, 7));
+
+  auto result = split(emptySurface, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 1);
+  BOOST_CHECK(gc.geometryN(0).is<PolyhedralSurface>());
+}
+
+BOOST_AUTO_TEST_CASE(test_split_empty_triangulatedsurface)
+{
+  TriangulatedSurface emptySurface;
+  LineString          line(Point(5, -1), Point(5, 7));
+
+  auto result = split(emptySurface, line);
+
+  const auto &gc = result->as<GeometryCollection>();
+  BOOST_CHECK_EQUAL(gc.numGeometries(), 1);
+  BOOST_CHECK(gc.geometryN(0).is<TriangulatedSurface>());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
