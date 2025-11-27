@@ -17,7 +17,7 @@
 
 #include "SFCGAL/Exception.h"
 
-#include "SFCGAL/algorithm/detail/FaceFilters.h"
+#include "SFCGAL/detail/algorithm/FaceFilters.h"
 #include "SFCGAL/algorithm/intersection.h"
 #include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/algorithm/orientation.h"

@@ -16,7 +16,7 @@
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/algorithm/ConsistentOrientationBuilder.h"
 #include "SFCGAL/algorithm/covers.h"
-#include "SFCGAL/algorithm/detail/FaceFilters.h"
+#include "SFCGAL/detail/algorithm/FaceFilters.h"
 #include "SFCGAL/algorithm/extrude.h"
 #include "SFCGAL/algorithm/force2D.h"
 #include "SFCGAL/algorithm/intersection.h"
