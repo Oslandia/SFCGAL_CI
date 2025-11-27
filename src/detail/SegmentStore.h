@@ -103,6 +103,67 @@ public:
   }
 
   /**
+   * @brief Find the nearest segment with Z coordinate
+   * @param x X-coordinate of the point
+   * @param y Y-coordinate of the point
+   * @return The nearest 3D segment, or empty segment if none exist
+   */
+  [[nodiscard]] auto
+  findNearestSegmentWithZ(double x, double y) const -> Segment
+  {
+    double minDist = std::numeric_limits<double>::max();
+    size_t bestIdx = 0;
+    bool   found   = false;
+
+    for (size_t i = 0; i < segments.size(); ++i) {
+      if (segments[i].source().is3D() && segments[i].target().is3D()) {
+        double dist = segments[i].distanceToPoint(x, y);
+        if (dist < minDist) {
+          minDist = dist;
+          bestIdx = i;
+          found   = true;
+        }
+      }
+    }
+
+    if (found) {
+      return segments[bestIdx];
+    }
+    return {Point(), Point()};
+  }
+
+  /**
+   * @brief Find the nearest segment with M coordinate
+   * @param x X-coordinate of the point
+   * @param y Y-coordinate of the point
+   * @return The nearest measured segment, or empty segment if none exist
+   */
+  [[nodiscard]] auto
+  findNearestSegmentWithM(double x, double y) const -> Segment
+  {
+    double minDist = std::numeric_limits<double>::max();
+    size_t bestIdx = 0;
+    bool   found   = false;
+
+    for (size_t i = 0; i < segments.size(); ++i) {
+      if (segments[i].source().isMeasured() &&
+          segments[i].target().isMeasured()) {
+        double dist = segments[i].distanceToPoint(x, y);
+        if (dist < minDist) {
+          minDist = dist;
+          bestIdx = i;
+          found   = true;
+        }
+      }
+    }
+
+    if (found) {
+      return segments[bestIdx];
+    }
+    return {Point(), Point()};
+  }
+
+  /**
    * @brief Interpolate Z and M values for a point
    * @param x X-coordinate of the point
    * @param y Y-coordinate of the point
@@ -117,23 +178,28 @@ public:
     if (segments.empty()) {
       return std::make_tuple(z, m);
     }
-
-    Segment nearest = findNearestSegment(x, y);
-    double  t       = nearest.interpolationParameter(x, y);
-
-    // Interpolate Z if available
-    if (hasZCoord && nearest.source().is3D() && nearest.target().is3D()) {
-      double z1 = CGAL::to_double(nearest.source().z());
-      double z2 = CGAL::to_double(nearest.target().z());
-      z         = z1 + (t * (z2 - z1));
+    // Interpolate Z from nearest segment with Z
+    if (hasZCoord) {
+      Segment nearestZ = findNearestSegmentWithZ(x, y);
+      if (!nearestZ.source().isEmpty() && nearestZ.source().is3D() &&
+          nearestZ.target().is3D()) {
+        double t  = nearestZ.interpolationParameter(x, y);
+        double z1 = CGAL::to_double(nearestZ.source().z());
+        double z2 = CGAL::to_double(nearestZ.target().z());
+        z         = z1 + t * (z2 - z1);
+      }
     }
 
-    // Interpolate M if available
-    if (hasMCoord && nearest.source().isMeasured() &&
-        nearest.target().isMeasured()) {
-      double m1 = nearest.source().m();
-      double m2 = nearest.target().m();
-      m         = m1 + (t * (m2 - m1));
+    // Interpolate M from nearest segment with M
+    if (hasMCoord) {
+      Segment nearestM = findNearestSegmentWithM(x, y);
+      if (!nearestM.source().isEmpty() && nearestM.source().isMeasured() &&
+          nearestM.target().isMeasured()) {
+        double t  = nearestM.interpolationParameter(x, y);
+        double m1 = nearestM.source().m();
+        double m2 = nearestM.target().m();
+        m         = m1 + t * (m2 - m1);
+      }
     }
 
     return std::make_tuple(z, m);
@@ -151,9 +217,9 @@ public:
     }
 
     for (size_t i = 1; i < lineString.numPoints(); ++i) {
-      const Point &point1 = lineString.pointN(i - 1);
-      const Point &point2 = lineString.pointN(i);
-      addSegment(Segment(point1, point2));
+      const Point &startPt = lineString.pointN(i - 1);
+      const Point &endPt   = lineString.pointN(i);
+      addSegment(Segment(startPt, endPt));
     }
   }
 
@@ -246,12 +312,19 @@ public:
    * @param y Y-coordinate of the point
    * @param dimension The coordinate type for the point
    * @return Point with interpolated Z and M values
+   *
+   * If Z or M cannot be interpolated (NaN) but are required by dimension,
+   * fallback to 0.0 to avoid non-finite coordinate exceptions.
    */
   [[nodiscard]] auto
   createPoint(double x, double y, CoordinateType dimension) const -> Point
   {
     auto [interpZ, interpM] = interpolateZM(x, y);
-    return {x, y, interpZ, interpM, dimension};
+
+    double z = std::isnan(interpZ) ? 0.0 : interpZ;
+    double m = std::isnan(interpM) ? 0.0 : interpM;
+
+    return {x, y, z, m, dimension};
   }
 };
 
