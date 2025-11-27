@@ -42,7 +42,11 @@ This document outlines the steps and checks necessary to perform a release of th
 - Once `pysfcgal` has been verified to work with the new SFCGAL release, proceed to release `pysfcgal`.
 - Follow the necessary steps to tag and release `pysfcgal`, similar to the process for SFCGAL.
 
-### 5. Announce the Release
+### 5. Update the DOI
+- Generates a new DOI for the new release on Zenodo.
+- Update the README (badge and Bibtex entry).
+
+### 6. Announce the Release
 - Announce the new release on relevant platforms (mailing lists, forums, social media).
 - Update any relevant documentation to reflect the new release.
 
