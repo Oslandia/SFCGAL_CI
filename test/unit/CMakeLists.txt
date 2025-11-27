@@ -42,6 +42,9 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC )
 endif()
 
 add_executable( unit-test-SFCGAL ${SFCGAL_UNIT_TEST_SOURCES} )
+target_compile_definitions(unit-test-SFCGAL PRIVATE
+  SFCGAL_TEST_DIRECTORY="${CMAKE_SOURCE_DIR}/test"
+)
 target_link_libraries(unit-test-SFCGAL PUBLIC SFCGAL)
 target_link_libraries(unit-test-SFCGAL PRIVATE ${CGAL_3RD_PARTY_LIBRARIES})
 target_link_libraries(unit-test-SFCGAL PRIVATE "${Boost_LIBRARIES}")
