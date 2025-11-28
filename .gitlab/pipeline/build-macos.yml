@@ -23,8 +23,9 @@ build:macos_clang:
   before_script:
     - brew install boost cgal cmake gmp mpfr ninja nlohmann-json
   script:
-    - cmake -GNinja -S . -B build -DSFCGAL_BUILD_TESTS=OFF
+    - cmake -GNinja -S . -B build -DSFCGAL_BUILD_TESTS=ON
     - cmake --build build
+    - ctest --test-dir build -VV
     - mkdir -p ${CI_PROJECT_DIR}/install
     - cmake --install build --prefix ${CI_PROJECT_DIR}/install
     - .gitlab/generate-homebrew.sh ${CI_PROJECT_DIR}/install ${SFCGAL_VERSION}
