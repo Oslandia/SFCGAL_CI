@@ -18,6 +18,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "Using C++17 standard")
 
+#
+# Cmake policies
+#
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
+endif()
+
 set(SFCGALOP_SOURCES
     main.cpp
     operations/operations.cpp
