@@ -1,4 +1,4 @@
-name: CI
+name: BSD
 
 on: [push, pull_request]
 

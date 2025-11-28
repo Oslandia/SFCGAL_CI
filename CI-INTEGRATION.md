@@ -108,7 +108,7 @@
 ##### 🌐 Cross Platform Actions
 | Platform | Badge | Environment |
 |:---------|:------|:------------|
-| Cross Platform | [![CI](https://github.com/Oslandia/SFCGAL_CI/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Oslandia/SFCGAL_CI/actions/workflows/ci.yml) | Multiple Environments |
+| Cross Platform | [![CI](https://github.com/Oslandia/SFCGAL_CI/actions/workflows/bsd.yml/badge.svg?branch=master)](https://github.com/Oslandia/SFCGAL_CI/actions/workflows/bsd.yml) | Multiple Environments |
 
 | Environment | Compiler | CGAL Version |
 |:------------|:---------|:-------------|
