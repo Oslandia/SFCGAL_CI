@@ -2,7 +2,7 @@
 
 ## Overview of CI Platforms
 
-| Platform | Badge | Status | Environment | 
+| Platform | Badge | Status | Environment |
 |:---------|:------|:-------|:------------|
 | **GitLab** | [![GitLab pipeline status](https://gitlab.com/sfcgal/SFCGAL/badges/master/pipeline.svg)](https://gitlab.com/sfcgal/SFCGAL/-/commits/master) | 🚀 Main Pipeline | All environments |
 
