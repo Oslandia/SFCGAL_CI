@@ -28,8 +28,8 @@ endif()
 file( GLOB_RECURSE SFCGAL_HEADERS_COPIED RELATIVE ${CMAKE_SOURCE_DIR}/src "*.h" )
 add_custom_target(copy)
 foreach (header ${SFCGAL_HEADERS_COPIED})
-    add_custom_command(TARGET copy
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/src/${header} ${CMAKE_BINARY_DIR}/include/SFCGAL/${header} DEPENDS ${CMAKE_SOURCE_DIR}/src/${header})
+    add_custom_command(TARGET copy PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/src/${header} ${CMAKE_BINARY_DIR}/include/SFCGAL/${header})
 endforeach()
 
 set( SFCGAL_OSG_HEADERS
