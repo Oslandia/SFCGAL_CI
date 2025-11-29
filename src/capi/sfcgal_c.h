@@ -2079,6 +2079,49 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_geometry_buffer3d(const sfcgal_geometry_t *geom, double radius,
                          int segments, sfcgal_buffer3d_type_t buffer_type);
 
+/**
+ * Computes a 3D chamfer on specific edge(s) of a geometry
+ * @param geom The input geometry (must be a SFCGAL::Solid or
+ * SFCGAL::PolyhedralSurface)
+ * @param distance The chamfer distance (symmetric chamfer)
+ * @param edge_geom Edge(s) to chamfer as LINESTRING Z or MULTILINESTRING Z
+ * @return A new geometry with the specified edge(s) chamfered
+ * @pre isValid(geom) == true
+ * @pre distance > 0
+ * @pre edge_geom is LINESTRING Z or MULTILINESTRING Z
+ * @post isValid(return) == true
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete()
+ * @return A chamfered geometry
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_chamfer_3d(const sfcgal_geometry_t *geom, double distance,
+                           const sfcgal_geometry_t *edge_geom);
+
+/**
+ * Computes an asymmetric 3D chamfer on specific edge(s) of a geometry
+ * @param geom The input geometry (must be a SFCGAL::Solid or
+ * SFCGAL::PolyhedralSurface)
+ * @param distance1 First chamfer distance
+ * @param distance2 Second chamfer distance
+ * @param edge_geom Edge(s) to chamfer as LINESTRING Z or MULTILINESTRING Z
+ * @return A new geometry with the specified edge(s) chamfered
+ * @pre isValid(geom) == true
+ * @pre distance1 > 0
+ * @pre distance2 > 0
+ * @pre edge_geom is LINESTRING Z or MULTILINESTRING Z
+ * @post isValid(return) == true
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete()
+ * @return A chamfered geometry
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_chamfer_3d_asymmetric(const sfcgal_geometry_t *geom,
+                                      double distance1, double distance2,
+                                      const sfcgal_geometry_t *edge_geom);
+
 /*--------------------------------------------------------------------------------------*
  *
  * Transformation

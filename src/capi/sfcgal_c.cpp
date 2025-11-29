@@ -47,6 +47,7 @@
 #include "SFCGAL/algorithm/alphaWrapping3D.h"
 #include "SFCGAL/algorithm/area.h"
 #include "SFCGAL/algorithm/buffer3D.h"
+#include "SFCGAL/algorithm/chamfer3D.h"
 #include "SFCGAL/algorithm/centroid.h"
 #include "SFCGAL/algorithm/convexHull.h"
 #include "SFCGAL/algorithm/covers.h"
@@ -2138,6 +2139,94 @@ sfcgal_geometry_buffer3d(const sfcgal_geometry_t *geom, double radius,
   } catch (std::exception &e) {
     SFCGAL_WARNING("During buffer3d (A, %g, %d, %d) :", radius, segments,
                    buffer_type);
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+  return result.release();
+}
+
+namespace {
+// Helper to extract edges from a geometry (LineString or MultiLineString)
+auto
+extractEdgesFromGeometry(const SFCGAL::Geometry *edge_geom)
+    -> std::vector<SFCGAL::algorithm::EdgeIdentifier>
+{
+  std::vector<SFCGAL::algorithm::EdgeIdentifier> edges;
+
+  if (edge_geom->is<SFCGAL::LineString>()) {
+    const auto &ls = edge_geom->as<SFCGAL::LineString>();
+    if (ls.numPoints() >= 2) {
+      edges.emplace_back(ls.pointN(0).toPoint_3(), ls.pointN(1).toPoint_3());
+    }
+  } else if (edge_geom->is<SFCGAL::MultiLineString>()) {
+    const auto &mls = edge_geom->as<SFCGAL::MultiLineString>();
+    for (size_t i = 0; i < mls.numGeometries(); ++i) {
+      const auto &ls = mls.lineStringN(i);
+      if (ls.numPoints() >= 2) {
+        edges.emplace_back(ls.pointN(0).toPoint_3(), ls.pointN(1).toPoint_3());
+      }
+    }
+  }
+
+  return edges;
+}
+} // namespace
+
+extern "C" auto
+sfcgal_geometry_chamfer_3d(const sfcgal_geometry_t *geom, double distance,
+                           const sfcgal_geometry_t *edge_geom)
+    -> sfcgal_geometry_t *
+{
+  std::unique_ptr<SFCGAL::Geometry> result;
+  try {
+    auto edges =
+        extractEdgesFromGeometry(static_cast<const SFCGAL::Geometry *>(edge_geom));
+    if (edges.empty()) {
+      SFCGAL_ERROR("chamfer_3d: edge geometry must be LINESTRING Z or "
+                   "MULTILINESTRING Z with at least 2 points");
+      return nullptr;
+    }
+    auto params = SFCGAL::algorithm::ChamferParameters::symmetric(distance);
+    result      = SFCGAL::algorithm::chamfer3D(
+        *static_cast<const SFCGAL::Geometry *>(geom), edges, params);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During chamfer_3d (A, %g, edge) :", distance);
+    SFCGAL_WARNING(
+        "  with A: %s",
+        static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+  return result.release();
+}
+
+extern "C" auto
+sfcgal_geometry_chamfer_3d_asymmetric(const sfcgal_geometry_t *geom,
+                                      double distance1, double distance2,
+                                      const sfcgal_geometry_t *edge_geom)
+    -> sfcgal_geometry_t *
+{
+  std::unique_ptr<SFCGAL::Geometry> result;
+  try {
+    auto edges =
+        extractEdgesFromGeometry(static_cast<const SFCGAL::Geometry *>(edge_geom));
+    if (edges.empty()) {
+      SFCGAL_ERROR("chamfer_3d_asymmetric: edge geometry must be LINESTRING Z or "
+                   "MULTILINESTRING Z with at least 2 points");
+      return nullptr;
+    }
+    auto selector = SFCGAL::algorithm::EdgeSelector::explicit_(edges);
+    auto params =
+        SFCGAL::algorithm::ChamferParameters::asymmetric(distance1, distance2);
+    SFCGAL::algorithm::Chamfer3D chamfer(
+        *static_cast<const SFCGAL::Geometry *>(geom));
+    result = chamfer.chamferEdges(selector, params);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During chamfer_3d_asymmetric (A, %g, %g, edge) :", distance1,
+                   distance2);
     SFCGAL_WARNING(
         "  with A: %s",
         static_cast<const SFCGAL::Geometry *>(geom)->asText().c_str());

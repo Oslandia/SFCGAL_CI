@@ -14,6 +14,7 @@
 #include <SFCGAL/algorithm/alphaWrapping3D.h>
 #include <SFCGAL/algorithm/area.h>
 #include <SFCGAL/algorithm/buffer3D.h>
+#include <SFCGAL/algorithm/chamfer3D.h>
 #include <SFCGAL/algorithm/centroid.h>
 #include <SFCGAL/algorithm/collect.h>
 #include <SFCGAL/algorithm/collectionExtract.h>
@@ -624,6 +625,79 @@ const std::vector<Operation> operations = {
          return buffer.compute(SFCGAL::algorithm::Buffer3D::ROUND);
        } catch (const std::exception &) {
          // Buffer3D only works for Point and LineString
+         return std::nullopt;
+       }
+     }},
+
+    {"chamfer3d", "Construction",
+     "Apply 3D chamfer to specific edge(s) of a Solid or PolyhedralSurface", true,
+     "Parameters:\n  distance=VALUE: Chamfer distance (default: 0.1)\n  "
+     "distance1=VALUE: First distance for asymmetric chamfer\n  "
+     "distance2=VALUE: Second distance for asymmetric chamfer\n\n"
+     "Edge Selection:\n  "
+     "Geometry B must be a LINESTRING Z defining the edge to chamfer.\n  "
+     "For multiple edges, use a MULTILINESTRING Z.\n\nNotes:\n  "
+     "- Use distance for symmetric chamfer\n  "
+     "- Use distance1+distance2 for asymmetric chamfer\n\nExamples:\n  "
+     "sfcgalop -a \"SOLID(...)\" -b \"LINESTRING Z(0 0 0, 1 0 0)\" chamfer3d \"distance=0.1\"\n  "
+     "sfcgalop -a \"SOLID(...)\" -b \"MULTILINESTRING Z((0 0 0, 1 0 0),(0 0 0, 0 1 0))\" chamfer3d \"distance=0.1\"",
+     "A, B, params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
+       auto params = parse_params(args);
+
+       if (!geom_b) {
+         std::cerr << "chamfer3d error: Geometry B (edge as LINESTRING Z) is required\n";
+         return std::nullopt;
+       }
+
+       // Check if asymmetric parameters are provided
+       bool has_distance1 = params.count("distance1") > 0;
+       bool has_distance2 = params.count("distance2") > 0;
+
+       try {
+         SFCGAL::algorithm::Chamfer3D chamfer(*geom_a);
+
+         // Determine chamfer parameters
+         SFCGAL::algorithm::ChamferParameters chamfer_params;
+         if (has_distance1 && has_distance2) {
+           chamfer_params = SFCGAL::algorithm::ChamferParameters::asymmetric(
+               params["distance1"], params["distance2"]);
+         } else {
+           double distance = params.count("distance") ? params["distance"] : 0.1;
+           chamfer_params = SFCGAL::algorithm::ChamferParameters::symmetric(distance);
+         }
+
+         // Extract edges from geometry B
+         std::vector<SFCGAL::algorithm::EdgeIdentifier> edges;
+
+         if (geom_b->is<SFCGAL::LineString>()) {
+           const auto& ls = geom_b->as<SFCGAL::LineString>();
+           if (ls.numPoints() >= 2) {
+             edges.emplace_back(ls.pointN(0).toPoint_3(), ls.pointN(1).toPoint_3());
+           }
+         } else if (geom_b->is<SFCGAL::MultiLineString>()) {
+           const auto& mls = geom_b->as<SFCGAL::MultiLineString>();
+           for (size_t i = 0; i < mls.numGeometries(); ++i) {
+             const auto& ls = mls.lineStringN(i);
+             if (ls.numPoints() >= 2) {
+               edges.emplace_back(ls.pointN(0).toPoint_3(), ls.pointN(1).toPoint_3());
+             }
+           }
+         } else {
+           std::cerr << "chamfer3d error: Geometry B must be LINESTRING Z or MULTILINESTRING Z\n";
+           return std::nullopt;
+         }
+
+         if (edges.empty()) {
+           std::cerr << "chamfer3d error: No valid edges found in geometry B\n";
+           return std::nullopt;
+         }
+
+         auto selector = SFCGAL::algorithm::EdgeSelector::explicit_(edges);
+         return chamfer.chamferEdges(selector, chamfer_params);
+       } catch (const std::exception &e) {
+         std::cerr << "chamfer3d error: " << e.what() << "\n";
          return std::nullopt;
        }
      }},
