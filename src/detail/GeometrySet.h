@@ -9,6 +9,8 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/variant.hpp>
 
+#include <cstdint>
+
 #include "SFCGAL/config.h"
 
 #include "SFCGAL/Kernel.h"
@@ -35,7 +37,7 @@ class Geometry;
 namespace SFCGAL::detail {
 
 /// Primitive type enumeration. Note that the value is the dimension !
-enum PrimitiveType {
+enum PrimitiveType : std::uint8_t {
   PrimitivePoint   = 0,
   PrimitiveSegment = 1,
   PrimitiveSurface = 2,
@@ -48,11 +50,10 @@ template <int Dim>
 struct PrimitiveHandle {
   //
   // We use boost::variant here for convenience, whereas it is needed
-  typedef boost::variant<const typename Point_d<Dim>::Type *,
-                         const typename Segment_d<Dim>::Type *,
-                         const typename Surface_d<Dim>::Type *,
-                         const typename Volume_d<Dim>::Type *>
-       Type;   ///< Variant type for storing different primitive pointers
+  using Type = boost::variant<const typename Point_d<Dim>::Type *,
+                              const typename Segment_d<Dim>::Type *,
+                              const typename Surface_d<Dim>::Type *,
+                              const typename Volume_d<Dim>::Type *>;
   Type handle; ///< The stored primitive handle
 
   /**
@@ -69,7 +70,7 @@ struct PrimitiveHandle {
    * @return Pointer to primitive of specified type
    */
   template <class T>
-  inline auto
+  [[nodiscard]] auto
   as() const -> const T *
   {
     return boost::get<const T *>(handle);
@@ -79,28 +80,26 @@ struct PrimitiveHandle {
 /// PrimitiveBox. Type used for CGAL::Box_intersection_d
 template <int Dim>
 struct PrimitiveBox {
-  typedef CGAL::Box_intersection_d::Box_with_handle_d<double, Dim,
-                                                      PrimitiveHandle<Dim> *>
-      Type; ///< CGAL box type with handle for intersection operations
+  using Type =
+      CGAL::Box_intersection_d::Box_with_handle_d<double, Dim,
+                                                  PrimitiveHandle<Dim> *>;
 };
 
 /// BoxCollection for use with CGAL::Box_intersection_d
 template <int Dim>
 struct BoxCollection {
-  typedef std::vector<typename PrimitiveBox<Dim>::Type>
-      Type; ///< Vector of primitive boxes
+  using Type = std::vector<typename PrimitiveBox<Dim>::Type>;
 };
 
 /// HandleCollection. Used to store PrimitiveHandle
 template <int Dim>
 struct HandleCollection {
-  typedef std::list<PrimitiveHandle<Dim>>
-      Type; ///< List type for storing primitive handles
+  using Type = std::list<PrimitiveHandle<Dim>>;
 };
 
 /// Flags available for each type of Geometry type.
 /// Primitives can be 'flagged' in order to speed up recomposition
-enum ElementFlag {
+enum ElementFlag : std::uint8_t {
   // the polyhedron is planar => build a triangle or a polygon
   FLAG_IS_PLANAR = 1
 };
@@ -231,15 +230,15 @@ template <int Dim>
 class GeometrySet {
 public:
   // Points are stored in an ordered set
-  typedef std::set<CollectionElement<typename Point_d<Dim>::Type>>
-      PointCollection; ///< Collection type for storing points
+  using PointCollection =
+      std::set<CollectionElement<typename Point_d<Dim>::Type>>;
   // Segments are stored in an ordered set
-  typedef std::set<CollectionElement<typename Segment_d<Dim>::Type>>
-      SegmentCollection; ///< Collection type for storing segments
-  typedef std::list<CollectionElement<typename Surface_d<Dim>::Type>>
-      SurfaceCollection; ///< Collection type for storing surfaces
-  typedef std::list<CollectionElement<typename Volume_d<Dim>::Type>>
-      VolumeCollection; ///< Collection type for storing volumes
+  using SegmentCollection =
+      std::set<CollectionElement<typename Segment_d<Dim>::Type>>;
+  using SurfaceCollection =
+      std::list<CollectionElement<typename Surface_d<Dim>::Type>>;
+  using VolumeCollection =
+      std::list<CollectionElement<typename Volume_d<Dim>::Type>>;
 
   GeometrySet();
 
@@ -293,19 +292,19 @@ public:
 
   /**
    * add a primitive from a PrimitiveHandle  to the set
-   * @param p The primitive handle to add
+   * @param handle The primitive handle to add
    */
   void
-  addPrimitive(const PrimitiveHandle<Dim> &p);
+  addPrimitive(const PrimitiveHandle<Dim> &handle);
 
   /**
    * add a primitive from a CGAL::Object to the set
-   * pointsAsRing : if set to true, build a polygon if o is a vector of points
-   * @param o The CGAL object to add as primitive
+   * pointsAsRing : if set to true, build a polygon if obj is a vector of points
+   * @param obj The CGAL object to add as primitive
    * @param pointsAsRing If true, build polygon from point vector
    */
   void
-  addPrimitive(const CGAL::Object &o, bool pointsAsRing = false);
+  addPrimitive(const CGAL::Object &obj, bool pointsAsRing = false);
 
   /**
    * add a point to the set
@@ -429,7 +428,7 @@ public:
    * @brief Get mutable reference to point collection
    * @return Reference to the point collection
    */
-  [[nodiscard]] inline auto
+  [[nodiscard]] auto
   points() -> PointCollection &
   {
     return _points;
@@ -438,7 +437,7 @@ public:
    * @brief Get const reference to point collection
    * @return Const reference to the point collection
    */
-  [[nodiscard]] inline auto
+  [[nodiscard]] auto
   points() const -> const PointCollection &
   {
     return _points;
@@ -448,7 +447,7 @@ public:
    * @brief Get mutable reference to segment collection
    * @return Reference to the segment collection
    */
-  [[nodiscard]] inline auto
+  [[nodiscard]] auto
   segments() -> SegmentCollection &
   {
     return _segments;
@@ -457,7 +456,7 @@ public:
    * @brief Get const reference to segment collection
    * @return Const reference to the segment collection
    */
-  [[nodiscard]] inline auto
+  [[nodiscard]] auto
   segments() const -> const SegmentCollection &
   {
     return _segments;
@@ -467,7 +466,7 @@ public:
    * @brief Get mutable reference to surface collection
    * @return Reference to the surface collection
    */
-  [[nodiscard]] inline auto
+  [[nodiscard]] auto
   surfaces() -> SurfaceCollection &
   {
     return _surfaces;
@@ -476,7 +475,7 @@ public:
    * @brief Get const reference to surface collection
    * @return Const reference to the surface collection
    */
-  [[nodiscard]] inline auto
+  [[nodiscard]] auto
   surfaces() const -> const SurfaceCollection &
   {
     return _surfaces;
@@ -486,7 +485,7 @@ public:
    * @brief Get mutable reference to volume collection
    * @return Reference to the volume collection
    */
-  [[nodiscard]] inline auto
+  [[nodiscard]] auto
   volumes() -> VolumeCollection &
   {
     return _volumes;
@@ -495,7 +494,7 @@ public:
    * @brief Get const reference to volume collection
    * @return Const reference to the volume collection
    */
-  [[nodiscard]] inline auto
+  [[nodiscard]] auto
   volumes() const -> const VolumeCollection &
   {
     return _volumes;
@@ -505,33 +504,33 @@ public:
    * Returns true if the set holds points
    * @return True if the set contains points
    */
-  bool
-  hasPoints() const;
+  [[nodiscard]] auto
+  hasPoints() const -> bool;
   /**
    * Returns true if the set holds segments
    * @return True if the set contains segments
    */
-  bool
-  hasSegments() const;
+  [[nodiscard]] auto
+  hasSegments() const -> bool;
   /**
    * Returns true if the set holds surfaces
    * @return True if the set contains surfaces
    */
-  bool
-  hasSurfaces() const;
+  [[nodiscard]] auto
+  hasSurfaces() const -> bool;
   /**
    * Returns true if the set holds volumes
    * @return True if the set contains volumes
    */
-  bool
-  hasVolumes() const;
+  [[nodiscard]] auto
+  hasVolumes() const -> bool;
 
   /**
    * convert the set to a SFCGAL::Geometry
    * @return Unique pointer to the recomposed geometry
    */
-  std::unique_ptr<Geometry>
-  recompose() const;
+  [[nodiscard]] auto
+  recompose() const -> std::unique_ptr<Geometry>;
 
   /**
    * Filter (remove) primitives that are already covered by others
@@ -579,7 +578,8 @@ operator<<(std::ostream &ostr, const GeometrySet<3> &geomSet) -> std::ostream &;
  * @return An empty 2D bounding box.
  */
 inline auto
-compute_solid_bbox(const NoVolume &, dim_t<2>) -> CGAL::Bbox_2
+compute_solid_bbox(const NoVolume & /*unused*/, dim_t<2> /*unused*/)
+    -> CGAL::Bbox_2
 {
   return {};
 }
@@ -592,8 +592,8 @@ compute_solid_bbox(const NoVolume &, dim_t<2>) -> CGAL::Bbox_2
  *
  */
 inline auto
-compute_solid_bbox(const TypeForDimension<3>::Volume &volume, dim_t<3>)
-    -> CGAL::Bbox_3
+compute_solid_bbox(const TypeForDimension<3>::Volume &volume,
+                   dim_t<3> /*unused*/) -> CGAL::Bbox_3
 {
   BOOST_ASSERT(volume.size_of_vertices());
   MarkedPolyhedron::Point_const_iterator pit = volume.points_begin();
