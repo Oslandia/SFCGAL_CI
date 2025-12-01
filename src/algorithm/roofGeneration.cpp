@@ -16,7 +16,6 @@
 #include "SFCGAL/Exception.h"
 #include "SFCGAL/algorithm/ConsistentOrientationBuilder.h"
 #include "SFCGAL/algorithm/covers.h"
-#include "SFCGAL/detail/algorithm/FaceFilters.h"
 #include "SFCGAL/algorithm/extrude.h"
 #include "SFCGAL/algorithm/force2D.h"
 #include "SFCGAL/algorithm/intersection.h"
@@ -25,6 +24,7 @@
 #include "SFCGAL/algorithm/straightSkeleton.h"
 #include "SFCGAL/algorithm/tesselate.h"
 #include "SFCGAL/algorithm/translate.h"
+#include "SFCGAL/detail/algorithm/FaceFilters.h"
 #include "SFCGAL/triangulate/triangulate2DZ.h"
 
 #include <CGAL/Boolean_set_operations_2.h>
