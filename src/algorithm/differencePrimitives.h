@@ -399,16 +399,10 @@ fix_cgal_valid_polygon(const Polygon_with_holes_2 &p,
     std::vector<std::vector<Polygon_2>> sortedHoles(
         boundaries.size()); // 1/1 with boudaries
 
-    unsigned nbHoles = 0;
-
-    for (std::vector<Polygon_2>::const_iterator h = holes.begin();
-         h != holes.end(); ++h) {
-      ++nbHoles;
-
-      for (std::vector<Polygon_2>::const_iterator b = boundaries.begin();
-           b != boundaries.end(); ++b) {
-        if (isHoleOf(*h, *b)) {
-          sortedHoles[b - boundaries.begin()].push_back(*h);
+    for (const auto &h : holes) {
+      for (size_t b = 0; b < boundaries.size(); ++b) {
+        if (isHoleOf(h, boundaries[b])) {
+          sortedHoles[b].push_back(h);
         }
       }
     }
