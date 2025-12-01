@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.6 )
+cmake_minimum_required(VERSION 3.16)
 
 set( SFCGAL_VERSION_MAJOR 2 )
 set( SFCGAL_VERSION_MINOR 3 )
@@ -17,13 +17,9 @@ list(APPEND CMAKE_IGNORE_PREFIX_PATH "/usr/local/include/SFCGAL")
 #
 # Cmake policies
 #
-if(POLICY CMP0077)
-    cmake_policy(SET CMP0077 NEW)
-endif()
-
-if(POLICY CMP0167)
-    cmake_policy(SET CMP0167 NEW)
-endif()
+cmake_policy(SET CMP0077 NEW)
+cmake_policy(SET CMP0167 NEW)
+cmake_policy(SET CMP0175 NEW)
 
 #----------------------------------------------------------------------------
 # build options
@@ -236,17 +232,21 @@ if(MSVC)
 	else()
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 	endif()
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-	# Update if necessary
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-long-long -pedantic -Wpointer-arith -Wcast-align -Wcast-qual -Wno-overloaded-virtual -Wformat=2 -Winit-self -Wmissing-include-dirs -Wwrite-strings -Wno-error=undef")#-Wfloat-equal -Wconversion -Wshadow
-    if( SFCGAL_WARNING_AS_ERROR )
-		 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=format")
-	endif()
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
+        CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
-	# Allows profiling with gprof
-	if(SFCGAL_BUILD_WITH_GPROF)
-		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-pg")
-	endif()
+    set(SFCGAL_WARNING_FLAGS
+        -Wall -Wextra -Wno-long-long -pedantic
+        -Wpointer-arith -Wcast-align -Wcast-qual
+        -Wno-overloaded-virtual -Wformat=2
+        -Winit-self -Wmissing-include-dirs
+        -Wwrite-strings -Wno-error=undef
+    )
+
+    if (SFCGAL_WARNING_AS_ERROR)
+        list(APPEND SFCGAL_WARNING_FLAGS -Werror -Wno-error=format)
+    endif()
+
 endif()
 
 
@@ -294,6 +294,14 @@ OPTION( SFCGAL_USE_STATIC_LIBS "define if SFCGAL is build as a static library" O
 
 #-- build the library
 add_subdirectory( src )
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(SFCGAL PRIVATE ${SFCGAL_WARNING_FLAGS})
+
+    if (SFCGAL_BUILD_WITH_GPROF)
+        target_link_options(SFCGAL PRIVATE -pg)
+    endif()
+endif()
 
 #-- build test (todo only if boost use dyn link)
 add_subdirectory( test )
