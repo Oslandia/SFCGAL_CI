@@ -99,17 +99,11 @@ makeConsistentOrientation3D(TriangulatedSurface &g) -> void
 auto
 isCounterClockWiseOriented(const LineString &lineString) -> bool
 {
-  // Compute the 'z' part of the Newell's formula
-  // and test against 0
-  Kernel::FT z = 0;
-
-  for (size_t i = 0; i < lineString.numSegments(); ++i) {
-    const Point &pi = lineString.pointN(i);
-    const Point &pj = lineString.pointN(i + 1);
-    z += (pi.x() - pj.x()) * (pi.y() + pj.y());
-  }
-
-  return z > 0;
+  // Use CGAL's built-in orientation() which properly handles lazy exact numbers
+  // The manual Newell's formula builds a huge DAG with lazy exact arithmetic
+  // causing stack overflow on Windows with polygons having 100,000+ points
+  // (see PostGIS issue #3651)
+  return lineString.toPolygon_2(false).orientation() == CGAL::COUNTERCLOCKWISE;
 }
 
 /// @private
