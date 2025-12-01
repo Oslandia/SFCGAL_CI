@@ -218,6 +218,7 @@ private:
   const PointType _ref;
 };
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 template <typename SegmentOutputIteratorType>
 SegmentOutputIteratorType
 difference(const Segment_2 &segment, const Polygon_with_holes_2 &polygon,
@@ -295,6 +296,7 @@ difference(const Segment_2 &segment, const Polygon_with_holes_2 &polygon,
 
   return out;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // assuming two disjoint (except at a point) polygon, test if the first a hole
 // of the second
@@ -309,6 +311,7 @@ isHoleOf(const Polygon_2 &hole, const Polygon_2 &poly)
                               Kernel()) == CGAL::ON_BOUNDED_SIDE;
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 template <typename PolygonOutputIteratorType>
 PolygonOutputIteratorType
 fix_cgal_valid_polygon(const Polygon_with_holes_2 &p,
@@ -420,6 +423,7 @@ fix_cgal_valid_polygon(const Polygon_with_holes_2 &p,
 
   return out;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 inline Polygon_with_holes_2
 fix_sfs_valid_polygon(const Polygon_with_holes_2 &p)
@@ -613,6 +617,7 @@ collidingTriangles(const FaceSegmentCollide::CollisionVector &collisions,
   return out;
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 template <typename SegmentOutputIteratorType>
 SegmentOutputIteratorType
 difference(const Segment_3 &segment, const MarkedPolyhedron &polyhedron,
@@ -708,6 +713,7 @@ difference(const Segment_3 &segment, const MarkedPolyhedron &polyhedron,
 
   return out;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // @TODO put that in a proper header
 void
