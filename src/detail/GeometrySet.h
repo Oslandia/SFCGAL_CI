@@ -180,6 +180,15 @@ public:
       : _primitive(other._primitive), _flags(other._flags)
   {
   }
+
+  /**
+   * @brief Copy assignment operator
+   * @param other The element to copy from
+   * @return Reference to this
+   */
+  auto
+  operator=(const CollectionElement &other) -> CollectionElement & = default;
+
   /**
    * @brief Less-than comparison operator
    * @param other The element to compare with
@@ -544,13 +553,19 @@ private:
 };
 
 /**
- * Display operator for 2D GeometrySet.
+ * @brief Display operator for 2D GeometrySet.
+ * @param ostr The output stream to write to.
+ * @param geomSet The 2D GeometrySet to display.
+ * @return The output stream after writing.
  */
 SFCGAL_API auto
 operator<<(std::ostream &ostr, const GeometrySet<2> &geomSet) -> std::ostream &;
 
 /**
- * Display operator for 3D GeometrySet.
+ * @brief Display operator for 3D GeometrySet.
+ * @param ostr The output stream to write to.
+ * @param geomSet The 3D GeometrySet to display.
+ * @return The output stream after writing.
  */
 SFCGAL_API auto
 operator<<(std::ostream &ostr, const GeometrySet<3> &geomSet) -> std::ostream &;
