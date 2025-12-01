@@ -147,8 +147,7 @@ angle(const Point &pointA, const Point &pointB, const Point &pointC) -> double
 template <class K>
 auto
 findEdgeMidpointProjection(
-    typename CGAL::Straight_skeleton_2<K>::Vertex_const_handle vertex,
-    const CGAL::Straight_skeleton_2<K> &skeleton) -> Point
+    typename CGAL::Straight_skeleton_2<K>::Vertex_const_handle vertex) -> Point
 {
   using Ss                    = CGAL::Straight_skeleton_2<K>;
   using Halfedge_const_handle = typename Ss::Halfedge_const_handle;
@@ -297,8 +296,7 @@ straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &skeleton,
 
     // Project start point if it's a free endpoint
     if (projectToEdges && vertexDegree[it->opposite()->vertex()] == 1) {
-      Point proj =
-          findEdgeMidpointProjection<K>(it->opposite()->vertex(), skeleton);
+      Point proj = findEdgeMidpointProjection<K>(it->opposite()->vertex());
       algorithm::translate(proj, translate);
       lineString->addPoint(proj);
     }
@@ -311,7 +309,7 @@ straightSkeletonToMedialAxis(const CGAL::Straight_skeleton_2<K> &skeleton,
 
     // Project end point if it's a free endpoint
     if (projectToEdges && vertexDegree[it->vertex()] == 1) {
-      Point proj = findEdgeMidpointProjection<K>(it->vertex(), skeleton);
+      Point proj = findEdgeMidpointProjection<K>(it->vertex());
       algorithm::translate(proj, translate);
       lineString->addPoint(proj);
     }
