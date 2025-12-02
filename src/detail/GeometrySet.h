@@ -48,8 +48,8 @@ enum PrimitiveType : std::uint8_t {
 /// member
 template <int Dim>
 struct PrimitiveHandle {
-  //
-  // We use boost::variant here for convenience, whereas it is needed
+  /// Variant type holding a pointer to one of the primitive types (Point,
+  /// Segment, Surface, or Volume)
   using Type = boost::variant<const typename Point_d<Dim>::Type *,
                               const typename Segment_d<Dim>::Type *,
                               const typename Surface_d<Dim>::Type *,
@@ -80,6 +80,7 @@ struct PrimitiveHandle {
 /// PrimitiveBox. Type used for CGAL::Box_intersection_d
 template <int Dim>
 struct PrimitiveBox {
+  /// Box type with handle for CGAL box intersection algorithms
   using Type =
       CGAL::Box_intersection_d::Box_with_handle_d<double, Dim,
                                                   PrimitiveHandle<Dim> *>;
@@ -88,12 +89,14 @@ struct PrimitiveBox {
 /// BoxCollection for use with CGAL::Box_intersection_d
 template <int Dim>
 struct BoxCollection {
+  /// Vector of primitive boxes for box intersection algorithms
   using Type = std::vector<typename PrimitiveBox<Dim>::Type>;
 };
 
 /// HandleCollection. Used to store PrimitiveHandle
 template <int Dim>
 struct HandleCollection {
+  /// List of primitive handles
   using Type = std::list<PrimitiveHandle<Dim>>;
 };
 
@@ -229,14 +232,16 @@ operator<<(std::ostream &ostr, const CollectionElement<Primitive> &collection)
 template <int Dim>
 class GeometrySet {
 public:
-  // Points are stored in an ordered set
+  /// Ordered set of point elements (dimension 0 primitives)
   using PointCollection =
       std::set<CollectionElement<typename Point_d<Dim>::Type>>;
-  // Segments are stored in an ordered set
+  /// Ordered set of segment elements (dimension 1 primitives)
   using SegmentCollection =
       std::set<CollectionElement<typename Segment_d<Dim>::Type>>;
+  /// List of surface elements (dimension 2 primitives)
   using SurfaceCollection =
       std::list<CollectionElement<typename Surface_d<Dim>::Type>>;
+  /// List of volume elements (dimension 3 primitives)
   using VolumeCollection =
       std::list<CollectionElement<typename Volume_d<Dim>::Type>>;
 
