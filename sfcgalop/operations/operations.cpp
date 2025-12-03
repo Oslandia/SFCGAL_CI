@@ -14,6 +14,7 @@
 #include <SFCGAL/algorithm/alphaWrapping3D.h>
 #include <SFCGAL/algorithm/area.h>
 #include <SFCGAL/algorithm/buffer3D.h>
+#include <SFCGAL/algorithm/fillet3D.h>
 #include <SFCGAL/algorithm/centroid.h>
 #include <SFCGAL/algorithm/collect.h>
 #include <SFCGAL/algorithm/collectionExtract.h>
@@ -625,6 +626,92 @@ const std::vector<Operation> operations = {
          return buffer.compute(SFCGAL::algorithm::Buffer3D::ROUND);
        } catch (const std::exception &) {
          // Buffer3D only works for Point and LineString
+         return std::nullopt;
+       }
+     }},
+
+    {"fillet3d", "Construction",
+     "Apply 3D fillet (rounded edges) to solid geometries", false,
+     "Parameters:\n"
+     "  radius=VALUE: Fillet radius (required)\n"
+     "  segments=N: Number of segments for arc approximation (default: 16)\n"
+     "  angle_threshold=DEGREES: Only fillet edges with dihedral angle >= "
+     "threshold (default: 0, all convex edges)\n\n"
+     "Optional geometry B: LINESTRING or MULTILINESTRING specifying edges to "
+     "fillet.\n"
+     "If B is provided, only those edges will be filleted.\n\n"
+     "Only works with Solid and PolyhedralSurface geometries.\n\n"
+     "Examples:\n"
+     "  # Fillet all convex edges of a cube\n"
+     "  sfcgalop make_cube \"size=2\" | sfcgalop -a - fillet3d "
+     "\"radius=0.2,segments=16\"\n\n"
+     "  # Fillet specific edges of an L-shape\n"
+     "  sfcgalop -a \"$SOLID\" -b \"LINESTRING Z(0 0 0, 1 0 0)\" fillet3d "
+     "\"radius=0.1\"",
+     "A, B, params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
+       auto   params   = parse_params(args);
+       double radius   = params.count("radius") ? params["radius"] : 0.0;
+       int    segments = static_cast<int>(
+           params.count("segments") ? params["segments"] : 16);
+       double angle_threshold =
+           params.count("angle_threshold") ? params["angle_threshold"] : 0.0;
+
+       if (radius <= 0) {
+         std::cerr << "Error: fillet3d requires radius > 0\n";
+         return std::nullopt;
+       }
+
+       try {
+         SFCGAL::algorithm::Fillet3D fillet(*geom_a);
+
+         // If geometry B is provided, extract edges from it
+         if (geom_b != nullptr) {
+           std::vector<SFCGAL::algorithm::EdgeIdentifier> edges;
+
+           std::function<void(const SFCGAL::Geometry &)> extractEdges =
+               [&](const SFCGAL::Geometry &geom) {
+                 if (geom.is<SFCGAL::LineString>()) {
+                   const auto &ls = geom.as<SFCGAL::LineString>();
+                   for (size_t i = 0; i + 1 < ls.numPoints(); ++i) {
+                     edges.emplace_back(ls.pointN(i).toPoint_3(),
+                                        ls.pointN(i + 1).toPoint_3());
+                   }
+                 } else if (geom.is<SFCGAL::MultiLineString>()) {
+                   const auto &mls = geom.as<SFCGAL::MultiLineString>();
+                   for (size_t i = 0; i < mls.numGeometries(); ++i) {
+                     extractEdges(mls.lineStringN(i));
+                   }
+                 } else if (geom.is<SFCGAL::GeometryCollection>()) {
+                   const auto &gc = geom.as<SFCGAL::GeometryCollection>();
+                   for (size_t i = 0; i < gc.numGeometries(); ++i) {
+                     extractEdges(gc.geometryN(i));
+                   }
+                 }
+               };
+
+           extractEdges(*geom_b);
+
+           if (!edges.empty()) {
+             return fillet.filletEdges(
+                 SFCGAL::algorithm::EdgeSelector::explicit_(edges),
+                 SFCGAL::algorithm::FilletParameters::constant(radius,
+                                                               segments));
+           }
+         }
+
+         // No geometry B or no edges extracted - use angle threshold or all
+         // convex
+         if (angle_threshold > 0) {
+           return fillet.filletEdges(
+               SFCGAL::algorithm::EdgeSelector::byAngleThreshold(
+                   angle_threshold),
+               SFCGAL::algorithm::FilletParameters::constant(radius, segments));
+         }
+         return fillet.fillet(radius, segments);
+       } catch (const std::exception &e) {
+         std::cerr << "fillet3d error: " << e.what() << "\n";
          return std::nullopt;
        }
      }},
