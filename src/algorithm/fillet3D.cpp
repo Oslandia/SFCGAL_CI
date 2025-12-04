@@ -18,7 +18,7 @@
 #include <set>
 
 // Uncomment to enable debug output
-// #define DEBUG_FILLET
+// #define DEBUG_FILLET  // Disabled for production
 
 namespace SFCGAL::algorithm {
 
@@ -78,6 +78,70 @@ intersectPointWithPlane(const Kernel::Point_3  &point,
                               plane.c() * point.z() + plane.d()) /
              denom;
   return point + direction * t;
+}
+
+/**
+ * @brief Solve for arc center offset using tangency constraints
+ *
+ * For a fillet arc to be tangent to both faces, the arc center C must satisfy:
+ *   n1 · (C - P) = -r   (distance r from face 1, on inward side)
+ *   n2 · (C - P) = -r   (distance r from face 2, on inward side)
+ *   edgeDir · (C - P) = 0  (in perpendicular plane)
+ *
+ * This is a 3x3 linear system solved using Cramer's rule.
+ */
+auto
+solveArcCenterOffset(const Kernel::Vector_3 &n1, const Kernel::Vector_3 &n2,
+                     const Kernel::Vector_3 &edgeDir,
+                     double radius) -> std::optional<Kernel::Vector_3>
+{
+  // Extract components
+  const double n1x = CGAL::to_double(n1.x());
+  const double n1y = CGAL::to_double(n1.y());
+  const double n1z = CGAL::to_double(n1.z());
+  const double n2x = CGAL::to_double(n2.x());
+  const double n2y = CGAL::to_double(n2.y());
+  const double n2z = CGAL::to_double(n2.z());
+  const double ex  = CGAL::to_double(edgeDir.x());
+  const double ey  = CGAL::to_double(edgeDir.y());
+  const double ez  = CGAL::to_double(edgeDir.z());
+
+  // Compute determinant: det(A) = n1 · (n2 × edgeDir)
+  // n2 × edgeDir = (n2y*ez - n2z*ey, n2z*ex - n2x*ez, n2x*ey - n2y*ex)
+  const double crossX = n2y * ez - n2z * ey;
+  const double crossY = n2z * ex - n2x * ez;
+  const double crossZ = n2x * ey - n2y * ex;
+  const double detA   = n1x * crossX + n1y * crossY + n1z * crossZ;
+
+  if (std::abs(detA) < EPSILON) {
+    return std::nullopt; // Degenerate case
+  }
+
+  // Right-hand side: b = [-r, -r, 0]
+  const double b1 = -radius;
+  const double b2 = -radius;
+  const double b3 = 0.0;
+
+  // Cramer's rule for Dx: replace first column with b
+  // det([b, n1y, n1z; b2, n2y, n2z; b3, ey, ez])
+  const double detDx = b1 * (n2y * ez - n2z * ey) - n1y * (b2 * ez - n2z * b3) +
+                       n1z * (b2 * ey - n2y * b3);
+
+  // Cramer's rule for Dy: replace second column with b
+  // det([n1x, b, n1z; n2x, b2, n2z; ex, b3, ez])
+  const double detDy = n1x * (b2 * ez - n2z * b3) - b1 * (n2x * ez - n2z * ex) +
+                       n1z * (n2x * b3 - b2 * ex);
+
+  // Cramer's rule for Dz: replace third column with b
+  // det([n1x, n1y, b; n2x, n2y, b2; ex, ey, b3])
+  const double detDz = n1x * (n2y * b3 - b2 * ey) - n1y * (n2x * b3 - b2 * ex) +
+                       b1 * (n2x * ey - n2y * ex);
+
+  const double Dx = detDx / detA;
+  const double Dy = detDy / detA;
+  const double Dz = detDz / detA;
+
+  return Kernel::Vector_3(Dx, Dy, Dz);
 }
 
 } // anonymous namespace
@@ -307,37 +371,26 @@ Fillet3D::createFilletWedgeWithPlanes(
     return {};
   }
 
-  const auto   bisector       = normalizeVector(into1 + into2);
-  const double halfArc        = arcAngle / 2.0;
-  const double sinHalfArc     = std::sin(halfArc);
-
-  // Guard against division by very small values
-  if (sinHalfArc < 0.01) {
+  // Solve for arc center offset using tangency constraints
+  // This ensures the fillet arc is properly tangent to both faces for ANY dihedral angle
+  auto arcCenterOffset =
+      solveArcCenterOffset(edge.normal1, edge.normal2, edgeDir, radius);
+  if (!arcCenterOffset.has_value()) {
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] sinHalfArc too small: " << sinHalfArc << "\n";
+    std::cerr << "[DEBUG] Failed to solve arc center offset (degenerate case)\n";
 #endif
-    return {};  // Angle too extreme - skip edge
+    return {}; // Degenerate case - skip edge
   }
 
-  const double centerDistance = radius / sinHalfArc;
-
-  // Validate radius is appropriate for this angle
-  // The wedge construction is optimized for ~90° dihedral angles.
-  // For non-90° angles, the arc geometry may extend outside the solid.
-  // Ratio 1.5 allows dihedral angles ~84°-96° for reasonably reliable results.
-  constexpr double maxCenterDistanceRatio = 1.5;
-  if (centerDistance > radius * maxCenterDistanceRatio) {
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] centerDistance ratio too large: " << (centerDistance / radius) << " > " << maxCenterDistanceRatio << "\n";
-#endif
-    return {};  // Radius too large for this angle - skip edge
-  }
-#ifdef DEBUG_FILLET
-  std::cerr << "[DEBUG] Creating wedge: arcAngle=" << (arcAngle * 180.0 / M_PI) << "°, ratio=" << (centerDistance / radius) << "\n";
+  std::cerr << "[DEBUG] Creating wedge: arcAngle=" << (arcAngle * 180.0 / M_PI)
+            << "°, offset=(" << CGAL::to_double(arcCenterOffset->x()) << ", "
+            << CGAL::to_double(arcCenterOffset->y()) << ", "
+            << CGAL::to_double(arcCenterOffset->z()) << ")\n";
 #endif
 
-  const auto baseArcCenterStart = edge.start + bisector * centerDistance;
-  const auto baseArcCenterEnd   = edge.end + bisector * centerDistance;
+  const auto baseArcCenterStart = edge.start + *arcCenterOffset;
+  const auto baseArcCenterEnd   = edge.end + *arcCenterOffset;
   const double defaultExtension = radius * 0.5;
 
   const auto startRadial = normalizeVector(edge.normal1);
@@ -379,6 +432,9 @@ Fillet3D::createFilletWedgeWithPlanes(
 
   // Position the wedge apex slightly outside the edge.
   // Use a small outward extension to ensure proper wedge volume.
+  // The bisector direction (average of into vectors) points into the solid,
+  // so we move opposite to it to place the apex outside.
+  const auto   bisector    = normalizeVector(into1 + into2);
   const double outwardExt  = radius * 0.05;
   auto         startEdgePt = edge.start - bisector * outwardExt;
   auto         endEdgePt   = edge.end - bisector * outwardExt;

@@ -126,12 +126,13 @@ private:
  * volumes along selected edges and subtracting them from the input geometry
  * using NEF polyhedron boolean operations.
  *
+ * The arc center is computed by solving a 3×3 linear system of tangency
+ * constraints, ensuring the fillet arc is properly tangent to both adjacent
+ * faces for any dihedral angle.
+ *
  * @note Known limitations:
  * - Edges at reflex (concave) corners are automatically skipped
- * - The algorithm is optimized for ~90° dihedral angles. Edges with
- *   dihedral angles outside ~84°-96° range are skipped to avoid
- *   invalid geometry. Angles close to the boundaries may show minor
- *   visual artifacts where the fillet intersects adjacent faces.
+ * - Edges where faces are nearly parallel (degenerate cases) are skipped
  * - Geometries with triangular faces are not supported (returns original)
  */
 class SFCGAL_API Fillet3D {
@@ -226,8 +227,8 @@ private:
  * @param segments Number of arc segments (default: 16)
  * @return Filleted geometry
  *
- * @note Edges at reflex corners and edges where the radius is too large
- * for the dihedral angle are automatically skipped.
+ * @note Edges at reflex corners and degenerate edges (nearly parallel faces)
+ * are automatically skipped.
  */
 SFCGAL_API auto
 fillet3D(const Geometry &geometry, double radius,
