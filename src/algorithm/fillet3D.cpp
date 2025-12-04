@@ -10,6 +10,11 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/numeric.h"
 #include <CGAL/Nef_polyhedron_3.h>
+#include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
+#include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
+#include <CGAL/Polygon_mesh_processing/repair_polygon_soup.h>
+#include <CGAL/Polygon_mesh_processing/stitch_borders.h>
+#include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/boost/graph/copy_face_graph.h>
 #include <cmath>
@@ -551,15 +556,18 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     return _geometry->clone();
   }
 
-  try {
-    CGAL::Polyhedron_3<Kernel> poly;
-    nef.convert_to_polyhedron(poly);
-
+  // Helper lambda to build result from a polyhedron
+  auto buildResult = [this](const CGAL::Polyhedron_3<Kernel> &poly)
+      -> std::unique_ptr<Geometry> {
     if (poly.is_empty()) {
       return _geometry->clone();
     }
 
     auto result = std::make_unique<PolyhedralSurface>();
+#ifdef DEBUG_FILLET
+    int skippedFaces = 0;
+    int addedFaces = 0;
+#endif
 
     for (auto fit = poly.facets_begin(); fit != poly.facets_end(); ++fit) {
       std::vector<Kernel::Point_3> points;
@@ -585,6 +593,9 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
       }
 
       if (uniquePoints.size() < 3) {
+#ifdef DEBUG_FILLET
+        ++skippedFaces;
+#endif
         continue;
       }
 
@@ -593,6 +604,9 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
         auto v2    = uniquePoints[2] - uniquePoints[0];
         auto cross = CGAL::cross_product(v1, v2);
         if (CGAL::to_double(cross.squared_length()) < EPSILON * EPSILON) {
+#ifdef DEBUG_FILLET
+          ++skippedFaces;
+#endif
           continue;
         }
       }
@@ -603,7 +617,14 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
       }
       ring.addPoint(ring.pointN(0));
       result->addPolygon(Polygon(ring));
+#ifdef DEBUG_FILLET
+      ++addedFaces;
+#endif
     }
+
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] buildResult: added " << addedFaces << " faces, skipped " << skippedFaces << " degenerate faces\n";
+#endif
 
     if (result->numPolygons() == 0) {
       return _geometry->clone();
@@ -616,6 +637,197 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     }
 
     return result;
+  };
+
+  // First, try direct conversion (faster)
+  try {
+    CGAL::Polyhedron_3<Kernel> poly;
+    nef.convert_to_polyhedron(poly);
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Direct NEF conversion: " << poly.size_of_vertices() << " vertices, " << poly.size_of_facets() << " facets\n";
+#endif
+    if (!poly.is_empty()) {
+      return buildResult(poly);
+    }
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Direct NEF conversion produced empty polyhedron, trying regularization\n";
+#endif
+    // Try regularizing the NEF first
+    Nef_polyhedron regularized = nef.regularization();
+    regularized.convert_to_polyhedron(poly);
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Regularized NEF conversion: " << poly.size_of_vertices() << " vertices, " << poly.size_of_facets() << " facets\n";
+#endif
+    if (!poly.is_empty()) {
+      return buildResult(poly);
+    }
+  } catch (const std::exception &e) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Direct NEF conversion failed: " << e.what() << "\n";
+#endif
+    // Direct conversion failed, try polygon soup approach
+  } catch (...) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Direct NEF conversion failed with unknown exception\n";
+#endif
+  }
+
+  // Fallback: Extract faces via polygon soup and rebuild
+  // This handles cases where direct conversion fails due to topology issues
+  try {
+    using Point_3 = Kernel::Point_3;
+    std::vector<Point_3>             soup_points;
+    std::vector<std::vector<size_t>> soup_polygons;
+    std::map<Point_3, size_t>        point_index;
+
+    // Helper to add a point and get its index
+    auto addPoint = [&](const Point_3 &pt) -> size_t {
+      auto it = point_index.find(pt);
+      if (it == point_index.end()) {
+        size_t idx      = soup_points.size();
+        point_index[pt] = idx;
+        soup_points.push_back(pt);
+        return idx;
+      }
+      return it->second;
+    };
+
+    // Iterate over volumes to get proper boundary faces
+    // For each bounded volume (mark() == true), extract its outer shell
+    typename Nef_polyhedron::Volume_const_iterator vol;
+    CGAL_forall_volumes(vol, nef) {
+      // Only process marked volumes (solid parts)
+      if (!vol->mark()) {
+        continue;
+      }
+
+      // Get shells of this volume
+      typename Nef_polyhedron::Shell_entry_const_iterator shell_it;
+      CGAL_forall_shells_of(shell_it, vol) {
+        // Get the halffacets of this shell
+        typename Nef_polyhedron::SFace_const_handle sf(shell_it);
+        typename Nef_polyhedron::SHalfedge_const_handle she = sf->sface_cycles_begin();
+
+        // Visit all faces reachable from this shell
+        // We'll use a workaround: iterate all halffacets and check if they belong to this volume
+      }
+    }
+
+    // Alternative approach: iterate all halffacets and check incident volume
+    typename Nef_polyhedron::Halffacet_const_iterator hf;
+    CGAL_forall_halffacets(hf, nef) {
+      // Check if this halffacet is on the boundary of a solid volume
+      // The incident volume on the positive side should be marked (solid)
+      // and on the negative side should be unmarked (void)
+      auto vol_pos = hf->incident_volume();
+      auto vol_neg = hf->twin()->incident_volume();
+
+      // We want faces where one side is solid and other is void
+      bool pos_solid = vol_pos->mark();
+      bool neg_solid = vol_neg->mark();
+
+      // Only process if this is a proper boundary (solid on one side, void on other)
+      if (pos_solid == neg_solid) {
+        continue;
+      }
+
+      // Use the halffacet facing outward from the solid (solid on positive side)
+      const typename Nef_polyhedron::Halffacet_const_handle *face_to_use = nullptr;
+      if (pos_solid && !neg_solid) {
+        face_to_use = &hf;
+      } else if (!pos_solid && neg_solid) {
+        // Skip - we'll process this face via its twin
+        continue;
+      }
+
+      if (!face_to_use) {
+        continue;
+      }
+
+      // Extract polygons from this halffacet
+      typename Nef_polyhedron::Halffacet_cycle_const_iterator fc;
+      CGAL_forall_facet_cycles_of(fc, (*face_to_use)) {
+        if (fc.is_shalfedge()) {
+          typename Nef_polyhedron::SHalfedge_const_handle she_start(fc);
+          typename Nef_polyhedron::SHalfedge_const_handle she = she_start;
+          std::vector<size_t>                             polygon;
+
+          do {
+            Point_3 pt = she->source()->source()->point();
+            polygon.push_back(addPoint(pt));
+            she = she->next();
+          } while (she != she_start);
+
+          if (polygon.size() >= 3) {
+            soup_polygons.push_back(polygon);
+          }
+        }
+      }
+    }
+
+    if (soup_polygons.empty()) {
+#ifdef DEBUG_FILLET
+      std::cerr << "[DEBUG] Polygon soup: no polygons extracted\n";
+#endif
+      return _geometry->clone();
+    }
+
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Polygon soup before repair: " << soup_points.size() << " points, " << soup_polygons.size() << " polygons\n";
+#endif
+
+    // Repair and orient the polygon soup
+    namespace PMP = CGAL::Polygon_mesh_processing;
+    PMP::repair_polygon_soup(soup_points, soup_polygons);
+    PMP::orient_polygon_soup(soup_points, soup_polygons);
+
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Polygon soup after repair: " << soup_points.size() << " points, " << soup_polygons.size() << " polygons\n";
+#endif
+
+    // Convert to Surface_mesh
+    Surface_mesh_3 mesh;
+    PMP::polygon_soup_to_polygon_mesh(soup_points, soup_polygons, mesh);
+
+    if (mesh.is_empty()) {
+#ifdef DEBUG_FILLET
+      std::cerr << "[DEBUG] Polygon soup: mesh conversion failed\n";
+#endif
+      return _geometry->clone();
+    }
+
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Polygon soup: mesh has " << mesh.number_of_vertices() << " vertices, " << mesh.number_of_faces() << " faces\n";
+    std::cerr << "[DEBUG] Mesh is_closed: " << mesh.is_valid() << ", closed: " << CGAL::is_closed(mesh) << "\n";
+#endif
+
+    // If the mesh isn't closed, try to repair it
+    if (!CGAL::is_closed(mesh)) {
+#ifdef DEBUG_FILLET
+      std::cerr << "[DEBUG] Mesh not closed, trying to repair\n";
+#endif
+      PMP::stitch_borders(mesh);
+#ifdef DEBUG_FILLET
+      std::cerr << "[DEBUG] After stitch_borders: closed=" << CGAL::is_closed(mesh) << "\n";
+#endif
+    }
+
+    // Triangulate faces to help with validity
+    PMP::triangulate_faces(mesh);
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] After triangulation: " << mesh.number_of_vertices() << " vertices, " << mesh.number_of_faces() << " faces\n";
+#endif
+
+    // Convert Surface_mesh to Polyhedron
+    CGAL::Polyhedron_3<Kernel> poly;
+    CGAL::copy_face_graph(mesh, poly);
+
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Final polyhedron: " << poly.size_of_vertices() << " vertices, " << poly.size_of_facets() << " facets, closed=" << poly.is_closed() << "\n";
+#endif
+
+    return buildResult(poly);
+
   } catch (const std::exception &) {
     return _geometry->clone();
   }
@@ -774,9 +986,10 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
     }
   }
 
-  // Create wedges
-  Nef_polyhedron allWedges;
-  bool           firstWedge = true;
+  // Create wedges and subtract them one at a time
+  // This avoids topology issues when wedges intersect at corners
+  Nef_polyhedron resultNef = inputNef;
+  int            wedgesProcessed = 0;
 
   for (size_t i = 0; i < edges.size(); ++i) {
     const auto &edge = edges[i];
@@ -809,51 +1022,46 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
         continue;
       }
 
-      if (firstWedge) {
-        allWedges  = std::move(wedgeNef);
-        firstWedge = false;
-      } else {
-        allWedges = allWedges + wedgeNef;
-      }
+      // Subtract this wedge immediately
+      // This avoids the topology issues that arise from unioning wedges first
+      resultNef = resultNef - wedgeNef;
+      ++wedgesProcessed;
+#ifdef DEBUG_FILLET
+      std::cerr << "[DEBUG] Subtracted wedge " << (i+1) << "/" << edges.size() << "\n";
+#endif
 
-    } catch (const std::exception &) {
+    } catch (const std::exception &e) {
+#ifdef DEBUG_FILLET
+      std::cerr << "[DEBUG] Exception processing edge " << i << ": " << e.what() << "\n";
+#endif
       continue;
     }
   }
 
-  if (firstWedge || allWedges.is_empty()) {
+  if (wedgesProcessed == 0) {
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] No wedges created\n";
+    std::cerr << "[DEBUG] No wedges processed\n";
 #endif
     return _geometry->clone();
   }
 
 #ifdef DEBUG_FILLET
-  std::cerr << "[DEBUG] Performing NEF subtraction\n";
-#endif
-  try {
-    auto resultNef = inputNef - allWedges;
-#ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] NEF subtraction completed, result empty=" << resultNef.is_empty() << "\n";
+  std::cerr << "[DEBUG] Processed " << wedgesProcessed << " wedges, converting result\n";
+  std::cerr << "[DEBUG] Result NEF: is_empty=" << resultNef.is_empty() << ", number_of_vertices=" << resultNef.number_of_vertices() << ", number_of_facets=" << resultNef.number_of_facets() << ", number_of_volumes=" << resultNef.number_of_volumes() << "\n";
+  // Count marked volumes
+  int markedVolumes = 0;
+  typename Fillet3D::Nef_polyhedron::Volume_const_iterator vol_it;
+  CGAL_forall_volumes(vol_it, resultNef) {
+    if (vol_it->mark()) ++markedVolumes;
+  }
+  std::cerr << "[DEBUG] Marked volumes: " << markedVolumes << "\n";
 #endif
 
-    if (resultNef.is_empty()) {
-      return _geometry->clone();
-    }
-
-    return fromNefPolyhedron(resultNef);
-  } catch (const std::exception &e) {
-#ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] NEF subtraction exception: " << e.what() << "\n";
-#endif
-    // Boolean operation failed
-    return _geometry->clone();
-  } catch (...) {
-#ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] NEF subtraction unknown exception\n";
-#endif
+  if (resultNef.is_empty()) {
     return _geometry->clone();
   }
+
+  return fromNefPolyhedron(resultNef);
 }
 
 auto
