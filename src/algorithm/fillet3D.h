@@ -11,6 +11,7 @@
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>
+#include <optional>
 
 namespace SFCGAL::algorithm {
 
@@ -121,10 +122,14 @@ private:
 /**
  * @brief Computes 3D fillet (rounded edges) on solids
  *
- * The fillet operation creates rounded edges by constructing quarter-cylinder
- * wedges along selected edges and spherical caps at vertices where multiple
- * filleted edges meet. The geometry is assembled using NEF polyhedron boolean
- * operations.
+ * The fillet operation creates rounded edges by constructing wedge-shaped
+ * volumes along selected edges and subtracting them from the input geometry
+ * using NEF polyhedron boolean operations.
+ *
+ * @note Known limitation: Edges at reflex (concave) corners are automatically
+ * skipped to ensure valid output geometry. This means inner corners of L-shaped,
+ * U-shaped, or similar geometries will remain sharp. This is a trade-off to
+ * guarantee valid, non-self-intersecting output.
  */
 class SFCGAL_API Fillet3D {
 public:
@@ -145,8 +150,8 @@ public:
    * @return Filleted geometry
    */
   [[nodiscard]] auto
-  filletEdges(const EdgeSelector      &selector,
-              const FilletParameters  &params) const -> std::unique_ptr<Geometry>;
+  filletEdges(const EdgeSelector     &selector,
+              const FilletParameters &params) const -> std::unique_ptr<Geometry>;
 
   /**
    * @brief Apply fillet to all convex edges
@@ -171,10 +176,7 @@ private:
     bool             isConvex;
   };
 
-  // Helper methods
-  [[nodiscard]] auto
-  toSurfaceMesh() const -> Surface_mesh_3;
-
+  // Edge selection
   [[nodiscard]] auto
   selectEdges(const EdgeSelector &selector) const -> std::vector<EdgeInfo>;
 
@@ -189,20 +191,13 @@ private:
   isEdgeConvex(const Kernel::Vector_3 &n1, const Kernel::Vector_3 &n2,
                const Kernel::Vector_3 &edgeDir) const -> bool;
 
+  // Wedge creation
   [[nodiscard]] auto
-  createFilletWedge(const EdgeInfo         &edge,
-                    const FilletParameters &params) const
+  createFilletWedgeWithPlanes(const EdgeInfo                       &edge,
+                              const FilletParameters               &params,
+                              const std::optional<Kernel::Plane_3> &startPlane,
+                              const std::optional<Kernel::Plane_3> &endPlane) const
       -> CGAL::Polyhedron_3<Kernel>;
-
-  [[nodiscard]] auto
-  createSphericalCap(const Kernel::Point_3              &vertex,
-                     const std::vector<Kernel::Vector_3> &faceNormals,
-                     double radius, int segments) const
-      -> CGAL::Polyhedron_3<Kernel>;
-
-  [[nodiscard]] auto
-  findJunctionVertices(const std::vector<EdgeInfo> &edges) const
-      -> std::vector<std::pair<Kernel::Point_3, std::vector<Kernel::Vector_3>>>;
 
   // Geometry conversion
   [[nodiscard]] auto
@@ -217,15 +212,8 @@ private:
   normalizeVector(const Kernel::Vector_3 &v) -> Kernel::Vector_3;
 
   [[nodiscard]] static auto
-  getPerpendicularVector(const Kernel::Vector_3 &v) -> Kernel::Vector_3;
-
-  [[nodiscard]] static auto
   rotateVector(const Kernel::Vector_3 &v, const Kernel::Vector_3 &axis,
                double angle) -> Kernel::Vector_3;
-
-  [[nodiscard]] auto
-  createFilletSurface(const EdgeInfo         &edge,
-                      const FilletParameters &params) const -> Surface_mesh_3;
 };
 
 /**
@@ -234,6 +222,8 @@ private:
  * @param radius Fillet radius
  * @param segments Number of arc segments (default: 16)
  * @return Filleted geometry
+ *
+ * @note Edges at reflex corners are skipped to ensure valid output.
  */
 SFCGAL_API auto
 fillet3D(const Geometry &geometry, double radius,
