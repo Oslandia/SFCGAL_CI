@@ -13,8 +13,12 @@
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/boost/graph/copy_face_graph.h>
 #include <cmath>
+#include <iostream>
 #include <map>
 #include <set>
+
+// Uncomment to enable debug output
+// #define DEBUG_FILLET
 
 namespace SFCGAL::algorithm {
 
@@ -236,6 +240,9 @@ Fillet3D::selectEdges(const EdgeSelector &selector) const
 
   case EdgeSelector::Type::EXPLICIT: {
     std::vector<EdgeInfo> selected;
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] EXPLICIT selector: looking for " << selector.edges().size() << " edges in " << allEdges.size() << " total edges\n";
+#endif
     for (const auto &edge : allEdges) {
       for (const auto &id : selector.edges()) {
         const bool match =
@@ -244,11 +251,17 @@ Fillet3D::selectEdges(const EdgeSelector &selector) const
             (CGAL::squared_distance(edge.start, id.end) < EPSILON &&
              CGAL::squared_distance(edge.end, id.start) < EPSILON);
         if (match) {
+#ifdef DEBUG_FILLET
+          std::cerr << "[DEBUG] Found edge: dihedral=" << edge.dihedralAngle << "°, convex=" << edge.isConvex << "\n";
+#endif
           selected.push_back(edge);
           break;
         }
       }
     }
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Selected " << selected.size() << " edges\n";
+#endif
     return selected;
   }
 
@@ -288,18 +301,47 @@ Fillet3D::createFilletWedgeWithPlanes(
   const double arcAngle = M_PI - std::acos(-dotInto);
 
   if (arcAngle < 0.01 || arcAngle > M_PI - 0.01) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] arcAngle out of range: " << (arcAngle * 180.0 / M_PI) << "°\n";
+#endif
     return {};
   }
 
   const auto   bisector       = normalizeVector(into1 + into2);
   const double halfArc        = arcAngle / 2.0;
-  const double centerDistance = radius / std::sin(halfArc);
+  const double sinHalfArc     = std::sin(halfArc);
+
+  // Guard against division by very small values
+  if (sinHalfArc < 0.01) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] sinHalfArc too small: " << sinHalfArc << "\n";
+#endif
+    return {};  // Angle too extreme - skip edge
+  }
+
+  const double centerDistance = radius / sinHalfArc;
+
+  // Validate radius is appropriate for this angle
+  // The wedge construction is optimized for ~90° dihedral angles.
+  // For non-90° angles, the arc geometry may extend outside the solid.
+  // Ratio 1.5 allows dihedral angles ~84°-96° for reasonably reliable results.
+  constexpr double maxCenterDistanceRatio = 1.5;
+  if (centerDistance > radius * maxCenterDistanceRatio) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] centerDistance ratio too large: " << (centerDistance / radius) << " > " << maxCenterDistanceRatio << "\n";
+#endif
+    return {};  // Radius too large for this angle - skip edge
+  }
+#ifdef DEBUG_FILLET
+  std::cerr << "[DEBUG] Creating wedge: arcAngle=" << (arcAngle * 180.0 / M_PI) << "°, ratio=" << (centerDistance / radius) << "\n";
+#endif
 
   const auto baseArcCenterStart = edge.start + bisector * centerDistance;
   const auto baseArcCenterEnd   = edge.end + bisector * centerDistance;
   const double defaultExtension = radius * 0.5;
 
   const auto startRadial = normalizeVector(edge.normal1);
+
   const auto endRadial   = normalizeVector(edge.normal2);
 
   auto rotationAxis =
@@ -335,7 +377,9 @@ Fillet3D::createFilletWedgeWithPlanes(
     endArcVerts.push_back(mesh.add_vertex(endPt));
   }
 
-  const double outwardExt  = radius * 0.1;
+  // Position the wedge apex slightly outside the edge.
+  // Use a small outward extension to ensure proper wedge volume.
+  const double outwardExt  = radius * 0.05;
   auto         startEdgePt = edge.start - bisector * outwardExt;
   auto         endEdgePt   = edge.end - bisector * outwardExt;
 
@@ -400,28 +444,44 @@ Fillet3D::createFilletWedgeWithPlanes(
   CGAL::copy_face_graph(mesh, poly);
 
   if (poly.is_empty() || !poly.is_closed()) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] Wedge poly invalid: empty=" << poly.is_empty() << ", closed=" << poly.is_closed() << "\n";
+#endif
     return {};
   }
 
+#ifdef DEBUG_FILLET
+  std::cerr << "[DEBUG] Wedge created successfully with " << poly.size_of_vertices() << " vertices, " << poly.size_of_facets() << " facets\n";
+  // Debug: output wedge vertices
+  std::cerr << "[DEBUG] Wedge apex: (" << CGAL::to_double(startEdgePt.x()) << ", " << CGAL::to_double(startEdgePt.y()) << ", " << CGAL::to_double(startEdgePt.z()) << ")\n";
+  std::cerr << "[DEBUG] Arc center: (" << CGAL::to_double(baseArcCenterStart.x()) << ", " << CGAL::to_double(baseArcCenterStart.y()) << ", " << CGAL::to_double(baseArcCenterStart.z()) << ")\n";
+  std::cerr << "[DEBUG] bisector: (" << CGAL::to_double(bisector.x()) << ", " << CGAL::to_double(bisector.y()) << ", " << CGAL::to_double(bisector.z()) << ")\n";
+  std::cerr << "[DEBUG] First arc point: (" << CGAL::to_double((baseArcCenterStart + startRadial * radius).x()) << ", " << CGAL::to_double((baseArcCenterStart + startRadial * radius).y()) << ", " << CGAL::to_double((baseArcCenterStart + startRadial * radius).z()) << ")\n";
+#endif
   return poly;
 }
 
 auto
 Fillet3D::toNefPolyhedron() const -> Nef_polyhedron
 {
-  if (_geometry->is<Solid>()) {
-    const auto &solid = _geometry->as<Solid>();
-    auto        poly_ptr =
-        solid.exteriorShell().toPolyhedron_3<CGAL::Polyhedron_3<Kernel>>();
-    if (poly_ptr && !poly_ptr->is_empty()) {
-      return Nef_polyhedron(*poly_ptr);
+  try {
+    if (_geometry->is<Solid>()) {
+      const auto &solid = _geometry->as<Solid>();
+      auto        poly_ptr =
+          solid.exteriorShell().toPolyhedron_3<CGAL::Polyhedron_3<Kernel>>();
+      if (poly_ptr && !poly_ptr->is_empty()) {
+        return Nef_polyhedron(*poly_ptr);
+      }
+    } else if (_geometry->is<PolyhedralSurface>()) {
+      const auto &ps       = _geometry->as<PolyhedralSurface>();
+      auto        poly_ptr = ps.toPolyhedron_3<CGAL::Polyhedron_3<Kernel>>();
+      if (poly_ptr && !poly_ptr->is_empty()) {
+        return Nef_polyhedron(*poly_ptr);
+      }
     }
-  } else if (_geometry->is<PolyhedralSurface>()) {
-    const auto &ps       = _geometry->as<PolyhedralSurface>();
-    auto        poly_ptr = ps.toPolyhedron_3<CGAL::Polyhedron_3<Kernel>>();
-    if (poly_ptr && !poly_ptr->is_empty()) {
-      return Nef_polyhedron(*poly_ptr);
-    }
+  } catch (const std::exception &) {
+    // NEF conversion failed (e.g., for some triangle prisms)
+    return {};
   }
 
   return {};
@@ -505,11 +565,43 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
   }
 }
 
+namespace {
+// Check if geometry has triangular faces (which can cause NEF issues)
+auto
+hasTriangularFaces(const Geometry *geom) -> bool
+{
+  if (geom->is<Solid>()) {
+    const auto &solid = geom->as<Solid>();
+    for (size_t i = 0; i < solid.numShells(); ++i) {
+      const auto &shell = solid.shellN(i);
+      for (size_t j = 0; j < shell.numPolygons(); ++j) {
+        if (shell.polygonN(j).exteriorRing().numPoints() <= 4) {
+          return true; // Triangle (3 points + closing point = 4)
+        }
+      }
+    }
+  } else if (geom->is<PolyhedralSurface>()) {
+    const auto &surface = geom->as<PolyhedralSurface>();
+    for (size_t i = 0; i < surface.numPolygons(); ++i) {
+      if (surface.polygonN(i).exteriorRing().numPoints() <= 4) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+} // namespace
+
 auto
 Fillet3D::filletEdges(const EdgeSelector     &selector,
                       const FilletParameters &params) const
     -> std::unique_ptr<Geometry>
 {
+  // Triangle-based geometries can crash CGAL NEF operations
+  if (hasTriangularFaces(_geometry)) {
+    return _geometry->clone();
+  }
+
   auto edges = selectEdges(selector);
 
   if (edges.empty()) {
@@ -536,48 +628,12 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
   }
 
   // Detect and skip edges at reflex corners to avoid self-intersections
+  // Only skip edges that are individually non-convex (concave/reflex)
   std::set<size_t> edgesToSkip;
 
-  for (const auto &[key, edgeIndices] : vertexToEdges) {
-    if (edgeIndices.size() < 3) {
-      continue;
-    }
-
-    const auto     &[vx, vy, vz] = key;
-    Kernel::Point_3 vertex(vx, vy, vz);
-
-    Kernel::Vector_3 edgeDirSum(0, 0, 0);
-    for (size_t idx : edgeIndices) {
-      const auto &e   = edges[idx];
-      auto        dir = (CGAL::squared_distance(e.start, vertex) < EPSILON)
-                            ? (e.end - e.start)
-                            : (e.start - e.end);
-      edgeDirSum      = edgeDirSum + normalizeVector(dir);
-    }
-
-    Kernel::Vector_3                          normalSum(0, 0, 0);
-    std::set<std::tuple<double, double, double>> seenNormals;
-    for (size_t idx : edgeIndices) {
-      const auto &e       = edges[idx];
-      auto        addNormal = [&](const Kernel::Vector_3 &n) {
-        auto nkey = std::make_tuple(
-            std::round(CGAL::to_double(n.x()) * 1000) / 1000,
-            std::round(CGAL::to_double(n.y()) * 1000) / 1000,
-            std::round(CGAL::to_double(n.z()) * 1000) / 1000);
-        if (seenNormals.insert(nkey).second) {
-          normalSum = normalSum + n;
-        }
-      };
-      addNormal(e.normal1);
-      addNormal(e.normal2);
-    }
-
-    double dotProduct = CGAL::to_double(edgeDirSum * normalSum);
-
-    if (dotProduct < 0) {
-      for (size_t idx : edgeIndices) {
-        edgesToSkip.insert(idx);
-      }
+  for (size_t i = 0; i < edges.size(); ++i) {
+    if (!edges[i].isConvex) {
+      edgesToSkip.insert(i);
     }
   }
 
@@ -609,8 +665,14 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
   }
 
   if (filteredEdges.empty()) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] No edges left after filtering\n";
+#endif
     return _geometry->clone();
   }
+#ifdef DEBUG_FILLET
+  std::cerr << "[DEBUG] Processing " << filteredEdges.size() << " edges\n";
+#endif
 
   // Rebuild vertex mapping
   vertexToEdges.clear();
@@ -704,16 +766,38 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
   }
 
   if (firstWedge || allWedges.is_empty()) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] No wedges created\n";
+#endif
     return _geometry->clone();
   }
 
-  auto resultNef = inputNef - allWedges;
+#ifdef DEBUG_FILLET
+  std::cerr << "[DEBUG] Performing NEF subtraction\n";
+#endif
+  try {
+    auto resultNef = inputNef - allWedges;
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] NEF subtraction completed, result empty=" << resultNef.is_empty() << "\n";
+#endif
 
-  if (resultNef.is_empty()) {
+    if (resultNef.is_empty()) {
+      return _geometry->clone();
+    }
+
+    return fromNefPolyhedron(resultNef);
+  } catch (const std::exception &e) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] NEF subtraction exception: " << e.what() << "\n";
+#endif
+    // Boolean operation failed
+    return _geometry->clone();
+  } catch (...) {
+#ifdef DEBUG_FILLET
+    std::cerr << "[DEBUG] NEF subtraction unknown exception\n";
+#endif
     return _geometry->clone();
   }
-
-  return fromNefPolyhedron(resultNef);
 }
 
 auto

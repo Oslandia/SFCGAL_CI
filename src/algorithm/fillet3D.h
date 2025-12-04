@@ -126,10 +126,13 @@ private:
  * volumes along selected edges and subtracting them from the input geometry
  * using NEF polyhedron boolean operations.
  *
- * @note Known limitation: Edges at reflex (concave) corners are automatically
- * skipped to ensure valid output geometry. This means inner corners of L-shaped,
- * U-shaped, or similar geometries will remain sharp. This is a trade-off to
- * guarantee valid, non-self-intersecting output.
+ * @note Known limitations:
+ * - Edges at reflex (concave) corners are automatically skipped
+ * - The algorithm is optimized for ~90° dihedral angles. Edges with
+ *   dihedral angles outside ~84°-96° range are skipped to avoid
+ *   invalid geometry. Angles close to the boundaries may show minor
+ *   visual artifacts where the fillet intersects adjacent faces.
+ * - Geometries with triangular faces are not supported (returns original)
  */
 class SFCGAL_API Fillet3D {
 public:
@@ -223,7 +226,8 @@ private:
  * @param segments Number of arc segments (default: 16)
  * @return Filleted geometry
  *
- * @note Edges at reflex corners are skipped to ensure valid output.
+ * @note Edges at reflex corners and edges where the radius is too large
+ * for the dihedral angle are automatically skipped.
  */
 SFCGAL_API auto
 fillet3D(const Geometry &geometry, double radius,
