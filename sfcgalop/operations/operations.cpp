@@ -610,22 +610,61 @@ const std::vector<Operation> operations = {
 
     {"buffer3d", "Construction", "Create a 3D buffer around points and lines",
      false,
-     "Parameters:\n  radius=VALUE: Buffer radius (default: 1.0)\n\nNote: "
-     "Segments are fixed at 16\nOnly works with Point and LineString "
-     "geometries\n\nExample:\n  sfcgalop -a \"POINT(0 0 0)\" buffer3d "
-     "\"radius=2.5\"",
+     "Parameters:\n"
+     "  radius=VALUE: Buffer radius (default: 1.0)\n"
+     "  segments=N: Number of segments for curved surfaces (default: 16)\n"
+     "  type=TYPE: Buffer type - round, cylsphere, or flat (default: round)\n\n"
+     "Buffer types:\n"
+     "  round     - Minkowski sum with a sphere (smooth result)\n"
+     "  cylsphere - Union of cylinders and spheres (faster)\n"
+     "  flat      - Construction using disk on bisector plane\n\n"
+     "Only works with Point and LineString geometries.\n\n"
+     "Examples:\n"
+     "  sfcgalop -a \"POINT(0 0 0)\" buffer3d \"radius=2.5\"\n"
+     "  sfcgalop -a \"LINESTRING Z(0 0 0,1 1 1)\" buffer3d "
+     "\"radius=0.5,type=cylsphere\"\n"
+     "  sfcgalop -a \"LINESTRING Z(0 0 0,1 0 0,1 1 0)\" buffer3d "
+     "\"radius=0.3,segments=32,type=flat\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
        auto   params   = parse_params(args);
        double radius   = params.count("radius") ? params["radius"] : 1.0;
-       int    segments = 16; // default segments
+       int    segments = static_cast<int>(
+           params.count("segments") ? params["segments"] : 16);
+
+       // Parse buffer type from string
+       SFCGAL::algorithm::Buffer3D::BufferType bufferType =
+           SFCGAL::algorithm::Buffer3D::ROUND;
+
+       // Check for type parameter in the args string
+       if (args.find("type=") != std::string::npos) {
+         size_t type_pos = args.find("type=");
+         size_t start    = type_pos + 5; // length of "type="
+         size_t end      = args.find(',', start);
+         if (end == std::string::npos) {
+           end = args.length();
+         }
+         std::string type_str = args.substr(start, end - start);
+         // Trim and convert to lowercase
+         type_str = trim(type_str);
+         std::transform(type_str.begin(), type_str.end(), type_str.begin(),
+                        [](unsigned char c) { return std::tolower(c); });
+
+         if (type_str == "cylsphere" || type_str == "cyl" ||
+             type_str == "cylinder") {
+           bufferType = SFCGAL::algorithm::Buffer3D::CYLSPHERE;
+         } else if (type_str == "flat" || type_str == "disk") {
+           bufferType = SFCGAL::algorithm::Buffer3D::FLAT;
+         }
+         // else keep ROUND as default
+       }
 
        try {
          SFCGAL::algorithm::Buffer3D buffer(*geom_a, radius, segments);
-         return buffer.compute(SFCGAL::algorithm::Buffer3D::ROUND);
-       } catch (const std::exception &) {
-         // Buffer3D only works for Point and LineString
+         return buffer.compute(bufferType);
+       } catch (const std::exception &e) {
+         std::cerr << "buffer3d error: " << e.what() << "\n";
          return std::nullopt;
        }
      }},
