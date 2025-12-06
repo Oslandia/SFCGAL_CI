@@ -251,11 +251,14 @@ public:
 
   /**
    * closes the LineString
+   * If the linestring is already closed, it remains unchanged
    */
   void
   closes()
   {
-    _points.push_back(_points.front()->clone());
+    if (!isClosed()) {
+      _points.push_back(_points.front()->clone());
+    }
   }
 
   //-- iterators

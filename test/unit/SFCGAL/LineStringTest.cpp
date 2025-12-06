@@ -146,6 +146,26 @@ BOOST_AUTO_TEST_CASE(testIsClosed_noClosed)
   g.addPoint(Point(1.0, 1.0));
   BOOST_CHECK(!g.isClosed());
 }
+
+BOOST_AUTO_TEST_CASE(testCloses)
+{
+  LineString line;
+  line.addPoint(Point(0.0, 0.0));
+  line.addPoint(Point(1.0, 0.0));
+  line.addPoint(Point(1.0, 1.0));
+  BOOST_CHECK_EQUAL(line.numPoints(), 3);
+  BOOST_CHECK(!line.isClosed());
+
+  line.closes();
+  BOOST_CHECK_EQUAL(line.numPoints(), 4);
+  BOOST_CHECK(line.isClosed());
+
+  // call it a second, linestring is unchanged
+  line.closes();
+  BOOST_CHECK_EQUAL(line.numPoints(), 4);
+  BOOST_CHECK(line.isClosed());
+}
+
 BOOST_AUTO_TEST_CASE(testIsClosed_triangle)
 {
   LineString g;
