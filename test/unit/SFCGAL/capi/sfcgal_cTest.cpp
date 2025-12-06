@@ -826,6 +826,32 @@ BOOST_AUTO_TEST_CASE(testCovers)
   BOOST_CHECK(sfcgal_geometry_covers(multiPolygon1.get(), multiPolygon2.get()));
 }
 
+BOOST_AUTO_TEST_CASE(testLinestring)
+{
+  // an empty line is closed
+  SfcgalUniquePtr line(sfcgal_linestring_create());
+  BOOST_CHECK(sfcgal_geometry_is_empty(line.get()));
+  BOOST_CHECK(sfcgal_geometry_is_closed(line.get()));
+
+  sfcgal_linestring_add_point(line.get(),
+                              sfcgal_point_create_from_xyz(2.3, -1.2, 4.5));
+  sfcgal_linestring_add_point(line.get(),
+                              sfcgal_point_create_from_xyz(5.3, 2.2, -2.5));
+  sfcgal_linestring_add_point(line.get(),
+                              sfcgal_point_create_from_xyz(1.3, 7.2, 3.5));
+  BOOST_CHECK_EQUAL(sfcgal_linestring_num_points(line.get()), 3);
+  BOOST_CHECK(!sfcgal_geometry_is_closed(line.get()));
+
+  sfcgal_linestring_closes(line.get());
+  BOOST_CHECK(sfcgal_geometry_is_closed(line.get()));
+  BOOST_CHECK_EQUAL(sfcgal_linestring_num_points(line.get()), 4);
+
+  // second call does nothing
+  sfcgal_linestring_closes(line.get());
+  BOOST_CHECK(sfcgal_geometry_is_closed(line.get()));
+  BOOST_CHECK_EQUAL(sfcgal_linestring_num_points(line.get()), 4);
+}
+
 BOOST_AUTO_TEST_CASE(testLineSubstring)
 {
   sfcgal_set_error_handlers(printf, on_error);

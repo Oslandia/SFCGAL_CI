@@ -597,6 +597,14 @@ sfcgal_linestring_add_point(sfcgal_geometry_t *linestring,
                             sfcgal_geometry_t *point);
 
 /**
+ * Closes the SCGAL::LineString if it is not already closed
+ * @param linestring the input SFCGAL::LineString to close
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_linestring_closes(sfcgal_geometry_t *linestring);
+
+/**
  * Creates an empty SFCGAL::Triangle
  * @return an empty SFCGAL::Triangle
  * @ingroup capi

@@ -760,6 +760,13 @@ sfcgal_linestring_add_point(sfcgal_geometry_t *geom, sfcgal_geometry_t *point)
           down_cast<SFCGAL::Point>(point));)
 }
 
+extern "C" void
+sfcgal_linestring_closes(sfcgal_geometry_t *linestring)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      down_cast<SFCGAL::LineString>(linestring)->closes();)
+}
+
 /**
  * Triangle
  */
