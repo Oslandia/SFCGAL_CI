@@ -93,9 +93,10 @@ typedef enum {
 
   SFCGAL_TYPE_NURBSCURVE = 21,
 
+  SFCGAL_TYPE_SOLID = 25,
+
   //-- not official codes
-  SFCGAL_TYPE_SOLID      = 101,
-  SFCGAL_TYPE_MULTISOLID = 102
+  SFCGAL_TYPE_MULTISOLID = 26
 } sfcgal_geometry_type_t;
 
 /**
