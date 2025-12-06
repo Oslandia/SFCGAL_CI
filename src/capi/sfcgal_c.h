@@ -702,6 +702,20 @@ SFCGAL_API sfcgal_geometry_t *
 sfcgal_polygon_create_from_exterior_ring(sfcgal_geometry_t *ring);
 
 /**
+ * Sets the exterior ring of a given SFCGAL::Polygon
+ * @param polygon the input geometry
+ * @param ring the new exterior ring
+ * @pre polygon must be a SFCGAL::Polygon
+ * @pre ring must be a SFCGAL::LineString
+ * @post the ownership of the given ring is taken. The caller is not responsible
+ * anymore of its deallocation
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_polygon_set_exterior_ring(sfcgal_geometry_t *polygon,
+                                 sfcgal_geometry_t *ring);
+
+/**
  * Returns the exterior ring of a given SFCGAL::Polygon
  * @param polygon the input geometry
  * @pre polygon must be a SFCGAL::Polygon

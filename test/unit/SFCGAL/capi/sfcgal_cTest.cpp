@@ -31,6 +31,22 @@ on_error(const char * /*msg*/, ...) -> int
   return 0;
 }
 
+//! Call sfcgal_geometry_delete when using a sfcgal_geometry_t unique_ptr
+struct SfcgalDeleter {
+  /// @brief Automatically delete a sfcgal geometry pointer
+  /// @param geometry the geometry to delete
+  void
+  operator()(sfcgal_geometry_t *geometry) const
+  {
+    if (geometry != nullptr) {
+      sfcgal_geometry_delete(geometry);
+    }
+  }
+};
+
+//! sfcgal_geometry_t unique_ptr
+using SfcgalUniquePtr = std::unique_ptr<sfcgal_geometry_t, SfcgalDeleter>;
+
 BOOST_AUTO_TEST_CASE(testEmpty)
 {
   sfcgal_set_error_handlers(printf, on_error);
@@ -825,6 +841,44 @@ BOOST_AUTO_TEST_CASE(testLineSubstring)
   BOOST_CHECK(sfcgal_geometry_covers_3d(subLine, line2.get()));
 
   sfcgal_geometry_delete(subLine);
+}
+
+BOOST_AUTO_TEST_CASE(testPolygon)
+{
+  SfcgalUniquePtr polygon(sfcgal_polygon_create());
+  BOOST_CHECK(sfcgal_geometry_is_empty(polygon.get()));
+  BOOST_CHECK(
+      sfcgal_geometry_is_empty(sfcgal_polygon_exterior_ring(polygon.get())));
+
+  std::unique_ptr<Geometry> exteriorRing(
+      io::readWkt("LINESTRING (0 0, 10 0, 10 10)"));
+  BOOST_CHECK(sfcgal_geometry_is_valid(exteriorRing.get()));
+  BOOST_CHECK(!sfcgal_geometry_is_empty(exteriorRing.get()));
+  sfcgal_polygon_set_exterior_ring(polygon.get(),
+                                   exteriorRing->clone().release());
+  BOOST_CHECK(sfcgal_geometry_covers(
+      exteriorRing.get(), sfcgal_polygon_exterior_ring(polygon.get())));
+
+  std::vector<std::string> interiorWkts = {
+      "LINESTRING (2 2, 4 2, 4 4, 2 4, 2 2)",
+      "LINESTRING (2 2, 4 2, 4 4, 2 4, 2 2)"};
+  std::vector<std::unique_ptr<Geometry>> interiorRings;
+  for (const auto &wkt : interiorWkts) {
+    std::unique_ptr<Geometry> ring = io::readWkt(wkt);
+    BOOST_CHECK(sfcgal_geometry_is_valid(ring.get()));
+    BOOST_CHECK(!sfcgal_geometry_is_empty(ring.get()));
+    sfcgal_polygon_add_interior_ring(polygon.get(), ring->clone().release());
+    interiorRings.push_back(std::move(ring));
+  }
+
+  BOOST_CHECK_EQUAL(sfcgal_polygon_num_interior_rings(polygon.get()),
+                    interiorRings.size());
+  for (unsigned int i = 0; i < sfcgal_polygon_num_interior_rings(polygon.get());
+       ++i) {
+    BOOST_CHECK(sfcgal_geometry_covers(
+        interiorRings[i].get(),
+        sfcgal_polygon_interior_ring_n(polygon.get(), i)));
+  }
 }
 
 BOOST_AUTO_TEST_CASE(testTriangle)

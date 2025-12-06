@@ -836,6 +836,15 @@ sfcgal_polygon_create_from_exterior_ring(sfcgal_geometry_t *ring)
                  new SFCGAL::Polygon(down_cast<SFCGAL::LineString>(ring)));)
 }
 
+extern "C" void
+sfcgal_polygon_set_exterior_ring(sfcgal_geometry_t *polygon,
+                                 sfcgal_geometry_t *ring)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      down_cast<SFCGAL::Polygon>(polygon)->setExteriorRing(
+          down_cast<SFCGAL::LineString>(ring));)
+}
+
 extern "C" auto
 sfcgal_polygon_exterior_ring(const sfcgal_geometry_t *geom)
     -> const sfcgal_geometry_t *
