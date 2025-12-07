@@ -73,6 +73,8 @@ WkbReader::readInnerLineString() -> LineString
   SFCGAL::LineString result;
   try {
     const uint32_t numPoints{read<uint32_t>()};
+    // Validate coordinate count to prevent memory exhaustion
+    checkCoordinateCount(numPoints);
     for (uint32_t i = 0; i < numPoints; ++i) {
       result.addPoint(readInnerPoint());
     }
@@ -92,6 +94,8 @@ WkbReader::readInnerPolygon() -> Polygon
   SFCGAL::Polygon result;
   try {
     const uint32_t numRings{read<uint32_t>()};
+    // Validate element count to prevent memory exhaustion
+    checkElementCount(numRings, "rings");
     for (uint32_t i = 0; i < numRings; ++i) {
       SFCGAL::LineString const ls{readInnerLineString()};
 
@@ -142,6 +146,8 @@ WkbReader::readInnerMultiGeometries() -> M
   M result;
   try {
     const uint32_t numGeoms{read<uint32_t>()};
+    // Validate element count to prevent memory exhaustion
+    checkElementCount(numGeoms, "geometries");
     for (uint32_t i = 0; i < numGeoms; ++i) {
       readWkb();
       G geom{_geometry->template as<G>()};
@@ -163,6 +169,8 @@ WkbReader::readInnerGeometryCollection() -> GeometryCollection
   SFCGAL::GeometryCollection result;
   try {
     const uint32_t numGeoms{read<uint32_t>()};
+    // Validate element count to prevent memory exhaustion
+    checkElementCount(numGeoms, "geometries in collection");
     for (uint32_t i = 0; i < numGeoms; ++i) {
       readWkb();
       if (_geometry != nullptr) {
@@ -185,6 +193,8 @@ WkbReader::readInnerTriangulatedSurface() -> TriangulatedSurface
   SFCGAL::TriangulatedSurface result;
   try {
     const uint32_t numGeoms{read<uint32_t>()};
+    // Validate element count to prevent memory exhaustion
+    checkElementCount(numGeoms, "triangles");
     for (uint32_t i = 0; i < numGeoms; ++i) {
       readWkb();
       if (_geometry != nullptr) {
@@ -208,6 +218,8 @@ WkbReader::readInnerPolyhedralSurface() -> PolyhedralSurface
   std::vector<Polygon> geoms;
   try {
     const uint32_t numGeoms{read<uint32_t>()};
+    // Validate element count to prevent memory exhaustion
+    checkElementCount(numGeoms, "polygons in surface");
     for (uint32_t i = 0; i < numGeoms; ++i) {
       readWkb();
       if (_geometry != nullptr) {
@@ -231,6 +243,8 @@ WkbReader::readInnerSolid() -> Solid
   std::vector<PolyhedralSurface> geoms;
   try {
     const uint32_t numGeoms{read<uint32_t>()};
+    // Validate element count to prevent memory exhaustion
+    checkElementCount(numGeoms, "shells in solid");
     for (uint32_t i = 0; i < numGeoms; ++i) {
       readWkb();
       if (_geometry != nullptr) {
@@ -272,6 +286,10 @@ WkbReader::readInnerNURBSCurve() -> NURBSCurve
                      numControlPoints % (degree + 1))
                         .str()));
     }
+
+    // Validate element and coordinate counts to prevent memory exhaustion
+    checkElementCount(numControlPoints, "NURBS control points");
+    checkCoordinateCount(numControlPoints);
 
     std::vector<Point>          controlPoints;
     std::vector<NURBSCurve::FT> weights;
