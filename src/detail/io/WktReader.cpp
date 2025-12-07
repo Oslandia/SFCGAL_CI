@@ -46,6 +46,19 @@ WktReader::readSRID() -> srid_t
 auto
 WktReader::readGeometry() -> Geometry *
 {
+  // Check recursion depth to prevent stack overflow (CWE-674)
+  if (_recursionDepth >= MAX_RECURSION_DEPTH) {
+    BOOST_THROW_EXCEPTION(
+        WktParseException("WktReader: maximum recursion depth exceeded"));
+  }
+
+  // RAII guard to ensure depth is decremented on exit
+  struct RecursionGuard {
+    int &depth;
+    RecursionGuard(int &d) : depth(d) { ++depth; }
+    ~RecursionGuard() { --depth; }
+  } guard(_recursionDepth);
+
   GeometryType const geometryType = readGeometryType();
   _is3D                           = _reader.imatch("Z");
   _isMeasured                     = _reader.imatch("M");

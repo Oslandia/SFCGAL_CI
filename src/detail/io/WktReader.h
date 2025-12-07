@@ -31,6 +31,12 @@ namespace SFCGAL::detail::io {
 class SFCGAL_API WktReader {
 public:
   /**
+   * Maximum recursion depth to prevent stack overflow attacks (CWE-674).
+   * Matches GDAL's limit of 32 levels.
+   */
+  static constexpr int MAX_RECURSION_DEPTH = 32;
+
+  /**
    * Constructor: read WKT from input stream
    *
    * @param inputStream input stream from which WKT will be read
@@ -232,6 +238,10 @@ private:
    * actually reading Measured ?
    */
   bool _isMeasured;
+  /**
+   * Current recursion depth for nested geometry collections
+   */
+  int _recursionDepth = 0;
 
   /**
    * returns default parse error message
