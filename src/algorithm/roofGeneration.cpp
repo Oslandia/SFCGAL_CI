@@ -56,6 +56,112 @@ namespace SFCGAL::algorithm {
 namespace {
 
 /**
+ * @brief Orient a PolyhedralSurface to have consistent face orientations
+ * Uses CGAL's Surface_mesh and polygon mesh processing to fix orientations
+ */
+auto
+orientPolyhedralSurface(PolyhedralSurface &surface) -> void
+{
+  if (surface.numPatches() == 0) {
+    return;
+  }
+
+  // Convert to polygon soup
+  using PointK = CGAL::Point_3<Kernel>;
+  using SurfaceMesh = CGAL::Surface_mesh<PointK>;
+
+  std::vector<PointK>              points;
+  std::vector<std::vector<size_t>> polygons;
+  std::map<Coordinate, size_t>     coordToIndex;
+
+  auto getPointIndex = [&](const Point &pt) -> size_t {
+    Coordinate coord = pt.coordinate();
+    auto       it    = coordToIndex.find(coord);
+    if (it != coordToIndex.end()) {
+      return it->second;
+    }
+    size_t idx = points.size();
+    points.emplace_back(pt.x(), pt.y(), pt.z());
+    coordToIndex[coord] = idx;
+    return idx;
+  };
+
+  for (size_t i = 0; i < surface.numPatches(); ++i) {
+    const auto &patch = surface.patchN(i);
+    if (const auto *triangle = dynamic_cast<const Triangle *>(&patch)) {
+      std::vector<size_t> indices;
+      indices.push_back(getPointIndex(triangle->vertex(0)));
+      indices.push_back(getPointIndex(triangle->vertex(1)));
+      indices.push_back(getPointIndex(triangle->vertex(2)));
+      polygons.push_back(indices);
+    } else {
+      const auto         &ring = patch.exteriorRing();
+      std::vector<size_t> indices;
+      for (size_t j = 0; j < ring.numPoints() - 1; ++j) {
+        indices.push_back(getPointIndex(ring.pointN(j)));
+      }
+      polygons.push_back(indices);
+    }
+  }
+
+  // Orient the polygon soup to be orientable
+  bool orientable =
+      CGAL::Polygon_mesh_processing::orient_polygon_soup(points, polygons);
+
+  if (!orientable) {
+    return; // Surface is not orientable, keep original
+  }
+
+  // Try to convert to Surface_mesh for better orientation
+  SurfaceMesh mesh;
+  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points,
+                                                              polygons,
+                                                              mesh);
+
+  if (CGAL::is_valid_polygon_mesh(mesh)) {
+    // Orient to have consistent outward normals
+    CGAL::Polygon_mesh_processing::orient(mesh);
+
+    // Convert back to PolyhedralSurface
+    surface = PolyhedralSurface();
+    for (auto face : mesh.faces()) {
+      std::vector<Point> pts;
+      for (auto vd : mesh.vertices_around_face(mesh.halfedge(face))) {
+        const auto &pt = mesh.point(vd);
+        pts.emplace_back(pt.x(), pt.y(), pt.z());
+      }
+      if (pts.size() == 3) {
+        surface.addPatch(Triangle(pts[0], pts[1], pts[2]));
+      } else {
+        pts.push_back(pts[0]); // Close the ring
+        surface.addPatch(Polygon(LineString(pts)));
+      }
+    }
+  } else {
+    // Fallback: rebuild from oriented soup
+    surface = PolyhedralSurface();
+    for (const auto &polyIndices : polygons) {
+      if (polyIndices.size() == 3) {
+        surface.addPatch(Triangle(
+            Point(points[polyIndices[0]].x(), points[polyIndices[0]].y(),
+                  points[polyIndices[0]].z()),
+            Point(points[polyIndices[1]].x(), points[polyIndices[1]].y(),
+                  points[polyIndices[1]].z()),
+            Point(points[polyIndices[2]].x(), points[polyIndices[2]].y(),
+                  points[polyIndices[2]].z())));
+      } else {
+        std::vector<Point> pts;
+        for (size_t idx : polyIndices) {
+          pts.emplace_back(points[idx].x(), points[idx].y(), points[idx].z());
+        }
+        pts.push_back(pts[0]); // Close the ring
+        surface.addPatch(Polygon(LineString(pts)));
+      }
+    }
+  }
+}
+
+/**
  * @brief Squared perpendicular distance from a point to a 2D line
  */
 auto
@@ -185,11 +291,23 @@ createSlopedSurfaceVertices(const Polygon &footprint, const Point &ridgeStart,
 }
 
 /**
+ * @brief Compute polygon centroid (2D)
+ */
+auto
+computePolygonCentroid2D(const Polygon &polygon) -> Point_2
+{
+  const auto            &ring = polygon.exteriorRing();
+  std::vector<Point_2> points;
+  points.reserve(ring.numPoints() - 1);
+  for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
+    points.emplace_back(ring.pointN(i).x(), ring.pointN(i).y());
+  }
+  return CGAL::centroid(points.begin(), points.end(), CGAL::Dimension_tag<0>());
+}
+
+/**
  * @brief Create vertical faces connecting base polygon to elevated roof
- * @param footprint The building footprint polygon
- * @param elevatedVertices The elevated vertices of the roof
- * @param addVerticalFaces Whether to add vertical faces
- * @return Vector of geometry patches representing vertical faces
+ * with proper face orientations (normals pointing outward)
  */
 auto
 createVerticalFaces(const Polygon            &footprint,
@@ -206,40 +324,107 @@ createVerticalFaces(const Polygon            &footprint,
   const auto &exteriorRing = footprint.exteriorRing();
   size_t      numPoints    = exteriorRing.numPoints();
 
-  // Create vertical faces for each edge when there is meaningful height
-  // difference
+  // Get polygon centroid for orientation check
+  Point_2 polyCentroid = computePolygonCentroid2D(footprint);
+
   for (size_t i = 0; i < numPoints - 1; ++i) {
     size_t nextI = (i + 1) % (numPoints - 1);
 
     // Base edge points (at z=0)
     const auto &baseVertex1 = exteriorRing.pointN(i);
     const auto &baseVertex2 = exteriorRing.pointN(nextI);
-    auto        basePt1     = Point(baseVertex1.x(), baseVertex1.y(), 0.0);
-    auto        basePt2     = Point(baseVertex2.x(), baseVertex2.y(), 0.0);
+    Kernel::FT  zBase(0);
+    Point       basePt1(baseVertex1.x(), baseVertex1.y(), zBase);
+    Point       basePt2(baseVertex2.x(), baseVertex2.y(), zBase);
 
     // Corresponding elevated points on the roof
-    auto roofPt1 = elevatedVertices[i];
-    auto roofPt2 = elevatedVertices[nextI];
+    Point roofPt1 = elevatedVertices[i];
+    Point roofPt2 = elevatedVertices[nextI];
 
     // Check if there's height difference for this edge
-    bool hasHeightDiff1 = (roofPt1.z() - basePt1.z()) != 0;
-    bool hasHeightDiff2 = (roofPt2.z() - basePt2.z()) != 0;
+    bool hasHeightDiff1 = roofPt1.z() != zBase;
+    bool hasHeightDiff2 = roofPt2.z() != zBase;
+
+    if (!hasHeightDiff1 && !hasHeightDiff2) {
+      continue; // No height difference, skip
+    }
+
+    // Helper to check if vertices need reversal for outward normal
+    auto needsReversal = [&polyCentroid](const Point &pt1, const Point &pt2,
+                                          const Point &pt3) -> bool {
+      // Face centroid
+      Kernel::FT faceCentroidX =
+          (pt1.x() + pt2.x() + pt3.x()) / Kernel::FT(3);
+      Kernel::FT faceCentroidY =
+          (pt1.y() + pt2.y() + pt3.y()) / Kernel::FT(3);
+
+      // Outward direction from polygon centroid
+      Kernel::FT outwardX = faceCentroidX - polyCentroid.x();
+      Kernel::FT outwardY = faceCentroidY - polyCentroid.y();
+
+      // Compute face normal
+      Vector_3 edge1(pt2.x() - pt1.x(), pt2.y() - pt1.y(), pt2.z() - pt1.z());
+      Vector_3 edge2(pt3.x() - pt1.x(), pt3.y() - pt1.y(), pt3.z() - pt1.z());
+      Vector_3 normal = CGAL::cross_product(edge1, edge2);
+
+      // Check orientation (XY dot product)
+      return normal.x() * outwardX + normal.y() * outwardY < Kernel::FT(0);
+    };
 
     if (hasHeightDiff1 && hasHeightDiff2) {
-      // Both points have height difference - create quadrilateral face
-      std::vector<Point> verticalFace = {basePt1, basePt2, roofPt2, roofPt1,
-                                         basePt1};
-      faces.push_back(std::make_unique<Polygon>(LineString(verticalFace)));
-    } else if (hasHeightDiff1 && !hasHeightDiff2) {
-      // Only point 1 has height difference - create triangular face
-      std::vector<Point> triangularFace = {basePt1, roofPt1, basePt2, basePt1};
-      faces.push_back(std::make_unique<Polygon>(LineString(triangularFace)));
-    } else if (!hasHeightDiff1 && hasHeightDiff2) {
-      // Only point 2 has height difference - create triangular face
-      std::vector<Point> triangularFace = {basePt1, basePt2, roofPt2, basePt1};
-      faces.push_back(std::make_unique<Polygon>(LineString(triangularFace)));
+      // Quadrilateral face: split into two triangles for planarity
+      // Use consistent orientation for both triangles based on quad centroid
+      Kernel::FT quadCentroidX =
+          (basePt1.x() + basePt2.x() + roofPt2.x() + roofPt1.x()) /
+          Kernel::FT(4);
+      Kernel::FT quadCentroidY =
+          (basePt1.y() + basePt2.y() + roofPt2.y() + roofPt1.y()) /
+          Kernel::FT(4);
+      Kernel::FT outwardX = quadCentroidX - polyCentroid.x();
+      Kernel::FT outwardY = quadCentroidY - polyCentroid.y();
+
+      // Compute normal for the first triangle
+      Vector_3 edge1(basePt2.x() - basePt1.x(), basePt2.y() - basePt1.y(),
+                     basePt2.z() - basePt1.z());
+      Vector_3 edge2(roofPt1.x() - basePt1.x(), roofPt1.y() - basePt1.y(),
+                     roofPt1.z() - basePt1.z());
+      Vector_3 normal = CGAL::cross_product(edge1, edge2);
+      bool     reverse = normal.x() * outwardX + normal.y() * outwardY <
+                     Kernel::FT(0);
+
+      if (!reverse) {
+        // CCW order: basePt1 -> basePt2 -> roofPt1
+        //            basePt2 -> roofPt2 -> roofPt1
+        faces.push_back(
+            std::make_unique<Triangle>(basePt1, basePt2, roofPt1));
+        faces.push_back(
+            std::make_unique<Triangle>(basePt2, roofPt2, roofPt1));
+      } else {
+        // CW order (reversed)
+        faces.push_back(
+            std::make_unique<Triangle>(basePt1, roofPt1, basePt2));
+        faces.push_back(
+            std::make_unique<Triangle>(basePt2, roofPt1, roofPt2));
+      }
+    } else if (hasHeightDiff1) {
+      // Triangle: basePt1, basePt2, roofPt1
+      if (!needsReversal(basePt1, basePt2, roofPt1)) {
+        faces.push_back(
+            std::make_unique<Triangle>(basePt1, basePt2, roofPt1));
+      } else {
+        faces.push_back(
+            std::make_unique<Triangle>(basePt1, roofPt1, basePt2));
+      }
+    } else {
+      // Triangle: basePt1, basePt2, roofPt2
+      if (!needsReversal(basePt1, basePt2, roofPt2)) {
+        faces.push_back(
+            std::make_unique<Triangle>(basePt1, basePt2, roofPt2));
+      } else {
+        faces.push_back(
+            std::make_unique<Triangle>(basePt1, roofPt2, basePt2));
+      }
     }
-    // If both points have no height difference, skip (would be degenerate)
   }
 
   return faces;
@@ -309,22 +494,123 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
   auto elevatedVertices =
       createSlopedSurfaceVertices(footprint, ridgeStart, ridgeEnd, slopeTan);
 
-  // Create the roof surface
+  // Create the roof surface using triangulation
+  // (necessary for non-convex polygons where a single face would be non-planar)
   auto roof = std::make_unique<PolyhedralSurface>();
 
-  // Create the sloped roof surface as a single polygon
-  if (elevatedVertices.size() >= 4) {
-    LineString elevatedRing(elevatedVertices);
-    Polygon    slopedSurface(elevatedRing);
-    roof->addPatch(slopedSurface);
+  // Triangulate the footprint
+  auto footprint_clone = footprint.clone();
+  SFCGAL::algorithm::force2D(*footprint_clone);
+  auto triangulation = SFCGAL::triangulate::triangulate2DZ(*footprint_clone);
+  auto triangulated_surface = triangulation.getTriangulatedSurface();
+
+  // Map from 2D to elevated Z
+  auto getElevatedZ = [&](const Point &pt) -> Kernel::FT {
+    double dist = distanceToLine2D(pt, ridgeStart, ridgeEnd);
+    return Kernel::FT(dist * slopeTan);
+  };
+
+  // Process each triangle and elevate vertices
+  for (size_t i = 0; i < triangulated_surface->numPatches(); ++i) {
+    const auto &patch = triangulated_surface->patchN(i);
+    if (const auto *triangle = dynamic_cast<const Triangle *>(&patch)) {
+      const auto &vertex1 = triangle->vertex(0);
+      const auto &vertex2 = triangle->vertex(1);
+      const auto &vertex3 = triangle->vertex(2);
+
+      Point newVertex1(vertex1.x(), vertex1.y(), getElevatedZ(vertex1));
+      Point newVertex2(vertex2.x(), vertex2.y(), getElevatedZ(vertex2));
+      Point newVertex3(vertex3.x(), vertex3.y(), getElevatedZ(vertex3));
+
+      // Ensure normal points upward (positive Z)
+      Vector_3 edge1(newVertex2.x() - newVertex1.x(),
+                     newVertex2.y() - newVertex1.y(),
+                     newVertex2.z() - newVertex1.z());
+      Vector_3 edge2(newVertex3.x() - newVertex1.x(),
+                     newVertex3.y() - newVertex1.y(),
+                     newVertex3.z() - newVertex1.z());
+      Vector_3 normal = CGAL::cross_product(edge1, edge2);
+
+      std::unique_ptr<Triangle> roofTriangle;
+      if (normal.z() >= Kernel::FT(0)) {
+        roofTriangle =
+            std::make_unique<Triangle>(newVertex1, newVertex2, newVertex3);
+      } else {
+        roofTriangle =
+            std::make_unique<Triangle>(newVertex1, newVertex3, newVertex2);
+      }
+      roof->addPatch(*roofTriangle);
+    }
   }
 
-  // Create vertical faces for proper roof closure
-  auto verticalFaces =
-      createVerticalFaces(footprint, elevatedVertices, addVerticalFaces);
-  for (const auto &face : verticalFaces) {
-    if (const auto *polygon = dynamic_cast<const Polygon *>(face.get())) {
-      roof->addPatch(*polygon);
+  // Create vertical faces from boundary edges for proper edge consistency
+  if (addVerticalFaces) {
+    // Collect all edges from roof triangles and find boundary edges (appear once)
+    using EdgeKey = std::pair<Coordinate, Coordinate>;
+    std::map<EdgeKey, int> edgeCounts;
+    std::map<EdgeKey, std::pair<Point, Point>> edgePoints;
+
+    auto normalizeEdge = [](const Point &pt1, const Point &pt2) -> EdgeKey {
+      Coordinate c1 = pt1.coordinate();
+      Coordinate c2 = pt2.coordinate();
+      return c1 < c2 ? EdgeKey(c1, c2) : EdgeKey(c2, c1);
+    };
+
+    // Count edge occurrences and store points
+    for (size_t i = 0; i < roof->numPatches(); ++i) {
+      const auto &patch = roof->patchN(i);
+      if (const auto *tri = dynamic_cast<const Triangle *>(&patch)) {
+        for (int e = 0; e < 3; ++e) {
+          const Point &pt1 = tri->vertex(e);
+          const Point &pt2 = tri->vertex((e + 1) % 3);
+          EdgeKey      key = normalizeEdge(pt1, pt2);
+          edgeCounts[key]++;
+          // Store the edge direction from the roof (for consistent orientation)
+          if (edgeCounts[key] == 1) {
+            edgePoints[key] = {pt1, pt2};
+          }
+        }
+      }
+    }
+
+    // Create vertical walls for boundary edges (count == 1) with height diff
+    for (const auto &entry : edgeCounts) {
+      if (entry.second != 1) {
+        continue; // Not a boundary edge
+      }
+
+      const auto &pts = edgePoints[entry.first];
+      Point roofPt1 = pts.first;
+      Point roofPt2 = pts.second;
+
+      // Get base points (z = 0)
+      Point basePt1(roofPt1.x(), roofPt1.y(), Kernel::FT(0));
+      Point basePt2(roofPt2.x(), roofPt2.y(), Kernel::FT(0));
+
+      bool hasHeight1 = roofPt1.z() != Kernel::FT(0);
+      bool hasHeight2 = roofPt2.z() != Kernel::FT(0);
+
+      if (!hasHeight1 && !hasHeight2) {
+        continue; // No vertical wall needed
+      }
+
+      // Create wall triangles with orientation matching the roof edge
+      // Roof edge goes roofPt1 -> roofPt2
+      // Wall should have edges going in opposite direction for consistency
+      if (hasHeight1 && hasHeight2) {
+        // Two triangles for the quadrilateral wall
+        // Triangle 1: basePt2 -> basePt1 -> roofPt1
+        // Triangle 2: basePt2 -> roofPt1 -> roofPt2
+        roof->addPatch(Triangle(basePt2, basePt1, roofPt1));
+        roof->addPatch(Triangle(basePt2, roofPt1, roofPt2));
+      } else if (hasHeight1) {
+        // Triangle: basePt2 -> basePt1 -> roofPt1
+        roof->addPatch(Triangle(basePt2, basePt1, roofPt1));
+      } else {
+        // Triangle: basePt2 -> basePt1 -> roofPt2
+        // But roofPt1 and basePt1 are at the same position
+        roof->addPatch(Triangle(basePt1, roofPt2, basePt2));
+      }
     }
   }
 
@@ -332,8 +618,10 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
   if (buildingHeight == 0.0) {
     // Roof only mode
     if (closeBase) {
-      // Add base polygon to create a closed solid
-      roof->addPatch(footprint);
+      // Add base polygon - reverse for downward normal
+      Polygon baseFace(footprint);
+      baseFace.reverse();
+      roof->addPatch(baseFace);
 
       auto solid = std::make_unique<Solid>(*roof);
       propagateValidityFlag(*solid, true);
