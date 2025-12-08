@@ -100,6 +100,13 @@ readBinaryPrepared(const std::string &str)
 } // namespace SFCGAL::io
 namespace boost::serialization {
 
+/**
+ * Maximum number of GMP limbs allowed during deserialization.
+ * This prevents memory exhaustion attacks via malicious serialized data.
+ * 1 million limbs = ~8MB on 64-bit systems (each limb is typically 8 bytes).
+ */
+static constexpr uint32_t MAX_GMP_LIMBS = 1'000'000;
+
 void
 save(boost::archive::text_oarchive &ar, const CGAL::Gmpz &z,
      const unsigned int /*version*/)
@@ -143,7 +150,14 @@ load(boost::archive::binary_iarchive &ar, CGAL::Gmpz &z,
   uint32_t rsize = 0;
   mpz_t   &mpz   = z.mpz();
   ar & size;
-  rsize         = size >= 0 ? size : -size;
+  rsize = size >= 0 ? size : -size;
+
+  // Validate size to prevent memory exhaustion attacks (CWE-400)
+  if (rsize > MAX_GMP_LIMBS) {
+    throw std::runtime_error(
+        "Serialization error: GMP number size exceeds maximum allowed");
+  }
+
   mpz->_mp_size = size;
   _mpz_realloc(mpz, rsize);
   uint32_t i = 0;
@@ -197,7 +211,14 @@ load(boost::archive::binary_iarchive &ar, mpz_class &z,
   uint32_t rsize = 0;
   mpz_ptr  mpz   = z.get_mpz_t();
   ar & size;
-  rsize         = size >= 0 ? size : -size;
+  rsize = size >= 0 ? size : -size;
+
+  // Validate size to prevent memory exhaustion attacks (CWE-400)
+  if (rsize > MAX_GMP_LIMBS) {
+    throw std::runtime_error(
+        "Serialization error: GMP number size exceeds maximum allowed");
+  }
+
   mpz->_mp_size = size;
   _mpz_realloc(mpz, rsize);
   uint32_t i = 0;
