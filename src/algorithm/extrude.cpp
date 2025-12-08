@@ -21,6 +21,7 @@
 
 #include "SFCGAL/Exception.h"
 
+#include "SFCGAL/algorithm/area.h"
 #include "SFCGAL/algorithm/force3D.h"
 #include "SFCGAL/algorithm/intersection.h"
 #include "SFCGAL/algorithm/isValid.h"
@@ -411,14 +412,17 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
     return std::make_unique<Solid>();
   }
 
+  // Normalize footprint to CCW orientation (positive signed area)
+  Polygon normalizedFootprint = footprint;
+  if (signedArea(normalizedFootprint.exteriorRing()) < 0) {
+    normalizedFootprint.reverse();
+  }
+
   std::unique_ptr<PolyhedralSurface> shell =
       std::make_unique<PolyhedralSurface>();
 
-  // 1. Add bottom face (footprint at z=0)
-  Polygon bottomFace = footprint;
-  force3D(bottomFace);
-  bottomFace.reverse(); // Normal pointing down (into solid)
-  shell->addPolygon(bottomFace);
+  // Note: Bottom face will be added later after collecting all boundary
+  // vertices
 
   // Helper to lift a 2D polygon to 3D using a plane
   auto liftPolygon = [](const Polygon               &poly2D,
@@ -473,7 +477,7 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
     // Intersect with footprint
     std::unique_ptr<Geometry> intersectionResult;
     try {
-      intersectionResult = intersection(footprint, roofPoly2D);
+      intersectionResult = intersection(normalizedFootprint, roofPoly2D);
     } catch (...) {
       continue;
     }
@@ -567,6 +571,9 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
     }
   }
 
+  // Collect oriented boundary edges
+  std::vector<std::pair<Point, Point>> boundaryEdges;
+
   for (const auto &[edge, count] : edgeCount) {
     if (count == 1) {
       // Boundary edge. Find orientation.
@@ -590,8 +597,119 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
       Point start = foundForward ? edgeStart : edgeEnd;
       Point end   = foundForward ? edgeEnd : edgeStart;
 
-      Point startBase(start.x(), start.y(), 0.0);
-      Point endBase(end.x(), end.y(), 0.0);
+      boundaryEdges.emplace_back(start, end);
+    }
+  }
+
+  if (boundaryEdges.empty()) {
+    return std::make_unique<Solid>();
+  }
+
+  // Build connected boundary loops from edges (handles multiple loops for holes)
+  std::vector<std::vector<std::pair<Point, Point>>> allLoops;
+
+  while (!boundaryEdges.empty()) {
+    std::vector<std::pair<Point, Point>> currentLoop;
+    currentLoop.push_back(boundaryEdges[0]);
+    boundaryEdges.erase(boundaryEdges.begin());
+
+    // Build connected loop
+    bool loopClosed = false;
+    while (!loopClosed && !boundaryEdges.empty()) {
+      Point currentEnd = currentLoop.back().second;
+      Point loopStart  = currentLoop.front().first;
+
+      // Check if loop is closed (using 2D comparison)
+      if (currentEnd.x() == loopStart.x() && currentEnd.y() == loopStart.y()) {
+        loopClosed = true;
+        break;
+      }
+
+      // Find edge starting at currentEnd
+      bool foundNext = false;
+      for (auto it = boundaryEdges.begin(); it != boundaryEdges.end(); ++it) {
+        if (it->first.x() == currentEnd.x() &&
+            it->first.y() == currentEnd.y()) {
+          currentLoop.push_back(*it);
+          boundaryEdges.erase(it);
+          foundNext = true;
+          break;
+        }
+      }
+      if (!foundNext) {
+        break;
+      }
+    }
+
+    if (!currentLoop.empty()) {
+      allLoops.push_back(std::move(currentLoop));
+    }
+  }
+
+  if (allLoops.empty()) {
+    return std::make_unique<Solid>();
+  }
+
+  // Find the exterior loop (largest area) and interior loops (holes)
+  size_t exteriorIdx = 0;
+  if (allLoops.size() > 1) {
+    // Calculate signed area to find exterior (positive/CCW) vs holes
+    // (negative/CW) For the bottom face, we need to reverse orientation
+    auto calcSignedArea2D =
+        [](const std::vector<std::pair<Point, Point>> &loop) -> Kernel::FT {
+      Kernel::FT area(0);
+      for (const auto &[start, end] : loop) {
+        area += (end.x() - start.x()) * (end.y() + start.y());
+      }
+      return area / Kernel::FT(2);
+    };
+
+    Kernel::FT maxArea(0);
+    for (size_t i = 0; i < allLoops.size(); ++i) {
+      Kernel::FT area = CGAL::abs(calcSignedArea2D(allLoops[i]));
+      if (area > maxArea) {
+        maxArea     = area;
+        exteriorIdx = i;
+      }
+    }
+  }
+
+  // Create bottom face with all rings (reversed for inward normal)
+  // Exterior ring first, then interior rings (holes)
+  LineString bottomExtRing;
+  for (auto it = allLoops[exteriorIdx].rbegin();
+       it != allLoops[exteriorIdx].rend(); ++it) {
+    bottomExtRing.addPoint(
+        Point(it->second.x(), it->second.y(), Kernel::FT(0)));
+  }
+  if (!bottomExtRing.isEmpty()) {
+    bottomExtRing.addPoint(bottomExtRing.pointN(0)); // Close the ring
+  }
+
+  Polygon bottomFace(bottomExtRing);
+
+  // Add interior rings (holes) - reversed again (so CW for holes in bottom)
+  for (size_t i = 0; i < allLoops.size(); ++i) {
+    if (i == exteriorIdx) {
+      continue;
+    }
+    LineString holeRing;
+    for (auto it = allLoops[i].rbegin(); it != allLoops[i].rend(); ++it) {
+      holeRing.addPoint(Point(it->second.x(), it->second.y(), Kernel::FT(0)));
+    }
+    if (!holeRing.isEmpty()) {
+      holeRing.addPoint(holeRing.pointN(0)); // Close the ring
+      bottomFace.addRing(holeRing);
+    }
+  }
+
+  shell->addPolygon(bottomFace);
+
+  // Create walls from all boundary edges
+  for (const auto &loop : allLoops) {
+    for (const auto &[start, end] : loop) {
+      Point startBase(start.x(), start.y(), Kernel::FT(0));
+      Point endBase(end.x(), end.y(), Kernel::FT(0));
 
       LineString wallRing;
       wallRing.addPoint(start);
@@ -610,4 +728,42 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
   return solid;
 }
 // NOLINTEND(readability-function-cognitive-complexity)
+
+SFCGAL_API auto
+extrudeUntil(const Polygon &footprint, const Geometry &roof)
+    -> std::unique_ptr<Solid>
+{
+  // Convert roof geometry to PolyhedralSurface based on type
+  PolyhedralSurface roofSurface;
+
+  switch (roof.geometryTypeId()) {
+  case TYPE_POLYHEDRALSURFACE:
+    roofSurface = roof.as<PolyhedralSurface>();
+    break;
+
+  case TYPE_POLYGON:
+    roofSurface.addPolygon(roof.as<Polygon>());
+    break;
+
+  case TYPE_TRIANGLE:
+    roofSurface.addPatch(roof.as<Triangle>());
+    break;
+
+  case TYPE_TRIANGULATEDSURFACE: {
+    const auto &tin = roof.as<TriangulatedSurface>();
+    for (size_t i = 0; i < tin.numPatches(); ++i) {
+      roofSurface.addPatch(tin.patchN(i));
+    }
+    break;
+  }
+
+  default:
+    BOOST_THROW_EXCEPTION(
+        Exception("extrudeUntil: roof must be Polygon, Triangle, "
+                  "PolyhedralSurface, or TriangulatedSurface"));
+  }
+
+  return extrudeUntil(footprint, roofSurface);
+}
+
 } // namespace SFCGAL::algorithm

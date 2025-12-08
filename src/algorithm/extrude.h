@@ -131,6 +131,23 @@ SFCGAL_API auto
 extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
     -> std::unique_ptr<Solid>;
 
+/**
+ * @brief Extrude a 2D polygon upward until it meets a roof surface.
+ *
+ * Overload that accepts any surface geometry type for the roof.
+ * Supported roof types: Polygon, Triangle, PolyhedralSurface,
+ * TriangulatedSurface.
+ *
+ * @param footprint The 2D polygon to extrude (building footprint).
+ * @param roof The roof geometry (Polygon, Triangle, PolyhedralSurface, or
+ *             TriangulatedSurface).
+ * @return A Solid representing the extruded building, or empty Solid if
+ *         inputs are invalid or roof type is not supported.
+ */
+SFCGAL_API auto
+extrudeUntil(const Polygon &footprint, const Geometry &roof)
+    -> std::unique_ptr<Solid>;
+
 } // namespace SFCGAL::algorithm
 
 #endif // ! SFCGAL_ALGORITHM_EXTRUDE_H_
