@@ -128,6 +128,21 @@ BOOST_AUTO_TEST_CASE(testArea2D_PolygonWithHoleWithBadOrientation)
   BOOST_CHECK_EQUAL(algorithm::area3D(polygon), 23.0);
 }
 
+BOOST_AUTO_TEST_CASE(testArea3D_Polygon)
+{
+  Polygon          polygon;
+  const LineString exteriorRing({Point(0, 0, 1), Point(0, 10, 2),
+                                 Point(10, 10, 3), Point(10, 0, 4),
+                                 Point(0, 0, 1)});
+  polygon.setExteriorRing(exteriorRing);
+  BOOST_CHECK_CLOSE(algorithm::area3D(polygon), 100.995, 0.001);
+
+  const LineString interiorRing({Point(1, 1, 1), Point(1, 9, 2), Point(9, 9, 3),
+                                 Point(9, 1, 4), Point(1, 1, 1)});
+  polygon.addInteriorRing(interiorRing);
+  BOOST_CHECK_CLOSE(algorithm::area3D(polygon), 36.0414, 0.0001);
+}
+
 BOOST_AUTO_TEST_CASE(testArea3D_Triangle1)
 {
   Triangle const triangle(Point(0.0, 0.0, 0.0), Point(0.0, 0.0, 1.0),
@@ -149,6 +164,58 @@ BOOST_AUTO_TEST_CASE(testArea2D_Triangle)
   Triangle const triangle2(Point(0.0, 0.0), Point(0.0, 4.0), Point(4.0, 4.0));
   BOOST_CHECK_EQUAL(algorithm::area(triangle1), 8.0);
   BOOST_CHECK_EQUAL(algorithm::area(triangle2), 8.0);
+}
+
+BOOST_AUTO_TEST_CASE(testArea3D_GeometryCollection)
+{
+  GeometryCollection collection;
+  LineString         line({Point(0, 0, 0), Point(0, 10, 0), Point(10, 10, 0),
+                           Point(10, 0, 0), Point(0, 0, 0)});
+  collection.addGeometry(line);
+  // area3D of a line is 0
+  BOOST_CHECK_EQUAL(algorithm::area3D(line), 0.0);
+  BOOST_CHECK_EQUAL(algorithm::area3D(collection), 0.0);
+
+  LineString line2(
+      {Point(3, 3, 3), Point(13, 3, 8), Point(13, 13, 13), Point(3, 13, 8)});
+  line2.closes();
+  Polygon polygon;
+  polygon.setExteriorRing(line2);
+  collection.addGeometry(polygon.clone());
+  BOOST_CHECK_CLOSE(algorithm::area3D(polygon), 122.474487, 0.0001);
+  BOOST_CHECK_CLOSE(algorithm::area3D(collection), 122.474487, 0.000001);
+
+  std::unique_ptr<Geometry> polyhedral(io::readWkt(
+      "PolyhedralSurface Z (((0 0 1, 0 10 1, 10 10 1, 10 0 1, 0 0 1)))"));
+  BOOST_CHECK_EQUAL(algorithm::area3D(polyhedral), 100.0);
+  collection.addGeometry(std::move(polyhedral));
+  BOOST_CHECK_CLOSE(algorithm::area3D(collection), 222.474487, 0.000001);
+}
+
+BOOST_AUTO_TEST_CASE(testArea3D_Tin)
+{
+  std::string const wkt("TIN Z ("
+                        "((0 0 0, 10 0 0, 5 5 2, 0 0 0)),"
+                        "((10 0 0, 10 10 1, 5 5 2, 10 0 0)),"
+                        "((10 10 1, 0 10 0, 5 5 2, 10 10 1)),"
+                        "((0 10 0, 0 0 0, 5 5 2, 0 10 0)))");
+
+  std::unique_ptr<Geometry> const tin(io::readWkt(wkt));
+  BOOST_CHECK_CLOSE(algorithm::area3D(*tin), 106.29209, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(testArea3D_PolyhedralSurface)
+{
+  std::string const wkt("POLYHEDRALSURFACE Z ("
+                        "((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0)),"
+                        "((0 0 10, 0 10 10, 10 10 10, 10 0 10, 0 0 10)),"
+                        "((0 0 0, 0 10 0, 0 10 10, 0 0 10, 0 0 0)),"
+                        "((10 0 0, 10 0 10, 10 10 10, 10 10 0, 10 0 0)),"
+                        "((0 0 0, 0 0 10, 10 0 10, 10 0 0, 0 0 0)),"
+                        "((0 10 0, 10 10 0, 10 10 10, 0 10 10, 0 10 0)))");
+
+  std::unique_ptr<Geometry> const polySurface(io::readWkt(wkt));
+  BOOST_CHECK_EQUAL(algorithm::area3D(*polySurface), 600.0);
 }
 
 BOOST_AUTO_TEST_CASE(testArea3D_Square1x1)
