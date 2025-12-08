@@ -26,6 +26,27 @@
 namespace SFCGAL::io::OBJ {
 
 /**
+ * Maximum number of vertices allowed in OBJ file to prevent memory exhaustion.
+ * 10 million vertices = ~240MB minimum for XYZ coordinates.
+ */
+static constexpr size_t MAX_VERTICES = 10'000'000;
+
+/**
+ * Maximum number of faces allowed in OBJ file to prevent memory exhaustion.
+ */
+static constexpr size_t MAX_FACES = 10'000'000;
+
+/**
+ * Maximum number of lines allowed in OBJ file to prevent memory exhaustion.
+ */
+static constexpr size_t MAX_LINES = 10'000'000;
+
+/**
+ * Maximum number of points allowed in OBJ file to prevent memory exhaustion.
+ */
+static constexpr size_t MAX_POINTS = 10'000'000;
+
+/**
  * @brief Parsed OBJ data structure
  */
 struct ObjData {
@@ -61,6 +82,10 @@ parseObjData(std::istream &inOBJ) -> ObjData
 
     if (type == "v") {
       // Vertex: v x y z [w]
+      if (obj_data.vertices.size() >= MAX_VERTICES) {
+        BOOST_THROW_EXCEPTION(
+            Exception("OBJ file exceeds maximum vertex count"));
+      }
       double x = 0.0;
       double y = 0.0;
       double z = 0.0;
@@ -71,6 +96,9 @@ parseObjData(std::istream &inOBJ) -> ObjData
       obj_data.vertices.emplace_back(x, y, z);
     } else if (type == "f") {
       // Face: f v1 v2 v3 ...
+      if (obj_data.faces.size() >= MAX_FACES) {
+        BOOST_THROW_EXCEPTION(Exception("OBJ file exceeds maximum face count"));
+      }
       std::vector<size_t> face;
       std::string         vertex_data;
       while (iss >> vertex_data) {
@@ -100,6 +128,9 @@ parseObjData(std::istream &inOBJ) -> ObjData
       obj_data.faces.push_back(face);
     } else if (type == "l") {
       // Line: l v1 v2 ...
+      if (obj_data.lines.size() >= MAX_LINES) {
+        BOOST_THROW_EXCEPTION(Exception("OBJ file exceeds maximum line count"));
+      }
       std::vector<size_t> line_indices;
       size_t              vertex_index;
       while (iss >> vertex_index) {
@@ -115,6 +146,9 @@ parseObjData(std::istream &inOBJ) -> ObjData
       obj_data.lines.push_back(line_indices);
     } else if (type == "p") {
       // Point: p v1
+      if (obj_data.points.size() >= MAX_POINTS) {
+        BOOST_THROW_EXCEPTION(Exception("OBJ file exceeds maximum point count"));
+      }
       size_t vertex_index;
       if (iss >> vertex_index) {
         if (vertex_index == 0) {
