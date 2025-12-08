@@ -23,6 +23,12 @@
 
 namespace SFCGAL::io::VTK {
 
+/**
+ * Maximum recursion depth for processing nested geometry collections.
+ * Prevents stack overflow attacks (CWE-674).
+ */
+static constexpr int MAX_RECURSION_DEPTH = 32;
+
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void
 save(const Geometry &geom, std::ostream &out)
@@ -31,8 +37,14 @@ save(const Geometry &geom, std::ostream &out)
   std::vector<std::vector<size_t>> all_cells;
   std::vector<int>                 cell_types;
 
-  std::function<void(const Geometry &)> process_geometry =
-      [&](const Geometry &geometry) {
+  std::function<void(const Geometry &, int)> process_geometry =
+      [&](const Geometry &geometry, int depth) {
+        // Check recursion depth to prevent stack overflow (CWE-674)
+        if (depth > MAX_RECURSION_DEPTH) {
+          throw std::runtime_error(
+              "VTK export: maximum recursion depth exceeded");
+        }
+
         switch (geometry.geometryTypeId()) {
         case TYPE_POINT: {
           const auto &point = geometry.as<Point>();
@@ -53,10 +65,10 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_TRIANGLE: {
-          const auto         &tri = geometry.as<Triangle>();
+          const auto         &triangle = geometry.as<Triangle>();
           std::vector<size_t> face;
           for (int i = 0; i < 3; ++i) {
-            all_points.push_back(tri.vertex(i));
+            all_points.push_back(triangle.vertex(i));
             face.push_back(all_points.size() - 1);
           }
           all_cells.push_back(face);
@@ -64,10 +76,10 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_POLYGON: {
-          const auto         &poly = geometry.as<Polygon>();
+          const auto         &polygon = geometry.as<Polygon>();
           std::vector<size_t> face;
-          for (size_t i = 0; i < poly.exteriorRing().numPoints() - 1; ++i) {
-            all_points.push_back(poly.exteriorRing().pointN(i));
+          for (size_t i = 0; i < polygon.exteriorRing().numPoints() - 1; ++i) {
+            all_points.push_back(polygon.exteriorRing().pointN(i));
             face.push_back(all_points.size() - 1);
           }
           all_cells.push_back(face);
@@ -75,23 +87,23 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_TRIANGULATEDSURFACE: {
-          const auto &triangulatedsurface = geometry.as<TriangulatedSurface>();
-          for (size_t i = 0; i < triangulatedsurface.numPatches(); ++i) {
-            process_geometry(triangulatedsurface.patchN(i));
+          const auto &triangulatedSurface = geometry.as<TriangulatedSurface>();
+          for (size_t i = 0; i < triangulatedSurface.numPatches(); ++i) {
+            process_geometry(triangulatedSurface.patchN(i), depth + 1);
           }
           break;
         }
         case TYPE_POLYHEDRALSURFACE: {
-          const auto &polyhedralsurface = geometry.as<PolyhedralSurface>();
-          for (size_t i = 0; i < polyhedralsurface.numPatches(); ++i) {
-            process_geometry(polyhedralsurface.patchN(i));
+          const auto &polyhedralSurface = geometry.as<PolyhedralSurface>();
+          for (size_t i = 0; i < polyhedralSurface.numPatches(); ++i) {
+            process_geometry(polyhedralSurface.patchN(i), depth + 1);
           }
           break;
         }
         case TYPE_SOLID: {
           const auto &solid = geometry.as<Solid>();
           if (!solid.isEmpty()) {
-            process_geometry(solid.exteriorShell());
+            process_geometry(solid.exteriorShell(), depth + 1);
           }
           break;
         }
@@ -100,9 +112,9 @@ save(const Geometry &geom, std::ostream &out)
         case TYPE_MULTIPOLYGON:
         case TYPE_MULTISOLID:
         case TYPE_GEOMETRYCOLLECTION: {
-          const auto &geometrycollection = geometry.as<GeometryCollection>();
-          for (size_t i = 0; i < geometrycollection.numGeometries(); ++i) {
-            process_geometry(geometrycollection.geometryN(i));
+          const auto &collection = geometry.as<GeometryCollection>();
+          for (size_t i = 0; i < collection.numGeometries(); ++i) {
+            process_geometry(collection.geometryN(i), depth + 1);
           }
           break;
         }
@@ -112,7 +124,7 @@ save(const Geometry &geom, std::ostream &out)
         }
       };
 
-  process_geometry(geom);
+  process_geometry(geom, 0);
 
   // Write VTK header
   out << "# vtk DataFile Version 2.0\n";
