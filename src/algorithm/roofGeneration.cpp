@@ -28,13 +28,16 @@
 #include "SFCGAL/triangulate/triangulate2DZ.h"
 
 #include <CGAL/Boolean_set_operations_2.h>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Line_2.h>
 #include <CGAL/Polygon_2.h>
 #include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
 #include <CGAL/Polygon_mesh_processing/orientation.h>
 #include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
 #include <CGAL/Polygon_with_holes_2.h>
+#include <CGAL/Segment_2.h>
 #include <CGAL/Surface_mesh.h>
+#include <CGAL/centroid.h>
+#include <CGAL/squared_distance_2.h>
 
 #include <algorithm>
 #include <cmath>
@@ -53,35 +56,33 @@ namespace SFCGAL::algorithm {
 namespace {
 
 /**
- * @brief Calculate perpendicular distance from a point to a 2D line using exact
- * arithmetic
- * @param point The point to measure distance from
- * @param lineStart Starting point of the line
- * @param lineEnd Ending point of the line
- * @return Exact distance value using kernel arithmetic
+ * @brief Squared perpendicular distance from a point to a 2D line
+ */
+auto
+squaredDistanceToLine2D(const Point &point, const Point &lineStart,
+                        const Point &lineEnd) -> Kernel::FT
+{
+  Point_2 point2D(point.x(), point.y());
+  Point_2 lineStart2D(lineStart.x(), lineStart.y());
+  Point_2 lineEnd2D(lineEnd.x(), lineEnd.y());
+
+  if (lineStart2D == lineEnd2D) {
+    return CGAL::squared_distance(point2D, lineStart2D);
+  }
+
+  CGAL::Line_2<Kernel> line(lineStart2D, lineEnd2D);
+  return CGAL::squared_distance(point2D, line);
+}
+
+/**
+ * @brief Perpendicular distance from a point to a 2D line
  */
 auto
 distanceToLine2D(const Point &point, const Point &lineStart,
                  const Point &lineEnd) -> double
 {
-  // Use high-precision arithmetic for numerical stability
-  auto dx = lineEnd.x() - lineStart.x();
-  auto dy = lineEnd.y() - lineStart.y();
-
-  // If line is degenerate (start == end), return distance to point
-  auto lineLengthSq = (dx * dx) + (dy * dy);
-  if (lineLengthSq == 0) {
-    auto px = point.x() - lineStart.x();
-    auto py = point.y() - lineStart.y();
-    return std::sqrt(CGAL::to_double((px * px) + (py * py)));
-  }
-
-  // Calculate perpendicular distance using cross product formula
-  auto px = point.x() - lineStart.x();
-  auto py = point.y() - lineStart.y();
-
-  return std::abs(CGAL::to_double((dx * py) - (dy * px))) /
-         std::sqrt(CGAL::to_double(lineLengthSq));
+  return std::sqrt(
+      CGAL::to_double(squaredDistanceToLine2D(point, lineStart, lineEnd)));
 }
 
 /**
@@ -550,8 +551,10 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       const auto &vertex3 = triangle->vertex(2);
 
       // Check if triangle centroid is inside the original polygon
-      Point centroid((vertex1.x() + vertex2.x() + vertex3.x()) / 3.0,
-                     (vertex1.y() + vertex2.y() + vertex3.y()) / 3.0, 0.0);
+      Point_2 centroid2D = CGAL::centroid(Point_2(vertex1.x(), vertex1.y()),
+                                          Point_2(vertex2.x(), vertex2.y()),
+                                          Point_2(vertex3.x(), vertex3.y()));
+      Point   centroid(centroid2D.x(), centroid2D.y(), Kernel::FT(0));
 
       // Use SFCGAL's covers algorithm to check if centroid is inside footprint
       if (!SFCGAL::algorithm::covers(footprint, centroid)) {
@@ -559,24 +562,40 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       }
 
       // Create new vertices with proper Z coordinates
-      Point newVertex1(vertex1.x(), vertex1.y(), 0.0);
-      Point newVertex2(vertex2.x(), vertex2.y(), 0.0);
-      Point newVertex3(vertex3.x(), vertex3.y(), 0.0);
+      Kernel::FT zBase(0);
+      Kernel::FT zRidge(ridgeHeight);
 
-      // Elevate ridge points
+      Point newVertex1(vertex1.x(), vertex1.y(), zBase);
+      Point newVertex2(vertex2.x(), vertex2.y(), zBase);
+      Point newVertex3(vertex3.x(), vertex3.y(), zBase);
+
       if (isRidgePoint(vertex1)) {
-        newVertex1 = Point(vertex1.x(), vertex1.y(), ridgeHeight);
+        newVertex1 = Point(vertex1.x(), vertex1.y(), zRidge);
       }
       if (isRidgePoint(vertex2)) {
-        newVertex2 = Point(vertex2.x(), vertex2.y(), ridgeHeight);
+        newVertex2 = Point(vertex2.x(), vertex2.y(), zRidge);
       }
       if (isRidgePoint(vertex3)) {
-        newVertex3 = Point(vertex3.x(), vertex3.y(), ridgeHeight);
+        newVertex3 = Point(vertex3.x(), vertex3.y(), zRidge);
       }
 
-      // Create roof triangle with elevated vertices
-      auto roofTriangle =
-          std::make_unique<Triangle>(newVertex1, newVertex2, newVertex3);
+      // Create roof triangle - ensure normal points upward (positive Z)
+      Vector_3 edge1(newVertex2.x() - newVertex1.x(),
+                     newVertex2.y() - newVertex1.y(),
+                     newVertex2.z() - newVertex1.z());
+      Vector_3 edge2(newVertex3.x() - newVertex1.x(),
+                     newVertex3.y() - newVertex1.y(),
+                     newVertex3.z() - newVertex1.z());
+      Vector_3 normal = CGAL::cross_product(edge1, edge2);
+
+      std::unique_ptr<Triangle> roofTriangle;
+      if (normal.z() >= Kernel::FT(0)) {
+        roofTriangle =
+            std::make_unique<Triangle>(newVertex1, newVertex2, newVertex3);
+      } else {
+        roofTriangle =
+            std::make_unique<Triangle>(newVertex1, newVertex3, newVertex2);
+      }
       roof->addPatch(*roofTriangle);
     }
   }
@@ -597,85 +616,95 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       }
     }
 
-    // For each ridge endpoint, check if it's on the polygon boundary
-    // Only create vertical faces for boundary ridge points (true gable ends)
-    const LineString &ring               = footprint.exteriorRing();
-    const double      BOUNDARY_TOLERANCE = 1e-6;
+    // For each ridge endpoint, check if it's on the polygon boundary.
+    // Only create vertical faces for boundary ridge points (true gable ends).
+    const LineString &ring = footprint.exteriorRing();
+
+    const Kernel::FT TOLERANCE_SQ(1e-12);
+
+    // Build polygon centroid
+    std::vector<Point_2> ringPoints2D;
+    ringPoints2D.reserve(ring.numPoints() - 1);
+    for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
+      ringPoints2D.emplace_back(ring.pointN(i).x(), ring.pointN(i).y());
+    }
+    Point_2 polyCentroid2D = CGAL::centroid(
+        ringPoints2D.begin(), ringPoints2D.end(), CGAL::Dimension_tag<0>());
 
     for (const Point &ridgeEndpoint : ridgeEndpoints) {
-      // Check if ridge endpoint lies on the footprint boundary
       bool               onBoundary = false;
       std::vector<Point> boundarySegmentPoints;
+
+      Point_2 ridgeP2D(ridgeEndpoint.x(), ridgeEndpoint.y());
 
       for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
         const Point &segmentPoint1 = ring.pointN(i);
         const Point &segmentPoint2 = ring.pointN(i + 1);
 
-        // Check if ridgeEndpoint lies on segment [segmentPoint1, segmentPoint2]
-        auto dx        = CGAL::to_double(segmentPoint2.x() - segmentPoint1.x());
-        auto dy        = CGAL::to_double(segmentPoint2.y() - segmentPoint1.y());
-        auto segLength = std::sqrt((dx * dx) + (dy * dy));
+        Point_2 segPt1(segmentPoint1.x(), segmentPoint1.y());
+        Point_2 segPt2(segmentPoint2.x(), segmentPoint2.y());
 
-        if (segLength < BOUNDARY_TOLERANCE) {
-          continue; // Skip degenerate segments
+        if (segPt1 == segPt2) {
+          continue;
         }
 
-        // Vector from segmentPoint1 to ridgeEndpoint
-        auto rx = CGAL::to_double(ridgeEndpoint.x() - segmentPoint1.x());
-        auto ry = CGAL::to_double(ridgeEndpoint.y() - segmentPoint1.y());
+        Segment_2  segment(segPt1, segPt2);
+        Kernel::FT sqDist = CGAL::squared_distance(ridgeP2D, segment);
 
-        // Project onto segment direction
-        auto t = ((rx * dx) + (ry * dy)) / (segLength * segLength);
+        if (sqDist < TOLERANCE_SQ) {
+          onBoundary = true;
 
-        // Check if projection is within segment bounds [0, 1]
-        if (t >= -BOUNDARY_TOLERANCE && t <= 1.0 + BOUNDARY_TOLERANCE) {
-          // Check distance from ridge endpoint to line
-          auto projX = CGAL::to_double(segmentPoint1.x()) + (t * dx);
-          auto projY = CGAL::to_double(segmentPoint1.y()) + (t * dy);
-          auto distX = CGAL::to_double(ridgeEndpoint.x()) - projX;
-          auto distY = CGAL::to_double(ridgeEndpoint.y()) - projY;
-          auto dist  = std::sqrt((distX * distX) + (distY * distY));
+          Kernel::FT sqDist1 = CGAL::squared_distance(ridgeP2D, segPt1);
+          Kernel::FT sqDist2 = CGAL::squared_distance(ridgeP2D, segPt2);
 
-          if (dist < BOUNDARY_TOLERANCE) {
-            // Ridge endpoint is on this boundary segment
-            onBoundary = true;
-
-            // Collect the segment endpoints (excluding ridge endpoint itself)
-            auto dist1 = std::sqrt(
-                std::pow(CGAL::to_double(segmentPoint1.x() - ridgeEndpoint.x()),
-                         2) +
-                std::pow(CGAL::to_double(segmentPoint1.y() - ridgeEndpoint.y()),
-                         2));
-            auto dist2 = std::sqrt(
-                std::pow(CGAL::to_double(segmentPoint2.x() - ridgeEndpoint.x()),
-                         2) +
-                std::pow(CGAL::to_double(segmentPoint2.y() - ridgeEndpoint.y()),
-                         2));
-
-            if (dist1 > BOUNDARY_TOLERANCE) {
-              boundarySegmentPoints.push_back(segmentPoint1);
-            }
-            if (dist2 > BOUNDARY_TOLERANCE) {
-              boundarySegmentPoints.push_back(segmentPoint2);
-            }
-            break; // Found the segment
+          if (sqDist1 > TOLERANCE_SQ) {
+            boundarySegmentPoints.push_back(segmentPoint1);
           }
+          if (sqDist2 > TOLERANCE_SQ) {
+            boundarySegmentPoints.push_back(segmentPoint2);
+          }
+          break;
         }
       }
 
-      // Only create vertical faces if ridge endpoint is on boundary
-      if (onBoundary && !boundarySegmentPoints.empty()) {
-        Point ridgeTop(ridgeEndpoint.x(), ridgeEndpoint.y(), ridgeHeight);
-        Point ridgeBase(ridgeEndpoint.x(), ridgeEndpoint.y(), 0.0);
+      // Create ONE gable triangle connecting both corners to ridge top
+      if (onBoundary && boundarySegmentPoints.size() == 2) {
+        Kernel::FT zRidge(ridgeHeight);
+        Kernel::FT zBase(0);
 
-        for (const Point &edgePoint : boundarySegmentPoints) {
-          Point edgeBase(edgePoint.x(), edgePoint.y(), 0.0);
+        Point ridgeTop(ridgeEndpoint.x(), ridgeEndpoint.y(), zRidge);
+        Point corner1(boundarySegmentPoints[0].x(),
+                      boundarySegmentPoints[0].y(), zBase);
+        Point corner2(boundarySegmentPoints[1].x(),
+                      boundarySegmentPoints[1].y(), zBase);
 
-          // Create triangle: ridge_base -> ridge_top -> edge_base
-          std::unique_ptr<Triangle> verticalTri(
-              new Triangle(ridgeBase, ridgeTop, edgeBase));
-          roof->addPatch(*verticalTri);
+        // Gable centroid
+        Kernel::FT gableCentroidX =
+            (ridgeTop.x() + corner1.x() + corner2.x()) / Kernel::FT(3);
+        Kernel::FT gableCentroidY =
+            (ridgeTop.y() + corner1.y() + corner2.y()) / Kernel::FT(3);
+
+        // Outward direction from polygon centroid to gable centroid
+        Kernel::FT outwardX = gableCentroidX - polyCentroid2D.x();
+        Kernel::FT outwardY = gableCentroidY - polyCentroid2D.y();
+
+        // Normal of triangle corner1 -> ridgeTop -> corner2
+        Vector_3 edge1(ridgeTop.x() - corner1.x(), ridgeTop.y() - corner1.y(),
+                       ridgeTop.z() - corner1.z());
+        Vector_3 edge2(corner2.x() - corner1.x(), corner2.y() - corner1.y(),
+                       corner2.z() - corner1.z());
+        Vector_3 normal = CGAL::cross_product(edge1, edge2);
+
+        // Check if normal points outward (XY dot product)
+        Kernel::FT dotProduct = normal.x() * outwardX + normal.y() * outwardY;
+
+        std::unique_ptr<Triangle> gableTri;
+        if (dotProduct >= Kernel::FT(0)) {
+          gableTri = std::make_unique<Triangle>(corner1, ridgeTop, corner2);
+        } else {
+          gableTri = std::make_unique<Triangle>(corner1, corner2, ridgeTop);
         }
+        roof->addPatch(*gableTri);
       }
     }
   }
@@ -685,9 +714,13 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
     // Roof only mode
     if (closeBase) {
       // Add base polygon to create a closed solid
-      roof->addPatch(footprint);
+      // The base face normal should point downward (negative Z) for a valid
+      // solid. A counter-clockwise polygon (viewed from above) has upward
+      // normal, so we need to reverse it.
+      Polygon baseFace(footprint);
+      baseFace.reverse();
+      roof->addPatch(baseFace);
 
-      // Use CGAL's robust orientation fixing
       auto solid = std::make_unique<Solid>(*roof);
       propagateValidityFlag(*solid, true);
       return solid;
