@@ -15,6 +15,12 @@
 
 namespace SFCGAL::io::STL {
 
+/**
+ * Maximum recursion depth for processing nested geometry collections.
+ * Prevents stack overflow attacks (CWE-674).
+ */
+static constexpr int MAX_RECURSION_DEPTH = 32;
+
 // Utility function to normalize "-0" strings to "0" for consistent output
 auto
 normalizeZeroString(const std::string &str) -> std::string
@@ -37,15 +43,21 @@ save(const Geometry &geom, std::ostream &out) -> void
 {
   std::vector<Triangle> all_triangles;
 
-  std::function<void(const Geometry &)> process_geometry =
-      [&](const Geometry &geom) {
-        switch (geom.geometryTypeId()) {
+  std::function<void(const Geometry &, int)> process_geometry =
+      [&](const Geometry &geometry, int depth) {
+        // Check recursion depth to prevent stack overflow (CWE-674)
+        if (depth > MAX_RECURSION_DEPTH) {
+          throw std::runtime_error(
+              "STL export: maximum recursion depth exceeded");
+        }
+
+        switch (geometry.geometryTypeId()) {
         case TYPE_TRIANGLE: {
-          all_triangles.push_back(geom.as<Triangle>());
+          all_triangles.push_back(geometry.as<Triangle>());
           break;
         }
         case TYPE_POLYGON: {
-          const auto         &poly = geom.as<Polygon>();
+          const auto         &poly = geometry.as<Polygon>();
           TriangulatedSurface tin;
           triangulate::triangulatePolygon3D(poly, tin);
           for (size_t i = 0; i < tin.numTriangles(); ++i) {
@@ -54,32 +66,32 @@ save(const Geometry &geom, std::ostream &out) -> void
           break;
         }
         case TYPE_TRIANGULATEDSURFACE: {
-          const auto &tin = geom.as<TriangulatedSurface>();
+          const auto &tin = geometry.as<TriangulatedSurface>();
           for (size_t i = 0; i < tin.numTriangles(); ++i) {
             all_triangles.push_back(tin.triangleN(i));
           }
           break;
         }
         case TYPE_POLYHEDRALSURFACE: {
-          const auto &phs = geom.as<PolyhedralSurface>();
-          for (size_t i = 0; i < phs.numPolygons(); ++i) {
-            process_geometry(phs.polygonN(i));
+          const auto &polyhedralSurface = geometry.as<PolyhedralSurface>();
+          for (size_t i = 0; i < polyhedralSurface.numPolygons(); ++i) {
+            process_geometry(polyhedralSurface.polygonN(i), depth + 1);
           }
           break;
         }
         case TYPE_SOLID: {
-          const auto &solid = geom.as<Solid>();
+          const auto &solid = geometry.as<Solid>();
           if (!solid.isEmpty()) {
-            process_geometry(solid.exteriorShell());
+            process_geometry(solid.exteriorShell(), depth + 1);
           }
           break;
         }
         case TYPE_MULTIPOLYGON:
         case TYPE_MULTISOLID:
         case TYPE_GEOMETRYCOLLECTION: {
-          const auto &geomcoll = geom.as<GeometryCollection>();
-          for (size_t i = 0; i < geomcoll.numGeometries(); ++i) {
-            process_geometry(geomcoll.geometryN(i));
+          const auto &collection = geometry.as<GeometryCollection>();
+          for (size_t i = 0; i < collection.numGeometries(); ++i) {
+            process_geometry(collection.geometryN(i), depth + 1);
           }
           break;
         }
@@ -89,7 +101,7 @@ save(const Geometry &geom, std::ostream &out) -> void
         }
       };
 
-  process_geometry(geom);
+  process_geometry(geom, 0);
 
   // Write STL header
   out << "solid SFCGAL_export\n";
