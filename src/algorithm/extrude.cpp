@@ -31,6 +31,7 @@
 #include "SFCGAL/numeric.h"
 #include "SFCGAL/triangulate/triangulatePolygon.h"
 
+#include "SFCGAL/detail/algorithm/SurfaceUtils.h"
 #include "SFCGAL/detail/tools/Log.h"
 
 #include <CGAL/Line_3.h>
@@ -412,9 +413,9 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
     return std::make_unique<Solid>();
   }
 
-  // Normalize footprint to CCW orientation (positive signed area)
+  // Normalize footprint to CCW orientation
   Polygon normalizedFootprint = footprint;
-  if (signedArea(normalizedFootprint.exteriorRing()) < 0) {
+  if (!normalizedFootprint.isCounterClockWiseOriented()) {
     normalizedFootprint.reverse();
   }
 
@@ -520,159 +521,23 @@ extrudeUntil(const Polygon &footprint, const PolyhedralSurface &roof)
   }
 
   // 3. Create lateral faces from boundary of top surface
-  struct Edge {
-    Point point1, point2;
-    auto
-    operator<(const Edge &other) const -> bool
-    {
-      if (point1.x() != other.point1.x()) {
-        return point1.x() < other.point1.x();
-      }
-      if (point1.y() != other.point1.y()) {
-        return point1.y() < other.point1.y();
-      }
-      if (point1.z() != other.point1.z()) {
-        return point1.z() < other.point1.z();
-      }
-      if (point2.x() != other.point2.x()) {
-        return point2.x() < other.point2.x();
-      }
-      if (point2.y() != other.point2.y()) {
-        return point2.y() < other.point2.y();
-      }
-      return point2.z() < other.point2.z();
-    }
-  };
-
-  std::map<Edge, int> edgeCount;
-
-  for (const auto &poly : topPolygons) {
-    for (size_t ringIdx = 0; ringIdx < poly.numRings(); ++ringIdx) {
-      const LineString &ring = poly.ringN(ringIdx);
-      for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
-        Point edgePoint1 = ring.pointN(i);
-        Point edgePoint2 = ring.pointN(i + 1);
-
-        Edge edge;
-        if (edgePoint1.x() < edgePoint2.x() ||
-            (edgePoint1.x() == edgePoint2.x() &&
-             edgePoint1.y() < edgePoint2.y()) ||
-            (edgePoint1.x() == edgePoint2.x() &&
-             edgePoint1.y() == edgePoint2.y() &&
-             edgePoint1.z() < edgePoint2.z())) {
-          edge.point1 = edgePoint1;
-          edge.point2 = edgePoint2;
-        } else {
-          edge.point1 = edgePoint2;
-          edge.point2 = edgePoint1;
-        }
-        edgeCount[edge]++;
-      }
-    }
-  }
-
-  // Collect oriented boundary edges
-  std::vector<std::pair<Point, Point>> boundaryEdges;
-
-  for (const auto &[edge, count] : edgeCount) {
-    if (count == 1) {
-      // Boundary edge. Find orientation.
-      Point edgeStart    = edge.point1;
-      Point edgeEnd      = edge.point2;
-      bool  foundForward = false;
-
-      for (const auto &poly : topPolygons) {
-        for (size_t ringIdx = 0; ringIdx < poly.numRings(); ++ringIdx) {
-          const LineString &ring = poly.ringN(ringIdx);
-          for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
-            if (ring.pointN(i) == edgeStart && ring.pointN(i + 1) == edgeEnd) {
-              foundForward = true;
-              goto found;
-            }
-          }
-        }
-      }
-    found:
-
-      Point start = foundForward ? edgeStart : edgeEnd;
-      Point end   = foundForward ? edgeEnd : edgeStart;
-
-      boundaryEdges.emplace_back(start, end);
-    }
-  }
-
-  if (boundaryEdges.empty()) {
+  auto boundaryResult =
+      SFCGAL::detail::algorithm::extractBoundaryEdges(topPolygons);
+  if (boundaryResult.edges.empty()) {
     return std::make_unique<Solid>();
   }
 
   // Build connected boundary loops from edges (handles multiple loops for holes)
-  std::vector<std::vector<std::pair<Point, Point>>> allLoops;
-
-  while (!boundaryEdges.empty()) {
-    std::vector<std::pair<Point, Point>> currentLoop;
-    currentLoop.push_back(boundaryEdges[0]);
-    boundaryEdges.erase(boundaryEdges.begin());
-
-    // Build connected loop
-    bool loopClosed = false;
-    while (!loopClosed && !boundaryEdges.empty()) {
-      Point currentEnd = currentLoop.back().second;
-      Point loopStart  = currentLoop.front().first;
-
-      // Check if loop is closed (using 2D comparison)
-      if (currentEnd.x() == loopStart.x() && currentEnd.y() == loopStart.y()) {
-        loopClosed = true;
-        break;
-      }
-
-      // Find edge starting at currentEnd
-      bool foundNext = false;
-      for (auto it = boundaryEdges.begin(); it != boundaryEdges.end(); ++it) {
-        if (it->first.x() == currentEnd.x() &&
-            it->first.y() == currentEnd.y()) {
-          currentLoop.push_back(*it);
-          boundaryEdges.erase(it);
-          foundNext = true;
-          break;
-        }
-      }
-      if (!foundNext) {
-        break;
-      }
-    }
-
-    if (!currentLoop.empty()) {
-      allLoops.push_back(std::move(currentLoop));
-    }
-  }
+  auto allLoops = SFCGAL::detail::algorithm::buildConnectedLoops(
+      std::move(boundaryResult.edges));
 
   if (allLoops.empty()) {
     return std::make_unique<Solid>();
   }
 
   // Find the exterior loop (largest area) and interior loops (holes)
-  size_t exteriorIdx = 0;
-  if (allLoops.size() > 1) {
-    // Calculate signed area to find exterior (positive/CCW) vs holes
-    // (negative/CW) For the bottom face, we need to reverse orientation
-    auto calcSignedArea2D =
-        [](const std::vector<std::pair<Point, Point>> &loop) -> Kernel::FT {
-      Kernel::FT area(0);
-      for (const auto &[start, end] : loop) {
-        area += (end.x() - start.x()) * (end.y() + start.y());
-      }
-      return area / Kernel::FT(2);
-    };
-
-    Kernel::FT maxArea(0);
-    for (size_t i = 0; i < allLoops.size(); ++i) {
-      Kernel::FT area = CGAL::abs(calcSignedArea2D(allLoops[i]));
-      if (area > maxArea) {
-        maxArea     = area;
-        exteriorIdx = i;
-      }
-    }
-  }
+  size_t exteriorIdx =
+      SFCGAL::detail::algorithm::findExteriorLoopIndex(allLoops);
 
   // Create bottom face with all rings (reversed for inward normal)
   // Exterior ring first, then interior rings (holes)
