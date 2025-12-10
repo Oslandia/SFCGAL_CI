@@ -374,10 +374,15 @@ const std::vector<Operation> operations = {
      }},
 
     {"is_valid", "Predicates", "Test if geometry is topologically valid", false,
-     "", "A", "B",
-     [](const std::string &, const SFCGAL::Geometry *geom_a,
+     "Parameters:\n  tolerance=VALUE: Absolute tolerance for planarity checks "
+     "(default: 1e-6)\n\nExample:\n  sfcgalop -a \"POLYGON Z ((0 0 0,1 0 0,1 1 "
+     "0.0001,0 0 0))\" is_valid \"tolerance=1e-3\"",
+     "A, params", "B",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       return static_cast<bool>(SFCGAL::algorithm::isValid(*geom_a));
+       auto   params    = parse_params(args);
+       double tolerance = params.count("tolerance") ? params["tolerance"] : 1e-6;
+       return static_cast<bool>(SFCGAL::algorithm::isValid(*geom_a, tolerance));
      }},
 
     {"is_simple", "Predicates", "Test if geometry has no self-intersections",
