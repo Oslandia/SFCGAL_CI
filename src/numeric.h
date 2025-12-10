@@ -18,7 +18,10 @@ namespace SFCGAL {
 /// @brief Default epsilon value for floating point comparisons
 constexpr double EPSILON = 1e-8;
 
-#if defined(__clang__)
+/// @brief Squared epsilon value for squared distance comparisons
+constexpr double EPSILON_SQ = 1e-16;
+
+#ifdef __clang__
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wfloat-equal"
 #elif defined(__GCC__)
@@ -83,7 +86,7 @@ almostEqual(const Kernel::FT &first, const Kernel::FT &second,
   return diff <= epsilon * std::max(absFirst, absSecond); // adaptative epsilon
 }
 
-#if defined(__clang__)
+#ifdef __clang__
   #pragma clang diagnostic pop
 #elif defined(__GCC__)
   #pragma gcc diagnostic pop
@@ -109,9 +112,8 @@ round(const double &value) -> double
 {
   if (value < 0.0) {
     return ::ceil(value - 0.5);
-  } else {
-    return ::floor(value + 0.5);
   }
+  return ::floor(value + 0.5);
 }
 
 #ifdef CGAL_USE_GMPXX
