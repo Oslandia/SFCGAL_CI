@@ -151,8 +151,8 @@ WkbWriter::writeGeometryType(const Geometry      &geometry,
   } else {
     toByte(static_cast<uint32_t>(
                geometry.geometryTypeId() +
-               static_cast<int>(geometry.is3D()) * COORDINATE_XYZ +
-               static_cast<int>(geometry.isMeasured()) * COORDINATE_XYM),
+               (static_cast<int>(geometry.is3D()) * COORDINATE_XYZ) +
+               (static_cast<int>(geometry.isMeasured()) * COORDINATE_XYM)),
            wkbOrder);
   }
 }
