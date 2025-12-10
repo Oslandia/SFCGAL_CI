@@ -59,6 +59,7 @@ namespace {
  * @brief Orient a PolyhedralSurface to have consistent face orientations
  * Uses CGAL's Surface_mesh and polygon mesh processing to fix orientations
  */
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 auto
 orientPolyhedralSurface(PolyhedralSurface &surface) -> void
 {
@@ -75,8 +76,8 @@ orientPolyhedralSurface(PolyhedralSurface &surface) -> void
   std::map<Coordinate, size_t>     coordToIndex;
 
   auto getPointIndex = [&](const Point &pt) -> size_t {
-    Coordinate coord = pt.coordinate();
-    auto       it    = coordToIndex.find(coord);
+    const auto &coord = pt.coordinate();
+    auto        it    = coordToIndex.find(coord);
     if (it != coordToIndex.end()) {
       return it->second;
     }
@@ -97,6 +98,7 @@ orientPolyhedralSurface(PolyhedralSurface &surface) -> void
     } else {
       const auto         &ring = patch.exteriorRing();
       std::vector<size_t> indices;
+      indices.reserve(ring.numPoints() - 1);
       for (size_t j = 0; j < ring.numPoints() - 1; ++j) {
         indices.push_back(getPointIndex(ring.pointN(j)));
       }
@@ -125,9 +127,9 @@ orientPolyhedralSurface(PolyhedralSurface &surface) -> void
     surface = PolyhedralSurface();
     for (auto face : mesh.faces()) {
       std::vector<Point> pts;
-      for (auto vd : mesh.vertices_around_face(mesh.halfedge(face))) {
-        const auto &pt = mesh.point(vd);
-        pts.emplace_back(pt.x(), pt.y(), pt.z());
+      for (auto vertex : mesh.vertices_around_face(mesh.halfedge(face))) {
+        const auto &meshPt = mesh.point(vertex);
+        pts.emplace_back(meshPt.x(), meshPt.y(), meshPt.z());
       }
       if (pts.size() == 3) {
         surface.addPatch(Triangle(pts[0], pts[1], pts[2]));
@@ -150,6 +152,7 @@ orientPolyhedralSurface(PolyhedralSurface &surface) -> void
                   points[polyIndices[2]].z())));
       } else {
         std::vector<Point> pts;
+        pts.reserve(polyIndices.size() + 1);
         for (size_t idx : polyIndices) {
           pts.emplace_back(points[idx].x(), points[idx].y(), points[idx].z());
         }
@@ -159,6 +162,7 @@ orientPolyhedralSurface(PolyhedralSurface &surface) -> void
     }
   }
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 /**
  * @brief Squared perpendicular distance from a point to a 2D line
@@ -188,6 +192,52 @@ distanceToLine2D(const Point &point, const Point &lineStart,
 {
   return std::sqrt(
       CGAL::to_double(squaredDistanceToLine2D(point, lineStart, lineEnd)));
+}
+
+/**
+ * @brief Minimum distance from a point to the polygon boundary (2D)
+ *
+ * Calculates the minimum perpendicular distance from a point to any edge
+ * of the polygon's exterior ring.
+ *
+ * @param point The point to measure from
+ * @param polygon The polygon whose boundary to measure to
+ * @return Minimum distance to the polygon boundary
+ */
+auto
+distanceToPolygonBoundary2D(const Point &point, const Polygon &polygon)
+    -> Kernel::FT
+{
+  const auto &ring     = polygon.exteriorRing();
+  size_t      numEdges = ring.numPoints() - 1;
+
+  Point_2 point2D(point.x(), point.y());
+
+  // Initialize with first edge distance
+  const auto &firstStart = ring.pointN(0);
+  const auto &firstEnd   = ring.pointN(1);
+  Point_2     firstStart2D(firstStart.x(), firstStart.y());
+  Point_2     firstEnd2D(firstEnd.x(), firstEnd.y());
+  Segment_2   firstSegment(firstStart2D, firstEnd2D);
+  auto        minSqDist = CGAL::squared_distance(point2D, firstSegment);
+
+  for (size_t i = 1; i < numEdges; ++i) {
+    const auto &edgeStart = ring.pointN(i);
+    const auto &edgeEnd   = ring.pointN(i + 1);
+
+    // Use segment distance, not line distance
+    Point_2   start2D(edgeStart.x(), edgeStart.y());
+    Point_2   end2D(edgeEnd.x(), edgeEnd.y());
+    Segment_2 segment(start2D, end2D);
+    auto      sqDist = CGAL::squared_distance(point2D, segment);
+
+    if (sqDist < minSqDist) {
+      minSqDist = sqDist;
+    }
+  }
+
+  // sqrt requires conversion to double for exact kernels
+  return {std::sqrt(CGAL::to_double(minSqDist))};
 }
 
 /**
@@ -348,26 +398,6 @@ createVerticalFaces(const Polygon            &footprint,
       continue; // No height difference, skip
     }
 
-    // Helper to check if vertices need reversal for outward normal
-    auto needsReversal = [&polyCentroid](const Point &pt1, const Point &pt2,
-                                         const Point &pt3) -> bool {
-      // Face centroid
-      Kernel::FT faceCentroidX = (pt1.x() + pt2.x() + pt3.x()) / Kernel::FT(3);
-      Kernel::FT faceCentroidY = (pt1.y() + pt2.y() + pt3.y()) / Kernel::FT(3);
-
-      // Outward direction from polygon centroid
-      Kernel::FT outwardX = faceCentroidX - polyCentroid.x();
-      Kernel::FT outwardY = faceCentroidY - polyCentroid.y();
-
-      // Compute face normal
-      Vector_3 edge1(pt2.x() - pt1.x(), pt2.y() - pt1.y(), pt2.z() - pt1.z());
-      Vector_3 edge2(pt3.x() - pt1.x(), pt3.y() - pt1.y(), pt3.z() - pt1.z());
-      Vector_3 normal = CGAL::cross_product(edge1, edge2);
-
-      // Check orientation (XY dot product)
-      return normal.x() * outwardX + normal.y() * outwardY < Kernel::FT(0);
-    };
-
     if (hasHeightDiff1 && hasHeightDiff2) {
       // Quadrilateral face: split into two triangles using diagonal
       // basePt2-roofPt1 This ensures roof-adjacent edge (roofPt2->roofPt1) is
@@ -512,7 +542,7 @@ generateSkillionRoof(const Polygon &footprint, const LineString &ridgeLine,
     // Copy all building faces except the top
     std::copy_if(buildingShell.begin(), buildingShell.end(),
                  std::back_inserter(*result),
-                 [buildingHeight](const Polygon &patch) {
+                 [buildingHeight](const Polygon &patch) -> bool {
                    return detail::isNotFaceAtHeight(patch, buildingHeight);
                  });
 
@@ -669,30 +699,120 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
 
   auto triangulated_surface = triangulation.getTriangulatedSurface();
 
-  // 3. Collect all ridge points from projected medial axis
-  std::vector<Point> ridgePoints;
+  // Calculate slope tangent for height computation
+  // Height = distance_to_boundary * tan(angle)
+  double slopeTan = std::tan(slopeAngle * M_PI / 180.0);
+
+  // Helper to check if a point is on the polygon boundary
+  auto isOnBoundary = [&footprint](const Point &pt) -> bool {
+    const auto &ring = footprint.exteriorRing();
+    Point_2     pt2D(pt.x(), pt.y());
+    for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
+      Point_2   segPt1(ring.pointN(i).x(), ring.pointN(i).y());
+      Point_2   segPt2(ring.pointN(i + 1).x(), ring.pointN(i + 1).y());
+      Segment_2 segment(segPt1, segPt2);
+      auto      sqDist = CGAL::squared_distance(pt2D, segment);
+      if (sqDist < Kernel::FT(EPSILON_SQ)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // 3. Collect ridge points with proper heights:
+  // - Interior points: use their actual distance to boundary
+  // - Boundary points (gable ends): use height of nearest interior point on same segment
+  std::map<std::pair<Kernel::FT, Kernel::FT>, Kernel::FT> ridgePointHeights;
+
   for (size_t i = 0; i < projectedMedialAxis->numGeometries(); ++i) {
     const auto *line =
         dynamic_cast<const LineString *>(&projectedMedialAxis->geometryN(i));
-    if (line != nullptr) {
-      for (size_t j = 0; j < line->numPoints(); ++j) {
-        ridgePoints.push_back(line->pointN(j));
+    if (line == nullptr || line->numPoints() == 0) {
+      continue;
+    }
+
+    // First pass: calculate heights for interior points
+    std::vector<Kernel::FT> pointDistances(line->numPoints());
+    std::vector<bool>       pointOnBoundary(line->numPoints());
+
+    for (size_t j = 0; j < line->numPoints(); ++j) {
+      const auto &pt     = line->pointN(j);
+      pointDistances[j]  = distanceToPolygonBoundary2D(pt, footprint);
+      pointOnBoundary[j] = isOnBoundary(pt);
+    }
+
+    // Second pass: assign heights
+    // For boundary points, find the nearest interior point's distance
+    for (size_t j = 0; j < line->numPoints(); ++j) {
+      const auto &pt  = line->pointN(j);
+      auto        key = std::make_pair(pt.x(), pt.y());
+
+      Kernel::FT height(0);
+      if (!pointOnBoundary[j]) {
+        // Interior point: use its actual distance
+        height = pointDistances[j] * slopeTan;
+      } else {
+        // Boundary point: find nearest interior point's height
+        Kernel::FT nearestInteriorDist(0);
+        // Search forward
+        for (size_t k = j + 1; k < line->numPoints(); ++k) {
+          if (!pointOnBoundary[k]) {
+            nearestInteriorDist = pointDistances[k];
+            break;
+          }
+        }
+        // If not found forward, search backward
+        if (nearestInteriorDist == Kernel::FT(0) && j > 0) {
+          for (size_t k = j; k > 0; --k) {
+            if (!pointOnBoundary[k - 1]) {
+              nearestInteriorDist = pointDistances[k - 1];
+              break;
+            }
+          }
+        }
+        height = nearestInteriorDist * slopeTan;
+      }
+
+      // Only update if we have a valid height or no existing entry
+      auto existingIt = ridgePointHeights.find(key);
+      if (existingIt == ridgePointHeights.end() || height > Kernel::FT(0)) {
+        ridgePointHeights[key] = height;
       }
     }
   }
 
-  // Helper function to check if a point is a ridge point
-  auto isRidgePoint = [&ridgePoints](const Point &point) -> bool {
-    return std::any_of(ridgePoints.begin(), ridgePoints.end(),
-                       [&point](const Point &ridgeP) {
-                         auto dx = point.x() - ridgeP.x();
-                         auto dy = point.y() - ridgeP.y();
-                         return dx * dx + dy * dy < Kernel::FT(EPSILON);
-                       });
+  // Helper function to check if a point is a ridge point and get its height
+  auto getRidgeHeight = [&ridgePointHeights](const Point &point) -> Kernel::FT {
+    auto key = std::make_pair(point.x(), point.y());
+    auto it  = ridgePointHeights.find(key);
+    if (it != ridgePointHeights.end()) {
+      return it->second;
+    }
+    // Fallback: search with tolerance
+    for (const auto &entry : ridgePointHeights) {
+      auto dx = entry.first.first - point.x();
+      auto dy = entry.first.second - point.y();
+      if (dx * dx + dy * dy < Kernel::FT(EPSILON)) {
+        return entry.second;
+      }
+    }
+    return {0};
   };
 
-  // Calculate ridge height from slope angle
-  double ridgeHeight = std::tan(slopeAngle * M_PI / 180.0);
+  auto isRidgePoint = [&ridgePointHeights](const Point &point) -> bool {
+    auto key = std::make_pair(point.x(), point.y());
+    if (ridgePointHeights.find(key) != ridgePointHeights.end()) {
+      return true;
+    }
+    // Fallback: search with tolerance
+    return std::any_of(
+        ridgePointHeights.begin(), ridgePointHeights.end(),
+        [&point](const auto &entry) -> bool {
+          auto dx = entry.first.first - point.x();
+          auto dy = entry.first.second - point.y();
+          return dx * dx + dy * dy < Kernel::FT(EPSILON);
+        });
+  };
 
   // Create roof surface
   auto roof = std::make_unique<PolyhedralSurface>();
@@ -717,21 +837,19 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       }
 
       // Create new vertices with proper Z coordinates
-      Kernel::FT zBase(0);
-      Kernel::FT zRidge(ridgeHeight);
-
-      Point newVertex1(vertex1.x(), vertex1.y(), zBase);
-      Point newVertex2(vertex2.x(), vertex2.y(), zBase);
-      Point newVertex3(vertex3.x(), vertex3.y(), zBase);
+      // Ridge points are elevated based on their distance to polygon boundary
+      Point newVertex1(vertex1.x(), vertex1.y(), Kernel::FT(0));
+      Point newVertex2(vertex2.x(), vertex2.y(), Kernel::FT(0));
+      Point newVertex3(vertex3.x(), vertex3.y(), Kernel::FT(0));
 
       if (isRidgePoint(vertex1)) {
-        newVertex1 = Point(vertex1.x(), vertex1.y(), zRidge);
+        newVertex1 = Point(vertex1.x(), vertex1.y(), getRidgeHeight(vertex1));
       }
       if (isRidgePoint(vertex2)) {
-        newVertex2 = Point(vertex2.x(), vertex2.y(), zRidge);
+        newVertex2 = Point(vertex2.x(), vertex2.y(), getRidgeHeight(vertex2));
       }
       if (isRidgePoint(vertex3)) {
-        newVertex3 = Point(vertex3.x(), vertex3.y(), zRidge);
+        newVertex3 = Point(vertex3.x(), vertex3.y(), getRidgeHeight(vertex3));
       }
 
       // Create roof triangle - ensure normal points upward (positive Z)
@@ -824,14 +942,15 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
 
       // Create ONE gable triangle connecting both corners to ridge top
       if (onBoundary && boundarySegmentPoints.size() == 2) {
-        Kernel::FT zRidge(ridgeHeight);
-        Kernel::FT zBase(0);
+        // Calculate ridge height using the constant segment height
+        auto ridgeZ = getRidgeHeight(ridgeEndpoint);
 
-        Point ridgeTop(ridgeEndpoint.x(), ridgeEndpoint.y(), zRidge);
+        Kernel::FT zBase(0);
         Point corner1(boundarySegmentPoints[0].x(),
                       boundarySegmentPoints[0].y(), zBase);
         Point corner2(boundarySegmentPoints[1].x(),
                       boundarySegmentPoints[1].y(), zBase);
+        Point ridgeTop(ridgeEndpoint.x(), ridgeEndpoint.y(), ridgeZ);
 
         // Gable centroid
         Kernel::FT gableCentroidX =
@@ -900,12 +1019,15 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
     // Copy all building faces except the top
     std::copy_if(buildingShell.begin(), buildingShell.end(),
                  std::back_inserter(*result),
-                 [buildingHeight](const Polygon &patch) {
+                 [buildingHeight](const Polygon &patch) -> bool {
                    return detail::isNotFaceAtHeight(patch, buildingHeight);
                  });
 
     // Add translated roof patches
     result->addPatchs(*roof);
+
+    // Orient the surface to have consistent face orientations
+    orientPolyhedralSurface(*result);
 
     // If addVerticalFaces is true, this should form a closed solid
     if (addVerticalFaces) {
