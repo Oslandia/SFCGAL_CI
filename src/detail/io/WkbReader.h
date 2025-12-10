@@ -135,7 +135,7 @@ private:
       std::string buffer(sizeType, '\0');
       _reader.readBytes(buffer, sizeType);
       std::transform(buffer.begin(), buffer.end(), byteArray.begin(),
-                     [](char c) { return std::byte(c); });
+                     [](char chr) -> std::byte { return std::byte(chr); });
 
       _index += sizeType;
     }
@@ -238,7 +238,7 @@ private:
     default:
       std::ostringstream oss;
       oss << "WkbReader: type '" << geometryType << "' is not supported";
-      std::cerr << oss.str() << std::endl;
+      std::cerr << oss.str() << '\n';
 
       return {};
     }
