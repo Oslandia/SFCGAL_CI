@@ -71,10 +71,10 @@ union3D(const Geometry &geometry1, const Geometry &geometry2, NoValidityCheck);
  * @param result Output geometry set containing the union
  */
 template <int Dim>
-void
+auto
 union_(const ::SFCGAL::detail::GeometrySet<Dim> &geometrySet1,
        const ::SFCGAL::detail::GeometrySet<Dim> &geometrySet2,
-       ::SFCGAL::detail::GeometrySet<Dim>       &result);
+       ::SFCGAL::detail::GeometrySet<Dim>       &result) -> void;
 
 /**
  * @brief Compute union of two PrimitiveHandle objects
@@ -83,10 +83,10 @@ union_(const ::SFCGAL::detail::GeometrySet<Dim> &geometrySet1,
  * @param result Output geometry set containing the union
  */
 template <int Dim>
-void
+auto
 union_(const ::SFCGAL::detail::PrimitiveHandle<Dim> &primitiveHandle1,
        const ::SFCGAL::detail::PrimitiveHandle<Dim> &primitiveHandle2,
-       ::SFCGAL::detail::GeometrySet<Dim>           &result);
+       ::SFCGAL::detail::GeometrySet<Dim>           &result) -> void;
 
 } // namespace algorithm
 } // namespace SFCGAL
