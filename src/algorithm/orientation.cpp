@@ -104,9 +104,9 @@ isCounterClockWiseOriented(const LineString &lineString) -> bool
   Kernel::FT z = 0;
 
   for (size_t i = 0; i < lineString.numSegments(); ++i) {
-    const Point &pi = lineString.pointN(i);
-    const Point &pj = lineString.pointN(i + 1);
-    z += (pi.x() - pj.x()) * (pi.y() + pj.y());
+    const Point &pointI = lineString.pointN(i);
+    const Point &pointJ = lineString.pointN(i + 1);
+    z += (pointI.x() - pointJ.x()) * (pointI.y() + pointJ.y());
   }
 
   return z > 0;
