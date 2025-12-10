@@ -31,14 +31,14 @@ struct NormalizedEdge {
   Point point2;
 
   NormalizedEdge() = default;
-  NormalizedEdge(const Point &p1, const Point &p2)
+  NormalizedEdge(const Point &pt1, const Point &pt2)
   {
-    if (comparePoints(p1, p2)) {
-      point1 = p1;
-      point2 = p2;
+    if (comparePoints(pt1, pt2)) {
+      point1 = pt1;
+      point2 = pt2;
     } else {
-      point1 = p2;
-      point2 = p1;
+      point1 = pt2;
+      point2 = pt1;
     }
   }
 
@@ -127,21 +127,9 @@ extractBoundaryEdges(const std::vector<Polygon> &polygons)
   // Collect boundary edges (count == 1) with correct orientation
   for (const auto &[edge, count] : edgeCount) {
     if (count == 1) {
-      // Find original orientation
-      const auto &origEdge  = edgeOrientation[edge];
-      Point       edgeStart = edge.point1;
-      Point       edgeEnd   = edge.point2;
-
-      // Check if original matches normalized order
-      bool isForward = (origEdge.first.x() == edgeStart.x() &&
-                        origEdge.first.y() == edgeStart.y() &&
-                        origEdge.first.z() == edgeStart.z());
-
-      if (isForward) {
-        result.edges.emplace_back(edgeStart, edgeEnd);
-      } else {
-        result.edges.emplace_back(edgeEnd, edgeStart);
-      }
+      // Find original orientation and use it directly
+      const auto &origEdge = edgeOrientation[edge];
+      result.edges.emplace_back(origEdge.first, origEdge.second);
     }
   }
 
@@ -177,17 +165,8 @@ extractBoundaryEdges(const TriangulatedSurface &surface) -> BoundaryEdgesResult
 
   for (const auto &[edge, count] : edgeCount) {
     if (count == 1) {
-      const auto &origEdge  = edgeOrientation[edge];
-      Point       edgeStart = edge.point1;
-      Point       edgeEnd   = edge.point2;
-      bool        isForward = (origEdge.first.x() == edgeStart.x() &&
-                        origEdge.first.y() == edgeStart.y() &&
-                        origEdge.first.z() == edgeStart.z());
-      if (isForward) {
-        result.edges.emplace_back(edgeStart, edgeEnd);
-      } else {
-        result.edges.emplace_back(edgeEnd, edgeStart);
-      }
+      const auto &origEdge = edgeOrientation[edge];
+      result.edges.emplace_back(origEdge.first, origEdge.second);
     }
   }
 
@@ -226,17 +205,8 @@ extractBoundaryEdgesFromTriangles(const PolyhedralSurface &surface)
 
   for (const auto &[edge, count] : edgeCount) {
     if (count == 1) {
-      const auto &origEdge  = edgeOrientation[edge];
-      Point       edgeStart = edge.point1;
-      Point       edgeEnd   = edge.point2;
-      bool        isForward = (origEdge.first.x() == edgeStart.x() &&
-                        origEdge.first.y() == edgeStart.y() &&
-                        origEdge.first.z() == edgeStart.z());
-      if (isForward) {
-        result.edges.emplace_back(edgeStart, edgeEnd);
-      } else {
-        result.edges.emplace_back(edgeEnd, edgeStart);
-      }
+      const auto &origEdge = edgeOrientation[edge];
+      result.edges.emplace_back(origEdge.first, origEdge.second);
     }
   }
 
