@@ -76,9 +76,9 @@ WkbReader::readInnerLineString() -> LineString
     for (uint32_t i = 0; i < numPoints; ++i) {
       result.addPoint(readInnerPoint());
     }
-  } catch (std::exception &e) {
+  } catch (std::exception &err) {
     BOOST_THROW_EXCEPTION(
-        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
+        Exception((boost::format("WkbReader error: %s") % err.what()).str()));
   }
   return result;
 }
@@ -101,9 +101,9 @@ WkbReader::readInnerPolygon() -> Polygon
         result.addInteriorRing(ls);
       }
     }
-  } catch (std::exception &e) {
+  } catch (std::exception &err) {
     BOOST_THROW_EXCEPTION(
-        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
+        Exception((boost::format("WkbReader error: %s") % err.what()).str()));
   }
   return result;
 }
@@ -126,8 +126,8 @@ WkbReader::readInnerTriangle() -> Triangle
     }
 
     return SFCGAL::Triangle{geom.pointN(0), geom.pointN(1), geom.pointN(2)};
-  } catch (std::exception &e) {
-    std::cerr << e.what();
+  } catch (std::exception &err) {
+    std::cerr << err.what();
   }
   return {};
 }
@@ -147,9 +147,9 @@ WkbReader::readInnerMultiGeometries() -> M
       G geom{_geometry->template as<G>()};
       result.addGeometry(geom);
     }
-  } catch (std::exception &e) {
+  } catch (std::exception &err) {
     BOOST_THROW_EXCEPTION(
-        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
+        Exception((boost::format("WkbReader error: %s") % err.what()).str()));
   }
   return result;
 }
@@ -169,9 +169,9 @@ WkbReader::readInnerGeometryCollection() -> GeometryCollection
         result.addGeometry(_geometry.release());
       }
     }
-  } catch (std::exception &e) {
+  } catch (std::exception &err) {
     BOOST_THROW_EXCEPTION(
-        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
+        Exception((boost::format("WkbReader error: %s") % err.what()).str()));
   }
   return result;
 }
@@ -192,9 +192,9 @@ WkbReader::readInnerTriangulatedSurface() -> TriangulatedSurface
         result.addPatch(geom);
       }
     }
-  } catch (std::exception &e) {
+  } catch (std::exception &err) {
     BOOST_THROW_EXCEPTION(
-        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
+        Exception((boost::format("WkbReader error: %s") % err.what()).str()));
   }
   return result;
 }
@@ -214,9 +214,9 @@ WkbReader::readInnerPolyhedralSurface() -> PolyhedralSurface
         geoms.push_back(_geometry->as<SFCGAL::Polygon>());
       }
     }
-  } catch (std::exception &e) {
+  } catch (std::exception &err) {
     BOOST_THROW_EXCEPTION(
-        Exception((boost::format("WkbReader error: %s") % e.what()).str()));
+        Exception((boost::format("WkbReader error: %s") % err.what()).str()));
   }
   SFCGAL::PolyhedralSurface const result{geoms};
   return result;
@@ -399,9 +399,9 @@ WkbReader::readInnerNURBSCurve() -> NURBSCurve
 
     return curve;
 
-  } catch (std::exception &e) {
+  } catch (std::exception &err) {
     BOOST_THROW_EXCEPTION(Exception(
-        (boost::format("WkbReader::readInnerNURBSCurve error: %s") % e.what())
+        (boost::format("WkbReader::readInnerNURBSCurve error: %s") % err.what())
             .str()));
   }
 }
