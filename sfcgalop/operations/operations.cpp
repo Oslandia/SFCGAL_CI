@@ -8,7 +8,7 @@
 #include "SFCGAL/version.h"
 #include <SFCGAL/Kernel.h>
 
-#if !defined(_MSC_VER)
+#ifndef _MSC_VER
   #include <SFCGAL/algorithm/alphaShapes.h>
 #endif
 #include <SFCGAL/algorithm/alphaWrapping3D.h>
@@ -144,7 +144,7 @@ parse_boolean(const std::string &str, bool default_val = false) -> bool
 {
   std::string lower_str = str;
   std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(),
-                 [](unsigned char chr) { return std::tolower(chr); });
+                 [](unsigned char chr) -> int { return std::tolower(chr); });
 
   if (lower_str == "true" || lower_str == "t" || lower_str == "1") {
     return true;
@@ -671,7 +671,7 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::minkowskiSum3D(*geom_a, *geom_b);
      }},
 
-#if !defined(_MSC_VER)
+#ifndef _MSC_VER
     {"alphashapes", "Construction", "Compute alpha shapes from point cloud",
      false,
      "Parameters:\n  alpha=VALUE: Alpha parameter controlling shape detail "
@@ -1487,10 +1487,11 @@ execute_operation(const std::string &op_name, const std::string &op_arg,
     -> std::optional<OperationResult>
 {
 
-  auto operation_it = std::find_if(operations.begin(), operations.end(),
-                                   [&op_name](const Operation &operation) {
-                                     return operation.name == op_name;
-                                   });
+  auto operation_it = std::find_if(
+      operations.begin(), operations.end(),
+      [&op_name](const Operation &operation) -> bool {
+        return operation.name == op_name;
+      });
 
   if (operation_it != operations.end()) {
     // Check for null geometry A before calling operation, but allow constructor
@@ -1563,7 +1564,9 @@ print_operation_help(const char *name) -> bool
 
   auto operation_it = std::find_if(
       operations.begin(), operations.end(),
-      [name](const Operation &operation) { return operation.name == name; });
+      [name](const Operation &operation) -> bool {
+        return operation.name == name;
+      });
 
   if (operation_it != operations.end()) {
     std::cout << "\nOperation: " << operation_it->name << "\n"
@@ -1629,11 +1632,11 @@ get_all_operations_info() -> std::vector<
 auto
 operation_requires_second_geometry(const std::string &operation_name) -> bool
 {
-  auto operation_it =
-      std::find_if(operations.begin(), operations.end(),
-                   [&operation_name](const Operation &operation) {
-                     return operation.name == operation_name;
-                   });
+  auto operation_it = std::find_if(
+      operations.begin(), operations.end(),
+      [&operation_name](const Operation &operation) -> bool {
+        return operation.name == operation_name;
+      });
 
   if (operation_it != operations.end()) {
     return operation_it->requires_b;
