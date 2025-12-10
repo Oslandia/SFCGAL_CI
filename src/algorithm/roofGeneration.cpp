@@ -908,32 +908,34 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       bool               onBoundary = false;
       std::vector<Point> boundarySegmentPoints;
 
-      Point_2 ridgeP2D(ridgeEndpoint.x(), ridgeEndpoint.y());
+      Point_2 ridgePoint2D(ridgeEndpoint.x(), ridgeEndpoint.y());
 
       for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
         const Point &segmentPoint1 = ring.pointN(i);
         const Point &segmentPoint2 = ring.pointN(i + 1);
 
-        Point_2 segPt1(segmentPoint1.x(), segmentPoint1.y());
-        Point_2 segPt2(segmentPoint2.x(), segmentPoint2.y());
+        Point_2 segStart2D(segmentPoint1.x(), segmentPoint1.y());
+        Point_2 segEnd2D(segmentPoint2.x(), segmentPoint2.y());
 
-        if (segPt1 == segPt2) {
+        if (segStart2D == segEnd2D) {
           continue;
         }
 
-        Segment_2  segment(segPt1, segPt2);
-        Kernel::FT sqDist = CGAL::squared_distance(ridgeP2D, segment);
+        Segment_2  segment(segStart2D, segEnd2D);
+        Kernel::FT sqDist = CGAL::squared_distance(ridgePoint2D, segment);
 
         if (sqDist < TOLERANCE_SQ) {
           onBoundary = true;
 
-          Kernel::FT sqDist1 = CGAL::squared_distance(ridgeP2D, segPt1);
-          Kernel::FT sqDist2 = CGAL::squared_distance(ridgeP2D, segPt2);
+          Kernel::FT sqDistToStart =
+              CGAL::squared_distance(ridgePoint2D, segStart2D);
+          Kernel::FT sqDistToEnd =
+              CGAL::squared_distance(ridgePoint2D, segEnd2D);
 
-          if (sqDist1 > TOLERANCE_SQ) {
+          if (sqDistToStart > TOLERANCE_SQ) {
             boundarySegmentPoints.push_back(segmentPoint1);
           }
-          if (sqDist2 > TOLERANCE_SQ) {
+          if (sqDistToEnd > TOLERANCE_SQ) {
             boundarySegmentPoints.push_back(segmentPoint2);
           }
           break;

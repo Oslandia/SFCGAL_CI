@@ -27,10 +27,17 @@ namespace SFCGAL::detail::algorithm {
  * ensuring that edges (A,B) and (B,A) map to the same key.
  */
 struct NormalizedEdge {
-  Point point1;
-  Point point2;
+  Point point1; ///< First point (lexicographically smaller)
+  Point point2; ///< Second point (lexicographically larger)
 
+  /// @brief Default constructor
   NormalizedEdge() = default;
+
+  /**
+   * @brief Construct a normalized edge from two points.
+   * @param pt1 First point of the edge.
+   * @param pt2 Second point of the edge.
+   */
   NormalizedEdge(const Point &pt1, const Point &pt2)
   {
     if (comparePoints(pt1, pt2)) {
@@ -42,6 +49,11 @@ struct NormalizedEdge {
     }
   }
 
+  /**
+   * @brief Less-than comparison operator for map ordering.
+   * @param other The edge to compare against.
+   * @return true if this edge is less than other.
+   */
   auto
   operator<(const NormalizedEdge &other) const -> bool
   {
@@ -65,15 +77,15 @@ struct NormalizedEdge {
 
 private:
   static auto
-  comparePoints(const Point &p1, const Point &p2) -> bool
+  comparePoints(const Point &pt1, const Point &pt2) -> bool
   {
-    if (p1.x() != p2.x()) {
-      return p1.x() < p2.x();
+    if (pt1.x() != pt2.x()) {
+      return pt1.x() < pt2.x();
     }
-    if (p1.y() != p2.y()) {
-      return p1.y() < p2.y();
+    if (pt1.y() != pt2.y()) {
+      return pt1.y() < pt2.y();
     }
-    return p1.z() < p2.z();
+    return pt1.z() < pt2.z();
   }
 };
 
@@ -86,8 +98,8 @@ using OrientedEdge = std::pair<Point, Point>;
  * @brief Result of boundary edge extraction.
  */
 struct BoundaryEdgesResult {
-  std::vector<OrientedEdge> edges;
-  bool                      success{true};
+  std::vector<OrientedEdge> edges;   ///< Vector of oriented boundary edges
+  bool                      success{true}; ///< Whether extraction succeeded
 };
 
 /**
@@ -113,12 +125,12 @@ extractBoundaryEdges(const std::vector<Polygon> &polygons)
     for (size_t ringIdx = 0; ringIdx < poly.numRings(); ++ringIdx) {
       const LineString &ring = poly.ringN(ringIdx);
       for (size_t i = 0; i < ring.numPoints() - 1; ++i) {
-        const Point   &p1 = ring.pointN(i);
-        const Point   &p2 = ring.pointN(i + 1);
-        NormalizedEdge key(p1, p2);
+        const Point   &pt1 = ring.pointN(i);
+        const Point   &pt2 = ring.pointN(i + 1);
+        NormalizedEdge key(pt1, pt2);
         edgeCount[key]++;
         if (edgeCount[key] == 1) {
-          edgeOrientation[key] = {p1, p2};
+          edgeOrientation[key] = {pt1, pt2};
         }
       }
     }
@@ -152,13 +164,13 @@ extractBoundaryEdges(const TriangulatedSurface &surface) -> BoundaryEdgesResult
 
   for (size_t i = 0; i < surface.numPatches(); ++i) {
     const Triangle &tri = surface.patchN(i);
-    for (int e = 0; e < 3; ++e) {
-      const Point   &p1 = tri.vertex(e);
-      const Point   &p2 = tri.vertex((e + 1) % 3);
-      NormalizedEdge key(p1, p2);
+    for (int edgeIdx = 0; edgeIdx < 3; ++edgeIdx) {
+      const Point   &pt1 = tri.vertex(edgeIdx);
+      const Point   &pt2 = tri.vertex((edgeIdx + 1) % 3);
+      NormalizedEdge key(pt1, pt2);
       edgeCount[key]++;
       if (edgeCount[key] == 1) {
-        edgeOrientation[key] = {p1, p2};
+        edgeOrientation[key] = {pt1, pt2};
       }
     }
   }
@@ -191,13 +203,13 @@ extractBoundaryEdgesFromTriangles(const PolyhedralSurface &surface)
   for (size_t i = 0; i < surface.numPatches(); ++i) {
     const auto &patch = surface.patchN(i);
     if (const auto *tri = dynamic_cast<const Triangle *>(&patch)) {
-      for (int e = 0; e < 3; ++e) {
-        const Point   &p1 = tri->vertex(e);
-        const Point   &p2 = tri->vertex((e + 1) % 3);
-        NormalizedEdge key(p1, p2);
+      for (int edgeIdx = 0; edgeIdx < 3; ++edgeIdx) {
+        const Point   &pt1 = tri->vertex(edgeIdx);
+        const Point   &pt2 = tri->vertex((edgeIdx + 1) % 3);
+        NormalizedEdge key(pt1, pt2);
         edgeCount[key]++;
         if (edgeCount[key] == 1) {
-          edgeOrientation[key] = {p1, p2};
+          edgeOrientation[key] = {pt1, pt2};
         }
       }
     }
@@ -240,7 +252,6 @@ buildConnectedLoops(std::vector<OrientedEdge> edges)
 
       // Check if loop is closed (using 2D comparison)
       if (currentEnd.x() == loopStart.x() && currentEnd.y() == loopStart.y()) {
-        loopClosed = true;
         break;
       }
 
@@ -318,7 +329,8 @@ findExteriorLoopIndex(const std::vector<std::vector<OrientedEdge>> &loops)
  */
 inline auto
 createWallTriangles(const Point &roofPt1, const Point &roofPt2,
-                    Kernel::FT baseZ = Kernel::FT(0)) -> std::vector<Triangle>
+                    const Kernel::FT &baseZ = Kernel::FT(0))
+    -> std::vector<Triangle>
 {
   std::vector<Triangle> walls;
 

@@ -29,8 +29,9 @@ struct NoValidityCheck;
  * @return union of the two geometries
  * @pre geometry1 and geometry2 are valid geometries
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           union_(const Geometry &geometry1, const Geometry &geometry2);
+SFCGAL_API auto
+union_(const Geometry &geometry1, const Geometry &geometry2)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * Union on 2D geometries. No validity check variant
@@ -40,8 +41,9 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @pre geometry1 and geometry2 are valid geometries
  * @warning No actual validity check is done.
  */
-SFCGAL_API std::unique_ptr<Geometry>
-union_(const Geometry &geometry1, const Geometry &geometry2, NoValidityCheck);
+SFCGAL_API auto
+union_(const Geometry &geometry1, const Geometry &geometry2, NoValidityCheck)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * Union on 3D geometries. Assume z = 0 if needed
@@ -50,8 +52,9 @@ union_(const Geometry &geometry1, const Geometry &geometry2, NoValidityCheck);
  * @return union of the two geometries
  * @pre geometry1 and geometry2 are valid geometries
  */
-SFCGAL_API std::unique_ptr<Geometry>
-           union3D(const Geometry &geometry1, const Geometry &geometry2);
+SFCGAL_API auto
+union3D(const Geometry &geometry1, const Geometry &geometry2)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * Union on 3D geometries. Assume z = 0 if needed
@@ -61,8 +64,9 @@ SFCGAL_API std::unique_ptr<Geometry>
  * @pre geometry1 and geometry2 are valid geometries
  * @warning No actual validity check is done
  */
-SFCGAL_API std::unique_ptr<Geometry>
-union3D(const Geometry &geometry1, const Geometry &geometry2, NoValidityCheck);
+SFCGAL_API auto
+union3D(const Geometry &geometry1, const Geometry &geometry2, NoValidityCheck)
+    -> std::unique_ptr<Geometry>;
 
 /**
  * @brief Compute union of two GeometrySet objects

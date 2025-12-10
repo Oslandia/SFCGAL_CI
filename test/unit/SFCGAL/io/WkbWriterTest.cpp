@@ -36,6 +36,7 @@ using namespace SFCGAL::io;
 
 BOOST_AUTO_TEST_SUITE(SFCGAL_io_WkbWriterTest)
 
+// NOLINTNEXTLINE(cert-err58-cpp)
 const std::vector<std::string> allowedBeThyFail{
     "GEOMETRYCOLLECTION (POINT Z (1 2 3), LINESTRING (0 0, 1 1, 2 2), "
     "POLYGON Z ((0 0 1, 0 3 2, 3 3 3, 3 0 4, 0 0 1)), MULTIPOINT M ((1 1 "

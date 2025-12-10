@@ -93,12 +93,12 @@ WkbReader::readInnerPolygon() -> Polygon
   try {
     const uint32_t numRings{read<uint32_t>()};
     for (uint32_t i = 0; i < numRings; ++i) {
-      SFCGAL::LineString const ls{readInnerLineString()};
+      SFCGAL::LineString const ring{readInnerLineString()};
 
       if (i == 0) {
-        result.setExteriorRing(ls);
+        result.setExteriorRing(ring);
       } else {
-        result.addInteriorRing(ls);
+        result.addInteriorRing(ring);
       }
     }
   } catch (std::exception &err) {
@@ -120,12 +120,13 @@ WkbReader::readInnerTriangle() -> Triangle
       return {};
     }
 
-    SFCGAL::LineString geom{poly.exteriorRing()};
-    if (geom.isEmpty()) {
+    const SFCGAL::LineString &exteriorRing{poly.exteriorRing()};
+    if (exteriorRing.isEmpty()) {
       return {};
     }
 
-    return SFCGAL::Triangle{geom.pointN(0), geom.pointN(1), geom.pointN(2)};
+    return SFCGAL::Triangle{exteriorRing.pointN(0), exteriorRing.pointN(1),
+                            exteriorRing.pointN(2)};
   } catch (std::exception &err) {
     std::cerr << err.what();
   }
