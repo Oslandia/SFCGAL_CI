@@ -17,9 +17,17 @@ list(APPEND CMAKE_IGNORE_PREFIX_PATH "/usr/local/include/SFCGAL")
 #
 # Cmake policies
 #
-cmake_policy(SET CMP0077 NEW)
-cmake_policy(SET CMP0167 NEW)
-cmake_policy(SET CMP0175 NEW)
+if(POLICY CMP0077)
+    cmake_policy(SET CMP0077 NEW)
+endif()
+
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
+endif()
+
+if(POLICY CMP0175)
+    cmake_policy(SET CMP0175 NEW)
+endif()
 
 #----------------------------------------------------------------------------
 # build options
