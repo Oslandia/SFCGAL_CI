@@ -241,6 +241,9 @@ WkbWriter::writeInner(const Triangle &geometry, boost::endian::order wkbOrder)
     for (int i = 0; i < 4; i++) {
       writeCoordinate(geometry.vertex(i), wkbOrder);
     }
+  } else {
+    // Empty triangle has 0 rings
+    toByte(static_cast<uint32_t>(0), wkbOrder);
   }
 }
 

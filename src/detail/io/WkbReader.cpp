@@ -131,9 +131,13 @@ WkbReader::readInnerTriangle() -> Triangle
 
     return SFCGAL::Triangle{geom.pointN(0), geom.pointN(1), geom.pointN(2)};
   } catch (std::exception &e) {
-    std::cerr << e.what();
+    // Propagate exception with context instead of swallowing it
+    // This allows callers to distinguish between empty geometry and parse error
+    BOOST_THROW_EXCEPTION(
+        Exception((boost::format("WkbReader error reading Triangle: %s") %
+                   e.what())
+                      .str()));
   }
-  return {};
 }
 
 /**
