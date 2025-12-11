@@ -454,9 +454,12 @@ WktReader::readInnerGeometryCollection(GeometryCollection &collection)
     bool saved_isMeasured = _isMeasured;
 
     // read a full wkt geometry ex : POINT (2.0 6.0)
-    Geometry *gg = readGeometry();
-    if (!gg->isEmpty()) {
-      collection.addGeometry(gg);
+    // Use unique_ptr to ensure proper memory management and null safety
+    std::unique_ptr<Geometry> gg(readGeometry());
+
+    // Check for null before dereferencing to prevent null pointer access
+    if (gg && !gg->isEmpty()) {
+      collection.addGeometry(gg.release());
     }
 
     // Restore state for next iteration
