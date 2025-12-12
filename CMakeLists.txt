@@ -129,13 +129,13 @@ if(SFCGAL_UBSAN)
         set(SFCGAL_UBSAN_FLAGS
             -fsanitize=undefined
             -fsanitize=float-divide-by-zero
-            -fsanitize=integer
-            -fno-sanitize=signed-integer-overflow  # CGAL uses intentional wrapping in some places
             -fno-sanitize-recover=all
             -g
         )
         add_compile_options(${SFCGAL_UBSAN_FLAGS})
         add_link_options(-fsanitize=undefined)
+        # Ensure C executables also link with UBSan runtime
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined" CACHE STRING "" FORCE)
     endif()
 endif()
 
