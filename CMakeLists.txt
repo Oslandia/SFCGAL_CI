@@ -134,8 +134,6 @@ if(SFCGAL_UBSAN)
         )
         add_compile_options(${SFCGAL_UBSAN_FLAGS})
         add_link_options(-fsanitize=undefined)
-        # Ensure C executables also link with UBSan runtime
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined" CACHE STRING "" FORCE)
     endif()
 endif()
 
@@ -382,6 +380,21 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"
 
     if (SFCGAL_BUILD_WITH_GPROF)
         target_link_options(SFCGAL PRIVATE -pg)
+    endif()
+
+    # Propagate sanitizer link options to targets linking against SFCGAL
+    # This ensures C executables (like test-regress-capi) link with sanitizer runtime
+    if(SFCGAL_UBSAN)
+        target_link_options(SFCGAL INTERFACE -fsanitize=undefined)
+    endif()
+    if(SFCGAL_ASAN)
+        target_link_options(SFCGAL INTERFACE -fsanitize=address)
+    endif()
+    if(SFCGAL_TSAN)
+        target_link_options(SFCGAL INTERFACE -fsanitize=thread)
+    endif()
+    if(SFCGAL_MSAN)
+        target_link_options(SFCGAL INTERFACE -fsanitize=memory)
     endif()
 endif()
 
