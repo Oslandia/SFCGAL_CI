@@ -6,6 +6,7 @@
 #ifndef SFCGAL_IO_WKTREADER_H_
 #define SFCGAL_IO_WKTREADER_H_
 
+#include <memory>
 #include <sstream>
 
 #include "SFCGAL/config.h"
@@ -54,11 +55,10 @@ public:
   /**
    * read a geometry from a string
    *
-   * @warning returns new instance
-   * @return pointer to newly created Geometry object
+   * @return unique_ptr to newly created Geometry object
    */
   auto
-  readGeometry() -> Geometry *;
+  readGeometry() -> std::unique_ptr<Geometry>;
 
   /**
    * read geometry type

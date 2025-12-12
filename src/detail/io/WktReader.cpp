@@ -44,7 +44,7 @@ WktReader::readSRID() -> srid_t
 }
 
 auto
-WktReader::readGeometry() -> Geometry *
+WktReader::readGeometry() -> std::unique_ptr<Geometry>
 {
   // Check recursion depth to prevent stack overflow (CWE-674)
   if (_recursionDepth >= MAX_RECURSION_DEPTH) {
@@ -67,79 +67,79 @@ WktReader::readGeometry() -> Geometry *
   case TYPE_POINT: {
     auto geom = std::make_unique<Point>();
     readInnerPoint(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_LINESTRING: {
     auto geom = std::make_unique<LineString>();
     readInnerLineString(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_TRIANGLE: {
     auto geom = std::make_unique<Triangle>();
     readInnerTriangle(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_POLYGON: {
     auto geom = std::make_unique<Polygon>();
     readInnerPolygon(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_MULTIPOINT: {
     auto geom = std::make_unique<MultiPoint>();
     readInnerMultiPoint(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_MULTILINESTRING: {
     auto geom = std::make_unique<MultiLineString>();
     readInnerMultiLineString(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_MULTIPOLYGON: {
     auto geom = std::make_unique<MultiPolygon>();
     readInnerMultiPolygon(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_GEOMETRYCOLLECTION: {
     auto geom = std::make_unique<GeometryCollection>();
     readInnerGeometryCollection(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_TRIANGULATEDSURFACE: {
     auto geom = std::make_unique<TriangulatedSurface>();
     readInnerTriangulatedSurface(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_POLYHEDRALSURFACE: {
     auto geom = std::make_unique<PolyhedralSurface>();
     readInnerPolyhedralSurface(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_SOLID: {
     auto geom = std::make_unique<Solid>();
     readInnerSolid(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_MULTISOLID: {
     auto geom = std::make_unique<MultiSolid>();
     readInnerMultiSolid(*geom);
-    return geom.release();
+    return geom;
   }
 
   case TYPE_NURBSCURVE: {
-    std::unique_ptr<NURBSCurve> geom(new NURBSCurve());
+    auto geom = std::make_unique<NURBSCurve>();
     readInnerNURBSCurve(*geom);
-    return geom.release();
+    return geom;
   }
   }
 
@@ -454,8 +454,7 @@ WktReader::readInnerGeometryCollection(GeometryCollection &collection)
     bool saved_isMeasured = _isMeasured;
 
     // read a full wkt geometry ex : POINT (2.0 6.0)
-    // Use unique_ptr to ensure proper memory management and null safety
-    std::unique_ptr<Geometry> gg(readGeometry());
+    auto gg = readGeometry();
 
     // Check for null before dereferencing to prevent null pointer access
     if (gg && !gg->isEmpty()) {
