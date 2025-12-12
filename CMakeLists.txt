@@ -125,10 +125,14 @@ if(SFCGAL_UBSAN)
         message(WARNING "UBSan is not fully supported on MSVC")
     else()
         message(STATUS "UndefinedBehaviorSanitizer enabled")
-        # Common UBSan checks - avoid some that cause issues with CGAL's exact arithmetic
+        # Common UBSan checks
+        # Disabled checks:
+        # - vptr: false positives in CGAL's iterator code (Arrangement_2_iterators.h)
+        # - pointer-overflow: false positives with libc++ iterator wrappers
         set(SFCGAL_UBSAN_FLAGS
             -fsanitize=undefined
             -fsanitize=float-divide-by-zero
+            -fno-sanitize=vptr,pointer-overflow
             -fno-sanitize-recover=all
             -g
         )
