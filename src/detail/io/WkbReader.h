@@ -191,6 +191,34 @@ private:
    * to SFCGAL one.
    *
    */
+  /**
+   * Validate that a numeric value is a valid GeometryType enum value.
+   * Valid values: 1-7 (basic types), 15-17 (surface types), 21 (NURBS), 25-26
+   * (solids)
+   */
+  static auto
+  isValidGeometryType(uint32_t value) -> bool
+  {
+    switch (value) {
+    case TYPE_POINT:
+    case TYPE_LINESTRING:
+    case TYPE_POLYGON:
+    case TYPE_MULTIPOINT:
+    case TYPE_MULTILINESTRING:
+    case TYPE_MULTIPOLYGON:
+    case TYPE_GEOMETRYCOLLECTION:
+    case TYPE_POLYHEDRALSURFACE:
+    case TYPE_TRIANGULATEDSURFACE:
+    case TYPE_TRIANGLE:
+    case TYPE_NURBSCURVE:
+    case TYPE_SOLID:
+    case TYPE_MULTISOLID:
+      return true;
+    default:
+      return false;
+    }
+  }
+
   auto
   readGeometryType() -> GeometryType
   {
@@ -202,12 +230,10 @@ private:
         _isEWKB = true;
       }
 
-      if ((geometryType & wkbZ) == wkbZ) {
-        _is3D = true;
-      }
-      if ((geometryType & wkbM) == wkbM) {
-        _isMeasured = true;
-      }
+      // Reset flags first, then set based on actual geometry flags
+      // This is critical for mixed-dimension collections
+      _is3D       = (geometryType & wkbZ) == wkbZ;
+      _isMeasured = (geometryType & wkbM) == wkbM;
       geometryType &= 0x0FFFFFFF;
     } else {
       if (geometryType >= COORDINATE_XYZM) {
@@ -222,6 +248,12 @@ private:
         _is3D       = true;
         _isMeasured = false;
         geometryType -= COORDINATE_XYZ;
+      } else {
+        // Pure 2D geometry (type < 1000) - reset flags
+        // This is critical for mixed-dimension collections where a 2D
+        // sub-geometry follows a 3D parent
+        _is3D       = false;
+        _isMeasured = false;
       }
     }
 
