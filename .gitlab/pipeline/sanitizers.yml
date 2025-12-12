@@ -1,0 +1,46 @@
+# Sanitizers CI Pipeline - extends debian_clang base
+# ASan: buffer overflows, use-after-free, memory leaks
+# UBSan: undefined behavior, integer overflows
+
+# Combined ASan + UBSan
+asan_ubsan:
+  extends: .debian_test_base
+  variables:
+    PACKAGE: "clang"
+    C_COMPILER: "clang"
+    CXX_COMPILER: "clang++"
+    CGAL_VERSION: $CGAL_LATEST_VERSION
+    OS_VERSION: "testing"
+    ASAN_OPTIONS: "halt_on_error=1:abort_on_error=1"
+    UBSAN_OPTIONS: "halt_on_error=1:abort_on_error=1:print_stacktrace=1"
+  # TODO: Uncomment to run only on master after testing
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  #     when: always
+  #   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  #     when: manual
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+    - when: always
+  script:
+    - apt-get update -qq
+    - apt-get install --yes sudo wget ${PACKAGE}
+    - ./ci/debian/before_install.sh $CGAL_VERSION
+    - cd $CI_PROJECT_DIR
+    - cmake -DCMAKE_BUILD_TYPE=Debug
+      -DSFCGAL_ASAN=ON
+      -DSFCGAL_UBSAN=ON
+      -DSFCGAL_BUILD_TESTS=ON
+      -DCMAKE_C_COMPILER=/usr/bin/${C_COMPILER}
+      -DCMAKE_CXX_COMPILER=/usr/bin/${CXX_COMPILER}
+      -DCGAL_DIR=${CI_PROJECT_DIR}/CGAL-${CGAL_VERSION}
+    - make -j$(nproc)
+    - ctest --output-on-failure
+  parallel: null  # Override matrix - run only once
+  artifacts:
+    when: on_failure
+    expire_in: 7 days
+    paths:
+      - CMakeFiles/CMakeError.log
+      - Testing/

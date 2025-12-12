@@ -28,7 +28,7 @@
 # - the output is not always clean :
 #   - TIN should sometimes be COLLECTION(TIN) if more than one connected component
 #   - MULTIPOLYGON should be POLYHEDRAL (if connected polygons)
-#   - GEOMETRYCOLLECTION(TRIANGLE...) could be a TIN 
+#   - GEOMETRYCOLLECTION(TRIANGLE...) could be a TIN
 ####################################################################################################
 
 #
@@ -241,7 +241,7 @@ S|polyhedral|POLYHEDRALSURFACE(((1.7 1.7,1.7 1.3,2 2,1.7 1.7)),((1.3 1.3,0 0,2 0
 
 #
 # triangle x polyhedral
-# 
+#
 
 # touching a vertex
 2|@polyhedral|TRIANGLE((-1 -1,0 -1,0 0,-1 -1))|POINT(0 0)

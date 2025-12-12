@@ -147,7 +147,8 @@ parseObjData(std::istream &inOBJ) -> ObjData
     } else if (type == "p") {
       // Point: p v1
       if (obj_data.points.size() >= MAX_POINTS) {
-        BOOST_THROW_EXCEPTION(Exception("OBJ file exceeds maximum point count"));
+        BOOST_THROW_EXCEPTION(
+            Exception("OBJ file exceeds maximum point count"));
       }
       size_t vertex_index;
       if (iss >> vertex_index) {

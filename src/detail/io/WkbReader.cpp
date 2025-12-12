@@ -133,10 +133,9 @@ WkbReader::readInnerTriangle() -> Triangle
   } catch (std::exception &e) {
     // Propagate exception with context instead of swallowing it
     // This allows callers to distinguish between empty geometry and parse error
-    BOOST_THROW_EXCEPTION(
-        Exception((boost::format("WkbReader error reading Triangle: %s") %
-                   e.what())
-                      .str()));
+    BOOST_THROW_EXCEPTION(Exception(
+        (boost::format("WkbReader error reading Triangle: %s") % e.what())
+            .str()));
   }
 }
 
