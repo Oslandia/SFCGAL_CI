@@ -50,7 +50,12 @@ option( SFCGAL_BUILD_DOC "Build documentation" OFF )
 
 option( SFCGAL_WITH_OSG "Compile with OpenSceneGraph support" OFF )
 option( SFCGAL_VALGRIND "Compile with Valgrind support" OFF )
-option( SFCGAL_TSAN "Enable ThreadSanitizer (Debug only)" OFF)
+
+#-- Sanitizers (mutually exclusive: ASAN/TSAN/MSAN cannot be combined)
+option( SFCGAL_ASAN "Enable AddressSanitizer (memory errors)" OFF )
+option( SFCGAL_UBSAN "Enable UndefinedBehaviorSanitizer" OFF )
+option( SFCGAL_TSAN "Enable ThreadSanitizer (Debug only)" OFF )
+option( SFCGAL_MSAN "Enable MemorySanitizer (requires instrumented deps)" OFF )
 
 # Configure CCache if available
 if(NOT MSVC)
@@ -81,15 +86,86 @@ if( SFCGAL_VALGRIND )
   add_definitions( "-DCGAL_DISABLE_ROUNDING_MATH_CHECK" )
 endif()
 
-# Require Debug build if SFCGAL_TSAN is ON
-if ( SFCGAL_TSAN )
-    if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message(FATAL_ERROR "SFCGAL_TSAN is enabled but CMAKE_BUILD_TYPE is not Debug. Please configure with -DCMAKE_BUILD_TYPE=Debug")
-    endif()
+#-- Sanitizers configuration
+# Check for mutual exclusivity (ASan, TSan, MSan cannot be combined)
+set(_SFCGAL_SANITIZER_COUNT 0)
+if(SFCGAL_ASAN)
+    math(EXPR _SFCGAL_SANITIZER_COUNT "${_SFCGAL_SANITIZER_COUNT} + 1")
+endif()
+if(SFCGAL_TSAN)
+    math(EXPR _SFCGAL_SANITIZER_COUNT "${_SFCGAL_SANITIZER_COUNT} + 1")
+endif()
+if(SFCGAL_MSAN)
+    math(EXPR _SFCGAL_SANITIZER_COUNT "${_SFCGAL_SANITIZER_COUNT} + 1")
+endif()
 
-    message(STATUS "ThreadSanitizer enabled (C & C++)")
+if(_SFCGAL_SANITIZER_COUNT GREATER 1)
+    message(FATAL_ERROR "SFCGAL_ASAN, SFCGAL_TSAN, and SFCGAL_MSAN are mutually exclusive. Enable only one.")
+endif()
+
+# AddressSanitizer (ASan) - detects memory errors
+if(SFCGAL_ASAN)
+    if(MSVC)
+        message(STATUS "AddressSanitizer enabled (MSVC)")
+        add_compile_options(/fsanitize=address)
+    else()
+        message(STATUS "AddressSanitizer enabled (GCC/Clang)")
+        add_compile_options(-fsanitize=address -fno-omit-frame-pointer -g)
+        add_link_options(-fsanitize=address)
+        # Note: LeakSanitizer is enabled by default with ASan on Linux
+        # but is NOT supported on FreeBSD/macOS
+    endif()
+endif()
+
+# UndefinedBehaviorSanitizer (UBSan) - detects undefined behavior
+# Can be combined with ASan or TSan
+if(SFCGAL_UBSAN)
+    if(MSVC)
+        message(WARNING "UBSan is not fully supported on MSVC")
+    else()
+        message(STATUS "UndefinedBehaviorSanitizer enabled")
+        # Common UBSan checks
+        # Disabled checks:
+        # - vptr: false positives in CGAL's iterator code (Arrangement_2_iterators.h)
+        # - pointer-overflow: false positives with libc++ iterator wrappers
+        set(SFCGAL_UBSAN_FLAGS
+            -fsanitize=undefined
+            -fsanitize=float-divide-by-zero
+            -fno-sanitize=vptr,pointer-overflow
+            -fno-sanitize-recover=all
+            -g
+        )
+        add_compile_options(${SFCGAL_UBSAN_FLAGS})
+        add_link_options(-fsanitize=undefined)
+    endif()
+endif()
+
+# ThreadSanitizer (TSan) - detects data races
+if(SFCGAL_TSAN)
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        message(FATAL_ERROR "SFCGAL_TSAN requires CMAKE_BUILD_TYPE=Debug or RelWithDebInfo")
+    endif()
+    if(MSVC)
+        message(FATAL_ERROR "ThreadSanitizer is not supported on MSVC")
+    endif()
+    message(STATUS "ThreadSanitizer enabled")
     add_compile_options(-fsanitize=thread -g)
     add_link_options(-fsanitize=thread)
+endif()
+
+# MemorySanitizer (MSan) - detects uninitialized memory reads
+# Note: Requires ALL dependencies to be built with MSan instrumentation
+if(SFCGAL_MSAN)
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "MemorySanitizer is only supported with Clang")
+    endif()
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        message(FATAL_ERROR "SFCGAL_MSAN requires CMAKE_BUILD_TYPE=Debug or RelWithDebInfo")
+    endif()
+    message(STATUS "MemorySanitizer enabled")
+    message(WARNING "MSan requires all dependencies (CGAL, Boost, GMP, MPFR) to be built with -fsanitize=memory")
+    add_compile_options(-fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer -g)
+    add_link_options(-fsanitize=memory)
 endif()
 
 #-- find CGAL  ---------------------------------------------
@@ -307,6 +383,21 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"
 
     if (SFCGAL_BUILD_WITH_GPROF)
         target_link_options(SFCGAL PRIVATE -pg)
+    endif()
+
+    # Propagate sanitizer link options to targets linking against SFCGAL
+    # This ensures C executables (like test-regress-capi) link with sanitizer runtime
+    if(SFCGAL_UBSAN)
+        target_link_options(SFCGAL INTERFACE -fsanitize=undefined)
+    endif()
+    if(SFCGAL_ASAN)
+        target_link_options(SFCGAL INTERFACE -fsanitize=address)
+    endif()
+    if(SFCGAL_TSAN)
+        target_link_options(SFCGAL INTERFACE -fsanitize=thread)
+    endif()
+    if(SFCGAL_MSAN)
+        target_link_options(SFCGAL INTERFACE -fsanitize=memory)
     endif()
 endif()
 
