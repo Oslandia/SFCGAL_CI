@@ -67,6 +67,9 @@ repairWithRule(const Multipolygon_with_holes_2     &mp,
 
 /**
  * @brief Convert geometry to Multipolygon_with_holes_2
+ * @note We pass fixOrientation=false to avoid calling orientation() which
+ *       has an is_simple_2 precondition that fails on self-intersecting
+ *       polygons. The repair algorithm will handle orientation correction.
  */
 auto
 geometryToMultipolygonWithHoles(const SFCGAL::Geometry &geometry)
@@ -76,13 +79,13 @@ geometryToMultipolygonWithHoles(const SFCGAL::Geometry &geometry)
   case SFCGAL::TYPE_POLYGON: {
     const auto               &polygon = geometry.as<SFCGAL::Polygon>();
     Multipolygon_with_holes_2 mp;
-    mp.add_polygon_with_holes(polygon.toPolygon_with_holes_2(true));
+    mp.add_polygon_with_holes(polygon.toPolygon_with_holes_2(false));
     return mp;
   }
 
   case SFCGAL::TYPE_MULTIPOLYGON: {
     const auto &multipolygon = geometry.as<SFCGAL::MultiPolygon>();
-    return multipolygon.toMultipolygon_with_holes_2(true);
+    return multipolygon.toMultipolygon_with_holes_2(false);
   }
 
   default:
