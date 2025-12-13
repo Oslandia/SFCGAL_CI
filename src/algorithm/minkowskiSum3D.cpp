@@ -12,6 +12,7 @@
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/translate.h"
 #include "SFCGAL/detail/GeometrySet.h"
 #include "SFCGAL/detail/transform/AffineTransform3.h"
 
@@ -194,6 +195,40 @@ minkowskiSum3D(const Geometry &gA, const Geometry &gB,
 {
   if (gA.isEmpty() || gB.isEmpty()) {
     return std::unique_ptr<Geometry>(new GeometryCollection());
+  }
+
+  // Special case: Minkowski(A, Point) = translation of A by the point vector
+  // Returns PolyhedralSurface to match the normal minkowskiSum3D output type
+  if (gB.geometryTypeId() == TYPE_POINT) {
+    const auto &pointOperand = gB.as<Point>();
+    if (gA.geometryTypeId() == TYPE_SOLID) {
+      // For Solid, extract exterior shell and translate
+      auto polyhedralSurface =
+          std::make_unique<PolyhedralSurface>(gA.as<Solid>().exteriorShell());
+      translate(*polyhedralSurface, pointOperand.x(), pointOperand.y(),
+                pointOperand.z());
+      return polyhedralSurface;
+    }
+    std::unique_ptr<Geometry> result = gA.clone();
+    translate(*result, pointOperand.x(), pointOperand.y(), pointOperand.z());
+    return result;
+  }
+
+  // Special case: Minkowski(Point, B) = translation of B by the point vector
+  // Returns PolyhedralSurface to match the normal minkowskiSum3D output type
+  if (gA.geometryTypeId() == TYPE_POINT) {
+    const auto &pointOperand = gA.as<Point>();
+    if (gB.geometryTypeId() == TYPE_SOLID) {
+      // For Solid, extract exterior shell and translate
+      auto polyhedralSurface =
+          std::make_unique<PolyhedralSurface>(gB.as<Solid>().exteriorShell());
+      translate(*polyhedralSurface, pointOperand.x(), pointOperand.y(),
+                pointOperand.z());
+      return polyhedralSurface;
+    }
+    std::unique_ptr<Geometry> result = gB.clone();
+    translate(*result, pointOperand.x(), pointOperand.y(), pointOperand.z());
+    return result;
   }
 
   Nef_polyhedron_3 nefA = geometryToNef(gA);
