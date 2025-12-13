@@ -361,6 +361,9 @@ sfcgal_geometry_dimension(const sfcgal_geometry_t *geom) -> int
 extern "C" auto
 sfcgal_geometry_is_valid(const sfcgal_geometry_t *geom) -> int
 {
+  if (geom == nullptr) {
+    return 0;
+  }
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
       return (int)bool(SFCGAL::algorithm::isValid(
           *reinterpret_cast<const SFCGAL::Geometry *>(geom)));)
