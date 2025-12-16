@@ -46,6 +46,7 @@
 #if SFCGAL_CGAL_VERSION_MAJOR >= 6
   #include <SFCGAL/algorithm/polygonRepair.h>
 #endif
+#include "SFCGAL/detail/transform/ForceOrderPoints.h"
 #include <SFCGAL/algorithm/rotate.h>
 #include <SFCGAL/algorithm/scale.h>
 #include <SFCGAL/algorithm/simplification.h>
@@ -824,6 +825,34 @@ const std::vector<Operation> operations = {
        double m      = params.count("m") ? params["m"] : 1.0;
        auto   result = geom_a->clone();
        SFCGAL::algorithm::forceMeasured(*result, m);
+       return result;
+     }},
+
+    {"forceLHR", "Transformations",
+     "Force a Left Handed Rule on the given Geometry", false,
+     "No parameters required.\n\nExample:\n  sfcgalop -a \"MULTIPOLYGON (((9 "
+     "9, 9 1, 1 1, 2 4, 7 7, 9 9)))\" "
+     "forceLHR",
+     "A", "G",
+     [](const std::string &, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto                                result = geom_a->clone();
+       SFCGAL::transform::ForceOrderPoints force(/* ccw */ true);
+       result->accept(force);
+       return result;
+     }},
+
+    {"forceRHR", "Transformations",
+     "Force a Right Handed Rule on the given Geometry", false,
+     "No parameters required.\n\nExample:\n  sfcgalop -a \"MULTIPOLYGON (((9 "
+     "9,7 7,2 4,1 1,9 1,9 9)))\" "
+     "forceRHR",
+     "A", "G",
+     [](const std::string &, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto                                result = geom_a->clone();
+       SFCGAL::transform::ForceOrderPoints force(/* ccw */ false);
+       result->accept(force);
        return result;
      }},
 
