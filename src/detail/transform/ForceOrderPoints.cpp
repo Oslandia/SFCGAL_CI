@@ -21,6 +21,10 @@ ForceOrderPoints::transform(Point & /*point*/)
 void
 ForceOrderPoints::visit(Triangle &t)
 {
+  if (t.isEmpty()) {
+    return;
+  }
+
   if (!SFCGAL::algorithm::isCounterClockWiseOriented(t)) {
     // not pointing up, reverse
     if (_orientCCW) {
@@ -38,6 +42,10 @@ ForceOrderPoints::visit(Triangle &t)
 void
 ForceOrderPoints::visit(Polygon &p)
 {
+  if (p.isEmpty()) {
+    return;
+  }
+
   LineString &ext = p.exteriorRing();
 
   if (!SFCGAL::algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
