@@ -19,36 +19,36 @@ ForceOrderPoints::transform(Point & /*point*/)
 }
 
 void
-ForceOrderPoints::visit(Triangle &t)
+ForceOrderPoints::visit(Triangle &triangle)
 {
-  if (t.isEmpty()) {
+  if (triangle.isEmpty()) {
     return;
   }
 
-  if (!SFCGAL::algorithm::isCounterClockWiseOriented(t)) {
+  if (!SFCGAL::algorithm::isCounterClockWiseOriented(triangle)) {
     // not pointing up, reverse
     if (_orientCCW) {
-      t.reverse();
+      triangle.reverse();
     }
   } else {
     if (!_orientCCW) {
-      t.reverse();
+      triangle.reverse();
     }
   }
 
-  Transform::visit(t);
+  Transform::visit(triangle);
 }
 
 void
-ForceOrderPoints::visit(Polygon &p)
+ForceOrderPoints::visit(Polygon &polygon)
 {
-  if (p.isEmpty()) {
+  if (polygon.isEmpty()) {
     return;
   }
 
-  LineString &ext = p.exteriorRing();
+  LineString &ext = polygon.exteriorRing();
 
-  if (!SFCGAL::algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
+  if (!SFCGAL::algorithm::isCounterClockWiseOriented(polygon.exteriorRing())) {
     // exterior ring not pointing up, reverse
     if (_orientCCW) {
       ext.reverse();
@@ -59,15 +59,15 @@ ForceOrderPoints::visit(Polygon &p)
     }
   }
   const bool isCCWO{SFCGAL::algorithm::isCounterClockWiseOriented(ext)};
-  for (size_t i = 0; i < p.numInteriorRings(); ++i) {
-    LineString &inter = p.interiorRingN(i);
+  for (size_t i = 0; i < polygon.numInteriorRings(); ++i) {
+    LineString &inter = polygon.interiorRingN(i);
 
     if (SFCGAL::algorithm::isCounterClockWiseOriented(inter) == isCCWO) {
       inter.reverse();
     }
   }
 
-  Transform::visit(p);
+  Transform::visit(polygon);
 }
 
 } // namespace SFCGAL::transform
