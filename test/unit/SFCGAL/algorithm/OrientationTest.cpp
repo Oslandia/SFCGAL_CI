@@ -3,6 +3,7 @@
 // Copyright (c) 2024-2025, SFCGAL team.
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
+#include <boost/test/tools/old/interface.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "SFCGAL/GeometryCollection.h"
@@ -19,6 +20,7 @@
 #include "SFCGAL/Triangle.h"
 #include "SFCGAL/TriangulatedSurface.h"
 #include "SFCGAL/algorithm/orientation.h"
+#include "SFCGAL/detail/transform/ForceOrderPoints.h"
 #include "SFCGAL/io/wkt.h"
 
 using namespace SFCGAL;
@@ -153,6 +155,16 @@ BOOST_AUTO_TEST_CASE(testPostGISIssue3651)
   std::getline(ifs, inputWkt);
   std::unique_ptr<Geometry> g(io::readWkt(inputWkt));
   algorithm::isCounterClockWiseOriented(g->as<Polygon>());
+}
+
+BOOST_AUTO_TEST_CASE(testPostGISIssue6029)
+{
+  std::unique_ptr<Geometry> geom(
+      io::readWkt("MULTIPOLYGON (((9 9, 9 1, 1 1, 2 4, 7 7, 9 9)), EMPTY)"));
+  SFCGAL::transform::ForceOrderPoints force(/* ccw */ true);
+  geom->accept(force);
+  BOOST_CHECK_EQUAL(geom->asText(0),
+                    "MULTIPOLYGON (((9 9,7 7,2 4,1 1,9 1,9 9)))");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
