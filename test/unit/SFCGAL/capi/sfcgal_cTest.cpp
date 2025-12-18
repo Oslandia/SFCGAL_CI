@@ -1827,6 +1827,33 @@ BOOST_AUTO_TEST_CASE(testSphereTest)
   // check clone
   sfcgal_primitive_t *sphere2 = sfcgal_primitive_clone(sphere);
   BOOST_CHECK(sfcgal_primitive_is_almost_equals(sphere, sphere2, 0.0));
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(sphere, "radius"),
+                    sfcgal_primitive_parameter_double(sphere2, "radius"), 1e-6);
+  BOOST_CHECK_EQUAL(sfcgal_primitive_parameter_int(sphere, "num_vertical"),
+                    sfcgal_primitive_parameter_int(sphere2, "num_vertical"));
+  BOOST_CHECK_EQUAL(sfcgal_primitive_parameter_int(sphere, "num_horizontal"),
+                    sfcgal_primitive_parameter_int(sphere2, "num_horizontal"));
+
+  double *center1 = sfcgal_primitive_parameter_point(sphere, "center");
+  double *center2 = sfcgal_primitive_parameter_point(sphere2, "center");
+  BOOST_CHECK(center1 != nullptr);
+  BOOST_CHECK(center2 != nullptr);
+  BOOST_CHECK_CLOSE(center1[0], center2[0], 1e-6);
+  BOOST_CHECK_CLOSE(center1[1], center2[1], 1e-6);
+  BOOST_CHECK_CLOSE(center1[2], center2[2], 1e-6);
+  sfcgal_free_buffer(center1);
+  sfcgal_free_buffer(center2);
+
+  double *direction1 = sfcgal_primitive_parameter_vector(sphere, "direction");
+  double *direction2 = sfcgal_primitive_parameter_vector(sphere2, "direction");
+  BOOST_CHECK(direction1 != nullptr);
+  BOOST_CHECK(direction2 != nullptr);
+  BOOST_CHECK_CLOSE(direction1[0], direction2[0], 1e-6);
+  BOOST_CHECK_CLOSE(direction1[1], direction2[1], 1e-6);
+  BOOST_CHECK_CLOSE(direction1[2], direction2[2], 1e-6);
+  sfcgal_free_buffer(direction1);
+  sfcgal_free_buffer(direction2);
+
   sfcgal_primitive_delete(sphere2);
 
   // check polyhedral conversion
@@ -1960,6 +1987,37 @@ BOOST_AUTO_TEST_CASE(testCylinderTest)
 
   // check clone
   sfcgal_primitive_t *cylinder2 = sfcgal_primitive_clone(cylinder);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(cylinder, "radius"),
+                    sfcgal_primitive_parameter_double(cylinder2, "radius"),
+                    1e-6);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(cylinder, "height"),
+                    sfcgal_primitive_parameter_double(cylinder2, "height"),
+                    1e-6);
+  BOOST_CHECK_EQUAL(sfcgal_primitive_parameter_int(cylinder, "num_radial"),
+                    sfcgal_primitive_parameter_int(cylinder2, "num_radial"));
+  BOOST_CHECK_EQUAL(sfcgal_primitive_parameter_int(cylinder, "num_radial"),
+                    sfcgal_primitive_parameter_int(cylinder2, "num_radial"));
+
+  double *center1 = sfcgal_primitive_parameter_point(cylinder, "base_center");
+  double *center2 = sfcgal_primitive_parameter_point(cylinder2, "base_center");
+  BOOST_CHECK(center1 != nullptr);
+  BOOST_CHECK(center2 != nullptr);
+  BOOST_CHECK_CLOSE(center1[0], center2[0], 1e-6);
+  BOOST_CHECK_CLOSE(center1[1], center2[1], 1e-6);
+  BOOST_CHECK_CLOSE(center1[2], center2[2], 1e-6);
+  sfcgal_free_buffer(center1);
+  sfcgal_free_buffer(center2);
+
+  double *axis1 = sfcgal_primitive_parameter_vector(cylinder, "axis");
+  double *axis2 = sfcgal_primitive_parameter_vector(cylinder2, "axis");
+  BOOST_CHECK(axis1 != nullptr);
+  BOOST_CHECK(axis2 != nullptr);
+  BOOST_CHECK_CLOSE(axis1[0], axis2[0], 1e-6);
+  BOOST_CHECK_CLOSE(axis1[1], axis2[1], 1e-6);
+  BOOST_CHECK_CLOSE(axis1[2], axis2[2], 1e-6);
+  sfcgal_free_buffer(axis1);
+  sfcgal_free_buffer(axis2);
+
   BOOST_CHECK(sfcgal_primitive_is_almost_equals(cylinder, cylinder2, 0.0));
   sfcgal_primitive_delete(cylinder2);
 
@@ -2111,6 +2169,16 @@ BOOST_AUTO_TEST_CASE(testTorusTest)
 
   // check clone
   sfcgal_primitive_t *torus2 = sfcgal_primitive_clone(torus);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(torus, "main_radius"),
+                    sfcgal_primitive_parameter_double(torus2, "main_radius"),
+                    1e-6);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(torus, "tube_radius"),
+                    sfcgal_primitive_parameter_double(torus2, "tube_radius"),
+                    1e-6);
+  BOOST_CHECK_EQUAL(sfcgal_primitive_parameter_int(torus, "main_num_radial"),
+                    sfcgal_primitive_parameter_int(torus2, "main_num_radial"));
+  BOOST_CHECK_EQUAL(sfcgal_primitive_parameter_int(torus, "tube_num_radial"),
+                    sfcgal_primitive_parameter_int(torus2, "tube_num_radial"));
   BOOST_CHECK(sfcgal_primitive_is_almost_equals(torus, torus2, 0.0));
   sfcgal_primitive_delete(torus2);
 
@@ -2203,6 +2271,12 @@ BOOST_AUTO_TEST_CASE(testBoxTest)
 
   // check clone
   sfcgal_primitive_t *box2 = sfcgal_primitive_clone(box);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(box, "x_extent"),
+                    sfcgal_primitive_parameter_double(box2, "x_extent"), 1e-6);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(box, "y_extent"),
+                    sfcgal_primitive_parameter_double(box2, "y_extent"), 1e-6);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(box, "z_extent"),
+                    sfcgal_primitive_parameter_double(box2, "z_extent"), 1e-6);
   BOOST_CHECK(sfcgal_primitive_is_almost_equals(box, box2, 0.0));
   sfcgal_primitive_delete(box2);
 
@@ -2275,12 +2349,13 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
   hasError = false;
 
   // check clone
+  sfcgal_primitive_set_parameter_double(cube, "size", 2.0);
   sfcgal_primitive_t *cube2 = sfcgal_primitive_clone(cube);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(cube, "size"),
+                    sfcgal_primitive_parameter_double(cube2, "size"), 1e-6);
   BOOST_CHECK(sfcgal_primitive_is_almost_equals(cube, cube2, 0.0));
-  sfcgal_primitive_delete(cube2);
 
   // check polyhedral conversion
-  sfcgal_primitive_set_parameter_double(cube, "size", 2.0);
   sfcgal_geometry_t *poly = sfcgal_primitive_as_polyhedral_surface(cube);
   char              *wkbApi;
   size_t             wkbLen;
@@ -2296,6 +2371,17 @@ BOOST_AUTO_TEST_CASE(testCubeTest)
                     "((0 0 0,0 0 2,0 2 2,0 2 0,0 0 0)))",
                     strApi);
   sfcgal_free_buffer(wkbApi);
+
+  sfcgal_geometry_t *poly2 = sfcgal_primitive_as_polyhedral_surface(cube2);
+  char              *wkbApi2;
+  size_t             wkbLen2;
+  sfcgal_geometry_as_text_decim(poly2, 0, &wkbApi2, &wkbLen2);
+  sfcgal_geometry_delete(poly2);
+  std::string strApi2(wkbApi2, wkbLen2);
+  sfcgal_free_buffer(wkbApi2);
+  sfcgal_primitive_delete(cube2);
+
+  BOOST_CHECK_EQUAL(strApi, strApi2);
 
   // check volume
   BOOST_CHECK_CLOSE(sfcgal_primitive_volume(cube, false), 8.0, 0.01);
@@ -2367,6 +2453,16 @@ BOOST_AUTO_TEST_CASE(testConeTest)
 
   // check clone
   sfcgal_primitive_t *cone2 = sfcgal_primitive_clone(cone);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(cone, "bottom_radius"),
+                    sfcgal_primitive_parameter_double(cone2, "bottom_radius"),
+                    1e-6);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(cone, "top_radius"),
+                    sfcgal_primitive_parameter_double(cone2, "top_radius"),
+                    1e-6);
+  BOOST_CHECK_CLOSE(sfcgal_primitive_parameter_double(cone, "height"),
+                    sfcgal_primitive_parameter_double(cone2, "height"), 1e-6);
+  BOOST_CHECK_EQUAL(sfcgal_primitive_parameter_int(cone, "num_radial"),
+                    sfcgal_primitive_parameter_int(cone2, "num_radial"));
   BOOST_CHECK(sfcgal_primitive_is_almost_equals(cone, cone2, 0.0));
   sfcgal_primitive_delete(cone2);
 
