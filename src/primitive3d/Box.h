@@ -47,14 +47,6 @@ public:
   primitiveTypeId() const -> PrimitiveType override;
 
   /**
-   * @brief Assignment operator
-   * @param other copy from
-   * @return ref on this
-   */
-  auto
-  operator=(Box &other) -> Box &;
-
-  /**
    * @brief Destructor
    */
   ~Box() override = default;

@@ -22,9 +22,6 @@ Torus::Torus(const Kernel::FT &main_radius, const Kernel::FT &tube_radius,
 }
 
 auto
-Torus::operator=(Torus &other) -> Torus & = default;
-
-auto
 Torus::primitiveType() const -> std::string
 {
   return "Torus";

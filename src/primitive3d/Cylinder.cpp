@@ -23,15 +23,6 @@ Cylinder::Cylinder(const Point_3 &base_center, const Vector_3 &axis,
 }
 
 auto
-Cylinder::operator=(Cylinder other) -> Cylinder &
-{
-  Primitive::operator=(other);
-  std::swap(m_polyhedron, other.m_polyhedron);
-  std::swap(m_surface_mesh, other.m_surface_mesh);
-  return *this;
-}
-
-auto
 Cylinder::primitiveType() const -> std::string
 {
   return "Cylinder";

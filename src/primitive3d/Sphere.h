@@ -49,14 +49,6 @@ public:
   Sphere(const Sphere &other) = default;
 
   /**
-   * @brief Assignment operator
-   * @param other copy from
-   * @return ref on this
-   */
-  auto
-  operator=(Sphere other) -> Sphere &;
-
-  /**
    * @brief Destructor
    */
   ~Sphere() override = default;

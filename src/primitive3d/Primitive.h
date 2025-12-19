@@ -67,14 +67,6 @@ public:
   Primitive() = default;
 
   /**
-   * @brief Assignment operator
-   * @param other copy from
-   * @return ref on this
-   */
-  auto
-  operator=(const Primitive &other) -> Primitive &;
-
-  /**
    * @brief Destructor.
    */
   virtual ~Primitive() = default;

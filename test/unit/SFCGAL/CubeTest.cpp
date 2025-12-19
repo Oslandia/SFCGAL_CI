@@ -48,14 +48,7 @@ BOOST_AUTO_TEST_CASE(testSurfaceArea)
 
 BOOST_AUTO_TEST_CASE(testPolyhedralSurface)
 {
-  // Create PolyhedralSurface from Polyhedron and check WKT output
-  Cube cube(24);
-  auto polyhedral_surface = cube.generatePolyhedralSurface();
-
-  BOOST_CHECK(algorithm::isValid(polyhedral_surface));
-
-  BOOST_CHECK_EQUAL(
-      polyhedral_surface.asText(1),
+  std::string expectedWkt(
       "POLYHEDRALSURFACE Z (((0.0 0.0 0.0,0.0 24.0 0.0,24.0 24.0 0.0,24.0 0.0 "
       "0.0,0.0 0.0 0.0)),((0.0 0.0 24.0,24.0 0.0 24.0,24.0 24.0 24.0,0.0 24.0 "
       "24.0,0.0 0.0 24.0)),((0.0 0.0 0.0,24.0 0.0 0.0,24.0 0.0 24.0,0.0 0.0 "
@@ -63,6 +56,38 @@ BOOST_AUTO_TEST_CASE(testPolyhedralSurface)
       "24.0 0.0,0.0 24.0 0.0)),((24.0 0.0 0.0,24.0 24.0 0.0,24.0 24.0 "
       "24.0,24.0 0.0 24.0,24.0 0.0 0.0)),((0.0 0.0 0.0,0.0 0.0 24.0,0.0 24.0 "
       "24.0,0.0 24.0 0.0,0.0 0.0 0.0)))");
+  // Create PolyhedralSurface from Polyhedron and check WKT output
+  Cube cube(24);
+  auto polyhedral_surface = cube.generatePolyhedralSurface();
+
+  BOOST_CHECK(algorithm::isValid(polyhedral_surface));
+  BOOST_CHECK_EQUAL(polyhedral_surface.asText(1), expectedWkt);
+}
+
+BOOST_AUTO_TEST_CASE(testCopy)
+{
+  std::string expectedWkt(
+      "POLYHEDRALSURFACE Z (((0.0 0.0 0.0,0.0 24.0 0.0,24.0 24.0 0.0,24.0 0.0 "
+      "0.0,0.0 0.0 0.0)),((0.0 0.0 24.0,24.0 0.0 24.0,24.0 24.0 24.0,0.0 24.0 "
+      "24.0,0.0 0.0 24.0)),((0.0 0.0 0.0,24.0 0.0 0.0,24.0 0.0 24.0,0.0 0.0 "
+      "24.0,0.0 0.0 0.0)),((0.0 24.0 0.0,0.0 24.0 24.0,24.0 24.0 24.0,24.0 "
+      "24.0 0.0,0.0 24.0 0.0)),((24.0 0.0 0.0,24.0 24.0 0.0,24.0 24.0 "
+      "24.0,24.0 0.0 24.0,24.0 0.0 0.0)),((0.0 0.0 0.0,0.0 0.0 24.0,0.0 24.0 "
+      "24.0,0.0 24.0 0.0,0.0 0.0 0.0)))");
+  // Create PolyhedralSurface from Polyhedron and check WKT output
+  Cube cube(24);
+  auto polyhedral_surface = cube.generatePolyhedralSurface();
+  BOOST_CHECK_EQUAL(polyhedral_surface.asText(1), expectedWkt);
+
+  Cube cube2;
+  cube2.operator=(cube);
+  auto polyhedral_surface2 = cube2.generatePolyhedralSurface();
+  BOOST_CHECK_EQUAL(polyhedral_surface2.asText(1), expectedWkt);
+
+  Cube cube3;
+  ((Primitive *)&cube3)->operator=(cube);
+  auto polyhedral_surface3 = cube3.generatePolyhedralSurface();
+  BOOST_CHECK_NE(polyhedral_surface3.asText(1), expectedWkt);
 }
 
 BOOST_AUTO_TEST_CASE(testGetSetSize)

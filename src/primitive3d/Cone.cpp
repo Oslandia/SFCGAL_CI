@@ -24,15 +24,6 @@ Cone::Cone(const Kernel::FT &bottom_radius, const Kernel::FT &top_radius,
 }
 
 auto
-Cone::operator=(Cone &other) -> Cone &
-{
-  if (this != &other) {
-    Primitive::operator=(other);
-  }
-  return *this;
-}
-
-auto
 Cone::primitiveType() const -> std::string
 {
   return "Cone";

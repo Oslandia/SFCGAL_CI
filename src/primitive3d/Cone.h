@@ -50,14 +50,6 @@ public:
   primitiveTypeId() const -> PrimitiveType override;
 
   /**
-   * @brief Assignment operator
-   * @param other copy from
-   * @return ref on this
-   */
-  auto
-  operator=(Cone &other) -> Cone &;
-
-  /**
    * @brief Destructor
    */
   ~Cone() override = default;

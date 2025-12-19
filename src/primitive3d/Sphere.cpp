@@ -172,15 +172,6 @@ Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
 }
 
 auto
-Sphere::operator=(Sphere other) -> Sphere &
-{
-  Primitive::operator=(other);
-  std::swap(m_polyhedron, other.m_polyhedron);
-  std::swap(m_points, other.m_points);
-  return *this;
-}
-
-auto
 Sphere::primitiveType() const -> std::string
 {
   return "Sphere";

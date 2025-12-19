@@ -13,16 +13,6 @@ Cube::Cube(const Kernel::FT &size) : m_box(Box(size, size, size))
 }
 
 auto
-Cube::operator=(Cube &other) -> Cube &
-{
-  if (this != &other) {
-    Primitive::operator=(other);
-    m_box = other.m_box;
-  }
-  return *this;
-}
-
-auto
 Cube::primitiveType() const -> std::string
 {
   return "Cube";

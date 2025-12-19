@@ -49,14 +49,6 @@ public:
   primitiveTypeId() const -> PrimitiveType override;
 
   /**
-   * @brief Assignment operator
-   * @param other copy from
-   * @return ref on this
-   */
-  auto
-  operator=(Torus &other) -> Torus &;
-
-  /**
    * @brief Destructor
    */
   ~Torus() override = default;

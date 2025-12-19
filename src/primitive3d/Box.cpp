@@ -22,15 +22,6 @@ Box::Box(const Kernel::FT &x_extent, const Kernel::FT &y_extent,
 }
 
 auto
-Box::operator=(Box &other) -> Box &
-{
-  if (this != &other) {
-    Primitive::operator=(other);
-  }
-  return *this;
-}
-
-auto
 Box::primitiveType() const -> std::string
 {
   return "Box";

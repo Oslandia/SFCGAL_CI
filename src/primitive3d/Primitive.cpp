@@ -6,16 +6,6 @@
 
 namespace SFCGAL {
 
-auto
-Primitive::operator=(const Primitive &other) -> Primitive &
-{
-  if (this != &other) {
-    m_parameters         = other.m_parameters;
-    m_polyhedral_surface = other.m_polyhedral_surface;
-  }
-  return *this;
-}
-
 void
 Primitive::setParameter(const std::string        &name,
                         const PrimitiveParameter &parameter)

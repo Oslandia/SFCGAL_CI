@@ -43,14 +43,6 @@ public:
   primitiveTypeId() const -> PrimitiveType override;
 
   /**
-   * @brief Assignment operator
-   * @param other copy from
-   * @return ref on this
-   */
-  auto
-  operator=(Cube &other) -> Cube &;
-
-  /**
    * @brief Destructor
    */
   ~Cube() override = default;
