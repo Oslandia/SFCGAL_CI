@@ -5,6 +5,7 @@
 
 #include "SFCGAL/primitive3d/Cylinder.h"
 #include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/isValid.h"
 #include "SFCGAL/io/wkt.h"
 #include <boost/test/unit_test.hpp>
@@ -281,6 +282,18 @@ BOOST_AUTO_TEST_CASE(testPolyhedron)
       "0.0,0.0 1.0 0.0,-0.7 0.7 0.0)),((0.0 1.0 2.0,0.0 0.0 2.0,-0.7 0.7 "
       "2.0,0.0 1.0 2.0)),((-1.0 0.0 0.0,0.0 0.0 0.0,-0.7 0.7 0.0,-1.0 0.0 "
       "0.0)),((-0.7 0.7 2.0,0.0 0.0 2.0,-1.0 0.0 2.0,-0.7 0.7 2.0)))");
+}
+
+BOOST_AUTO_TEST_CASE(testClone)
+{
+  Point_3                   base(1, 2, 3);
+  Vector_3                  axis(0, 1, 0);
+  Cylinder                  cylinder(base, axis, 2.0, 5.0, 16);
+  std::unique_ptr<Cylinder> cylinderCloned = cylinder.clone();
+
+  BOOST_CHECK_EQUAL(cylinder, *cylinderCloned);
+  BOOST_CHECK(algorithm::covers3D(cylinder.generatePolyhedralSurface(),
+                                  cylinderCloned->generatePolyhedralSurface()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

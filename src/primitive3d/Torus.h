@@ -21,7 +21,7 @@ namespace SFCGAL {
  * representation of a torus. It uses SFCGAL's Kernel for
  * exact computations.
  */
-class SFCGAL_API Torus : public Primitive {
+class SFCGAL_API Torus : public PrimitiveImpl<Torus, Primitive> {
 public:
   /**
    * @brief Constructs a Torus object centered on the origin and lying in

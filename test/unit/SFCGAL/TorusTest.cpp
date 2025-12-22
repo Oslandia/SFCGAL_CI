@@ -4,6 +4,7 @@
 #include "SFCGAL/primitive3d/Torus.h"
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/algorithm/area.h"
+#include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/volume.h"
 #include "SFCGAL/io/OBJ.h"
 #include <boost/test/unit_test.hpp>
@@ -123,6 +124,17 @@ BOOST_AUTO_TEST_CASE(testGetSetTubeNumRadial)
 
   torus.setTubeNumRadial(54);
   BOOST_CHECK_EQUAL(torus.tubeNumRadial(), 54);
+}
+
+BOOST_AUTO_TEST_CASE(testClone)
+{
+  Point_3                center(1, 2, 3);
+  Torus                  torus(14, 6, 6, 8);
+  std::unique_ptr<Torus> torusCloned = torus.clone();
+
+  BOOST_CHECK_EQUAL(torus, *torusCloned);
+  BOOST_CHECK(algorithm::covers3D(torus.generatePolyhedralSurface(),
+                                  torusCloned->generatePolyhedralSurface()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

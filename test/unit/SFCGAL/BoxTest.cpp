@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/primitive3d/Box.h"
+#include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/isValid.h"
 #include <boost/test/unit_test.hpp>
 
@@ -89,6 +90,16 @@ BOOST_AUTO_TEST_CASE(testGetSetExtents)
   BOOST_CHECK_EQUAL(box.xExtent(), 6.904);
   BOOST_CHECK_EQUAL(box.yExtent(), 9.44);
   BOOST_CHECK_EQUAL(box.zExtent(), 543.8209);
+}
+
+BOOST_AUTO_TEST_CASE(testClone)
+{
+  Box                  box(3.5, 34.5, 3.3);
+  std::unique_ptr<Box> boxCloned = box.clone();
+
+  BOOST_CHECK_EQUAL(box, *boxCloned);
+  BOOST_CHECK(algorithm::covers3D(box.generatePolyhedralSurface(),
+                                  boxCloned->generatePolyhedralSurface()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

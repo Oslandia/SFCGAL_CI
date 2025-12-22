@@ -72,6 +72,17 @@ public:
   virtual ~Primitive() = default;
 
   /**
+   * @brief Get a deep copy of the primitive
+   *
+   * @return a deep copy of the primitive as a unique_ptr
+   */
+  [[nodiscard]] auto
+  clone() const -> std::unique_ptr<Primitive>
+  {
+    return std::unique_ptr<Primitive>(this->cloneImpl());
+  }
+
+  /**
    * @brief returns the primitive type
    * @warning use CamelCase (Cylinder, not CYLINDER)
    * @return the primitive type as string
@@ -226,6 +237,10 @@ protected:
    * generatePolyhedralSurface()
    */
   mutable std::optional<PolyhedralSurface> m_polyhedral_surface;
+
+private:
+  [[nodiscard]] virtual auto
+  cloneImpl() const -> Primitive * = 0;
 };
 
 /**
@@ -238,6 +253,46 @@ protected:
  */
 SFCGAL_API auto
 operator==(const Primitive &prim1, const Primitive &prim2) -> bool;
+
+/// @{
+/// @privatesection
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+/**
+ * @brief Base class that implements covariant cloning with CRTP pattern
+ */
+template <typename Derived, typename Base>
+class SFCGAL_API PrimitiveImpl : public Base {
+  PrimitiveImpl() = default;
+
+public:
+  [[nodiscard]] auto
+  clone() const -> std::unique_ptr<Derived>
+  {
+    return std::unique_ptr<Derived>(static_cast<Derived *>(this->cloneImpl()));
+  }
+
+private:
+  [[nodiscard]] auto
+  cloneImpl() const -> PrimitiveImpl * override
+  {
+    return new Derived(*static_cast<const Derived *>(this));
+  }
+  friend Derived;
+};
+
+template <typename Derived, typename Base>
+class SFCGAL_API PrimitiveImpl<AbstractMethod<Derived>, Base> : public Base {
+public:
+  virtual ~PrimitiveImpl() = default;
+
+private:
+  virtual auto
+  cloneImpl() const -> PrimitiveImpl * = 0;
+};
+
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS
+/// @} end of private section
 
 } // namespace SFCGAL
 

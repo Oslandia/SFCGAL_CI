@@ -21,7 +21,7 @@ namespace SFCGAL {
  * representation of a box (rectangular prism). It uses SFCGAL's Kernel for
  * exact computations.
  */
-class SFCGAL_API Box : public Primitive {
+class SFCGAL_API Box : public PrimitiveImpl<Box, Primitive> {
 public:
   /**
    * @brief Constructs a Box object in the first octant (+, +, +)

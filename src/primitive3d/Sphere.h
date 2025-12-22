@@ -27,7 +27,7 @@ class PolyhedralSurface;
  * This class provides methods to generate a polyhedron and a point cloud
  * representation of a sphere. It uses SFCGAL's Kernel for exact computations.
  */
-class SFCGAL_API Sphere : public Primitive {
+class SFCGAL_API Sphere : public PrimitiveImpl<Sphere, Primitive> {
 public:
   /**
    * @brief Constructs a Sphere object

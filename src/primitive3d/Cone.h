@@ -21,7 +21,7 @@ namespace SFCGAL {
  * representation of a cone. It uses SFCGAL's Kernel for
  * exact computations.
  */
-class SFCGAL_API Cone : public Primitive {
+class SFCGAL_API Cone : public PrimitiveImpl<Cone, Primitive> {
 public:
   /**
    * @brief Constructs a Cone object with its base centered on the origin and in

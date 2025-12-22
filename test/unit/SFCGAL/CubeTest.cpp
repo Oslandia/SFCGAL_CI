@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/primitive3d/Cube.h"
+#include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/isValid.h"
+#include <boost/test/tools/old/interface.hpp>
 #include <boost/test/unit_test.hpp>
+#include <memory>
 
 using namespace SFCGAL;
 
@@ -97,6 +100,16 @@ BOOST_AUTO_TEST_CASE(testGetSetSize)
 
   cube.setSize(6.904);
   BOOST_CHECK_EQUAL(cube.size(), 6.904);
+}
+
+BOOST_AUTO_TEST_CASE(testClone)
+{
+  Cube                  cube(3.5);
+  std::unique_ptr<Cube> cubeCloned = cube.clone();
+
+  BOOST_CHECK_EQUAL(cube, *cubeCloned);
+  BOOST_CHECK(algorithm::covers3D(cube.generatePolyhedralSurface(),
+                                  cubeCloned->generatePolyhedralSurface()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

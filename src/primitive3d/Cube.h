@@ -5,6 +5,7 @@
 #define SFCGAL_CUBE_H_
 
 #include "Box.h"
+#include "Primitive.h"
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/export.h"
@@ -20,7 +21,7 @@ namespace SFCGAL {
  * representation of a cube. It uses SFCGAL's Kernel for
  * exact computations.
  */
-class SFCGAL_API Cube : public Primitive {
+class SFCGAL_API Cube : public PrimitiveImpl<Cube, Primitive> {
 public:
   /**
    * @brief Constructs a Cube object in the first octant (+, +, +)

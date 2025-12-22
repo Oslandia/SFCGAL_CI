@@ -5,6 +5,7 @@
 
 #include "SFCGAL/primitive3d/Sphere.h"
 #include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/io/wkt.h"
 #include <boost/test/unit_test.hpp>
 #include <cmath>
@@ -111,6 +112,17 @@ BOOST_AUTO_TEST_CASE(testWKT)
 
   BOOST_TEST_MESSAGE("Sphere WKT: " << wkt);
   BOOST_CHECK(wkt.find("POLYHEDRALSURFACE Z") == 0);
+}
+
+BOOST_AUTO_TEST_CASE(testClone)
+{
+  Point_3                 center(1, 2, 3);
+  Sphere                  sphere(3.2, center, 6.0, 12.0);
+  std::unique_ptr<Sphere> sphereCloned = sphere.clone();
+
+  BOOST_CHECK_EQUAL(sphere, *sphereCloned);
+  BOOST_CHECK(algorithm::covers3D(sphere.generatePolyhedralSurface(),
+                                  sphereCloned->generatePolyhedralSurface()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

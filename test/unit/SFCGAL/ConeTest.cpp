@@ -4,6 +4,7 @@
 #include "SFCGAL/primitive3d/Cone.h"
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/algorithm/area.h"
+#include "SFCGAL/algorithm/covers.h"
 #include "SFCGAL/algorithm/volume.h"
 #include <boost/test/unit_test.hpp>
 
@@ -237,6 +238,16 @@ BOOST_AUTO_TEST_CASE(testGetSetNumRadial)
 
   cone.setNumRadial(54);
   BOOST_CHECK_EQUAL(cone.numRadial(), 54);
+}
+
+BOOST_AUTO_TEST_CASE(testClone)
+{
+  Cone                  cone(3.5, 34.5, 3.3);
+  std::unique_ptr<Cone> coneCloned = cone.clone();
+
+  BOOST_CHECK_EQUAL(cone, *coneCloned);
+  BOOST_CHECK(algorithm::covers3D(cone.generatePolyhedralSurface(),
+                                  coneCloned->generatePolyhedralSurface()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

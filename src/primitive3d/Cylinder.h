@@ -23,7 +23,7 @@ namespace SFCGAL {
  * This class provides methods to generate a polyhedron and a surface mesh
  * representation of a cylinder. It uses SFCGAL's Kernel for exact computations.
  */
-class SFCGAL_API Cylinder : public Primitive {
+class SFCGAL_API Cylinder : public PrimitiveImpl<Cylinder, Primitive> {
 public:
   /**
    * @brief Constructs a Cylinder object
