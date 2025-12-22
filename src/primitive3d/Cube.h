@@ -37,9 +37,11 @@ public:
    */
   Cube(const Cube &other) = default;
 
+  /// @copydoc SFCGAL::Primitive::primitiveType
   [[nodiscard]] auto
   primitiveType() const -> std::string override;
 
+  /// @copydoc SFCGAL::Primitive::primitiveTypeId
   [[nodiscard]] auto
   primitiveTypeId() const -> PrimitiveType override;
 
@@ -83,6 +85,7 @@ public:
   [[nodiscard]] auto
   area3D(bool withDiscretization = false) const -> double override;
 
+  /// @copydoc SFCGAL::Primitive::toString
   [[nodiscard]] auto
   toString() const -> std::string override;
 
@@ -98,6 +101,7 @@ protected:
   validateParameters(std::unordered_map<std::string, PrimitiveParameter> const
                          &tempParameters) const override;
 
+  /// @copydoc SFCGAL::Primitive::onValidatedAndSetParameter
   void
   onValidatedAndSetParameter(const std::string        &name,
                              const PrimitiveParameter &parameter) override;
