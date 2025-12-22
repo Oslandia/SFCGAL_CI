@@ -43,9 +43,11 @@ public:
    */
   Cone(const Cone &other) = default;
 
+  /// @copydoc SFCGAL::Primitive::primitiveType
   [[nodiscard]] auto
   primitiveType() const -> std::string override;
 
+  /// @copydoc SFCGAL::Primitive::primitiveTypeId
   [[nodiscard]] auto
   primitiveTypeId() const -> PrimitiveType override;
 
@@ -117,9 +119,11 @@ public:
   auto
   generatePolyhedralSurface() const -> PolyhedralSurface override;
 
+  /// @copydoc SFCGAL::Primitive::volume
   [[nodiscard]] auto
   volume(bool withDiscretization = false) const -> double override;
 
+  /// @copydoc SFCGAL::Primitive::area3D
   [[nodiscard]] auto
   area3D(bool withDiscretization = false) const -> double override;
 
