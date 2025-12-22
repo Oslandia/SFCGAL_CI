@@ -2387,48 +2387,10 @@ sfcgal_primitive_delete(sfcgal_primitive_t *primitive) -> void
 extern "C" auto
 sfcgal_primitive_clone(const sfcgal_primitive_t *prim) -> sfcgal_primitive_t *
 {
-  const auto *primitive1Cast =
-      reinterpret_cast<const SFCGAL::Primitive *>(prim);
-  sfcgal_primitive_t *out = sfcgal_primitive_create(
-      static_cast<sfcgal_primitive_type_t>(primitive1Cast->primitiveTypeId()));
-
-  switch (primitive1Cast->primitiveTypeId()) {
-  case SFCGAL::PrimitiveType::TYPE_CYLINDER: {
-    auto *outCast = reinterpret_cast<SFCGAL::Cylinder *>(out);
-    outCast->operator=(
-        *reinterpret_cast<const SFCGAL::Cylinder *>(primitive1Cast));
-    break;
-  }
-  case SFCGAL::PrimitiveType::TYPE_SPHERE: {
-    auto *outCast = reinterpret_cast<SFCGAL::Sphere *>(out);
-    outCast->operator=(
-        *reinterpret_cast<const SFCGAL::Sphere *>(primitive1Cast));
-    break;
-  }
-  case SFCGAL::PrimitiveType::TYPE_TORUS: {
-    auto *outCast = reinterpret_cast<SFCGAL::Torus *>(out);
-    outCast->operator=(
-        *reinterpret_cast<const SFCGAL::Torus *>(primitive1Cast));
-    break;
-  }
-  case SFCGAL::PrimitiveType::TYPE_BOX: {
-    auto *outCast = reinterpret_cast<SFCGAL::Box *>(out);
-    outCast->operator=(*reinterpret_cast<const SFCGAL::Box *>(primitive1Cast));
-    break;
-  }
-  case SFCGAL::PrimitiveType::TYPE_CUBE: {
-    auto *outCast = reinterpret_cast<SFCGAL::Cube *>(out);
-    outCast->operator=(*reinterpret_cast<const SFCGAL::Cube *>(primitive1Cast));
-    break;
-  }
-  case SFCGAL::PrimitiveType::TYPE_CONE: {
-    auto *outCast = reinterpret_cast<SFCGAL::Cone *>(out);
-    outCast->operator=(*reinterpret_cast<const SFCGAL::Cone *>(primitive1Cast));
-    break;
-  }
-  }
-
-  return out;
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return reinterpret_cast<const SFCGAL::Primitive *>(prim)
+          ->clone()
+          .release();)
 }
 
 extern "C" auto
