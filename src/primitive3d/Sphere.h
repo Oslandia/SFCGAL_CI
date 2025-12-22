@@ -53,9 +53,11 @@ public:
    */
   ~Sphere() override = default;
 
+  /// @copydoc SFCGAL::Primitive::primitiveType
   [[nodiscard]] auto
   primitiveType() const -> std::string override;
 
+  /// @copydoc SFCGAL::Primitive::primitiveTypeId
   [[nodiscard]] auto
   primitiveTypeId() const -> PrimitiveType override;
 
