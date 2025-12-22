@@ -11,9 +11,7 @@
 #include "SFCGAL/Kernel.h"
 #include "SFCGAL/Transform.h"
 
-namespace SFCGAL {
-
-namespace transform {
+namespace SFCGAL::transform {
 
 /**
  * Force Z. If the 2D surface is pointing down, reverse its points
@@ -27,14 +25,14 @@ public:
    * @brief Constructor with a default Z value
    * @param defaultZ The default Z coordinate value (default 0)
    */
-  ForceZOrderPoints(const Kernel::FT defaultZ = 0);
+  ForceZOrderPoints(Kernel::FT defaultZ = 0);
 
   /**
    * @brief Transform a point to force Z coordinates
-   * @param p The point to transform
+   * @param point The point to transform
    */
   void
-  transform(Point &p) override;
+  transform(Point &point) override;
 
   /**
    * @brief Visit and force point order for a triangle with Z coordinates
@@ -53,7 +51,6 @@ private:
   Kernel::FT _defaultZ;
 };
 
-} // namespace transform
-} // namespace SFCGAL
+} // namespace SFCGAL::transform
 
 #endif

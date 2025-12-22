@@ -20,10 +20,10 @@ namespace SFCGAL::algorithm {
  * @return the 3D normal vector
  */
 template <typename Kernel>
-CGAL::Vector_3<Kernel>
+auto
 normal3D(const CGAL::Point_3<Kernel> &point1,
          const CGAL::Point_3<Kernel> &point2,
-         const CGAL::Point_3<Kernel> &point3)
+         const CGAL::Point_3<Kernel> &point3) -> CGAL::Vector_3<Kernel>
 {
   // bc ^ ba
   return CGAL::cross_product(point3 - point2, point1 - point2);
@@ -37,11 +37,14 @@ normal3D(const CGAL::Point_3<Kernel> &point1,
  * @warning exact allows to avoid double rounding at the end of the computation
  */
 template <typename Kernel>
-CGAL::Vector_3<Kernel>
+auto
 normal3D(const LineString &lineString, bool exact = true)
+    -> CGAL::Vector_3<Kernel>
 {
   // Newell's formula
-  typename Kernel::FT nx, ny, nz;
+  typename Kernel::FT nx;
+  typename Kernel::FT ny;
+  typename Kernel::FT nz;
   nx = ny = nz = 0.0;
 
   for (size_t i = 0; i < lineString.numPoints(); ++i) {
@@ -56,10 +59,9 @@ normal3D(const LineString &lineString, bool exact = true)
 
   if (exact) {
     return CGAL::Vector_3<Kernel>(nx, ny, nz);
-  } else {
-    return CGAL::Vector_3<Kernel>(CGAL::to_double(nx), CGAL::to_double(ny),
-                                  CGAL::to_double(nz));
   }
+
+  return {CGAL::to_double(nx), CGAL::to_double(ny), CGAL::to_double(nz)};
 }
 
 /**
@@ -67,11 +69,12 @@ normal3D(const LineString &lineString, bool exact = true)
  * @param polygon the polygon to compute the normal for
  * @param exact whether to use exact computation (default: true)
  * @return the 3D normal vector
- * @warning exact allows to avoid double rounding at the end of the computation
+ * @warning exact allows to avoid double rounding at the end of the
+ * computation
  */
 template <typename Kernel>
-CGAL::Vector_3<Kernel>
-normal3D(const Polygon &polygon, bool exact = true)
+auto
+normal3D(const Polygon &polygon, bool exact = true) -> CGAL::Vector_3<Kernel>
 {
   if (polygon.isEmpty()) {
     return CGAL::Vector_3<Kernel>(0, 0, 0);

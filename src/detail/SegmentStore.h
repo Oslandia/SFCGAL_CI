@@ -36,7 +36,7 @@ public:
   /**
    * @brief Default constructor
    */
-  SegmentStore() {}
+  SegmentStore() = default;
 
   /**
    * @brief Add a segment to the store
@@ -58,8 +58,8 @@ public:
    * @brief Check if store contains segments with Z coordinates
    * @return True if any segment has Z coordinates
    */
-  bool
-  hasZ() const
+  [[nodiscard]] auto
+  hasZ() const -> bool
   {
     return hasZCoord;
   }
@@ -68,8 +68,8 @@ public:
    * @brief Check if store contains segments with M values
    * @return True if any segment has M values
    */
-  bool
-  hasM() const
+  [[nodiscard]] auto
+  hasM() const -> bool
   {
     return hasMCoord;
   }
@@ -80,12 +80,12 @@ public:
    * @param y Y-coordinate of the point
    * @return The nearest segment to the given point
    */
-  Segment
-  findNearestSegment(double x, double y) const
+  [[nodiscard]] auto
+  findNearestSegment(double x, double y) const -> Segment
   {
     if (segments.empty()) {
       // Return a dummy segment if store is empty
-      return Segment(Point(), Point());
+      return {Point(), Point()};
     }
 
     double minDist = std::numeric_limits<double>::max();
@@ -108,8 +108,8 @@ public:
    * @param y Y-coordinate of the point
    * @return Tuple with interpolated (z, m) values, NaN if not applicable
    */
-  std::tuple<double, double>
-  interpolateZM(double x, double y) const
+  [[nodiscard]] auto
+  interpolateZM(double x, double y) const -> std::tuple<double, double>
   {
     double z = NaN();
     double m = NaN();
@@ -125,7 +125,7 @@ public:
     if (hasZCoord && nearest.source().is3D() && nearest.target().is3D()) {
       double z1 = CGAL::to_double(nearest.source().z());
       double z2 = CGAL::to_double(nearest.target().z());
-      z         = z1 + t * (z2 - z1);
+      z         = z1 + (t * (z2 - z1));
     }
 
     // Interpolate M if available
@@ -133,7 +133,7 @@ public:
         nearest.target().isMeasured()) {
       double m1 = nearest.source().m();
       double m2 = nearest.target().m();
-      m         = m1 + t * (m2 - m1);
+      m         = m1 + (t * (m2 - m1));
     }
 
     return std::make_tuple(z, m);
@@ -143,17 +143,17 @@ public:
    * @brief Extract segments from a LineString for interpolation
    * @param lineString The linestring to extract segments from
    */
-  void
-  extractSegments(const LineString &lineString)
+  auto
+  extractSegments(const LineString &lineString) -> void
   {
     if (lineString.numPoints() < 2) {
       return;
     }
 
     for (size_t i = 1; i < lineString.numPoints(); ++i) {
-      const Point &p1 = lineString.pointN(i - 1);
-      const Point &p2 = lineString.pointN(i);
-      addSegment(Segment(p1, p2));
+      const Point &point1 = lineString.pointN(i - 1);
+      const Point &point2 = lineString.pointN(i);
+      addSegment(Segment(point1, point2));
     }
   }
 
@@ -161,8 +161,8 @@ public:
    * @brief Extract segments from a Polygon for interpolation
    * @param polygon The polygon to extract segments from
    */
-  void
-  extractSegments(const Polygon &polygon)
+  auto
+  extractSegments(const Polygon &polygon) -> void
   {
     if (polygon.isEmpty()) {
       return;
@@ -181,8 +181,8 @@ public:
    * @brief Extract segments from all geometry types
    * @param geometry The geometry to extract segments from
    */
-  void
-  extractSegments(const Geometry &geometry)
+  auto
+  extractSegments(const Geometry &geometry) -> void
   {
     switch (geometry.geometryTypeId()) {
     case TYPE_POINT:
@@ -247,11 +247,11 @@ public:
    * @param dimension The coordinate type for the point
    * @return Point with interpolated Z and M values
    */
-  Point
-  createPoint(double x, double y, CoordinateType dimension) const
+  [[nodiscard]] auto
+  createPoint(double x, double y, CoordinateType dimension) const -> Point
   {
     auto [interpZ, interpM] = interpolateZM(x, y);
-    return Point(x, y, interpZ, interpM, dimension);
+    return {x, y, interpZ, interpM, dimension};
   }
 };
 

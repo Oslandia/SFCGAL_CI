@@ -23,6 +23,7 @@
 
 namespace SFCGAL::io::VTK {
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void
 save(const Geometry &geom, std::ostream &out)
 {
@@ -31,20 +32,20 @@ save(const Geometry &geom, std::ostream &out)
   std::vector<int>                 cell_types;
 
   std::function<void(const Geometry &)> process_geometry =
-      [&](const Geometry &g) {
-        switch (g.geometryTypeId()) {
+      [&](const Geometry &geometry) {
+        switch (geometry.geometryTypeId()) {
         case TYPE_POINT: {
-          const auto &p = g.as<Point>();
-          all_points.push_back(p);
+          const auto &point = geometry.as<Point>();
+          all_points.push_back(point);
           all_cells.push_back({all_points.size() - 1});
           cell_types.push_back(1); // VTK_VERTEX
           break;
         }
         case TYPE_LINESTRING: {
-          const auto         &ls = g.as<LineString>();
+          const auto         &linestring = geometry.as<LineString>();
           std::vector<size_t> line;
-          for (size_t i = 0; i < ls.numPoints(); ++i) {
-            all_points.push_back(ls.pointN(i));
+          for (size_t i = 0; i < linestring.numPoints(); ++i) {
+            all_points.push_back(linestring.pointN(i));
             line.push_back(all_points.size() - 1);
           }
           all_cells.push_back(line);
@@ -52,7 +53,7 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_TRIANGLE: {
-          const auto         &tri = g.as<Triangle>();
+          const auto         &tri = geometry.as<Triangle>();
           std::vector<size_t> face;
           for (int i = 0; i < 3; ++i) {
             all_points.push_back(tri.vertex(i));
@@ -63,7 +64,7 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_POLYGON: {
-          const auto         &poly = g.as<Polygon>();
+          const auto         &poly = geometry.as<Polygon>();
           std::vector<size_t> face;
           for (size_t i = 0; i < poly.exteriorRing().numPoints() - 1; ++i) {
             all_points.push_back(poly.exteriorRing().pointN(i));
@@ -74,21 +75,21 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_TRIANGULATEDSURFACE: {
-          const auto &ts = g.as<TriangulatedSurface>();
-          for (size_t i = 0; i < ts.numPatches(); ++i) {
-            process_geometry(ts.patchN(i));
+          const auto &triangulatedsurface = geometry.as<TriangulatedSurface>();
+          for (size_t i = 0; i < triangulatedsurface.numPatches(); ++i) {
+            process_geometry(triangulatedsurface.patchN(i));
           }
           break;
         }
         case TYPE_POLYHEDRALSURFACE: {
-          const auto &ps = g.as<PolyhedralSurface>();
-          for (size_t i = 0; i < ps.numPatches(); ++i) {
-            process_geometry(ps.patchN(i));
+          const auto &polyhedralsurface = geometry.as<PolyhedralSurface>();
+          for (size_t i = 0; i < polyhedralsurface.numPatches(); ++i) {
+            process_geometry(polyhedralsurface.patchN(i));
           }
           break;
         }
         case TYPE_SOLID: {
-          const auto &solid = g.as<Solid>();
+          const auto &solid = geometry.as<Solid>();
           if (!solid.isEmpty()) {
             process_geometry(solid.exteriorShell());
           }
@@ -99,15 +100,15 @@ save(const Geometry &geom, std::ostream &out)
         case TYPE_MULTIPOLYGON:
         case TYPE_MULTISOLID:
         case TYPE_GEOMETRYCOLLECTION: {
-          const auto &gc = g.as<GeometryCollection>();
-          for (size_t i = 0; i < gc.numGeometries(); ++i) {
-            process_geometry(gc.geometryN(i));
+          const auto &geometrycollection = geometry.as<GeometryCollection>();
+          for (size_t i = 0; i < geometrycollection.numGeometries(); ++i) {
+            process_geometry(geometrycollection.geometryN(i));
           }
           break;
         }
         default:
           BOOST_THROW_EXCEPTION(InappropriateGeometryException(
-              "Unsupported geometry type: " + g.geometryType()));
+              "Unsupported geometry type: " + geometry.geometryType()));
         }
       };
 
@@ -121,8 +122,9 @@ save(const Geometry &geom, std::ostream &out)
 
   // Write points
   out << "POINTS " << all_points.size() << " float\n";
-  for (const auto &p : all_points) {
-    out << p.x() << " " << p.y() << " " << (p.is3D() ? p.z() : 0.0) << "\n";
+  for (const auto &point : all_points) {
+    out << point.x() << " " << point.y() << " "
+        << (point.is3D() ? point.z() : 0.0) << "\n";
   }
 
   // Write cells
@@ -145,6 +147,7 @@ save(const Geometry &geom, std::ostream &out)
     out << type << "\n";
   }
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 void
 save(const Geometry &geom, const std::string &filename)

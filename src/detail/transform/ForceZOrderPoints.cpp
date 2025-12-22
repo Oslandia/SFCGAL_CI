@@ -31,7 +31,7 @@ ForceZOrderPoints::transform(Point &point)
 }
 
 void
-ForceZOrderPoints::visit(Triangle &t)
+ForceZOrderPoints::visit(Triangle &triangle)
 {
   if (triangle.isEmpty()) {
     return;
@@ -40,30 +40,31 @@ ForceZOrderPoints::visit(Triangle &t)
   if (!triangle.is3D()) {
     if (!SFCGAL::algorithm::isCounterClockWiseOriented(triangle)) {
       // not pointing up, reverse
-      t.reverse();
+      triangle.reverse();
     }
 
-    Transform::visit(t);
+    Transform::visit(triangle);
   }
 }
 
 void
-ForceZOrderPoints::visit(Polygon &p)
+ForceZOrderPoints::visit(Polygon &polygon)
 {
-  if (p.isEmpty()) {
+  if (polygon.isEmpty()) {
     return;
   }
 
-  if (!p.is3D()) {
-    LineString &ext = p.exteriorRing();
+  if (!polygon.is3D()) {
+    LineString &ext = polygon.exteriorRing();
 
-    if (!SFCGAL::algorithm::isCounterClockWiseOriented(p.exteriorRing())) {
+    if (!SFCGAL::algorithm::isCounterClockWiseOriented(
+            polygon.exteriorRing())) {
       // exterior ring not pointing up, reverse
       ext.reverse();
     }
 
-    for (size_t i = 0; i < p.numInteriorRings(); ++i) {
-      LineString &inter = p.interiorRingN(i);
+    for (size_t i = 0; i < polygon.numInteriorRings(); ++i) {
+      LineString &inter = polygon.interiorRingN(i);
 
       if (SFCGAL::algorithm::isCounterClockWiseOriented(inter)) {
         // interior ring is pointing up, reverse
@@ -71,7 +72,7 @@ ForceZOrderPoints::visit(Polygon &p)
       }
     }
 
-    Transform::visit(p);
+    Transform::visit(polygon);
   }
 }
 
