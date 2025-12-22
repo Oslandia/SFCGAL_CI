@@ -14,6 +14,10 @@ RoundTransform::RoundTransform(const long &scale) : _scale(scale) {}
 void
 RoundTransform::transform(Point &point)
 {
+  if (point.isEmpty()) {
+    return;
+  }
+
   point.coordinate().round(_scale);
 }
 

@@ -30,6 +30,10 @@ bool
 hasPlane3D(const Polygon &polygon, CGAL::Point_3<Kernel> &a,
            CGAL::Point_3<Kernel> &b, CGAL::Point_3<Kernel> &c)
 {
+  if (polygon.isEmpty()) {
+    return false;
+  }
+
   const LineString &exteriorRing = polygon.exteriorRing();
 
   /*
@@ -101,6 +105,10 @@ template <typename Kernel>
 CGAL::Plane_3<Kernel>
 plane3D(const Polygon &polygon)
 {
+  if (polygon.isEmpty()) {
+    BOOST_THROW_EXCEPTION(Exception("Cannot compute plane for empty polygon"));
+  }
+
   CGAL::Vector_3<Kernel> nrml = normal3D<Kernel>(polygon, true);
 
   return CGAL::Plane_3<Kernel>(polygon.exteriorRing().pointN(0).toPoint_3(),
@@ -121,6 +129,10 @@ template <typename Kernel>
 CGAL::Plane_3<Kernel>
 plane3D(const Polygon &polygon, const Plane3DInexactUnsafe &)
 {
+  if (polygon.isEmpty()) {
+    BOOST_THROW_EXCEPTION(Exception("Cannot compute plane for empty polygon"));
+  }
+
   CGAL::Vector_3<Kernel> nrml = normal3D<Kernel>(polygon, false);
 
   const double nrm = std::sqrt(CGAL::to_double(nrml.squared_length()));

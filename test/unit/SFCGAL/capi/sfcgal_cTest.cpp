@@ -2445,4 +2445,61 @@ BOOST_AUTO_TEST_CASE(testProjectedMedialAxis)
   sfcgal_geometry_delete(result);
 }
 
+// Test for Issue #315 - Empty polygon crash with orientation and extrude
+BOOST_AUTO_TEST_CASE(testOrientationEmptyPolygon_Issue315)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // Test with empty polygon - should not crash and return 0 (invalid)
+  std::unique_ptr<Geometry> emptyPolygon(io::readWkt("POLYGON EMPTY"));
+  BOOST_REQUIRE(sfcgal_geometry_is_empty(emptyPolygon.get()));
+
+  int orientation = sfcgal_geometry_orientation(emptyPolygon.get());
+  BOOST_CHECK_EQUAL(orientation, 0); // Invalid/undetermined orientation
+  BOOST_CHECK(!hasError);
+
+  // Test with non-empty polygon for comparison
+  std::unique_ptr<Geometry> polygon(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 6, 0 6, 0 0))"));
+  int orientation2 = sfcgal_geometry_orientation(polygon.get());
+  BOOST_CHECK_EQUAL(orientation2, -1); // Counter-clockwise
+}
+
+BOOST_AUTO_TEST_CASE(testExtrudeEmptyGeometries_Issue315)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // Test empty point
+  std::unique_ptr<Geometry> emptyPoint(io::readWkt("POINT EMPTY"));
+  BOOST_REQUIRE(sfcgal_geometry_is_empty(emptyPoint.get()));
+
+  sfcgal_geometry_t *extrudedPoint =
+      sfcgal_geometry_extrude(emptyPoint.get(), 0.0, 0.0, 1.0);
+  BOOST_REQUIRE(extrudedPoint != nullptr);
+  BOOST_CHECK(sfcgal_geometry_is_empty(extrudedPoint));
+  sfcgal_geometry_delete(extrudedPoint);
+
+  // Test empty linestring
+  std::unique_ptr<Geometry> emptyLineString(io::readWkt("LINESTRING EMPTY"));
+  BOOST_REQUIRE(sfcgal_geometry_is_empty(emptyLineString.get()));
+
+  sfcgal_geometry_t *extrudedLineString =
+      sfcgal_geometry_extrude(emptyLineString.get(), 0.0, 0.0, 1.0);
+  BOOST_REQUIRE(extrudedLineString != nullptr);
+  BOOST_CHECK(sfcgal_geometry_is_empty(extrudedLineString));
+  sfcgal_geometry_delete(extrudedLineString);
+
+  // Test empty polygon - this was crashing before the fix
+  std::unique_ptr<Geometry> emptyPolygon(io::readWkt("POLYGON EMPTY"));
+  BOOST_REQUIRE(sfcgal_geometry_is_empty(emptyPolygon.get()));
+
+  sfcgal_geometry_t *extrudedPolygon =
+      sfcgal_geometry_extrude(emptyPolygon.get(), 0.0, 0.0, 1.0);
+  BOOST_REQUIRE(extrudedPolygon != nullptr);
+  BOOST_CHECK(sfcgal_geometry_is_empty(extrudedPolygon));
+  sfcgal_geometry_delete(extrudedPolygon);
+
+  BOOST_CHECK(!hasError);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

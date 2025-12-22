@@ -120,6 +120,21 @@ BOOST_AUTO_TEST_CASE(testIsCounterClockWiseOriented_Polygon)
   BOOST_CHECK(!algorithm::isCounterClockWiseOriented(polygon));
 }
 
+// Test for empty polygon - Issue #315
+BOOST_AUTO_TEST_CASE(testIsCounterClockWiseOriented_EmptyPolygon)
+{
+  // Empty polygon should not crash and should return false
+  Polygon emptyPolygon;
+  BOOST_CHECK(emptyPolygon.isEmpty());
+  BOOST_CHECK(!algorithm::isCounterClockWiseOriented(emptyPolygon));
+
+  // Also test with WKT parsing
+  std::unique_ptr<Geometry> geom(io::readWkt("POLYGON EMPTY"));
+  BOOST_REQUIRE(geom->is<Polygon>());
+  BOOST_CHECK(geom->isEmpty());
+  BOOST_CHECK(!algorithm::isCounterClockWiseOriented(geom->as<Polygon>()));
+}
+
 // bool isCounterClockWiseOriented( const Triangle& );
 BOOST_AUTO_TEST_CASE(testIsCounterClockWiseOriented_Triangle)
 {

@@ -69,7 +69,9 @@ save(const Geometry &geom, std::ostream &out) -> void
         }
         case TYPE_SOLID: {
           const auto &solid = geom.as<Solid>();
-          process_geometry(solid.exteriorShell());
+          if (!solid.isEmpty()) {
+            process_geometry(solid.exteriorShell());
+          }
           break;
         }
         case TYPE_MULTIPOLYGON:

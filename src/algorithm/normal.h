@@ -73,6 +73,10 @@ template <typename Kernel>
 CGAL::Vector_3<Kernel>
 normal3D(const Polygon &polygon, bool exact = true)
 {
+  if (polygon.isEmpty()) {
+    return CGAL::Vector_3<Kernel>(0, 0, 0);
+  }
+
   return normal3D<Kernel>(polygon.exteriorRing(), exact);
 }
 

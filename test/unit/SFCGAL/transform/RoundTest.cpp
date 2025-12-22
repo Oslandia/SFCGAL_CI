@@ -38,4 +38,14 @@ BOOST_AUTO_TEST_CASE(testRoundLineString)
   BOOST_CHECK_EQUAL(g->asText(), "LINESTRING (1/2 1/2,3/2 3/2)");
 }
 
+// Test for empty point - to verify RoundTransform isEmpty() guard
+BOOST_AUTO_TEST_CASE(testRoundEmptyPoint)
+{
+  std::unique_ptr<Geometry> g(io::readWkt("POINT EMPTY"));
+  BOOST_CHECK(g->isEmpty());
+  g->round(); // Should not crash
+  BOOST_CHECK(g->isEmpty());
+  BOOST_CHECK_EQUAL(g->asText(), "POINT EMPTY");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

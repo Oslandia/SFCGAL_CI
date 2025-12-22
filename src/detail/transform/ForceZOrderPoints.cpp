@@ -21,6 +21,10 @@ ForceZOrderPoints::ForceZOrderPoints(Kernel::FT defaultZ)
 void
 ForceZOrderPoints::transform(Point &point)
 {
+  if (point.isEmpty()) {
+    return;
+  }
+
   if (!point.is3D()) {
     point = Point(point.x(), point.y(), _defaultZ);
   }
@@ -29,8 +33,12 @@ ForceZOrderPoints::transform(Point &point)
 void
 ForceZOrderPoints::visit(Triangle &t)
 {
-  if (!t.is3D()) {
-    if (!SFCGAL::algorithm::isCounterClockWiseOriented(t)) {
+  if (triangle.isEmpty()) {
+    return;
+  }
+
+  if (!triangle.is3D()) {
+    if (!SFCGAL::algorithm::isCounterClockWiseOriented(triangle)) {
       // not pointing up, reverse
       t.reverse();
     }
@@ -42,6 +50,10 @@ ForceZOrderPoints::visit(Triangle &t)
 void
 ForceZOrderPoints::visit(Polygon &p)
 {
+  if (p.isEmpty()) {
+    return;
+  }
+
   if (!p.is3D()) {
     LineString &ext = p.exteriorRing();
 
