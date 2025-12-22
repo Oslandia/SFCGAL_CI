@@ -43,48 +43,48 @@ AffineTransform3::transform(Point &point)
 }
 
 void
-AffineTransform3::transform(LineString &ls)
+AffineTransform3::transform(LineString &linestring)
 {
-  for (size_t i = 0; i < ls.numPoints(); ++i) {
-    transform(ls.pointN(i));
+  for (size_t i = 0; i < linestring.numPoints(); ++i) {
+    transform(linestring.pointN(i));
   }
 }
 
 void
-AffineTransform3::transform(Triangle &tri)
+AffineTransform3::transform(Triangle &triangle)
 {
-  transform(tri.vertex(0));
-  transform(tri.vertex(1));
-  transform(tri.vertex(2));
+  transform(triangle.vertex(0));
+  transform(triangle.vertex(1));
+  transform(triangle.vertex(2));
 }
 
 void
-AffineTransform3::transform(Polygon &poly)
+AffineTransform3::transform(Polygon &polygon)
 {
-  if (poly.isEmpty()) {
+  if (polygon.isEmpty()) {
     return;
   }
 
-  transform(poly.exteriorRing());
+  transform(polygon.exteriorRing());
 
-  for (size_t i = 0; i < poly.numInteriorRings(); ++i) {
-    transform(poly.interiorRingN(i));
+  for (size_t i = 0; i < polygon.numInteriorRings(); ++i) {
+    transform(polygon.interiorRingN(i));
   }
 }
 
 void
-AffineTransform3::transform(PolyhedralSurface &surf)
+AffineTransform3::transform(PolyhedralSurface &surface)
 {
-  for (size_t i = 0; i < surf.numPatches(); ++i) {
-    transform(surf.patchN(i));
+  for (size_t i = 0; i < surface.numPatches(); ++i) {
+    transform(surface.patchN(i));
   }
 }
 
 void
-AffineTransform3::transform(TriangulatedSurface &surf)
+AffineTransform3::transform(TriangulatedSurface &surface)
 {
-  for (size_t i = 0; i < surf.numPatches(); ++i) {
-    transform(surf.patchN(i));
+  for (size_t i = 0; i < surface.numPatches(); ++i) {
+    transform(surface.patchN(i));
   }
 }
 

@@ -28,43 +28,43 @@ public:
 
   /**
    * @brief Transform a point using the 3D affine transformation
-   * @param p The point to transform
+   * @param point The point to transform
    */
   void
-  transform(Point &p) override;
+  transform(Point &point) override;
 
   /**
    * @brief Transform a linestring using the 3D affine transformation
-   * @param ls The linestring to transform
+   * @param linestring The linestring to transform
    */
   virtual void
-  transform(LineString &ls);
+  transform(LineString &linestring);
   /**
    * @brief Transform a triangle using the 3D affine transformation
-   * @param tri The triangle to transform
+   * @param triangle The triangle to transform
    */
   virtual void
-  transform(Triangle &tri);
+  transform(Triangle &triangle);
   /**
    * @brief Transform a polygon using the 3D affine transformation
-   * @param poly The polygon to transform
+   * @param polygon The polygon to transform
    */
   virtual void
-  transform(Polygon &poly);
+  transform(Polygon &polygon);
 
   /**
    * @brief Transform a polyhedral surface using the 3D affine transformation
-   * @param surf The polyhedral surface to transform
+   * @param surface The polyhedral surface to transform
    */
   virtual void
-  transform(PolyhedralSurface &surf);
+  transform(PolyhedralSurface &surface);
 
   /**
    * @brief Transform a triangulated surface using the 3D affine transformation
-   * @param surf The triangulated surface to transform
+   * @param surface The triangulated surface to transform
    */
   virtual void
-  transform(TriangulatedSurface &surf);
+  transform(TriangulatedSurface &surface);
 
   /**
    * @brief Transform a solid using the 3D affine transformation
