@@ -367,6 +367,11 @@ auto
 preparePolygon(const Polygon &poly, Kernel::Vector_2 &trans)
     -> Polygon_with_holes_2
 {
+  if (poly.isEmpty()) {
+    trans = Kernel::Vector_2(0, 0);
+    return {};
+  }
+
   checkNoTouchingHoles(poly);
   Envelope const env = poly.envelope();
   trans              = Kernel::Vector_2(-env.xMin(), -env.yMin());
@@ -586,6 +591,10 @@ extrudeStraightSkeleton(const Geometry &geom, double building_height,
 
   // Predicate to identify non-base faces (roof slopes)
   auto isNotBaseFace = [](const Polygon &patch) -> bool {
+    if (patch.isEmpty()) {
+      return false;
+    }
+
     const LineString &exterior = patch.exteriorRing();
 
     // Check if any point has z != 0 (not a base face)

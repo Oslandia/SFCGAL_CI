@@ -231,12 +231,33 @@ BOOST_AUTO_TEST_CASE(testDistanceInM)
   BOOST_CHECK_EQUAL(out->asText(1), expectedWKT);
 }
 
+// Test for empty polygon - to verify preparePolygon() isEmpty() guard
+BOOST_AUTO_TEST_CASE(testEmptyPolygon)
+{
+  std::unique_ptr<Geometry> const g(io::readWkt("POLYGON EMPTY"));
+  std::unique_ptr<Geometry>       out(algorithm::straightSkeleton(*g));
+  std::string const               expectedWKT("MULTILINESTRING EMPTY");
+  BOOST_CHECK_EQUAL(out->asText(1), expectedWKT);
+}
+
 BOOST_AUTO_TEST_CASE(testMultiEmptyEmpty)
 {
   std::unique_ptr<Geometry> const g(io::readWkt("MULTIPOLYGON (EMPTY,EMPTY)"));
   std::unique_ptr<Geometry>       out(algorithm::straightSkeleton(*g));
   std::string const               expectedWKT("MULTILINESTRING EMPTY");
   BOOST_CHECK_EQUAL(out->asText(1), expectedWKT);
+}
+
+// Test for multipolygon with one empty and one valid polygon
+BOOST_AUTO_TEST_CASE(testMultiPolygonWithEmpty)
+{
+  std::unique_ptr<Geometry> const g(
+      io::readWkt("MULTIPOLYGON (EMPTY, ((0 0, 2 0, 2 2, 0 2, 0 0)))"));
+  std::unique_ptr<Geometry> out(algorithm::straightSkeleton(*g));
+  // Should process only the valid polygon
+  BOOST_CHECK(!out->isEmpty());
+  BOOST_CHECK(out->is<MultiLineString>());
+  BOOST_CHECK_EQUAL(out->as<MultiLineString>().numGeometries(), 4U);
 }
 
 // See https://gitlab.com/Oslandia/SFCGAL/-/issues/194

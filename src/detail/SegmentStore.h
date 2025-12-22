@@ -164,6 +164,10 @@ public:
   void
   extractSegments(const Polygon &polygon)
   {
+    if (polygon.isEmpty()) {
+      return;
+    }
+
     // Extract from exterior ring
     extractSegments(polygon.exteriorRing());
 

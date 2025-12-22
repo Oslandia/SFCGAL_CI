@@ -1392,6 +1392,11 @@ sfcgal_geometry_orientation(const sfcgal_geometry_t *ga) -> int
     return 0;
   }
 
+  if (g->isEmpty()) {
+    // Empty polygon has invalid/undetermined orientation
+    return 0;
+  }
+
   bool r = false;
 
   try {
@@ -1401,7 +1406,7 @@ sfcgal_geometry_orientation(const sfcgal_geometry_t *ga) -> int
     SFCGAL_WARNING("  with A: %s",
                    static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_ERROR("%s", e.what());
-    return -1.0;
+    return -1;
   }
 
   return r ? -1 : 1;

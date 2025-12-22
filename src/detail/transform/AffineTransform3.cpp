@@ -61,6 +61,10 @@ AffineTransform3::transform(Triangle &tri)
 void
 AffineTransform3::transform(Polygon &poly)
 {
+  if (poly.isEmpty()) {
+    return;
+  }
+
   transform(poly.exteriorRing());
 
   for (size_t i = 0; i < poly.numInteriorRings(); ++i) {
@@ -87,6 +91,10 @@ AffineTransform3::transform(TriangulatedSurface &surf)
 void
 AffineTransform3::transform(Solid &solid)
 {
+  if (solid.isEmpty()) {
+    return;
+  }
+
   transform(solid.exteriorShell());
 
   for (size_t i = 0; i < solid.numInteriorShells(); ++i) {

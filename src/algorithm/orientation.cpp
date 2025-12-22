@@ -110,6 +110,9 @@ isCounterClockWiseOriented(const LineString &lineString) -> bool
 auto
 isCounterClockWiseOriented(const Triangle &triangle) -> bool
 {
+  if (triangle.isEmpty()) {
+    return false;
+  }
   // Compute the 'z' part of the cross product
 
   return (triangle.vertex(2).x() - triangle.vertex(1).x()) *
@@ -123,6 +126,9 @@ isCounterClockWiseOriented(const Triangle &triangle) -> bool
 auto
 isCounterClockWiseOriented(const Polygon &polygon) -> bool
 {
+  if (polygon.isEmpty()) {
+    return false;
+  }
   return isCounterClockWiseOriented(polygon.exteriorRing());
 }
 

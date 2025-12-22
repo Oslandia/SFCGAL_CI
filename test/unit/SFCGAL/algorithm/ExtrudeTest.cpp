@@ -155,4 +155,42 @@ BOOST_AUTO_TEST_CASE(testChainingExtrude)
       "1,0 1 0)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0))))");
 }
 
+// Test for empty geometries - Issue #315
+BOOST_AUTO_TEST_CASE(testExtrudeEmptyPoint)
+{
+  Point emptyPoint;
+  BOOST_CHECK(emptyPoint.isEmpty());
+  std::unique_ptr<Geometry> ext(algorithm::extrude(emptyPoint, 0.0, 0.0, 1.0));
+  BOOST_CHECK(ext->isEmpty());
+  BOOST_CHECK(ext->is<LineString>());
+}
+
+BOOST_AUTO_TEST_CASE(testExtrudeEmptyLineString)
+{
+  LineString emptyLineString;
+  BOOST_CHECK(emptyLineString.isEmpty());
+  std::unique_ptr<Geometry> ext(
+      algorithm::extrude(emptyLineString, 0.0, 0.0, 1.0));
+  BOOST_CHECK(ext->isEmpty());
+  BOOST_CHECK(ext->is<PolyhedralSurface>());
+}
+
+BOOST_AUTO_TEST_CASE(testExtrudeEmptyPolygon)
+{
+  // This tests ForceZOrderPoints::visit(Polygon) with empty polygon
+  Polygon emptyPolygon;
+  BOOST_CHECK(emptyPolygon.isEmpty());
+  std::unique_ptr<Geometry> ext(
+      algorithm::extrude(emptyPolygon, 0.0, 0.0, 1.0));
+  BOOST_CHECK(ext->isEmpty());
+  BOOST_CHECK(ext->is<Solid>());
+
+  // Also test with WKT parsing
+  std::unique_ptr<Geometry> geom(io::readWkt("POLYGON EMPTY"));
+  BOOST_REQUIRE(geom->is<Polygon>());
+  std::unique_ptr<Geometry> ext2(algorithm::extrude(*geom, 0.0, 0.0, 1.0));
+  BOOST_CHECK(ext2->isEmpty());
+  BOOST_CHECK(ext2->is<Solid>());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

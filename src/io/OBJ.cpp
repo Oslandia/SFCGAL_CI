@@ -297,13 +297,16 @@ save(const Geometry &geom, std::ostream &out)
           break;
         }
         case TYPE_POLYGON: {
-          const auto         &polygon = geom.as<Polygon>();
-          std::vector<size_t> face;
-          for (size_t i = 0; i < polygon.exteriorRing().numPoints() - 1; ++i) {
-            size_t idx = find_or_add_point(polygon.exteriorRing().pointN(i));
-            face.push_back(idx);
+          const auto &polygon = geom.as<Polygon>();
+          if (!polygon.isEmpty()) {
+            std::vector<size_t> face;
+            for (size_t i = 0; i < polygon.exteriorRing().numPoints() - 1;
+                 ++i) {
+              size_t idx = find_or_add_point(polygon.exteriorRing().pointN(i));
+              face.push_back(idx);
+            }
+            all_faces.push_back(face);
           }
-          all_faces.push_back(face);
           break;
         }
         case TYPE_TRIANGULATEDSURFACE: {
@@ -322,7 +325,9 @@ save(const Geometry &geom, std::ostream &out)
         }
         case TYPE_SOLID: {
           const auto &solid = geom.as<Solid>();
-          process_geometry(solid.exteriorShell());
+          if (!solid.isEmpty()) {
+            process_geometry(solid.exteriorShell());
+          }
           break;
         }
         case TYPE_MULTIPOINT:

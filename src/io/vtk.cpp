@@ -89,7 +89,9 @@ save(const Geometry &geom, std::ostream &out)
         }
         case TYPE_SOLID: {
           const auto &solid = g.as<Solid>();
-          process_geometry(solid.exteriorShell());
+          if (!solid.isEmpty()) {
+            process_geometry(solid.exteriorShell());
+          }
           break;
         }
         case TYPE_MULTIPOINT:
