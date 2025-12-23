@@ -12,7 +12,7 @@
 #include <string>
 #include <variant>
 
-enum class OutputFormat : std::uint8_t { WKT = 0, WKB = 1, TXT = 2, OBJ = 3 };
+enum class OutputFormat : std::uint8_t { WKT = 0, WKB = 1, TXT = 2, OBJ = 3, STL = 4, VTK = 5 };
 
 [[nodiscard]] auto
 load_geometry(const std::string &source) -> std::unique_ptr<SFCGAL::Geometry>;

@@ -4,73 +4,74 @@
 #include "operations.hpp"
 
 #include "../constructors.hpp"
+#include "../util.hpp"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/config.h"
 #include "SFCGAL/version.h"
-#include <SFCGAL/Kernel.h>
 
-#if !defined(_MSC_VER)
-  #include <SFCGAL/algorithm/alphaShapes.h>
+#ifndef _MSC_VER
+  #include "SFCGAL/algorithm/alphaShapes.h"
 #endif
-#include <SFCGAL/algorithm/alphaWrapping3D.h>
-#include <SFCGAL/algorithm/area.h>
-#include <SFCGAL/algorithm/buffer3D.h>
-#include <SFCGAL/algorithm/centroid.h>
-#include <SFCGAL/algorithm/collect.h>
-#include <SFCGAL/algorithm/collectionExtract.h>
-#include <SFCGAL/algorithm/collectionHomogenize.h>
-#include <SFCGAL/algorithm/collectionToMulti.h>
-#include <SFCGAL/algorithm/connection.h>
-#include <SFCGAL/algorithm/convexHull.h>
-#include <SFCGAL/algorithm/covers.h>
-#include <SFCGAL/algorithm/difference.h>
-#include <SFCGAL/algorithm/distance.h>
-#include <SFCGAL/algorithm/distance3d.h>
-#include <SFCGAL/algorithm/extrude.h>
-#include <SFCGAL/algorithm/force2D.h>
-#include <SFCGAL/algorithm/force3D.h>
-#include <SFCGAL/algorithm/forceMeasured.h>
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/algorithm/isClosed.h>
-#include <SFCGAL/algorithm/isSimple.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/length.h>
-#include <SFCGAL/algorithm/lineSubstring.h>
-#include <SFCGAL/algorithm/minkowskiSum.h>
-#include <SFCGAL/algorithm/minkowskiSum3D.h>
-#include <SFCGAL/algorithm/normal.h>
-#include <SFCGAL/algorithm/offset.h>
-#include <SFCGAL/algorithm/orientation.h>
-#include <SFCGAL/algorithm/partition_2.h>
-#include <SFCGAL/algorithm/plane.h>
+#include "SFCGAL/algorithm/alphaWrapping3D.h"
+#include "SFCGAL/algorithm/area.h"
+#include "SFCGAL/algorithm/buffer3D.h"
+#include "SFCGAL/algorithm/centroid.h"
+#include "SFCGAL/algorithm/collect.h"
+#include "SFCGAL/algorithm/collectionExtract.h"
+#include "SFCGAL/algorithm/collectionHomogenize.h"
+#include "SFCGAL/algorithm/collectionToMulti.h"
+#include "SFCGAL/algorithm/connection.h"
+#include "SFCGAL/algorithm/convexHull.h"
+#include "SFCGAL/algorithm/covers.h"
+#include "SFCGAL/algorithm/difference.h"
+#include "SFCGAL/algorithm/distance.h"
+#include "SFCGAL/algorithm/distance3d.h"
+#include "SFCGAL/algorithm/extrude.h"
+#include "SFCGAL/algorithm/force2D.h"
+#include "SFCGAL/algorithm/force3D.h"
+#include "SFCGAL/algorithm/forceMeasured.h"
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/algorithm/isClosed.h"
+#include "SFCGAL/algorithm/isSimple.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/length.h"
+#include "SFCGAL/algorithm/lineSubstring.h"
+#include "SFCGAL/algorithm/minkowskiSum.h"
+#include "SFCGAL/algorithm/minkowskiSum3D.h"
+#include "SFCGAL/algorithm/normal.h"
+#include "SFCGAL/algorithm/offset.h"
+#include "SFCGAL/algorithm/orientation.h"
+#include "SFCGAL/algorithm/partition_2.h"
+#include "SFCGAL/algorithm/plane.h"
 #if SFCGAL_CGAL_VERSION_MAJOR >= 6
-  #include <SFCGAL/algorithm/polygonRepair.h>
+  #include "SFCGAL/algorithm/polygonRepair.h"
 #endif
+#include "SFCGAL/algorithm/rotate.h"
+#include "SFCGAL/algorithm/scale.h"
+#include "SFCGAL/algorithm/simplification.h"
+#include "SFCGAL/algorithm/straightSkeleton.h"
+#include "SFCGAL/algorithm/tesselate.h"
+#include "SFCGAL/algorithm/translate.h"
+#include "SFCGAL/algorithm/union.h"
+#include "SFCGAL/algorithm/visibility.h"
+#include "SFCGAL/algorithm/volume.h"
 #include "SFCGAL/detail/transform/ForceOrderPoints.h"
-#include <SFCGAL/algorithm/rotate.h>
-#include <SFCGAL/algorithm/scale.h>
-#include <SFCGAL/algorithm/simplification.h>
-#include <SFCGAL/algorithm/straightSkeleton.h>
-#include <SFCGAL/algorithm/tesselate.h>
-#include <SFCGAL/algorithm/translate.h>
-#include <SFCGAL/algorithm/union.h>
-#include <SFCGAL/algorithm/visibility.h>
-#include <SFCGAL/algorithm/volume.h>
-#include <SFCGAL/triangulate/triangulate2DZ.h>
+#include "SFCGAL/triangulate/triangulate2DZ.h"
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPoint.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/MultiSolid.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
 #include <CGAL/number_utils.h>
 #include <cmath>
@@ -107,6 +108,32 @@ struct Operation {
 };
 
 namespace {
+
+using namespace SFCGAL::sfcgalop::util;
+
+// Define the OperationMatchResult struct specifically for this implementation
+struct OperationMatchResult {
+    bool found;
+    std::string resolved_name;
+    std::vector<Operation>::const_iterator operation_it;
+};
+
+// Forward declaration for find_operation implementation
+extern const std::vector<Operation> operations;
+
+auto find_operation(std::string_view op_name) -> OperationMatchResult
+{
+    // Normalize the input operation name
+    std::string normalized_input = normalize_operation_name(op_name);
+
+    auto operation_it = std::find_if(operations.begin(), operations.end(),
+        [&normalized_input](const Operation &operation) -> bool {
+            // Normalize the operation name for comparison
+            return normalize_operation_name(operation.name) == normalized_input;
+        });
+
+    return {operation_it != operations.end(), std::string(op_name), operation_it};
+}
 
 /**
  * @brief Parse a string to double, returning a fallback on failure.
@@ -145,7 +172,7 @@ parse_boolean(const std::string &str, bool default_val = false) -> bool
 {
   std::string lower_str = str;
   std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(),
-                 [](unsigned char chr) { return std::tolower(chr); });
+                 [](unsigned char chr) -> int { return std::tolower(chr); });
 
   if (lower_str == "true" || lower_str == "t" || lower_str == "1") {
     return true;
@@ -280,9 +307,9 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::area(*geom);
      }},
 
-    {"area3d", "Metrics", "Calculate the 3D surface area of a geometry", false,
+    {"area_3d", "Metrics", "Calculate the 3D surface area of a geometry", false,
      "No parameters required.\n\nExample:\n  sfcgalop -a \"POLYGON Z((0 0 0,3 "
-     "0 0,3 4 2,0 4 2,0 0 0))\" area3d",
+     "0 0,3 4 2,0 4 2,0 0 0))\" area_3d",
      "A", "D",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -307,10 +334,10 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::length(*geom_a);
      }},
 
-    {"length3d", "Metrics", "Calculate the 3D length of linear geometries",
+    {"length_3d", "Metrics", "Calculate the 3D length of linear geometries",
      false,
      "No parameters required.\n\nExample:\n  sfcgalop -a \"LINESTRING Z(0 0 "
-     "0,3 4 2,6 0 1)\" length3d",
+     "0,3 4 2,6 0 1)\" length_3d",
      "A", "D",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -330,10 +357,10 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::distance(*geom_a, *geom_b);
      }},
 
-    {"distance3d", "Metrics",
+    {"distance_3d", "Metrics",
      "Calculate the 3D minimum distance between two geometries", true,
      "No parameters required.\nRequires two geometries.\n\nExample:\n  "
-     "sfcgalop -a \"POINT Z(0 0 0)\" -b \"POINT Z(3 4 5)\" distance3d",
+     "sfcgalop -a \"POINT Z(0 0 0)\" -b \"POINT Z(3 4 5)\" distance_3d",
      "A, B", "D",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
@@ -354,7 +381,7 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::intersects(*geom_a, *geom_b);
      }},
 
-    {"intersects3d", "Predicates", "Test if two geometries intersect in 3D",
+    {"intersects_3d", "Predicates", "Test if two geometries intersect in 3D",
      true, "", "A, B", "B",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
@@ -428,7 +455,7 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::intersection(*geom_a, *geom_b);
      }},
 
-    {"intersection3d", "Set Operations",
+    {"intersection_3d", "Set Operations",
      "Compute the 3D geometric intersection of two geometries", true, "",
      "A, B", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
@@ -449,7 +476,7 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::difference(*geom_a, *geom_b);
      }},
 
-    {"difference3d", "Set Operations", "Compute 3D geometry A minus geometry B",
+    {"difference_3d", "Set Operations", "Compute 3D geometry A minus geometry B",
      true, "", "A, B", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
@@ -469,7 +496,7 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::union_(*geom_a, *geom_b);
      }},
 
-    {"union3d", "Set Operations",
+    {"union_3d", "Set Operations",
      "Compute the 3D geometric union of two geometries", true, "", "A, B", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
@@ -495,14 +522,14 @@ const std::vector<Operation> operations = {
        return env.toPolygon();
      }},
 
-    {"convexhull", "Construction", "Compute the 2D convex hull of a geometry",
+    {"convex_hull", "Construction", "Compute the 2D convex hull of a geometry",
      false, "", "A", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
        return SFCGAL::algorithm::convexHull(*geom_a);
      }},
 
-    {"convexhull3d", "Construction", "Compute the 3D convex hull of a geometry",
+    {"convex_hull_3d", "Construction", "Compute the 3D convex hull of a geometry",
      false, "", "A", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -516,14 +543,14 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::centroid(*geom_a);
      }},
 
-    {"straightskeleton", "Construction",
+    {"straight_skeleton", "Construction",
      "Compute the straight skeleton of a polygon", false,
      "Parameters:\n  auto_orientation=BOOL: Enable automatic orientation "
      "correction (default: false)\n"
      "                         Accepts: true/false, t/f, 1/0, TRUE/FALSE "
      "(case-insensitive)\n\n"
      "Example:\n  sfcgalop -a \"POLYGON((0 0,4 0,4 "
-     "4,0 4,0 0))\" straightskeleton \"auto_orientation=true\"",
+     "4,0 4,0 0))\" straight_skeleton \"auto_orientation=true\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -633,11 +660,11 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::offset(*geom_a, distance);
      }},
 
-    {"buffer3d", "Construction", "Create a 3D buffer around points and lines",
+    {"buffer_3d", "Construction", "Create a 3D buffer around points and lines",
      false,
      "Parameters:\n  radius=VALUE: Buffer radius (default: 1.0)\n\nNote: "
      "Segments are fixed at 16\nOnly works with Point and LineString "
-     "geometries\n\nExample:\n  sfcgalop -a \"POINT(0 0 0)\" buffer3d "
+     "geometries\n\nExample:\n  sfcgalop -a \"POINT(0 0 0)\" buffer_3d "
      "\"radius=2.5\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
@@ -655,7 +682,7 @@ const std::vector<Operation> operations = {
        }
      }},
 
-    {"minkowskisum", "Construction", "Compute Minkowski sum of two geometries",
+    {"minkowski_sum", "Construction", "Compute Minkowski sum of two geometries",
      true, "", "A, B", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
@@ -669,7 +696,7 @@ const std::vector<Operation> operations = {
        return std::nullopt;
      }},
 
-    {"minkowskisum3d", "Construction",
+    {"minkowski_sum_3d", "Construction",
      "Compute 3D Minkowski sum of two geometries", true, "", "A, B", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
@@ -679,13 +706,13 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::minkowskiSum3D(*geom_a, *geom_b);
      }},
 
-#if !defined(_MSC_VER)
-    {"alphashapes", "Construction", "Compute alpha shapes from point cloud",
+#ifndef _MSC_VER
+    {"alpha_shapes", "Construction", "Compute alpha shapes from point cloud",
      false,
      "Parameters:\n  alpha=VALUE: Alpha parameter controlling shape detail "
      "(default: 1.0)\n  Smaller values create more detailed "
      "shapes\n\nExample:\n  sfcgalop -a \"MULTIPOINT((0 0),(1 0),(0.5 1),(2 "
-     "0.5))\" alphashapes \"alpha=0.5\"",
+     "0.5))\" alpha_shapes \"alpha=0.5\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -696,11 +723,11 @@ const std::vector<Operation> operations = {
      }},
 #endif
 
-    {"alphawrapping3d", "Construction",
+    {"alpha_wrapping_3d", "Construction",
      "Create 3D alpha wrapping surface from points", false,
      "Parameters:\n  alpha=VALUE: Alpha parameter (default: 1.0)\n  "
      "offset=VALUE: Offset parameter (default: 0)\n\nExample:\n  sfcgalop -a "
-     "\"MULTIPOINT Z((0 0 0),(1 0 0),(0 1 0),(0 0 1))\" alphawrapping3d "
+     "\"MULTIPOINT Z((0 0 0),(1 0 0),(0 1 0),(0 0 1))\" alpha_wrapping_3d "
      "\"alpha=1.5,offset=0\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
@@ -714,11 +741,11 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::alphaWrapping3D(*geom_a, alphaInt, offset);
      }},
 
-    {"linesubstring", "Construction",
+    {"line_substring", "Construction",
      "Extract substring from linestring by fraction", false,
      "Parameters:\n  start=VALUE: Start fraction (0.0 to 1.0)\n  end=VALUE: "
      "End fraction (default: 1.0)\n\nExample:\n  sfcgalop -a \"LINESTRING(0 "
-     "0,10 0,10 10)\" linesubstring \"start=0.25,end=0.75\"",
+     "0,10 0,10 10)\" line_substring \"start=0.25,end=0.75\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -814,10 +841,10 @@ const std::vector<Operation> operations = {
        return result;
      }},
 
-    {"force2d", "Transformations", "Remove Z coordinates to create 2D geometry",
+    {"force_2d", "Transformations", "Remove Z coordinates to create 2D geometry",
      false,
      "No parameters required.\n\nExample:\n  sfcgalop -a \"POINT Z(1 2 3)\" "
-     "force2d",
+     "force_2d",
      "A", "G",
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -826,10 +853,10 @@ const std::vector<Operation> operations = {
        return result;
      }},
 
-    {"force3d", "Transformations", "Add Z coordinates to create 3D geometry",
+    {"force_3d", "Transformations", "Add Z coordinates to create 3D geometry",
      false,
      "Parameters:\n  z=VALUE: Z coordinate value to assign (default: "
-     "0.0)\n\nExample:\n  sfcgalop -a \"POINT(1 2)\" force3d \"z=5.0\"",
+     "0.0)\n\nExample:\n  sfcgalop -a \"POINT(1 2)\" force_3d \"z=5.0\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -840,10 +867,10 @@ const std::vector<Operation> operations = {
        return result;
      }},
 
-    {"forcemeasured", "Transformations", "Add measure coordinates to geometry",
+    {"force_measured", "Transformations", "Add measure coordinates to geometry",
      false,
      "Parameters:\n  m=VALUE: Measure coordinate value (default: "
-     "0.0)\n\nExample:\n  sfcgalop -a \"POINT(1 2)\" forcemeasured \"m=10.0\"",
+     "0.0)\n\nExample:\n  sfcgalop -a \"POINT(1 2)\" force_measured \"m=10.0\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -897,13 +924,13 @@ const std::vector<Operation> operations = {
      }},
 
 #if SFCGAL_CGAL_VERSION_MAJOR >= 6
-    {"polygonrepair", "Transformations", "Repair invalid polygons with rules",
+    {"polygon_repair", "Transformations", "Repair invalid polygons with rules",
      false,
      "Parameters:\n  method=0|1|2|3 (default: 0)\n\nMethods:\n  0 = "
      "Even-odd\n  1 = Non-zero winding\n  2 = Union of all polygons\n  3 = "
      "Intersection of all polygons\n\n"
      "Example:\n  sfcgalop -a \"POLYGON((0 0, 2 2, 2 0, 0 2, 0 0)) "
-     "polygonrepair \"method=1\"",
+     "polygon_repair \"method=1\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -1261,22 +1288,18 @@ execute_operation(const std::string &op_name, const std::string &op_arg,
                   const SFCGAL::Geometry *geom_b)
     -> std::optional<OperationResult>
 {
+  auto match_result = find_operation(op_name);
 
-  auto operation_it = std::find_if(operations.begin(), operations.end(),
-                                   [&op_name](const Operation &operation) {
-                                     return operation.name == op_name;
-                                   });
-
-  if (operation_it != operations.end()) {
+  if (match_result.found) {
     // Check for null geometry A before calling operation, but allow constructor
     // operations
-    bool is_constructor = operation_it->name.find("make_") == 0;
+    bool is_constructor = match_result.operation_it->name.find("make_") == 0;
     if (geom_a == nullptr && !is_constructor) {
       return std::nullopt;
     }
 
     try {
-      return operation_it->func(op_arg, geom_a, geom_b);
+      return match_result.operation_it->func(op_arg, geom_a, geom_b);
     } catch (const std::exception &e) {
       std::cerr << "Operation error: " << e.what() << "\n";
       return std::nullopt;
@@ -1336,19 +1359,18 @@ print_operation_help(const char *name) -> bool
     return false;
   }
 
-  auto operation_it = std::find_if(
-      operations.begin(), operations.end(),
-      [name](const Operation &operation) { return operation.name == name; });
+  auto match_result = find_operation(name);
 
-  if (operation_it != operations.end()) {
-    std::cout << "\nOperation: " << operation_it->name << "\n"
-              << "Category: " << operation_it->category << "\n"
-              << "Description: " << operation_it->description << "\n";
-    if (operation_it->requires_b) {
+  if (match_result.found) {
+    std::cout << "\nOperation: " << to_underscore_convention(match_result.operation_it->name)
+              << "\n"
+              << "Category: " << match_result.operation_it->category << "\n"
+              << "Description: " << match_result.operation_it->description << "\n";
+    if (match_result.operation_it->requires_b) {
       std::cout << "Requires two geometries\n";
     }
-    if (!operation_it->param_help.empty()) {
-      std::cout << "\n" << operation_it->param_help << "\n";
+    if (!match_result.operation_it->param_help.empty()) {
+      std::cout << "\n" << match_result.operation_it->param_help << "\n";
     }
     return true;
   }
@@ -1382,9 +1404,9 @@ get_all_operations_info() -> std::vector<
   result.reserve(operations.size());
 
   for (const auto &operation : operations) {
-    result.emplace_back(operation.name, operation.category,
-                        operation.description, operation.input,
-                        operation.output);
+    result.emplace_back(to_underscore_convention(operation.name),
+                        operation.category, operation.description,
+                        operation.input, operation.output);
   }
 
   return result;
@@ -1404,14 +1426,10 @@ get_all_operations_info() -> std::vector<
 auto
 operation_requires_second_geometry(const std::string &operation_name) -> bool
 {
-  auto operation_it =
-      std::find_if(operations.begin(), operations.end(),
-                   [&operation_name](const Operation &operation) {
-                     return operation.name == operation_name;
-                   });
+  auto match_result = find_operation(operation_name);
 
-  if (operation_it != operations.end()) {
-    return operation_it->requires_b;
+  if (match_result.found) {
+    return match_result.operation_it->requires_b;
   }
 
   return false; // Operation not found, assume it doesn't require second

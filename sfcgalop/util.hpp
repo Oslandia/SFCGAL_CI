@@ -9,6 +9,7 @@
 #define SFCGALOP_UTIL_HPP
 
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -39,5 +40,43 @@ parse_parameter(const std::string &param_str, std::string &name,
 auto
 parse_parameters(const std::string &params_str)
     -> std::vector<std::pair<std::string, std::string>>;
+
+namespace SFCGAL::sfcgalop::util {
+
+/**
+ * @brief Structure to hold the result of an operation match
+ */
+struct OperationMatchResult {
+  /**
+   * @brief Indicates whether the operation was found
+   */
+  bool found;
+  /**
+   * @brief The resolved name after alias processing
+   */
+  std::string resolved_name;
+  /**
+   * @brief Iterator to the operation in the operations vector
+   */
+  void *operation_it; // Using void* as a placeholder; will be cast
+                      // appropriately in implementation
+};
+
+/**
+ * @brief Convert operation name to underscore convention for display purposes.
+ * This function converts camelCase names to snake_case for consistent display.
+ */
+auto
+to_underscore_convention(std::string_view op_name) -> std::string;
+
+/**
+ * @brief Normalize operation name by converting to lowercase and removing
+ * underscores This allows matching of different naming conventions (e.g.,
+ * alpha_wrapping_3d, alphawrapping3d, alphaWrapping3D)
+ */
+auto
+normalize_operation_name(std::string_view op_name) -> std::string;
+
+} // namespace SFCGAL::sfcgalop::util
 
 #endif /* SFCGALOP_UTIL_HPP */

@@ -10,8 +10,10 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
+#include <regex>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace {
@@ -123,3 +125,56 @@ parse_parameters(const std::string &params_str)
 
   return result;
 }
+
+namespace SFCGAL::sfcgalop::util {
+
+auto
+to_underscore_convention(std::string_view op_name) -> std::string
+{
+  std::string result;
+  for (size_t i = 0; i < op_name.length(); ++i) {
+    char current_char = op_name[i];
+
+    // Add underscore before uppercase letters (except at the beginning)
+    if (current_char >= 'A' && current_char <= 'Z' && i > 0) {
+      // Check if previous character is lowercase or if previous is digit and
+      // current is not 'D' to avoid adding underscore in sequences like "3D"
+      if ((i > 0 && op_name[i - 1] >= 'a' && op_name[i - 1] <= 'z') ||
+          (i > 0 && op_name[i - 1] >= '0' && op_name[i - 1] <= '9' &&
+           current_char != 'D')) {
+        result += '_';
+      }
+    }
+
+    // Convert uppercase to lowercase
+    result += static_cast<char>(std::tolower(current_char));
+  }
+
+  // Handle common patterns like 3D, 2D
+  std::regex pattern(R"((\d)([A-Z]))");
+  result = std::regex_replace(result, pattern, "$1_$2");
+
+  return result;
+}
+
+/**
+ * @brief Normalize operation name by converting to lowercase and removing
+ * underscores This allows matching of different naming conventions (e.g.,
+ * alpha_wrapping_3d, alphawrapping3d, alphaWrapping3D)
+ */
+auto
+normalize_operation_name(std::string_view op_name) -> std::string
+{
+  std::string result;
+  result.reserve(op_name.length());
+
+  for (char c : op_name) {
+    if (c != '_') { // Skip underscores
+      result += std::tolower(c);
+    }
+  }
+
+  return result;
+}
+
+} // namespace SFCGAL::sfcgalop::util

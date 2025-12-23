@@ -45,7 +45,7 @@ sfcgalop [options] -a <WKT/WKB> [-b <WKT/WKB>] [operation] [params]
 - `-a, --geom-a <WKT/WKB>` : First geometry (required, use "stdin" to read from stdin)
 - `-b, --geom-b <WKT/WKB>` : Second geometry (for binary operations, use "stdin" to read from stdin)
 - `--validate` : Validate input geometries before operation
-- `-f, --format <fmt>` : Output format (wkt, wkb, txt/ewkt)
+- `-f, --format <fmt>` : Output format (wkt, wkb, txt/ewkt, obj, stl, vtk)
 - `--precision <n>` : Output precision (decimal places)
 - `--list` : List all available operations
 - `--help` : Show help message
@@ -91,6 +91,24 @@ echo "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))" | \
 ```bash
 sfcgalop -a "POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))" -f wkb
 #Output : Binary WKB representation
+```
+
+#### Convert geometry to OBJ format
+
+```bash
+sfcgalop -a "TRIANGLE((0 0 0, 1 0 0, 0 1 0, 0 0 0))" -f obj
+```
+
+#### Convert geometry to STL format
+
+```bash
+sfcgalop -a "SOLID((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)), ((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)), ((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0)), ((0 0 1,0 1 1,0 1 0,0 0 0,0 0 1)), ((1 0 1,1 1 1,0 1 1,0 0 1,1 0 1)), ((1 0 0,1 0 1,0 0 1,0 0 0,1 0 0))))" -f stl
+```
+
+#### Convert geometry to VTK format
+
+```bash
+sfcgalop -a "TIN Z (((0 0 0, 0 0 1, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 1 0 0, 0 0 0)))" -f vtk
 ```
 
 #### Display geometry from file
@@ -213,6 +231,35 @@ sfcgalop --validate -a "POLYGON((0 0, 0 10, 10 10, 10 0, 1 0))" area
 #WKT : POLYGON((0 0, 0 10, 10 10, 10 0, 1 0))
 ```
 
+## Naming Conventions and Compatibility
+
+SFCGAL supports multiple naming conventions for better compatibility and flexibility through a normalization approach:
+
+### Normalization Approach
+SFCGAL uses a normalization system that allows multiple naming conventions for the same operation by converting names to lowercase and removing underscores for matching:
+
+- `alpha_wrapping_3d`, `alphawrapping3d`, and `alphaWrapping3D` all refer to the same operation
+- `line_substring`, `linesubstring`, and `LineSubstring` all refer to the same operation
+- `convex_hull_3d`, `convexhull3d`, and `ConvexHull3D` all refer to the same operation
+
+This approach provides flexibility while maintaining consistency.
+
+### Canonical Names
+The preferred canonical names follow the underscore convention (e.g., `minkowski_sum`, `alpha_shapes`, `area_3d`).
+The `sfcgalop --list` command displays operations using these canonical names.
+
+### Case Insensitivity
+All operation names are case-insensitive, so `Area`, `AREA`, and `area` all work the same.
+
+Example usage:
+```bash
+# Using different naming conventions for the same operation
+sfcgalop -a "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))" area_3d
+sfcgalop -a "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))" area3d
+sfcgalop -a "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))" AREA3D
+# All of these work the same way
+```
+
 ## Contributing
 
 Contributions are welcome! Please follow these guidelines:
@@ -229,9 +276,3 @@ This project is part of SFCGAL and follows the same license terms.
 ## Authors
 
 SFCGAL Contributors
-
-## See Also
-
-- [SFCGAL Documentation](https://sfcgal.gitlab.io/SFCGAL/)
-- [CGAL Documentation](https://www.cgal.org/)
-- [OGC Simple Features](https://www.ogc.org/standards/sfa)
