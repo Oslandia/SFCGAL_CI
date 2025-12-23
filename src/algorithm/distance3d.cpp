@@ -402,7 +402,7 @@ distanceLineStringPolyhedralSurface3D(const LineString        &lineA,
     return std::numeric_limits<double>::infinity();
   }
 
-  if (intersects(lineA, polySurfaceB, NoValidityCheck())) {
+  if (intersects3D(lineA, polySurfaceB, NoValidityCheck())) {
     return 0.0;
   }
 
@@ -425,7 +425,7 @@ distanceLineStringTriangulatedSurface3D(
     return std::numeric_limits<double>::infinity();
   }
 
-  if (intersects(lineA, triangulatedSurfaceB, NoValidityCheck())) {
+  if (intersects3D(lineA, triangulatedSurfaceB, NoValidityCheck())) {
     return 0.0;
   }
 
@@ -446,7 +446,7 @@ distanceLineStringSolid3D(const LineString &gA, const Solid &gB) -> double
     return std::numeric_limits<double>::infinity();
   }
 
-  if (intersects(gA, gB, NoValidityCheck())) {
+  if (intersects3D(gA, gB, NoValidityCheck())) {
     return 0.0;
   }
 
@@ -600,7 +600,7 @@ distancePolyhedralSurfaceGeometry3D(const PolyhedralSurface &polySurfaceA,
     return std::numeric_limits<double>::infinity();
   }
 
-  if (intersects(polySurfaceA, geomB, NoValidityCheck())) {
+  if (intersects3D(polySurfaceA, geomB, NoValidityCheck())) {
     return 0.0;
   }
 
@@ -623,7 +623,7 @@ distanceTriangulatedSurfaceGeometry3D(
     return std::numeric_limits<double>::infinity();
   }
 
-  if (intersects(triangulatedSurfaceA, geomB, NoValidityCheck())) {
+  if (intersects3D(triangulatedSurfaceA, geomB, NoValidityCheck())) {
     return 0.0;
   }
 
@@ -698,7 +698,7 @@ distanceSolidSolid3D(const Solid &gA, const Solid &gB) -> double
     return std::numeric_limits<double>::infinity();
   }
 
-  if (intersects(gA, gB, NoValidityCheck())) {
+  if (intersects3D(gA, gB, NoValidityCheck())) {
     return 0.0;
   }
 
