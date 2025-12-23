@@ -98,7 +98,7 @@ print_help()
       {"-b, --geom-b=ARG", "Source for geometry B (WKT, WKB, file, stdin)"});
   options_table.add_row(
       {"-f, --format=ARG",
-       "Output format: wkt, wkb, txt/ewkt, obj (default: wkt)"});
+       "Output format: wkt, wkb, txt/ewkt, obj, stl, vtk (default: wkt)"});
   options_table.add_row(
       {"-p, --precision=N", "Decimal precision for output (default: 6)"});
   options_table.add_row({""});
@@ -151,6 +151,16 @@ print_help()
             << TextUI::Colors::RESET << "\n";
   std::cout << "  " << PROGRAM_NAME
             << " -a \"TRIANGLE((0 0 0, 1 0 0, 0 1 0, 0 0 0))\" -f obj\n\n";
+
+  std::cout << TextUI::Colors::DIM << "  # Convert geometry to STL format"
+            << TextUI::Colors::RESET << "\n";
+  std::cout << "  " << PROGRAM_NAME
+            << " -a \"SOLID((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)), ((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)), ((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0)), ((0 0 1,0 1 1,0 1 0,0 0 0,0 0 1)), ((1 0 1,1 1 1,0 1 1,0 0 1,1 0 1)), ((1 0 0,1 0 1,0 0 1,0 0 0,1 0 0))))\" -f stl\n\n";
+
+  std::cout << TextUI::Colors::DIM << "  # Convert geometry to VTK format"
+            << TextUI::Colors::RESET << "\n";
+  std::cout << "  " << PROGRAM_NAME
+            << " -a \"TIN Z (((0 0 0, 0 0 1, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 1 0 0, 0 0 0)))\" -f vtk\n\n";
 
   std::cout << TextUI::Colors::DIM << "  # Display geometry from file"
             << TextUI::Colors::RESET << "\n";
@@ -450,6 +460,12 @@ handle_geometry_display(const Options &options) -> bool
       break;
     case OutputFormat::OBJ:
       std::cout << "OBJ";
+      break;
+    case OutputFormat::STL:
+      std::cout << "STL";
+      break;
+    case OutputFormat::VTK:
+      std::cout << "VTK";
       break;
     }
     std::cout << TextUI::Colors::RESET << "\n\n";

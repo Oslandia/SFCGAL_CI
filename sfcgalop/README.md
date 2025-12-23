@@ -45,7 +45,7 @@ sfcgalop [options] -a <WKT/WKB> [-b <WKT/WKB>] [operation] [params]
 - `-a, --geom-a <WKT/WKB>` : First geometry (required, use "stdin" to read from stdin)
 - `-b, --geom-b <WKT/WKB>` : Second geometry (for binary operations, use "stdin" to read from stdin)
 - `--validate` : Validate input geometries before operation
-- `-f, --format <fmt>` : Output format (wkt, wkb, txt/ewkt)
+- `-f, --format <fmt>` : Output format (wkt, wkb, txt/ewkt, obj, stl, vtk)
 - `--precision <n>` : Output precision (decimal places)
 - `--list` : List all available operations
 - `--help` : Show help message
@@ -91,6 +91,24 @@ echo "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))" | \
 ```bash
 sfcgalop -a "POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))" -f wkb
 #Output : Binary WKB representation
+```
+
+#### Convert geometry to OBJ format
+
+```bash
+sfcgalop -a "TRIANGLE((0 0 0, 1 0 0, 0 1 0, 0 0 0))" -f obj
+```
+
+#### Convert geometry to STL format
+
+```bash
+sfcgalop -a "SOLID((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)), ((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)), ((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0)), ((0 0 1,0 1 1,0 1 0,0 0 0,0 0 1)), ((1 0 1,1 1 1,0 1 1,0 0 1,1 0 1)), ((1 0 0,1 0 1,0 0 1,0 0 0,1 0 0))))" -f stl
+```
+
+#### Convert geometry to VTK format
+
+```bash
+sfcgalop -a "TIN Z (((0 0 0, 0 0 1, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 1 0 0, 0 0 0)))" -f vtk
 ```
 
 #### Display geometry from file
@@ -211,6 +229,71 @@ sfcgalop --validate -a "POLYGON((0 0, 0 10, 10 10, 10 0, 1 0))" area
 #Details:
 #Geometry type : Polygon
 #WKT : POLYGON((0 0, 0 10, 10 10, 10 0, 1 0))
+```
+
+## Naming Conventions and Compatibility
+
+SFCGAL supports multiple naming conventions for better compatibility and flexibility:
+
+### Underscore Convention Aliases
+SFCGAL supports the `xx_yyy_zzz` naming convention as aliases for all operations:
+
+- `line_substring` → `linesubstring`
+- `alpha_shapes` → `alphashapes`
+- `alpha_wrapping3d` → `alphawrapping3d`
+- `alpha_wrapping_3d` → `alphawrapping3d`
+- `alphawrapping_3d` → `alphawrapping3d`
+- `buffer_3d` → `buffer3d`
+- `minkowski_sum` → `minkowskisum`
+- `minkowski_sum3d` → `minkowskisum3d`
+- `minkowski_sum_3d` → `minkowskisum3d`
+- `convex_hull` → `convexhull`
+- `convex_hull3d` → `convexhull3d`
+- `convex_hull_3d` → `convexhull3d`
+- `straight_skeleton` → `straightskeleton`
+- `force_2d` → `force2d`
+- `force_3d` → `force3d`
+- `force_measured` → `forcemeasured`
+- `force_lhr` → `forceLHR`
+- `force_rhr` → `forceRHR`
+- `polygon_repair` → `polygonrepair`
+- `distance_3d` → `distance3d`
+- `length_3d` → `length3d`
+- `area_3d` → `area3d`
+- And many more
+
+### GEOS Compatibility
+SFCGAL also supports GEOS-style operation names as aliases:
+
+- `buffer` → `offset` (GEOS name for offset operation)
+- `symdifference` → `difference` (GEOS symmetric difference - note: SFCGAL uses regular difference)
+- `geomunion` → `union` (Alternative to union)
+- `geomintersection` → `intersection` (Alternative to intersection)
+- `geomdifference` → `difference` (Alternative to difference)
+- `isempty` → `is_empty` (Boolean check)
+- `issimple` → `is_simple` (Boolean check)
+- `isvalid` → `is_valid` (Boolean check)
+- `is3d` → `is_3d` (Boolean check)
+- `ismeasured` → `is_measured` (Boolean check)
+- `isclosed` → `is_closed` (Boolean check)
+- And many more common aliases
+
+### Case Insensitivity
+All operation names are case-insensitive, so `Area`, `AREA`, and `area` all work the same.
+
+Example usage:
+```bash
+# Using underscore convention alias
+sfcgalop -a "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))" line_substring "start=0.25,end=0.75"
+# Using GEOS-style alias
+sfcgalop -a "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))" isvalid
+# Output: true
+# Using original SFCGAL name
+sfcgalop -a "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))" is_valid
+# Output: true
+# Using case-insensitive name
+sfcgalop -a "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))" ISVALID
+# Output: true
 ```
 
 ## Contributing

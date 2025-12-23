@@ -108,6 +108,171 @@ struct Operation {
 namespace {
 
 /**
+ * @brief Convert operation name to lowercase for case-insensitive matching.
+ */
+auto
+to_lower(const std::string &str) -> std::string
+{
+  std::string result = str;
+  std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+  return result;
+}
+
+/**
+ * @brief Convert operation name to underscore convention for display purposes.
+ * This function converts camelCase names to snake_case for consistent display.
+ */
+auto
+to_underscore_convention(const std::string &op_name) -> std::string
+{
+  std::string result;
+  for (size_t i = 0; i < op_name.length(); ++i) {
+    char c = op_name[i];
+
+    // Add underscore before uppercase letters (except at the beginning)
+    if (c >= 'A' && c <= 'Z' && i > 0) {
+      // Check if previous character is lowercase to avoid adding underscore in sequences like "3D"
+      if (i > 0 && op_name[i-1] >= 'a' && op_name[i-1] <= 'z') {
+        result += '_';
+      } else if (i > 0 && op_name[i-1] >= '0' && op_name[i-1] <= '9' && c != 'D') {
+        // Special case for numbers followed by letters, but not for "3D", "2D", etc.
+        result += '_';
+      }
+    }
+
+    // Convert uppercase to lowercase
+    result += std::tolower(c);
+  }
+
+  // Special handling for common patterns that need specific underscore placement
+  if (result == "linesubstring") return "line_substring";
+  if (result == "alphashapes") return "alpha_shapes";
+  if (result == "alphawrapping3d") return "alpha_wrapping_3d";
+  if (result == "buffer3d") return "buffer_3d";
+  if (result == "minkowskisum") return "minkowski_sum";
+  if (result == "minkowskisum3d") return "minkowski_sum_3d";
+  if (result == "convexhull") return "convex_hull";
+  if (result == "convexhull3d") return "convex_hull_3d";
+  if (result == "straightskeleton") return "straight_skeleton";
+  if (result == "force2d") return "force_2d";
+  if (result == "force3d") return "force_3d";
+  if (result == "forcemeasured") return "force_measured";
+  if (result == "collectionextract") return "collection_extract";
+  if (result == "collectionhomogenize") return "collection_homogenize";
+  if (result == "collectiontomulti") return "collection_to_multi";
+  if (result == "intersects3d") return "intersects_3d";
+  if (result == "isvalid") return "is_valid";
+  if (result == "issimple") return "is_simple";
+  if (result == "isclosed") return "is_closed";
+  if (result == "is3d") return "is_3d";
+  if (result == "ismeasured") return "is_measured";
+  if (result == "isempty") return "is_empty";
+  if (result == "distance3d") return "distance_3d";
+  if (result == "length3d") return "length_3d";
+  if (result == "area3d") return "area_3d";
+  if (result == "polygonrepair") return "polygon_repair";
+  if (result == "intersection3d") return "intersection_3d";
+  if (result == "difference3d") return "difference_3d";
+  if (result == "union3d") return "union_3d";
+  if (result == "makecube") return "make_cube";
+  if (result == "makebox") return "make_box";
+  if (result == "makecylinder") return "make_cylinder";
+  if (result == "makecone") return "make_cone";
+  if (result == "maketorus") return "make_torus";
+  if (result == "makesphere") return "make_sphere";
+
+  return result;
+}
+
+/**
+ * @brief Map GEOS-compatible aliases and alternative naming conventions to SFCGAL operation names.
+ * This allows users to use familiar GEOS operation names and different naming conventions.
+ */
+auto
+resolve_operation_alias(const std::string &op_name) -> std::string
+{
+  std::string lower_op_name = to_lower(op_name);
+
+  static const std::map<std::string, std::string> alias_map = {
+      // Standard SFCGAL operations with underscore convention aliases
+      {"line_substring", "linesubstring"},
+      {"alpha_shapes", "alphashapes"},
+      {"alpha_wrapping3d", "alphawrapping3d"},
+      {"alpha_wrapping_3d", "alphawrapping3d"},
+      {"alphawrapping_3d", "alphawrapping3d"},
+      {"buffer_3d", "buffer3d"},
+      {"minkowski_sum", "minkowskisum"},
+      {"minkowski_sum3d", "minkowskisum3d"},
+      {"minkowski_sum_3d", "minkowskisum3d"},
+      {"convex_hull", "convexhull"},
+      {"convex_hull3d", "convexhull3d"},
+      {"convex_hull_3d", "convexhull3d"},
+      {"straight_skeleton", "straightskeleton"},
+      {"force_2d", "force2d"},
+      {"force_3d", "force3d"},
+      {"force_measured", "forcemeasured"},
+      {"collection_extract", "collection_extract"},
+      {"collection_homogenize", "collection_homogenize"},
+      {"collection_to_multi", "collection_to_multi"},
+      {"is_valid", "is_valid"},
+      {"is_simple", "is_simple"},
+      {"is_closed", "is_closed"},
+      {"is_3d", "is_3d"},
+      {"is_measured", "is_measured"},
+      {"is_empty", "is_empty"},
+      {"distance_3d", "distance3d"},
+      {"length_3d", "length3d"},
+      {"area_3d", "area3d"},
+      {"force_lhr", "forceLHR"},
+      {"force_rhr", "forceRHR"},
+      {"polygon_repair", "polygonrepair"},
+      {"collection_to_multi", "collection_to_multi"},
+      {"collection_extract", "collection_extract"},
+      {"collection_homogenize", "collection_homogenize"},
+      {"make_sphere", "make_sphere"},
+      {"make_cube", "make_cube"},
+      {"make_box", "make_box"},
+      {"make_cylinder", "make_cylinder"},
+      {"make_cone", "make_cone"},
+      {"make_torus", "make_torus"},
+
+      // Common GEOS-style aliases
+      {"buffer", "offset"}, // GEOS uses 'buffer', SFCGAL uses 'offset'
+      {"symdifference", "difference"}, // GEOS symdifference (though SFCGAL doesn't have true symmetric difference)
+      {"symmetricdifference", "difference"},
+      {"geomunion", "union"}, // Alternative to 'union'
+      {"geomintersection", "intersection"},
+      {"geomdifference", "difference"},
+      {"isempty", "is_empty"},
+      {"issimple", "is_simple"},
+      {"isvalid", "is_valid"},
+      {"is3d", "is_3d"},
+      {"ismeasured", "is_measured"},
+      {"isclosed", "is_closed"},
+      {"distance3d", "distance3d"},
+      {"hausdorffdistance", "distance"}, // Approximate using distance
+      {"frechetdistance", "distance"},   // Approximate using distance
+      {"length2d", "length"},            // Explicit 2D length
+      {"length3d", "length3d"},          // Explicit 3D length
+      {"area2d", "area"},                // Explicit 2D area
+      {"area3d", "area3d"},              // Explicit 3D area
+      {"x", "point_x"},                  // Get X coordinate (would need to be implemented)
+      {"y", "point_y"},                  // Get Y coordinate (would need to be implemented)
+      {"z", "point_z"},                  // Get Z coordinate (would need to be implemented)
+      {"numgeometries", "geometry_count"}, // Count geometries (would need to be implemented)
+      {"numpoints", "point_count"},      // Count points (would need to be implemented)
+      {"delaunaytriangulation", "tesselate"}, // Related to triangulation
+      {"voronoi", "tesselate"},               // Related to tesselation
+  };
+
+  auto it = alias_map.find(lower_op_name);
+  if (it != alias_map.end()) {
+    return it->second;
+  }
+  return op_name; // Return original name if no alias found
+}
+
+/**
  * @brief Parse a string to double, returning a fallback on failure.
  *
  * Attempts to convert the given string to a double using std::stod.
@@ -1235,10 +1400,12 @@ execute_operation(const std::string &op_name, const std::string &op_arg,
                   const SFCGAL::Geometry *geom_b)
     -> std::optional<OperationResult>
 {
+  // First try the resolved alias name
+  std::string resolved_op_name = resolve_operation_alias(op_name);
 
   auto operation_it = std::find_if(operations.begin(), operations.end(),
-                                   [&op_name](const Operation &operation) {
-                                     return operation.name == op_name;
+                                   [&resolved_op_name](const Operation &operation) {
+                                     return to_lower(operation.name) == to_lower(resolved_op_name);
                                    });
 
   if (operation_it != operations.end()) {
@@ -1310,12 +1477,16 @@ print_operation_help(const char *name) -> bool
     return false;
   }
 
+  std::string op_name = name;
+  std::string lower_op_name = to_lower(op_name);
+
+  // First try case-insensitive match with original name
   auto operation_it = std::find_if(
       operations.begin(), operations.end(),
-      [name](const Operation &operation) { return operation.name == name; });
+      [&lower_op_name](const Operation &operation) { return to_lower(operation.name) == lower_op_name; });
 
   if (operation_it != operations.end()) {
-    std::cout << "\nOperation: " << operation_it->name << "\n"
+    std::cout << "\nOperation: " << to_underscore_convention(operation_it->name) << "\n"
               << "Category: " << operation_it->category << "\n"
               << "Description: " << operation_it->description << "\n";
     if (operation_it->requires_b) {
@@ -1325,6 +1496,29 @@ print_operation_help(const char *name) -> bool
       std::cout << "\n" << operation_it->param_help << "\n";
     }
     return true;
+  }
+
+  // If not found, try resolving aliases
+  std::string resolved_op_name = resolve_operation_alias(op_name);
+  std::string lower_resolved_op_name = to_lower(resolved_op_name);
+
+  if (lower_resolved_op_name != lower_op_name) {
+    operation_it = std::find_if(
+        operations.begin(), operations.end(),
+        [&lower_resolved_op_name](const Operation &operation) { return to_lower(operation.name) == lower_resolved_op_name; });
+
+    if (operation_it != operations.end()) {
+      std::cout << "\nOperation (via alias '" << op_name << "'): " << to_underscore_convention(operation_it->name) << "\n"
+                << "Category: " << operation_it->category << "\n"
+                << "Description: " << operation_it->description << "\n";
+      if (operation_it->requires_b) {
+        std::cout << "Requires two geometries\n";
+      }
+      if (!operation_it->param_help.empty()) {
+        std::cout << "\n" << operation_it->param_help << "\n";
+      }
+      return true;
+    }
   }
 
   std::cerr << "Unknown operation: " << name << "\n";
@@ -1356,7 +1550,7 @@ get_all_operations_info() -> std::vector<
   result.reserve(operations.size());
 
   for (const auto &operation : operations) {
-    result.emplace_back(operation.name, operation.category,
+    result.emplace_back(to_underscore_convention(operation.name), operation.category,
                         operation.description, operation.input,
                         operation.output);
   }
@@ -1378,10 +1572,13 @@ get_all_operations_info() -> std::vector<
 auto
 operation_requires_second_geometry(const std::string &operation_name) -> bool
 {
+  // Resolve any aliases to actual operation names
+  std::string resolved_op_name = resolve_operation_alias(operation_name);
+
   auto operation_it =
       std::find_if(operations.begin(), operations.end(),
-                   [&operation_name](const Operation &operation) {
-                     return operation.name == operation_name;
+                   [&resolved_op_name](const Operation &operation) {
+                     return to_lower(operation.name) == to_lower(resolved_op_name);
                    });
 
   if (operation_it != operations.end()) {

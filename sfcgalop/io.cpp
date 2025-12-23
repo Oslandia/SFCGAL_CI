@@ -4,7 +4,9 @@
 #include "io.hpp"
 
 #include <SFCGAL/io/OBJ.h>
+#include <SFCGAL/io/STL.h>
 #include <SFCGAL/io/ewkt.h>
+#include <SFCGAL/io/vtk.h>
 #include <SFCGAL/io/wkb.h>
 #include <SFCGAL/io/wkt.h>
 
@@ -246,6 +248,12 @@ print_result(const std::optional<OperationResult> &result, OutputFormat format,
             case OutputFormat::OBJ:
               out << SFCGAL::io::OBJ::saveToString(*arg);
               break;
+            case OutputFormat::STL:
+              out << SFCGAL::io::STL::saveToString(*arg);
+              break;
+            case OutputFormat::VTK:
+              out << SFCGAL::io::VTK::saveToString(*arg);
+              break;
             }
           }
         } else if constexpr (std::is_same_v<T, bool>) {
@@ -292,6 +300,10 @@ parse_output_format(const char *format_str, OutputFormat &format) -> bool
     format = OutputFormat::TXT;
   } else if (fmt == "obj") {
     format = OutputFormat::OBJ;
+  } else if (fmt == "stl") {
+    format = OutputFormat::STL;
+  } else if (fmt == "vtk") {
+    format = OutputFormat::VTK;
   } else {
     return false;
   }
