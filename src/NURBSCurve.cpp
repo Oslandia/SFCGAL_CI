@@ -9,8 +9,6 @@
 #include "SFCGAL/detail/ublas.h"
 #include <CGAL/Bbox_3.h>
 #include <algorithm>
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/lu.hpp>
 #include <cmath>
 #include <map>
 #include <utility>
