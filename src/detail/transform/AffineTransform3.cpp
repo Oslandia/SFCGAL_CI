@@ -45,6 +45,10 @@ AffineTransform3::transform(Point &point)
 void
 AffineTransform3::transform(LineString &linestring)
 {
+  if (linestring.isEmpty()) {
+    return;
+  }
+
   for (size_t i = 0; i < linestring.numPoints(); ++i) {
     transform(linestring.pointN(i));
   }
@@ -53,6 +57,10 @@ AffineTransform3::transform(LineString &linestring)
 void
 AffineTransform3::transform(Triangle &triangle)
 {
+  if (triangle.isEmpty()) {
+    return;
+  }
+
   transform(triangle.vertex(0));
   transform(triangle.vertex(1));
   transform(triangle.vertex(2));
