@@ -15,13 +15,11 @@
 #include "SFCGAL/TriangulatedSurface.h"
 
 #include "SFCGAL/algorithm/isValid.h"
-#include "SFCGAL/algorithm/plane.h"
 
 #include <CGAL/Point_2.h>
 #include <CGAL/Polygon_2.h>
 #include <CGAL/Triangle_2.h>
 
-#include <CGAL/Plane_3.h>
 #include <CGAL/Point_3.h>
 #include <CGAL/Triangle_3.h>
 
@@ -206,45 +204,26 @@ area3D(const Polygon &polygon) -> double
     return result;
   }
 
-  CGAL::Point_3<Kernel> a;
-  CGAL::Point_3<Kernel> b;
-  CGAL::Point_3<Kernel> c;
-  algorithm::plane3D<Kernel>(polygon, a, b, c);
-
-  /*
-   * compute polygon basis (CGAL doesn't build an orthonormal basis so that
-   * computing the 2D area in this basis would lead to scale effects) ux = bc uz
-   * = bc^ba uy = uz^ux
-   *
-   * Note that the basis is rounded to double (CGAL::sqrt)
-   */
-  CGAL::Vector_3<Kernel> ux = c - b;
-  CGAL::Vector_3<Kernel> uz = CGAL::cross_product(ux, a - b);
-  ux = ux / CGAL::sqrt(CGAL::to_double(ux.squared_length()));
-  uz = uz / CGAL::sqrt(CGAL::to_double(uz.squared_length()));
-  CGAL::Vector_3<Kernel> const uy = CGAL::cross_product(uz, ux);
-
   /*
    * compute the area for each ring in the local basis
    */
   for (size_t i = 0; i < polygon.numRings(); i++) {
-    const LineString &ring = polygon.ringN(i);
-
-    CGAL::Polygon_2<Kernel> projectedPolygon;
-
-    for (size_t j = 0; j < ring.numPoints() - 1; j++) {
-      CGAL::Point_3<Kernel> const point = ring.pointN(j).toPoint_3();
-      CGAL::Point_2<Kernel> const projectedPoint((point - b) * ux,
-                                                 (point - b) * uy);
-      projectedPolygon.push_back(projectedPoint);
+    const LineString      &ring = polygon.ringN(i);
+    CGAL::Vector_3<Kernel> sum(0, 0, 0);
+    CGAL::Vector_3<Kernel> prev = ring.pointN(0).toVector_3();
+    for (size_t j = 1; j < ring.numPoints(); ++j) {
+      const CGAL::Vector_3<Kernel> cur = ring.pointN(j).toVector_3();
+      sum += CGAL::cross_product(cur, prev);
+      prev = cur;
     }
 
+    const double area = 0.5 * CGAL::sqrt(CGAL::to_double(sum.squared_length()));
     if (i == 0) {
       // exterior ring
-      result += CGAL::to_double(CGAL::abs(projectedPolygon.area()));
+      result += area;
     } else {
       // interior ring
-      result -= CGAL::to_double(CGAL::abs(projectedPolygon.area()));
+      result -= area;
     }
   }
 
