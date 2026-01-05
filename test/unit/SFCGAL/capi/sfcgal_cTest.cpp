@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "SFCGAL/capi/sfcgal_c.h"
+#include "SFCGAL/PolyhedralSurface.h"
 #include "SFCGAL/Solid.h"
 #include "SFCGAL/io/wkt.h"
 
@@ -2363,6 +2364,159 @@ BOOST_AUTO_TEST_CASE(testProjectedMedialAxis)
   sfcgal_free_buffer(wkt);
 
   sfcgal_geometry_delete(result);
+}
+
+BOOST_AUTO_TEST_CASE(testGenerateRoof)
+{
+  std::unique_ptr<Geometry> polygon(
+      io::readWkt("POLYGON ((0 0, 10 0, 10 4, 0 4, 0 0))"));
+
+  /**
+   * flat roof
+   **/
+  sfcgal_roof_parameters_t *roofFlatParameters =
+      sfcgal_roof_parameters_create();
+  BOOST_CHECK_EQUAL(roofFlatParameters->type,
+                    sfcgal_roof_type_t::ROOF_TYPE_FLAT);
+  BOOST_CHECK_EQUAL(roofFlatParameters->roof_height, 0.0);
+  BOOST_CHECK_EQUAL(roofFlatParameters->close_base, false);
+  BOOST_CHECK_EQUAL(roofFlatParameters->add_vertical_faces, false);
+  BOOST_CHECK_EQUAL(roofFlatParameters->ridge_edge, -1);
+  roofFlatParameters->building_height = 3.4;
+  roofFlatParameters->roof_height     = 0.6;
+
+  sfcgal_geometry_t *flatRoof =
+      sfcgal_roof_generate(polygon.get(), roofFlatParameters);
+  sfcgal_roof_parameters_delete(roofFlatParameters);
+  char  *flatWkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(flatRoof, 2, &flatWkt, &len);
+  BOOST_CHECK_EQUAL(std::string(flatWkt, len),
+                    "SOLID Z ((((0.00 0.00 0.00,0.00 4.00 0.00,10.00 4.00 "
+                    "0.00,10.00 0.00 0.00,0.00 0.00 0.00)),"
+                    "((0.00 0.00 4.00,10.00 0.00 4.00,10.00 4.00 4.00,0.00 "
+                    "4.00 4.00,0.00 0.00 4.00)),"
+                    "((0.00 0.00 0.00,0.00 0.00 4.00,0.00 4.00 4.00,0.00 4.00 "
+                    "0.00,0.00 0.00 0.00)),"
+                    "((0.00 4.00 0.00,0.00 4.00 4.00,10.00 4.00 4.00,10.00 "
+                    "4.00 0.00,0.00 4.00 0.00)),"
+                    "((10.00 4.00 0.00,10.00 4.00 4.00,10.00 0.00 4.00,10.00 "
+                    "0.00 0.00,10.00 4.00 0.00)),"
+                    "((10.00 0.00 0.00,10.00 0.00 4.00,0.00 0.00 4.00,0.00 "
+                    "0.00 0.00,10.00 0.00 0.00))))");
+
+  sfcgal_free_buffer(flatWkt);
+  sfcgal_geometry_delete(flatRoof);
+
+  /**
+   * gable roof
+   **/
+  sfcgal_roof_parameters_t *roofGableParameters =
+      sfcgal_roof_parameters_create();
+  roofGableParameters->type            = sfcgal_roof_type_t::ROOF_TYPE_GABLE;
+  roofGableParameters->building_height = 3.4;
+  roofGableParameters->slope_angle     = 30.0;
+
+  sfcgal_geometry_t *gableRoof =
+      sfcgal_roof_generate(polygon.get(), roofGableParameters);
+  sfcgal_roof_parameters_delete(roofGableParameters);
+  char *gableWkt;
+  sfcgal_geometry_as_text_decim(gableRoof, 2, &gableWkt, &len);
+  BOOST_CHECK_EQUAL(
+      std::string(gableWkt, len),
+      "POLYHEDRALSURFACE Z (((0.00 0.00 0.00,0.00 4.00 0.00,10.00 4.00 "
+      "0.00,10.00 0.00 0.00,0.00 0.00 0.00)),"
+      "((0.00 0.00 0.00,0.00 0.00 3.40,0.00 4.00 3.40,0.00 4.00 0.00,0.00 0.00 "
+      "0.00)),"
+      "((0.00 4.00 0.00,0.00 4.00 3.40,10.00 4.00 3.40,10.00 4.00 0.00,0.00 "
+      "4.00 0.00)),"
+      "((10.00 4.00 0.00,10.00 4.00 3.40,10.00 0.00 3.40,10.00 0.00 0.00,10.00 "
+      "4.00 0.00)),"
+      "((10.00 0.00 0.00,10.00 0.00 3.40,0.00 0.00 3.40,0.00 0.00 0.00,10.00 "
+      "0.00 0.00)),"
+      "((0.00 4.00 3.40,0.00 2.00 4.55,2.00 2.00 4.55,0.00 4.00 3.40)),"
+      "((8.00 2.00 4.55,0.00 0.00 3.40,10.00 0.00 3.40,8.00 2.00 4.55)),"
+      "((2.00 2.00 4.55,0.00 2.00 4.55,0.00 0.00 3.40,2.00 2.00 4.55)),"
+      "((8.00 2.00 4.55,2.00 2.00 4.55,0.00 0.00 3.40,8.00 2.00 4.55)),"
+      "((8.00 2.00 4.55,0.00 4.00 3.40,2.00 2.00 4.55,8.00 2.00 4.55)),"
+      "((10.00 2.00 4.55,8.00 2.00 4.55,10.00 0.00 3.40,10.00 2.00 4.55)),"
+      "((10.00 4.00 3.40,0.00 4.00 3.40,8.00 2.00 4.55,10.00 4.00 3.40)),"
+      "((10.00 4.00 3.40,8.00 2.00 4.55,10.00 2.00 4.55,10.00 4.00 3.40)))");
+
+  sfcgal_free_buffer(gableWkt);
+  sfcgal_geometry_delete(gableRoof);
+
+  /**
+   * hipped roof
+   **/
+  sfcgal_roof_parameters_t *roofHippedParameters =
+      sfcgal_roof_parameters_create();
+  roofHippedParameters->type            = sfcgal_roof_type_t::ROOF_TYPE_HIPPED;
+  roofHippedParameters->building_height = 3.4;
+  roofHippedParameters->roof_height     = 0.6;
+
+  sfcgal_geometry_t *hippedRoof =
+      sfcgal_roof_generate(polygon.get(), roofHippedParameters);
+  sfcgal_roof_parameters_delete(roofHippedParameters);
+  char *hippedWkt;
+  sfcgal_geometry_as_text_decim(hippedRoof, 2, &hippedWkt, &len);
+  BOOST_CHECK_EQUAL(
+      std::string(hippedWkt, len),
+      "SOLID Z ((((0.00 0.00 0.00,0.00 4.00 0.00,10.00 4.00 0.00,10.00 0.00 "
+      "0.00,0.00 0.00 0.00)),"
+      "((0.00 0.00 0.00,0.00 0.00 3.40,0.00 4.00 3.40,0.00 4.00 0.00,0.00 0.00 "
+      "0.00)),"
+      "((0.00 4.00 0.00,0.00 4.00 3.40,10.00 4.00 3.40,10.00 4.00 0.00,0.00 "
+      "4.00 0.00)),"
+      "((10.00 4.00 0.00,10.00 4.00 3.40,10.00 0.00 3.40,10.00 0.00 0.00,10.00 "
+      "4.00 0.00)),"
+      "((10.00 0.00 0.00,10.00 0.00 3.40,0.00 0.00 3.40,0.00 0.00 0.00,10.00 "
+      "0.00 0.00)),"
+      "((0.60 3.40 4.00,9.40 0.60 4.00,9.40 3.40 4.00,0.60 3.40 4.00)),"
+      "((0.60 3.40 4.00,0.60 0.60 4.00,9.40 0.60 4.00,0.60 3.40 4.00)),"
+      "((0.00 4.00 3.40,0.00 0.00 3.40,0.60 0.60 4.00,0.00 4.00 3.40)),"
+      "((0.60 3.40 4.00,0.00 4.00 3.40,0.60 0.60 4.00,0.60 3.40 4.00)),"
+      "((0.00 0.00 3.40,10.00 0.00 3.40,9.40 0.60 4.00,0.00 0.00 3.40)),"
+      "((0.60 0.60 4.00,0.00 0.00 3.40,9.40 0.60 4.00,0.60 0.60 4.00)),"
+      "((10.00 0.00 3.40,10.00 4.00 3.40,9.40 3.40 4.00,10.00 0.00 3.40)),"
+      "((9.40 0.60 4.00,10.00 0.00 3.40,9.40 3.40 4.00,9.40 0.60 4.00)),"
+      "((9.40 3.40 4.00,0.00 4.00 3.40,0.60 3.40 4.00,9.40 3.40 4.00)),"
+      "((9.40 3.40 4.00,10.00 4.00 3.40,0.00 4.00 3.40,9.40 3.40 4.00))))");
+
+  sfcgal_free_buffer(hippedWkt);
+  sfcgal_geometry_delete(hippedRoof);
+
+  /**
+   * skillion roof
+   **/
+  sfcgal_roof_parameters_t *roofSkillionParameters =
+      sfcgal_roof_parameters_create();
+  roofSkillionParameters->type = sfcgal_roof_type_t::ROOF_TYPE_SKILLION;
+  roofSkillionParameters->building_height = 3.4;
+  roofSkillionParameters->slope_angle     = 30.0;
+  roofSkillionParameters->ridge_edge      = 0;
+
+  sfcgal_geometry_t *skillionRoof =
+      sfcgal_roof_generate(polygon.get(), roofSkillionParameters);
+  sfcgal_roof_parameters_delete(roofSkillionParameters);
+  char *skillionWkt;
+  sfcgal_geometry_as_text_decim(skillionRoof, 2, &skillionWkt, &len);
+  BOOST_CHECK_EQUAL(std::string(skillionWkt, len),
+                    "POLYHEDRALSURFACE Z (((0.00 0.00 0.00,0.00 4.00 "
+                    "0.00,10.00 4.00 0.00,10.00 0.00 0.00,0.00 0.00 0.00)),"
+                    "((0.00 0.00 0.00,0.00 0.00 3.40,0.00 4.00 3.40,0.00 4.00 "
+                    "0.00,0.00 0.00 0.00)),"
+                    "((0.00 4.00 0.00,0.00 4.00 3.40,10.00 4.00 3.40,10.00 "
+                    "4.00 0.00,0.00 4.00 0.00)),"
+                    "((10.00 4.00 0.00,10.00 4.00 3.40,10.00 0.00 3.40,10.00 "
+                    "0.00 0.00,10.00 4.00 0.00)),"
+                    "((10.00 0.00 0.00,10.00 0.00 3.40,0.00 0.00 3.40,0.00 "
+                    "0.00 0.00,10.00 0.00 0.00)),"
+                    "((0.00 0.00 3.40,10.00 0.00 3.40,10.00 4.00 5.71,0.00 "
+                    "4.00 5.71,0.00 0.00 3.40)))");
+
+  sfcgal_free_buffer(skillionWkt);
+  sfcgal_geometry_delete(skillionRoof);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

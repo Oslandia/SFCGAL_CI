@@ -3036,6 +3036,109 @@ sfcgal_nurbs_curve_to_linestring_adaptive(const sfcgal_geometry_t *curve,
                                           unsigned int             min_segments,
                                           unsigned int max_segments);
 
+/**
+ * Roof types
+ * @ingroup capi
+ */
+typedef enum {
+  ROOF_TYPE_FLAT,
+  ROOF_TYPE_GABLE,
+  ROOF_TYPE_HIPPED,
+  ROOF_TYPE_SKILLION
+} sfcgal_roof_type_t;
+
+/**
+ * Roof parameters
+ *
+ * Defines all the parameters to generate a roof.
+ * Depending on the type of roof, certain parameters have no effect.
+ *
+ * - FLAT: Simple Z-translation or extrusion (slope_angle, add_vertical_faces
+ * ignored)
+ * - HIPPED: Uses straight skeleton (slope_angle, add_vertical_faces ignored)
+ * - GABLE: Uses medial axis approach (slope_angle, add_vertical_faces used)
+ * - SKILLION: Uses ridge line (slope_angle, add_vertical_faces and ridge_edge
+ * used)
+ *
+ * @ingroup capi
+ */
+typedef struct {
+  /**
+   * Roof type see sfcgal_roof_type_t.
+   */
+  sfcgal_roof_type_t type;
+
+  /**
+   * @brief Roof height in units
+   * @pre building_height must be positive or null
+   */
+  double building_height;
+
+  /**
+   * @brief Roof height in units (FLAT or HIPPED roofs).
+   * @pre roof_height must be positive
+   */
+  double roof_height;
+
+  /**
+   * @brief Roof slope angle in degrees (GABLE and SKILLION roofs).
+   */
+  double slope_angle;
+
+  /**
+   * @brief Indicates whether the base must be closed.
+   */
+  bool close_base;
+
+  /**
+   * @brief Indicates if the vertical faces must be added (GABLE or SKILLION
+   * roofs).
+   */
+  bool add_vertical_faces;
+
+  /**
+   * @brief Edge index to use as ridge line (SKILLION roof only).
+   */
+  int ridge_edge;
+
+} sfcgal_roof_parameters_t;
+
+/**
+ * Generates roof with default parameters
+ * @return Roof parameters with default values
+ * @post The parameters must be deallocated by the caller with
+ * sfcgal_roof_parameters_delete()
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_roof_parameters_t *
+sfcgal_roof_parameters_create();
+
+/**
+ * @brief Deletes a previously allocated roof parameters.
+ * @param roof_parameters Pointer to the roof parameters to delete.
+ * @pre @p roof_parameters must be a valid pointer returned by a creation
+ * function ( e.g. sfcgal_roof_parameters_create() ).
+ * @post After this call, the pointer is invalid and must not be used.
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_roof_parameters_delete(sfcgal_roof_parameters_t *roof_parameters);
+
+/**
+ * Generates a roof according to roof parameters
+ * @param footprint The building footprint polygon
+ * @param roof_parameters the roof parameters. They can be created by using
+ * sfcgal_roof_parameters_create()
+ * @return The roof as a Solid, a PolyhedralSurface or a Polygon
+ * @pre polygon must be a 2D polygon
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete()
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_roof_generate(const sfcgal_geometry_t        *footprint,
+                     const sfcgal_roof_parameters_t *roof_parameters);
+
 #ifdef __cplusplus
 }
 #endif

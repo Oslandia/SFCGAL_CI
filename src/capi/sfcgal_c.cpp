@@ -70,6 +70,7 @@
 #if SFCGAL_CGAL_VERSION_MAJOR >= 6
   #include "SFCGAL/algorithm/polygonRepair.h"
 #endif
+#include "SFCGAL/algorithm/roofGeneration.h"
 #include "SFCGAL/algorithm/rotate.h"
 #include "SFCGAL/algorithm/scale.h"
 #include "SFCGAL/algorithm/simplification.h"
@@ -3289,4 +3290,117 @@ sfcgal_geometry_projected_medial_axis(const sfcgal_geometry_t *geom)
   }
 
   return multiLineString.release();
+}
+
+extern "C" auto
+sfcgal_roof_parameters_create() -> sfcgal_roof_parameters_t *
+{
+  auto *roofParams = (sfcgal_roof_parameters_t *)sfcgal_alloc_handler(
+      sizeof(sfcgal_roof_parameters_t));
+  roofParams->type               = sfcgal_roof_type_t::ROOF_TYPE_FLAT;
+  roofParams->building_height    = 0.0;
+  roofParams->roof_height        = 0.0;
+  roofParams->slope_angle        = 0.0;
+  roofParams->close_base         = false;
+  roofParams->add_vertical_faces = false;
+  roofParams->ridge_edge         = -1;
+
+  return roofParams;
+}
+
+extern "C" void
+sfcgal_roof_parameters_delete(sfcgal_roof_parameters_t *roof_parameters)
+{
+  if (roof_parameters != nullptr) {
+    sfcgal_free_handler(roof_parameters);
+  }
+}
+
+SFCGAL_API
+extern "C" auto
+sfcgal_roof_generate(const sfcgal_geometry_t        *footprint,
+                     const sfcgal_roof_parameters_t *roof_parameters)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL::algorithm::RoofType roofType;
+
+  switch (roof_parameters->type) {
+  case ROOF_TYPE_FLAT:
+    roofType = SFCGAL::algorithm::RoofType::FLAT;
+    break;
+  case ROOF_TYPE_GABLE:
+    roofType = SFCGAL::algorithm::RoofType::GABLE;
+    break;
+  case ROOF_TYPE_HIPPED:
+    roofType = SFCGAL::algorithm::RoofType::HIPPED;
+    break;
+  case ROOF_TYPE_SKILLION:
+    roofType = SFCGAL::algorithm::RoofType::SKILLION;
+    break;
+  default:
+    SFCGAL_ERROR("Invalid roof type");
+    return nullptr;
+  }
+
+  if (roof_parameters->building_height < 0.0) {
+    SFCGAL_ERROR("Error: building height must be non-negative, got: %d",
+                 roof_parameters->building_height);
+    return nullptr;
+  }
+
+  if ((roofType == SFCGAL::algorithm::RoofType::FLAT ||
+       roofType == SFCGAL::algorithm::RoofType::HIPPED) &&
+      roof_parameters->roof_height <= 0.0) {
+    SFCGAL_ERROR("Error: roof height must be positive, got: %d",
+                 roof_parameters->roof_height);
+    return nullptr;
+  }
+
+  SFCGAL::LineString ridgeLine;
+
+  if (roofType == SFCGAL::algorithm::RoofType::SKILLION) {
+    // Create a ridge line along specified edge of the polygon
+    const auto &ring =
+        down_const_cast<SFCGAL::Polygon>(footprint)->exteriorRing();
+    if (ring.numPoints() < 4) {
+      SFCGAL_ERROR(
+          "Polygon must have at least 3 vertices for roof generation\n");
+      SFCGAL_ERROR("Provided polygon has %i vertices", ring.numPoints() - 1);
+      return nullptr;
+    }
+
+    // Validate ridge_edge index
+    int numEdges = static_cast<int>(ring.numPoints()) - 1;
+    if (roof_parameters->ridge_edge >= numEdges ||
+        roof_parameters->ridge_edge < 0) {
+      SFCGAL_ERROR("ridge_edge must be between 0 and %i for polygon with %i "
+                   "edges, got: %i",
+                   numEdges - 1, numEdges, roof_parameters->ridge_edge);
+      SFCGAL_ERROR("Edge numbering: 0=first edge, %i=last edge", numEdges - 1);
+      return nullptr;
+    }
+
+    // Use the specified edge as the ridge line (high edge)
+    auto point1 = ring.pointN(roof_parameters->ridge_edge);
+    auto point2 = ring.pointN(roof_parameters->ridge_edge + 1);
+    ridgeLine   = SFCGAL::LineString(point1, point2);
+  } else if (roofType != SFCGAL::algorithm::RoofType::SKILLION &&
+             roof_parameters->ridge_edge >= 0) {
+    SFCGAL_WARNING("Ignoring ridge_edge parameter. It is only valid for "
+                   "SKILLION roof type.");
+  }
+
+  SFCGAL::algorithm::RoofParameters roofParams;
+  roofParams.type             = roofType;
+  roofParams.buildingHeight   = roof_parameters->building_height;
+  roofParams.roofHeight       = roof_parameters->roof_height;
+  roofParams.slopeAngle       = roof_parameters->slope_angle;
+  roofParams.closeBase        = roof_parameters->close_base;
+  roofParams.addVerticalFaces = roof_parameters->add_vertical_faces;
+
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return SFCGAL::algorithm::generateRoof(
+                 *down_const_cast<SFCGAL::Polygon>(footprint), ridgeLine,
+                 roofParams)
+          .release();)
 }
