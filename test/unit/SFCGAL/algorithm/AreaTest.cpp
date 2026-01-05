@@ -149,6 +149,21 @@ BOOST_AUTO_TEST_CASE(testArea3D_Polygon)
                                  Point(1, 1, 1.2)});
   polygon.addInteriorRing(interiorRing);
   BOOST_CHECK_CLOSE(algorithm::area3D(polygon), 36.3582, 0.0001);
+
+  // T shape
+  Polygon          polygon2;
+  const LineString exteriorRing2(
+      {Point(0, 0, -1), Point(0, 3, -1), Point(-1, 3, -1), Point(-1, 4, -1),
+       Point(2, 4, -1), Point(2, 3, -1), Point(1, 3, -1), Point(1, 0, -1),
+       Point(0, 0, -1)});
+  polygon2.setExteriorRing(exteriorRing2);
+  BOOST_CHECK_EQUAL(algorithm::area3D(polygon2), 6.0);
+
+  const LineString interiorRing2({Point(-0.5, 3.1, -1), Point(1.5, 3.1, -1.),
+                                  Point(1.5, 3.9, -1), Point(-0.5, 3.9, -1),
+                                  Point(-0.5, 3.1, -1)});
+  polygon2.addInteriorRing(interiorRing2);
+  BOOST_CHECK_EQUAL(algorithm::area3D(polygon2), 4.4);
 }
 
 BOOST_AUTO_TEST_CASE(testArea3D_Triangle1)
