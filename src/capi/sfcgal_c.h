@@ -3059,6 +3059,243 @@ sfcgal_nurbs_curve_to_linestring_adaptive(const sfcgal_geometry_t *curve,
                                           unsigned int             min_segments,
                                           unsigned int max_segments);
 
+/*--------------------------------------------------------------------------------------*
+ *
+ * Grid Generation Functions
+ *
+ *--------------------------------------------------------------------------------------*/
+
+/**
+ * Grid clipping mode
+ * @ingroup capi
+ */
+typedef enum {
+  SFCGAL_GRID_CLIP_TO_EXTENT, ///< Clip cells to extent boundary
+  SFCGAL_GRID_COVER_EXTENT ///< Full cells covering extent (may extend beyond)
+} sfcgal_grid_clip_mode_t;
+
+/**
+ * sfcgal_grid2d_t is an opaque pointer type that represents a 2D grid
+ * @ingroup capi
+ */
+typedef void sfcgal_grid2d_t;
+
+/**
+ * sfcgal_grid3d_t is an opaque pointer type that represents a 3D grid
+ * @ingroup capi
+ */
+typedef void sfcgal_grid3d_t;
+
+/**
+ * Generate a square grid covering an extent
+ * @param extent The extent polygon to cover
+ * @param cell_size The side length of each square cell
+ * @param clip_mode How to handle cells at the extent boundary
+ * @return A 2D grid, or NULL on error
+ * @post The returned grid must be deallocated by the caller with
+ * sfcgal_grid2d_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_grid2d_t *
+sfcgal_make_square_grid(const sfcgal_geometry_t *extent, double cell_size,
+                        sfcgal_grid_clip_mode_t clip_mode);
+
+/**
+ * Generate a rectangular grid covering an extent
+ * @param extent The extent polygon to cover
+ * @param cell_size_x The width of each cell
+ * @param cell_size_y The height of each cell
+ * @param clip_mode How to handle cells at the extent boundary
+ * @return A 2D grid, or NULL on error
+ * @post The returned grid must be deallocated by the caller with
+ * sfcgal_grid2d_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_grid2d_t *
+sfcgal_make_rectangle_grid(const sfcgal_geometry_t *extent, double cell_size_x,
+                           double                  cell_size_y,
+                           sfcgal_grid_clip_mode_t clip_mode);
+
+/**
+ * Generate a hexagonal grid covering an extent
+ * @param extent The extent polygon to cover
+ * @param cell_size The edge length of each hexagon
+ * @param flat_top If non-zero, hexagons have a flat top edge; if zero, pointy
+ * top
+ * @param clip_mode How to handle cells at the extent boundary
+ * @return A 2D grid, or NULL on error
+ * @post The returned grid must be deallocated by the caller with
+ * sfcgal_grid2d_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_grid2d_t *
+sfcgal_make_hexagon_grid(const sfcgal_geometry_t *extent, double cell_size,
+                         int flat_top, sfcgal_grid_clip_mode_t clip_mode);
+
+/**
+ * Generate a triangular grid covering an extent
+ * @param extent The extent polygon to cover
+ * @param cell_size The edge length of each triangle
+ * @param clip_mode How to handle cells at the extent boundary
+ * @return A 2D grid, or NULL on error
+ * @post The returned grid must be deallocated by the caller with
+ * sfcgal_grid2d_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_grid2d_t *
+sfcgal_make_triangle_grid(const sfcgal_geometry_t *extent, double cell_size,
+                          sfcgal_grid_clip_mode_t clip_mode);
+
+/**
+ * Generate a diamond grid covering an extent
+ * @param extent The extent polygon to cover
+ * @param cell_size The diagonal length of each diamond
+ * @param clip_mode How to handle cells at the extent boundary
+ * @return A 2D grid, or NULL on error
+ * @post The returned grid must be deallocated by the caller with
+ * sfcgal_grid2d_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_grid2d_t *
+sfcgal_make_diamond_grid(const sfcgal_geometry_t *extent, double cell_size,
+                         sfcgal_grid_clip_mode_t clip_mode);
+
+/**
+ * Generate a 3D voxel grid covering an extent
+ * @param extent The 3D extent (Solid or geometry with 3D envelope)
+ * @param cell_size_x The X dimension of each voxel
+ * @param cell_size_y The Y dimension of each voxel
+ * @param cell_size_z The Z dimension of each voxel
+ * @param clip_mode How to handle cells at the extent boundary
+ * @return A 3D grid, or NULL on error
+ * @post The returned grid must be deallocated by the caller with
+ * sfcgal_grid3d_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_grid3d_t *
+sfcgal_make_voxel_grid(const sfcgal_geometry_t *extent, double cell_size_x,
+                       double cell_size_y, double cell_size_z,
+                       sfcgal_grid_clip_mode_t clip_mode);
+
+/**
+ * Generate a 3D tetrahedral grid covering an extent
+ * @param extent The 3D extent (Solid or geometry with 3D envelope)
+ * @param cell_size The base cube size for tetrahedral subdivision
+ * @param clip_mode How to handle cells at the extent boundary
+ * @return A 3D grid, or NULL on error
+ * @post The returned grid must be deallocated by the caller with
+ * sfcgal_grid3d_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_grid3d_t *
+sfcgal_make_tetrahedron_grid(const sfcgal_geometry_t *extent, double cell_size,
+                             sfcgal_grid_clip_mode_t clip_mode);
+
+/**
+ * Get the number of cells in a 2D grid
+ * @param grid The 2D grid
+ * @return The number of cells
+ * @ingroup capi
+ */
+SFCGAL_API size_t
+sfcgal_grid2d_num_cells(const sfcgal_grid2d_t *grid);
+
+/**
+ * Get the geometry of a cell in a 2D grid
+ * @param grid The 2D grid
+ * @param index The cell index
+ * @return The cell geometry, or NULL if index is out of range
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_grid2d_cell_geometry(const sfcgal_grid2d_t *grid, size_t index);
+
+/**
+ * Get the grid indices of a cell in a 2D grid
+ * @param grid The 2D grid
+ * @param index The cell index
+ * @param[out] i Column index
+ * @param[out] j Row index
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_grid2d_cell_indices(const sfcgal_grid2d_t *grid, size_t index,
+                           int64_t *i, int64_t *j);
+
+/**
+ * Get the number of cells in a 3D grid
+ * @param grid The 3D grid
+ * @return The number of cells
+ * @ingroup capi
+ */
+SFCGAL_API size_t
+sfcgal_grid3d_num_cells(const sfcgal_grid3d_t *grid);
+
+/**
+ * Get the geometry of a cell in a 3D grid
+ * @param grid The 3D grid
+ * @param index The cell index
+ * @return The cell geometry, or NULL if index is out of range
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_grid3d_cell_geometry(const sfcgal_grid3d_t *grid, size_t index);
+
+/**
+ * Get the grid indices of a cell in a 3D grid
+ * @param grid The 3D grid
+ * @param index The cell index
+ * @param[out] i X index
+ * @param[out] j Y index
+ * @param[out] k Z index
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_grid3d_cell_indices(const sfcgal_grid3d_t *grid, size_t index,
+                           int64_t *i, int64_t *j, int64_t *k);
+
+/**
+ * Convert a 2D grid to a GeometryCollection
+ * @param grid The 2D grid
+ * @return A GeometryCollection containing all cell geometries
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_grid2d_to_geometry_collection(sfcgal_grid2d_t *grid);
+
+/**
+ * Convert a 3D grid to a GeometryCollection
+ * @param grid The 3D grid
+ * @return A GeometryCollection containing all cell geometries
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_grid3d_to_geometry_collection(sfcgal_grid3d_t *grid);
+
+/**
+ * Delete a 2D grid
+ * @param grid The 2D grid to delete
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_grid2d_delete(sfcgal_grid2d_t *grid);
+
+/**
+ * Delete a 3D grid
+ * @param grid The 3D grid to delete
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_grid3d_delete(sfcgal_grid3d_t *grid);
+
 #ifdef __cplusplus
 }
 #endif

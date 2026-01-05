@@ -55,6 +55,7 @@
 #include <SFCGAL/algorithm/translate.h>
 #include <SFCGAL/algorithm/union.h>
 #include <SFCGAL/algorithm/visibility.h>
+#include <SFCGAL/algorithm/Grid.h>
 #include <SFCGAL/algorithm/volume.h>
 
 #include <SFCGAL/Envelope.h>
@@ -1369,6 +1370,141 @@ const std::vector<Operation> operations = {
        // Clone the input geometry to pass ownership to make_solid
        auto geom_copy = geom_a->clone();
        return Constructors::make_solid(std::move(geom_copy));
+     }},
+
+    // Grid generation operations
+    {"square_grid", "Grid", "Generate a square grid covering an extent", false,
+     "Parameters:\n"
+     "  cell_size=VALUE: Size of each square cell (required)\n"
+     "  clip=0|1: 0=cover extent, 1=clip to extent (default: 0)\n"
+     "\nExample:\n"
+     "  sfcgalop -a \"POLYGON((0 0,100 0,100 100,0 100,0 0))\" square_grid \"cell_size=10\"",
+     "A, params", "G",
+     [](const std::string &op_arg, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto params = parse_params(op_arg);
+       double cellSize = params.count("cell_size") ? params["cell_size"] : 10.0;
+       bool clip = parse_boolean_param(params, "clip", op_arg, false);
+       auto clipMode = clip ? SFCGAL::algorithm::GridClipMode::CLIP_TO_EXTENT
+                            : SFCGAL::algorithm::GridClipMode::COVER_EXTENT;
+       auto grid = SFCGAL::algorithm::makeSquareGrid(*geom_a, cellSize, clipMode);
+       return SFCGAL::algorithm::gridToGeometryCollection(grid);
+     }},
+
+    {"rectangle_grid", "Grid", "Generate a rectangular grid covering an extent", false,
+     "Parameters:\n"
+     "  cell_size_x=VALUE: Width of each cell (required)\n"
+     "  cell_size_y=VALUE: Height of each cell (required)\n"
+     "  clip=0|1: 0=cover extent, 1=clip to extent (default: 0)\n"
+     "\nExample:\n"
+     "  sfcgalop -a \"POLYGON((0 0,100 0,100 80,0 80,0 0))\" rectangle_grid \"cell_size_x=10,cell_size_y=8\"",
+     "A, params", "G",
+     [](const std::string &op_arg, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto params = parse_params(op_arg);
+       double cellSizeX = params.count("cell_size_x") ? params["cell_size_x"] : 10.0;
+       double cellSizeY = params.count("cell_size_y") ? params["cell_size_y"] : 10.0;
+       bool clip = parse_boolean_param(params, "clip", op_arg, false);
+       auto clipMode = clip ? SFCGAL::algorithm::GridClipMode::CLIP_TO_EXTENT
+                            : SFCGAL::algorithm::GridClipMode::COVER_EXTENT;
+       auto grid = SFCGAL::algorithm::makeRectangleGrid(*geom_a, cellSizeX, cellSizeY, clipMode);
+       return SFCGAL::algorithm::gridToGeometryCollection(grid);
+     }},
+
+    {"hexagon_grid", "Grid", "Generate a hexagonal grid covering an extent", false,
+     "Parameters:\n"
+     "  cell_size=VALUE: Edge length of each hexagon (required)\n"
+     "  flat_top=0|1: 0=pointy-top, 1=flat-top (default: 1)\n"
+     "  clip=0|1: 0=cover extent, 1=clip to extent (default: 0)\n"
+     "\nExample:\n"
+     "  sfcgalop -a \"POLYGON((0 0,100 0,100 100,0 100,0 0))\" hexagon_grid \"cell_size=10\"",
+     "A, params", "G",
+     [](const std::string &op_arg, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto params = parse_params(op_arg);
+       double cellSize = params.count("cell_size") ? params["cell_size"] : 10.0;
+       bool flatTop = parse_boolean_param(params, "flat_top", op_arg, true);
+       bool clip = parse_boolean_param(params, "clip", op_arg, false);
+       auto clipMode = clip ? SFCGAL::algorithm::GridClipMode::CLIP_TO_EXTENT
+                            : SFCGAL::algorithm::GridClipMode::COVER_EXTENT;
+       auto grid = SFCGAL::algorithm::makeHexagonGrid(*geom_a, cellSize, flatTop, clipMode);
+       return SFCGAL::algorithm::gridToGeometryCollection(grid);
+     }},
+
+    {"triangle_grid", "Grid", "Generate a triangular grid covering an extent", false,
+     "Parameters:\n"
+     "  cell_size=VALUE: Edge length of each triangle (required)\n"
+     "  clip=0|1: 0=cover extent, 1=clip to extent (default: 0)\n"
+     "\nExample:\n"
+     "  sfcgalop -a \"POLYGON((0 0,100 0,100 100,0 100,0 0))\" triangle_grid \"cell_size=10\"",
+     "A, params", "G",
+     [](const std::string &op_arg, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto params = parse_params(op_arg);
+       double cellSize = params.count("cell_size") ? params["cell_size"] : 10.0;
+       bool clip = parse_boolean_param(params, "clip", op_arg, false);
+       auto clipMode = clip ? SFCGAL::algorithm::GridClipMode::CLIP_TO_EXTENT
+                            : SFCGAL::algorithm::GridClipMode::COVER_EXTENT;
+       auto grid = SFCGAL::algorithm::makeTriangleGrid(*geom_a, cellSize, clipMode);
+       return SFCGAL::algorithm::gridToGeometryCollection(grid);
+     }},
+
+    {"diamond_grid", "Grid", "Generate a diamond grid covering an extent", false,
+     "Parameters:\n"
+     "  cell_size=VALUE: Diagonal length of each diamond (required)\n"
+     "  clip=0|1: 0=cover extent, 1=clip to extent (default: 0)\n"
+     "\nExample:\n"
+     "  sfcgalop -a \"POLYGON((0 0,100 0,100 100,0 100,0 0))\" diamond_grid \"cell_size=10\"",
+     "A, params", "G",
+     [](const std::string &op_arg, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto params = parse_params(op_arg);
+       double cellSize = params.count("cell_size") ? params["cell_size"] : 10.0;
+       bool clip = parse_boolean_param(params, "clip", op_arg, false);
+       auto clipMode = clip ? SFCGAL::algorithm::GridClipMode::CLIP_TO_EXTENT
+                            : SFCGAL::algorithm::GridClipMode::COVER_EXTENT;
+       auto grid = SFCGAL::algorithm::makeDiamondGrid(*geom_a, cellSize, clipMode);
+       return SFCGAL::algorithm::gridToGeometryCollection(grid);
+     }},
+
+    {"voxel_grid", "Grid", "Generate a 3D voxel grid covering an extent", false,
+     "Parameters:\n"
+     "  cell_size_x=VALUE: X dimension of each voxel (required)\n"
+     "  cell_size_y=VALUE: Y dimension of each voxel (required)\n"
+     "  cell_size_z=VALUE: Z dimension of each voxel (required)\n"
+     "  clip=0|1: 0=cover extent, 1=clip to extent (default: 0)\n"
+     "\nExample:\n"
+     "  sfcgalop -a \"SOLID(...)\" voxel_grid \"cell_size_x=10,cell_size_y=10,cell_size_z=5\"",
+     "A, params", "G",
+     [](const std::string &op_arg, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto params = parse_params(op_arg);
+       double cellSizeX = params.count("cell_size_x") ? params["cell_size_x"] : 10.0;
+       double cellSizeY = params.count("cell_size_y") ? params["cell_size_y"] : 10.0;
+       double cellSizeZ = params.count("cell_size_z") ? params["cell_size_z"] : 10.0;
+       bool clip = parse_boolean_param(params, "clip", op_arg, false);
+       auto clipMode = clip ? SFCGAL::algorithm::GridClipMode::CLIP_TO_EXTENT
+                            : SFCGAL::algorithm::GridClipMode::COVER_EXTENT;
+       auto grid = SFCGAL::algorithm::makeVoxelGrid(*geom_a, cellSizeX, cellSizeY, cellSizeZ, clipMode);
+       return SFCGAL::algorithm::gridToGeometryCollection(grid);
+     }},
+
+    {"tetrahedron_grid", "Grid", "Generate a 3D tetrahedral grid covering an extent", false,
+     "Parameters:\n"
+     "  cell_size=VALUE: Base cube size for tetrahedral subdivision (required)\n"
+     "  clip=0|1: 0=cover extent, 1=clip to extent (default: 0)\n"
+     "\nExample:\n"
+     "  sfcgalop -a \"SOLID(...)\" make_tetrahedron_grid \"cell_size=10\"",
+     "A, params", "G",
+     [](const std::string &op_arg, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       auto params = parse_params(op_arg);
+       double cellSize = params.count("cell_size") ? params["cell_size"] : 10.0;
+       bool clip = parse_boolean_param(params, "clip", op_arg, false);
+       auto clipMode = clip ? SFCGAL::algorithm::GridClipMode::CLIP_TO_EXTENT
+                            : SFCGAL::algorithm::GridClipMode::COVER_EXTENT;
+       auto grid = SFCGAL::algorithm::makeTetrahedronGrid(*geom_a, cellSize, clipMode);
+       return SFCGAL::algorithm::gridToGeometryCollection(grid);
      }}}; // end operations array
 
 } // namespace

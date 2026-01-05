@@ -70,6 +70,7 @@
 #if SFCGAL_CGAL_VERSION_MAJOR >= 6
   #include "SFCGAL/algorithm/polygonRepair.h"
 #endif
+#include "SFCGAL/algorithm/Grid.h"
 #include "SFCGAL/algorithm/rotate.h"
 #include "SFCGAL/algorithm/scale.h"
 #include "SFCGAL/algorithm/simplification.h"
@@ -3338,4 +3339,260 @@ sfcgal_geometry_projected_medial_axis(const sfcgal_geometry_t *geom)
   }
 
   return multiLineString.release();
+}
+
+//------------------------------------------------------------------------------
+// Grid Generation C API
+//------------------------------------------------------------------------------
+
+namespace {
+auto
+toCppClipMode(sfcgal_grid_clip_mode_t mode) -> SFCGAL::algorithm::GridClipMode
+{
+  switch (mode) {
+  case SFCGAL_GRID_CLIP_TO_EXTENT:
+    return SFCGAL::algorithm::GridClipMode::CLIP_TO_EXTENT;
+  case SFCGAL_GRID_COVER_EXTENT:
+  default:
+    return SFCGAL::algorithm::GridClipMode::COVER_EXTENT;
+  }
+}
+} // namespace
+
+extern "C" auto
+sfcgal_make_square_grid(const sfcgal_geometry_t *extent, double cell_size,
+                        sfcgal_grid_clip_mode_t clip_mode) -> sfcgal_grid2d_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(extent);
+
+  try {
+    auto *grid =
+        new SFCGAL::algorithm::Grid2D(SFCGAL::algorithm::makeSquareGrid(
+            *geometry, cell_size, toCppClipMode(clip_mode)));
+    return reinterpret_cast<sfcgal_grid2d_t *>(grid);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During make_square_grid:");
+    SFCGAL_WARNING("  with extent: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+}
+
+extern "C" auto
+sfcgal_make_rectangle_grid(const sfcgal_geometry_t *extent, double cell_size_x,
+                           double                  cell_size_y,
+                           sfcgal_grid_clip_mode_t clip_mode)
+    -> sfcgal_grid2d_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(extent);
+
+  try {
+    auto *grid =
+        new SFCGAL::algorithm::Grid2D(SFCGAL::algorithm::makeRectangleGrid(
+            *geometry, cell_size_x, cell_size_y, toCppClipMode(clip_mode)));
+    return reinterpret_cast<sfcgal_grid2d_t *>(grid);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During make_rectangle_grid:");
+    SFCGAL_WARNING("  with extent: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+}
+
+extern "C" auto
+sfcgal_make_hexagon_grid(const sfcgal_geometry_t *extent, double cell_size,
+                         int flat_top, sfcgal_grid_clip_mode_t clip_mode)
+    -> sfcgal_grid2d_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(extent);
+
+  try {
+    auto *grid =
+        new SFCGAL::algorithm::Grid2D(SFCGAL::algorithm::makeHexagonGrid(
+            *geometry, cell_size, flat_top != 0, toCppClipMode(clip_mode)));
+    return reinterpret_cast<sfcgal_grid2d_t *>(grid);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During make_hexagon_grid:");
+    SFCGAL_WARNING("  with extent: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+}
+
+extern "C" auto
+sfcgal_make_triangle_grid(const sfcgal_geometry_t *extent, double cell_size,
+                          sfcgal_grid_clip_mode_t clip_mode)
+    -> sfcgal_grid2d_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(extent);
+
+  try {
+    auto *grid =
+        new SFCGAL::algorithm::Grid2D(SFCGAL::algorithm::makeTriangleGrid(
+            *geometry, cell_size, toCppClipMode(clip_mode)));
+    return reinterpret_cast<sfcgal_grid2d_t *>(grid);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During make_triangle_grid:");
+    SFCGAL_WARNING("  with extent: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+}
+
+extern "C" auto
+sfcgal_make_diamond_grid(const sfcgal_geometry_t *extent, double cell_size,
+                         sfcgal_grid_clip_mode_t clip_mode) -> sfcgal_grid2d_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(extent);
+
+  try {
+    auto *grid =
+        new SFCGAL::algorithm::Grid2D(SFCGAL::algorithm::makeDiamondGrid(
+            *geometry, cell_size, toCppClipMode(clip_mode)));
+    return reinterpret_cast<sfcgal_grid2d_t *>(grid);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During make_diamond_grid:");
+    SFCGAL_WARNING("  with extent: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+}
+
+extern "C" auto
+sfcgal_make_voxel_grid(const sfcgal_geometry_t *extent, double cell_size_x,
+                       double cell_size_y, double cell_size_z,
+                       sfcgal_grid_clip_mode_t clip_mode) -> sfcgal_grid3d_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(extent);
+
+  try {
+    auto *grid = new SFCGAL::algorithm::Grid3D(SFCGAL::algorithm::makeVoxelGrid(
+        *geometry, cell_size_x, cell_size_y, cell_size_z,
+        toCppClipMode(clip_mode)));
+    return reinterpret_cast<sfcgal_grid3d_t *>(grid);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During make_voxel_grid:");
+    SFCGAL_WARNING("  with extent: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+}
+
+extern "C" auto
+sfcgal_make_tetrahedron_grid(const sfcgal_geometry_t *extent, double cell_size,
+                             sfcgal_grid_clip_mode_t clip_mode)
+    -> sfcgal_grid3d_t *
+{
+  const auto *geometry = reinterpret_cast<const SFCGAL::Geometry *>(extent);
+
+  try {
+    auto *grid =
+        new SFCGAL::algorithm::Grid3D(SFCGAL::algorithm::makeTetrahedronGrid(
+            *geometry, cell_size, toCppClipMode(clip_mode)));
+    return reinterpret_cast<sfcgal_grid3d_t *>(grid);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During make_tetrahedron_grid:");
+    SFCGAL_WARNING("  with extent: %s", geometry->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+}
+
+extern "C" auto
+sfcgal_grid2d_num_cells(const sfcgal_grid2d_t *grid) -> size_t
+{
+  const auto *g = reinterpret_cast<const SFCGAL::algorithm::Grid2D *>(grid);
+  return g->size();
+}
+
+extern "C" auto
+sfcgal_grid2d_cell_geometry(const sfcgal_grid2d_t *grid, size_t index)
+    -> sfcgal_geometry_t *
+{
+  const auto *g = reinterpret_cast<const SFCGAL::algorithm::Grid2D *>(grid);
+  if (index >= g->size()) {
+    return nullptr;
+  }
+  return (*g)[index].geometry->clone().release();
+}
+
+extern "C" void
+sfcgal_grid2d_cell_indices(const sfcgal_grid2d_t *grid, size_t index,
+                           int64_t *i, int64_t *j)
+{
+  const auto *g = reinterpret_cast<const SFCGAL::algorithm::Grid2D *>(grid);
+  if (index < g->size()) {
+    if (i != nullptr) {
+      *i = (*g)[index].i;
+    }
+    if (j != nullptr) {
+      *j = (*g)[index].j;
+    }
+  }
+}
+
+extern "C" auto
+sfcgal_grid3d_num_cells(const sfcgal_grid3d_t *grid) -> size_t
+{
+  const auto *g = reinterpret_cast<const SFCGAL::algorithm::Grid3D *>(grid);
+  return g->size();
+}
+
+extern "C" auto
+sfcgal_grid3d_cell_geometry(const sfcgal_grid3d_t *grid, size_t index)
+    -> sfcgal_geometry_t *
+{
+  const auto *g = reinterpret_cast<const SFCGAL::algorithm::Grid3D *>(grid);
+  if (index >= g->size()) {
+    return nullptr;
+  }
+  return (*g)[index].geometry->clone().release();
+}
+
+extern "C" void
+sfcgal_grid3d_cell_indices(const sfcgal_grid3d_t *grid, size_t index,
+                           int64_t *i, int64_t *j, int64_t *k)
+{
+  const auto *g = reinterpret_cast<const SFCGAL::algorithm::Grid3D *>(grid);
+  if (index < g->size()) {
+    if (i != nullptr) {
+      *i = (*g)[index].i;
+    }
+    if (j != nullptr) {
+      *j = (*g)[index].j;
+    }
+    if (k != nullptr) {
+      *k = (*g)[index].k;
+    }
+  }
+}
+
+extern "C" auto
+sfcgal_grid2d_to_geometry_collection(sfcgal_grid2d_t *grid)
+    -> sfcgal_geometry_t *
+{
+  auto *g  = reinterpret_cast<SFCGAL::algorithm::Grid2D *>(grid);
+  auto  gc = SFCGAL::algorithm::gridToGeometryCollection(*g);
+  return gc.release();
+}
+
+extern "C" auto
+sfcgal_grid3d_to_geometry_collection(sfcgal_grid3d_t *grid)
+    -> sfcgal_geometry_t *
+{
+  auto *g  = reinterpret_cast<SFCGAL::algorithm::Grid3D *>(grid);
+  auto  gc = SFCGAL::algorithm::gridToGeometryCollection(*g);
+  return gc.release();
+}
+
+extern "C" void
+sfcgal_grid2d_delete(sfcgal_grid2d_t *grid)
+{
+  delete reinterpret_cast<SFCGAL::algorithm::Grid2D *>(grid);
+}
+
+extern "C" void
+sfcgal_grid3d_delete(sfcgal_grid3d_t *grid)
+{
+  delete reinterpret_cast<SFCGAL::algorithm::Grid3D *>(grid);
 }

@@ -129,3 +129,15 @@ BOOST_AUTO_TEST_CASE(test_is_valid)
   auto result = Operations::execute_operation("is_valid", "", &point, nullptr);
   BOOST_CHECK(result.has_value());
 }
+
+/// @brief Test grid generation operation
+BOOST_AUTO_TEST_CASE(test_square_grid)
+{
+  std::string wkt  = "POLYGON((0 0,10 0,10 10,0 10,0 0))";
+  auto        geom = load_geometry(wkt);
+  BOOST_CHECK(geom != nullptr);
+
+  auto result =
+      Operations::execute_operation("square_grid", "cell_size=5", geom.get(), nullptr);
+  BOOST_CHECK(result.has_value());
+}
