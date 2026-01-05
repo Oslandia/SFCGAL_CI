@@ -132,15 +132,16 @@ BOOST_AUTO_TEST_CASE(testArea3D_Polygon)
 {
   Polygon          polygon;
   const LineString exteriorRing({Point(0, 0, 1), Point(0, 10, 2),
-                                 Point(10, 10, 3), Point(10, 0, 4),
+                                 Point(10, 10, 3), Point(10, 0, 2),
                                  Point(0, 0, 1)});
   polygon.setExteriorRing(exteriorRing);
   BOOST_CHECK_CLOSE(algorithm::area3D(polygon), 100.995, 0.001);
 
-  const LineString interiorRing({Point(1, 1, 1), Point(1, 9, 2), Point(9, 9, 3),
-                                 Point(9, 1, 4), Point(1, 1, 1)});
+  const LineString interiorRing({Point(1, 1, 1.2), Point(9, 1, 2),
+                                 Point(9, 9, 2.8), Point(1, 9, 2),
+                                 Point(1, 1, 1.2)});
   polygon.addInteriorRing(interiorRing);
-  BOOST_CHECK_CLOSE(algorithm::area3D(polygon), 36.0414, 0.0001);
+  BOOST_CHECK_CLOSE(algorithm::area3D(polygon), 36.3582, 0.0001);
 }
 
 BOOST_AUTO_TEST_CASE(testArea3D_Triangle1)
