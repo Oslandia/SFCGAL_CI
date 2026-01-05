@@ -130,13 +130,20 @@ BOOST_AUTO_TEST_CASE(testArea2D_PolygonWithHoleWithBadOrientation)
 
 BOOST_AUTO_TEST_CASE(testArea3D_Polygon)
 {
-  Polygon          polygon;
+  Polygon polygon;
+
+  // empty polygon
+  BOOST_CHECK(polygon.isEmpty());
+  BOOST_CHECK_EQUAL(algorithm::area3D(polygon), 0.0);
+
+  // polygon with an exterior ring
   const LineString exteriorRing({Point(0, 0, 1), Point(0, 10, 2),
                                  Point(10, 10, 3), Point(10, 0, 2),
                                  Point(0, 0, 1)});
   polygon.setExteriorRing(exteriorRing);
   BOOST_CHECK_CLOSE(algorithm::area3D(polygon), 100.995, 0.001);
 
+  // polygon with an interior and exterior ring
   const LineString interiorRing({Point(1, 1, 1.2), Point(9, 1, 2),
                                  Point(9, 9, 2.8), Point(1, 9, 2),
                                  Point(1, 1, 1.2)});
