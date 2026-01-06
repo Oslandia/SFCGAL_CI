@@ -2519,4 +2519,49 @@ BOOST_AUTO_TEST_CASE(testGenerateRoof)
   sfcgal_geometry_delete(skillionRoof);
 }
 
+BOOST_AUTO_TEST_CASE(testExtrudeUntil)
+{
+  // Create a rectangular footprint at z=0
+  std::vector<Point> points;
+  points.emplace_back(0.0, 0.0, 0.0);
+  points.emplace_back(10.0, 0.0, 0.0);
+  points.emplace_back(10.0, 6.0, 0.0);
+  points.emplace_back(0.0, 6.0, 0.0);
+  points.emplace_back(0.0, 0.0, 0.0);
+  const LineString exteriorRing(points);
+  const Polygon    footprint(exteriorRing);
+
+  // Create a flat roof at z=5
+  PolyhedralSurface  roof;
+  std::vector<Point> roofPoints;
+  roofPoints.emplace_back(0.0, 0.0, 5.0);
+  roofPoints.emplace_back(10.0, 0.0, 5.0);
+  roofPoints.emplace_back(10.0, 6.0, 5.0);
+  roofPoints.emplace_back(0.0, 6.0, 5.0);
+  roofPoints.emplace_back(0.0, 0.0, 5.0);
+  roof.addPolygon(Polygon(LineString(roofPoints)));
+
+  // Extrude until roof
+  sfcgal_geometry_t *result = sfcgal_geometry_extrude_until(&footprint, &roof);
+
+  // check result
+  char  *extrudeWkt;
+  size_t len;
+  sfcgal_geometry_as_text_decim(result, 2, &extrudeWkt, &len);
+  std::cout << std::string(extrudeWkt);
+  BOOST_CHECK_EQUAL(std::string(extrudeWkt, len),
+                    "SOLID Z ((((0.00 6.00 5.00,0.00 0.00 5.00,10.00 0.00 "
+                    "5.00,10.00 6.00 5.00,0.00 6.00 5.00)),"
+                    "((0.00 6.00 0.00,10.00 6.00 0.00,10.00 0.00 0.00,0.00 "
+                    "0.00 0.00,0.00 6.00 0.00)),"
+                    "((0.00 6.00 5.00,0.00 6.00 0.00,0.00 0.00 0.00,0.00 0.00 "
+                    "5.00,0.00 6.00 5.00)),"
+                    "((0.00 0.00 5.00,0.00 0.00 0.00,10.00 0.00 0.00,10.00 "
+                    "0.00 5.00,0.00 0.00 5.00)),"
+                    "((10.00 0.00 5.00,10.00 0.00 0.00,10.00 6.00 0.00,10.00 "
+                    "6.00 5.00,10.00 0.00 5.00)),"
+                    "((10.00 6.00 5.00,10.00 6.00 0.00,0.00 6.00 0.00,0.00 "
+                    "6.00 5.00,10.00 6.00 5.00))))");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

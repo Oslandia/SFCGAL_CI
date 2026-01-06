@@ -1647,6 +1647,19 @@ sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom)
   return mls.release();
 }
 
+SFCGAL_API
+extern "C" auto
+sfcgal_geometry_extrude_until(const sfcgal_geometry_t *footprint,
+                              const sfcgal_geometry_t *roof)
+    -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      return SFCGAL::algorithm::extrudeUntil(
+                 *down_const_cast<SFCGAL::Polygon>(footprint),
+                 *static_cast<const SFCGAL::Geometry *>(roof))
+          .release();)
+}
+
 extern "C" auto
 sfcgal_geometry_line_sub_string(const sfcgal_geometry_t *geom, double start,
                                 double end) -> sfcgal_geometry_t *
