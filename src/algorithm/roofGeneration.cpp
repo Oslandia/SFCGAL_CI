@@ -6,6 +6,7 @@
 #include "SFCGAL/GeometryCollection.h"
 #include "SFCGAL/LineString.h"
 #include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
 #include "SFCGAL/MultiPolygon.h"
 #include "SFCGAL/Point.h"
 #include "SFCGAL/Polygon.h"
@@ -24,6 +25,7 @@
 #include "SFCGAL/algorithm/straightSkeleton.h"
 #include "SFCGAL/algorithm/tesselate.h"
 #include "SFCGAL/algorithm/translate.h"
+#include "SFCGAL/detail/GetPointsVisitor.h"
 #include "SFCGAL/detail/algorithm/FaceFilters.h"
 #include "SFCGAL/triangulate/triangulate2DZ.h"
 
@@ -686,10 +688,27 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
   // 1. Get projected medial axis to edges (this gives us the ridge line)
   auto projectedMedialAxis = approximateMedialAxis(footprint, true);
 
-  // 2. Perform constrained Delaunay triangulation with ridge as constraints
-  auto footprint_clone = footprint.clone();
-  SFCGAL::algorithm::force2D(*footprint_clone);
-  auto triangulation = SFCGAL::triangulate::triangulate2DZ(*footprint_clone);
+  // 2. Create a MultiPoint containing all points from footprint and
+  // projectedMedialAxis
+  auto multiPoint = std::make_unique<MultiPoint>();
+
+  // Use GetPointsVisitor to collect all points from footprint and
+  // projectedMedialAxis
+  SFCGAL::detail::GetPointsVisitor visitor;
+
+  // Collect points from footprint
+  visitor.visit(footprint);
+
+  // Collect points from projected medial axis
+  visitor.visit(*projectedMedialAxis);
+
+  // Add all collected points to the MultiPoint
+  for (const Point *point : visitor.points) {
+    multiPoint->addGeometry(*point);
+  }
+
+  // Perform constrained Delaunay triangulation on the MultiPoint
+  auto triangulation = SFCGAL::triangulate::triangulate2DZ(*multiPoint);
 
   // Add constraints from projected medial axis
   auto projectedMedialAxis_clone = projectedMedialAxis->clone();
@@ -721,7 +740,8 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
 
   // 3. Collect ridge points with proper heights:
   // - Interior points: use their actual distance to boundary
-  // - Boundary points (gable ends): use height of nearest interior point on same segment
+  // - Boundary points (gable ends): use height of nearest interior point on
+  // same segment
   std::map<std::pair<Kernel::FT, Kernel::FT>, Kernel::FT> ridgePointHeights;
 
   for (size_t i = 0; i < projectedMedialAxis->numGeometries(); ++i) {
@@ -805,13 +825,12 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
       return true;
     }
     // Fallback: search with tolerance
-    return std::any_of(
-        ridgePointHeights.begin(), ridgePointHeights.end(),
-        [&point](const auto &entry) -> bool {
-          auto dx = entry.first.first - point.x();
-          auto dy = entry.first.second - point.y();
-          return dx * dx + dy * dy < Kernel::FT(EPSILON);
-        });
+    return std::any_of(ridgePointHeights.begin(), ridgePointHeights.end(),
+                       [&point](const auto &entry) -> bool {
+                         auto dx = entry.first.first - point.x();
+                         auto dy = entry.first.second - point.y();
+                         return dx * dx + dy * dy < Kernel::FT(EPSILON);
+                       });
   };
 
   // Create roof surface
@@ -948,11 +967,11 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
         auto ridgeZ = getRidgeHeight(ridgeEndpoint);
 
         Kernel::FT zBase(0);
-        Point corner1(boundarySegmentPoints[0].x(),
-                      boundarySegmentPoints[0].y(), zBase);
-        Point corner2(boundarySegmentPoints[1].x(),
-                      boundarySegmentPoints[1].y(), zBase);
-        Point ridgeTop(ridgeEndpoint.x(), ridgeEndpoint.y(), ridgeZ);
+        Point      corner1(boundarySegmentPoints[0].x(),
+                           boundarySegmentPoints[0].y(), zBase);
+        Point      corner2(boundarySegmentPoints[1].x(),
+                           boundarySegmentPoints[1].y(), zBase);
+        Point      ridgeTop(ridgeEndpoint.x(), ridgeEndpoint.y(), ridgeZ);
 
         // Gable centroid
         Kernel::FT gableCentroidX =
