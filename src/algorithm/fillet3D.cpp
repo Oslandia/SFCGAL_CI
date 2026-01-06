@@ -16,9 +16,9 @@
 #include <CGAL/Polygon_mesh_processing/repair_polygon_soup.h>
 #include <CGAL/Polygon_mesh_processing/stitch_borders.h>
 #include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
+#include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/boost/graph/copy_face_graph.h>
-#include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <cmath>
 #include <iostream>
 #include <map>
@@ -54,8 +54,8 @@ rotateVector(const Kernel::Vector_3 &v, const Kernel::Vector_3 &axis,
 }
 
 auto
-computeDihedralAngle(const Kernel::Vector_3 &n1,
-                     const Kernel::Vector_3 &n2) -> double
+computeDihedralAngle(const Kernel::Vector_3 &n1, const Kernel::Vector_3 &n2)
+    -> double
 {
   double dot = CGAL::to_double(n1 * n2);
   dot        = std::clamp(dot, -1.0, 1.0);
@@ -72,9 +72,9 @@ isEdgeConvex(const Kernel::Vector_3 &n1, const Kernel::Vector_3 &n2,
   // - For convex edges, (n1 × n2) · edgeDir > 0 when edgeDir is aligned
   //
   // To handle arbitrary edgeDir sign, we check if |dot| is close to |cross|.
-  // This means the edge direction is aligned (either way) with the cross product.
-  // Then we check the actual dot product sign to determine convexity.
-  const auto cross = CGAL::cross_product(n1, n2);
+  // This means the edge direction is aligned (either way) with the cross
+  // product. Then we check the actual dot product sign to determine convexity.
+  const auto   cross    = CGAL::cross_product(n1, n2);
   const double crossLen = std::sqrt(CGAL::to_double(cross.squared_length()));
 
   // If faces are nearly parallel, skip (degenerate edge)
@@ -84,7 +84,7 @@ isEdgeConvex(const Kernel::Vector_3 &n1, const Kernel::Vector_3 &n2,
 
   // Check alignment: |cross · edgeDir| should be close to |cross| * |edgeDir|
   // (i.e., vectors are parallel or anti-parallel)
-  double dot = CGAL::to_double(cross * edgeDir);
+  double dot     = CGAL::to_double(cross * edgeDir);
   double edgeLen = std::sqrt(CGAL::to_double(edgeDir.squared_length()));
 
   // For parallel vectors: |dot| ≈ |cross| * |edgeDir|
@@ -99,23 +99,27 @@ isEdgeConvex(const Kernel::Vector_3 &n1, const Kernel::Vector_3 &n2,
   // But the sign depends on which way we computed edgeDir.
   // The key insight: take absolute value and check magnitude.
   // If |dot| is significant, the edge is at a real corner (convex or concave).
-  // For a solid with consistent outward normals, convex edges have positive dot.
-  // Since edgeDir is arbitrary, we trust that significant |dot| means convex.
+  // For a solid with consistent outward normals, convex edges have positive
+  // dot. Since edgeDir is arbitrary, we trust that significant |dot| means
+  // convex.
   bool isConvex = std::abs(dot) > 0.01;
 
 #ifdef DEBUG_FILLET
-  bool isInnerCornerNormals =
-      (std::abs(CGAL::to_double(n1.x()) - 1.0) < 0.01 &&
-       std::abs(CGAL::to_double(n2.y()) - 1.0) < 0.01);
+  bool isInnerCornerNormals = (std::abs(CGAL::to_double(n1.x()) - 1.0) < 0.01 &&
+                               std::abs(CGAL::to_double(n2.y()) - 1.0) < 0.01);
   if (isInnerCornerNormals) {
     std::cerr << "[DEBUG] isEdgeConvex: n1=(" << CGAL::to_double(n1.x()) << ","
-              << CGAL::to_double(n1.y()) << "," << CGAL::to_double(n1.z()) << ")"
-              << " n2=(" << CGAL::to_double(n2.x()) << "," << CGAL::to_double(n2.y()) << ","
-              << CGAL::to_double(n2.z()) << ")"
+              << CGAL::to_double(n1.y()) << "," << CGAL::to_double(n1.z())
+              << ")"
+              << " n2=(" << CGAL::to_double(n2.x()) << ","
+              << CGAL::to_double(n2.y()) << "," << CGAL::to_double(n2.z())
+              << ")"
               << " edgeDir=(" << CGAL::to_double(edgeDir.x()) << ","
-              << CGAL::to_double(edgeDir.y()) << "," << CGAL::to_double(edgeDir.z()) << ")"
+              << CGAL::to_double(edgeDir.y()) << ","
+              << CGAL::to_double(edgeDir.z()) << ")"
               << " cross=(" << CGAL::to_double(cross.x()) << ","
-              << CGAL::to_double(cross.y()) << "," << CGAL::to_double(cross.z()) << ")"
+              << CGAL::to_double(cross.y()) << "," << CGAL::to_double(cross.z())
+              << ")"
               << " dot=" << dot << " isConvex=" << isConvex << "\n";
   }
 #endif
@@ -127,9 +131,9 @@ intersectPointWithPlane(const Kernel::Point_3  &point,
                         const Kernel::Vector_3 &direction,
                         const Kernel::Plane_3  &plane) -> Kernel::Point_3
 {
-  double denom = CGAL::to_double(plane.a() * direction.x() +
-                                 plane.b() * direction.y() +
-                                 plane.c() * direction.z());
+  double denom =
+      CGAL::to_double(plane.a() * direction.x() + plane.b() * direction.y() +
+                      plane.c() * direction.z());
   if (std::abs(denom) < 1e-10) {
     return point;
   }
@@ -151,8 +155,8 @@ intersectPointWithPlane(const Kernel::Point_3  &point,
  */
 auto
 solveArcCenterOffset(const Kernel::Vector_3 &n1, const Kernel::Vector_3 &n2,
-                     const Kernel::Vector_3 &edgeDir,
-                     double radius) -> std::optional<Kernel::Vector_3>
+                     const Kernel::Vector_3 &edgeDir, double radius)
+    -> std::optional<Kernel::Vector_3>
 {
   // Extract components
   const double n1x = CGAL::to_double(n1.x());
@@ -251,7 +255,7 @@ Fillet3D::findAllEdgesWithNormals() const -> std::vector<EdgeInfo>
 
   std::map<EdgeKey,
            std::pair<Kernel::Vector_3, std::optional<Kernel::Vector_3>>>
-                                                              edgeNormals;
+                                                                 edgeNormals;
   std::map<EdgeKey, std::pair<Kernel::Point_3, Kernel::Point_3>> edgePoints;
 
   auto makeKey = [](const Kernel::Point_3 &p1,
@@ -329,17 +333,18 @@ Fillet3D::findAllEdgesWithNormals() const -> std::vector<EdgeInfo>
   }
 
   for (const auto &[key, normals] : edgeNormals) {
-    const auto &[k1, k2] = key;
+    const auto &[k1, k2]     = key;
     const auto &[x1, y1, z1] = k1;
     const auto &[x2, y2, z2] = k2;
 
 #ifdef DEBUG_FILLET
-    bool isInnerCornerEdge = (std::abs(x1 - 1.0) < 0.01 && std::abs(y1 - 1.0) < 0.01 &&
-                              std::abs(x2 - 1.0) < 0.01 && std::abs(y2 - 1.0) < 0.01);
+    bool isInnerCornerEdge =
+        (std::abs(x1 - 1.0) < 0.01 && std::abs(y1 - 1.0) < 0.01 &&
+         std::abs(x2 - 1.0) < 0.01 && std::abs(y2 - 1.0) < 0.01);
     if (isInnerCornerEdge) {
-      std::cerr << "[DEBUG] Found edge at inner corner: ("
-                << x1 << ", " << y1 << ", " << z1 << ") to ("
-                << x2 << ", " << y2 << ", " << z2 << ")"
+      std::cerr << "[DEBUG] Found edge at inner corner: (" << x1 << ", " << y1
+                << ", " << z1 << ") to (" << x2 << ", " << y2 << ", " << z2
+                << ")"
                 << " has_second=" << normals.second.has_value() << "\n";
     }
 #endif
@@ -357,8 +362,8 @@ Fillet3D::findAllEdgesWithNormals() const -> std::vector<EdgeInfo>
 
 #ifdef DEBUG_FILLET
       if (isInnerCornerEdge) {
-        std::cerr << "[DEBUG] Inner corner edge: dihedral=" << info.dihedralAngle
-                  << "° convex=" << info.isConvex
+        std::cerr << "[DEBUG] Inner corner edge: dihedral="
+                  << info.dihedralAngle << "° convex=" << info.isConvex
                   << " n1=(" << CGAL::to_double(info.normal1.x()) << ","
                   << CGAL::to_double(info.normal1.y()) << ","
                   << CGAL::to_double(info.normal1.z()) << ")"
@@ -392,7 +397,9 @@ Fillet3D::selectEdges(const EdgeSelector &selector) const
   case EdgeSelector::Type::EXPLICIT: {
     std::vector<EdgeInfo> selected;
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] EXPLICIT selector: looking for " << selector.edges().size() << " edges in " << allEdges.size() << " total edges\n";
+    std::cerr << "[DEBUG] EXPLICIT selector: looking for "
+              << selector.edges().size() << " edges in " << allEdges.size()
+              << " total edges\n";
 #endif
     for (const auto &edge : allEdges) {
       for (const auto &id : selector.edges()) {
@@ -403,7 +410,8 @@ Fillet3D::selectEdges(const EdgeSelector &selector) const
              CGAL::squared_distance(edge.end, id.start) < EPSILON);
         if (match) {
 #ifdef DEBUG_FILLET
-          std::cerr << "[DEBUG] Found edge: dihedral=" << edge.dihedralAngle << "°, convex=" << edge.isConvex << "\n";
+          std::cerr << "[DEBUG] Found edge: dihedral=" << edge.dihedralAngle
+                    << "°, convex=" << edge.isConvex << "\n";
 #endif
           selected.push_back(edge);
           break;
@@ -432,8 +440,7 @@ Fillet3D::selectEdges(const EdgeSelector &selector) const
 
 auto
 Fillet3D::createFilletWedgeWithPlanes(
-    const EdgeInfo                       &edge,
-    const FilletParameters               &params,
+    const EdgeInfo &edge, const FilletParameters &params,
     const std::optional<Kernel::Plane_3> &startPlane,
     const std::optional<Kernel::Plane_3> &endPlane) const
     -> CGAL::Polyhedron_3<Kernel>
@@ -447,24 +454,27 @@ Fillet3D::createFilletWedgeWithPlanes(
   const auto into1 = -edge.normal1;
   const auto into2 = -edge.normal2;
 
-  double dotInto = CGAL::to_double(into1 * into2);
-  dotInto        = std::clamp(dotInto, -1.0, 1.0);
+  double dotInto        = CGAL::to_double(into1 * into2);
+  dotInto               = std::clamp(dotInto, -1.0, 1.0);
   const double arcAngle = M_PI - std::acos(-dotInto);
 
   if (arcAngle < 0.01 || arcAngle > M_PI - 0.01) {
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] arcAngle out of range: " << (arcAngle * 180.0 / M_PI) << "°\n";
+    std::cerr << "[DEBUG] arcAngle out of range: " << (arcAngle * 180.0 / M_PI)
+              << "°\n";
 #endif
     return {};
   }
 
   // Solve for arc center offset using tangency constraints
-  // This ensures the fillet arc is properly tangent to both faces for ANY dihedral angle
+  // This ensures the fillet arc is properly tangent to both faces for ANY
+  // dihedral angle
   auto arcCenterOffset =
       solveArcCenterOffset(edge.normal1, edge.normal2, edgeDir, radius);
   if (!arcCenterOffset.has_value()) {
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Failed to solve arc center offset (degenerate case)\n";
+    std::cerr
+        << "[DEBUG] Failed to solve arc center offset (degenerate case)\n";
 #endif
     return {}; // Degenerate case - skip edge
   }
@@ -476,13 +486,13 @@ Fillet3D::createFilletWedgeWithPlanes(
             << CGAL::to_double(arcCenterOffset->z()) << ")\n";
 #endif
 
-  const auto baseArcCenterStart = edge.start + *arcCenterOffset;
-  const auto baseArcCenterEnd   = edge.end + *arcCenterOffset;
-  const double defaultExtension = radius * 0.5;
+  const auto   baseArcCenterStart = edge.start + *arcCenterOffset;
+  const auto   baseArcCenterEnd   = edge.end + *arcCenterOffset;
+  const double defaultExtension   = radius * 0.5;
 
   const auto startRadial = normalizeVector(edge.normal1);
 
-  const auto endRadial   = normalizeVector(edge.normal2);
+  const auto endRadial = normalizeVector(edge.normal2);
 
   auto rotationAxis =
       normalizeVector(CGAL::cross_product(startRadial, endRadial));
@@ -494,7 +504,8 @@ Fillet3D::createFilletWedgeWithPlanes(
   std::vector<Surface_mesh_3::Vertex_index> endArcVerts;
 
   // Pre-compute extended arc points and use segment direction for intersection
-  // This follows the "flat buffer" principle: intersect segment lines with planes
+  // This follows the "flat buffer" principle: intersect segment lines with
+  // planes
   for (int i = 0; i <= segments; ++i) {
     const double t     = static_cast<double>(i) / segments;
     const double angle = t * arcAngle;
@@ -517,7 +528,8 @@ Fillet3D::createFilletWedgeWithPlanes(
 
     if (startPlane.has_value()) {
       // Intersect the segment line with the start plane
-      startPt = intersectPointWithPlane(extendedStartPt, segmentDir, *startPlane);
+      startPt =
+          intersectPointWithPlane(extendedStartPt, segmentDir, *startPlane);
     }
 
     if (endPlane.has_value()) {
@@ -597,12 +609,14 @@ Fillet3D::createFilletWedgeWithPlanes(
     mesh.add_face(startEdgeVert, startArcVerts[0], endArcVerts[0]);
     mesh.add_face(startEdgeVert, endArcVerts[0], endEdgeVert);
     mesh.add_face(startEdgeVert, endEdgeVert, endArcVerts[segments]);
-    mesh.add_face(startEdgeVert, endArcVerts[segments], startArcVerts[segments]);
+    mesh.add_face(startEdgeVert, endArcVerts[segments],
+                  startArcVerts[segments]);
   } else {
     mesh.add_face(startEdgeVert, endArcVerts[0], startArcVerts[0]);
     mesh.add_face(startEdgeVert, endEdgeVert, endArcVerts[0]);
     mesh.add_face(startEdgeVert, endArcVerts[segments], endEdgeVert);
-    mesh.add_face(startEdgeVert, startArcVerts[segments], endArcVerts[segments]);
+    mesh.add_face(startEdgeVert, startArcVerts[segments],
+                  endArcVerts[segments]);
   }
 
   CGAL::Polyhedron_3<Kernel> poly;
@@ -610,18 +624,34 @@ Fillet3D::createFilletWedgeWithPlanes(
 
   if (poly.is_empty() || !poly.is_closed()) {
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Wedge poly invalid: empty=" << poly.is_empty() << ", closed=" << poly.is_closed() << "\n";
+    std::cerr << "[DEBUG] Wedge poly invalid: empty=" << poly.is_empty()
+              << ", closed=" << poly.is_closed() << "\n";
 #endif
     return {};
   }
 
 #ifdef DEBUG_FILLET
-  std::cerr << "[DEBUG] Wedge created successfully with " << poly.size_of_vertices() << " vertices, " << poly.size_of_facets() << " facets\n";
+  std::cerr << "[DEBUG] Wedge created successfully with "
+            << poly.size_of_vertices() << " vertices, " << poly.size_of_facets()
+            << " facets\n";
   // Debug: output wedge vertices
-  std::cerr << "[DEBUG] Wedge apex: (" << CGAL::to_double(startEdgePt.x()) << ", " << CGAL::to_double(startEdgePt.y()) << ", " << CGAL::to_double(startEdgePt.z()) << ")\n";
-  std::cerr << "[DEBUG] Arc center: (" << CGAL::to_double(baseArcCenterStart.x()) << ", " << CGAL::to_double(baseArcCenterStart.y()) << ", " << CGAL::to_double(baseArcCenterStart.z()) << ")\n";
-  std::cerr << "[DEBUG] bisector: (" << CGAL::to_double(bisector.x()) << ", " << CGAL::to_double(bisector.y()) << ", " << CGAL::to_double(bisector.z()) << ")\n";
-  std::cerr << "[DEBUG] First arc point: (" << CGAL::to_double((baseArcCenterStart + startRadial * radius).x()) << ", " << CGAL::to_double((baseArcCenterStart + startRadial * radius).y()) << ", " << CGAL::to_double((baseArcCenterStart + startRadial * radius).z()) << ")\n";
+  std::cerr << "[DEBUG] Wedge apex: (" << CGAL::to_double(startEdgePt.x())
+            << ", " << CGAL::to_double(startEdgePt.y()) << ", "
+            << CGAL::to_double(startEdgePt.z()) << ")\n";
+  std::cerr << "[DEBUG] Arc center: ("
+            << CGAL::to_double(baseArcCenterStart.x()) << ", "
+            << CGAL::to_double(baseArcCenterStart.y()) << ", "
+            << CGAL::to_double(baseArcCenterStart.z()) << ")\n";
+  std::cerr << "[DEBUG] bisector: (" << CGAL::to_double(bisector.x()) << ", "
+            << CGAL::to_double(bisector.y()) << ", "
+            << CGAL::to_double(bisector.z()) << ")\n";
+  std::cerr << "[DEBUG] First arc point: ("
+            << CGAL::to_double((baseArcCenterStart + startRadial * radius).x())
+            << ", "
+            << CGAL::to_double((baseArcCenterStart + startRadial * radius).y())
+            << ", "
+            << CGAL::to_double((baseArcCenterStart + startRadial * radius).z())
+            << ")\n";
 #endif
   return poly;
 }
@@ -661,8 +691,9 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
   }
 
   // Helper lambda to build result from a polyhedron
-  auto buildResult = [this](const CGAL::Polyhedron_3<Kernel> &poly)
-      -> std::unique_ptr<Geometry> {
+  auto buildResult =
+      [this](
+          const CGAL::Polyhedron_3<Kernel> &poly) -> std::unique_ptr<Geometry> {
     if (poly.is_empty()) {
       return _geometry->clone();
     }
@@ -670,7 +701,7 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     auto result = std::make_unique<PolyhedralSurface>();
 #ifdef DEBUG_FILLET
     int skippedFaces = 0;
-    int addedFaces = 0;
+    int addedFaces   = 0;
 #endif
 
     for (auto fit = poly.facets_begin(); fit != poly.facets_end(); ++fit) {
@@ -727,7 +758,8 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     }
 
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] buildResult: added " << addedFaces << " faces, skipped " << skippedFaces << " degenerate faces\n";
+    std::cerr << "[DEBUG] buildResult: added " << addedFaces
+              << " faces, skipped " << skippedFaces << " degenerate faces\n";
 #endif
 
     if (result->numPolygons() == 0) {
@@ -748,19 +780,23 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     CGAL::Polyhedron_3<Kernel> poly;
     nef.convert_to_polyhedron(poly);
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Direct NEF conversion: " << poly.size_of_vertices() << " vertices, " << poly.size_of_facets() << " facets\n";
+    std::cerr << "[DEBUG] Direct NEF conversion: " << poly.size_of_vertices()
+              << " vertices, " << poly.size_of_facets() << " facets\n";
 #endif
     if (!poly.is_empty()) {
       return buildResult(poly);
     }
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Direct NEF conversion produced empty polyhedron, trying regularization\n";
+    std::cerr << "[DEBUG] Direct NEF conversion produced empty polyhedron, "
+                 "trying regularization\n";
 #endif
     // Try regularizing the NEF first
     Nef_polyhedron regularized = nef.regularization();
     regularized.convert_to_polyhedron(poly);
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Regularized NEF conversion: " << poly.size_of_vertices() << " vertices, " << poly.size_of_facets() << " facets\n";
+    std::cerr << "[DEBUG] Regularized NEF conversion: "
+              << poly.size_of_vertices() << " vertices, "
+              << poly.size_of_facets() << " facets\n";
 #endif
     if (!poly.is_empty()) {
       return buildResult(poly);
@@ -772,7 +808,8 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     // Direct conversion failed, try polygon soup approach
   } catch (...) {
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Direct NEF conversion failed with unknown exception\n";
+    std::cerr
+        << "[DEBUG] Direct NEF conversion failed with unknown exception\n";
 #endif
   }
 
@@ -799,7 +836,8 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     // Iterate over volumes to get proper boundary faces
     // For each bounded volume (mark() == true), extract its outer shell
     typename Nef_polyhedron::Volume_const_iterator vol;
-    CGAL_forall_volumes(vol, nef) {
+    CGAL_forall_volumes(vol, nef)
+    {
       // Only process marked volumes (solid parts)
       if (!vol->mark()) {
         continue;
@@ -807,19 +845,23 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
 
       // Get shells of this volume
       typename Nef_polyhedron::Shell_entry_const_iterator shell_it;
-      CGAL_forall_shells_of(shell_it, vol) {
+      CGAL_forall_shells_of(shell_it, vol)
+      {
         // Get the halffacets of this shell
-        typename Nef_polyhedron::SFace_const_handle sf(shell_it);
-        typename Nef_polyhedron::SHalfedge_const_handle she = sf->sface_cycles_begin();
+        typename Nef_polyhedron::SFace_const_handle     sf(shell_it);
+        typename Nef_polyhedron::SHalfedge_const_handle she =
+            sf->sface_cycles_begin();
 
         // Visit all faces reachable from this shell
-        // We'll use a workaround: iterate all halffacets and check if they belong to this volume
+        // We'll use a workaround: iterate all halffacets and check if they
+        // belong to this volume
       }
     }
 
     // Alternative approach: iterate all halffacets and check incident volume
     typename Nef_polyhedron::Halffacet_const_iterator hf;
-    CGAL_forall_halffacets(hf, nef) {
+    CGAL_forall_halffacets(hf, nef)
+    {
       // Check if this halffacet is on the boundary of a solid volume
       // The incident volume on the positive side should be marked (solid)
       // and on the negative side should be unmarked (void)
@@ -830,13 +872,16 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
       bool pos_solid = vol_pos->mark();
       bool neg_solid = vol_neg->mark();
 
-      // Only process if this is a proper boundary (solid on one side, void on other)
+      // Only process if this is a proper boundary (solid on one side, void on
+      // other)
       if (pos_solid == neg_solid) {
         continue;
       }
 
-      // Use the halffacet facing outward from the solid (solid on positive side)
-      const typename Nef_polyhedron::Halffacet_const_handle *face_to_use = nullptr;
+      // Use the halffacet facing outward from the solid (solid on positive
+      // side)
+      const typename Nef_polyhedron::Halffacet_const_handle *face_to_use =
+          nullptr;
       if (pos_solid && !neg_solid) {
         face_to_use = &hf;
       } else if (!pos_solid && neg_solid) {
@@ -850,7 +895,8 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
 
       // Extract polygons from this halffacet
       typename Nef_polyhedron::Halffacet_cycle_const_iterator fc;
-      CGAL_forall_facet_cycles_of(fc, (*face_to_use)) {
+      CGAL_forall_facet_cycles_of(fc, (*face_to_use))
+      {
         if (fc.is_shalfedge()) {
           typename Nef_polyhedron::SHalfedge_const_handle she_start(fc);
           typename Nef_polyhedron::SHalfedge_const_handle she = she_start;
@@ -877,7 +923,8 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     }
 
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Polygon soup before repair: " << soup_points.size() << " points, " << soup_polygons.size() << " polygons\n";
+    std::cerr << "[DEBUG] Polygon soup before repair: " << soup_points.size()
+              << " points, " << soup_polygons.size() << " polygons\n";
 #endif
 
     // Repair and orient the polygon soup
@@ -886,7 +933,8 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     PMP::orient_polygon_soup(soup_points, soup_polygons);
 
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Polygon soup after repair: " << soup_points.size() << " points, " << soup_polygons.size() << " polygons\n";
+    std::cerr << "[DEBUG] Polygon soup after repair: " << soup_points.size()
+              << " points, " << soup_polygons.size() << " polygons\n";
 #endif
 
     // Convert to Surface_mesh
@@ -901,8 +949,10 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     }
 
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Polygon soup: mesh has " << mesh.number_of_vertices() << " vertices, " << mesh.number_of_faces() << " faces\n";
-    std::cerr << "[DEBUG] Mesh is_closed: " << mesh.is_valid() << ", closed: " << CGAL::is_closed(mesh) << "\n";
+    std::cerr << "[DEBUG] Polygon soup: mesh has " << mesh.number_of_vertices()
+              << " vertices, " << mesh.number_of_faces() << " faces\n";
+    std::cerr << "[DEBUG] Mesh is_closed: " << mesh.is_valid()
+              << ", closed: " << CGAL::is_closed(mesh) << "\n";
 #endif
 
     // If the mesh isn't closed, try to repair it
@@ -912,14 +962,16 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
 #endif
       PMP::stitch_borders(mesh);
 #ifdef DEBUG_FILLET
-      std::cerr << "[DEBUG] After stitch_borders: closed=" << CGAL::is_closed(mesh) << "\n";
+      std::cerr << "[DEBUG] After stitch_borders: closed="
+                << CGAL::is_closed(mesh) << "\n";
 #endif
     }
 
     // Triangulate faces to help with validity
     PMP::triangulate_faces(mesh);
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] After triangulation: " << mesh.number_of_vertices() << " vertices, " << mesh.number_of_faces() << " faces\n";
+    std::cerr << "[DEBUG] After triangulation: " << mesh.number_of_vertices()
+              << " vertices, " << mesh.number_of_faces() << " faces\n";
 #endif
 
     // Convert Surface_mesh to Polyhedron
@@ -927,7 +979,9 @@ Fillet3D::fromNefPolyhedron(const Nef_polyhedron &nef) const
     CGAL::copy_face_graph(mesh, poly);
 
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Final polyhedron: " << poly.size_of_vertices() << " vertices, " << poly.size_of_facets() << " facets, closed=" << poly.is_closed() << "\n";
+    std::cerr << "[DEBUG] Final polyhedron: " << poly.size_of_vertices()
+              << " vertices, " << poly.size_of_facets()
+              << " facets, closed=" << poly.is_closed() << "\n";
 #endif
 
     return buildResult(poly);
@@ -1008,8 +1062,9 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
               << CGAL::to_double(edges[i].start.z()) << ") to ("
               << CGAL::to_double(edges[i].end.x()) << ", "
               << CGAL::to_double(edges[i].end.y()) << ", "
-              << CGAL::to_double(edges[i].end.z()) << ") dihedral="
-              << edges[i].dihedralAngle << "° convex=" << edges[i].isConvex << "\n";
+              << CGAL::to_double(edges[i].end.z())
+              << ") dihedral=" << edges[i].dihedralAngle
+              << "° convex=" << edges[i].isConvex << "\n";
   }
 #endif
 
@@ -1027,25 +1082,26 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
                 << CGAL::to_double(edges[i].start.z()) << ") to ("
                 << CGAL::to_double(edges[i].end.x()) << ", "
                 << CGAL::to_double(edges[i].end.y()) << ", "
-                << CGAL::to_double(edges[i].end.z()) << ") dihedral="
-                << edges[i].dihedralAngle << "°\n";
+                << CGAL::to_double(edges[i].end.z())
+                << ") dihedral=" << edges[i].dihedralAngle << "°\n";
 #endif
     }
   }
 
-  // For inner corner detection, we need ALL edges of the solid, not just selected edges.
-  // This ensures proper detection even when using EXPLICIT edge selection.
-  auto allEdges = findAllEdgesWithNormals();
+  // For inner corner detection, we need ALL edges of the solid, not just
+  // selected edges. This ensures proper detection even when using EXPLICIT edge
+  // selection.
+  auto                                    allEdges = findAllEdgesWithNormals();
   std::map<PointKey, std::vector<size_t>> allVertexToEdges;
   for (size_t i = 0; i < allEdges.size(); ++i) {
     allVertexToEdges[pointKey(allEdges[i].start)].push_back(i);
     allVertexToEdges[pointKey(allEdges[i].end)].push_back(i);
   }
 
-  // Detect inner corner vertices by checking face normal directions relative to centroid.
-  // At an outer corner, face normals point away from solid centroid.
+  // Detect inner corner vertices by checking face normal directions relative to
+  // centroid. At an outer corner, face normals point away from solid centroid.
   // At an inner corner, some face normals point toward solid centroid.
-  std::set<PointKey> innerCornerVertices;
+  std::set<PointKey>                                innerCornerVertices;
   std::map<PointKey, std::vector<Kernel::Vector_3>> innerCornerFaceNormals;
 
   // Compute solid centroid using ALL edge endpoints (not just selected)
@@ -1060,9 +1116,9 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
       CGAL::ORIGIN + centroidSum / static_cast<double>(pointCount);
 
 #ifdef DEBUG_FILLET
-  std::cerr << "[DEBUG] Solid centroid: (" << CGAL::to_double(centroid.x()) << ", "
-            << CGAL::to_double(centroid.y()) << ", " << CGAL::to_double(centroid.z())
-            << ")\n";
+  std::cerr << "[DEBUG] Solid centroid: (" << CGAL::to_double(centroid.x())
+            << ", " << CGAL::to_double(centroid.y()) << ", "
+            << CGAL::to_double(centroid.z()) << ")\n";
 #endif
 
   // Use ALL edges of solid for inner corner detection
@@ -1086,13 +1142,15 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
     // Collect unique face normals at this vertex from ALL edges
     std::vector<Kernel::Vector_3> faceNormals;
     for (size_t idx : edgeIndices) {
-      const auto &e = allEdges[idx];
+      const auto &e     = allEdges[idx];
       bool        hasN1 = false, hasN2 = false;
       for (const auto &existing : faceNormals) {
-        if (CGAL::to_double((existing - e.normal1).squared_length()) < EPSILON) {
+        if (CGAL::to_double((existing - e.normal1).squared_length()) <
+            EPSILON) {
           hasN1 = true;
         }
-        if (CGAL::to_double((existing - e.normal2).squared_length()) < EPSILON) {
+        if (CGAL::to_double((existing - e.normal2).squared_length()) <
+            EPSILON) {
           hasN2 = true;
         }
       }
@@ -1105,7 +1163,8 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
     }
 
     // At an outer corner, all face normals point away from centroid (dot < 0).
-    // At an inner corner, at least one face normal points toward centroid (dot > 0).
+    // At an inner corner, at least one face normal points toward centroid (dot
+    // > 0).
     int normalsTowardCentroid = 0;
     for (const auto &n : faceNormals) {
       double dot = CGAL::to_double(n * toCentroid);
@@ -1117,10 +1176,12 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
     // Inner corner: majority of normals point toward centroid
     if (normalsTowardCentroid >= 2) {
       innerCornerVertices.insert(key);
-      innerCornerFaceNormals[key] = faceNormals;  // Store all face normals at this inner corner
+      innerCornerFaceNormals[key] =
+          faceNormals; // Store all face normals at this inner corner
 #ifdef DEBUG_FILLET
-      std::cerr << "[DEBUG] Detected inner corner at (" << vx << ", " << vy << ", "
-                << vz << ") normalsTowardCentroid=" << normalsTowardCentroid << "\n";
+      std::cerr << "[DEBUG] Detected inner corner at (" << vx << ", " << vy
+                << ", " << vz
+                << ") normalsTowardCentroid=" << normalsTowardCentroid << "\n";
 #endif
     }
   }
@@ -1141,35 +1202,38 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
     bool endIsInner   = innerCornerVertices.count(endKey) > 0;
 
     if (startIsInner || endIsInner) {
-      // Check if this edge IS the inner corner edge (both normals point toward centroid)
-      const auto &e = edges[i];
+      // Check if this edge IS the inner corner edge (both normals point toward
+      // centroid)
+      const auto &e    = edges[i];
       double      dot1 = 0, dot2 = 0;
 
       if (startIsInner) {
         Kernel::Point_3  startPt(std::get<0>(startKey), std::get<1>(startKey),
                                  std::get<2>(startKey));
         Kernel::Vector_3 toCenter = centroid - startPt;
-        toCenter = normalizeVector(toCenter);
-        dot1     = CGAL::to_double(e.normal1 * toCenter);
-        dot2     = CGAL::to_double(e.normal2 * toCenter);
+        toCenter                  = normalizeVector(toCenter);
+        dot1                      = CGAL::to_double(e.normal1 * toCenter);
+        dot2                      = CGAL::to_double(e.normal2 * toCenter);
       } else {
         Kernel::Point_3  endPt(std::get<0>(endKey), std::get<1>(endKey),
                                std::get<2>(endKey));
         Kernel::Vector_3 toCenter = centroid - endPt;
-        toCenter = normalizeVector(toCenter);
-        dot1     = CGAL::to_double(e.normal1 * toCenter);
-        dot2     = CGAL::to_double(e.normal2 * toCenter);
+        toCenter                  = normalizeVector(toCenter);
+        dot1                      = CGAL::to_double(e.normal1 * toCenter);
+        dot2                      = CGAL::to_double(e.normal2 * toCenter);
       }
 
-      // If BOTH normals point toward centroid, this is the inner corner edge - SKIP it
-      // We'll handle it specially by subtracting a cube and adding a sphere at the corners
+      // If BOTH normals point toward centroid, this is the inner corner edge -
+      // SKIP it We'll handle it specially by subtracting a cube and adding a
+      // sphere at the corners
       bool isInnerCornerEdge = (dot1 > 0.1 && dot2 > 0.1);
 
       if (isInnerCornerEdge) {
         edgesToSkip.insert(i);
 #ifdef DEBUG_FILLET
-        std::cerr << "[DEBUG] Skipping inner corner edge " << i << " (dots=" << dot1
-                  << "," << dot2 << ") - will handle with cube+sphere\n";
+        std::cerr << "[DEBUG] Skipping inner corner edge " << i
+                  << " (dots=" << dot1 << "," << dot2
+                  << ") - will handle with cube+sphere\n";
 #endif
       }
     }
@@ -1210,7 +1274,7 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
       continue;
     }
 
-    const auto     &[vx, vy, vz] = key;
+    const auto &[vx, vy, vz] = key;
     Kernel::Point_3 vertex(vx, vy, vz);
 
     std::vector<std::pair<size_t, Kernel::Vector_3>> edgeDirs;
@@ -1226,17 +1290,18 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
       // Two edges: bisector is sum of both directions (like buffer3D)
       auto bisectorNormal =
           normalizeVector(edgeDirs[0].second + edgeDirs[1].second);
-      auto plane                                = Kernel::Plane_3(vertex, bisectorNormal);
+      auto plane = Kernel::Plane_3(vertex, bisectorNormal);
       edgeBisectorPlanes[{key, edgeDirs[0].first}] = plane;
       edgeBisectorPlanes[{key, edgeDirs[1].first}] = plane;
     } else {
-      // 3+ edges: for each edge, find the adjacent edge (closest angle) and compute bisector
+      // 3+ edges: for each edge, find the adjacent edge (closest angle) and
+      // compute bisector
       for (size_t i = 0; i < edgeDirs.size(); ++i) {
         const auto &[edgeIdx, dir] = edgeDirs[i];
 
         // Find the edge with smallest angle to this one (most adjacent)
-        double     bestDot = -2.0;
-        size_t     bestJ   = (i + 1) % edgeDirs.size();
+        double bestDot = -2.0;
+        size_t bestJ   = (i + 1) % edgeDirs.size();
         for (size_t j = 0; j < edgeDirs.size(); ++j) {
           if (j == i)
             continue;
@@ -1257,7 +1322,7 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
 
   // Create wedges and subtract them one at a time
   // This avoids topology issues when wedges intersect at corners
-  Nef_polyhedron resultNef = inputNef;
+  Nef_polyhedron resultNef       = inputNef;
   int            wedgesProcessed = 0;
 
   for (size_t i = 0; i < edges.size(); ++i) {
@@ -1270,29 +1335,33 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
       auto startKey = pointKey(edge.start);
       auto endKey   = pointKey(edge.end);
 
-      // At inner corner vertices, use a perpendicular face plane (not a 45° bisector).
-      // Find a face normal at the inner corner that is NOT part of this edge.
-      // This ensures each edge's wedge is cut by the perpendicular face, producing valid geometry.
+      // At inner corner vertices, use a perpendicular face plane (not a 45°
+      // bisector). Find a face normal at the inner corner that is NOT part of
+      // this edge. This ensures each edge's wedge is cut by the perpendicular
+      // face, producing valid geometry.
       if (innerCornerVertices.count(startKey) > 0) {
-        Kernel::Point_3 startPt(std::get<0>(startKey), std::get<1>(startKey),
-                                std::get<2>(startKey));
+        Kernel::Point_3  startPt(std::get<0>(startKey), std::get<1>(startKey),
+                                 std::get<2>(startKey));
         Kernel::Vector_3 toCenter = centroid - startPt;
-        toCenter = normalizeVector(toCenter);
+        toCenter                  = normalizeVector(toCenter);
 
-        // Find a face normal at this vertex that is different from edge.normal1 and edge.normal2
-        const auto &allNormals = innerCornerFaceNormals[startKey];
-        Kernel::Vector_3 planeNormal = edge.normal1;  // default
-        double bestScore = -2.0;
+        // Find a face normal at this vertex that is different from edge.normal1
+        // and edge.normal2
+        const auto      &allNormals  = innerCornerFaceNormals[startKey];
+        Kernel::Vector_3 planeNormal = edge.normal1; // default
+        double           bestScore   = -2.0;
         for (const auto &n : allNormals) {
           // Check if this normal is different from both edge normals
-          bool isDifferent = (CGAL::to_double((n - edge.normal1).squared_length()) > 0.01 &&
-                              CGAL::to_double((n - edge.normal2).squared_length()) > 0.01);
-          if (!isDifferent) continue;
+          bool isDifferent =
+              (CGAL::to_double((n - edge.normal1).squared_length()) > 0.01 &&
+               CGAL::to_double((n - edge.normal2).squared_length()) > 0.01);
+          if (!isDifferent)
+            continue;
 
           // Prefer the normal pointing most toward centroid (the "inner" face)
           double dotCenter = CGAL::to_double(n * toCenter);
           if (dotCenter > bestScore) {
-            bestScore = dotCenter;
+            bestScore   = dotCenter;
             planeNormal = n;
           }
         }
@@ -1301,7 +1370,8 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
         std::cerr << "[DEBUG] Inner corner start plane: normal=("
                   << CGAL::to_double(planeNormal.x()) << ", "
                   << CGAL::to_double(planeNormal.y()) << ", "
-                  << CGAL::to_double(planeNormal.z()) << ") bestScore=" << bestScore << "\n";
+                  << CGAL::to_double(planeNormal.z())
+                  << ") bestScore=" << bestScore << "\n";
 #endif
       } else {
         if (auto it = edgeBisectorPlanes.find({startKey, i});
@@ -1311,23 +1381,26 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
       }
 
       if (innerCornerVertices.count(endKey) > 0) {
-        Kernel::Point_3 endPt(std::get<0>(endKey), std::get<1>(endKey),
-                              std::get<2>(endKey));
+        Kernel::Point_3  endPt(std::get<0>(endKey), std::get<1>(endKey),
+                               std::get<2>(endKey));
         Kernel::Vector_3 toCenter = centroid - endPt;
-        toCenter = normalizeVector(toCenter);
+        toCenter                  = normalizeVector(toCenter);
 
-        // Find a face normal at this vertex that is different from edge.normal1 and edge.normal2
-        const auto &allNormals = innerCornerFaceNormals[endKey];
-        Kernel::Vector_3 planeNormal = edge.normal1;  // default
-        double bestScore = -2.0;
+        // Find a face normal at this vertex that is different from edge.normal1
+        // and edge.normal2
+        const auto      &allNormals  = innerCornerFaceNormals[endKey];
+        Kernel::Vector_3 planeNormal = edge.normal1; // default
+        double           bestScore   = -2.0;
         for (const auto &n : allNormals) {
-          bool isDifferent = (CGAL::to_double((n - edge.normal1).squared_length()) > 0.01 &&
-                              CGAL::to_double((n - edge.normal2).squared_length()) > 0.01);
-          if (!isDifferent) continue;
+          bool isDifferent =
+              (CGAL::to_double((n - edge.normal1).squared_length()) > 0.01 &&
+               CGAL::to_double((n - edge.normal2).squared_length()) > 0.01);
+          if (!isDifferent)
+            continue;
 
           double dotCenter = CGAL::to_double(n * toCenter);
           if (dotCenter > bestScore) {
-            bestScore = dotCenter;
+            bestScore   = dotCenter;
             planeNormal = n;
           }
         }
@@ -1336,7 +1409,8 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
         std::cerr << "[DEBUG] Inner corner end plane: normal=("
                   << CGAL::to_double(planeNormal.x()) << ", "
                   << CGAL::to_double(planeNormal.y()) << ", "
-                  << CGAL::to_double(planeNormal.z()) << ") bestScore=" << bestScore << "\n";
+                  << CGAL::to_double(planeNormal.z())
+                  << ") bestScore=" << bestScore << "\n";
 #endif
       } else {
         if (auto it = edgeBisectorPlanes.find({endKey, i});
@@ -1345,7 +1419,8 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
         }
       }
 
-      auto wedge = createFilletWedgeWithPlanes(edge, params, startPlane, endPlane);
+      auto wedge =
+          createFilletWedgeWithPlanes(edge, params, startPlane, endPlane);
 
       if (wedge.empty() || !wedge.is_closed()) {
         continue;
@@ -1362,12 +1437,14 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
       resultNef = resultNef - wedgeNef;
       ++wedgesProcessed;
 #ifdef DEBUG_FILLET
-      std::cerr << "[DEBUG] Subtracted wedge " << (i+1) << "/" << edges.size() << "\n";
+      std::cerr << "[DEBUG] Subtracted wedge " << (i + 1) << "/" << edges.size()
+                << "\n";
 #endif
 
     } catch (const std::exception &e) {
 #ifdef DEBUG_FILLET
-      std::cerr << "[DEBUG] Exception processing edge " << i << ": " << e.what() << "\n";
+      std::cerr << "[DEBUG] Exception processing edge " << i << ": " << e.what()
+                << "\n";
 #endif
       continue;
     }
@@ -1378,8 +1455,9 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
   // Adding an extra corner wedge creates an unwanted concave bubble.
   // The inner corner edge should be filleted like any other edge.
   for (const auto &cornerKey : innerCornerVertices) {
-    (void)cornerKey;  // Suppress unused variable warning
-    continue;  // Skip inner corner treatment - let edge fillets handle it naturally
+    (void)cornerKey; // Suppress unused variable warning
+    continue;        // Skip inner corner treatment - let edge fillets handle it
+                     // naturally
     double vx = std::get<0>(cornerKey);
     double vy = std::get<1>(cornerKey);
     double vz = std::get<2>(cornerKey);
@@ -1392,7 +1470,7 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
 
     // Find the two horizontal face normals (perpendicular to Z)
     Kernel::Vector_3 n1(0, 0, 0), n2(0, 0, 0);
-    Kernel::Vector_3 nz(0, 0, 0);  // vertical normal (for top/bottom face)
+    Kernel::Vector_3 nz(0, 0, 0); // vertical normal (for top/bottom face)
     for (const auto &n : it->second) {
       double nzComp = std::abs(CGAL::to_double(n.z()));
       if (nzComp < 0.1) {
@@ -1407,14 +1485,18 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
       }
     }
 
-    if (CGAL::to_double(n1 * n1) < EPSILON || CGAL::to_double(n2 * n2) < EPSILON) {
-      continue;  // Couldn't find two horizontal normals
+    if (CGAL::to_double(n1 * n1) < EPSILON ||
+        CGAL::to_double(n2 * n2) < EPSILON) {
+      continue; // Couldn't find two horizontal normals
     }
 
 #ifdef DEBUG_FILLET
-    std::cerr << "[DEBUG] Inner corner vertex at (" << vx << ", " << vy << ", " << vz << ")\n"
-              << "  n1=(" << CGAL::to_double(n1.x()) << ", " << CGAL::to_double(n1.y()) << ")\n"
-              << "  n2=(" << CGAL::to_double(n2.x()) << ", " << CGAL::to_double(n2.y()) << ")\n";
+    std::cerr << "[DEBUG] Inner corner vertex at (" << vx << ", " << vy << ", "
+              << vz << ")\n"
+              << "  n1=(" << CGAL::to_double(n1.x()) << ", "
+              << CGAL::to_double(n1.y()) << ")\n"
+              << "  n2=(" << CGAL::to_double(n2.x()) << ", "
+              << CGAL::to_double(n2.y()) << ")\n";
 #endif
 
     try {
@@ -1434,26 +1516,30 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
         continue;
       }
 
-      double cornerHeight = 2.0;  // Height of inner corner edge
-      double zBottom = vz;
-      double zTop = vz + cornerHeight;
+      double cornerHeight = 2.0; // Height of inner corner edge
+      double zBottom      = vz;
+      double zTop         = vz + cornerHeight;
 
       // n1 and n2 are face normals pointing OUTWARD from the inner corner
       // For L-shape at (1,1): n1=(0,1), n2=(1,0)
-      // Arc center is offset INTO the solid by radius in direction opposite to normals
-      double arcCenterX = vx - params.radius * CGAL::to_double(n2.x());  // 1 - 0.15 = 0.85
-      double arcCenterY = vy - params.radius * CGAL::to_double(n1.y());  // 1 - 0.15 = 0.85
+      // Arc center is offset INTO the solid by radius in direction opposite to
+      // normals
+      double arcCenterX =
+          vx - params.radius * CGAL::to_double(n2.x()); // 1 - 0.15 = 0.85
+      double arcCenterY =
+          vy - params.radius * CGAL::to_double(n1.y()); // 1 - 0.15 = 0.85
 
       // Small offset to avoid coincidence with edge wedge end faces
       double eps = params.radius * 0.001;
 
       // Arc endpoints (where the edge fillets end) - slightly offset inward
-      double arcPtAx = vx - eps;                                    // ~0.99985
-      double arcPtAy = vy - params.radius * CGAL::to_double(n1.y());  // 0.85
-      double arcPtBx = vx - params.radius * CGAL::to_double(n2.x());  // 0.85
-      double arcPtBy = vy - eps;                                    // ~0.99985
+      double arcPtAx = vx - eps;                                     // ~0.99985
+      double arcPtAy = vy - params.radius * CGAL::to_double(n1.y()); // 0.85
+      double arcPtBx = vx - params.radius * CGAL::to_double(n2.x()); // 0.85
+      double arcPtBy = vy - eps;                                     // ~0.99985
 
-      // Apex at the arc center (not corner) to properly connect with edge fillets
+      // Apex at the arc center (not corner) to properly connect with edge
+      // fillets
       double apexX = arcCenterX;
       double apexY = arcCenterY;
 
@@ -1466,23 +1552,32 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
 #endif
 
       // Build the curved triangular prism
-      unsigned int numSegs = std::max(8u, static_cast<unsigned int>(params.segments));
+      unsigned int numSegs =
+          std::max(8u, static_cast<unsigned int>(params.segments));
       CGAL::Polyhedron_3<Kernel> wedgePoly;
 
-      struct CurvedTriangleBuilder : public CGAL::Modifier_base<CGAL::Polyhedron_3<Kernel>::HalfedgeDS> {
-        double apexX, apexY;      // Apex (corner vertex)
-        double arcCx, arcCy, r;   // Arc center and radius
-        double z0, z1;            // Z extents
-        double startAngle, endAngle;  // Arc angles
+      struct CurvedTriangleBuilder
+          : public CGAL::Modifier_base<CGAL::Polyhedron_3<Kernel>::HalfedgeDS> {
+        double       apexX, apexY;         // Apex (corner vertex)
+        double       arcCx, arcCy, r;      // Arc center and radius
+        double       z0, z1;               // Z extents
+        double       startAngle, endAngle; // Arc angles
         unsigned int segs;
 
-        CurvedTriangleBuilder(double ax, double ay, double cx, double cy, double r_,
-                              double z0_, double z1_, double sa, double ea, unsigned int s)
-            : apexX(ax), apexY(ay), arcCx(cx), arcCy(cy), r(r_),
-              z0(z0_), z1(z1_), startAngle(sa), endAngle(ea), segs(s) {}
+        CurvedTriangleBuilder(double ax, double ay, double cx, double cy,
+                              double r_, double z0_, double z1_, double sa,
+                              double ea, unsigned int s)
+            : apexX(ax), apexY(ay), arcCx(cx), arcCy(cy), r(r_), z0(z0_),
+              z1(z1_), startAngle(sa), endAngle(ea), segs(s)
+        {
+        }
 
-        void operator()(CGAL::Polyhedron_3<Kernel>::HalfedgeDS &hds) {
-          CGAL::Polyhedron_incremental_builder_3<CGAL::Polyhedron_3<Kernel>::HalfedgeDS> B(hds, true);
+        void
+        operator()(CGAL::Polyhedron_3<Kernel>::HalfedgeDS &hds)
+        {
+          CGAL::Polyhedron_incremental_builder_3<
+              CGAL::Polyhedron_3<Kernel>::HalfedgeDS>
+              B(hds, true);
 
           // Vertices:
           // - Arc points at z0: indices 0 to segs
@@ -1490,9 +1585,9 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
           // - Apex at z0: index 2*(segs+1)
           // - Apex at z1: index 2*(segs+1)+1
           unsigned int numArcPts = segs + 1;
-          unsigned int apex0 = 2 * numArcPts;
-          unsigned int apex1 = 2 * numArcPts + 1;
-          unsigned int numVerts = 2 * numArcPts + 2;
+          unsigned int apex0     = 2 * numArcPts;
+          unsigned int apex1     = 2 * numArcPts + 1;
+          unsigned int numVerts  = 2 * numArcPts + 2;
 
           // Faces:
           // - Arc surface: segs quads
@@ -1506,31 +1601,32 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
 
           // Add arc vertices at z0
           for (unsigned int i = 0; i <= segs; ++i) {
-            double t = static_cast<double>(i) / segs;
+            double t     = static_cast<double>(i) / segs;
             double angle = startAngle + t * (endAngle - startAngle);
-            double px = arcCx + r * std::cos(angle);
-            double py = arcCy + r * std::sin(angle);
+            double px    = arcCx + r * std::cos(angle);
+            double py    = arcCy + r * std::sin(angle);
             B.add_vertex(Kernel::Point_3(px, py, z0));
           }
           // Add arc vertices at z1
           for (unsigned int i = 0; i <= segs; ++i) {
-            double t = static_cast<double>(i) / segs;
+            double t     = static_cast<double>(i) / segs;
             double angle = startAngle + t * (endAngle - startAngle);
-            double px = arcCx + r * std::cos(angle);
-            double py = arcCy + r * std::sin(angle);
+            double px    = arcCx + r * std::cos(angle);
+            double py    = arcCy + r * std::sin(angle);
             B.add_vertex(Kernel::Point_3(px, py, z1));
           }
           // Add apex vertices
           B.add_vertex(Kernel::Point_3(apexX, apexY, z0));
           B.add_vertex(Kernel::Point_3(apexX, apexY, z1));
 
-          // Arc surface quads - normals point OUTWARD from the wedge (toward arc center)
+          // Arc surface quads - normals point OUTWARD from the wedge (toward
+          // arc center)
           for (unsigned int i = 0; i < segs; ++i) {
             B.begin_facet();
-            B.add_vertex_to_facet(i + 1);                // z0 arc[i+1]
-            B.add_vertex_to_facet(i);                    // z0 arc[i]
-            B.add_vertex_to_facet(numArcPts + i);        // z1 arc[i]
-            B.add_vertex_to_facet(numArcPts + i + 1);    // z1 arc[i+1]
+            B.add_vertex_to_facet(i + 1);             // z0 arc[i+1]
+            B.add_vertex_to_facet(i);                 // z0 arc[i]
+            B.add_vertex_to_facet(numArcPts + i);     // z1 arc[i]
+            B.add_vertex_to_facet(numArcPts + i + 1); // z1 arc[i+1]
             B.end_facet();
           }
 
@@ -1556,14 +1652,14 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
           B.begin_facet();
           B.add_vertex_to_facet(apex0);
           B.add_vertex_to_facet(apex1);
-          B.add_vertex_to_facet(numArcPts);       // z1 arc[0]
-          B.add_vertex_to_facet(0);               // z0 arc[0]
+          B.add_vertex_to_facet(numArcPts); // z1 arc[0]
+          B.add_vertex_to_facet(0);         // z0 arc[0]
           B.end_facet();
 
           // End face 2: quad from apex to arc[segs] (connects to X-edge fillet)
           B.begin_facet();
-          B.add_vertex_to_facet(segs);              // z0 arc[segs]
-          B.add_vertex_to_facet(numArcPts + segs);  // z1 arc[segs]
+          B.add_vertex_to_facet(segs);             // z0 arc[segs]
+          B.add_vertex_to_facet(numArcPts + segs); // z1 arc[segs]
           B.add_vertex_to_facet(apex1);
           B.add_vertex_to_facet(apex0);
           B.end_facet();
@@ -1576,8 +1672,10 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
       // n2 = (1, 0) -> angle = 0°
       // n1 = (0, 1) -> angle = 90°
       // Arc goes from 0° to 90° (counterclockwise)
-      double startAng = std::atan2(CGAL::to_double(n2.y()), CGAL::to_double(n2.x()));  // 0°
-      double endAng = std::atan2(CGAL::to_double(n1.y()), CGAL::to_double(n1.x()));    // 90°
+      double startAng =
+          std::atan2(CGAL::to_double(n2.y()), CGAL::to_double(n2.x())); // 0°
+      double endAng =
+          std::atan2(CGAL::to_double(n1.y()), CGAL::to_double(n1.x())); // 90°
 
       // Handle angle wrap
       if (endAng < startAng) {
@@ -1589,8 +1687,9 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
                 << (endAng * 180 / M_PI) << "°\n";
 #endif
 
-      CurvedTriangleBuilder builder(apexX, apexY, arcCenterX, arcCenterY, params.radius,
-                                    zBottom, zTop, startAng, endAng, numSegs);
+      CurvedTriangleBuilder builder(apexX, apexY, arcCenterX, arcCenterY,
+                                    params.radius, zBottom, zTop, startAng,
+                                    endAng, numSegs);
       wedgePoly.delegate(builder);
 
       if (!wedgePoly.is_closed() || wedgePoly.empty()) {
@@ -1601,8 +1700,9 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
       }
 
 #ifdef DEBUG_FILLET
-      std::cerr << "[DEBUG] Corner wedge: " << wedgePoly.size_of_vertices() << " vertices, "
-                << wedgePoly.size_of_facets() << " facets, closed=" << wedgePoly.is_closed() << "\n";
+      std::cerr << "[DEBUG] Corner wedge: " << wedgePoly.size_of_vertices()
+                << " vertices, " << wedgePoly.size_of_facets()
+                << " facets, closed=" << wedgePoly.is_closed() << "\n";
 #endif
 
       Nef_polyhedron wedgeNef(wedgePoly);
@@ -1620,9 +1720,9 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
     }
   }
 
-  // Note: Sphere octant treatment at inner corner vertices was attempted but caused
-  // invalid geometry due to overlap with corner wedge. The corner wedge alone is
-  // sufficient for handling inner corner edges.
+  // Note: Sphere octant treatment at inner corner vertices was attempted but
+  // caused invalid geometry due to overlap with corner wedge. The corner wedge
+  // alone is sufficient for handling inner corner edges.
 
   if (wedgesProcessed == 0) {
 #ifdef DEBUG_FILLET
@@ -1632,13 +1732,19 @@ Fillet3D::filletEdges(const EdgeSelector     &selector,
   }
 
 #ifdef DEBUG_FILLET
-  std::cerr << "[DEBUG] Processed " << wedgesProcessed << " wedges, converting result\n";
-  std::cerr << "[DEBUG] Result NEF: is_empty=" << resultNef.is_empty() << ", number_of_vertices=" << resultNef.number_of_vertices() << ", number_of_facets=" << resultNef.number_of_facets() << ", number_of_volumes=" << resultNef.number_of_volumes() << "\n";
+  std::cerr << "[DEBUG] Processed " << wedgesProcessed
+            << " wedges, converting result\n";
+  std::cerr << "[DEBUG] Result NEF: is_empty=" << resultNef.is_empty()
+            << ", number_of_vertices=" << resultNef.number_of_vertices()
+            << ", number_of_facets=" << resultNef.number_of_facets()
+            << ", number_of_volumes=" << resultNef.number_of_volumes() << "\n";
   // Count marked volumes
-  int markedVolumes = 0;
+  int                                                      markedVolumes = 0;
   typename Fillet3D::Nef_polyhedron::Volume_const_iterator vol_it;
-  CGAL_forall_volumes(vol_it, resultNef) {
-    if (vol_it->mark()) ++markedVolumes;
+  CGAL_forall_volumes(vol_it, resultNef)
+  {
+    if (vol_it->mark())
+      ++markedVolumes;
   }
   std::cerr << "[DEBUG] Marked volumes: " << markedVolumes << "\n";
 #endif

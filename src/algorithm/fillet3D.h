@@ -19,8 +19,8 @@ namespace SFCGAL::algorithm {
  * @brief Parameters for fillet operation
  */
 struct SFCGAL_API FilletParameters {
-  double radius{0.0};   ///< Fillet radius
-  int    segments{16};  ///< Number of segments for arc approximation
+  double radius{0.0};  ///< Fillet radius
+  int    segments{16}; ///< Number of segments for arc approximation
 
   /**
    * @brief Create constant fillet parameters
@@ -155,7 +155,8 @@ public:
    */
   [[nodiscard]] auto
   filletEdges(const EdgeSelector     &selector,
-              const FilletParameters &params) const -> std::unique_ptr<Geometry>;
+              const FilletParameters &params) const
+      -> std::unique_ptr<Geometry>;
 
   /**
    * @brief Apply fillet to all convex edges
@@ -174,8 +175,8 @@ private:
   struct EdgeInfo {
     Kernel::Point_3  start;
     Kernel::Point_3  end;
-    Kernel::Vector_3 normal1;  // Normal of first adjacent face
-    Kernel::Vector_3 normal2;  // Normal of second adjacent face
+    Kernel::Vector_3 normal1; // Normal of first adjacent face
+    Kernel::Vector_3 normal2; // Normal of second adjacent face
     double           dihedralAngle;
     bool             isConvex;
   };
@@ -197,10 +198,10 @@ private:
 
   // Wedge creation
   [[nodiscard]] auto
-  createFilletWedgeWithPlanes(const EdgeInfo                       &edge,
-                              const FilletParameters               &params,
-                              const std::optional<Kernel::Plane_3> &startPlane,
-                              const std::optional<Kernel::Plane_3> &endPlane) const
+  createFilletWedgeWithPlanes(
+      const EdgeInfo &edge, const FilletParameters &params,
+      const std::optional<Kernel::Plane_3> &startPlane,
+      const std::optional<Kernel::Plane_3> &endPlane) const
       -> CGAL::Polyhedron_3<Kernel>;
 
   // Geometry conversion
@@ -231,8 +232,8 @@ private:
  * are automatically skipped.
  */
 SFCGAL_API auto
-fillet3D(const Geometry &geometry, double radius,
-         int segments = 16) -> std::unique_ptr<Geometry>;
+fillet3D(const Geometry &geometry, double radius, int segments = 16)
+    -> std::unique_ptr<Geometry>;
 
 } // namespace SFCGAL::algorithm
 
