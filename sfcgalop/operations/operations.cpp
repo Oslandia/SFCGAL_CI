@@ -56,6 +56,7 @@
 #include <SFCGAL/algorithm/union.h>
 #include <SFCGAL/algorithm/visibility.h>
 #include <SFCGAL/algorithm/volume.h>
+#include <SFCGAL/triangulate/triangulate2DZ.h>
 
 #include <SFCGAL/Envelope.h>
 #include <SFCGAL/GeometryCollection.h>
@@ -581,6 +582,31 @@ const std::vector<Operation> operations = {
      [](const std::string &, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
        return SFCGAL::algorithm::tesselate(*geom_a);
+     }},
+
+    {"delaunay_triangulation", "Construction",
+     "Compute Delaunay Triangulation of a geometry", false,
+     "No parameters required.\n\nExample:\n  sfcgalop -a \"POLYGON((0 0,3 0,3 "
+     "3,0 3,0 0))\" delaunay_triangulation",
+     "A", "G",
+     [](const std::string &, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *) -> std::optional<OperationResult> {
+       return SFCGAL::triangulate::triangulate2DZ(*geom_a)
+           .getTriangulatedSurface();
+     }},
+
+    {"constrained_delaunay_triangulation", "Construction",
+     "Compute Constrained Delaunay Triangulation of a geometry", true,
+     "No parameters required.\n\nExample:\n  sfcgalop -a "
+     "\"POLYGON((0 0,3 0,3 3,0 3,0 0))\" -b \"LINESTRING(0 1.5, 3 1.5)\" "
+     "constrained_delaunay_triangulation",
+     "A, B", "G",
+     [](const std::string &, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
+       auto triangulation = SFCGAL::triangulate::triangulate2DZ(*geom_a);
+       SFCGAL::triangulate::triangulate2DZ(*geom_b, triangulation);
+
+       return triangulation.getTriangulatedSurface();
      }},
 
     {"triangulate", "Construction",
@@ -1204,7 +1230,7 @@ const std::vector<Operation> operations = {
        // Clone the input geometry to pass ownership to make_solid
        auto geom_copy = geom_a->clone();
        return Constructors::make_solid(std::move(geom_copy));
-     }}}; // end operations array
+     }}}; // namespace
 
 } // namespace
 
