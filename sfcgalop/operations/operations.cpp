@@ -4,73 +4,73 @@
 #include "operations.hpp"
 
 #include "../constructors.hpp"
+#include "SFCGAL/Kernel.h"
 #include "SFCGAL/config.h"
 #include "SFCGAL/version.h"
-#include <SFCGAL/Kernel.h>
 
-#if !defined(_MSC_VER)
-  #include <SFCGAL/algorithm/alphaShapes.h>
+#ifndef _MSC_VER
+  #include "SFCGAL/algorithm/alphaShapes.h"
 #endif
-#include <SFCGAL/algorithm/alphaWrapping3D.h>
-#include <SFCGAL/algorithm/area.h>
-#include <SFCGAL/algorithm/buffer3D.h>
-#include <SFCGAL/algorithm/centroid.h>
-#include <SFCGAL/algorithm/collect.h>
-#include <SFCGAL/algorithm/collectionExtract.h>
-#include <SFCGAL/algorithm/collectionHomogenize.h>
-#include <SFCGAL/algorithm/collectionToMulti.h>
-#include <SFCGAL/algorithm/connection.h>
-#include <SFCGAL/algorithm/convexHull.h>
-#include <SFCGAL/algorithm/covers.h>
-#include <SFCGAL/algorithm/difference.h>
-#include <SFCGAL/algorithm/distance.h>
-#include <SFCGAL/algorithm/distance3d.h>
-#include <SFCGAL/algorithm/extrude.h>
-#include <SFCGAL/algorithm/force2D.h>
-#include <SFCGAL/algorithm/force3D.h>
-#include <SFCGAL/algorithm/forceMeasured.h>
-#include <SFCGAL/algorithm/intersection.h>
-#include <SFCGAL/algorithm/intersects.h>
-#include <SFCGAL/algorithm/isClosed.h>
-#include <SFCGAL/algorithm/isSimple.h>
-#include <SFCGAL/algorithm/isValid.h>
-#include <SFCGAL/algorithm/length.h>
-#include <SFCGAL/algorithm/lineSubstring.h>
-#include <SFCGAL/algorithm/minkowskiSum.h>
-#include <SFCGAL/algorithm/minkowskiSum3D.h>
-#include <SFCGAL/algorithm/normal.h>
-#include <SFCGAL/algorithm/offset.h>
-#include <SFCGAL/algorithm/orientation.h>
-#include <SFCGAL/algorithm/partition_2.h>
-#include <SFCGAL/algorithm/plane.h>
+#include "SFCGAL/algorithm/alphaWrapping3D.h"
+#include "SFCGAL/algorithm/area.h"
+#include "SFCGAL/algorithm/buffer3D.h"
+#include "SFCGAL/algorithm/centroid.h"
+#include "SFCGAL/algorithm/collect.h"
+#include "SFCGAL/algorithm/collectionExtract.h"
+#include "SFCGAL/algorithm/collectionHomogenize.h"
+#include "SFCGAL/algorithm/collectionToMulti.h"
+#include "SFCGAL/algorithm/connection.h"
+#include "SFCGAL/algorithm/convexHull.h"
+#include "SFCGAL/algorithm/covers.h"
+#include "SFCGAL/algorithm/difference.h"
+#include "SFCGAL/algorithm/distance.h"
+#include "SFCGAL/algorithm/distance3d.h"
+#include "SFCGAL/algorithm/extrude.h"
+#include "SFCGAL/algorithm/force2D.h"
+#include "SFCGAL/algorithm/force3D.h"
+#include "SFCGAL/algorithm/forceMeasured.h"
+#include "SFCGAL/algorithm/intersection.h"
+#include "SFCGAL/algorithm/intersects.h"
+#include "SFCGAL/algorithm/isClosed.h"
+#include "SFCGAL/algorithm/isSimple.h"
+#include "SFCGAL/algorithm/isValid.h"
+#include "SFCGAL/algorithm/length.h"
+#include "SFCGAL/algorithm/lineSubstring.h"
+#include "SFCGAL/algorithm/minkowskiSum.h"
+#include "SFCGAL/algorithm/minkowskiSum3D.h"
+#include "SFCGAL/algorithm/normal.h"
+#include "SFCGAL/algorithm/offset.h"
+#include "SFCGAL/algorithm/orientation.h"
+#include "SFCGAL/algorithm/partition_2.h"
+#include "SFCGAL/algorithm/plane.h"
 #if SFCGAL_CGAL_VERSION_MAJOR >= 6
   #include <SFCGAL/algorithm/polygonRepair.h>
 #endif
+#include "SFCGAL/algorithm/rotate.h"
+#include "SFCGAL/algorithm/scale.h"
+#include "SFCGAL/algorithm/simplification.h"
+#include "SFCGAL/algorithm/straightSkeleton.h"
+#include "SFCGAL/algorithm/tesselate.h"
+#include "SFCGAL/algorithm/translate.h"
+#include "SFCGAL/algorithm/union.h"
+#include "SFCGAL/algorithm/visibility.h"
+#include "SFCGAL/algorithm/volume.h"
 #include "SFCGAL/detail/transform/ForceOrderPoints.h"
-#include <SFCGAL/algorithm/rotate.h>
-#include <SFCGAL/algorithm/scale.h>
-#include <SFCGAL/algorithm/simplification.h>
-#include <SFCGAL/algorithm/straightSkeleton.h>
-#include <SFCGAL/algorithm/tesselate.h>
-#include <SFCGAL/algorithm/translate.h>
-#include <SFCGAL/algorithm/union.h>
-#include <SFCGAL/algorithm/visibility.h>
-#include <SFCGAL/algorithm/volume.h>
-#include <SFCGAL/triangulate/triangulate2DZ.h>
+#include "SFCGAL/triangulate/triangulate2DZ.h"
 
-#include <SFCGAL/Envelope.h>
-#include <SFCGAL/GeometryCollection.h>
-#include <SFCGAL/LineString.h>
-#include <SFCGAL/MultiLineString.h>
-#include <SFCGAL/MultiPoint.h>
-#include <SFCGAL/MultiPolygon.h>
-#include <SFCGAL/MultiSolid.h>
-#include <SFCGAL/Point.h>
-#include <SFCGAL/Polygon.h>
-#include <SFCGAL/PolyhedralSurface.h>
-#include <SFCGAL/Solid.h>
-#include <SFCGAL/Triangle.h>
-#include <SFCGAL/TriangulatedSurface.h>
+#include "SFCGAL/Envelope.h"
+#include "SFCGAL/GeometryCollection.h"
+#include "SFCGAL/LineString.h"
+#include "SFCGAL/MultiLineString.h"
+#include "SFCGAL/MultiPoint.h"
+#include "SFCGAL/MultiPolygon.h"
+#include "SFCGAL/MultiSolid.h"
+#include "SFCGAL/Point.h"
+#include "SFCGAL/Polygon.h"
+#include "SFCGAL/PolyhedralSurface.h"
+#include "SFCGAL/Solid.h"
+#include "SFCGAL/Triangle.h"
+#include "SFCGAL/TriangulatedSurface.h"
 
 #include <CGAL/number_utils.h>
 #include <cmath>
@@ -145,7 +145,7 @@ parse_boolean(const std::string &str, bool default_val = false) -> bool
 {
   std::string lower_str = str;
   std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(),
-                 [](unsigned char chr) { return std::tolower(chr); });
+                 [](unsigned char chr) -> int { return std::tolower(chr); });
 
   if (lower_str == "true" || lower_str == "t" || lower_str == "1") {
     return true;
@@ -673,8 +673,9 @@ const std::vector<Operation> operations = {
          std::string type_str = args.substr(start, end - start);
          // Trim and convert to lowercase
          type_str = trim(type_str);
-         std::transform(type_str.begin(), type_str.end(), type_str.begin(),
-                        [](unsigned char c) { return std::tolower(c); });
+         std::transform(
+             type_str.begin(), type_str.end(), type_str.begin(),
+             [](unsigned char chr) -> int { return std::tolower(chr); });
 
          if (type_str == "cylsphere" || type_str == "cyl" ||
              type_str == "cylinder") {
@@ -718,7 +719,7 @@ const std::vector<Operation> operations = {
        return SFCGAL::algorithm::minkowskiSum3D(*geom_a, *geom_b);
      }},
 
-#if !defined(_MSC_VER)
+#ifndef _MSC_VER
     {"alphashapes", "Construction", "Compute alpha shapes from point cloud",
      false,
      "Parameters:\n  alpha=VALUE: Alpha parameter controlling shape detail "
@@ -1304,10 +1305,11 @@ execute_operation(const std::string &op_name, const std::string &op_arg,
     -> std::optional<OperationResult>
 {
 
-  auto operation_it = std::find_if(operations.begin(), operations.end(),
-                                   [&op_name](const Operation &operation) {
-                                     return operation.name == op_name;
-                                   });
+  auto operation_it =
+      std::find_if(operations.begin(), operations.end(),
+                   [&op_name](const Operation &operation) -> bool {
+                     return operation.name == op_name;
+                   });
 
   if (operation_it != operations.end()) {
     // Check for null geometry A before calling operation, but allow constructor
@@ -1378,9 +1380,10 @@ print_operation_help(const char *name) -> bool
     return false;
   }
 
-  auto operation_it = std::find_if(
-      operations.begin(), operations.end(),
-      [name](const Operation &operation) { return operation.name == name; });
+  auto operation_it = std::find_if(operations.begin(), operations.end(),
+                                   [name](const Operation &operation) -> bool {
+                                     return operation.name == name;
+                                   });
 
   if (operation_it != operations.end()) {
     std::cout << "\nOperation: " << operation_it->name << "\n"
@@ -1448,7 +1451,7 @@ operation_requires_second_geometry(const std::string &operation_name) -> bool
 {
   auto operation_it =
       std::find_if(operations.begin(), operations.end(),
-                   [&operation_name](const Operation &operation) {
+                   [&operation_name](const Operation &operation) -> bool {
                      return operation.name == operation_name;
                    });
 
