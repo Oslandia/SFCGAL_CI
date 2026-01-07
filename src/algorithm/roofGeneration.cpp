@@ -24,6 +24,7 @@
 #include "SFCGAL/algorithm/orientation.h"
 #include "SFCGAL/algorithm/straightSkeleton.h"
 #include "SFCGAL/algorithm/tesselate.h"
+#include "SFCGAL/algorithm/topologyEdit.h"
 #include "SFCGAL/algorithm/translate.h"
 #include "SFCGAL/detail/GetPointsVisitor.h"
 #include "SFCGAL/detail/algorithm/FaceFilters.h"
@@ -688,27 +689,15 @@ generateGableRoof(const Polygon &footprint, double slopeAngle,
   // 1. Get projected medial axis to edges (this gives us the ridge line)
   auto projectedMedialAxis = approximateMedialAxis(footprint, true);
 
-  // 2. Create a MultiPoint containing all points from footprint and
-  // projectedMedialAxis
-  auto multiPoint = std::make_unique<MultiPoint>();
+  // 2. Use our topologyEdit algorithm to add points from projectedMedialAxis to
+  // footprint This creates a new footprint with the points from
+  // projectedMedialAxis inserted
+  auto densified_footprint =
+      insertPointsFrom(footprint, *projectedMedialAxis, EPSILON);
 
-  // Use GetPointsVisitor to collect all points from footprint and
-  // projectedMedialAxis
-  SFCGAL::detail::GetPointsVisitor visitor;
-
-  // Collect points from footprint
-  visitor.visit(footprint);
-
-  // Collect points from projected medial axis
-  visitor.visit(*projectedMedialAxis);
-
-  // Add all collected points to the MultiPoint
-  for (const Point *point : visitor.points) {
-    multiPoint->addGeometry(*point);
-  }
-
-  // Perform constrained Delaunay triangulation on the MultiPoint
-  auto triangulation = SFCGAL::triangulate::triangulate2DZ(*multiPoint);
+  // Perform constrained Delaunay triangulation on the densified footprint
+  auto triangulation =
+      SFCGAL::triangulate::triangulate2DZ(*densified_footprint);
 
   // Add constraints from projected medial axis
   auto projectedMedialAxis_clone = projectedMedialAxis->clone();
