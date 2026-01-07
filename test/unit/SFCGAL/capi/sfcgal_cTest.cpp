@@ -2598,4 +2598,43 @@ BOOST_AUTO_TEST_CASE(testExtrudeEmptyGeometries_Issue315)
   BOOST_CHECK(!hasError);
 }
 
+BOOST_AUTO_TEST_CASE(testMinkowskiSum3D)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+  hasError = false;
+
+  // Test cube + point (translation)
+  std::unique_ptr<Geometry> cube(io::readWkt(
+      "SOLID((((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)),((0 0 1,1 0 1,1 1 1,0 1 1,0 0 "
+      "1)),((0 0 0,1 0 0,1 0 1,0 0 1,0 0 0)),((1 0 0,1 1 0,1 1 1,1 0 1,1 0 "
+      "0)),((1 1 0,0 1 0,0 1 1,1 1 1,1 1 0)),((0 1 0,0 0 0,0 0 1,0 1 1,0 1 "
+      "0))))"));
+  std::unique_ptr<Geometry> point(io::readWkt("POINT(1 1 1)"));
+
+  sfcgal_geometry_t *result =
+      sfcgal_geometry_minkowski_sum_3d(cube.get(), point.get());
+  BOOST_REQUIRE(result != nullptr);
+  BOOST_CHECK(!sfcgal_geometry_is_empty(result));
+  sfcgal_geometry_delete(result);
+
+  // Test linestring + triangle (sweep)
+  std::unique_ptr<Geometry> line(io::readWkt("LINESTRING Z (0 0 0, 0 0 5)"));
+  std::unique_ptr<Geometry> triangle(
+      io::readWkt("TRIANGLE Z ((0 0 0, 1 0 0, 0 1 0, 0 0 0))"));
+
+  result = sfcgal_geometry_minkowski_sum_3d(triangle.get(), line.get());
+  BOOST_REQUIRE(result != nullptr);
+  BOOST_CHECK(!sfcgal_geometry_is_empty(result));
+  sfcgal_geometry_delete(result);
+
+  // Test empty geometries
+  std::unique_ptr<Geometry> emptyGeom(io::readWkt("GEOMETRYCOLLECTION EMPTY"));
+  result = sfcgal_geometry_minkowski_sum_3d(emptyGeom.get(), point.get());
+  BOOST_REQUIRE(result != nullptr);
+  BOOST_CHECK(sfcgal_geometry_is_empty(result));
+  sfcgal_geometry_delete(result);
+
+  BOOST_CHECK(!hasError);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

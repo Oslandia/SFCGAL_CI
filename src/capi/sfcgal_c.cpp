@@ -64,6 +64,7 @@
 #include "SFCGAL/algorithm/length.h"
 #include "SFCGAL/algorithm/lineSubstring.h"
 #include "SFCGAL/algorithm/minkowskiSum.h"
+#include "SFCGAL/algorithm/minkowskiSum3D.h"
 #include "SFCGAL/algorithm/offset.h"
 #include "SFCGAL/algorithm/partition_2.h"
 #include "SFCGAL/algorithm/plane.h"
@@ -1554,6 +1555,31 @@ sfcgal_geometry_minkowski_sum(const sfcgal_geometry_t *ga,
     sum = SFCGAL::algorithm::minkowskiSum(*g1, g2->as<const SFCGAL::Polygon>());
   } catch (std::exception &e) {
     SFCGAL_WARNING("During minkowski_sum(A,B):");
+    SFCGAL_WARNING("  with A: %s",
+                   static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
+    SFCGAL_WARNING("   and B: %s",
+                   static_cast<const SFCGAL::Geometry *>(gb)->asText().c_str());
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  return sum.release();
+}
+
+extern "C" auto
+sfcgal_geometry_minkowski_sum_3d(const sfcgal_geometry_t *ga,
+                                 const sfcgal_geometry_t *gb)
+    -> sfcgal_geometry_t *
+{
+  const auto *g1 = reinterpret_cast<const SFCGAL::Geometry *>(ga);
+  const auto *g2 = reinterpret_cast<const SFCGAL::Geometry *>(gb);
+
+  std::unique_ptr<SFCGAL::Geometry> sum;
+
+  try {
+    sum = SFCGAL::algorithm::minkowskiSum3D(*g1, *g2);
+  } catch (std::exception &e) {
+    SFCGAL_WARNING("During minkowski_sum_3d(A,B):");
     SFCGAL_WARNING("  with A: %s",
                    static_cast<const SFCGAL::Geometry *>(ga)->asText().c_str());
     SFCGAL_WARNING("   and B: %s",
