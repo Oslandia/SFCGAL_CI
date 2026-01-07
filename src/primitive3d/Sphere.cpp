@@ -10,6 +10,8 @@
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Vector_3.h>
 #include <cmath>
+#include <map>
+#include <stdexcept>
 #include <utility>
 
 namespace SFCGAL {
@@ -26,12 +28,10 @@ namespace SFCGAL {
 template <class HDS>
 class Sphere_builder : public CGAL::Modifier_base<HDS> {
 public:
-  Sphere_builder(double radius, unsigned int num_vertical,
-                 unsigned int num_horizontal, Point_3 center,
+  Sphere_builder(double radius, unsigned int num_subdivisions, Point_3 center,
                  const Kernel::Vector_3 &direction)
-      : radius(radius), num_vertical(num_vertical),
-        num_horizontal(num_horizontal), center(std::move(center)),
-        direction(normalizeVector(direction))
+      : radius(radius), num_subdivisions(num_subdivisions),
+        center(std::move(center)), direction(normalizeVector(direction))
   {
   }
 
@@ -40,115 +40,147 @@ public:
   {
     CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
 
-    int num_vertices = ((num_vertical - 1) * num_horizontal) + 2;
-    int num_faces    = num_vertical * num_horizontal * 2;
+    // Create icosahedron vertices
+    const double phi      = (1.0 + std::sqrt(5.0)) / 2.0; // golden ratio
+    const double inv_norm = 1.0 / std::sqrt(1.0 + (phi * phi));
 
-    B.begin_surface(num_vertices, num_faces);
+    // 12 base icosahedron vertices
+    std::vector<Point_3> base_vertices = {
+        Point_3(-1 * inv_norm, phi * inv_norm, 0),
+        Point_3(1 * inv_norm, phi * inv_norm, 0),
+        Point_3(-1 * inv_norm, -phi * inv_norm, 0),
+        Point_3(1 * inv_norm, -phi * inv_norm, 0),
+        Point_3(0, -1 * inv_norm, phi * inv_norm),
+        Point_3(0, 1 * inv_norm, phi * inv_norm),
+        Point_3(0, -1 * inv_norm, -phi * inv_norm),
+        Point_3(0, 1 * inv_norm, -phi * inv_norm),
+        Point_3(phi * inv_norm, 0, -1 * inv_norm),
+        Point_3(phi * inv_norm, 0, 1 * inv_norm),
+        Point_3(-phi * inv_norm, 0, -1 * inv_norm),
+        Point_3(-phi * inv_norm, 0, 1 * inv_norm)};
 
-    // Add vertices
-    addVertices(B);
+    // 20 base icosahedron faces
+    std::vector<std::array<int, 3>> base_faces = {
+        {0, 11, 5}, {0, 5, 1},  {0, 1, 7},   {0, 7, 10}, {0, 10, 11},
+        {1, 5, 9},  {5, 11, 4}, {11, 10, 2}, {10, 7, 6}, {7, 1, 8},
+        {3, 9, 4},  {3, 4, 2},  {3, 2, 6},   {3, 6, 8},  {3, 8, 9},
+        {4, 9, 5},  {2, 4, 11}, {6, 2, 10},  {8, 6, 7},  {9, 8, 1}};
 
-    // Add faces
-    addTopFaces(B);
-    addMiddleFaces(B);
-    addBottomFaces(B);
+    // Subdivide the icosahedron
+    std::vector<Point_3>            vertices = base_vertices;
+    std::vector<std::array<int, 3>> faces    = base_faces;
 
-    B.end_surface();
+    for (unsigned int level = 0; level < num_subdivisions; ++level) {
+      subdivideIcosahedron(vertices, faces);
+    }
+
+    // Project all vertices to sphere surface, scale, orient and translate
+    for (auto &vertex : vertices) {
+      // Normalize to unit sphere
+      Kernel::Vector_3 vec(vertex.x(), vertex.y(), vertex.z());
+      double length = std::sqrt(CGAL::to_double(vec.squared_length()));
+      if (length > 1e-10) {
+        vec = vec / length;
+      }
+
+      // Apply radius scaling
+      vec = vec * radius;
+
+      // Apply orientation (simple case - keep Z-up for now)
+      // In future, could apply rotation matrix based on direction vector
+
+      // Translate to center
+      vertex = Point_3(center.x() + vec.x(), center.y() + vec.y(),
+                       center.z() + vec.z());
+    }
+
+    B.begin_surface(vertices.size(), faces.size());
+
+    try {
+      // Add vertices
+      for (const auto &vertex : vertices) {
+        B.add_vertex(vertex);
+      }
+
+      // Add faces
+      for (const auto &face : faces) {
+        B.begin_facet();
+        B.add_vertex_to_facet(face[0]);
+        B.add_vertex_to_facet(face[1]);
+        B.add_vertex_to_facet(face[2]);
+        B.end_facet();
+      }
+
+      B.end_surface();
+
+      if (B.error()) {
+        throw std::runtime_error("CGAL polyhedron builder reported an error "
+                                 "during icosahedron construction");
+      }
+    } catch (const std::exception &e) {
+      if (!B.error()) {
+        B.rollback();
+      }
+      throw std::runtime_error(
+          std::string("Failed to build subdivided icosahedron: ") + e.what());
+    }
   }
 
 private:
-  // Function to get an orthogonal vector in the XY plane
-  auto
-  get_orthogonal_vector(const Kernel::Vector_3 &vec) -> Kernel::Vector_3
-  {
-    if (vec.x() != 0 || vec.y() != 0) {
-      return Kernel::Vector_3(-vec.y(), vec.x(), 0);
-    }
-    return Kernel::Vector_3(0, -vec.z(), vec.y());
-  }
-
-  void
-  addVertices(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
-  {
-    Kernel::Vector_3 v1 = normalizeVector(get_orthogonal_vector(direction));
-    Kernel::Vector_3 v2 = normalizeVector(CGAL::cross_product(direction, v1));
-
-    // Add top vertex
-    B.add_vertex(Point_3(center + direction * radius));
-
-    // Add middle vertices
-    for (unsigned int i = 1; i < num_vertical; ++i) {
-      double phi = M_PI * double(i) / double(num_vertical);
-      double z   = radius * std::cos(phi);
-      double r   = radius * std::sin(phi);
-      for (unsigned int j = 0; j < num_horizontal; ++j) {
-        double           theta = 2 * M_PI * double(j) / double(num_horizontal);
-        Kernel::Vector_3 point_vec =
-            r * (std::cos(theta) * v1 + std::sin(theta) * v2) + z * direction;
-        B.add_vertex(Point_3(center + point_vec));
-      }
-    }
-
-    // Add bottom vertex
-    B.add_vertex(Point_3(center - direction * radius));
-  }
-
-  void
-  addTopFaces(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
-  {
-    for (unsigned int j = 0; j < num_horizontal; ++j) {
-      B.begin_facet();
-      B.add_vertex_to_facet(0);
-      B.add_vertex_to_facet(1 + ((j + 1) % num_horizontal));
-      B.add_vertex_to_facet(1 + j);
-      B.end_facet();
-    }
-  }
-
-  void
-  addMiddleFaces(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
-  {
-    for (unsigned int i = 1; i < num_vertical - 1; ++i) {
-      for (unsigned int j = 0; j < num_horizontal; ++j) {
-        int current = 1 + ((i - 1) * num_horizontal) + j;
-        int next = 1 + ((i - 1) * num_horizontal) + ((j + 1) % num_horizontal);
-        int below_current = 1 + (i * num_horizontal) + j;
-        int below_next = 1 + (i * num_horizontal) + ((j + 1) % num_horizontal);
-
-        B.begin_facet();
-        B.add_vertex_to_facet(current);
-        B.add_vertex_to_facet(next);
-        B.add_vertex_to_facet(below_next);
-        B.end_facet();
-
-        B.begin_facet();
-        B.add_vertex_to_facet(current);
-        B.add_vertex_to_facet(below_next);
-        B.add_vertex_to_facet(below_current);
-        B.end_facet();
-      }
-    }
-  }
-
-  void
-  addBottomFaces(CGAL::Polyhedron_incremental_builder_3<HDS> &B)
-  {
-    unsigned int last_vertex = ((num_vertical - 1) * num_horizontal) + 1;
-    unsigned int last_row    = 1 + ((num_vertical - 2) * num_horizontal);
-    for (unsigned int j = 0; j < num_horizontal; ++j) {
-      B.begin_facet();
-      B.add_vertex_to_facet(last_vertex);
-      B.add_vertex_to_facet(last_row + j);
-      B.add_vertex_to_facet(last_row + ((j + 1) % num_horizontal));
-      B.end_facet();
-    }
-  }
-
   double           radius;
-  unsigned int     num_vertical;
-  unsigned int     num_horizontal;
+  unsigned int     num_subdivisions;
   Point_3          center;
   Kernel::Vector_3 direction;
+
+  void
+  subdivideIcosahedron(std::vector<Point_3>            &vertices,
+                       std::vector<std::array<int, 3>> &faces)
+  {
+    std::vector<std::array<int, 3>>    new_faces;
+    std::map<std::pair<int, int>, int> edge_to_vertex;
+
+    // Helper function to get or create a midpoint vertex
+    auto getMidpoint = [&](int vertexA, int vertexB) -> int {
+      auto key = std::make_pair(std::min(vertexA, vertexB),
+                                std::max(vertexA, vertexB));
+      auto it  = edge_to_vertex.find(key);
+      if (it != edge_to_vertex.end()) {
+        return it->second;
+      }
+
+      // Create new midpoint vertex
+      Point_3 point1 = vertices[vertexA];
+      Point_3 point2 = vertices[vertexB];
+      Point_3 midpoint((point1.x() + point2.x()) / 2.0,
+                       (point1.y() + point2.y()) / 2.0,
+                       (point1.z() + point2.z()) / 2.0);
+
+      int new_index = static_cast<int>(vertices.size());
+      vertices.push_back(midpoint);
+      edge_to_vertex[key] = new_index;
+      return new_index;
+    };
+
+    // Subdivide each triangle into 4 smaller triangles
+    for (const auto &face : faces) {
+      int vertex0 = face[0];
+      int vertex1 = face[1];
+      int vertex2 = face[2];
+
+      // Get midpoints of each edge
+      int m01 = getMidpoint(vertex0, vertex1);
+      int m12 = getMidpoint(vertex1, vertex2);
+      int m20 = getMidpoint(vertex2, vertex0);
+
+      // Create 4 new triangles
+      new_faces.push_back({vertex0, m01, m20});
+      new_faces.push_back({vertex1, m12, m01});
+      new_faces.push_back({vertex2, m20, m12});
+      new_faces.push_back({m01, m12, m20});
+    }
+
+    faces = new_faces;
+  }
 };
 
 /// @} end of private section
@@ -159,14 +191,12 @@ private:
 /// @publicsection
 
 Sphere::Sphere(const Kernel::FT &radius, const Kernel::Point_3 &center,
-               unsigned int num_vertical, unsigned int num_horizontal,
-               const Kernel::Vector_3 &direction)
+               unsigned int num_subdivisions, const Kernel::Vector_3 &direction)
 {
-  m_parameters["radius"]         = Kernel::FT(radius);
-  m_parameters["num_vertical"]   = num_vertical;
-  m_parameters["num_horizontal"] = num_horizontal;
-  m_parameters["center"]         = center;
-  m_parameters["direction"]      = normalizeVector(direction);
+  m_parameters["radius"]           = Kernel::FT(radius);
+  m_parameters["num_subdivisions"] = num_subdivisions;
+  m_parameters["center"]           = center;
+  m_parameters["direction"]        = normalizeVector(direction);
 
   Sphere::validateParameters(m_parameters);
 }
@@ -200,7 +230,15 @@ Sphere::validateParameters(
       CGAL::to_double(std::get<Kernel::FT>(tempParameters.at("radius")));
 
   if (radius <= 0.) {
-    BOOST_THROW_EXCEPTION(Exception("Sphere radius cannot be negative."));
+    BOOST_THROW_EXCEPTION(Exception("Sphere radius must be positive."));
+  }
+
+  const unsigned int num_subdivisions =
+      std::get<unsigned int>(tempParameters.at("num_subdivisions"));
+
+  if (num_subdivisions > 6) {
+    BOOST_THROW_EXCEPTION(Exception(
+        "Sphere subdivisions should not exceed 6 (too many vertices)."));
   }
 }
 
@@ -210,8 +248,7 @@ Sphere::generateSpherePolyhedron() const -> Polyhedron_3
 {
   Polyhedron_3                             P;
   Sphere_builder<Polyhedron_3::HalfedgeDS> builder(
-      CGAL::to_double(radius()), numVertical(), numHorizontal(), center(),
-      direction());
+      CGAL::to_double(radius()), numSubdivisions(), center(), direction());
   P.delegate(builder);
   return P;
 }
@@ -241,37 +278,44 @@ Sphere::generatePolyhedralSurface() const -> PolyhedralSurface
     return *m_polyhedral_surface;
   }
 
-  m_polyhedral_surface = PolyhedralSurface(generatePolyhedron());
-  return *m_polyhedral_surface;
+  try {
+    Polyhedron_3 polyhedron = generatePolyhedron();
+
+    // Validate the polyhedron before converting to PolyhedralSurface
+    if (polyhedron.empty()) {
+      throw std::runtime_error("Generated sphere polyhedron is empty");
+    }
+
+    if (!polyhedron.is_valid()) {
+      throw std::runtime_error("Generated sphere polyhedron is invalid");
+    }
+
+    if (!polyhedron.is_closed()) {
+      throw std::runtime_error("Generated sphere polyhedron is not closed");
+    }
+
+    m_polyhedral_surface = PolyhedralSurface(polyhedron);
+
+    return *m_polyhedral_surface;
+  } catch (const std::exception &e) {
+    throw std::runtime_error(std::string("Sphere surface generation failed: ") +
+                             e.what());
+  }
 }
 
-// Generate points on the sphere's surface
+// Generate points on the sphere's surface from icosahedron vertices
 auto
 Sphere::generateSpherePoints() const -> std::vector<Point_3>
 {
+  // Generate the same vertices as the polyhedron
+  Polyhedron_3         poly = generatePolyhedron();
   std::vector<Point_3> points;
-  points.reserve(static_cast<unsigned long>(numVertical()) * numHorizontal());
+  points.reserve(poly.size_of_vertices());
 
-  Kernel::Vector_3 vec1 = normalizeVector(get_orthogonal_vector(direction()));
-  Kernel::Vector_3 vec2 =
-      normalizeVector(CGAL::cross_product(direction(), vec1));
-
-  Kernel::FT d_lat = CGAL_PI / static_cast<double>(numVertical() - 1);
-  Kernel::FT d_lon = 2 * CGAL_PI / static_cast<double>(numHorizontal());
-
-  for (unsigned int i = 0; i < numVertical(); ++i) {
-    Kernel::FT lat        = CGAL_PI / 2 - static_cast<int>(i) * d_lat;
-    Kernel::FT z          = radius() * std::sin(CGAL::to_double(lat));
-    Kernel::FT lat_radius = radius() * std::cos(CGAL::to_double(lat));
-    for (unsigned int j = 0; j < numHorizontal(); ++j) {
-      Kernel::FT       lon = static_cast<int>(j) * d_lon;
-      Kernel::Vector_3 point_vec =
-          lat_radius * (std::cos(CGAL::to_double(lon)) * vec1 +
-                        std::sin(CGAL::to_double(lon)) * vec2) +
-          z * direction();
-      points.emplace_back(center() + point_vec);
-    }
+  for (auto vit = poly.vertices_begin(); vit != poly.vertices_end(); ++vit) {
+    points.emplace_back(vit->point());
   }
+
   return points;
 }
 
