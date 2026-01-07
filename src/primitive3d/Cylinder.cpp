@@ -73,11 +73,16 @@ Cylinder::validateParameters(
       CGAL::to_double(std::get<Kernel::FT>(tempParameters.at("radius")));
   const double height =
       CGAL::to_double(std::get<Kernel::FT>(tempParameters.at("height")));
+  const unsigned int num_radial =
+      std::get<unsigned int>(tempParameters.at("num_radial"));
 
   if (radius <= 0.) {
     BOOST_THROW_EXCEPTION(Exception("Cylinder radius cannot be negative."));
   } else if (height <= 0.) {
     BOOST_THROW_EXCEPTION(Exception("Cylinder height cannot be negative."));
+  } else if (num_radial < 3) {
+    BOOST_THROW_EXCEPTION(
+        Exception("Cylinder requires at least 3 radial segments."));
   }
 }
 
@@ -87,6 +92,7 @@ Cylinder::invalidateCache()
   Primitive::invalidateCache();
   m_polyhedron.reset();
   m_surface_mesh.reset();
+  m_polyhedral_surface.reset();
 }
 
 auto
@@ -123,13 +129,20 @@ Cylinder::generateSurfaceMesh() const -> Surface_mesh_3
   Surface_mesh_3 mesh;
 
   Vector_3 normalized_axis = normalize(axis());
-  Vector_3 perpendicular =
-      normalize(CGAL::cross_product(normalized_axis, Vector_3(0, 0, 1)));
-  if (perpendicular.squared_length() < EPSILON) {
+
+  // Find a perpendicular vector
+  Vector_3 perpendicular;
+  if (CGAL::abs(normalized_axis.z()) < 0.9) {
+    // If axis is not too close to Z, use Z cross axis
+    perpendicular =
+        normalize(CGAL::cross_product(normalized_axis, Vector_3(0, 0, 1)));
+  } else {
+    // If axis is close to Z, use Y cross axis
     perpendicular =
         normalize(CGAL::cross_product(normalized_axis, Vector_3(0, 1, 0)));
   }
-  Vector_3 perpendicular2 = CGAL::cross_product(normalized_axis, perpendicular);
+  Vector_3 perpendicular2 =
+      normalize(CGAL::cross_product(normalized_axis, perpendicular));
 
   std::vector<Surface_mesh_3::Vertex_index> base_vertices;
   std::vector<Surface_mesh_3::Vertex_index> top_vertices;
