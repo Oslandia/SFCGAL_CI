@@ -56,6 +56,7 @@
 #include "SFCGAL/algorithm/extrude.h"
 #include "SFCGAL/algorithm/force3D.h"
 #include "SFCGAL/algorithm/forceMeasured.h"
+#include "SFCGAL/algorithm/insertPointsWithinTolerance.h"
 #include "SFCGAL/algorithm/intersection.h"
 #include "SFCGAL/algorithm/intersects.h"
 #include "SFCGAL/algorithm/isClosed.h"
@@ -1563,6 +1564,28 @@ sfcgal_geometry_minkowski_sum(const sfcgal_geometry_t *ga,
   }
 
   return sum.release();
+}
+
+extern "C" auto
+sfcgal_geometry_insert_points_within_tolerance(const sfcgal_geometry_t *base,
+                                               const sfcgal_geometry_t *source,
+                                               double tolerance)
+    -> sfcgal_geometry_t *
+{
+  const auto *geomBase   = reinterpret_cast<const SFCGAL::Geometry *>(base);
+  const auto *geomSource = reinterpret_cast<const SFCGAL::Geometry *>(source);
+
+  std::unique_ptr<SFCGAL::Geometry> result;
+
+  try {
+    result = SFCGAL::algorithm::insertPointsWithinTolerance(
+        *geomBase, *geomSource, tolerance);
+  } catch (std::exception &e) {
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  return result.release();
 }
 
 extern "C" auto

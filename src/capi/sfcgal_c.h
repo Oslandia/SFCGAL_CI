@@ -1674,6 +1674,22 @@ sfcgal_geometry_minkowski_sum(const sfcgal_geometry_t *geom1,
                               const sfcgal_geometry_t *geom2);
 
 /**
+ * Insert points from source geometry into base geometry within tolerance.
+ * This function densifies the base geometry by adding points from the source
+ * geometry where they are within the specified tolerance distance from the
+ * base geometry's segments.
+ * @param base The geometry to receive inserted points
+ * @param source The geometry providing points to insert
+ * @param tolerance Maximum distance for a point to be considered for insertion
+ * @return A new geometry with points inserted, or NULL on error
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_geometry_insert_points_within_tolerance(const sfcgal_geometry_t *base,
+                                               const sfcgal_geometry_t *source,
+                                               double tolerance);
+
+/**
  * Returns the offset polygon of the given Geometry.
  * @param geom the input geometry
  * @param radius offset distance

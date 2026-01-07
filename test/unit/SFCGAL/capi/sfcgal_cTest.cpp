@@ -2598,4 +2598,64 @@ BOOST_AUTO_TEST_CASE(testExtrudeEmptyGeometries_Issue315)
   BOOST_CHECK(!hasError);
 }
 
+BOOST_AUTO_TEST_CASE(testInsertPointsWithinTolerance)
+{
+  sfcgal_set_error_handlers(printf, on_error);
+
+  // Test basic point insertion on a linestring
+  std::unique_ptr<Geometry> base(io::readWkt("LINESTRING(0 0, 2 2)"));
+  std::unique_ptr<Geometry> source(io::readWkt("POINT(1 1)"));
+
+  hasError                   = false;
+  sfcgal_geometry_t *result1 = sfcgal_geometry_insert_points_within_tolerance(
+      base.get(), source.get(), 0.1);
+
+  BOOST_CHECK(!hasError);
+  BOOST_REQUIRE(result1 != nullptr);
+
+  char  *wkt1;
+  size_t len1;
+  sfcgal_geometry_as_text_decim(result1, 0, &wkt1, &len1);
+  BOOST_CHECK_EQUAL(std::string(wkt1), "LINESTRING (0 0,1 1,2 2)");
+  sfcgal_free_buffer(wkt1);
+  sfcgal_geometry_delete(result1);
+
+  // Test with tolerance too small (point should not be inserted)
+  std::unique_ptr<Geometry> base2(io::readWkt("LINESTRING(0 0, 2 0)"));
+  std::unique_ptr<Geometry> source2(io::readWkt("POINT(1 0.5)"));
+
+  hasError                   = false;
+  sfcgal_geometry_t *result2 = sfcgal_geometry_insert_points_within_tolerance(
+      base2.get(), source2.get(), 0.1);
+
+  BOOST_CHECK(!hasError);
+  BOOST_REQUIRE(result2 != nullptr);
+
+  char  *wkt2;
+  size_t len2;
+  sfcgal_geometry_as_text_decim(result2, 0, &wkt2, &len2);
+  BOOST_CHECK_EQUAL(std::string(wkt2), "LINESTRING (0 0,2 0)");
+  sfcgal_free_buffer(wkt2);
+  sfcgal_geometry_delete(result2);
+
+  // Test with polygon
+  std::unique_ptr<Geometry> basePoly(
+      io::readWkt("POLYGON((0 0, 4 0, 4 4, 0 4, 0 0))"));
+  std::unique_ptr<Geometry> sourcePoly(io::readWkt("POINT(2 0)"));
+
+  hasError                   = false;
+  sfcgal_geometry_t *result3 = sfcgal_geometry_insert_points_within_tolerance(
+      basePoly.get(), sourcePoly.get(), 0.1);
+
+  BOOST_CHECK(!hasError);
+  BOOST_REQUIRE(result3 != nullptr);
+
+  char  *wkt3;
+  size_t len3;
+  sfcgal_geometry_as_text_decim(result3, 0, &wkt3, &len3);
+  BOOST_CHECK_EQUAL(std::string(wkt3), "POLYGON ((0 0,2 0,4 0,4 4,0 4,0 0))");
+  sfcgal_free_buffer(wkt3);
+  sfcgal_geometry_delete(result3);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
