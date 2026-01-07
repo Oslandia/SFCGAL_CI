@@ -610,7 +610,8 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
     // slopeAngle and addVerticalFaces are ignored
     if (params.buildingHeight == 0.0) {
       // Just the roof
-      auto roof = extrudeStraightSkeleton(footprint, params.roofHeight);
+      auto roof =
+          extrudeStraightSkeleton(footprint, params.roofHeight, params.angles);
 
       // Legacy: extrudeStraightSkeleton returns a closed geometry
       if (!params.closeBase) {
@@ -626,7 +627,7 @@ generateRoof(const Polygon &footprint, const LineString &ridgeLine,
     }
     // Building + roof using the two-parameter version
     auto result = extrudeStraightSkeleton(footprint, params.buildingHeight,
-                                          params.roofHeight);
+                                          params.roofHeight, params.angles);
     auto solid  = std::make_unique<Solid>(*result);
     propagateValidityFlag(*solid, true);
     return solid;

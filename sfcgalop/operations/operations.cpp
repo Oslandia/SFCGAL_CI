@@ -380,8 +380,9 @@ const std::vector<Operation> operations = {
      "A, params", "B",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto   params    = parse_params(args);
-       double tolerance = params.count("tolerance") ? params["tolerance"] : 1e-6;
+       auto   params = parse_params(args);
+       double tolerance =
+           params.count("tolerance") ? params["tolerance"] : 1e-6;
        return static_cast<bool>(SFCGAL::algorithm::isValid(*geom_a, tolerance));
      }},
 
@@ -1301,14 +1302,17 @@ const std::vector<Operation> operations = {
      "Parameters:\n"
      "  height=VALUE              - Roof height in units (required)\n"
      "  building_height=HEIGHT    - Building height in units (optional, "
-     "default=0.0)\n\n"
+     "default=0.0)\n"
+     "  angle1=VALUE    - Roof angle for the first edge\n"
+     "  angleN=VALUE    - Roof angle for the Nth edge\n\n"
      "Examples:\n"
      "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" "
      "generate_hipped_roof "
      "\"height=3.0\"\n"
      "  sfcgalop -a \"POLYGON((0 0,10 0,10 6,0 6,0 0))\" "
      "generate_hipped_roof "
-     "\"height=3.0,building_height=5.0\"",
+     "\"height=3.0,building_height=5.0,angle1=30.0,angle2=45.0,angle3=30.0,"
+     "angle4=45.0\"",
      "A, params", "G",
      [](const std::string &params_str, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
@@ -1333,10 +1337,22 @@ const std::vector<Operation> operations = {
          building_height = building_height_it->second;
        }
 
+       std::vector<SFCGAL::Kernel::FT> angles;
+       int                             angleIdx = 0;
+       while (true) {
+         angleIdx++;
+         auto angle_it = params.find("angle" + std::to_string(angleIdx));
+         if (angle_it == params.end()) {
+           break;
+         }
+         angles.emplace_back(angle_it->second);
+       };
+
        SFCGAL::algorithm::RoofParameters roof_params;
        roof_params.type           = SFCGAL::algorithm::RoofType::HIPPED;
        roof_params.roofHeight     = roof_height;
        roof_params.buildingHeight = building_height;
+       roof_params.angles.emplace_back(angles);
        return SFCGAL::algorithm::generateRoof(*polygon, SFCGAL::LineString(),
                                               roof_params);
      }
@@ -1487,11 +1503,11 @@ execute_operation(const std::string &op_name, const std::string &op_arg,
     -> std::optional<OperationResult>
 {
 
-  auto operation_it = std::find_if(
-      operations.begin(), operations.end(),
-      [&op_name](const Operation &operation) -> bool {
-        return operation.name == op_name;
-      });
+  auto operation_it =
+      std::find_if(operations.begin(), operations.end(),
+                   [&op_name](const Operation &operation) -> bool {
+                     return operation.name == op_name;
+                   });
 
   if (operation_it != operations.end()) {
     // Check for null geometry A before calling operation, but allow constructor
@@ -1562,11 +1578,10 @@ print_operation_help(const char *name) -> bool
     return false;
   }
 
-  auto operation_it = std::find_if(
-      operations.begin(), operations.end(),
-      [name](const Operation &operation) -> bool {
-        return operation.name == name;
-      });
+  auto operation_it = std::find_if(operations.begin(), operations.end(),
+                                   [name](const Operation &operation) -> bool {
+                                     return operation.name == name;
+                                   });
 
   if (operation_it != operations.end()) {
     std::cout << "\nOperation: " << operation_it->name << "\n"
@@ -1632,11 +1647,11 @@ get_all_operations_info() -> std::vector<
 auto
 operation_requires_second_geometry(const std::string &operation_name) -> bool
 {
-  auto operation_it = std::find_if(
-      operations.begin(), operations.end(),
-      [&operation_name](const Operation &operation) -> bool {
-        return operation.name == operation_name;
-      });
+  auto operation_it =
+      std::find_if(operations.begin(), operations.end(),
+                   [&operation_name](const Operation &operation) -> bool {
+                     return operation.name == operation_name;
+                   });
 
   if (operation_it != operations.end()) {
     return operation_it->requires_b;

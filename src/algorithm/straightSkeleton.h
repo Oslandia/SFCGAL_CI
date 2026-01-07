@@ -119,24 +119,28 @@ straightSkeleton(const MultiPolygon &geom, bool autoOrientation = true,
  * @brief build a 3D straight skeleton extruded for a Polygon
  * @param geom the input polygon
  * @param height extrusion height
+ * @param angles vector of vector of angles for each polygon ring edge
  * @return extruded straight skeleton as a PolyhedralSurface
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
 SFCGAL_API auto
-extrudeStraightSkeleton(const Polygon &geom, double height)
+extrudeStraightSkeleton(const Polygon &geom, double height,
+                        std::vector<std::vector<Kernel::FT>> angles = {{}})
     -> std::unique_ptr<PolyhedralSurface>;
 
 /**
  * @brief build a 3D straight skeleton extruded for a Geometry
  * @param geom input geometry
  * @param height extrusion height
+ * @param angles vector of vector of angles for each polygon ring edge
  * @return extruded straight skeleton as a PolyhedralSurface
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
 SFCGAL_API auto
-extrudeStraightSkeleton(const Geometry &geom, double height)
+extrudeStraightSkeleton(const Geometry &geom, double height,
+                        std::vector<std::vector<Kernel::FT>> angles = {{}})
     -> std::unique_ptr<PolyhedralSurface>;
 
 /**
@@ -145,13 +149,15 @@ extrudeStraightSkeleton(const Geometry &geom, double height)
  * @param geom input geometry
  * @param building_height building height
  * @param roof_height roof height
+ * @param angles vector of vector of angles for each polygon ring edge
  * @return extruded straight skeleton as a PolyhedralSurface
  * @throws NotImplementedException If geom is a Polygon with point touching
  * rings.
  */
 SFCGAL_API auto
 extrudeStraightSkeleton(const Geometry &geom, double building_height,
-                        double roof_height)
+                        double                               roof_height,
+                        std::vector<std::vector<Kernel::FT>> angles = {{}})
     -> std::unique_ptr<PolyhedralSurface>;
 
 /**

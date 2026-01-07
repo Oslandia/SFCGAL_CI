@@ -54,6 +54,8 @@ struct RoofParameters {
   double   slopeAngle = 30.0;            ///< Slope angle in degrees (0-90) for
                                          ///< gable/skillion roofs
   double roofHeight = 3.0; ///< Maximum roof height for flat/hipped roofs (>= 0)
+  std::vector<std::vector<Kernel::FT>>
+         angles; //< angles for each edge or each polygon ring for hipped roofs
   double buildingHeight = 0.0;   ///< Building wall height (>= 0), 0 = roof only
   bool   closeBase      = false; ///< Close the base (only if buildingHeight ==
                                  ///< 0)
