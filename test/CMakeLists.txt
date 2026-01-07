@@ -9,17 +9,13 @@ configure_file( ${SFCGAL_TEST_DIRECTORY}/test_config.h.cmake ${SFCGAL_TEST_DIREC
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   add_definitions( "-frounding-math" )
-  
+
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 #-- build regression tests
 if( SFCGAL_BUILD_TESTS )
 	add_subdirectory( unit )
 	add_subdirectory( regress )
-endif()
-
-if( SFCGAL_BUILD_BENCH )
-	add_subdirectory( bench )
 endif()
 
 # add a custom rule "check" that adds verbosity to ctest

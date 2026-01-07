@@ -46,7 +46,6 @@ endif()
 
 option( SFCGAL_BUILD_EXAMPLES "build examples" OFF )
 option( SFCGAL_BUILD_TESTS "build unit and regress tests" OFF )
-option( SFCGAL_BUILD_BENCH "Build benchmarks" OFF )
 option( SFCGAL_BUILD_DOC "Build documentation" OFF )
 
 option( SFCGAL_WITH_OSG "Compile with OpenSceneGraph support" OFF )
