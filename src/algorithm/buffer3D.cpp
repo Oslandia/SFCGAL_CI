@@ -63,8 +63,12 @@ Buffer3D::computePointBuffer() const -> std::unique_ptr<PolyhedralSurface>
 {
   Kernel::Point_3 center(_inputPoints[0].x(), _inputPoints[0].y(),
                          _inputPoints[0].z());
-  Sphere          sphere(_radius, center, _segments / 2, _segments);
-  return std::make_unique<PolyhedralSurface>(sphere.generatePolyhedron());
+  // Convert segments to subdivision level for icosahedron
+  unsigned int subdivision_level =
+      std::max(1U, static_cast<unsigned int>(_segments / 16));
+  Sphere sphere(_radius, center, subdivision_level);
+  return std::make_unique<PolyhedralSurface>(
+      sphere.generatePolyhedralSurface());
 }
 
 auto
@@ -76,8 +80,11 @@ Buffer3D::computeRoundBuffer() const -> std::unique_ptr<PolyhedralSurface>
   using Nef_polyhedron = CGAL::Nef_polyhedron_3<Kernel>;
 
   // Create sphere
-  Point_3        center(0, 0, 0);
-  SFCGAL::Sphere sphere(_radius, center, _segments / 2, _segments);
+  Point_3 center(0, 0, 0);
+  // Convert segments to subdivision level for icosahedron
+  unsigned int subdivision_level =
+      std::max(1U, static_cast<unsigned int>(_segments / 16));
+  SFCGAL::Sphere sphere(_radius, center, subdivision_level);
 
   // Generate polyhedron from sphere
   CGAL::Polyhedron_3<Kernel> spherePolyhedron = sphere.generatePolyhedron();
@@ -125,7 +132,9 @@ Buffer3D::computeCylSphereBuffer() const -> std::unique_ptr<PolyhedralSurface>
           Kernel::Vector_3(0, 0, 1); // Default direction if only one point
     }
 
-    Sphere start_sphere(_radius, start_sphere_center, _segments / 2, _segments,
+    unsigned int subdivision_level =
+        std::max(1U, static_cast<unsigned int>(_segments / 16));
+    Sphere start_sphere(_radius, start_sphere_center, subdivision_level,
                         start_direction);
     CGAL::Polyhedron_3<Kernel> start_sphere_poly =
         start_sphere.generatePolyhedron();
@@ -174,8 +183,9 @@ Buffer3D::computeCylSphereBuffer() const -> std::unique_ptr<PolyhedralSurface>
           sphere_direction /
           CGAL::sqrt(CGAL::to_double(sphere_direction.squared_length()));
 
-      Sphere sphere(_radius, sphereCenter, _segments / 2, _segments,
-                    sphere_direction);
+      unsigned int subdivision_level =
+          std::max(1U, static_cast<unsigned int>(_segments / 16));
+      Sphere sphere(_radius, sphereCenter, subdivision_level, sphere_direction);
       CGAL::Polyhedron_3<Kernel> sphere_poly = sphere.generatePolyhedron();
       Nef_polyhedron             sphere_nef(sphere_poly);
       result = result.join(sphere_nef);
