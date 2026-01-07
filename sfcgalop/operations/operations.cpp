@@ -56,6 +56,7 @@
 #include <SFCGAL/algorithm/union.h>
 #include <SFCGAL/algorithm/visibility.h>
 #include <SFCGAL/algorithm/volume.h>
+#include <SFCGAL/algorithm/topologyEdit.h>
 
 #include <SFCGAL/Envelope.h>
 #include <SFCGAL/GeometryCollection.h>
@@ -1185,6 +1186,23 @@ const std::vector<Operation> operations = {
        return Constructors::make_torus(center_x, center_y, center_z, axis_x,
                                        axis_y, axis_z, major_radius,
                                        minor_radius, num_major, num_minor);
+     }},
+
+    {"insert_points_from", "Construction",
+     "Insert points from geometry B into geometry A within tolerance", true,
+     "Parameters:\n  tolerance=VALUE: Maximum distance for point insertion "
+     "(default: 1e-9)\n\nExample:\n  sfcgalop -a \"POLYGON((0 0,10 0,10 10,0 "
+     "10,0 0))\" -b \"MULTILINESTRING((5 0,5 10),(0 5,10 5))\" "
+     "insert_points_from \"tolerance=0.01\"",
+     "A, B, params", "G",
+     [](const std::string &args, const SFCGAL::Geometry *geom_a,
+        const SFCGAL::Geometry *geom_b) -> std::optional<OperationResult> {
+       if (!geom_b) {
+         return std::nullopt;
+       }
+       auto   params    = parse_params(args);
+       double tolerance = params.count("tolerance") ? params["tolerance"] : 1e-9;
+       return SFCGAL::algorithm::insertPointsFrom(*geom_a, *geom_b, tolerance);
      }},
 
     {"to_solid", "Conversions", "Convert a PolyhedralSurface to a Solid", false,
