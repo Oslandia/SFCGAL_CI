@@ -635,22 +635,61 @@ const std::vector<Operation> operations = {
 
     {"buffer3d", "Construction", "Create a 3D buffer around points and lines",
      false,
-     "Parameters:\n  radius=VALUE: Buffer radius (default: 1.0)\n\nNote: "
-     "Segments are fixed at 16\nOnly works with Point and LineString "
-     "geometries\n\nExample:\n  sfcgalop -a \"POINT(0 0 0)\" buffer3d "
-     "\"radius=2.5\"",
+     "Parameters:\n"
+     "  radius=VALUE: Buffer radius (default: 1.0)\n"
+     "  segments=N: Number of segments for curved surfaces (default: 16)\n"
+     "  type=TYPE: Buffer type - round, cylsphere, or flat (default: round)\n\n"
+     "Buffer types:\n"
+     "  round     - Minkowski sum with a sphere (smooth result)\n"
+     "  cylsphere - Union of cylinders and spheres (faster)\n"
+     "  flat      - Construction using disk on bisector plane\n\n"
+     "Only works with Point and LineString geometries.\n\n"
+     "Examples:\n"
+     "  sfcgalop -a \"POINT(0 0 0)\" buffer3d \"radius=2.5\"\n"
+     "  sfcgalop -a \"LINESTRING Z(0 0 0,1 1 1)\" buffer3d "
+     "\"radius=0.5,type=cylsphere\"\n"
+     "  sfcgalop -a \"LINESTRING Z(0 0 0,1 0 0,1 1 0)\" buffer3d "
+     "\"radius=0.3,segments=32,type=flat\"",
      "A, params", "G",
      [](const std::string &args, const SFCGAL::Geometry *geom_a,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto   params   = parse_params(args);
-       double radius   = params.count("radius") ? params["radius"] : 1.0;
-       int    segments = 16; // default segments
+       auto   params = parse_params(args);
+       double radius = params.count("radius") ? params["radius"] : 1.0;
+       int    segments =
+           static_cast<int>(params.count("segments") ? params["segments"] : 16);
+
+       // Parse buffer type from string
+       SFCGAL::algorithm::Buffer3D::BufferType bufferType =
+           SFCGAL::algorithm::Buffer3D::ROUND;
+
+       // Check for type parameter in the args string
+       if (args.find("type=") != std::string::npos) {
+         size_t type_pos = args.find("type=");
+         size_t start    = type_pos + 5; // length of "type="
+         size_t end      = args.find(',', start);
+         if (end == std::string::npos) {
+           end = args.length();
+         }
+         std::string type_str = args.substr(start, end - start);
+         // Trim and convert to lowercase
+         type_str = trim(type_str);
+         std::transform(type_str.begin(), type_str.end(), type_str.begin(),
+                        [](unsigned char c) { return std::tolower(c); });
+
+         if (type_str == "cylsphere" || type_str == "cyl" ||
+             type_str == "cylinder") {
+           bufferType = SFCGAL::algorithm::Buffer3D::CYLSPHERE;
+         } else if (type_str == "flat" || type_str == "disk") {
+           bufferType = SFCGAL::algorithm::Buffer3D::FLAT;
+         }
+         // else keep ROUND as default
+       }
 
        try {
          SFCGAL::algorithm::Buffer3D buffer(*geom_a, radius, segments);
-         return buffer.compute(SFCGAL::algorithm::Buffer3D::ROUND);
-       } catch (const std::exception &) {
-         // Buffer3D only works for Point and LineString
+         return buffer.compute(bufferType);
+       } catch (const std::exception &e) {
+         std::cerr << "buffer3d error: " << e.what() << "\n";
          return std::nullopt;
        }
      }},
@@ -1072,28 +1111,31 @@ const std::vector<Operation> operations = {
      }},
 
     // Constructors
-    {"make_sphere", "Constructors", "Create a 3D sphere primitive", false,
+    {"make_sphere", "Constructors",
+     "Create a 3D sphere primitive using icosahedron subdivision", false,
      "Parameters:\n  x=X_COORD: X coordinate of center (default: 0.0)\n  "
      "y=Y_COORD: Y coordinate of center (default: 0.0)\n  z=Z_COORD: Z "
      "coordinate of center (default: 0.0)\n  radius=VALUE: Sphere radius "
-     "(default: 1.0)\n  num_vertical=N: Number of vertical divisions (default: "
-     "16)\n  num_horizontal=N: Number of horizontal divisions (default: "
-     "32)\n\nExample:\n  sfcgalop make_sphere "
-     "\"x=0,y=0,z=0,radius=2.5,num_vertical=20,num_horizontal=40\"",
+     "(default: 1.0)\n  num_subdivisions=N: Number of icosahedron subdivisions "
+     "(default: 2)\n\n"
+     "Example:\n  sfcgalop make_sphere "
+     "\"x=0,y=0,z=0,radius=2.5,num_subdivisions=3\"",
      "params", "G",
      [](const std::string &args, const SFCGAL::Geometry *,
         const SFCGAL::Geometry *) -> std::optional<OperationResult> {
-       auto   params       = parse_params(args);
-       double x            = params.count("x") ? params["x"] : 0.0;
-       double y            = params.count("y") ? params["y"] : 0.0;
-       double z            = params.count("z") ? params["z"] : 0.0;
-       double radius       = params.count("radius") ? params["radius"] : 1.0;
-       auto   num_vertical = static_cast<unsigned int>(
-           params.count("num_vertical") ? params["num_vertical"] : 16);
-       auto num_horizontal = static_cast<unsigned int>(
-           params.count("num_horizontal") ? params["num_horizontal"] : 32);
-       return Constructors::make_sphere(x, y, z, radius, num_vertical,
-                                        num_horizontal);
+       auto   params = parse_params(args);
+       double x      = params.count("x") ? params["x"] : 0.0;
+       double y      = params.count("y") ? params["y"] : 0.0;
+       double z      = params.count("z") ? params["z"] : 0.0;
+       double radius = params.count("radius") ? params["radius"] : 1.0;
+
+       unsigned int num_subdivisions = 2; // default
+       if (params.count("num_subdivisions")) {
+         num_subdivisions =
+             static_cast<unsigned int>(params["num_subdivisions"]);
+       }
+
+       return Constructors::make_sphere(x, y, z, radius, num_subdivisions);
      }},
 
     {"make_cube", "Constructors", "Create a 3D cube primitive", false,
