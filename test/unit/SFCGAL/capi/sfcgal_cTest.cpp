@@ -24,6 +24,7 @@ BOOST_AUTO_TEST_SUITE(SFCGAL_sfcgal_cTest)
 
 bool hasError = false;
 
+// NOLINTNEXTLINE(cert-dcl50-cpp)
 auto
 on_error(const char * /*msg*/, ...) -> int
 {
@@ -36,10 +37,10 @@ struct SfcgalDeleter {
   /// @brief Automatically delete a sfcgal geometry pointer
   /// @param geometry the geometry to delete
   void
-  operator()(sfcgal_geometry_t *geometry) const
+  operator()(const sfcgal_geometry_t *geometry) const
   {
     if (geometry != nullptr) {
-      sfcgal_geometry_delete(geometry);
+      sfcgal_geometry_delete(const_cast<sfcgal_geometry_t *>(geometry));
     }
   }
 };
@@ -51,7 +52,7 @@ BOOST_AUTO_TEST_CASE(testEmpty)
 {
   sfcgal_set_error_handlers(printf, on_error);
 
-  std::unique_ptr<Geometry> const emptyGeom(io::readWkt("POLYGON EMPTY"));
+  auto const emptyGeom = io::readWkt("POLYGON EMPTY");
   BOOST_CHECK(sfcgal_geometry_is_empty(emptyGeom.get()));
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(emptyGeom.get()), 0);
 
@@ -82,12 +83,12 @@ BOOST_AUTO_TEST_CASE(testDimension)
   sfcgal_set_error_handlers(printf, on_error);
 
   // ========== Empty Polygon
-  std::unique_ptr<Geometry> const emptyPolygon(io::readWkt("POLYGON EMPTY"));
+  auto const emptyPolygon = io::readWkt("POLYGON EMPTY");
   BOOST_CHECK(sfcgal_geometry_is_empty(emptyPolygon.get()));
   BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(emptyPolygon.get()), 2);
 
   // ========== Point
-  std::unique_ptr<Geometry> const pointGeom(io::readWkt("POINTZ (4 4 9)"));
+  auto const pointGeom = io::readWkt("POINTZ (4 4 9)");
   BOOST_CHECK(!sfcgal_geometry_is_empty(pointGeom.get()));
   BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(pointGeom.get()), 0);
 
@@ -109,8 +110,8 @@ BOOST_AUTO_TEST_CASE(testDimension)
   BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(polygonGeom3D.get()), 2);
 
   // ========== PolyhedralSurface
-  std::unique_ptr<Geometry> const polyhedralSurface(io::readWkt(
-      "POLYHEDRALSURFACE Z (((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)))"));
+  auto const polyhedralSurface = io::readWkt(
+      "POLYHEDRALSURFACE Z (((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)))");
   BOOST_CHECK(!sfcgal_geometry_is_empty(polyhedralSurface.get()));
   BOOST_CHECK_EQUAL(sfcgal_geometry_dimension(polyhedralSurface.get()), 2);
 }
@@ -147,8 +148,8 @@ BOOST_AUTO_TEST_CASE(testIsValid)
   }
 
   // ========== 3D
-  std::unique_ptr<Geometry> const invalidTriangle1(io::readWkt(
-      "TRIANGLE((1.0 -1.0 -1.0,1.0 1.0 -1.0,1.0 -1.0 1.0,1.0 -1.0 -1.0))"));
+  auto const invalidTriangle1 = io::readWkt(
+      "TRIANGLE((1.0 -1.0 -1.0,1.0 1.0 -1.0,1.0 -1.0 1.0,1.0 -1.0 -1.0))");
   result = sfcgal_geometry_is_valid_detail(invalidTriangle1.get(), &reason,
                                            &location);
   // check
@@ -156,8 +157,8 @@ BOOST_AUTO_TEST_CASE(testIsValid)
   BOOST_CHECK_EQUAL(nullptr, reason);
   BOOST_CHECK_EQUAL(nullptr, location);
 
-  std::unique_ptr<Geometry> const invalidTriangle2(io::readWkt(
-      "TRIANGLE((1.0 -1.0 -1.0,1.0 1.0 -1.0,1.0 -1.0 -1.0,1.0 -1.0 -1.0))"));
+  auto const invalidTriangle2 = io::readWkt(
+      "TRIANGLE((1.0 -1.0 -1.0,1.0 1.0 -1.0,1.0 -1.0 -1.0,1.0 -1.0 -1.0))");
   result = sfcgal_geometry_is_valid_detail(invalidTriangle2.get(), &reason,
                                            &location);
   // check
@@ -473,14 +474,14 @@ BOOST_AUTO_TEST_CASE(testSwapXY)
 BOOST_AUTO_TEST_CASE(testType)
 {
   // PolyhedralSurface
-  std::string const               polySurfaceStr = "POLYHEDRALSURFACE Z ("
-                                                   "((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0)),"
-                                                   "((2 0 0, 4 0 0, 4 2 1, 2 2 1, 2 0 0)),"
-                                                   "((0 2 1, 2 2 1, 1 3 2, 0 2 1))"
-                                                   ")";
-  std::unique_ptr<Geometry> const polySurface(io::readWkt(polySurfaceStr));
-  char                           *polyType;
-  size_t                          polyLen;
+  std::string const polySurfaceStr = "POLYHEDRALSURFACE Z ("
+                                     "((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0)),"
+                                     "((2 0 0, 4 0 0, 4 2 1, 2 2 1, 2 0 0)),"
+                                     "((0 2 1, 2 2 1, 1 3 2, 0 2 1))"
+                                     ")";
+  auto const        polySurface    = io::readWkt(polySurfaceStr);
+  char             *polyType;
+  size_t            polyLen;
   sfcgal_geometry_type(polySurface.get(), &polyType, &polyLen);
   std::string strPolyType(polyType, polyLen);
   sfcgal_free_buffer(polyType);
@@ -559,7 +560,7 @@ BOOST_AUTO_TEST_CASE(testIsEqual)
     hasError = false;
     BOOST_CHECK_EQUAL(true,
                       sfcgal_geometry_is_equals(line1.get(), line2.get()));
-    BOOST_CHECK(hasError == false);
+    BOOST_CHECK(!hasError);
   }
 
   {
@@ -572,7 +573,7 @@ BOOST_AUTO_TEST_CASE(testIsEqual)
     hasError = false;
     BOOST_CHECK_EQUAL(
         true, sfcgal_geometry_is_almost_equals(line1.get(), line2.get(), 0.11));
-    BOOST_CHECK(hasError == false);
+    BOOST_CHECK(!hasError);
   }
 
   {
@@ -587,7 +588,7 @@ BOOST_AUTO_TEST_CASE(testIsEqual)
                                 line1.get(), line2.get(), 0.100008));
     BOOST_CHECK_EQUAL(false, sfcgal_geometry_is_almost_equals(
                                  line1.get(), line2.get(), 0.099993));
-    BOOST_CHECK(hasError == false);
+    BOOST_CHECK(!hasError);
   }
 }
 
@@ -596,69 +597,67 @@ BOOST_AUTO_TEST_CASE(testErrorOnBadGeometryType)
 {
   sfcgal_set_error_handlers(printf, on_error);
 
-  std::unique_ptr<Geometry> const line(io::readWkt("LINESTRING (0 0, 0 1)"));
-  std::unique_ptr<Geometry>       point(io::readWkt("POINT (0 2)"));
-  sfcgal_geometry_t              *lineGeom = line.get();
+  auto const                line = io::readWkt("LINESTRING (0 0, 0 1)");
+  std::unique_ptr<Geometry> point(io::readWkt("POINT (0 2)"));
+  sfcgal_geometry_t        *lineGeom = line.get();
 
   hasError = false;
   BOOST_CHECK_EQUAL(2,
                     sfcgal_linestring_num_points(lineGeom)); // should succeed
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   hasError = false;
   BOOST_CHECK(sfcgal_triangle_vertex(lineGeom, 0) == nullptr); // should fail
-  BOOST_CHECK(hasError == true);
+  BOOST_CHECK(hasError);
 
   sfcgal_geometry_t *pointGeom = point.release();
   hasError                     = false;
   sfcgal_linestring_add_point(lineGeom, pointGeom); // should succeed
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   hasError = false;
   sfcgal_linestring_add_point(lineGeom, lineGeom); // should fail
-  BOOST_CHECK(hasError == true);
+  BOOST_CHECK(hasError);
 }
 
 BOOST_AUTO_TEST_CASE(testGeometryN)
 {
   sfcgal_set_error_handlers(printf, on_error);
 
-  std::unique_ptr<Geometry> const line(io::readWkt("LINESTRING (0 0, 0 1)"));
-  std::unique_ptr<Geometry> const point(io::readWkt("POINT (0 2)"));
+  auto const line  = io::readWkt("LINESTRING (0 0, 0 1)");
+  auto const point = io::readWkt("POINT (0 2)");
 
-  std::string                     geomCollectionStr = "GEOMETRYCOLLECTION ("
-                                                      "POINT (1 1),"
-                                                      "LINESTRING (0 0, 2 2, 3 3),"
-                                                      "POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0)),"
-                                                      "MULTIPOINT ((2 2), (3 3), (4 4))"
-                                                      ")";
-  std::unique_ptr<Geometry> const geomCollection(
-      io::readWkt(geomCollectionStr));
-  std::unique_ptr<Geometry> const geomCollection0(io::readWkt("POINT (1 1)"));
-  std::unique_ptr<Geometry> const geomCollection2(
-      io::readWkt("POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0))"));
+  std::string geomCollectionStr = "GEOMETRYCOLLECTION ("
+                                  "POINT (1 1),"
+                                  "LINESTRING (0 0, 2 2, 3 3),"
+                                  "POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0)),"
+                                  "MULTIPOINT ((2 2), (3 3), (4 4))"
+                                  ")";
+  auto const  geomCollection    = io::readWkt(geomCollectionStr);
+  auto const  geomCollection0   = io::readWkt("POINT (1 1)");
+  auto const  geomCollection2 =
+      io::readWkt("POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0))");
 
-  std::string                     polySurfaceStr = "POLYHEDRALSURFACE Z ("
-                                                   "((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0)),"
-                                                   "((2 0 0, 4 0 0, 4 2 1, 2 2 1, 2 0 0)),"
-                                                   "((0 2 1, 2 2 1, 1 3 2, 0 2 1))"
-                                                   ")";
-  std::unique_ptr<Geometry> const polySurface(io::readWkt(polySurfaceStr));
-  std::unique_ptr<Geometry> const polySurface0(
-      io::readWkt("POLYGON Z ((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0))"));
-  std::unique_ptr<Geometry> const polySurface2(
-      io::readWkt("POLYGON Z ((0 2 1, 2 2 1, 1 3 2, 0 2 1))"));
+  std::string polySurfaceStr = "POLYHEDRALSURFACE Z ("
+                               "((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0)),"
+                               "((2 0 0, 4 0 0, 4 2 1, 2 2 1, 2 0 0)),"
+                               "((0 2 1, 2 2 1, 1 3 2, 0 2 1))"
+                               ")";
+  auto const  polySurface    = io::readWkt(polySurfaceStr);
+  auto const  polySurface0 =
+      io::readWkt("POLYGON Z ((0 0 0, 2 0 0, 2 2 1, 0 2 1, 0 0 0))");
+  auto const polySurface2 =
+      io::readWkt("POLYGON Z ((0 2 1, 2 2 1, 1 3 2, 0 2 1))");
 
-  std::string                     tinStr = "TIN Z ("
-                                           "((0 0 0, 1 0 0, 0.5 1 1, 0 0 0)),"
-                                           "((1 0 0, 1.5 1 1, 0.5 1 1, 1 0 0)),"
-                                           "((0.5 1 1, 1.5 1 1, 1 2 2, 0.5 1 1))"
-                                           ")";
-  std::unique_ptr<Geometry> const tin(io::readWkt(tinStr));
-  std::unique_ptr<Geometry> const tin0(
-      io::readWkt("TRIANGLE Z ((0 0 0, 1 0 0, 0.5 1 1, 0 0 0))"));
-  std::unique_ptr<Geometry> const tin2(
-      io::readWkt("TRIANGLE Z ((0.5 1 1, 1.5 1 1, 1 2 2, 0.5 1 1))"));
+  std::string tinStr = "TIN Z ("
+                       "((0 0 0, 1 0 0, 0.5 1 1, 0 0 0)),"
+                       "((1 0 0, 1.5 1 1, 0.5 1 1, 1 0 0)),"
+                       "((0.5 1 1, 1.5 1 1, 1 2 2, 0.5 1 1))"
+                       ")";
+  auto const  tin    = io::readWkt(tinStr);
+  auto const  tin0 = io::readWkt("TRIANGLE Z ((0 0 0, 1 0 0, 0.5 1 1, 0 0 0))");
+  auto const  tin2 =
+      io::readWkt("TRIANGLE Z ((0.5 1 1, 1.5 1 1, 1 2 2, 0.5 1 1))");
 
   // GeometryCollection
   hasError = false;
@@ -669,12 +668,12 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   BOOST_CHECK(sfcgal_geometry_covers(
       sfcgal_geometry_collection_geometry_n(geomCollection.get(), 0),
       geomCollection0.get()));
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   hasError = false;
   BOOST_CHECK(sfcgal_geometry_covers(
       sfcgal_geometry_collection_geometry_n(geomCollection.get(), 2),
       geomCollection2.get()));
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   sfcgal_geometry_collection_set_geometry_n(geomCollection.get(),
                                             point->clone().release(), 1);
   BOOST_CHECK(sfcgal_geometry_covers(
@@ -692,12 +691,12 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   BOOST_CHECK(sfcgal_geometry_covers_3d(
       sfcgal_polyhedral_surface_patch_n(polySurface.get(), 0),
       polySurface0.get()));
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   hasError = false;
   BOOST_CHECK(sfcgal_geometry_covers_3d(
       sfcgal_polyhedral_surface_patch_n(polySurface.get(), 2),
       polySurface2.get()));
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   std::unique_ptr<Geometry> const simplePolygon(
       io::readWkt("POLYGON Z ((0 0 0, 2 0 1, 2 2 2, 0 2 1, 0 0 0))"));
   sfcgal_polyhedral_surface_set_patch_n(polySurface.get(),
@@ -715,11 +714,11 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   BOOST_CHECK_EQUAL(sfcgal_triangulated_surface_num_patches(tin.get()), 3);
   BOOST_CHECK(sfcgal_geometry_covers_3d(
       sfcgal_triangulated_surface_patch_n(tin.get(), 0), tin0.get()));
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   hasError = false;
   BOOST_CHECK(sfcgal_geometry_covers_3d(
       sfcgal_triangulated_surface_patch_n(tin.get(), 2), tin2.get()));
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   std::unique_ptr<Geometry> const simpleTriangle(
       io::readWkt("TRIANGLE Z ((0 0 0, 2 0 1, 2 2 2, 0 0 0))"));
   sfcgal_triangulated_surface_set_patch_n(tin.get(),
@@ -730,12 +729,12 @@ BOOST_AUTO_TEST_CASE(testGeometryN)
   // Line
   hasError = false;
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(line.get()), 1);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   // Point
   hasError = false;
   BOOST_CHECK_EQUAL(sfcgal_geometry_num_geometries(point.get()), 1);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 }
 
 BOOST_AUTO_TEST_CASE(testAsWkb)
@@ -770,7 +769,7 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonPolygon)
   hasError = false;
   sfcgal_geometry_t *skeleton =
       sfcgal_geometry_straight_skeleton(polygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(5, sfcgal_geometry_num_geometries(skeleton));
 
   sfcgal_geometry_delete(skeleton);
@@ -787,7 +786,7 @@ BOOST_AUTO_TEST_CASE(testStraightSkeletonMultiPolygon)
   hasError = false;
   sfcgal_geometry_t *skeleton =
       sfcgal_geometry_straight_skeleton(multiPolygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(8, sfcgal_geometry_num_geometries(skeleton));
 
   sfcgal_geometry_delete(skeleton);
@@ -797,14 +796,14 @@ BOOST_AUTO_TEST_CASE(testApproximateMedialAxis)
 {
   sfcgal_set_error_handlers(printf, on_error);
 
-  std::unique_ptr<Geometry> const polygon(io::readWkt(
+  auto const polygon = io::readWkt(
       "POLYGON ((-42 9,-44 9,-42 8,-22 7,-22 21,1 22,-5 13,-5 12,-4 "
-      "13,2 23,-23 22,-23 8,-42 9))"));
+      "13,2 23,-23 22,-23 8,-42 9))");
 
   hasError = false;
   sfcgal_geometry_t *skeleton =
       sfcgal_geometry_approximate_medial_axis(polygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(11, sfcgal_geometry_num_geometries(skeleton));
   BOOST_CHECK_EQUAL(
       71.56, std::round(sfcgal_geometry_length(skeleton) * 100.0) / 100.0);
@@ -819,9 +818,9 @@ BOOST_AUTO_TEST_CASE(testCovers)
   std::unique_ptr<Geometry> const multiPolygon1(
       io::readWkt("MULTIPOLYGON (((0 0, 20 0, 20 10, 0 10, 0 0)),((100 0,200 "
                   "0,150 100,100 0)))"));
-  std::unique_ptr<Geometry> const multiPolygon2(io::readWkt(
+  auto const multiPolygon2 = io::readWkt(
       "MULTIPOLYGON (((100 0,200 0,150 100,100 0)), ((0 0, 20 0, 20 "
-      "10, 0 10, 0 0)))"));
+      "10, 0 10, 0 0)))");
 
   BOOST_CHECK(sfcgal_geometry_covers(multiPolygon1.get(), multiPolygon2.get()));
 }
@@ -862,7 +861,7 @@ BOOST_AUTO_TEST_CASE(testLineSubstring)
   hasError = false;
   sfcgal_geometry_t *subLine =
       sfcgal_geometry_line_sub_string(line1.get(), 0.3, 0.7);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   BOOST_CHECK(sfcgal_geometry_covers_3d(subLine, line2.get()));
 
@@ -967,7 +966,7 @@ BOOST_AUTO_TEST_CASE(testForceRHR)
 
   std::string strGeom{"POLYGON ((0 0,0 5,5 5,5 0,0 0),(1 1,2 1,2 2,1 2,1 1))"};
 
-  std::unique_ptr<Geometry> const geom(io::readWkt(strGeom));
+  auto const geom = io::readWkt(strGeom);
 
   sfcgal_geometry_t *rhr = sfcgal_geometry_force_rhr(geom.get());
   // retrieve wkb from C api
@@ -990,7 +989,7 @@ BOOST_AUTO_TEST_CASE(testForceLHR)
   std::string expectedGeom{
       "POLYGON ((0 0,5 0,5 5,0 5,0 0),(1 1,1 2,2 2,2 1,1 1))"};
 
-  std::unique_ptr<Geometry> const geom(io::readWkt(strGeom));
+  auto const geom = io::readWkt(strGeom);
 
   sfcgal_geometry_t *lhr = sfcgal_geometry_force_lhr(geom.get());
   // retrieve wkb from C api
@@ -1015,7 +1014,7 @@ BOOST_AUTO_TEST_CASE(testForceRHR_3D)
       "POLYGON Z ((0 5 1,5 5 4,5 0 3,0 0 2,0 5 1),(2 1 1,2 2 4,1 2 3,1 1 2,2 1 "
       "1),(4 3 1,4 4 4,3 4 3,3 3 2,4 3 1))"};
 
-  std::unique_ptr<Geometry> const geom(io::readWkt(strGeom));
+  auto const geom = io::readWkt(strGeom);
 
   sfcgal_geometry_t *rhr = sfcgal_geometry_force_rhr(geom.get());
   // retrieve wkb from C api
@@ -1038,7 +1037,7 @@ BOOST_AUTO_TEST_CASE(testScaleUniformC)
 
   hasError                  = false;
   sfcgal_geometry_t *scaled = sfcgal_geometry_scale(point2D.get(), 2.0);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1058,7 +1057,7 @@ BOOST_AUTO_TEST_CASE(testScaleNonUniformC)
   hasError = false;
   sfcgal_geometry_t *scaled =
       sfcgal_geometry_scale_3d(point2D.get(), 2.0, 3.0, 4.0);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   // FLAKY WKT test
   std::unique_ptr<Geometry> const pointZ(io::readWkt("POINT Z (2/1 6/1 12/1)"));
@@ -1076,7 +1075,7 @@ BOOST_AUTO_TEST_CASE(testScaleAroundCenterC)
   hasError                  = false;
   sfcgal_geometry_t *scaled = sfcgal_geometry_scale_3d_around_center(
       point2D.get(), 2.0, 2.0, 2.0, 1, 1, 1);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1100,12 +1099,12 @@ BOOST_AUTO_TEST_CASE(testScaleCubeNonUniformC)
                         "((0 10 0, 0 10 10, 10 10 10, 10 10 0, 0 10 0)),"
                         "((0 0 0, 0 0 10, 0 10 10, 0 10 0, 0 0 0)))";
 
-  std::unique_ptr<Geometry> const cube(io::readWkt(cubeWkt));
+  auto const cube = io::readWkt(cubeWkt);
 
   hasError = false;
   sfcgal_geometry_t *scaled =
       sfcgal_geometry_scale_3d(cube.get(), 0.5, 1.0, 2.0);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1134,7 +1133,7 @@ BOOST_AUTO_TEST_CASE(testRotate2D)
 
   hasError                   = false;
   sfcgal_geometry_t *rotated = sfcgal_geometry_rotate(point2D.get(), M_PI / 2);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1154,7 +1153,7 @@ BOOST_AUTO_TEST_CASE(testRotate2DAroundPoint)
   hasError = false;
   sfcgal_geometry_t *rotated =
       sfcgal_geometry_rotate_2d(point2D.get(), M_PI / 2, 1, 0);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1174,7 +1173,7 @@ BOOST_AUTO_TEST_CASE(testRotate3D)
   hasError = false;
   sfcgal_geometry_t *rotated =
       sfcgal_geometry_rotate_3d(pointZ.get(), M_PI / 2, 0, 0, 1);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1203,7 +1202,7 @@ BOOST_AUTO_TEST_CASE(testTransform)
     hasError = false;
     sfcgal_geometry_t *result =
         sfcgal_geometry_transform(multiPolygon.get(), mat.data());
-    BOOST_CHECK(hasError == false);
+    BOOST_CHECK(!hasError);
 
     char  *wkt;
     size_t len;
@@ -1227,7 +1226,7 @@ BOOST_AUTO_TEST_CASE(testTransform)
     hasError = false;
     sfcgal_geometry_t *result =
         sfcgal_geometry_transform(multiPolygon.get(), mat.data());
-    BOOST_CHECK(hasError == false);
+    BOOST_CHECK(!hasError);
 
     char  *wkt;
     size_t len;
@@ -1251,7 +1250,7 @@ BOOST_AUTO_TEST_CASE(testTransform)
     hasError = false;
     sfcgal_geometry_t *result =
         sfcgal_geometry_transform(multiPolygon.get(), mat.data());
-    BOOST_CHECK(hasError == false);
+    BOOST_CHECK(!hasError);
 
     char  *wkt;
     size_t len;
@@ -1276,7 +1275,7 @@ BOOST_AUTO_TEST_CASE(testEnvelope2D)
 
   hasError                  = false;
   sfcgal_geometry_t *result = sfcgal_geometry_envelope(multiPolygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1288,7 +1287,7 @@ BOOST_AUTO_TEST_CASE(testEnvelope2D)
 
   hasError = false;
   result   = sfcgal_geometry_envelope_3d(multiPolygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   sfcgal_geometry_as_text_decim(result, 0, &wkt, &len);
   BOOST_CHECK_EQUAL(std::string(wkt), "POLYGON ((0 0,30 0,30 15,0 15,0 0))");
@@ -1307,7 +1306,7 @@ BOOST_AUTO_TEST_CASE(testEnvelope3D)
 
   hasError                  = false;
   sfcgal_geometry_t *result = sfcgal_geometry_envelope(multiLine.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   std::string expected = "POLYGON ((0 0,30 0,30 15,0 15,0 0))";
   char       *wkt;
@@ -1320,7 +1319,7 @@ BOOST_AUTO_TEST_CASE(testEnvelope3D)
 
   hasError = false;
   result   = sfcgal_geometry_envelope_3d(multiLine.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   expected = "POLYHEDRALSURFACE Z (((0 0 -5,0 15 -5,30 15 -5,30 0 -5,0 0 -5)),"
              "((0 0 25,30 0 25,30 15 25,0 15 25,0 0 25)),"
@@ -1343,7 +1342,7 @@ BOOST_AUTO_TEST_CASE(testLength2D)
       io::readWkt("POLYGON ((0 0,30 0,30 15,0 15,0 0))"));
   hasError      = false;
   double result = sfcgal_geometry_length(polygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(0.0, result);
 
   std::unique_ptr<Geometry> const multiPolygon(
@@ -1351,28 +1350,28 @@ BOOST_AUTO_TEST_CASE(testLength2D)
                   "5, 30 15, 25 15, 25 5)))"));
   hasError = false;
   result   = sfcgal_geometry_length(multiPolygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(0.0, result);
 
   std::unique_ptr<Geometry> const line2D(
       io::readWkt("LINESTRING (0 0, 0 3, 4 3)"));
   hasError = false;
   result   = sfcgal_geometry_length(line2D.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(7.0, result);
 
   std::unique_ptr<Geometry> const multiLine(
       io::readWkt("MULTILINESTRING ((0 0, 0 3, 4 3), (10 0, 10 3, 14 3))"));
   hasError = false;
   result   = sfcgal_geometry_length(multiLine.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(14.0, result);
 
   std::unique_ptr<Geometry> const lineZ(
       io::readWkt("LINESTRING Z (0 0 0, 0 3 10, 4 3 20)"));
   hasError = false;
   result   = sfcgal_geometry_length(lineZ.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(7.0, result);
 }
 
@@ -1384,7 +1383,7 @@ BOOST_AUTO_TEST_CASE(testLength3D)
       io::readWkt("POLYGON ((0 0,30 0,30 15,0 15,0 0))"));
   hasError      = false;
   double result = sfcgal_geometry_length_3d(polygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(0.0, result);
 
   std::unique_ptr<Geometry> const multiPolygon(
@@ -1392,28 +1391,28 @@ BOOST_AUTO_TEST_CASE(testLength3D)
                   "5, 30 15, 25 15, 25 5)))"));
   hasError = false;
   result   = sfcgal_geometry_length_3d(multiPolygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(0.0, result);
 
   std::unique_ptr<Geometry> const line2D(
       io::readWkt("LINESTRING (0 0, 0 3, 4 3)"));
   hasError = false;
   result   = sfcgal_geometry_length(line2D.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(7.0, result);
 
   std::unique_ptr<Geometry> const multiLine(
       io::readWkt("MULTILINESTRING ((0 0, 0 3, 4 3), (10 0, 10 3, 14 3))"));
   hasError = false;
   result   = sfcgal_geometry_length_3d(multiLine.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(14.0, result);
 
   std::unique_ptr<Geometry> const lineZ(
       io::readWkt("LINESTRING Z (0 0 0, 0 3 10, 4 3 20)"));
   hasError = false;
   result   = sfcgal_geometry_length_3d(lineZ.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
   BOOST_CHECK_EQUAL(21.2106, std::round(result * 10000.0) / 10000.0);
 }
 
@@ -1427,7 +1426,7 @@ BOOST_AUTO_TEST_CASE(testBoundary)
   hasError = false;
   sfcgal_geometry_t *polygon2DBoundary =
       sfcgal_geometry_boundary(polygon2D.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   std::string expectedPolygon2DBoundary =
       "LINESTRING (0 0,30 0,30 15,0 15,0 0)";
@@ -1448,7 +1447,7 @@ BOOST_AUTO_TEST_CASE(testBoundary)
   hasError = false;
   sfcgal_geometry_t *multiPolygon2DBoundary =
       sfcgal_geometry_boundary(multiPolygon2D.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   std::string expectedMultiPolygon2DBoundary =
       "MULTILINESTRING ((0 0,20 0),(20 0,20 10),(20 10,0 10),(0 10,0 0),(25 "
@@ -1470,7 +1469,7 @@ BOOST_AUTO_TEST_CASE(testBoundary)
   hasError = false;
   sfcgal_geometry_t *polygon3DBoundary =
       sfcgal_geometry_boundary(polygon3D.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   std::string expectedPolygon3DBoundary =
       "MULTILINESTRING ((0 0,0 10,10 10,10 0,0 0),(1 1 1,1 2 1,2 2 1,2 1 1,1 1 "
@@ -1490,7 +1489,7 @@ BOOST_AUTO_TEST_CASE(testBoundary)
       io::readWkt("LINESTRING (0 0, 0 3, 4 3)"));
   hasError                          = false;
   sfcgal_geometry_t *line2DBoundary = sfcgal_geometry_boundary(line2D.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   std::string expectedLine2DBoundary = "MULTIPOINT ((0 0),(4 3))";
   char       *wktLine2DBoundary;
@@ -1508,7 +1507,7 @@ BOOST_AUTO_TEST_CASE(testBoundary)
   hasError = false;
   sfcgal_geometry_t *multiLine3DBoundary =
       sfcgal_geometry_boundary(multiLine3D.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   std::string expectedMultiLine3DBoundary =
       "MULTIPOINT Z ((0 0 1),(2 2 3),(3 3 4),(5 5 6))";
@@ -1527,7 +1526,7 @@ BOOST_AUTO_TEST_CASE(testBoundary)
       io::readWkt("LINESTRING Z (0 0 0, 0 3 10, 4 3 20)"));
   hasError                          = false;
   sfcgal_geometry_t *line3DBoundary = sfcgal_geometry_boundary(line3D.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   std::string expectedLine3DBoundary = "MULTIPOINT Z ((0 0 0),(4 3 20))";
   char       *wktLine3DBoundary;
@@ -1550,7 +1549,7 @@ BOOST_AUTO_TEST_CASE(testCentroid)
 
   hasError                  = false;
   sfcgal_geometry_t *result = sfcgal_geometry_centroid(multiPolygon.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1571,7 +1570,7 @@ BOOST_AUTO_TEST_CASE(testCentroid3D)
 
   hasError                  = false;
   sfcgal_geometry_t *result = sfcgal_geometry_centroid(multiPolygonZ.get());
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1591,7 +1590,7 @@ BOOST_AUTO_TEST_CASE(testRotate3DAroundCenter)
   hasError                   = false;
   sfcgal_geometry_t *rotated = sfcgal_geometry_rotate_3d_around_center(
       pointZ.get(), M_PI / 2, 0, 0, 1, 1, 0, 0);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1610,7 +1609,7 @@ BOOST_AUTO_TEST_CASE(testRotateX)
 
   hasError                   = false;
   sfcgal_geometry_t *rotated = sfcgal_geometry_rotate_x(pointZ.get(), M_PI / 2);
-  BOOST_CHECK(hasError == false);
+  BOOST_CHECK(!hasError);
 
   char  *wkt;
   size_t len;
@@ -1662,7 +1661,7 @@ BOOST_AUTO_TEST_CASE(testSolidSetExteriorShell)
                                      "((0 0 1, 1 0 1, 1 1 1, 0 1 1, 0 0 1))"
                                      ")";
 
-  std::unique_ptr<Geometry> shell1(io::readWkt(polyhedral1Str));
+  auto shell1 = io::readWkt(polyhedral1Str);
   BOOST_CHECK(!shell1->isEmpty());
 
   sfcgal_solid_set_exterior_shell(solid.get(),
@@ -1721,7 +1720,7 @@ BOOST_AUTO_TEST_CASE(testIsClosed)
                     "((0 2 0, 1 1 2, 0 0 0, 0 2 0))"         // Left
                     ")";
 
-  std::unique_ptr<Geometry> const polyhedralSurface(io::readWkt(wkt));
+  auto const polyhedralSurface = io::readWkt(wkt);
   BOOST_CHECK(sfcgal_geometry_is_closed(polyhedralSurface.get()));
 }
 
