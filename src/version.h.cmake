@@ -18,6 +18,12 @@ extern "C" {
 
 #define SFCGAL_VERSION "@SFCGAL_VERSION@"
 
+// compute SFCGAL integer version from major, minor and patch number
+#define SFCGAL_MAKE_VERSION( major, minor, patch ) ( ( ( major ) * 10000 ) + ( ( minor ) * 100 ) + ( patch ) )
+
+// compute current SFCGAL integer version
+#define SFCGAL_VERSION_NUM SFCGAL_MAKE_VERSION( @SFCGAL_VERSION_MAJOR@, @SFCGAL_VERSION_MINOR@, @SFCGAL_VERSION_PATCH@ )
+
 // CGAL version macros
 #define SFCGAL_CGAL_VERSION_MAJOR @SFCGAL_CGAL_VERSION_MAJOR@
 #define SFCGAL_CGAL_VERSION_MINOR @SFCGAL_CGAL_VERSION_MINOR@
