@@ -23,4 +23,4 @@ Thank you to all our contributors for your support and dedication to the project
 
 The first SFCGAL releases were funded by the European Union (FEDER, related to the [e-PLU project](http://www.e-plu.fr)) and by Oslandia.
 
-We are seeking additional funding to continue development. If interested, contact us at [infos@oslandia.com](mailto:infos@oslandia.com).
+We are seeking additional funding to continue development. If interested, contact us at [infos@sfcgal.org](mailto:infos@sfcgal.org).
