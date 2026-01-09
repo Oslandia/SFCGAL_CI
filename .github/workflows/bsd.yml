@@ -25,14 +25,14 @@ jobs:
             echo `sysctl -n hw.ncpu`
             case "${{ matrix.os.name }}" in
               freebsd)
-                ASSUME_ALWAYS_YES=yes sudo pkg install -y cgal gmp mpfr boost-libs cmake ninja curl nlohmann-json
+                ASSUME_ALWAYS_YES=yes sudo pkg install -y gmp mpfr boost-libs cmake ninja curl nlohmann-json
                 ;;
               netbsd)
                 sudo pkgin -y update
-                sudo pkgin -y install cgal gmp mpfr boost cmake ninja-build curl nlohmann-json
+                sudo pkgin -y install gmp mpfr boost cmake ninja-build curl nlohmann-json
                 ;;
               openbsd)
-                sudo pkg_add cgal gmp gmpxx mpfr boost cmake ninja curl nlohmann-json
+                sudo pkg_add gmp gmpxx mpfr boost cmake ninja curl nlohmann-json
                 ;;
             esac
 
@@ -40,7 +40,7 @@ jobs:
             curl -L -o CGAL-${CGAL_VERSION}.tar.gz "https://github.com/CGAL/cgal/archive/refs/tags/v${CGAL_VERSION}.tar.gz"
             tar xzf CGAL-${CGAL_VERSION}.tar.gz
 
-            cmake -GNinja -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCGAL_DIR=CGAL-${CGAL_VERSION}
+            cmake -GNinja -S . -B build -DSFCGAL_BUILD_TESTS=ON -DCGAL_DIR=cgal-${CGAL_VERSION}
             cmake --build build -j `sysctl -n hw.ncpu`
             ctest -VV --test-dir build
 
