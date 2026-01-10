@@ -1315,6 +1315,33 @@ SFCGAL_API sfcgal_prepared_geometry_t *
 sfcgal_io_read_ewkt(const char *str, size_t len);
 
 /**
+ * Parse a GeoJSON representation into a Geometry.
+ * Supports Geometry, Feature, and FeatureCollection.
+ * For Feature/FeatureCollection, only the geometry part is extracted.
+ * @param str The GeoJSON string representing the geometry.
+ * @param len The size of @p str
+ * @post The returned geometry must be deallocated by the caller with
+ * sfcgal_geometry_delete()
+ * @return A SFCGAL::Geometry from the GeoJSON
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_geometry_t *
+sfcgal_io_read_geojson(const char *str, size_t len);
+
+/**
+ * Parse a GeoJSON representation into a PreparedGeometry.
+ * If CRS is specified in GeoJSON, extracts the EPSG code as SRID.
+ * @param str The GeoJSON string representing the geometry.
+ * @param len The size of @p str
+ * @post The returned prepared geometry must be deallocated by the caller with
+ * @pre sfcgal_prepared_geometry_delete
+ * @return A SFCGAL::PreparedGeometry from the GeoJSON
+ * @ingroup capi
+ */
+SFCGAL_API sfcgal_prepared_geometry_t *
+sfcgal_io_read_geojson_prepared(const char *str, size_t len);
+
+/**
  * io::readWKB
  */
 
@@ -1358,6 +1385,49 @@ sfcgal_io_write_binary_prepared(const sfcgal_prepared_geometry_t *geom,
  */
 SFCGAL_API sfcgal_prepared_geometry_t *
 sfcgal_io_read_binary_prepared(const char *str, size_t len);
+
+/**
+ * Convert a Geometry to its GeoJSON representation.
+ * @param[in] geom the input geometry
+ * @param[in] strict If true, output strictly RFC 7946 compliant GeoJSON.
+ *                   Non-standard types (TIN, Solid, etc.) are converted to
+ * standard types. If false, use SFCGAL type names as extensions (allows
+ * round-trip).
+ * @param[in] precision Number of decimal places for coordinates. -1 means full
+ * precision.
+ * @param[in] include_bbox Include bounding box in output.
+ * @param[out] buffer The output buffer
+ * @param[out] len The size of @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_geometry_as_geojson(const sfcgal_geometry_t *geom, int strict,
+                           int precision, int include_bbox, char **buffer,
+                           size_t *len);
+
+/**
+ * Convert a PreparedGeometry to its GeoJSON representation.
+ * If SRID is non-zero, includes a CRS member (non-standard but useful).
+ * @param[in] prepared the input prepared geometry
+ * @param[in] strict If true, output strictly RFC 7946 compliant GeoJSON.
+ *                   Non-standard types (TIN, Solid, etc.) are converted to
+ * standard types. If false, use SFCGAL type names as extensions (allows
+ * round-trip).
+ * @param[in] precision Number of decimal places for coordinates. -1 means full
+ * precision.
+ * @param[in] include_bbox Include bounding box in output.
+ * @param[out] buffer The output buffer
+ * @param[out] len The size of @p buffer
+ * @post @p buffer is returned allocated and must be freed by the caller with
+ *       sfcgal_free_buffer()
+ * @ingroup capi
+ */
+SFCGAL_API void
+sfcgal_prepared_geometry_as_geojson(const sfcgal_prepared_geometry_t *prepared,
+                                    int strict, int precision, int include_bbox,
+                                    char **buffer, size_t *len);
 
 /*--------------------------------------------------------------------------------------*
  *

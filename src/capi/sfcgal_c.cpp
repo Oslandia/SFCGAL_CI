@@ -36,6 +36,7 @@
 #include "SFCGAL/io/OBJ.h"
 #include "SFCGAL/io/STL.h"
 #include "SFCGAL/io/ewkt.h"
+#include "SFCGAL/io/geojson.h"
 #include "SFCGAL/io/vtk.h"
 #include "SFCGAL/io/wkb.h"
 #include "SFCGAL/io/wkt.h"
@@ -656,6 +657,33 @@ sfcgal_geometry_as_obj(const sfcgal_geometry_t *pgeom, char **buffer,
       alloc_and_copy(obj, buffer, len);)
 }
 
+extern "C" void
+sfcgal_geometry_as_geojson(const sfcgal_geometry_t *pgeom, int strict,
+                           int precision, int include_bbox, char **buffer,
+                           size_t *len)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      SFCGAL::io::GeoJSONOptions options; options.strict = strict != 0;
+      options.precision = precision; options.includeBbox = include_bbox != 0;
+      std::string json = SFCGAL::io::writeGeoJSON(
+          *reinterpret_cast<const SFCGAL::Geometry *>(pgeom), options);
+      alloc_and_copy(json, buffer, len);)
+}
+
+extern "C" void
+sfcgal_prepared_geometry_as_geojson(const sfcgal_prepared_geometry_t *pprepared,
+                                    int strict, int precision, int include_bbox,
+                                    char **buffer, size_t *len)
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR_NO_RET(
+      SFCGAL::io::GeoJSONOptions options; options.strict = strict != 0;
+      options.precision = precision; options.includeBbox = include_bbox != 0;
+      std::string json = SFCGAL::io::writeGeoJSON(
+          *reinterpret_cast<const SFCGAL::PreparedGeometry *>(pprepared),
+          options);
+      alloc_and_copy(json, buffer, len);)
+}
+
 /**
  * Point
  */
@@ -1228,6 +1256,14 @@ sfcgal_io_read_wkt(const char *str, size_t len) -> sfcgal_geometry_t *
 }
 
 extern "C" auto
+sfcgal_io_read_geojson(const char *str, size_t len) -> sfcgal_geometry_t *
+{
+  SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
+      std::string geojson_str(str, len);
+      return SFCGAL::io::readGeoJSON(geojson_str).release();)
+}
+
+extern "C" auto
 sfcgal_io_read_wkb(const char *str, size_t len) -> sfcgal_geometry_t *
 {
   SFCGAL_GEOMETRY_CONVERT_CATCH_TO_ERROR(
@@ -1273,6 +1309,24 @@ sfcgal_io_read_ewkt(const char *str, size_t len) -> sfcgal_prepared_geometry_t *
 
   try {
     g = SFCGAL::io::readEwkt(str, len);
+  } catch (std::exception &e) {
+    SFCGAL_ERROR("%s", e.what());
+    return nullptr;
+  }
+
+  SFCGAL::PreparedGeometry *pg = g.release();
+  return pg;
+}
+
+extern "C" auto
+sfcgal_io_read_geojson_prepared(const char *str, size_t len)
+    -> sfcgal_prepared_geometry_t *
+{
+  std::unique_ptr<SFCGAL::PreparedGeometry> g;
+
+  try {
+    std::string geojson_str(str, len);
+    g = SFCGAL::io::readGeoJSONPrepared(geojson_str);
   } catch (std::exception &e) {
     SFCGAL_ERROR("%s", e.what());
     return nullptr;
