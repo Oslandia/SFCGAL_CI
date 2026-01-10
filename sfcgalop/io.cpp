@@ -5,6 +5,7 @@
 
 #include <SFCGAL/io/OBJ.h>
 #include <SFCGAL/io/ewkt.h>
+#include <SFCGAL/io/geojson.h>
 #include <SFCGAL/io/wkb.h>
 #include <SFCGAL/io/wkt.h>
 
@@ -123,6 +124,23 @@ load_geometry(const std::string &source) -> std::unique_ptr<SFCGAL::Geometry>
 
       if (looks_like_obj) {
         return SFCGAL::io::OBJ::load(data);
+      }
+      // Check if this looks like GeoJSON
+      // GeoJSON typically starts with '{' and contains "type" field
+      if (!data.empty() && data[0] == '{') {
+        // Check for common GeoJSON type values
+        if (data.find("\"type\"") != std::string::npos &&
+            (data.find("\"Point\"") != std::string::npos ||
+             data.find("\"LineString\"") != std::string::npos ||
+             data.find("\"Polygon\"") != std::string::npos ||
+             data.find("\"MultiPoint\"") != std::string::npos ||
+             data.find("\"MultiLineString\"") != std::string::npos ||
+             data.find("\"MultiPolygon\"") != std::string::npos ||
+             data.find("\"GeometryCollection\"") != std::string::npos ||
+             data.find("\"Feature\"") != std::string::npos ||
+             data.find("\"FeatureCollection\"") != std::string::npos)) {
+          return SFCGAL::io::readGeoJSON(data);
+        }
       }
       // First, detect raw (binary) WKB: first byte 0x00/0x01 or presence of
       // NUL/control bytes.
@@ -246,6 +264,9 @@ print_result(const std::optional<OperationResult> &result, OutputFormat format,
             case OutputFormat::OBJ:
               out << SFCGAL::io::OBJ::saveToString(*arg);
               break;
+            case OutputFormat::GEOJSON:
+              out << SFCGAL::io::writeGeoJSON(*arg) << "\n";
+              break;
             }
           }
         } else if constexpr (std::is_same_v<T, bool>) {
@@ -292,6 +313,8 @@ parse_output_format(const char *format_str, OutputFormat &format) -> bool
     format = OutputFormat::TXT;
   } else if (fmt == "obj") {
     format = OutputFormat::OBJ;
+  } else if (fmt == "geojson" || fmt == "json") {
+    format = OutputFormat::GEOJSON;
   } else {
     return false;
   }

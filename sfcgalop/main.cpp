@@ -98,7 +98,7 @@ print_help()
       {"-b, --geom-b=ARG", "Source for geometry B (WKT, WKB, file, stdin)"});
   options_table.add_row(
       {"-f, --format=ARG",
-       "Output format: wkt, wkb, txt/ewkt, obj (default: wkt)"});
+       "Output format: wkt, wkb, txt/ewkt, obj, geojson/json (default: wkt)"});
   options_table.add_row(
       {"-p, --precision=N", "Decimal precision for output (default: 6)"});
   options_table.add_row({""});
@@ -450,6 +450,9 @@ handle_geometry_display(const Options &options) -> bool
       break;
     case OutputFormat::OBJ:
       std::cout << "OBJ";
+      break;
+    case OutputFormat::GEOJSON:
+      std::cout << "GEOJSON";
       break;
     }
     std::cout << TextUI::Colors::RESET << "\n\n";
